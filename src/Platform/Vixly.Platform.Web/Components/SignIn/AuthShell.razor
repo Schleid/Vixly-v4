@@ -44,42 +44,60 @@ IMPORTANT NOTES:
                     <h2 class="vx-auth__showcase-title">@T["ui.auth.headline"]</h2>
                     <p class="vx-auth__showcase-desc">@T["ui.auth.description"]</p>
                 </div>
-                <div class="vx-auth__pillars" role="list">
-                    <div class="vx-auth__pillar" role="listitem">
-                        <div class="vx-auth__pillar-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M10 11v2M14 11v2M10 17v2M14 17v2" />
-                            </svg>
+                <div class="vx-auth__telemetry" role="region" aria-label="@T["ui.auth.telemetry.badge"]">
+                    <div class="vx-auth__telemetry-header">
+                        <span class="vx-auth__telemetry-dot" aria-hidden="true"></span>
+                        <span class="vx-auth__telemetry-badge">@T["ui.auth.telemetry.badge"]</span>
+                    </div>
+                    <div class="vx-auth__telemetry-grid">
+                        <div class="vx-auth__telemetry-item">
+                            <div class="vx-auth__telemetry-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                    <path d="M9 12l2 2 4-4" />
+                                </svg>
+                            </div>
+                            <div class="vx-auth__telemetry-text">
+                                <div class="vx-auth__telemetry-title">@T["ui.auth.telemetry.p1_title"]</div>
+                                <div class="vx-auth__telemetry-desc">@T["ui.auth.telemetry.p1_desc"]</div>
+                            </div>
                         </div>
-                        <div class="vx-auth__pillar-text">
-                            <div class="vx-auth__pillar-title">@T["ui.auth.pillar.tenants.title"]</div>
-                            <div class="vx-auth__pillar-desc">@T["ui.auth.pillar.tenants.desc"]</div>
+                        <div class="vx-auth__telemetry-item">
+                            <div class="vx-auth__telemetry-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
+                                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
+                                    <line x1="6" y1="6" x2="6.01" y2="6" />
+                                    <line x1="6" y1="18" x2="6.01" y2="18" />
+                                </svg>
+                            </div>
+                            <div class="vx-auth__telemetry-text">
+                                <div class="vx-auth__telemetry-title">@T["ui.auth.telemetry.p2_title"]</div>
+                                <div class="vx-auth__telemetry-desc">@T["ui.auth.telemetry.p2_desc"]</div>
+                            </div>
+                        </div>
+                        <div class="vx-auth__telemetry-item">
+                            <div class="vx-auth__telemetry-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                                </svg>
+                            </div>
+                            <div class="vx-auth__telemetry-text">
+                                <div class="vx-auth__telemetry-title">@T["ui.auth.telemetry.p3_title"]</div>
+                                <div class="vx-auth__telemetry-desc">@T["ui.auth.telemetry.p3_desc"]</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="vx-auth__pillar" role="listitem">
-                        <div class="vx-auth__pillar-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                            </svg>
-                        </div>
-                        <div class="vx-auth__pillar-text">
-                            <div class="vx-auth__pillar-title">@T["ui.auth.pillar.licensing.title"]</div>
-                            <div class="vx-auth__pillar-desc">@T["ui.auth.pillar.licensing.desc"]</div>
-                        </div>
+                    <div class="vx-auth__telemetry-footer">
+                        <span>@T["ui.auth.telemetry.footer"]</span>
                     </div>
-                    <div class="vx-auth__pillar" role="listitem">
-                        <div class="vx-auth__pillar-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2" y="4" width="20" height="16" rx="2" />
-                                <line x1="2" y1="10" x2="22" y2="10" />
-                            </svg>
-                        </div>
-                        <div class="vx-auth__pillar-text">
-                            <div class="vx-auth__pillar-title">@T["ui.auth.pillar.billing.title"]</div>
-                            <div class="vx-auth__pillar-desc">@T["ui.auth.pillar.billing.desc"]</div>
-                        </div>
-                    </div>
+                </div>
+                <div class="vx-auth__compliance">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                    <span>@T["ui.auth.compliance"]</span>
                 </div>
             </div>
         </aside>

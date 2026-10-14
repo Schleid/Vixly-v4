@@ -2958,43 +2958,55 @@ Vixly</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.auth.badge" xml:space="preserve">
-    <value>PLANO DE CONTROL</value>
+    <value>PANEL DE CONTROL</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.auth.headline" xml:space="preserve">
-    <value>Administración de plataforma para el ecosistema Vixly.</value>
+    <value>Gobernanza de plataforma e infraestructura operativa</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.auth.description" xml:space="preserve">
-    <value>Administre de forma segura los inquilinos, suscripciones, licencias, usuarios y la infraestructura operativa desde un centro de control ejecutivo.</value>
+    <value>Administración unificada de inquilinos empresariales, licencias, políticas de acceso e infraestructura distribuida.</value>
     <comment>needs-review</comment>
   </data>
-  <data name="ui.auth.pillar.tenants.title" xml:space="preserve">
-    <value>Control de inquilinos</value>
+  <data name="ui.auth.telemetry.badge" xml:space="preserve">
+    <value>ENTORNO ZERO-TRUST</value>
     <comment>needs-review</comment>
   </data>
-  <data name="ui.auth.pillar.tenants.desc" xml:space="preserve">
-    <value>Gestione la integración, el acceso y el estado de la plataforma.</value>
+  <data name="ui.auth.telemetry.p1_title" xml:space="preserve">
+    <value>Gobernanza de identidad y acceso</value>
     <comment>needs-review</comment>
   </data>
-  <data name="ui.auth.pillar.licensing.title" xml:space="preserve">
-    <value>Licenciamiento</value>
+  <data name="ui.auth.telemetry.p1_desc" xml:space="preserve">
+    <value>Claves de acceso WebAuthn, tokens de hardware y delegación dinámica de roles.</value>
     <comment>needs-review</comment>
   </data>
-  <data name="ui.auth.pillar.licensing.desc" xml:space="preserve">
-    <value>Supervise el acceso a nivel de suscripciones y dispositivos.</value>
+  <data name="ui.auth.telemetry.p2_title" xml:space="preserve">
+    <value>Aislamiento y federación de inquilinos</value>
     <comment>needs-review</comment>
   </data>
-  <data name="ui.auth.pillar.billing.title" xml:space="preserve">
-    <value>Facturación</value>
+  <data name="ui.auth.telemetry.p2_desc" xml:space="preserve">
+    <value>Planos de datos particionados con mensajería de buzón de salida aislada.</value>
     <comment>needs-review</comment>
   </data>
-  <data name="ui.auth.pillar.billing.desc" xml:space="preserve">
-    <value>Gestione la facturación de la plataforma y los flujos de trabajo administrativos.</value>
+  <data name="ui.auth.telemetry.p3_title" xml:space="preserve">
+    <value>Registro de auditoría inmutable</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.telemetry.p3_desc" xml:space="preserve">
+    <value>Flujo continuo de eventos operativos con no repudio.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.telemetry.footer" xml:space="preserve">
+    <value>Estado: Operativo · Latencia: 14ms · Malla global</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.compliance" xml:space="preserve">
+    <value>Conforme a SOC2 Type II y FedRAMP · Grado Empresarial</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.auth.form_badge" xml:space="preserve">
-    <value>ACCESO SEGURO A LA PLATAFORMA</value>
+    <value>PASARELA DE ACCESO SEGURO</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.auth.welcome_back" xml:space="preserve">
@@ -3002,11 +3014,11 @@ Vixly</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.auth.signin_subtitle" xml:space="preserve">
-    <value>Inicie sesión con sus credenciales de personal para continuar al panel de control de Vixly.</value>
+    <value>Ingrese sus credenciales de plataforma para acceder a los sistemas administrativos.</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.auth.email_placeholder" xml:space="preserve">
-    <value>Ingrese su dirección de correo electrónico</value>
+    <value>admin@vixly.ltd</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.auth.password_placeholder" xml:space="preserve">
@@ -3014,7 +3026,7 @@ Vixly</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.auth.signin_button" xml:space="preserve">
-    <value>Iniciar sesión en el plano de control</value>
+    <value>Iniciar sesión en el panel de control</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.auth.authorized_only" xml:space="preserve">
@@ -3843,6 +3855,2570 @@ Vixly</value>
   </data>
   <data name="ui.verify.use_recovery" xml:space="preserve">
     <value>Usar un código de recuperación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.code_invalid" xml:space="preserve">
+    <value>Use de {minLength} a {maxLength} caracteres: letras, dígitos, guiones o guiones bajos, empezando por una letra o un dígito.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.code_taken" xml:space="preserve">
+    <value>Otro plan ya usa este código.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.name_required" xml:space="preserve">
+    <value>Escriba un nombre.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.name_too_long" xml:space="preserve">
+    <value>Use como máximo {maxLength} caracteres para el nombre.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.description_too_long" xml:space="preserve">
+    <value>Use como máximo {maxLength} caracteres para la descripción.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.english_name_required" xml:space="preserve">
+    <value>El plan necesita un nombre en inglés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.currency_invalid" xml:space="preserve">
+    <value>Elija un código de moneda válido, como USD, CAD o EUR.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.currency_fixed" xml:space="preserve">
+    <value>La moneda no puede cambiar una vez publicada una versión.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.price_invalid" xml:space="preserve">
+    <value>Los precios deben ser cero o más, con como máximo 4 decimales.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.price_required" xml:space="preserve">
+    <value>Indique un precio mensual o anual antes de publicar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.minimum_licences_invalid" xml:space="preserve">
+    <value>El número mínimo de licencias debe estar entre 1 y {maxCount}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.trial_days_invalid" xml:space="preserve">
+    <value>Una prueba dura de 1 a {maxCount} días; déjelo vacío para no ofrecerla.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.limit_invalid" xml:space="preserve">
+    <value>Los límites deben estar entre 0 y {maxCount}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.minimum_above_device_limit" xml:space="preserve">
+    <value>El número mínimo de licencias no puede superar el límite de dispositivos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.feature_invalid" xml:space="preserve">
+    <value>Una de las funciones no se reconoce.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.display_order_invalid" xml:space="preserve">
+    <value>El orden de visualización debe estar entre 0 y {maxCount}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.no_draft" xml:space="preserve">
+    <value>Este plan no tiene una versión en borrador.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.draft_exists" xml:space="preserve">
+    <value>Este plan ya tiene una versión en borrador.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.nothing_published" xml:space="preserve">
+    <value>Publique una primera versión antes de hacer esto.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.already_retired" xml:space="preserve">
+    <value>Este plan ya está retirado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.not_retired" xml:space="preserve">
+    <value>Este plan no está retirado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.retired" xml:space="preserve">
+    <value>Este plan está retirado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.version_not_found" xml:space="preserve">
+    <value>Esa versión del plan ya no existe.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.actor_required" xml:space="preserve">
+    <value>Se necesita una persona con sesión iniciada para este cambio.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.tenant_required" xml:space="preserve">
+    <value>Se requiere un inquilino.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.actor_required" xml:space="preserve">
+    <value>Se necesita una persona con sesión iniciada para este cambio.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.already_subscribed" xml:space="preserve">
+    <value>Este inquilino ya tiene una suscripción vigente.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.no_subscription" xml:space="preserve">
+    <value>Este inquilino no tiene una suscripción vigente.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.plan_not_available" xml:space="preserve">
+    <value>Ese plan no se puede elegir.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.term_not_offered" xml:space="preserve">
+    <value>Ese plan no se ofrece con este periodo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.term_invalid" xml:space="preserve">
+    <value>Elija mensual o anual.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.trial_not_offered" xml:space="preserve">
+    <value>Ese plan no ofrece prueba.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.below_minimum" xml:space="preserve">
+    <value>Este plan requiere al menos {minimum} licencias.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.above_limit" xml:space="preserve">
+    <value>Este inquilino puede tener como máximo {maximum} licencias en este plan.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.below_active_licences" xml:space="preserve">
+    <value>Hay {active} licencias en uso; libere algunas antes de bajar más.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.nothing_to_change" xml:space="preserve">
+    <value>No cambiaría nada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.no_scheduled_change" xml:space="preserve">
+    <value>No hay ningún cambio programado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.not_trialing" xml:space="preserve">
+    <value>Esta suscripción no está en prueba.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.trial_end_invalid" xml:space="preserve">
+    <value>Elija un fin de prueba futuro, como máximo dentro de un año.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.not_awaiting_payment" xml:space="preserve">
+    <value>Esta suscripción no está esperando un pago.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.cancellation_already_requested" xml:space="preserve">
+    <value>Ya se solicitó la cancelación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.no_cancellation_requested" xml:space="preserve">
+    <value>No se ha solicitado ninguna cancelación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.ended" xml:space="preserve">
+    <value>Esta suscripción ha terminado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.not_allowed_in_status" xml:space="preserve">
+    <value>Esta suscripción no puede hacer eso en su estado actual.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.reason_required" xml:space="preserve">
+    <value>Indique un motivo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.reason_too_long" xml:space="preserve">
+    <value>Use como máximo {maxLength} caracteres para el motivo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.licences_invalid" xml:space="preserve">
+    <value>El número de licencias debe estar entre 1 y {maxCount}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.override_value_invalid" xml:space="preserve">
+    <value>El valor debe estar entre 0 y {maxCount}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.override_end_invalid" xml:space="preserve">
+    <value>Elija una fecha de fin futura, o ninguna.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.override_limit_invalid" xml:space="preserve">
+    <value>Ese límite no se reconoce.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.override_closed" xml:space="preserve">
+    <value>Esta excepción ya se retiró.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.plan_already_chosen" xml:space="preserve">
+    <value>Ya se eligió un plan para este registro.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.plans.created" xml:space="preserve">
+    <value>Plan creado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.plans.draft_updated" xml:space="preserve">
+    <value>Borrador del plan modificado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.plans.translation_set" xml:space="preserve">
+    <value>Traducción del plan definida</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.plans.catalogue_set" xml:space="preserve">
+    <value>Ajustes de catálogo del plan cambiados</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.plans.version_published" xml:space="preserve">
+    <value>Versión del plan publicada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.plans.draft_started" xml:space="preserve">
+    <value>Borrador del plan iniciado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.plans.draft_discarded" xml:space="preserve">
+    <value>Borrador del plan descartado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.plans.retired" xml:space="preserve">
+    <value>Plan retirado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.plans.reactivated" xml:space="preserve">
+    <value>Plan reactivado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.started" xml:space="preserve">
+    <value>Suscripción iniciada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.changed" xml:space="preserve">
+    <value>Suscripción modificada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.change_scheduled" xml:space="preserve">
+    <value>Cambio de suscripción programado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.scheduled_change_cancelled" xml:space="preserve">
+    <value>Cambio programado cancelado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.trial_extended" xml:space="preserve">
+    <value>Prueba ampliada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.trial_ended" xml:space="preserve">
+    <value>Prueba terminada por el personal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.trial_expired" xml:space="preserve">
+    <value>Prueba vencida</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.cancellation_requested" xml:space="preserve">
+    <value>Cancelación de la suscripción solicitada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.resumed" xml:space="preserve">
+    <value>Suscripción reanudada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.ended" xml:space="preserve">
+    <value>Suscripción terminada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.offline_payment_recorded" xml:space="preserve">
+    <value>Pago fuera de línea registrado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.renewed" xml:space="preserve">
+    <value>Suscripción renovada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.suspended_with_tenant" xml:space="preserve">
+    <value>Suscripción suspendida con el inquilino</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.restored_with_tenant" xml:space="preserve">
+    <value>Suscripción restablecida con el inquilino</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.ended_with_tenant" xml:space="preserve">
+    <value>Suscripción terminada con el inquilino</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.override_set" xml:space="preserve">
+    <value>Excepción de límite definida</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.override_removed" xml:space="preserve">
+    <value>Excepción de límite retirada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.registrations.plan_chosen" xml:space="preserve">
+    <value>Plan elegido en el registro</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.plans.view" xml:space="preserve">
+    <value>Ver los planes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.plans.manage" xml:space="preserve">
+    <value>Gestionar los planes (borradores, traducciones, retiro)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.plans.publish" xml:space="preserve">
+    <value>Publicar versiones de plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.subscriptions.view" xml:space="preserve">
+    <value>Ver las suscripciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.subscriptions.manage" xml:space="preserve">
+    <value>Gestionar las suscripciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.subscriptions.override_limits" xml:space="preserve">
+    <value>Hacer excepciones a los límites de un inquilino</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.plans" xml:space="preserve">
+    <value>Planes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.subscriptions" xml:space="preserve">
+    <value>Suscripciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.started_trial" xml:space="preserve">
+    <value>Prueba {term} iniciada en {plan} (versión {version}), {licences} licencias, hasta el {trialEnds}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.started_awaiting_payment" xml:space="preserve">
+    <value>Iniciada en {plan} (versión {version}), {term}, {licences} licencias; esperando el pago</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.activated" xml:space="preserve">
+    <value>Pago recibido; el periodo dura hasta el {periodEnd}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.offline_payment_recorded" xml:space="preserve">
+    <value>Pago fuera de línea registrado; el periodo dura hasta el {periodEnd}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.trial_extended" xml:space="preserve">
+    <value>Prueba ampliada del {from} al {to}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.trial_ended" xml:space="preserve">
+    <value>Prueba terminada; esperando el pago</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.trial_expired" xml:space="preserve">
+    <value>Periodo de prueba vencido; esperando el pago</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.changed" xml:space="preserve">
+    <value>Cambio de {fromPlan} a {plan}, {term}, {licences} licencias; cobrado ahora {charge}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.change_scheduled" xml:space="preserve">
+    <value>Cambio a {plan}, {term}, {licences} licencias programado para el {effective}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.scheduled_change_cancelled" xml:space="preserve">
+    <value>Cambio programado cancelado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.renewed" xml:space="preserve">
+    <value>Renovada en {plan} (versión {version}), {term}, {licences} licencias, hasta el {periodEnd}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.cancellation_requested" xml:space="preserve">
+    <value>Cancelación solicitada; termina el {effective}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.resumed" xml:space="preserve">
+    <value>Cancelación retirada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.ended" xml:space="preserve">
+    <value>Terminada: {endReason}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.suspended_with_tenant" xml:space="preserve">
+    <value>Suspendida porque se suspendió al inquilino</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.restored_with_tenant" xml:space="preserve">
+    <value>Restablecida porque se reactivó al inquilino</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.title" xml:space="preserve">
+    <value>Planes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.new" xml:space="preserve">
+    <value>Nuevo plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.back" xml:space="preserve">
+    <value>Volver a los planes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.search" xml:space="preserve">
+    <value>Buscar por nombre o código</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.status" xml:space="preserve">
+    <value>Estado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.status.all" xml:space="preserve">
+    <value>Todos los estados</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.status.active" xml:space="preserve">
+    <value>Activo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.status.retired" xml:space="preserve">
+    <value>Retirado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.count" xml:space="preserve">
+    <value>Planes: {count}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.empty" xml:space="preserve">
+    <value>Ningún plan coincide con estos filtros.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.name" xml:space="preserve">
+    <value>Nombre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.code" xml:space="preserve">
+    <value>Código</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.code_help" xml:space="preserve">
+    <value>Letras, dígitos, guiones o guiones bajos. El código no podrá cambiar después.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.description" xml:space="preserve">
+    <value>Descripción</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.currency" xml:space="preserve">
+    <value>Moneda</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.currency_help" xml:space="preserve">
+    <value>Código de tres letras, como USD, CAD o EUR. Una moneda por plan; no puede cambiar una vez publicada una versión.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.create" xml:space="preserve">
+    <value>Crear el plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.version" xml:space="preserve">
+    <value>Versión</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.version_number" xml:space="preserve">
+    <value>Versión {number}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.not_published" xml:space="preserve">
+    <value>Aún no publicado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.has_draft" xml:space="preserve">
+    <value>Borrador</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.monthly_price" xml:space="preserve">
+    <value>Precio mensual por licencia</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.annual_price" xml:space="preserve">
+    <value>Precio anual por licencia</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.setup_fee" xml:space="preserve">
+    <value>Tarifa de alta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.minimum_licences" xml:space="preserve">
+    <value>Licencias mínimas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.trial_days" xml:space="preserve">
+    <value>Días de prueba</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.trial_help" xml:space="preserve">
+    <value>Déjelo vacío para no ofrecer prueba. Una prueba no requiere pago y termina cuando el inquilino paga o se acaban los días.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.public" xml:space="preserve">
+    <value>Público</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.public_help" xml:space="preserve">
+    <value>Mostrar este plan en el catálogo público para el registro autónomo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.is_public" xml:space="preserve">
+    <value>Se muestra en el catálogo público.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.is_private" xml:space="preserve">
+    <value>No se muestra en el catálogo público.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.display_order" xml:space="preserve">
+    <value>Orden en el catálogo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.save_catalogue" xml:space="preserve">
+    <value>Guardar los ajustes del catálogo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.subscribers" xml:space="preserve">
+    <value>Suscriptores</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.overview" xml:space="preserve">
+    <value>Resumen</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.retire" xml:space="preserve">
+    <value>Retirar el plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.reactivate" xml:space="preserve">
+    <value>Reactivar el plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.retired" xml:space="preserve">
+    <value>Plan retirado. Las suscripciones existentes lo conservan.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.reactivated" xml:space="preserve">
+    <value>Plan reactivado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.catalogue_saved" xml:space="preserve">
+    <value>Ajustes del catálogo guardados.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.translations" xml:space="preserve">
+    <value>Nombres y descripciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.save_translation" xml:space="preserve">
+    <value>Guardar este idioma</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.translation_saved" xml:space="preserve">
+    <value>Traducción guardada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.draft" xml:space="preserve">
+    <value>Versión borrador</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.draft_help" xml:space="preserve">
+    <value>Está editando la versión {number}. Publicarla nunca cambia el periodo en curso de un suscriptor: los suscriptores pasan a ella al renovar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.no_draft" xml:space="preserve">
+    <value>No hay borrador. Inicie uno para cambiar precios, límites o funciones.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.start_draft" xml:space="preserve">
+    <value>Iniciar un borrador</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.draft_started" xml:space="preserve">
+    <value>Borrador iniciado a partir de la versión publicada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.prices" xml:space="preserve">
+    <value>Precios</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.prices_help" xml:space="preserve">
+    <value>Precios sin impuestos. Ponga 0 para no ofrecer un plazo; al menos un plazo necesita precio.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.limits" xml:space="preserve">
+    <value>Límites</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.limit.max_licensed_devices" xml:space="preserve">
+    <value>Dispositivos con licencia</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.limit.max_warehouses" xml:space="preserve">
+    <value>Almacenes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.features" xml:space="preserve">
+    <value>Funciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.feature.homepage_content_customization" xml:space="preserve">
+    <value>Personalización del contenido de la página de inicio</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.feature.portal_theme_customization" xml:space="preserve">
+    <value>Personalización del tema del portal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.feature.custom_domain" xml:space="preserve">
+    <value>Dominio propio</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.feature.white_label_portal" xml:space="preserve">
+    <value>Portal de marca blanca</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.feature.advanced_analytics" xml:space="preserve">
+    <value>Análisis avanzados</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.feature.data_export" xml:space="preserve">
+    <value>Exportación de datos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.save_draft" xml:space="preserve">
+    <value>Guardar el borrador</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.draft_saved" xml:space="preserve">
+    <value>Borrador guardado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.publish" xml:space="preserve">
+    <value>Publicar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.published" xml:space="preserve">
+    <value>Versión publicada. Los suscriptores pasarán a ella en su próxima renovación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.discard_draft" xml:space="preserve">
+    <value>Descartar el borrador</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.draft_discarded" xml:space="preserve">
+    <value>Borrador descartado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.preview_price" xml:space="preserve">
+    <value>Ver el precio</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.preview_result" xml:space="preserve">
+    <value>Versión publicada, por periodo: {amount} (sin impuestos)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.versions" xml:space="preserve">
+    <value>Versiones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.no_versions" xml:space="preserve">
+    <value>Aún no hay versiones.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.version_status.draft" xml:space="preserve">
+    <value>Borrador</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.version_status.published" xml:space="preserve">
+    <value>Publicada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.version_status.superseded" xml:space="preserve">
+    <value>Reemplazada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.published_on" xml:space="preserve">
+    <value>Publicada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.published_by" xml:space="preserve">
+    <value>{time} por {name}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.title" xml:space="preserve">
+    <value>Suscripciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.section" xml:space="preserve">
+    <value>Suscripción</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.search" xml:space="preserve">
+    <value>Buscar por nombre o código de inquilino</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.status" xml:space="preserve">
+    <value>Estado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.status.all" xml:space="preserve">
+    <value>Todos los estados vigentes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.status.trialing" xml:space="preserve">
+    <value>Prueba</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.status.pending_payment" xml:space="preserve">
+    <value>Pago pendiente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.status.active" xml:space="preserve">
+    <value>Activa</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.status.past_due" xml:space="preserve">
+    <value>Pago vencido</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.status.suspended" xml:space="preserve">
+    <value>Suspendida</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.status.ended" xml:space="preserve">
+    <value>Terminada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.renews_within" xml:space="preserve">
+    <value>Se renueva en</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.renews_any" xml:space="preserve">
+    <value>Cualquier fecha</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.days" xml:space="preserve">
+    <value>{count} días</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.include_ended" xml:space="preserve">
+    <value>Incluir las suscripciones terminadas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.all_plans" xml:space="preserve">
+    <value>Todos los planes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.count" xml:space="preserve">
+    <value>Suscripciones: {count}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.empty" xml:space="preserve">
+    <value>Ninguna suscripción coincide con estos filtros.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.tenant" xml:space="preserve">
+    <value>Inquilino</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.plan" xml:space="preserve">
+    <value>Plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.term" xml:space="preserve">
+    <value>Plazo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.term.monthly" xml:space="preserve">
+    <value>Mensual</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.term.annual" xml:space="preserve">
+    <value>Anual</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.licences" xml:space="preserve">
+    <value>Licencias</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.period_amount" xml:space="preserve">
+    <value>Importe por periodo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.next_period_amount" xml:space="preserve">
+    <value>Próximo periodo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.price_per_licence" xml:space="preserve">
+    <value>Precio por licencia</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.renews" xml:space="preserve">
+    <value>Renovación o fin de prueba</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.notes" xml:space="preserve">
+    <value>Notas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.cancels_at_period_end" xml:space="preserve">
+    <value>Se cancela al final del periodo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.change_scheduled" xml:space="preserve">
+    <value>Cambio programado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.none" xml:space="preserve">
+    <value>Este inquilino no tiene una suscripción vigente.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.start" xml:space="preserve">
+    <value>Iniciar una suscripción</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.started" xml:space="preserve">
+    <value>Suscripción iniciada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.change" xml:space="preserve">
+    <value>Cambiar plan, plazo o licencias</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.changed" xml:space="preserve">
+    <value>Cambio aplicado o programado, como se mostró en la vista previa.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.cancel_scheduled" xml:space="preserve">
+    <value>Cancelar el cambio programado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.scheduled_cancelled" xml:space="preserve">
+    <value>Cambio programado cancelado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.choose_plan" xml:space="preserve">
+    <value>Elija un plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.plan_option" xml:space="preserve">
+    <value>{name}: {monthly} al mes, {annual} al año, por licencia</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.licences_range" xml:space="preserve">
+    <value>Entre {min} y {max} licencias.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.start_trial" xml:space="preserve">
+    <value>Empezar con la prueba de {days} días</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.preview" xml:space="preserve">
+    <value>Vista previa</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.confirm" xml:space="preserve">
+    <value>Confirmar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.quote_now" xml:space="preserve">
+    <value>Se aplica ahora (mejora).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.quote_at_renewal" xml:space="preserve">
+    <value>Se aplica al renovar, el {date}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.quote_charge" xml:space="preserve">
+    <value>Cobro ahora: {amount} (sin impuestos)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.quote_next" xml:space="preserve">
+    <value>Próximo periodo: {amount} (sin impuestos)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.quote_ends_trial" xml:space="preserve">
+    <value>Esto termina la prueba.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.newer_version" xml:space="preserve">
+    <value>Una versión más reciente se aplica al renovar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.since" xml:space="preserve">
+    <value>desde {time}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.access" xml:space="preserve">
+    <value>Acceso</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.access.none" xml:space="preserve">
+    <value>Sin acceso</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.access.read_only" xml:space="preserve">
+    <value>Solo lectura</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.access.full" xml:space="preserve">
+    <value>Completo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.licences_used" xml:space="preserve">
+    <value>{active} activas de {total}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.setup_fee_charged" xml:space="preserve">
+    <value>cobrada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.setup_fee_due" xml:space="preserve">
+    <value>aún no cobrada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.trial_ends" xml:space="preserve">
+    <value>Fin de la prueba</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.period" xml:space="preserve">
+    <value>Periodo en curso</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.period_range" xml:space="preserve">
+    <value>del {from} al {to}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.cancels_on" xml:space="preserve">
+    <value>Esta suscripción termina el {date} salvo que se reanude.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.scheduled_change" xml:space="preserve">
+    <value>El {date}: {plan}, {term}, {licences} licencias, {amount} por periodo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.actions" xml:space="preserve">
+    <value>Acciones de la suscripción</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.no_actions" xml:space="preserve">
+    <value>No tiene acciones de suscripción disponibles.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.resume" xml:space="preserve">
+    <value>Retirar la cancelación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.resumed" xml:space="preserve">
+    <value>Cancelación retirada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.action.cancel" xml:space="preserve">
+    <value>Cancelar al final del periodo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.action.endnow" xml:space="preserve">
+    <value>Terminar ahora</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.action.recordpayment" xml:space="preserve">
+    <value>Registrar un pago fuera de línea</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.action.extendtrial" xml:space="preserve">
+    <value>Ampliar la prueba</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.action.endtrial" xml:space="preserve">
+    <value>Terminar la prueba</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.help.cancel" xml:space="preserve">
+    <value>El inquilino conserva el acceso hasta el final del periodo pagado y luego la suscripción termina.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.help.endnow" xml:space="preserve">
+    <value>La suscripción termina de inmediato y el inquilino pierde el acceso. No se puede deshacer.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.help.recordpayment" xml:space="preserve">
+    <value>Registre un pago recibido fuera de Vixly, como una transferencia. El periodo empieza ahora.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.help.extendtrial" xml:space="preserve">
+    <value>Elija el nuevo último día de la prueba.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.help.endtrial" xml:space="preserve">
+    <value>La prueba termina ahora y la suscripción queda a la espera del pago.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.done.cancel" xml:space="preserve">
+    <value>Cancelación registrada; surte efecto al final del periodo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.done.endnow" xml:space="preserve">
+    <value>Suscripción terminada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.done.recordpayment" xml:space="preserve">
+    <value>Pago registrado; la suscripción está activa.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.done.extendtrial" xml:space="preserve">
+    <value>Prueba ampliada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.done.endtrial" xml:space="preserve">
+    <value>Prueba terminada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.trial_title" xml:space="preserve">
+    <value>Prueba hasta el {date}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.trial_new_end" xml:space="preserve">
+    <value>Nuevo último día</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.end_reason.cancelled" xml:space="preserve">
+    <value>cancelada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.end_reason.ended_by_staff" xml:space="preserve">
+    <value>terminada por el personal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.end_reason.tenant_closed" xml:space="preserve">
+    <value>inquilino cerrado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.end_reason.replaced" xml:space="preserve">
+    <value>reemplazada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.limits" xml:space="preserve">
+    <value>Límites</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.limit" xml:space="preserve">
+    <value>Límite</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.plan_value" xml:space="preserve">
+    <value>Plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.effective_value" xml:space="preserve">
+    <value>Vigente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.override" xml:space="preserve">
+    <value>Excepción</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.override_detail" xml:space="preserve">
+    <value>{value} hasta {until}, fijada por {name}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.no_end" xml:space="preserve">
+    <value>que se quite</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.set_override" xml:space="preserve">
+    <value>Fijar una excepción</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.remove_override" xml:space="preserve">
+    <value>Quitar la excepción</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.remove_override_help" xml:space="preserve">
+    <value>El límite del plan vuelve a aplicarse de inmediato.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.override_for" xml:space="preserve">
+    <value>Excepción para {limit}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.override_value" xml:space="preserve">
+    <value>Valor</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.override_ends" xml:space="preserve">
+    <value>Último día (opcional)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.override_ends_help" xml:space="preserve">
+    <value>Déjelo vacío para mantener la excepción hasta que se quite.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.override_saved" xml:space="preserve">
+    <value>Excepción guardada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.override_removed" xml:space="preserve">
+    <value>Excepción quitada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.history" xml:space="preserve">
+    <value>Historial de la suscripción</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.history_empty" xml:space="preserve">
+    <value>Aún no hay historial de suscripción.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.price_increase.subject" xml:space="preserve">
+    <value>Su precio de Vixly para {plan} cambia</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.price_increase.body" xml:space="preserve">
+    <value>Hola {name}:
+
+El precio del plan {plan} que usa {company} cambia.
+
+Su importe {term} pasa de {current} a {new} (sin impuestos) en su próxima renovación, el {date}. Su periodo en curso no se ve afectado.
+
+¿Preguntas? Escríbanos a {support}.
+
+Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.tenant_cannot_subscribe" xml:space="preserve">
+    <value>Este inquilino no puede iniciar una suscripción en su estado actual. Reactive primero a un inquilino suspendido o desactivado; un inquilino vetado no puede suscribirse.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.start_blocked.suspended" xml:space="preserve">
+    <value>El inquilino está suspendido. Reactívelo antes de iniciar una suscripción.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.start_blocked.deactivated" xml:space="preserve">
+    <value>El inquilino está desactivado. Reactívelo antes de iniciar una suscripción.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.start_blocked.banned" xml:space="preserve">
+    <value>El inquilino está vetado y no podrá volver a suscribirse.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.kind_invalid" xml:space="preserve">
+    <value>Elija un porcentaje o un importe fijo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.percent_invalid" xml:space="preserve">
+    <value>Un descuento porcentual debe ser mayor que 0 y como máximo 100, con hasta dos decimales.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.amount_invalid" xml:space="preserve">
+    <value>Un descuento fijo debe ser mayor que 0, con hasta dos decimales.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.duration_invalid" xml:space="preserve">
+    <value>Elija cuánto dura el descuento: un número de periodos, hasta una fecha o sin fin.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.periods_invalid" xml:space="preserve">
+    <value>El número de periodos debe estar entre 1 y {max}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.end_date_invalid" xml:space="preserve">
+    <value>La fecha de fin debe ser futura.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.already_pending" xml:space="preserve">
+    <value>Ya hay un descuento pendiente de aprobación para esta suscripción.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.not_pending" xml:space="preserve">
+    <value>Este descuento no está pendiente de aprobación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.no_active_discount" xml:space="preserve">
+    <value>Esta suscripción no tiene ningún descuento activo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.own_request" xml:space="preserve">
+    <value>No puede aprobar ni rechazar un descuento que usted mismo solicitó.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.not_found" xml:space="preserve">
+    <value>No se encontró el descuento.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.already_discounted" xml:space="preserve">
+    <value>Esta suscripción ya tiene un descuento. Solo puede aplicarse un descuento a la vez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.charge_description_required" xml:space="preserve">
+    <value>Describa el cargo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.charge_description_too_long" xml:space="preserve">
+    <value>La descripción puede tener como máximo {maxLength} caracteres.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.charge_not_found" xml:space="preserve">
+    <value>No se encontró el cargo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.charge_not_pending" xml:space="preserve">
+    <value>Este cargo ya se facturó o se canceló.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.discounts.setup_fee_charged" xml:space="preserve">
+    <value>La tarifa de alta ya se cobró y no puede cambiar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.sales_settings.value_invalid" xml:space="preserve">
+    <value>Uno de los valores no es válido. Los porcentajes van de 0 a 100; los importes y los días deben ser positivos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.code_invalid" xml:space="preserve">
+    <value>Use de 3 a 32 letras, dígitos o guiones para el código.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.code_taken" xml:space="preserve">
+    <value>Este código ya lo usa otra promoción.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.name_required" xml:space="preserve">
+    <value>Introduzca un nombre para la promoción.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.name_too_long" xml:space="preserve">
+    <value>El nombre es demasiado largo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.dates_invalid" xml:space="preserve">
+    <value>El fin de la validez debe ser posterior a su inicio.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.use_invalid" xml:space="preserve">
+    <value>Permita el código en el registro, por el personal o en ambos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.limit_invalid" xml:space="preserve">
+    <value>El límite de canjes debe ser al menos 1, o dejarse en blanco para no tener límite.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.not_editable" xml:space="preserve">
+    <value>Solo se puede cambiar una promoción en borrador o devuelta.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.not_pending" xml:space="preserve">
+    <value>Esta promoción no está pendiente de aprobación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.not_found" xml:space="preserve">
+    <value>No se encontró la promoción.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.not_active" xml:space="preserve">
+    <value>Este código promocional no está activo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.not_started" xml:space="preserve">
+    <value>Este código promocional aún no es válido.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.expired" xml:space="preserve">
+    <value>Este código promocional ha caducado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.not_for_plan" xml:space="preserve">
+    <value>Este código promocional no se aplica a este plan.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.not_for_term" xml:space="preserve">
+    <value>Este código promocional no se aplica a esta periodicidad.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.not_at_registration" xml:space="preserve">
+    <value>Este código promocional no se puede usar en el registro.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.not_by_staff" xml:space="preserve">
+    <value>El personal no puede aplicar este código promocional.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.used_up" xml:space="preserve">
+    <value>Este código promocional ha alcanzado el número máximo de usos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.promotions.already_used" xml:space="preserve">
+    <value>Este cliente ya usó este código promocional.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.sales.own_submission" xml:space="preserve">
+    <value>No puede decidir sobre algo que preparó usted mismo. Otro aprobador debe decidir.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.sales.reason_required" xml:space="preserve">
+    <value>Introduzca un motivo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.sales.reason_too_long" xml:space="preserve">
+    <value>El motivo es demasiado largo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.sales.actor_required" xml:space="preserve">
+    <value>No se conoce a la persona que hace este cambio.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.offers.company_required" xml:space="preserve">
+    <value>Introduzca el nombre de la empresa del cliente.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.offers.email_invalid" xml:space="preserve">
+    <value>Introduzca una dirección de correo válida o déjela en blanco.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.offers.terms_invalid" xml:space="preserve">
+    <value>El plan, la periodicidad o el número de licencias no es válido para esta oferta.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.offers.expiry_invalid" xml:space="preserve">
+    <value>La fecha de caducidad debe ser futura y estar dentro del plazo que permite el responsable de ventas.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.offers.uses_invalid" xml:space="preserve">
+    <value>El número de usos debe ser al menos 1.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.offers.not_editable" xml:space="preserve">
+    <value>Solo se puede cambiar una oferta en borrador o devuelta.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.offers.not_pending" xml:space="preserve">
+    <value>Esta oferta no está pendiente de aprobación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.offers.not_issued" xml:space="preserve">
+    <value>Este enlace de oferta no está activo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.offers.not_found" xml:space="preserve">
+    <value>No se encontró la oferta.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.offers.unavailable" xml:space="preserve">
+    <value>Este enlace de oferta ya no está disponible. Contacte con su comercial de Vixly.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.offers.email_mismatch" xml:space="preserve">
+    <value>Esta oferta está reservada para otra dirección de correo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.offers.not_revocable" xml:space="preserve">
+    <value>Esta oferta ya se usó o se revocó.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.draft_submitted" xml:space="preserve">
+    <value>Este borrador está pendiente de aprobación y no puede cambiar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.draft_not_submitted" xml:space="preserve">
+    <value>Este borrador no se ha enviado para aprobación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.own_submission" xml:space="preserve">
+    <value>No puede aprobar una versión de plan que usted mismo envió.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.plans.rejection_reason_required" xml:space="preserve">
+    <value>Indique por qué se devuelve la versión, para que ventas pueda corregirla.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.plans.version_submitted" xml:space="preserve">
+    <value>Versión de plan enviada para aprobación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.plans.version_rejected" xml:space="preserve">
+    <value>Versión de plan devuelta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.discounts.requested" xml:space="preserve">
+    <value>Descuento solicitado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.discounts.applied" xml:space="preserve">
+    <value>Descuento aplicado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.discounts.approved" xml:space="preserve">
+    <value>Descuento aprobado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.discounts.rejected" xml:space="preserve">
+    <value>Descuento rechazado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.discounts.ended" xml:space="preserve">
+    <value>Descuento finalizado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.charge_added" xml:space="preserve">
+    <value>Cargo único añadido</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.charge_cancelled" xml:space="preserve">
+    <value>Cargo único cancelado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.setup_fee_changed" xml:space="preserve">
+    <value>Tarifa de alta cambiada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.activated_nothing_due" xml:space="preserve">
+    <value>Suscripción activada sin importe a pagar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.promotions.created" xml:space="preserve">
+    <value>Promoción creada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.promotions.updated" xml:space="preserve">
+    <value>Promoción actualizada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.promotions.name_set" xml:space="preserve">
+    <value>Nombre de promoción establecido</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.promotions.submitted" xml:space="preserve">
+    <value>Promoción enviada para aprobación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.promotions.approved" xml:space="preserve">
+    <value>Promoción aprobada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.promotions.rejected" xml:space="preserve">
+    <value>Promoción devuelta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.promotions.paused" xml:space="preserve">
+    <value>Promoción pausada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.promotions.resumed" xml:space="preserve">
+    <value>Promoción reanudada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.promotions.ended" xml:space="preserve">
+    <value>Promoción finalizada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.promotions.redeemed" xml:space="preserve">
+    <value>Código promocional canjeado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.offers.prepared" xml:space="preserve">
+    <value>Oferta preparada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.offers.updated" xml:space="preserve">
+    <value>Oferta actualizada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.offers.submitted" xml:space="preserve">
+    <value>Oferta enviada para aprobación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.offers.issued" xml:space="preserve">
+    <value>Enlace de oferta emitido</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.offers.approved" xml:space="preserve">
+    <value>Oferta aprobada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.offers.rejected" xml:space="preserve">
+    <value>Oferta devuelta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.offers.revoked" xml:space="preserve">
+    <value>Oferta revocada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.offers.link_replaced" xml:space="preserve">
+    <value>Enlace de oferta sustituido</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.offers.used" xml:space="preserve">
+    <value>Enlace de oferta usado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.sales_settings.updated" xml:space="preserve">
+    <value>Límites comerciales cambiados</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.discounts.grant" xml:space="preserve">
+    <value>Conceder descuentos y aplicar códigos promocionales</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.discounts.approve" xml:space="preserve">
+    <value>Aprobar descuentos que superan los límites comerciales</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.offers.manage" xml:space="preserve">
+    <value>Preparar y gestionar enlaces de oferta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.promotions.manage" xml:space="preserve">
+    <value>Diseñar y gestionar códigos promocionales</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.promotions.approve" xml:space="preserve">
+    <value>Aprobar promociones antes de publicarlas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.subscriptions.charges" xml:space="preserve">
+    <value>Añadir cargos únicos y cambiar tarifas de alta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.sales.configure" xml:space="preserve">
+    <value>Establecer los límites comerciales</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.discounts" xml:space="preserve">
+    <value>Descuentos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.offers" xml:space="preserve">
+    <value>Ofertas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.promotions" xml:space="preserve">
+    <value>Promociones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.sales" xml:space="preserve">
+    <value>Ventas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.system.salesperson" xml:space="preserve">
+    <value>Comercial</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.system.sales_manager" xml:space="preserve">
+    <value>Responsable de ventas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.system.chief_financial_officer" xml:space="preserve">
+    <value>Director financiero</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.activated_nothing_due" xml:space="preserve">
+    <value>Activada sin importe a pagar; el periodo dura hasta el {periodEnd}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.discount_requested" xml:space="preserve">
+    <value>Descuento solicitado ({source}): {terms}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.discount_applied" xml:space="preserve">
+    <value>Descuento aplicado ({source}): {terms}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.discount_approved" xml:space="preserve">
+    <value>Descuento aprobado: {terms}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.discount_rejected" xml:space="preserve">
+    <value>Descuento rechazado: {terms}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.discount_ended" xml:space="preserve">
+    <value>Descuento finalizado: {endReason}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.charge_added" xml:space="preserve">
+    <value>Cargo único añadido: {description}, {amount} {currency}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.charge_cancelled" xml:space="preserve">
+    <value>Cargo único cancelado: {description}, {amount} {currency}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.setup_fee_changed" xml:space="preserve">
+    <value>Tarifa de alta cambiada de {from} a {to} {currency}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.end_reason.completed" xml:space="preserve">
+    <value>ha terminado su duración</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.end_reason.replaced" xml:space="preserve">
+    <value>sustituido por otro descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.end_reason.ended_by_staff" xml:space="preserve">
+    <value>finalizado por el personal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.end_reason.subscription_ended" xml:space="preserve">
+    <value>la suscripción terminó</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.approval_request.subject" xml:space="preserve">
+    <value>Vixly: aprobación necesaria ({kind})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.approval_request.body" xml:space="preserve">
+    <value>Hola {name}:
+
+{subject} espera su decisión ({kind}).
+
+Abra sus aprobaciones: {link}
+
+La persona que lo preparó no puede aprobarlo; debe decidir otro aprobador.
+
+Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.discount_ending.subject" xml:space="preserve">
+    <value>Su descuento en el plan {plan} termina</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.discount_ending.body" xml:space="preserve">
+    <value>Hola {name}:
+
+El descuento que recibe {company} en el plan {plan} termina el {date}.
+
+A partir de entonces, su importe por periodo será de {amount} (sin impuestos).
+
+¿Preguntas? Escríbanos a {support}.
+
+Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.title" xml:space="preserve">
+    <value>Aprobaciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.help" xml:space="preserve">
+    <value>Solicitudes que esperan su decisión. Abra una para aprobarla o devolverla; nadie decide sobre su propia solicitud.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.count" xml:space="preserve">
+    <value>{count} pendientes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.empty" xml:space="preserve">
+    <value>No hay nada pendiente de su aprobación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.kind" xml:space="preserve">
+    <value>Tipo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.kind.discount" xml:space="preserve">
+    <value>Descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.kind.offer" xml:space="preserve">
+    <value>Enlace de oferta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.kind.promotion" xml:space="preserve">
+    <value>Promoción</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.kind.plan_version" xml:space="preserve">
+    <value>Versión de plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.item" xml:space="preserve">
+    <value>Solicitud</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.detail" xml:space="preserve">
+    <value>Detalles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.requested_by" xml:space="preserve">
+    <value>Solicitado por</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.requested" xml:space="preserve">
+    <value>Solicitado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.reason" xml:space="preserve">
+    <value>Motivo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.reason_help" xml:space="preserve">
+    <value>Opcional al aprobar; obligatorio al devolver, para que el solicitante sepa qué cambiar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.approve" xml:space="preserve">
+    <value>Aprobar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.reject" xml:space="preserve">
+    <value>Devolver</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.decision" xml:space="preserve">
+    <value>Decisión</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.submit" xml:space="preserve">
+    <value>Enviar para aprobación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.submitted" xml:space="preserve">
+    <value>Borrador enviado para aprobación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.waiting_for_cfo" xml:space="preserve">
+    <value>Enviado el {time}; pendiente de la aprobación del director financiero. Mientras tanto, el borrador no puede cambiar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.sent_back" xml:space="preserve">
+    <value>Devuelto: {reason}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.approval" xml:space="preserve">
+    <value>Aprobación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.approval_help" xml:space="preserve">
+    <value>La versión {number} espera su aprobación. Aprobarla la publica: los nuevos suscriptores la reciben de inmediato y los actuales en su próxima renovación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.approve_publish" xml:space="preserve">
+    <value>Aprobar y publicar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.version_rejected" xml:space="preserve">
+    <value>Versión devuelta a ventas.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.title" xml:space="preserve">
+    <value>Descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.none" xml:space="preserve">
+    <value>Sin descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.terms" xml:space="preserve">
+    <value>Descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.kind" xml:space="preserve">
+    <value>Tipo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.kind.percent" xml:space="preserve">
+    <value>Porcentaje</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.kind.fixed_amount" xml:space="preserve">
+    <value>Importe fijo por periodo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.percent" xml:space="preserve">
+    <value>Porcentaje de descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.amount_in" xml:space="preserve">
+    <value>Importe ({currency})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.amount_plan_currency" xml:space="preserve">
+    <value>Importe (en la moneda de la suscripción)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.duration" xml:space="preserve">
+    <value>Duración</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.duration.periods" xml:space="preserve">
+    <value>Un número de periodos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.duration.until_date" xml:space="preserve">
+    <value>Hasta una fecha</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.duration.no_end" xml:space="preserve">
+    <value>Sin fin</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.periods" xml:space="preserve">
+    <value>Número de periodos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.periods_help" xml:space="preserve">
+    <value>Un periodo es un mes o un año, según la periodicidad de la suscripción. Un mes gratis: 100 % durante 1 periodo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.ends_on" xml:space="preserve">
+    <value>Termina el</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.ends_on_help" xml:space="preserve">
+    <value>Se aplica a los periodos que empiezan antes de esta fecha.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.percent_value" xml:space="preserve">
+    <value>{value} % de descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.fixed_value" xml:space="preserve">
+    <value>{amount} de descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.for_periods" xml:space="preserve">
+    <value>durante {count} periodo(s)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.until_date" xml:space="preserve">
+    <value>hasta el {date}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.no_end" xml:space="preserve">
+    <value>sin fin</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.source.staff" xml:space="preserve">
+    <value>concedido por el personal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.source.promotion" xml:space="preserve">
+    <value>código promocional</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.source.offer" xml:space="preserve">
+    <value>enlace de oferta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.granted_by" xml:space="preserve">
+    <value>{source}, por {name} el {time}: {reason}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.lasts_until" xml:space="preserve">
+    <value>El último periodo con descuento empieza antes del {date}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.pending" xml:space="preserve">
+    <value>Pendiente de la aprobación del responsable de ventas: {terms}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.grant" xml:space="preserve">
+    <value>Conceder un descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.replace" xml:space="preserve">
+    <value>Sustituir el descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.end" xml:space="preserve">
+    <value>Finalizar el descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.apply_promotion" xml:space="preserve">
+    <value>Aplicar un código promocional</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.promotion_code" xml:space="preserve">
+    <value>Código promocional</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.applied" xml:space="preserve">
+    <value>Descuento aplicado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.sent_for_approval" xml:space="preserve">
+    <value>Supera sus límites: el descuento se envió al responsable de ventas para su aprobación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.approved" xml:space="preserve">
+    <value>Descuento aprobado y aplicado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.rejected" xml:space="preserve">
+    <value>Descuento rechazado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.ended" xml:space="preserve">
+    <value>Descuento finalizado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.promotion_applied" xml:space="preserve">
+    <value>Código promocional aplicado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.current_period" xml:space="preserve">
+    <value>Descuento en este periodo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.before_discount" xml:space="preserve">
+    <value>{amount} antes del descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.filter" xml:space="preserve">
+    <value>Con descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.discounts.badge" xml:space="preserve">
+    <value>Descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.title" xml:space="preserve">
+    <value>Tarifa de alta y cargos únicos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.setup_fee" xml:space="preserve">
+    <value>Tarifa de alta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.setup_fee_line" xml:space="preserve">
+    <value>Tarifa de alta: {amount}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.setup_fee_plan" xml:space="preserve">
+    <value>tarifa del plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.setup_fee_custom" xml:space="preserve">
+    <value>acordada para este cliente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.setup_fee_overridden" xml:space="preserve">
+    <value>(acordada para este cliente)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.setup_fee_help" xml:space="preserve">
+    <value>Déjelo en blanco para volver a la tarifa del plan; introduzca 0 para eximirla.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.change_setup_fee" xml:space="preserve">
+    <value>Cambiar la tarifa de alta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.add" xml:space="preserve">
+    <value>Añadir un cargo único</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.description" xml:space="preserve">
+    <value>Descripción</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.amount" xml:space="preserve">
+    <value>Importe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.status" xml:space="preserve">
+    <value>Estado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.status.pending" xml:space="preserve">
+    <value>Por facturar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.status.billed" xml:space="preserve">
+    <value>Facturado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.status.cancelled" xml:space="preserve">
+    <value>Cancelado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.cancel" xml:space="preserve">
+    <value>Cancelar el cargo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.empty" xml:space="preserve">
+    <value>Sin cargos únicos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.added" xml:space="preserve">
+    <value>Cargo añadido; se facturará con la próxima factura.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.cancelled" xml:space="preserve">
+    <value>Cargo cancelado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.charges.setup_fee_changed" xml:space="preserve">
+    <value>Tarifa de alta cambiada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.common.remove" xml:space="preserve">
+    <value>Quitar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.title" xml:space="preserve">
+    <value>Promociones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.new" xml:space="preserve">
+    <value>Nueva promoción</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.back" xml:space="preserve">
+    <value>Volver a promociones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.search" xml:space="preserve">
+    <value>Buscar código o nombre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.status" xml:space="preserve">
+    <value>Estado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.status.all" xml:space="preserve">
+    <value>Todos los estados</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.status.draft" xml:space="preserve">
+    <value>Borrador</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.status.pending_approval" xml:space="preserve">
+    <value>Pendiente de aprobación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.status.active" xml:space="preserve">
+    <value>Activa</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.status.rejected" xml:space="preserve">
+    <value>Devuelta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.status.paused" xml:space="preserve">
+    <value>Pausada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.status.ended" xml:space="preserve">
+    <value>Finalizada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.count" xml:space="preserve">
+    <value>{count} promociones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.empty" xml:space="preserve">
+    <value>Aún no hay promociones.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.name" xml:space="preserve">
+    <value>Nombre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.code" xml:space="preserve">
+    <value>Código</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.code_help" xml:space="preserve">
+    <value>Lo que escriben los clientes, como PRIMAVERA25. Letras, dígitos y guiones; sin distinguir mayúsculas.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.create" xml:space="preserve">
+    <value>Crear el borrador</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.create_help" xml:space="preserve">
+    <value>La promoción empieza como borrador. Envíela para aprobación: solo se activa cuando el director financiero la aprueba.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.validity" xml:space="preserve">
+    <value>Validez</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.valid_from" xml:space="preserve">
+    <value>Válida desde</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.valid_to" xml:space="preserve">
+    <value>Válida hasta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.valid_to_help" xml:space="preserve">
+    <value>Último día en que se puede usar el código. Déjelo en blanco para que no termine.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.valid_range" xml:space="preserve">
+    <value>del {from} al {to}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.no_end" xml:space="preserve">
+    <value>sin fin</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.where" xml:space="preserve">
+    <value>Dónde se puede usar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.where.both" xml:space="preserve">
+    <value>En el registro y por el personal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.where.registration" xml:space="preserve">
+    <value>En el registro</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.where.staff" xml:space="preserve">
+    <value>Por el personal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.at_registration" xml:space="preserve">
+    <value>Los clientes pueden introducirlo en el registro</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.by_staff" xml:space="preserve">
+    <value>El personal puede aplicarlo a una suscripción existente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.redemption_limit" xml:space="preserve">
+    <value>Usos máximos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.redemption_limit_help" xml:space="preserve">
+    <value>Entre todos los clientes. Déjelo en blanco para no tener límite; cada cliente puede usar un código una vez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.redemptions" xml:space="preserve">
+    <value>Usos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.redeemed_of" xml:space="preserve">
+    <value>{count} de {limit}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.plans" xml:space="preserve">
+    <value>Planes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.plans_help" xml:space="preserve">
+    <value>Marque los planes a los que se aplica el código. Ninguno marcado significa todos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.all_plans" xml:space="preserve">
+    <value>Todos los planes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.any_term" xml:space="preserve">
+    <value>Cualquier periodicidad</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.overview" xml:space="preserve">
+    <value>Resumen</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.designed_by" xml:space="preserve">
+    <value>Diseñada por</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.waiting_for_cfo" xml:space="preserve">
+    <value>Pendiente de la aprobación del director financiero. Mientras tanto, la promoción no puede cambiar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.edit" xml:space="preserve">
+    <value>Condiciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.save" xml:space="preserve">
+    <value>Guardar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.saved" xml:space="preserve">
+    <value>Promoción guardada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.submitted" xml:space="preserve">
+    <value>Promoción enviada para aprobación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.names" xml:space="preserve">
+    <value>Nombre en cada idioma</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.name_help" xml:space="preserve">
+    <value>Se muestra a los clientes que usan el código. Déjelo en blanco para quitar una traducción.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.save_name" xml:space="preserve">
+    <value>Guardar el nombre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.name_saved" xml:space="preserve">
+    <value>Nombre guardado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.decision_help" xml:space="preserve">
+    <value>Revise las condiciones de arriba. Al aprobar, el código se puede usar desde su fecha de inicio.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.approved" xml:space="preserve">
+    <value>Promoción aprobada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.rejected" xml:space="preserve">
+    <value>Promoción devuelta.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.pause" xml:space="preserve">
+    <value>Pausar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.resume" xml:space="preserve">
+    <value>Reanudar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.end" xml:space="preserve">
+    <value>Finalizar la promoción</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.end_help" xml:space="preserve">
+    <value>Finalizar es definitivo. Los clientes que ya usaron el código conservan su descuento durante el plazo acordado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.paused" xml:space="preserve">
+    <value>Promoción pausada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.resumed" xml:space="preserve">
+    <value>Promoción reanudada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.promotions.ended" xml:space="preserve">
+    <value>Promoción finalizada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.title" xml:space="preserve">
+    <value>Enlaces de oferta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.new" xml:space="preserve">
+    <value>Nuevo enlace de oferta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.back" xml:space="preserve">
+    <value>Volver a enlaces de oferta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.search" xml:space="preserve">
+    <value>Buscar empresa o correo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.status" xml:space="preserve">
+    <value>Estado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.status.all" xml:space="preserve">
+    <value>Todos los estados</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.status.draft" xml:space="preserve">
+    <value>Borrador</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.status.pending_approval" xml:space="preserve">
+    <value>Pendiente de aprobación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.status.issued" xml:space="preserve">
+    <value>Emitido</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.status.expired" xml:space="preserve">
+    <value>Caducado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.status.rejected" xml:space="preserve">
+    <value>Devuelto</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.status.used" xml:space="preserve">
+    <value>Usado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.status.revoked" xml:space="preserve">
+    <value>Revocado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.count" xml:space="preserve">
+    <value>{count} enlaces de oferta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.empty" xml:space="preserve">
+    <value>Aún no hay enlaces de oferta.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.company" xml:space="preserve">
+    <value>Empresa</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.customer" xml:space="preserve">
+    <value>Cliente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.bound_email" xml:space="preserve">
+    <value>Reservado para el correo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.bound_email_help" xml:space="preserve">
+    <value>Opcional. Si se indica, solo esta dirección puede registrarse con el enlace.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.any_email" xml:space="preserve">
+    <value>Cualquier dirección de correo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.reason" xml:space="preserve">
+    <value>Motivo de esta oferta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.reason_help" xml:space="preserve">
+    <value>Por qué este cliente obtiene estas condiciones. El responsable de ventas lo ve al aprobar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.subscription" xml:space="preserve">
+    <value>Suscripción</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.start_trial" xml:space="preserve">
+    <value>Empezar con la prueba del plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.with_discount" xml:space="preserve">
+    <value>Incluir un descuento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.charges" xml:space="preserve">
+    <value>Tarifa de alta y cargos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.setup_fee_help" xml:space="preserve">
+    <value>Déjelo en blanco para mantener la tarifa de alta del plan; introduzca 0 para eximirla.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.plan_setup_fee" xml:space="preserve">
+    <value>La tarifa de alta del plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.link" xml:space="preserve">
+    <value>Enlace de oferta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.expires" xml:space="preserve">
+    <value>Caduca</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.expires_help" xml:space="preserve">
+    <value>Último día en que se puede usar el enlace. El responsable de ventas puede limitar este plazo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.uses_allowed" xml:space="preserve">
+    <value>Número de registros permitidos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.uses" xml:space="preserve">
+    <value>Usos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.uses_of" xml:space="preserve">
+    <value>{count} de {allowed}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.prepared_by" xml:space="preserve">
+    <value>Preparado por</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.issued" xml:space="preserve">
+    <value>Emitido</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.overview" xml:space="preserve">
+    <value>Condiciones acordadas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.create_help" xml:space="preserve">
+    <value>La oferta se guarda como borrador. Envíela desde su página: dentro de sus límites el enlace se emite al momento; si los supera, primero lo aprueba el responsable de ventas.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.prepare" xml:space="preserve">
+    <value>Guardar el borrador</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.edit" xml:space="preserve">
+    <value>Condiciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.save" xml:space="preserve">
+    <value>Guardar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.saved" xml:space="preserve">
+    <value>Oferta guardada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.submit" xml:space="preserve">
+    <value>Emitir el enlace</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.submit_help" xml:space="preserve">
+    <value>Usa las condiciones guardadas. Dentro de sus límites el enlace se emite ahora; si los supera, pasa antes por el responsable de ventas.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.submitted" xml:space="preserve">
+    <value>Hecho. Si se necesita aprobación, se ha avisado al responsable de ventas.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.waiting_for_manager" xml:space="preserve">
+    <value>Pendiente de la aprobación del responsable de ventas.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.decision_help" xml:space="preserve">
+    <value>Revise las condiciones de arriba. Al aprobar se emite el enlace; lo verá una sola vez para enviarlo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.approved" xml:space="preserve">
+    <value>Oferta aprobada y enlace emitido.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.rejected" xml:space="preserve">
+    <value>Oferta devuelta.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.link_once" xml:space="preserve">
+    <value>Copie este enlace ahora y envíelo al cliente. Solo se muestra una vez; use «Obtener un enlace nuevo» si se pierde.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.new_link" xml:space="preserve">
+    <value>Obtener un enlace nuevo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.link_replaced" xml:space="preserve">
+    <value>Enlace nuevo emitido; el anterior ya no funciona.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.revoke" xml:space="preserve">
+    <value>Revocar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.revoke_reason" xml:space="preserve">
+    <value>Por qué revocar esta oferta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.revoked" xml:space="preserve">
+    <value>Oferta revocada; el enlace ya no funciona.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.title" xml:space="preserve">
+    <value>Límites comerciales</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.help" xml:space="preserve">
+    <value>Lo que los comerciales pueden ofrecer por su cuenta. Todo lo que supere estos límites pasa al responsable de ventas. Un límite en blanco significa que todo necesita aprobación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.updated" xml:space="preserve">
+    <value>Último cambio de {name} el {time}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.discounts" xml:space="preserve">
+    <value>Descuentos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.max_percent" xml:space="preserve">
+    <value>Porcentaje máximo sin aprobación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.max_percent_help" xml:space="preserve">
+    <value>Déjelo en blanco: todo descuento porcentual necesita aprobación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.fixed_limits" xml:space="preserve">
+    <value>Importe fijo máximo sin aprobación, por moneda</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.fixed_amount" xml:space="preserve">
+    <value>Importe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.add_limit" xml:space="preserve">
+    <value>Añadir una moneda</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.fixed_limits_help" xml:space="preserve">
+    <value>Una moneda sin límite significa que todo descuento fijo en ella necesita aprobación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.no_end" xml:space="preserve">
+    <value>Los descuentos sin fin siempre necesitan aprobación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.offers" xml:space="preserve">
+    <value>Enlaces de oferta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.max_offer_days" xml:space="preserve">
+    <value>Validez máxima de un enlace de oferta, en días</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.max_offer_days_help" xml:space="preserve">
+    <value>Déjelo en blanco para no tener máximo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.customers" xml:space="preserve">
+    <value>Clientes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.notice_days" xml:space="preserve">
+    <value>Avisar a los clientes del fin de un descuento, días antes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.notice_days_help" xml:space="preserve">
+    <value>Déjelo en blanco: no se envía ningún correo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.codes_at_registration" xml:space="preserve">
+    <value>Mostrar el campo de código promocional en el registro</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.save" xml:space="preserve">
+    <value>Guardar los límites</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_settings.saved" xml:space="preserve">
+    <value>Límites comerciales guardados.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.offers.one_time_charges" xml:space="preserve">
+    <value>Cargos únicos</value>
     <comment>needs-review</comment>
   </data>
 </root>

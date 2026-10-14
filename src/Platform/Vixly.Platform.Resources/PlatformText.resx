@@ -2234,40 +2234,49 @@ Vixly</value>
     <value>CONTROL PLANE</value>
   </data>
   <data name="ui.auth.headline" xml:space="preserve">
-    <value>Platform administration for the Vixly ecosystem.</value>
+    <value>Platform Governance &amp; Operational Infrastructure</value>
   </data>
   <data name="ui.auth.description" xml:space="preserve">
-    <value>Securely manage tenants, subscriptions, licensing, platform users, and operational infrastructure from one executive control center.</value>
+    <value>Unified administration across enterprise tenants, licensing, access policies, and distributed infrastructure.</value>
   </data>
-  <data name="ui.auth.pillar.tenants.title" xml:space="preserve">
-    <value>Tenant Control</value>
+  <data name="ui.auth.telemetry.badge" xml:space="preserve">
+    <value>ZERO-TRUST ENVIRONMENT</value>
   </data>
-  <data name="ui.auth.pillar.tenants.desc" xml:space="preserve">
-    <value>Manage onboarding, access, and platform state.</value>
+  <data name="ui.auth.telemetry.p1_title" xml:space="preserve">
+    <value>Identity &amp; Access Governance</value>
   </data>
-  <data name="ui.auth.pillar.licensing.title" xml:space="preserve">
-    <value>Licensing</value>
+  <data name="ui.auth.telemetry.p1_desc" xml:space="preserve">
+    <value>WebAuthn passkeys, hardware tokens, and dynamic role delegation.</value>
   </data>
-  <data name="ui.auth.pillar.licensing.desc" xml:space="preserve">
-    <value>Monitor subscription and device-level access.</value>
+  <data name="ui.auth.telemetry.p2_title" xml:space="preserve">
+    <value>Tenant Isolation &amp; Federation</value>
   </data>
-  <data name="ui.auth.pillar.billing.title" xml:space="preserve">
-    <value>Billing</value>
+  <data name="ui.auth.telemetry.p2_desc" xml:space="preserve">
+    <value>Partitioned data planes with leased outbox messaging.</value>
   </data>
-  <data name="ui.auth.pillar.billing.desc" xml:space="preserve">
-    <value>Support platform billing and administrative workflows.</value>
+  <data name="ui.auth.telemetry.p3_title" xml:space="preserve">
+    <value>Immutable Audit Trail</value>
+  </data>
+  <data name="ui.auth.telemetry.p3_desc" xml:space="preserve">
+    <value>Append-only operational event stream with non-repudiation.</value>
+  </data>
+  <data name="ui.auth.telemetry.footer" xml:space="preserve">
+    <value>Status: Operational · Latency: 14ms · Global Edge Mesh</value>
+  </data>
+  <data name="ui.auth.compliance" xml:space="preserve">
+    <value>SOC2 Type II &amp; FedRAMP Ready · Enterprise Grade</value>
   </data>
   <data name="ui.auth.form_badge" xml:space="preserve">
-    <value>SECURE PLATFORM ACCESS</value>
+    <value>SECURE ACCESS GATEWAY</value>
   </data>
   <data name="ui.auth.welcome_back" xml:space="preserve">
     <value>Welcome back</value>
   </data>
   <data name="ui.auth.signin_subtitle" xml:space="preserve">
-    <value>Sign in with your platform staff credentials to continue to the Vixly Control Plane.</value>
+    <value>Enter your platform credentials to access administrative systems.</value>
   </data>
   <data name="ui.auth.email_placeholder" xml:space="preserve">
-    <value>Enter your email address</value>
+    <value>admin@vixly.ltd</value>
   </data>
   <data name="ui.auth.password_placeholder" xml:space="preserve">
     <value>Enter your password</value>
@@ -2895,5 +2904,1934 @@ Vixly</value>
   </data>
   <data name="ui.verify.use_recovery" xml:space="preserve">
     <value>Use a recovery code instead</value>
+  </data>
+  <data name="platform.plans.code_invalid" xml:space="preserve">
+    <value>Use {minLength} to {maxLength} characters: letters, digits, hyphens or underscores, starting with a letter or digit.</value>
+  </data>
+  <data name="platform.plans.code_taken" xml:space="preserve">
+    <value>Another plan already uses this code.</value>
+  </data>
+  <data name="platform.plans.name_required" xml:space="preserve">
+    <value>Enter a name.</value>
+  </data>
+  <data name="platform.plans.name_too_long" xml:space="preserve">
+    <value>Use at most {maxLength} characters for the name.</value>
+  </data>
+  <data name="platform.plans.description_too_long" xml:space="preserve">
+    <value>Use at most {maxLength} characters for the description.</value>
+  </data>
+  <data name="platform.plans.english_name_required" xml:space="preserve">
+    <value>The plan needs an English name.</value>
+  </data>
+  <data name="platform.plans.currency_invalid" xml:space="preserve">
+    <value>Choose a valid currency code, such as USD, CAD or EUR.</value>
+  </data>
+  <data name="platform.plans.currency_fixed" xml:space="preserve">
+    <value>The currency cannot change once a version has been published.</value>
+  </data>
+  <data name="platform.plans.price_invalid" xml:space="preserve">
+    <value>Prices must be zero or more, with at most 4 decimals.</value>
+  </data>
+  <data name="platform.plans.price_required" xml:space="preserve">
+    <value>Set a monthly or annual price before publishing.</value>
+  </data>
+  <data name="platform.plans.minimum_licences_invalid" xml:space="preserve">
+    <value>The minimum number of licences must be between 1 and {maxCount}.</value>
+  </data>
+  <data name="platform.plans.trial_days_invalid" xml:space="preserve">
+    <value>A trial lasts from 1 to {maxCount} days, or leave it empty for no trial.</value>
+  </data>
+  <data name="platform.plans.limit_invalid" xml:space="preserve">
+    <value>Limits must be between 0 and {maxCount}.</value>
+  </data>
+  <data name="platform.plans.minimum_above_device_limit" xml:space="preserve">
+    <value>The minimum number of licences cannot be above the device limit.</value>
+  </data>
+  <data name="platform.plans.feature_invalid" xml:space="preserve">
+    <value>One of the features is not known.</value>
+  </data>
+  <data name="platform.plans.display_order_invalid" xml:space="preserve">
+    <value>The display order must be between 0 and {maxCount}.</value>
+  </data>
+  <data name="platform.plans.no_draft" xml:space="preserve">
+    <value>This plan has no draft version.</value>
+  </data>
+  <data name="platform.plans.draft_exists" xml:space="preserve">
+    <value>This plan already has a draft version.</value>
+  </data>
+  <data name="platform.plans.nothing_published" xml:space="preserve">
+    <value>Publish a first version before doing this.</value>
+  </data>
+  <data name="platform.plans.already_retired" xml:space="preserve">
+    <value>This plan is already retired.</value>
+  </data>
+  <data name="platform.plans.not_retired" xml:space="preserve">
+    <value>This plan is not retired.</value>
+  </data>
+  <data name="platform.plans.retired" xml:space="preserve">
+    <value>This plan is retired.</value>
+  </data>
+  <data name="platform.plans.version_not_found" xml:space="preserve">
+    <value>That version of the plan no longer exists.</value>
+  </data>
+  <data name="platform.plans.actor_required" xml:space="preserve">
+    <value>A signed-in person is required for this change.</value>
+  </data>
+  <data name="platform.subscriptions.tenant_required" xml:space="preserve">
+    <value>A tenant is required.</value>
+  </data>
+  <data name="platform.subscriptions.actor_required" xml:space="preserve">
+    <value>A signed-in person is required for this change.</value>
+  </data>
+  <data name="platform.subscriptions.already_subscribed" xml:space="preserve">
+    <value>This tenant already has a current subscription.</value>
+  </data>
+  <data name="platform.subscriptions.no_subscription" xml:space="preserve">
+    <value>This tenant has no current subscription.</value>
+  </data>
+  <data name="platform.subscriptions.plan_not_available" xml:space="preserve">
+    <value>That plan cannot be chosen.</value>
+  </data>
+  <data name="platform.subscriptions.term_not_offered" xml:space="preserve">
+    <value>That plan is not sold on this term.</value>
+  </data>
+  <data name="platform.subscriptions.term_invalid" xml:space="preserve">
+    <value>Choose monthly or annual.</value>
+  </data>
+  <data name="platform.subscriptions.trial_not_offered" xml:space="preserve">
+    <value>That plan does not offer a trial.</value>
+  </data>
+  <data name="platform.subscriptions.below_minimum" xml:space="preserve">
+    <value>This plan needs at least {minimum} licences.</value>
+  </data>
+  <data name="platform.subscriptions.above_limit" xml:space="preserve">
+    <value>This tenant can have at most {maximum} licences on this plan.</value>
+  </data>
+  <data name="platform.subscriptions.below_active_licences" xml:space="preserve">
+    <value>{active} licences are in use; release some before going lower.</value>
+  </data>
+  <data name="platform.subscriptions.nothing_to_change" xml:space="preserve">
+    <value>Nothing would change.</value>
+  </data>
+  <data name="platform.subscriptions.no_scheduled_change" xml:space="preserve">
+    <value>No change is scheduled.</value>
+  </data>
+  <data name="platform.subscriptions.not_trialing" xml:space="preserve">
+    <value>This subscription is not in a trial.</value>
+  </data>
+  <data name="platform.subscriptions.trial_end_invalid" xml:space="preserve">
+    <value>Choose a trial end in the future, at most a year away.</value>
+  </data>
+  <data name="platform.subscriptions.not_awaiting_payment" xml:space="preserve">
+    <value>This subscription is not waiting for a payment.</value>
+  </data>
+  <data name="platform.subscriptions.cancellation_already_requested" xml:space="preserve">
+    <value>Cancellation has already been requested.</value>
+  </data>
+  <data name="platform.subscriptions.no_cancellation_requested" xml:space="preserve">
+    <value>No cancellation has been requested.</value>
+  </data>
+  <data name="platform.subscriptions.ended" xml:space="preserve">
+    <value>This subscription has ended.</value>
+  </data>
+  <data name="platform.subscriptions.not_allowed_in_status" xml:space="preserve">
+    <value>This subscription cannot do that in its current status.</value>
+  </data>
+  <data name="platform.subscriptions.reason_required" xml:space="preserve">
+    <value>Give a reason.</value>
+  </data>
+  <data name="platform.subscriptions.reason_too_long" xml:space="preserve">
+    <value>Use at most {maxLength} characters for the reason.</value>
+  </data>
+  <data name="platform.subscriptions.licences_invalid" xml:space="preserve">
+    <value>The number of licences must be between 1 and {maxCount}.</value>
+  </data>
+  <data name="platform.subscriptions.override_value_invalid" xml:space="preserve">
+    <value>The value must be between 0 and {maxCount}.</value>
+  </data>
+  <data name="platform.subscriptions.override_end_invalid" xml:space="preserve">
+    <value>Choose an end date in the future, or none.</value>
+  </data>
+  <data name="platform.subscriptions.override_limit_invalid" xml:space="preserve">
+    <value>That limit is not known.</value>
+  </data>
+  <data name="platform.subscriptions.override_closed" xml:space="preserve">
+    <value>This override has already been removed.</value>
+  </data>
+  <data name="platform.registrations.plan_already_chosen" xml:space="preserve">
+    <value>A plan has already been chosen for this registration.</value>
+  </data>
+  <data name="ui.audit.action.platform.plans.created" xml:space="preserve">
+    <value>Plan created</value>
+  </data>
+  <data name="ui.audit.action.platform.plans.draft_updated" xml:space="preserve">
+    <value>Plan draft updated</value>
+  </data>
+  <data name="ui.audit.action.platform.plans.translation_set" xml:space="preserve">
+    <value>Plan translation set</value>
+  </data>
+  <data name="ui.audit.action.platform.plans.catalogue_set" xml:space="preserve">
+    <value>Plan catalogue settings changed</value>
+  </data>
+  <data name="ui.audit.action.platform.plans.version_published" xml:space="preserve">
+    <value>Plan version published</value>
+  </data>
+  <data name="ui.audit.action.platform.plans.draft_started" xml:space="preserve">
+    <value>Plan draft started</value>
+  </data>
+  <data name="ui.audit.action.platform.plans.draft_discarded" xml:space="preserve">
+    <value>Plan draft discarded</value>
+  </data>
+  <data name="ui.audit.action.platform.plans.retired" xml:space="preserve">
+    <value>Plan retired</value>
+  </data>
+  <data name="ui.audit.action.platform.plans.reactivated" xml:space="preserve">
+    <value>Plan reactivated</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.started" xml:space="preserve">
+    <value>Subscription started</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.changed" xml:space="preserve">
+    <value>Subscription changed</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.change_scheduled" xml:space="preserve">
+    <value>Subscription change scheduled</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.scheduled_change_cancelled" xml:space="preserve">
+    <value>Scheduled change cancelled</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.trial_extended" xml:space="preserve">
+    <value>Trial extended</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.trial_ended" xml:space="preserve">
+    <value>Trial ended by staff</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.trial_expired" xml:space="preserve">
+    <value>Trial expired</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.cancellation_requested" xml:space="preserve">
+    <value>Subscription cancellation requested</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.resumed" xml:space="preserve">
+    <value>Subscription resumed</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.ended" xml:space="preserve">
+    <value>Subscription ended</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.offline_payment_recorded" xml:space="preserve">
+    <value>Offline payment recorded</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.renewed" xml:space="preserve">
+    <value>Subscription renewed</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.suspended_with_tenant" xml:space="preserve">
+    <value>Subscription suspended with the tenant</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.restored_with_tenant" xml:space="preserve">
+    <value>Subscription restored with the tenant</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.ended_with_tenant" xml:space="preserve">
+    <value>Subscription ended with the tenant</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.override_set" xml:space="preserve">
+    <value>Limit override set</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.override_removed" xml:space="preserve">
+    <value>Limit override removed</value>
+  </data>
+  <data name="ui.audit.action.platform.registrations.plan_chosen" xml:space="preserve">
+    <value>Plan chosen at registration</value>
+  </data>
+  <data name="ui.permission.platform.plans.view" xml:space="preserve">
+    <value>View plans</value>
+  </data>
+  <data name="ui.permission.platform.plans.manage" xml:space="preserve">
+    <value>Manage plans (drafts, translations, retire)</value>
+  </data>
+  <data name="ui.permission.platform.plans.publish" xml:space="preserve">
+    <value>Publish plan versions</value>
+  </data>
+  <data name="ui.permission.platform.subscriptions.view" xml:space="preserve">
+    <value>View subscriptions</value>
+  </data>
+  <data name="ui.permission.platform.subscriptions.manage" xml:space="preserve">
+    <value>Manage subscriptions</value>
+  </data>
+  <data name="ui.permission.platform.subscriptions.override_limits" xml:space="preserve">
+    <value>Override tenant limits</value>
+  </data>
+  <data name="ui.permission_area.plans" xml:space="preserve">
+    <value>Plans</value>
+  </data>
+  <data name="ui.permission_area.subscriptions" xml:space="preserve">
+    <value>Subscriptions</value>
+  </data>
+  <data name="ui.subscription_history.started_trial" xml:space="preserve">
+    <value>Started a {term} trial on {plan} (version {version}), {licences} licences, until {trialEnds}</value>
+  </data>
+  <data name="ui.subscription_history.started_awaiting_payment" xml:space="preserve">
+    <value>Started on {plan} (version {version}), {term}, {licences} licences; waiting for payment</value>
+  </data>
+  <data name="ui.subscription_history.activated" xml:space="preserve">
+    <value>Payment received; period runs until {periodEnd}</value>
+  </data>
+  <data name="ui.subscription_history.offline_payment_recorded" xml:space="preserve">
+    <value>Offline payment recorded; period runs until {periodEnd}</value>
+  </data>
+  <data name="ui.subscription_history.trial_extended" xml:space="preserve">
+    <value>Trial extended from {from} to {to}</value>
+  </data>
+  <data name="ui.subscription_history.trial_ended" xml:space="preserve">
+    <value>Trial ended; waiting for payment</value>
+  </data>
+  <data name="ui.subscription_history.trial_expired" xml:space="preserve">
+    <value>Trial period over; waiting for payment</value>
+  </data>
+  <data name="ui.subscription_history.changed" xml:space="preserve">
+    <value>Changed from {fromPlan} to {plan}, {term}, {licences} licences; charged now {charge}</value>
+  </data>
+  <data name="ui.subscription_history.change_scheduled" xml:space="preserve">
+    <value>Change to {plan}, {term}, {licences} licences scheduled for {effective}</value>
+  </data>
+  <data name="ui.subscription_history.scheduled_change_cancelled" xml:space="preserve">
+    <value>Scheduled change cancelled</value>
+  </data>
+  <data name="ui.subscription_history.renewed" xml:space="preserve">
+    <value>Renewed on {plan} (version {version}), {term}, {licences} licences, until {periodEnd}</value>
+  </data>
+  <data name="ui.subscription_history.cancellation_requested" xml:space="preserve">
+    <value>Cancellation requested; ends on {effective}</value>
+  </data>
+  <data name="ui.subscription_history.resumed" xml:space="preserve">
+    <value>Cancellation withdrawn</value>
+  </data>
+  <data name="ui.subscription_history.ended" xml:space="preserve">
+    <value>Ended: {endReason}</value>
+  </data>
+  <data name="ui.subscription_history.suspended_with_tenant" xml:space="preserve">
+    <value>Suspended because the tenant was suspended</value>
+  </data>
+  <data name="ui.subscription_history.restored_with_tenant" xml:space="preserve">
+    <value>Restored because the tenant was reactivated</value>
+  </data>
+  <data name="ui.plans.title" xml:space="preserve">
+    <value>Plans</value>
+  </data>
+  <data name="ui.plans.new" xml:space="preserve">
+    <value>New plan</value>
+  </data>
+  <data name="ui.plans.back" xml:space="preserve">
+    <value>Back to plans</value>
+  </data>
+  <data name="ui.plans.search" xml:space="preserve">
+    <value>Search by name or code</value>
+  </data>
+  <data name="ui.plans.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.plans.status.all" xml:space="preserve">
+    <value>All statuses</value>
+  </data>
+  <data name="ui.plans.status.active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="ui.plans.status.retired" xml:space="preserve">
+    <value>Retired</value>
+  </data>
+  <data name="ui.plans.count" xml:space="preserve">
+    <value>Plans: {count}</value>
+  </data>
+  <data name="ui.plans.empty" xml:space="preserve">
+    <value>No plan matches these filters.</value>
+  </data>
+  <data name="ui.plans.name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ui.plans.code" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="ui.plans.code_help" xml:space="preserve">
+    <value>Letters, digits, hyphens or underscores. The code cannot change later.</value>
+  </data>
+  <data name="ui.plans.description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="ui.plans.currency" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="ui.plans.currency_help" xml:space="preserve">
+    <value>Three-letter code, such as USD, CAD or EUR. One currency per plan; it cannot change once a version is published.</value>
+  </data>
+  <data name="ui.plans.create" xml:space="preserve">
+    <value>Create plan</value>
+  </data>
+  <data name="ui.plans.version" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="ui.plans.version_number" xml:space="preserve">
+    <value>Version {number}</value>
+  </data>
+  <data name="ui.plans.not_published" xml:space="preserve">
+    <value>Not published yet</value>
+  </data>
+  <data name="ui.plans.has_draft" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="ui.plans.monthly_price" xml:space="preserve">
+    <value>Monthly price per licence</value>
+  </data>
+  <data name="ui.plans.annual_price" xml:space="preserve">
+    <value>Annual price per licence</value>
+  </data>
+  <data name="ui.plans.setup_fee" xml:space="preserve">
+    <value>Setup fee</value>
+  </data>
+  <data name="ui.plans.minimum_licences" xml:space="preserve">
+    <value>Minimum licences</value>
+  </data>
+  <data name="ui.plans.trial_days" xml:space="preserve">
+    <value>Trial days</value>
+  </data>
+  <data name="ui.plans.trial_help" xml:space="preserve">
+    <value>Leave empty for no trial. A trial needs no payment and ends when the tenant pays or the days run out.</value>
+  </data>
+  <data name="ui.plans.public" xml:space="preserve">
+    <value>Public</value>
+  </data>
+  <data name="ui.plans.public_help" xml:space="preserve">
+    <value>Show this plan in the public catalogue for self-registration</value>
+  </data>
+  <data name="ui.plans.is_public" xml:space="preserve">
+    <value>Shown in the public catalogue.</value>
+  </data>
+  <data name="ui.plans.is_private" xml:space="preserve">
+    <value>Not shown in the public catalogue.</value>
+  </data>
+  <data name="ui.plans.display_order" xml:space="preserve">
+    <value>Order in the catalogue</value>
+  </data>
+  <data name="ui.plans.save_catalogue" xml:space="preserve">
+    <value>Save catalogue settings</value>
+  </data>
+  <data name="ui.plans.subscribers" xml:space="preserve">
+    <value>Subscribers</value>
+  </data>
+  <data name="ui.plans.overview" xml:space="preserve">
+    <value>Overview</value>
+  </data>
+  <data name="ui.plans.retire" xml:space="preserve">
+    <value>Retire plan</value>
+  </data>
+  <data name="ui.plans.reactivate" xml:space="preserve">
+    <value>Reactivate plan</value>
+  </data>
+  <data name="ui.plans.retired" xml:space="preserve">
+    <value>Plan retired. Existing subscriptions keep it.</value>
+  </data>
+  <data name="ui.plans.reactivated" xml:space="preserve">
+    <value>Plan reactivated.</value>
+  </data>
+  <data name="ui.plans.catalogue_saved" xml:space="preserve">
+    <value>Catalogue settings saved.</value>
+  </data>
+  <data name="ui.plans.translations" xml:space="preserve">
+    <value>Names and descriptions</value>
+  </data>
+  <data name="ui.plans.save_translation" xml:space="preserve">
+    <value>Save this language</value>
+  </data>
+  <data name="ui.plans.translation_saved" xml:space="preserve">
+    <value>Translation saved.</value>
+  </data>
+  <data name="ui.plans.draft" xml:space="preserve">
+    <value>Draft version</value>
+  </data>
+  <data name="ui.plans.draft_help" xml:space="preserve">
+    <value>You are editing version {number}. Publishing it never changes a subscriber’s current period: subscribers move to it at renewal.</value>
+  </data>
+  <data name="ui.plans.no_draft" xml:space="preserve">
+    <value>There is no draft. Start one to change prices, limits or features.</value>
+  </data>
+  <data name="ui.plans.start_draft" xml:space="preserve">
+    <value>Start a draft</value>
+  </data>
+  <data name="ui.plans.draft_started" xml:space="preserve">
+    <value>Draft started from the published version.</value>
+  </data>
+  <data name="ui.plans.prices" xml:space="preserve">
+    <value>Prices</value>
+  </data>
+  <data name="ui.plans.prices_help" xml:space="preserve">
+    <value>Prices are before tax. Set 0 to stop offering a term; at least one term needs a price.</value>
+  </data>
+  <data name="ui.plans.limits" xml:space="preserve">
+    <value>Limits</value>
+  </data>
+  <data name="ui.plans.limit.max_licensed_devices" xml:space="preserve">
+    <value>Licensed devices</value>
+  </data>
+  <data name="ui.plans.limit.max_warehouses" xml:space="preserve">
+    <value>Warehouses</value>
+  </data>
+  <data name="ui.plans.features" xml:space="preserve">
+    <value>Features</value>
+  </data>
+  <data name="ui.plans.feature.homepage_content_customization" xml:space="preserve">
+    <value>Homepage content customization</value>
+  </data>
+  <data name="ui.plans.feature.portal_theme_customization" xml:space="preserve">
+    <value>Portal theme customization</value>
+  </data>
+  <data name="ui.plans.feature.custom_domain" xml:space="preserve">
+    <value>Custom domain</value>
+  </data>
+  <data name="ui.plans.feature.white_label_portal" xml:space="preserve">
+    <value>White-label portal</value>
+  </data>
+  <data name="ui.plans.feature.advanced_analytics" xml:space="preserve">
+    <value>Advanced analytics</value>
+  </data>
+  <data name="ui.plans.feature.data_export" xml:space="preserve">
+    <value>Data export</value>
+  </data>
+  <data name="ui.plans.save_draft" xml:space="preserve">
+    <value>Save draft</value>
+  </data>
+  <data name="ui.plans.draft_saved" xml:space="preserve">
+    <value>Draft saved.</value>
+  </data>
+  <data name="ui.plans.publish" xml:space="preserve">
+    <value>Publish</value>
+  </data>
+  <data name="ui.plans.published" xml:space="preserve">
+    <value>Version published. Subscribers move to it at their next renewal.</value>
+  </data>
+  <data name="ui.plans.discard_draft" xml:space="preserve">
+    <value>Discard draft</value>
+  </data>
+  <data name="ui.plans.draft_discarded" xml:space="preserve">
+    <value>Draft discarded.</value>
+  </data>
+  <data name="ui.plans.preview_price" xml:space="preserve">
+    <value>Preview price</value>
+  </data>
+  <data name="ui.plans.preview_result" xml:space="preserve">
+    <value>Published version, per period: {amount} (before tax)</value>
+  </data>
+  <data name="ui.plans.versions" xml:space="preserve">
+    <value>Versions</value>
+  </data>
+  <data name="ui.plans.no_versions" xml:space="preserve">
+    <value>No versions yet.</value>
+  </data>
+  <data name="ui.plans.version_status.draft" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="ui.plans.version_status.published" xml:space="preserve">
+    <value>Published</value>
+  </data>
+  <data name="ui.plans.version_status.superseded" xml:space="preserve">
+    <value>Superseded</value>
+  </data>
+  <data name="ui.plans.published_on" xml:space="preserve">
+    <value>Published</value>
+  </data>
+  <data name="ui.plans.published_by" xml:space="preserve">
+    <value>{time} by {name}</value>
+  </data>
+  <data name="ui.subscriptions.title" xml:space="preserve">
+    <value>Subscriptions</value>
+  </data>
+  <data name="ui.subscriptions.section" xml:space="preserve">
+    <value>Subscription</value>
+  </data>
+  <data name="ui.subscriptions.search" xml:space="preserve">
+    <value>Search by tenant name or code</value>
+  </data>
+  <data name="ui.subscriptions.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.subscriptions.status.all" xml:space="preserve">
+    <value>All current statuses</value>
+  </data>
+  <data name="ui.subscriptions.status.trialing" xml:space="preserve">
+    <value>Trial</value>
+  </data>
+  <data name="ui.subscriptions.status.pending_payment" xml:space="preserve">
+    <value>Pending payment</value>
+  </data>
+  <data name="ui.subscriptions.status.active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="ui.subscriptions.status.past_due" xml:space="preserve">
+    <value>Past due</value>
+  </data>
+  <data name="ui.subscriptions.status.suspended" xml:space="preserve">
+    <value>Suspended</value>
+  </data>
+  <data name="ui.subscriptions.status.ended" xml:space="preserve">
+    <value>Ended</value>
+  </data>
+  <data name="ui.subscriptions.renews_within" xml:space="preserve">
+    <value>Renews within</value>
+  </data>
+  <data name="ui.subscriptions.renews_any" xml:space="preserve">
+    <value>Any time</value>
+  </data>
+  <data name="ui.subscriptions.days" xml:space="preserve">
+    <value>{count} days</value>
+  </data>
+  <data name="ui.subscriptions.include_ended" xml:space="preserve">
+    <value>Include ended subscriptions</value>
+  </data>
+  <data name="ui.subscriptions.all_plans" xml:space="preserve">
+    <value>All plans</value>
+  </data>
+  <data name="ui.subscriptions.count" xml:space="preserve">
+    <value>Subscriptions: {count}</value>
+  </data>
+  <data name="ui.subscriptions.empty" xml:space="preserve">
+    <value>No subscription matches these filters.</value>
+  </data>
+  <data name="ui.subscriptions.tenant" xml:space="preserve">
+    <value>Tenant</value>
+  </data>
+  <data name="ui.subscriptions.plan" xml:space="preserve">
+    <value>Plan</value>
+  </data>
+  <data name="ui.subscriptions.term" xml:space="preserve">
+    <value>Term</value>
+  </data>
+  <data name="ui.subscriptions.term.monthly" xml:space="preserve">
+    <value>Monthly</value>
+  </data>
+  <data name="ui.subscriptions.term.annual" xml:space="preserve">
+    <value>Annual</value>
+  </data>
+  <data name="ui.subscriptions.licences" xml:space="preserve">
+    <value>Licences</value>
+  </data>
+  <data name="ui.subscriptions.period_amount" xml:space="preserve">
+    <value>Amount per period</value>
+  </data>
+  <data name="ui.subscriptions.next_period_amount" xml:space="preserve">
+    <value>Next period</value>
+  </data>
+  <data name="ui.subscriptions.price_per_licence" xml:space="preserve">
+    <value>Price per licence</value>
+  </data>
+  <data name="ui.subscriptions.renews" xml:space="preserve">
+    <value>Renews or trial ends</value>
+  </data>
+  <data name="ui.subscriptions.notes" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="ui.subscriptions.cancels_at_period_end" xml:space="preserve">
+    <value>Cancels at period end</value>
+  </data>
+  <data name="ui.subscriptions.change_scheduled" xml:space="preserve">
+    <value>Change scheduled</value>
+  </data>
+  <data name="ui.subscriptions.none" xml:space="preserve">
+    <value>This tenant has no current subscription.</value>
+  </data>
+  <data name="ui.subscriptions.start" xml:space="preserve">
+    <value>Start a subscription</value>
+  </data>
+  <data name="ui.subscriptions.started" xml:space="preserve">
+    <value>Subscription started.</value>
+  </data>
+  <data name="ui.subscriptions.change" xml:space="preserve">
+    <value>Change plan, term or licences</value>
+  </data>
+  <data name="ui.subscriptions.changed" xml:space="preserve">
+    <value>Change applied or scheduled, as shown in the preview.</value>
+  </data>
+  <data name="ui.subscriptions.cancel_scheduled" xml:space="preserve">
+    <value>Cancel scheduled change</value>
+  </data>
+  <data name="ui.subscriptions.scheduled_cancelled" xml:space="preserve">
+    <value>Scheduled change cancelled.</value>
+  </data>
+  <data name="ui.subscriptions.choose_plan" xml:space="preserve">
+    <value>Choose a plan</value>
+  </data>
+  <data name="ui.subscriptions.plan_option" xml:space="preserve">
+    <value>{name}: {monthly} per month, {annual} per year, per licence</value>
+  </data>
+  <data name="ui.subscriptions.licences_range" xml:space="preserve">
+    <value>Between {min} and {max} licences.</value>
+  </data>
+  <data name="ui.subscriptions.start_trial" xml:space="preserve">
+    <value>Start with the {days}-day trial</value>
+  </data>
+  <data name="ui.subscriptions.preview" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="ui.subscriptions.confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="ui.subscriptions.quote_now" xml:space="preserve">
+    <value>Applies now (upgrade).</value>
+  </data>
+  <data name="ui.subscriptions.quote_at_renewal" xml:space="preserve">
+    <value>Applies at renewal, on {date}.</value>
+  </data>
+  <data name="ui.subscriptions.quote_charge" xml:space="preserve">
+    <value>Charged now: {amount} (before tax)</value>
+  </data>
+  <data name="ui.subscriptions.quote_next" xml:space="preserve">
+    <value>Next period: {amount} (before tax)</value>
+  </data>
+  <data name="ui.subscriptions.quote_ends_trial" xml:space="preserve">
+    <value>This ends the trial.</value>
+  </data>
+  <data name="ui.subscriptions.newer_version" xml:space="preserve">
+    <value>A newer version applies at renewal.</value>
+  </data>
+  <data name="ui.subscriptions.since" xml:space="preserve">
+    <value>since {time}</value>
+  </data>
+  <data name="ui.subscriptions.access" xml:space="preserve">
+    <value>Access</value>
+  </data>
+  <data name="ui.subscriptions.access.none" xml:space="preserve">
+    <value>No access</value>
+  </data>
+  <data name="ui.subscriptions.access.read_only" xml:space="preserve">
+    <value>Read-only</value>
+  </data>
+  <data name="ui.subscriptions.access.full" xml:space="preserve">
+    <value>Full</value>
+  </data>
+  <data name="ui.subscriptions.licences_used" xml:space="preserve">
+    <value>{active} active of {total}</value>
+  </data>
+  <data name="ui.subscriptions.setup_fee_charged" xml:space="preserve">
+    <value>charged</value>
+  </data>
+  <data name="ui.subscriptions.setup_fee_due" xml:space="preserve">
+    <value>not yet charged</value>
+  </data>
+  <data name="ui.subscriptions.trial_ends" xml:space="preserve">
+    <value>Trial ends</value>
+  </data>
+  <data name="ui.subscriptions.period" xml:space="preserve">
+    <value>Current period</value>
+  </data>
+  <data name="ui.subscriptions.period_range" xml:space="preserve">
+    <value>{from} to {to}</value>
+  </data>
+  <data name="ui.subscriptions.cancels_on" xml:space="preserve">
+    <value>This subscription ends on {date} unless it is resumed.</value>
+  </data>
+  <data name="ui.subscriptions.scheduled_change" xml:space="preserve">
+    <value>On {date}: {plan}, {term}, {licences} licences, {amount} per period.</value>
+  </data>
+  <data name="ui.subscriptions.actions" xml:space="preserve">
+    <value>Subscription actions</value>
+  </data>
+  <data name="ui.subscriptions.no_actions" xml:space="preserve">
+    <value>No subscription action is available to you.</value>
+  </data>
+  <data name="ui.subscriptions.resume" xml:space="preserve">
+    <value>Withdraw cancellation</value>
+  </data>
+  <data name="ui.subscriptions.resumed" xml:space="preserve">
+    <value>Cancellation withdrawn.</value>
+  </data>
+  <data name="ui.subscriptions.action.cancel" xml:space="preserve">
+    <value>Cancel at period end</value>
+  </data>
+  <data name="ui.subscriptions.action.endnow" xml:space="preserve">
+    <value>End now</value>
+  </data>
+  <data name="ui.subscriptions.action.recordpayment" xml:space="preserve">
+    <value>Record offline payment</value>
+  </data>
+  <data name="ui.subscriptions.action.extendtrial" xml:space="preserve">
+    <value>Extend trial</value>
+  </data>
+  <data name="ui.subscriptions.action.endtrial" xml:space="preserve">
+    <value>End trial</value>
+  </data>
+  <data name="ui.subscriptions.help.cancel" xml:space="preserve">
+    <value>The tenant keeps access until the end of the paid period, then the subscription ends.</value>
+  </data>
+  <data name="ui.subscriptions.help.endnow" xml:space="preserve">
+    <value>The subscription ends at once and the tenant loses access. This cannot be undone.</value>
+  </data>
+  <data name="ui.subscriptions.help.recordpayment" xml:space="preserve">
+    <value>Record a payment received outside Vixly, such as a bank transfer. The period starts now.</value>
+  </data>
+  <data name="ui.subscriptions.help.extendtrial" xml:space="preserve">
+    <value>Choose the new last day of the trial.</value>
+  </data>
+  <data name="ui.subscriptions.help.endtrial" xml:space="preserve">
+    <value>The trial ends now and the subscription waits for payment.</value>
+  </data>
+  <data name="ui.subscriptions.done.cancel" xml:space="preserve">
+    <value>Cancellation recorded; it takes effect at period end.</value>
+  </data>
+  <data name="ui.subscriptions.done.endnow" xml:space="preserve">
+    <value>Subscription ended.</value>
+  </data>
+  <data name="ui.subscriptions.done.recordpayment" xml:space="preserve">
+    <value>Payment recorded; the subscription is active.</value>
+  </data>
+  <data name="ui.subscriptions.done.extendtrial" xml:space="preserve">
+    <value>Trial extended.</value>
+  </data>
+  <data name="ui.subscriptions.done.endtrial" xml:space="preserve">
+    <value>Trial ended.</value>
+  </data>
+  <data name="ui.subscriptions.trial_title" xml:space="preserve">
+    <value>Trial until {date}</value>
+  </data>
+  <data name="ui.subscriptions.trial_new_end" xml:space="preserve">
+    <value>New last day</value>
+  </data>
+  <data name="ui.subscriptions.end_reason.cancelled" xml:space="preserve">
+    <value>cancelled</value>
+  </data>
+  <data name="ui.subscriptions.end_reason.ended_by_staff" xml:space="preserve">
+    <value>ended by staff</value>
+  </data>
+  <data name="ui.subscriptions.end_reason.tenant_closed" xml:space="preserve">
+    <value>tenant closed</value>
+  </data>
+  <data name="ui.subscriptions.end_reason.replaced" xml:space="preserve">
+    <value>replaced</value>
+  </data>
+  <data name="ui.subscriptions.limits" xml:space="preserve">
+    <value>Limits</value>
+  </data>
+  <data name="ui.subscriptions.limit" xml:space="preserve">
+    <value>Limit</value>
+  </data>
+  <data name="ui.subscriptions.plan_value" xml:space="preserve">
+    <value>Plan</value>
+  </data>
+  <data name="ui.subscriptions.effective_value" xml:space="preserve">
+    <value>In effect</value>
+  </data>
+  <data name="ui.subscriptions.override" xml:space="preserve">
+    <value>Override</value>
+  </data>
+  <data name="ui.subscriptions.override_detail" xml:space="preserve">
+    <value>{value} until {until}, set by {name}</value>
+  </data>
+  <data name="ui.subscriptions.no_end" xml:space="preserve">
+    <value>removed</value>
+  </data>
+  <data name="ui.subscriptions.set_override" xml:space="preserve">
+    <value>Set override</value>
+  </data>
+  <data name="ui.subscriptions.remove_override" xml:space="preserve">
+    <value>Remove override</value>
+  </data>
+  <data name="ui.subscriptions.remove_override_help" xml:space="preserve">
+    <value>The plan’s limit applies again at once.</value>
+  </data>
+  <data name="ui.subscriptions.override_for" xml:space="preserve">
+    <value>Override for {limit}</value>
+  </data>
+  <data name="ui.subscriptions.override_value" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="ui.subscriptions.override_ends" xml:space="preserve">
+    <value>Last day (optional)</value>
+  </data>
+  <data name="ui.subscriptions.override_ends_help" xml:space="preserve">
+    <value>Leave empty to keep the override until it is removed.</value>
+  </data>
+  <data name="ui.subscriptions.override_saved" xml:space="preserve">
+    <value>Override saved.</value>
+  </data>
+  <data name="ui.subscriptions.override_removed" xml:space="preserve">
+    <value>Override removed.</value>
+  </data>
+  <data name="ui.subscriptions.history" xml:space="preserve">
+    <value>Subscription history</value>
+  </data>
+  <data name="ui.subscriptions.history_empty" xml:space="preserve">
+    <value>No subscription history yet.</value>
+  </data>
+  <data name="email.price_increase.subject" xml:space="preserve">
+    <value>Your Vixly price for {plan} is changing</value>
+  </data>
+  <data name="email.price_increase.body" xml:space="preserve">
+    <value>Hello {name},
+
+The price of the {plan} plan used by {company} is changing.
+
+Your {term} amount moves from {current} to {new} (before tax) at your next renewal, on {date}. Your current period is not affected.
+
+Questions? Contact us at {support}.
+
+Vixly</value>
+  </data>
+  <data name="platform.subscriptions.tenant_cannot_subscribe" xml:space="preserve">
+    <value>This tenant cannot start a subscription in its current status. Reactivate a suspended or deactivated tenant first; a banned tenant cannot subscribe.</value>
+  </data>
+  <data name="ui.subscriptions.start_blocked.suspended" xml:space="preserve">
+    <value>The tenant is suspended. Reactivate it before starting a subscription.</value>
+  </data>
+  <data name="ui.subscriptions.start_blocked.deactivated" xml:space="preserve">
+    <value>The tenant is deactivated. Reactivate it before starting a subscription.</value>
+  </data>
+  <data name="ui.subscriptions.start_blocked.banned" xml:space="preserve">
+    <value>The tenant is banned and can never subscribe again.</value>
+  </data>
+  <data name="platform.discounts.kind_invalid" xml:space="preserve">
+    <value>Choose a percentage or a fixed amount.</value>
+  </data>
+  <data name="platform.discounts.percent_invalid" xml:space="preserve">
+    <value>A percentage discount must be more than 0 and at most 100, with up to two decimals.</value>
+  </data>
+  <data name="platform.discounts.amount_invalid" xml:space="preserve">
+    <value>A fixed discount must be more than 0, with up to two decimals.</value>
+  </data>
+  <data name="platform.discounts.duration_invalid" xml:space="preserve">
+    <value>Choose how long the discount lasts: a number of periods, until a date, or with no end.</value>
+  </data>
+  <data name="platform.discounts.periods_invalid" xml:space="preserve">
+    <value>The number of periods must be between 1 and {max}.</value>
+  </data>
+  <data name="platform.discounts.end_date_invalid" xml:space="preserve">
+    <value>The end date must be in the future.</value>
+  </data>
+  <data name="platform.discounts.already_pending" xml:space="preserve">
+    <value>A discount is already waiting for approval for this subscription.</value>
+  </data>
+  <data name="platform.discounts.not_pending" xml:space="preserve">
+    <value>This discount is not waiting for approval.</value>
+  </data>
+  <data name="platform.discounts.no_active_discount" xml:space="preserve">
+    <value>This subscription has no active discount.</value>
+  </data>
+  <data name="platform.discounts.own_request" xml:space="preserve">
+    <value>You cannot approve or reject a discount you requested yourself.</value>
+  </data>
+  <data name="platform.discounts.not_found" xml:space="preserve">
+    <value>The discount was not found.</value>
+  </data>
+  <data name="platform.discounts.already_discounted" xml:space="preserve">
+    <value>This subscription already has a discount. Only one discount can apply at a time.</value>
+  </data>
+  <data name="platform.discounts.charge_description_required" xml:space="preserve">
+    <value>Describe the charge.</value>
+  </data>
+  <data name="platform.discounts.charge_description_too_long" xml:space="preserve">
+    <value>The description can be at most {maxLength} characters.</value>
+  </data>
+  <data name="platform.discounts.charge_not_found" xml:space="preserve">
+    <value>The charge was not found.</value>
+  </data>
+  <data name="platform.discounts.charge_not_pending" xml:space="preserve">
+    <value>This charge has already been billed or cancelled.</value>
+  </data>
+  <data name="platform.discounts.setup_fee_charged" xml:space="preserve">
+    <value>The setup fee has already been charged and can no longer change.</value>
+  </data>
+  <data name="platform.sales_settings.value_invalid" xml:space="preserve">
+    <value>One of the values is not valid. Percentages are 0 to 100; amounts and days must be positive.</value>
+  </data>
+  <data name="platform.promotions.code_invalid" xml:space="preserve">
+    <value>Use 3 to 32 letters, digits or hyphens for the code.</value>
+  </data>
+  <data name="platform.promotions.code_taken" xml:space="preserve">
+    <value>This code is already used by another promotion.</value>
+  </data>
+  <data name="platform.promotions.name_required" xml:space="preserve">
+    <value>Enter a name for the promotion.</value>
+  </data>
+  <data name="platform.promotions.name_too_long" xml:space="preserve">
+    <value>The name is too long.</value>
+  </data>
+  <data name="platform.promotions.dates_invalid" xml:space="preserve">
+    <value>The end of the validity must be after its start.</value>
+  </data>
+  <data name="platform.promotions.use_invalid" xml:space="preserve">
+    <value>Allow the code at registration, by staff, or both.</value>
+  </data>
+  <data name="platform.promotions.limit_invalid" xml:space="preserve">
+    <value>The redemption limit must be at least 1, or left blank for no limit.</value>
+  </data>
+  <data name="platform.promotions.not_editable" xml:space="preserve">
+    <value>Only a draft or a sent-back promotion can be changed.</value>
+  </data>
+  <data name="platform.promotions.not_pending" xml:space="preserve">
+    <value>This promotion is not waiting for approval.</value>
+  </data>
+  <data name="platform.promotions.not_found" xml:space="preserve">
+    <value>The promotion was not found.</value>
+  </data>
+  <data name="platform.promotions.not_active" xml:space="preserve">
+    <value>This promotion code is not active.</value>
+  </data>
+  <data name="platform.promotions.not_started" xml:space="preserve">
+    <value>This promotion code is not valid yet.</value>
+  </data>
+  <data name="platform.promotions.expired" xml:space="preserve">
+    <value>This promotion code has expired.</value>
+  </data>
+  <data name="platform.promotions.not_for_plan" xml:space="preserve">
+    <value>This promotion code does not apply to this plan.</value>
+  </data>
+  <data name="platform.promotions.not_for_term" xml:space="preserve">
+    <value>This promotion code does not apply to this billing term.</value>
+  </data>
+  <data name="platform.promotions.not_at_registration" xml:space="preserve">
+    <value>This promotion code cannot be used at registration.</value>
+  </data>
+  <data name="platform.promotions.not_by_staff" xml:space="preserve">
+    <value>This promotion code cannot be applied by staff.</value>
+  </data>
+  <data name="platform.promotions.used_up" xml:space="preserve">
+    <value>This promotion code has been used the maximum number of times.</value>
+  </data>
+  <data name="platform.promotions.already_used" xml:space="preserve">
+    <value>This customer has already used this promotion code.</value>
+  </data>
+  <data name="platform.sales.own_submission" xml:space="preserve">
+    <value>You cannot decide on something you prepared yourself. Another approver must decide.</value>
+  </data>
+  <data name="platform.sales.reason_required" xml:space="preserve">
+    <value>Enter a reason.</value>
+  </data>
+  <data name="platform.sales.reason_too_long" xml:space="preserve">
+    <value>The reason is too long.</value>
+  </data>
+  <data name="platform.sales.actor_required" xml:space="preserve">
+    <value>The person making this change is not known.</value>
+  </data>
+  <data name="platform.offers.company_required" xml:space="preserve">
+    <value>Enter the customer’s company name.</value>
+  </data>
+  <data name="platform.offers.email_invalid" xml:space="preserve">
+    <value>Enter a valid email address, or leave it blank.</value>
+  </data>
+  <data name="platform.offers.terms_invalid" xml:space="preserve">
+    <value>The plan, term or number of licences is not valid for this offer.</value>
+  </data>
+  <data name="platform.offers.expiry_invalid" xml:space="preserve">
+    <value>The expiry date must be in the future and within the period the sales manager allows.</value>
+  </data>
+  <data name="platform.offers.uses_invalid" xml:space="preserve">
+    <value>The number of uses must be at least 1.</value>
+  </data>
+  <data name="platform.offers.not_editable" xml:space="preserve">
+    <value>Only a draft or a sent-back offer can be changed.</value>
+  </data>
+  <data name="platform.offers.not_pending" xml:space="preserve">
+    <value>This offer is not waiting for approval.</value>
+  </data>
+  <data name="platform.offers.not_issued" xml:space="preserve">
+    <value>This offer link is not active.</value>
+  </data>
+  <data name="platform.offers.not_found" xml:space="preserve">
+    <value>The offer was not found.</value>
+  </data>
+  <data name="platform.offers.unavailable" xml:space="preserve">
+    <value>This offer link is no longer available. Contact your Vixly sales contact.</value>
+  </data>
+  <data name="platform.offers.email_mismatch" xml:space="preserve">
+    <value>This offer is reserved for another email address.</value>
+  </data>
+  <data name="platform.offers.not_revocable" xml:space="preserve">
+    <value>This offer has already been used or revoked.</value>
+  </data>
+  <data name="platform.plans.draft_submitted" xml:space="preserve">
+    <value>This draft is waiting for approval and cannot change.</value>
+  </data>
+  <data name="platform.plans.draft_not_submitted" xml:space="preserve">
+    <value>This draft has not been submitted for approval.</value>
+  </data>
+  <data name="platform.plans.own_submission" xml:space="preserve">
+    <value>You cannot approve a plan version you submitted yourself.</value>
+  </data>
+  <data name="platform.plans.rejection_reason_required" xml:space="preserve">
+    <value>Say why the version is sent back, so sales can correct it.</value>
+  </data>
+  <data name="ui.audit.action.platform.plans.version_submitted" xml:space="preserve">
+    <value>Plan version submitted for approval</value>
+  </data>
+  <data name="ui.audit.action.platform.plans.version_rejected" xml:space="preserve">
+    <value>Plan version sent back</value>
+  </data>
+  <data name="ui.audit.action.platform.discounts.requested" xml:space="preserve">
+    <value>Discount requested</value>
+  </data>
+  <data name="ui.audit.action.platform.discounts.applied" xml:space="preserve">
+    <value>Discount applied</value>
+  </data>
+  <data name="ui.audit.action.platform.discounts.approved" xml:space="preserve">
+    <value>Discount approved</value>
+  </data>
+  <data name="ui.audit.action.platform.discounts.rejected" xml:space="preserve">
+    <value>Discount rejected</value>
+  </data>
+  <data name="ui.audit.action.platform.discounts.ended" xml:space="preserve">
+    <value>Discount ended</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.charge_added" xml:space="preserve">
+    <value>One-time charge added</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.charge_cancelled" xml:space="preserve">
+    <value>One-time charge cancelled</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.setup_fee_changed" xml:space="preserve">
+    <value>Setup fee changed</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.activated_nothing_due" xml:space="preserve">
+    <value>Subscription activated with nothing to pay</value>
+  </data>
+  <data name="ui.audit.action.platform.promotions.created" xml:space="preserve">
+    <value>Promotion created</value>
+  </data>
+  <data name="ui.audit.action.platform.promotions.updated" xml:space="preserve">
+    <value>Promotion updated</value>
+  </data>
+  <data name="ui.audit.action.platform.promotions.name_set" xml:space="preserve">
+    <value>Promotion name set</value>
+  </data>
+  <data name="ui.audit.action.platform.promotions.submitted" xml:space="preserve">
+    <value>Promotion submitted for approval</value>
+  </data>
+  <data name="ui.audit.action.platform.promotions.approved" xml:space="preserve">
+    <value>Promotion approved</value>
+  </data>
+  <data name="ui.audit.action.platform.promotions.rejected" xml:space="preserve">
+    <value>Promotion sent back</value>
+  </data>
+  <data name="ui.audit.action.platform.promotions.paused" xml:space="preserve">
+    <value>Promotion paused</value>
+  </data>
+  <data name="ui.audit.action.platform.promotions.resumed" xml:space="preserve">
+    <value>Promotion resumed</value>
+  </data>
+  <data name="ui.audit.action.platform.promotions.ended" xml:space="preserve">
+    <value>Promotion ended</value>
+  </data>
+  <data name="ui.audit.action.platform.promotions.redeemed" xml:space="preserve">
+    <value>Promotion code redeemed</value>
+  </data>
+  <data name="ui.audit.action.platform.offers.prepared" xml:space="preserve">
+    <value>Offer prepared</value>
+  </data>
+  <data name="ui.audit.action.platform.offers.updated" xml:space="preserve">
+    <value>Offer updated</value>
+  </data>
+  <data name="ui.audit.action.platform.offers.submitted" xml:space="preserve">
+    <value>Offer submitted for approval</value>
+  </data>
+  <data name="ui.audit.action.platform.offers.issued" xml:space="preserve">
+    <value>Offer link issued</value>
+  </data>
+  <data name="ui.audit.action.platform.offers.approved" xml:space="preserve">
+    <value>Offer approved</value>
+  </data>
+  <data name="ui.audit.action.platform.offers.rejected" xml:space="preserve">
+    <value>Offer sent back</value>
+  </data>
+  <data name="ui.audit.action.platform.offers.revoked" xml:space="preserve">
+    <value>Offer revoked</value>
+  </data>
+  <data name="ui.audit.action.platform.offers.link_replaced" xml:space="preserve">
+    <value>Offer link replaced</value>
+  </data>
+  <data name="ui.audit.action.platform.offers.used" xml:space="preserve">
+    <value>Offer link used</value>
+  </data>
+  <data name="ui.audit.action.platform.sales_settings.updated" xml:space="preserve">
+    <value>Sales limits changed</value>
+  </data>
+  <data name="ui.permission.platform.discounts.grant" xml:space="preserve">
+    <value>Grant discounts and apply promotion codes</value>
+  </data>
+  <data name="ui.permission.platform.discounts.approve" xml:space="preserve">
+    <value>Approve discounts beyond the sales limits</value>
+  </data>
+  <data name="ui.permission.platform.offers.manage" xml:space="preserve">
+    <value>Prepare and manage offer links</value>
+  </data>
+  <data name="ui.permission.platform.promotions.manage" xml:space="preserve">
+    <value>Design and manage promotion codes</value>
+  </data>
+  <data name="ui.permission.platform.promotions.approve" xml:space="preserve">
+    <value>Approve promotions before they go live</value>
+  </data>
+  <data name="ui.permission.platform.subscriptions.charges" xml:space="preserve">
+    <value>Add one-time charges and change setup fees</value>
+  </data>
+  <data name="ui.permission.platform.sales.configure" xml:space="preserve">
+    <value>Set the sales limits</value>
+  </data>
+  <data name="ui.permission_area.discounts" xml:space="preserve">
+    <value>Discounts</value>
+  </data>
+  <data name="ui.permission_area.offers" xml:space="preserve">
+    <value>Offers</value>
+  </data>
+  <data name="ui.permission_area.promotions" xml:space="preserve">
+    <value>Promotions</value>
+  </data>
+  <data name="ui.permission_area.sales" xml:space="preserve">
+    <value>Sales</value>
+  </data>
+  <data name="ui.roles.system.salesperson" xml:space="preserve">
+    <value>Salesperson</value>
+  </data>
+  <data name="ui.roles.system.sales_manager" xml:space="preserve">
+    <value>Sales manager</value>
+  </data>
+  <data name="ui.roles.system.chief_financial_officer" xml:space="preserve">
+    <value>Chief Financial Officer</value>
+  </data>
+  <data name="ui.subscription_history.activated_nothing_due" xml:space="preserve">
+    <value>Activated with nothing to pay; period runs until {periodEnd}</value>
+  </data>
+  <data name="ui.subscription_history.discount_requested" xml:space="preserve">
+    <value>Discount requested ({source}): {terms}</value>
+  </data>
+  <data name="ui.subscription_history.discount_applied" xml:space="preserve">
+    <value>Discount applied ({source}): {terms}</value>
+  </data>
+  <data name="ui.subscription_history.discount_approved" xml:space="preserve">
+    <value>Discount approved: {terms}</value>
+  </data>
+  <data name="ui.subscription_history.discount_rejected" xml:space="preserve">
+    <value>Discount rejected: {terms}</value>
+  </data>
+  <data name="ui.subscription_history.discount_ended" xml:space="preserve">
+    <value>Discount ended: {endReason}</value>
+  </data>
+  <data name="ui.subscription_history.charge_added" xml:space="preserve">
+    <value>One-time charge added: {description}, {amount} {currency}</value>
+  </data>
+  <data name="ui.subscription_history.charge_cancelled" xml:space="preserve">
+    <value>One-time charge cancelled: {description}, {amount} {currency}</value>
+  </data>
+  <data name="ui.subscription_history.setup_fee_changed" xml:space="preserve">
+    <value>Setup fee changed from {from} to {to} {currency}</value>
+  </data>
+  <data name="ui.discounts.end_reason.completed" xml:space="preserve">
+    <value>its duration is over</value>
+  </data>
+  <data name="ui.discounts.end_reason.replaced" xml:space="preserve">
+    <value>replaced by another discount</value>
+  </data>
+  <data name="ui.discounts.end_reason.ended_by_staff" xml:space="preserve">
+    <value>ended by staff</value>
+  </data>
+  <data name="ui.discounts.end_reason.subscription_ended" xml:space="preserve">
+    <value>the subscription ended</value>
+  </data>
+  <data name="email.approval_request.subject" xml:space="preserve">
+    <value>Vixly: approval needed ({kind})</value>
+  </data>
+  <data name="email.approval_request.body" xml:space="preserve">
+    <value>Hello {name},
+
+{subject} is waiting for your decision ({kind}).
+
+Open your approvals: {link}
+
+The person who prepared it cannot approve it; another approver must decide.
+
+Vixly</value>
+  </data>
+  <data name="email.discount_ending.subject" xml:space="preserve">
+    <value>Your discount on the {plan} plan is ending</value>
+  </data>
+  <data name="email.discount_ending.body" xml:space="preserve">
+    <value>Hello {name},
+
+The discount {company} receives on the {plan} plan ends on {date}.
+
+From then on, your amount per period will be {amount} (before tax).
+
+Questions? Contact us at {support}.
+
+Vixly</value>
+  </data>
+  <data name="ui.approvals.title" xml:space="preserve">
+    <value>Approvals</value>
+  </data>
+  <data name="ui.approvals.help" xml:space="preserve">
+    <value>Requests waiting for your decision. Open one to approve or send it back; nobody decides on their own request.</value>
+  </data>
+  <data name="ui.approvals.count" xml:space="preserve">
+    <value>{count} waiting</value>
+  </data>
+  <data name="ui.approvals.empty" xml:space="preserve">
+    <value>Nothing is waiting for your approval.</value>
+  </data>
+  <data name="ui.approvals.kind" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ui.approvals.kind.discount" xml:space="preserve">
+    <value>Discount</value>
+  </data>
+  <data name="ui.approvals.kind.offer" xml:space="preserve">
+    <value>Offer link</value>
+  </data>
+  <data name="ui.approvals.kind.promotion" xml:space="preserve">
+    <value>Promotion</value>
+  </data>
+  <data name="ui.approvals.kind.plan_version" xml:space="preserve">
+    <value>Plan version</value>
+  </data>
+  <data name="ui.approvals.item" xml:space="preserve">
+    <value>Request</value>
+  </data>
+  <data name="ui.approvals.detail" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="ui.approvals.requested_by" xml:space="preserve">
+    <value>Requested by</value>
+  </data>
+  <data name="ui.approvals.requested" xml:space="preserve">
+    <value>Requested</value>
+  </data>
+  <data name="ui.approvals.reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="ui.approvals.reason_help" xml:space="preserve">
+    <value>Optional when approving; required when sending back, so the requester knows what to change.</value>
+  </data>
+  <data name="ui.approvals.approve" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="ui.approvals.reject" xml:space="preserve">
+    <value>Send back</value>
+  </data>
+  <data name="ui.approvals.decision" xml:space="preserve">
+    <value>Decision</value>
+  </data>
+  <data name="ui.plans.submit" xml:space="preserve">
+    <value>Submit for approval</value>
+  </data>
+  <data name="ui.plans.submitted" xml:space="preserve">
+    <value>Draft submitted for approval.</value>
+  </data>
+  <data name="ui.plans.waiting_for_cfo" xml:space="preserve">
+    <value>Submitted on {time}; waiting for the CFO’s approval. The draft cannot change meanwhile.</value>
+  </data>
+  <data name="ui.plans.sent_back" xml:space="preserve">
+    <value>Sent back: {reason}</value>
+  </data>
+  <data name="ui.plans.approval" xml:space="preserve">
+    <value>Approval</value>
+  </data>
+  <data name="ui.plans.approval_help" xml:space="preserve">
+    <value>Version {number} is waiting for your approval. Approving publishes it: new subscribers get it at once, existing ones at their next renewal.</value>
+  </data>
+  <data name="ui.plans.approve_publish" xml:space="preserve">
+    <value>Approve and publish</value>
+  </data>
+  <data name="ui.plans.version_rejected" xml:space="preserve">
+    <value>Version sent back to sales.</value>
+  </data>
+  <data name="ui.discounts.title" xml:space="preserve">
+    <value>Discount</value>
+  </data>
+  <data name="ui.discounts.none" xml:space="preserve">
+    <value>No discount</value>
+  </data>
+  <data name="ui.discounts.terms" xml:space="preserve">
+    <value>Discount</value>
+  </data>
+  <data name="ui.discounts.kind" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ui.discounts.kind.percent" xml:space="preserve">
+    <value>Percentage</value>
+  </data>
+  <data name="ui.discounts.kind.fixed_amount" xml:space="preserve">
+    <value>Fixed amount per period</value>
+  </data>
+  <data name="ui.discounts.percent" xml:space="preserve">
+    <value>Percentage off</value>
+  </data>
+  <data name="ui.discounts.amount_in" xml:space="preserve">
+    <value>Amount ({currency})</value>
+  </data>
+  <data name="ui.discounts.amount_plan_currency" xml:space="preserve">
+    <value>Amount (in the subscription’s currency)</value>
+  </data>
+  <data name="ui.discounts.duration" xml:space="preserve">
+    <value>Lasts</value>
+  </data>
+  <data name="ui.discounts.duration.periods" xml:space="preserve">
+    <value>A number of periods</value>
+  </data>
+  <data name="ui.discounts.duration.until_date" xml:space="preserve">
+    <value>Until a date</value>
+  </data>
+  <data name="ui.discounts.duration.no_end" xml:space="preserve">
+    <value>No end</value>
+  </data>
+  <data name="ui.discounts.periods" xml:space="preserve">
+    <value>Number of periods</value>
+  </data>
+  <data name="ui.discounts.periods_help" xml:space="preserve">
+    <value>A period is a month or a year, following the subscription’s term. One free month: 100% for 1 period.</value>
+  </data>
+  <data name="ui.discounts.ends_on" xml:space="preserve">
+    <value>Ends on</value>
+  </data>
+  <data name="ui.discounts.ends_on_help" xml:space="preserve">
+    <value>Applies to periods that start before this date.</value>
+  </data>
+  <data name="ui.discounts.percent_value" xml:space="preserve">
+    <value>{value}% off</value>
+  </data>
+  <data name="ui.discounts.fixed_value" xml:space="preserve">
+    <value>{amount} off</value>
+  </data>
+  <data name="ui.discounts.for_periods" xml:space="preserve">
+    <value>for {count} period(s)</value>
+  </data>
+  <data name="ui.discounts.until_date" xml:space="preserve">
+    <value>until {date}</value>
+  </data>
+  <data name="ui.discounts.no_end" xml:space="preserve">
+    <value>with no end</value>
+  </data>
+  <data name="ui.discounts.source.staff" xml:space="preserve">
+    <value>granted by staff</value>
+  </data>
+  <data name="ui.discounts.source.promotion" xml:space="preserve">
+    <value>promotion code</value>
+  </data>
+  <data name="ui.discounts.source.offer" xml:space="preserve">
+    <value>offer link</value>
+  </data>
+  <data name="ui.discounts.granted_by" xml:space="preserve">
+    <value>{source}, by {name} on {time}: {reason}</value>
+  </data>
+  <data name="ui.discounts.lasts_until" xml:space="preserve">
+    <value>Last discounted period starts before {date}.</value>
+  </data>
+  <data name="ui.discounts.pending" xml:space="preserve">
+    <value>Waiting for the sales manager’s approval: {terms}</value>
+  </data>
+  <data name="ui.discounts.grant" xml:space="preserve">
+    <value>Grant a discount</value>
+  </data>
+  <data name="ui.discounts.replace" xml:space="preserve">
+    <value>Replace the discount</value>
+  </data>
+  <data name="ui.discounts.end" xml:space="preserve">
+    <value>End the discount</value>
+  </data>
+  <data name="ui.discounts.apply_promotion" xml:space="preserve">
+    <value>Apply a promotion code</value>
+  </data>
+  <data name="ui.discounts.promotion_code" xml:space="preserve">
+    <value>Promotion code</value>
+  </data>
+  <data name="ui.discounts.applied" xml:space="preserve">
+    <value>Discount applied.</value>
+  </data>
+  <data name="ui.discounts.sent_for_approval" xml:space="preserve">
+    <value>Beyond your limits: the discount was sent to the sales manager for approval.</value>
+  </data>
+  <data name="ui.discounts.approved" xml:space="preserve">
+    <value>Discount approved and applied.</value>
+  </data>
+  <data name="ui.discounts.rejected" xml:space="preserve">
+    <value>Discount rejected.</value>
+  </data>
+  <data name="ui.discounts.ended" xml:space="preserve">
+    <value>Discount ended.</value>
+  </data>
+  <data name="ui.discounts.promotion_applied" xml:space="preserve">
+    <value>Promotion code applied.</value>
+  </data>
+  <data name="ui.discounts.current_period" xml:space="preserve">
+    <value>Discount this period</value>
+  </data>
+  <data name="ui.discounts.before_discount" xml:space="preserve">
+    <value>{amount} before discount</value>
+  </data>
+  <data name="ui.discounts.filter" xml:space="preserve">
+    <value>With a discount</value>
+  </data>
+  <data name="ui.discounts.badge" xml:space="preserve">
+    <value>Discount</value>
+  </data>
+  <data name="ui.charges.title" xml:space="preserve">
+    <value>Setup fee and one-time charges</value>
+  </data>
+  <data name="ui.charges.setup_fee" xml:space="preserve">
+    <value>Setup fee</value>
+  </data>
+  <data name="ui.charges.setup_fee_line" xml:space="preserve">
+    <value>Setup fee: {amount}</value>
+  </data>
+  <data name="ui.charges.setup_fee_plan" xml:space="preserve">
+    <value>plan’s fee</value>
+  </data>
+  <data name="ui.charges.setup_fee_custom" xml:space="preserve">
+    <value>agreed for this customer</value>
+  </data>
+  <data name="ui.charges.setup_fee_overridden" xml:space="preserve">
+    <value>(agreed for this customer)</value>
+  </data>
+  <data name="ui.charges.setup_fee_help" xml:space="preserve">
+    <value>Leave blank to go back to the plan’s fee; enter 0 to waive it.</value>
+  </data>
+  <data name="ui.charges.change_setup_fee" xml:space="preserve">
+    <value>Change the setup fee</value>
+  </data>
+  <data name="ui.charges.add" xml:space="preserve">
+    <value>Add a one-time charge</value>
+  </data>
+  <data name="ui.charges.description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="ui.charges.amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="ui.charges.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.charges.status.pending" xml:space="preserve">
+    <value>To bill</value>
+  </data>
+  <data name="ui.charges.status.billed" xml:space="preserve">
+    <value>Billed</value>
+  </data>
+  <data name="ui.charges.status.cancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="ui.charges.cancel" xml:space="preserve">
+    <value>Cancel the charge</value>
+  </data>
+  <data name="ui.charges.empty" xml:space="preserve">
+    <value>No one-time charges.</value>
+  </data>
+  <data name="ui.charges.added" xml:space="preserve">
+    <value>Charge added; it is billed with the next invoice.</value>
+  </data>
+  <data name="ui.charges.cancelled" xml:space="preserve">
+    <value>Charge cancelled.</value>
+  </data>
+  <data name="ui.charges.setup_fee_changed" xml:space="preserve">
+    <value>Setup fee changed.</value>
+  </data>
+  <data name="ui.common.remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ui.promotions.title" xml:space="preserve">
+    <value>Promotions</value>
+  </data>
+  <data name="ui.promotions.new" xml:space="preserve">
+    <value>New promotion</value>
+  </data>
+  <data name="ui.promotions.back" xml:space="preserve">
+    <value>Back to promotions</value>
+  </data>
+  <data name="ui.promotions.search" xml:space="preserve">
+    <value>Search code or name</value>
+  </data>
+  <data name="ui.promotions.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.promotions.status.all" xml:space="preserve">
+    <value>All statuses</value>
+  </data>
+  <data name="ui.promotions.status.draft" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="ui.promotions.status.pending_approval" xml:space="preserve">
+    <value>Waiting for approval</value>
+  </data>
+  <data name="ui.promotions.status.active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="ui.promotions.status.rejected" xml:space="preserve">
+    <value>Sent back</value>
+  </data>
+  <data name="ui.promotions.status.paused" xml:space="preserve">
+    <value>Paused</value>
+  </data>
+  <data name="ui.promotions.status.ended" xml:space="preserve">
+    <value>Ended</value>
+  </data>
+  <data name="ui.promotions.count" xml:space="preserve">
+    <value>{count} promotions</value>
+  </data>
+  <data name="ui.promotions.empty" xml:space="preserve">
+    <value>No promotions yet.</value>
+  </data>
+  <data name="ui.promotions.name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ui.promotions.code" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="ui.promotions.code_help" xml:space="preserve">
+    <value>What customers type, such as SPRING25. Letters, digits and hyphens; not case-sensitive.</value>
+  </data>
+  <data name="ui.promotions.create" xml:space="preserve">
+    <value>Create the draft</value>
+  </data>
+  <data name="ui.promotions.create_help" xml:space="preserve">
+    <value>The promotion starts as a draft. Submit it for approval: it goes live only once the CFO approves it.</value>
+  </data>
+  <data name="ui.promotions.validity" xml:space="preserve">
+    <value>Valid</value>
+  </data>
+  <data name="ui.promotions.valid_from" xml:space="preserve">
+    <value>Valid from</value>
+  </data>
+  <data name="ui.promotions.valid_to" xml:space="preserve">
+    <value>Valid until</value>
+  </data>
+  <data name="ui.promotions.valid_to_help" xml:space="preserve">
+    <value>Last day the code can be used. Leave blank for no end.</value>
+  </data>
+  <data name="ui.promotions.valid_range" xml:space="preserve">
+    <value>{from} to {to}</value>
+  </data>
+  <data name="ui.promotions.no_end" xml:space="preserve">
+    <value>no end</value>
+  </data>
+  <data name="ui.promotions.where" xml:space="preserve">
+    <value>Where it can be used</value>
+  </data>
+  <data name="ui.promotions.where.both" xml:space="preserve">
+    <value>At registration and by staff</value>
+  </data>
+  <data name="ui.promotions.where.registration" xml:space="preserve">
+    <value>At registration</value>
+  </data>
+  <data name="ui.promotions.where.staff" xml:space="preserve">
+    <value>By staff</value>
+  </data>
+  <data name="ui.promotions.at_registration" xml:space="preserve">
+    <value>Customers can enter it at registration</value>
+  </data>
+  <data name="ui.promotions.by_staff" xml:space="preserve">
+    <value>Staff can apply it to an existing subscription</value>
+  </data>
+  <data name="ui.promotions.redemption_limit" xml:space="preserve">
+    <value>Maximum uses</value>
+  </data>
+  <data name="ui.promotions.redemption_limit_help" xml:space="preserve">
+    <value>Across all customers. Leave blank for no limit; each customer can use a code once.</value>
+  </data>
+  <data name="ui.promotions.redemptions" xml:space="preserve">
+    <value>Used</value>
+  </data>
+  <data name="ui.promotions.redeemed_of" xml:space="preserve">
+    <value>{count} of {limit}</value>
+  </data>
+  <data name="ui.promotions.plans" xml:space="preserve">
+    <value>Plans</value>
+  </data>
+  <data name="ui.promotions.plans_help" xml:space="preserve">
+    <value>Tick the plans the code applies to. None ticked means every plan.</value>
+  </data>
+  <data name="ui.promotions.all_plans" xml:space="preserve">
+    <value>All plans</value>
+  </data>
+  <data name="ui.promotions.any_term" xml:space="preserve">
+    <value>Any term</value>
+  </data>
+  <data name="ui.promotions.overview" xml:space="preserve">
+    <value>Overview</value>
+  </data>
+  <data name="ui.promotions.designed_by" xml:space="preserve">
+    <value>Designed by</value>
+  </data>
+  <data name="ui.promotions.waiting_for_cfo" xml:space="preserve">
+    <value>Waiting for the CFO’s approval. The promotion cannot change meanwhile.</value>
+  </data>
+  <data name="ui.promotions.edit" xml:space="preserve">
+    <value>Terms</value>
+  </data>
+  <data name="ui.promotions.save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ui.promotions.saved" xml:space="preserve">
+    <value>Promotion saved.</value>
+  </data>
+  <data name="ui.promotions.submitted" xml:space="preserve">
+    <value>Promotion submitted for approval.</value>
+  </data>
+  <data name="ui.promotions.names" xml:space="preserve">
+    <value>Name in each language</value>
+  </data>
+  <data name="ui.promotions.name_help" xml:space="preserve">
+    <value>Shown to customers who use the code. Leave blank to remove a translation.</value>
+  </data>
+  <data name="ui.promotions.save_name" xml:space="preserve">
+    <value>Save the name</value>
+  </data>
+  <data name="ui.promotions.name_saved" xml:space="preserve">
+    <value>Name saved.</value>
+  </data>
+  <data name="ui.promotions.decision_help" xml:space="preserve">
+    <value>Check the terms above. Approving makes the code usable from its start date.</value>
+  </data>
+  <data name="ui.promotions.approved" xml:space="preserve">
+    <value>Promotion approved.</value>
+  </data>
+  <data name="ui.promotions.rejected" xml:space="preserve">
+    <value>Promotion sent back.</value>
+  </data>
+  <data name="ui.promotions.pause" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="ui.promotions.resume" xml:space="preserve">
+    <value>Resume</value>
+  </data>
+  <data name="ui.promotions.end" xml:space="preserve">
+    <value>End the promotion</value>
+  </data>
+  <data name="ui.promotions.end_help" xml:space="preserve">
+    <value>Ending is final. Customers who already used the code keep their discount for its agreed duration.</value>
+  </data>
+  <data name="ui.promotions.paused" xml:space="preserve">
+    <value>Promotion paused.</value>
+  </data>
+  <data name="ui.promotions.resumed" xml:space="preserve">
+    <value>Promotion resumed.</value>
+  </data>
+  <data name="ui.promotions.ended" xml:space="preserve">
+    <value>Promotion ended.</value>
+  </data>
+  <data name="ui.offers.title" xml:space="preserve">
+    <value>Offer links</value>
+  </data>
+  <data name="ui.offers.new" xml:space="preserve">
+    <value>New offer link</value>
+  </data>
+  <data name="ui.offers.back" xml:space="preserve">
+    <value>Back to offer links</value>
+  </data>
+  <data name="ui.offers.search" xml:space="preserve">
+    <value>Search company or email</value>
+  </data>
+  <data name="ui.offers.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.offers.status.all" xml:space="preserve">
+    <value>All statuses</value>
+  </data>
+  <data name="ui.offers.status.draft" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="ui.offers.status.pending_approval" xml:space="preserve">
+    <value>Waiting for approval</value>
+  </data>
+  <data name="ui.offers.status.issued" xml:space="preserve">
+    <value>Issued</value>
+  </data>
+  <data name="ui.offers.status.expired" xml:space="preserve">
+    <value>Expired</value>
+  </data>
+  <data name="ui.offers.status.rejected" xml:space="preserve">
+    <value>Sent back</value>
+  </data>
+  <data name="ui.offers.status.used" xml:space="preserve">
+    <value>Used</value>
+  </data>
+  <data name="ui.offers.status.revoked" xml:space="preserve">
+    <value>Revoked</value>
+  </data>
+  <data name="ui.offers.count" xml:space="preserve">
+    <value>{count} offer links</value>
+  </data>
+  <data name="ui.offers.empty" xml:space="preserve">
+    <value>No offer links yet.</value>
+  </data>
+  <data name="ui.offers.company" xml:space="preserve">
+    <value>Company</value>
+  </data>
+  <data name="ui.offers.customer" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="ui.offers.bound_email" xml:space="preserve">
+    <value>Reserved for email</value>
+  </data>
+  <data name="ui.offers.bound_email_help" xml:space="preserve">
+    <value>Optional. When set, only this email address can register with the link.</value>
+  </data>
+  <data name="ui.offers.any_email" xml:space="preserve">
+    <value>Any email address</value>
+  </data>
+  <data name="ui.offers.reason" xml:space="preserve">
+    <value>Why this offer</value>
+  </data>
+  <data name="ui.offers.reason_help" xml:space="preserve">
+    <value>Why this customer gets these terms. The sales manager sees it when approving.</value>
+  </data>
+  <data name="ui.offers.subscription" xml:space="preserve">
+    <value>Subscription</value>
+  </data>
+  <data name="ui.offers.start_trial" xml:space="preserve">
+    <value>Start with the plan’s trial</value>
+  </data>
+  <data name="ui.offers.with_discount" xml:space="preserve">
+    <value>Include a discount</value>
+  </data>
+  <data name="ui.offers.charges" xml:space="preserve">
+    <value>Setup fee and charges</value>
+  </data>
+  <data name="ui.offers.setup_fee_help" xml:space="preserve">
+    <value>Leave blank to keep the plan’s setup fee; enter 0 to waive it.</value>
+  </data>
+  <data name="ui.offers.plan_setup_fee" xml:space="preserve">
+    <value>The plan’s setup fee</value>
+  </data>
+  <data name="ui.offers.link" xml:space="preserve">
+    <value>Offer link</value>
+  </data>
+  <data name="ui.offers.expires" xml:space="preserve">
+    <value>Expires</value>
+  </data>
+  <data name="ui.offers.expires_help" xml:space="preserve">
+    <value>Last day the link can be used. The sales manager may limit how far ahead this can be.</value>
+  </data>
+  <data name="ui.offers.uses_allowed" xml:space="preserve">
+    <value>Number of registrations allowed</value>
+  </data>
+  <data name="ui.offers.uses" xml:space="preserve">
+    <value>Used</value>
+  </data>
+  <data name="ui.offers.uses_of" xml:space="preserve">
+    <value>{count} of {allowed}</value>
+  </data>
+  <data name="ui.offers.prepared_by" xml:space="preserve">
+    <value>Prepared by</value>
+  </data>
+  <data name="ui.offers.issued" xml:space="preserve">
+    <value>Issued</value>
+  </data>
+  <data name="ui.offers.overview" xml:space="preserve">
+    <value>Agreed terms</value>
+  </data>
+  <data name="ui.offers.create_help" xml:space="preserve">
+    <value>The offer is saved as a draft. Submit it from its page: within your limits the link is issued at once, beyond them the sales manager approves it first.</value>
+  </data>
+  <data name="ui.offers.prepare" xml:space="preserve">
+    <value>Save the draft</value>
+  </data>
+  <data name="ui.offers.edit" xml:space="preserve">
+    <value>Terms</value>
+  </data>
+  <data name="ui.offers.save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ui.offers.saved" xml:space="preserve">
+    <value>Offer saved.</value>
+  </data>
+  <data name="ui.offers.submit" xml:space="preserve">
+    <value>Issue the link</value>
+  </data>
+  <data name="ui.offers.submit_help" xml:space="preserve">
+    <value>Uses the saved terms. Within your limits the link is issued now; beyond them it goes to the sales manager first.</value>
+  </data>
+  <data name="ui.offers.submitted" xml:space="preserve">
+    <value>Done. If approval is needed, the sales manager has been asked.</value>
+  </data>
+  <data name="ui.offers.waiting_for_manager" xml:space="preserve">
+    <value>Waiting for the sales manager’s approval.</value>
+  </data>
+  <data name="ui.offers.decision_help" xml:space="preserve">
+    <value>Check the agreed terms above. Approving issues the link; you will see it once to pass on.</value>
+  </data>
+  <data name="ui.offers.approved" xml:space="preserve">
+    <value>Offer approved and link issued.</value>
+  </data>
+  <data name="ui.offers.rejected" xml:space="preserve">
+    <value>Offer sent back.</value>
+  </data>
+  <data name="ui.offers.link_once" xml:space="preserve">
+    <value>Copy this link now and send it to the customer. It is shown only once; use “Get a new link” if it is lost.</value>
+  </data>
+  <data name="ui.offers.new_link" xml:space="preserve">
+    <value>Get a new link</value>
+  </data>
+  <data name="ui.offers.link_replaced" xml:space="preserve">
+    <value>New link issued; the previous link no longer works.</value>
+  </data>
+  <data name="ui.offers.revoke" xml:space="preserve">
+    <value>Revoke</value>
+  </data>
+  <data name="ui.offers.revoke_reason" xml:space="preserve">
+    <value>Why revoke this offer</value>
+  </data>
+  <data name="ui.offers.revoked" xml:space="preserve">
+    <value>Offer revoked; the link no longer works.</value>
+  </data>
+  <data name="ui.sales_settings.title" xml:space="preserve">
+    <value>Sales limits</value>
+  </data>
+  <data name="ui.sales_settings.help" xml:space="preserve">
+    <value>What salespeople may offer on their own. Anything beyond these limits goes to the sales manager for approval. A blank limit means everything needs approval.</value>
+  </data>
+  <data name="ui.sales_settings.updated" xml:space="preserve">
+    <value>Last changed by {name} on {time}</value>
+  </data>
+  <data name="ui.sales_settings.discounts" xml:space="preserve">
+    <value>Discounts</value>
+  </data>
+  <data name="ui.sales_settings.max_percent" xml:space="preserve">
+    <value>Highest percentage without approval</value>
+  </data>
+  <data name="ui.sales_settings.max_percent_help" xml:space="preserve">
+    <value>Leave blank: every percentage discount needs approval.</value>
+  </data>
+  <data name="ui.sales_settings.fixed_limits" xml:space="preserve">
+    <value>Highest fixed amount without approval, per currency</value>
+  </data>
+  <data name="ui.sales_settings.fixed_amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="ui.sales_settings.add_limit" xml:space="preserve">
+    <value>Add a currency</value>
+  </data>
+  <data name="ui.sales_settings.fixed_limits_help" xml:space="preserve">
+    <value>A currency without a limit means every fixed discount in it needs approval.</value>
+  </data>
+  <data name="ui.sales_settings.no_end" xml:space="preserve">
+    <value>Discounts with no end always need approval</value>
+  </data>
+  <data name="ui.sales_settings.offers" xml:space="preserve">
+    <value>Offer links</value>
+  </data>
+  <data name="ui.sales_settings.max_offer_days" xml:space="preserve">
+    <value>Longest validity of an offer link, in days</value>
+  </data>
+  <data name="ui.sales_settings.max_offer_days_help" xml:space="preserve">
+    <value>Leave blank for no maximum.</value>
+  </data>
+  <data name="ui.sales_settings.customers" xml:space="preserve">
+    <value>Customers</value>
+  </data>
+  <data name="ui.sales_settings.notice_days" xml:space="preserve">
+    <value>Tell customers a discount is ending, days before</value>
+  </data>
+  <data name="ui.sales_settings.notice_days_help" xml:space="preserve">
+    <value>Leave blank: no email is sent.</value>
+  </data>
+  <data name="ui.sales_settings.codes_at_registration" xml:space="preserve">
+    <value>Show the promotion code field at registration</value>
+  </data>
+  <data name="ui.sales_settings.save" xml:space="preserve">
+    <value>Save the limits</value>
+  </data>
+  <data name="ui.sales_settings.saved" xml:space="preserve">
+    <value>Sales limits saved.</value>
+  </data>
+  <data name="ui.offers.one_time_charges" xml:space="preserve">
+    <value>One-time charges</value>
   </data>
 </root>

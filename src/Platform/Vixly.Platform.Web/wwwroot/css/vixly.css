@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    FILE: vixly.css
    PURPOSE: Complete Design System Stylesheet for Vixly Platform Console.
    NOTES:
@@ -877,78 +877,154 @@ a:focus-visible {
     color: #CBD5E1;
 }
 
-.vx-auth__pillars {
+/* Telemetry Widget */
+.vx-auth__telemetry {
+    display: flex;
+    flex-direction: column;
+    gap: var(--vx-space-3);
+    padding: var(--vx-space-4);
+    border-radius: var(--vx-radius-lg);
+    background: rgba(10, 18, 36, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme="light"] .vx-auth__telemetry {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.vx-auth__telemetry-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding-bottom: var(--vx-space-2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.vx-auth__telemetry-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ADE80;
+    box-shadow: 0 0 8px #4ADE80;
+}
+
+.vx-auth__telemetry-badge {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #86EFAC;
+    text-transform: uppercase;
+}
+
+.vx-auth__telemetry-grid {
     display: flex;
     flex-direction: column;
     gap: 0.65rem;
 }
 
-.vx-auth__pillar {
+.vx-auth__telemetry-item {
     display: flex;
     align-items: flex-start;
     gap: var(--vx-space-3);
-    padding: var(--vx-space-3) var(--vx-space-4);
-    border-radius: var(--vx-radius-md);
-    background: rgba(15, 23, 42, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(8px);
+    padding: 0.45rem 0.6rem;
+    border-radius: var(--vx-radius-sm);
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.04);
     transition: background var(--vx-transition-fast), border-color var(--vx-transition-fast);
 }
 
-.vx-auth__pillar:hover {
-    background: rgba(15, 23, 42, 0.7);
-    border-color: rgba(96, 165, 250, 0.35);
+.vx-auth__telemetry-item:hover {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: rgba(96, 165, 250, 0.3);
 }
 
-:root[data-theme="light"] .vx-auth__pillar {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.12);
+:root[data-theme="light"] .vx-auth__telemetry-item {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
-:root[data-theme="light"] .vx-auth__pillar:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.25);
+:root[data-theme="light"] .vx-auth__telemetry-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
-.vx-auth__pillar-icon {
+.vx-auth__telemetry-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    width: 1.85rem;
+    height: 1.85rem;
     border-radius: var(--vx-radius-sm);
     background: rgba(37, 99, 235, 0.25);
     color: #60A5FA;
     flex-shrink: 0;
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
-:root[data-theme="light"] .vx-auth__pillar-icon {
+:root[data-theme="light"] .vx-auth__telemetry-icon {
     background: rgba(255, 255, 255, 0.2);
     color: #FFFFFF;
 }
 
-.vx-auth__pillar-text {
+.vx-auth__telemetry-text {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
-.vx-auth__pillar-title {
-    font-size: var(--vx-font-size-sm);
+.vx-auth__telemetry-title {
+    font-size: var(--vx-font-size-xs);
     font-weight: 600;
     color: #F1F5F9;
     letter-spacing: -0.01em;
 }
 
-.vx-auth__pillar-desc {
-    font-size: var(--vx-font-size-xs);
+.vx-auth__telemetry-desc {
+    font-size: 0.6875rem;
     color: #94A3B8;
-    line-height: 1.4;
+    line-height: 1.35;
 }
 
-:root[data-theme="light"] .vx-auth__pillar-desc {
+:root[data-theme="light"] .vx-auth__telemetry-desc {
     color: #CBD5E1;
+}
+
+.vx-auth__telemetry-footer {
+    display: flex;
+    align-items: center;
+    padding-top: var(--vx-space-2);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 0.625rem;
+    color: #64748B;
+    font-family: var(--vx-font-mono);
+    letter-spacing: 0.02em;
+}
+
+:root[data-theme="light"] .vx-auth__telemetry-footer {
+    color: #CBD5E1;
+}
+
+.vx-auth__compliance {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: #64748B;
+    letter-spacing: 0.03em;
+}
+
+:root[data-theme="light"] .vx-auth__compliance {
+    color: #CBD5E1;
+}
+
+.vx-auth__compliance svg {
+    color: #38BDF8;
+    flex-shrink: 0;
 }
 
 /* Right Form Pane */
