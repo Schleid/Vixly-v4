@@ -1,4 +1,4 @@
-/* =========================================================
+﻿/* =========================================================
    FILE: vixly.css
    PURPOSE: Complete Design System Stylesheet for Vixly Platform Console.
    NOTES:
@@ -742,46 +742,251 @@ a:focus-visible {
    SIGN-IN FRAME & SCREENS (AUTHSHELL)
    ========================================================= */
 .vx-auth {
-    display: grid;
+    display: flex;
     min-height: 100vh;
-    place-items: center;
-    padding: var(--vx-space-6) var(--vx-space-4);
-    background: radial-gradient(ellipse at 50% 0%, var(--vx-color-surface-sunken) 0%, var(--vx-color-app) 75%);
+    align-items: center;
+    justify-content: center;
+    padding: var(--vx-space-8) var(--vx-space-4);
+    background: radial-gradient(circle at 50% 15%, #0F172A 0%, #060911 100%);
+    box-sizing: border-box;
+}
+
+:root[data-theme="light"] .vx-auth {
+    background: radial-gradient(circle at 50% 15%, #EFF6FF 0%, #E2E8F0 100%);
 }
 
 .vx-auth__card {
-    width: min(28rem, 100%);
-    background: var(--vx-color-surface);
-    border: 1px solid var(--vx-color-border);
-    border-radius: var(--vx-radius-xl);
-    padding: var(--vx-space-8);
-    box-shadow: var(--vx-shadow-3);
+    display: flex;
+    width: 100%;
+    max-width: 66rem;
+    min-height: 38rem;
+    background: #0B1120;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.5rem;
+    box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    overflow: hidden;
 }
 
-.vx-auth__header {
-    text-align: center;
-    margin-bottom: var(--vx-space-6);
+:root[data-theme="light"] .vx-auth__card {
+    background: #FFFFFF;
+    border-color: rgba(15, 23, 42, 0.08);
+    box-shadow: 0 32px 64px -12px rgba(15, 23, 42, 0.15), 0 0 0 1px rgba(15, 23, 42, 0.05);
 }
 
-.vx-auth__brand {
+/* Left Showcase Panel */
+.vx-auth__showcase {
+    flex: 1 1 52%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--vx-space-8) var(--vx-space-8);
+    background: linear-gradient(150deg, #13274F 0%, #0D172E 50%, #090E1B 100%);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    color: #F8FAFC;
+}
+
+:root[data-theme="light"] .vx-auth__showcase {
+    background: linear-gradient(150deg, #1E3A8A 0%, #1E40AF 60%, #172554 100%);
+    border-right-color: rgba(255, 255, 255, 0.15);
+}
+
+.vx-auth__showcase-glow {
+    position: absolute;
+    top: -25%;
+    left: -20%;
+    width: 140%;
+    height: 90%;
+    background: radial-gradient(circle at 35% 30%, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.08) 50%, transparent 75%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.vx-auth__showcase-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    gap: var(--vx-space-6);
+}
+
+.vx-auth__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--vx-radius-full);
+    background: rgba(37, 99, 235, 0.2);
+    border: 1px solid rgba(96, 165, 250, 0.35);
+    color: #93C5FD;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.vx-auth__badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #38BDF8;
+    box-shadow: 0 0 8px #38BDF8;
+}
+
+.vx-auth__showcase-hero {
+    display: flex;
+    flex-direction: column;
+    gap: var(--vx-space-3);
+}
+
+.vx-auth__logo-squircle {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.65rem;
+    color: #FFFFFF;
+    box-shadow: 0 10px 25px -4px rgba(37, 99, 235, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    margin-bottom: var(--vx-space-1);
+}
+
+.vx-auth__showcase-title {
+    font-size: 1.625rem;
     font-weight: 700;
-    font-size: var(--vx-font-size-lg);
-    letter-spacing: -0.02em;
-    color: var(--vx-color-text);
+    line-height: 1.25;
+    letter-spacing: -0.03em;
+    color: #FFFFFF;
+    margin: 0;
+}
+
+.vx-auth__showcase-desc {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: #94A3B8;
+    margin: 0;
+    max-width: 27rem;
+}
+
+:root[data-theme="light"] .vx-auth__showcase-desc {
+    color: #CBD5E1;
+}
+
+.vx-auth__pillars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.vx-auth__pillar {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--vx-space-3);
+    padding: var(--vx-space-3) var(--vx-space-4);
+    border-radius: var(--vx-radius-md);
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(8px);
+    transition: background var(--vx-transition-fast), border-color var(--vx-transition-fast);
+}
+
+.vx-auth__pillar:hover {
+    background: rgba(15, 23, 42, 0.7);
+    border-color: rgba(96, 165, 250, 0.35);
+}
+
+:root[data-theme="light"] .vx-auth__pillar {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme="light"] .vx-auth__pillar:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.vx-auth__pillar-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--vx-radius-sm);
+    background: rgba(37, 99, 235, 0.25);
+    color: #60A5FA;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+:root[data-theme="light"] .vx-auth__pillar-icon {
+    background: rgba(255, 255, 255, 0.2);
+    color: #FFFFFF;
+}
+
+.vx-auth__pillar-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.vx-auth__pillar-title {
+    font-size: var(--vx-font-size-sm);
+    font-weight: 600;
+    color: #F1F5F9;
+    letter-spacing: -0.01em;
+}
+
+.vx-auth__pillar-desc {
+    font-size: var(--vx-font-size-xs);
+    color: #94A3B8;
+    line-height: 1.4;
+}
+
+:root[data-theme="light"] .vx-auth__pillar-desc {
+    color: #CBD5E1;
+}
+
+/* Right Form Pane */
+.vx-auth__form-pane {
+    flex: 1 1 48%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--vx-space-8) var(--vx-space-8);
+    background: var(--vx-color-surface);
+    min-width: 0;
+}
+
+.vx-auth__form-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    padding: 0.2rem 0.65rem;
+    border-radius: var(--vx-radius-full);
+    background: var(--vx-color-primary-soft);
+    border: 1px solid color-mix(in srgb, var(--vx-color-primary) 30%, transparent);
+    color: var(--vx-color-primary);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     margin-bottom: var(--vx-space-4);
 }
 
-.vx-auth__brand svg {
-    color: var(--vx-color-primary);
-    background: var(--vx-color-primary-soft);
-    padding: 6px;
-    border-radius: var(--vx-radius-md);
-    box-sizing: content-box;
-    border: 1px solid color-mix(in srgb, var(--vx-color-primary) 20%, transparent);
+.vx-auth__form-badge .vx-auth__badge-dot {
+    background: var(--vx-color-primary);
+    box-shadow: 0 0 6px var(--vx-color-primary);
+}
+
+.vx-auth__header {
+    text-align: left;
+    margin-bottom: var(--vx-space-5);
 }
 
 .vx-auth__title {
@@ -789,6 +994,13 @@ a:focus-visible {
     font-weight: 700;
     color: var(--vx-color-text);
     letter-spacing: -0.025em;
+    margin: 0 0 var(--vx-space-2);
+}
+
+.vx-auth__subtitle {
+    font-size: var(--vx-font-size-sm);
+    color: var(--vx-color-text-muted);
+    line-height: 1.5;
     margin: 0;
 }
 
@@ -805,9 +1017,57 @@ a:focus-visible {
     gap: var(--vx-space-4);
 }
 
-.vx-auth__card .vx-form .vx-button {
+.vx-auth__card .vx-input {
+    height: 2.75rem;
+    padding: 0 0.875rem;
+    border-radius: var(--vx-radius-md);
+    border: 1px solid var(--vx-color-border-control);
+    background: var(--vx-color-surface-sunken);
+    color: var(--vx-color-text);
+    font-size: var(--vx-font-size-md);
+    transition: border-color var(--vx-transition-fast), box-shadow var(--vx-transition-fast), background var(--vx-transition-fast);
+}
+
+.vx-auth__card .vx-input:focus {
+    border-color: var(--vx-color-focus);
+    background: var(--vx-color-surface);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--vx-color-focus) 25%, transparent);
+    outline: none;
+}
+
+.vx-auth__card .vx-input::placeholder {
+    color: var(--vx-color-text-subtle);
+    opacity: 0.7;
+}
+
+.vx-auth__card .vx-form .vx-button,
+.vx-auth__card .vx-actions .vx-button {
+    height: 2.75rem;
     width: 100%;
     margin-top: var(--vx-space-2);
+    font-size: var(--vx-font-size-md);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border-radius: var(--vx-radius-md);
+    background: var(--vx-gradient-brand, linear-gradient(135deg, #2563EB 0%, #0EA5E9 100%));
+    color: #FFFFFF;
+    border: none;
+    box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: transform var(--vx-transition-fast), box-shadow var(--vx-transition-fast), filter var(--vx-transition-fast);
+}
+
+.vx-auth__card .vx-form .vx-button:hover,
+.vx-auth__card .vx-actions .vx-button:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 6px 20px 0 rgba(37, 99, 235, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+.vx-auth__card .vx-form .vx-button:active,
+.vx-auth__card .vx-actions .vx-button:active {
+    transform: translateY(0);
+    filter: brightness(0.96);
 }
 
 .vx-field__header {
@@ -819,8 +1079,15 @@ a:focus-visible {
 
 .vx-auth__forgot {
     font-size: var(--vx-font-size-xs);
-    font-weight: 500;
+    font-weight: 600;
     color: var(--vx-color-link);
+    text-decoration: none;
+    transition: color var(--vx-transition-fast);
+}
+
+.vx-auth__forgot:hover {
+    text-decoration: underline;
+    color: var(--vx-color-primary-hover);
 }
 
 .vx-auth__links {
@@ -837,8 +1104,19 @@ a:focus-visible {
     margin-top: var(--vx-space-5);
 }
 
-.vx-auth__actions .vx-button {
-    width: 100%;
+.vx-auth__disclaimer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    margin-top: var(--vx-space-5);
+    font-size: var(--vx-font-size-xs);
+    color: var(--vx-color-text-subtle);
+}
+
+.vx-auth__disclaimer svg {
+    color: var(--vx-color-text-subtle);
+    flex-shrink: 0;
 }
 
 .vx-auth__languages {
@@ -846,7 +1124,7 @@ a:focus-visible {
     justify-content: center;
     align-items: center;
     gap: var(--vx-space-2);
-    margin-top: var(--vx-space-6);
+    margin-top: var(--vx-space-4);
     padding-top: var(--vx-space-4);
     border-top: 1px solid var(--vx-color-border);
 }
@@ -960,8 +1238,13 @@ a:focus-visible {
         box-shadow: none;
         padding: 0;
         width: 100%;
+        max-width: none;
     }
-    .vx-auth__languages, .vx-button {
+    .vx-auth__showcase,
+    .vx-auth__form-badge,
+    .vx-auth__disclaimer,
+    .vx-auth__languages,
+    .vx-button {
         display: none !important;
     }
 }
@@ -1025,6 +1308,22 @@ a:focus-visible {
 /* =========================================================
    RESPONSIVE BREAKPOINTS (ADR-0013)
    ========================================================= */
+@media (max-width: 1024px) {
+    .vx-auth__card {
+        flex-direction: column;
+        max-width: 28rem;
+        min-height: auto;
+    }
+
+    .vx-auth__showcase {
+        display: none;
+    }
+
+    .vx-auth__form-pane {
+        padding: var(--vx-space-6) var(--vx-space-5);
+    }
+}
+
 @media (max-width: 640px) {
     .vx-shell__header {
         height: auto;

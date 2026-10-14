@@ -2957,6 +2957,70 @@ Vixly</value>
     <value>Connexion à Vixly Control</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.auth.badge" xml:space="preserve">
+    <value>PLAN DE CONTRÔLE</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.headline" xml:space="preserve">
+    <value>Administration de plateforme pour l'écosystème Vixly.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.description" xml:space="preserve">
+    <value>Gérez en toute sécurité les locataires, les abonnements, les licences, les utilisateurs et l'infrastructure opérationnelle depuis un centre de contrôle exécutif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.pillar.tenants.title" xml:space="preserve">
+    <value>Contrôle des locataires</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.pillar.tenants.desc" xml:space="preserve">
+    <value>Gérez l'intégration, l'accès et l'état de la plateforme.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.pillar.licensing.title" xml:space="preserve">
+    <value>Octroi de licences</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.pillar.licensing.desc" xml:space="preserve">
+    <value>Surveillez les abonnements et l'accès au niveau des appareils.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.pillar.billing.title" xml:space="preserve">
+    <value>Facturation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.pillar.billing.desc" xml:space="preserve">
+    <value>Prenez en charge la facturation de la plateforme et les flux administratifs.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.form_badge" xml:space="preserve">
+    <value>ACCÈS SÉCURISÉ À LA PLATEFORME</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.welcome_back" xml:space="preserve">
+    <value>Bon retour</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.signin_subtitle" xml:space="preserve">
+    <value>Connectez-vous avec vos identifiants du personnel pour accéder au plan de contrôle Vixly.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.email_placeholder" xml:space="preserve">
+    <value>Entrez votre adresse courriel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.password_placeholder" xml:space="preserve">
+    <value>Entrez votre mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.signin_button" xml:space="preserve">
+    <value>Se connecter au plan de contrôle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.authorized_only" xml:space="preserve">
+    <value>Personnel autorisé de la plateforme Vixly uniquement.</value>
+    <comment>needs-review</comment>
+  </data>
   <data name="ui.signout" xml:space="preserve">
     <value>Se déconnecter</value>
     <comment>needs-review</comment>

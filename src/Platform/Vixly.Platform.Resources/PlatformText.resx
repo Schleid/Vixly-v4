@@ -2230,6 +2230,54 @@ Vixly</value>
   <data name="ui.signin.title" xml:space="preserve">
     <value>Sign in to Vixly Control</value>
   </data>
+  <data name="ui.auth.badge" xml:space="preserve">
+    <value>CONTROL PLANE</value>
+  </data>
+  <data name="ui.auth.headline" xml:space="preserve">
+    <value>Platform administration for the Vixly ecosystem.</value>
+  </data>
+  <data name="ui.auth.description" xml:space="preserve">
+    <value>Securely manage tenants, subscriptions, licensing, platform users, and operational infrastructure from one executive control center.</value>
+  </data>
+  <data name="ui.auth.pillar.tenants.title" xml:space="preserve">
+    <value>Tenant Control</value>
+  </data>
+  <data name="ui.auth.pillar.tenants.desc" xml:space="preserve">
+    <value>Manage onboarding, access, and platform state.</value>
+  </data>
+  <data name="ui.auth.pillar.licensing.title" xml:space="preserve">
+    <value>Licensing</value>
+  </data>
+  <data name="ui.auth.pillar.licensing.desc" xml:space="preserve">
+    <value>Monitor subscription and device-level access.</value>
+  </data>
+  <data name="ui.auth.pillar.billing.title" xml:space="preserve">
+    <value>Billing</value>
+  </data>
+  <data name="ui.auth.pillar.billing.desc" xml:space="preserve">
+    <value>Support platform billing and administrative workflows.</value>
+  </data>
+  <data name="ui.auth.form_badge" xml:space="preserve">
+    <value>SECURE PLATFORM ACCESS</value>
+  </data>
+  <data name="ui.auth.welcome_back" xml:space="preserve">
+    <value>Welcome back</value>
+  </data>
+  <data name="ui.auth.signin_subtitle" xml:space="preserve">
+    <value>Sign in with your platform staff credentials to continue to the Vixly Control Plane.</value>
+  </data>
+  <data name="ui.auth.email_placeholder" xml:space="preserve">
+    <value>Enter your email address</value>
+  </data>
+  <data name="ui.auth.password_placeholder" xml:space="preserve">
+    <value>Enter your password</value>
+  </data>
+  <data name="ui.auth.signin_button" xml:space="preserve">
+    <value>Sign In to Control Plane</value>
+  </data>
+  <data name="ui.auth.authorized_only" xml:space="preserve">
+    <value>Authorized Vixly platform personnel only.</value>
+  </data>
   <data name="ui.signout" xml:space="preserve">
     <value>Sign out</value>
   </data>

@@ -1,4 +1,4 @@
-@*
+﻿@*
 =========================================================
 FILE: AuthShell.razor
 
@@ -27,23 +27,88 @@ IMPORTANT NOTES:
     <script src="/js/passkeys.js" defer></script>
 </head>
 <body class="vx-auth">
-    <main class="vx-auth__card" aria-labelledby="vx-page-title">
-        <header class="vx-auth__header">
-            <div class="vx-auth__brand">
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                </svg>
-                <span>@T["ui.app.name"]</span>
+    <div class="vx-auth__card">
+        <aside class="vx-auth__showcase" aria-label="@T["ui.auth.headline"]">
+            <div class="vx-auth__showcase-glow" aria-hidden="true"></div>
+            <div class="vx-auth__showcase-inner">
+                <div class="vx-auth__badge">
+                    <span class="vx-auth__badge-dot" aria-hidden="true"></span>
+                    <span>@T["ui.auth.badge"]</span>
+                </div>
+                <div class="vx-auth__showcase-hero">
+                    <div class="vx-auth__logo-squircle" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                        </svg>
+                    </div>
+                    <h2 class="vx-auth__showcase-title">@T["ui.auth.headline"]</h2>
+                    <p class="vx-auth__showcase-desc">@T["ui.auth.description"]</p>
+                </div>
+                <div class="vx-auth__pillars" role="list">
+                    <div class="vx-auth__pillar" role="listitem">
+                        <div class="vx-auth__pillar-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 21h18M3 7v14M21 7v14M6 7V3h12v4M10 11v2M14 11v2M10 17v2M14 17v2" />
+                            </svg>
+                        </div>
+                        <div class="vx-auth__pillar-text">
+                            <div class="vx-auth__pillar-title">@T["ui.auth.pillar.tenants.title"]</div>
+                            <div class="vx-auth__pillar-desc">@T["ui.auth.pillar.tenants.desc"]</div>
+                        </div>
+                    </div>
+                    <div class="vx-auth__pillar" role="listitem">
+                        <div class="vx-auth__pillar-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                        </div>
+                        <div class="vx-auth__pillar-text">
+                            <div class="vx-auth__pillar-title">@T["ui.auth.pillar.licensing.title"]</div>
+                            <div class="vx-auth__pillar-desc">@T["ui.auth.pillar.licensing.desc"]</div>
+                        </div>
+                    </div>
+                    <div class="vx-auth__pillar" role="listitem">
+                        <div class="vx-auth__pillar-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="4" width="20" height="16" rx="2" />
+                                <line x1="2" y1="10" x2="22" y2="10" />
+                            </svg>
+                        </div>
+                        <div class="vx-auth__pillar-text">
+                            <div class="vx-auth__pillar-title">@T["ui.auth.pillar.billing.title"]</div>
+                            <div class="vx-auth__pillar-desc">@T["ui.auth.pillar.billing.desc"]</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <h1 id="vx-page-title" class="vx-auth__title">@Title</h1>
-        </header>
-        @ChildContent
-        <nav class="vx-auth__languages" aria-label="@T["ui.language"]">
-            <a href="/culture/en?returnUrl=@ReturnHere" hreflang="en" lang="en" class="@(CurrentLang == "en" ? "active" : null)">English</a>
-            <a href="/culture/fr?returnUrl=@ReturnHere" hreflang="fr" lang="fr" class="@(CurrentLang == "fr" ? "active" : null)">Français</a>
-            <a href="/culture/es?returnUrl=@ReturnHere" hreflang="es" lang="es" class="@(CurrentLang == "es" ? "active" : null)">Español</a>
-        </nav>
-    </main>
+        </aside>
+        <main id="main-content" class="vx-auth__form-pane" aria-labelledby="vx-page-title">
+            <div class="vx-auth__form-badge">
+                <span class="vx-auth__badge-dot" aria-hidden="true"></span>
+                <span>@T["ui.auth.form_badge"]</span>
+            </div>
+            <header class="vx-auth__header">
+                <h1 id="vx-page-title" class="vx-auth__title">@Title</h1>
+                @if (!string.IsNullOrWhiteSpace(Subtitle))
+                {
+                    <p class="vx-auth__subtitle">@Subtitle</p>
+                }
+            </header>
+            @ChildContent
+            <div class="vx-auth__disclaimer">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <span>@T["ui.auth.authorized_only"]</span>
+            </div>
+            <nav class="vx-auth__languages" aria-label="@T["ui.language"]">
+                <a href="/culture/en?returnUrl=@ReturnHere" hreflang="en" lang="en" class="@(CurrentLang == "en" ? "active" : null)">English</a>
+                <a href="/culture/fr?returnUrl=@ReturnHere" hreflang="fr" lang="fr" class="@(CurrentLang == "fr" ? "active" : null)">Français</a>
+                <a href="/culture/es?returnUrl=@ReturnHere" hreflang="es" lang="es" class="@(CurrentLang == "es" ? "active" : null)">Español</a>
+            </nav>
+        </main>
+    </div>
 </body>
 </html>
 
@@ -52,6 +117,9 @@ IMPORTANT NOTES:
 
     [Parameter, EditorRequired]
     public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Subtitle { get; set; }
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
