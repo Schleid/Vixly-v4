@@ -544,12 +544,172 @@ a:hover {
 }
 
 /* =========================================================
-   CONSOLE SHELL & NAVIGATION
+   CONSOLE SHELL & DIRECTION A SIDEBAR NAVIGATION
    ========================================================= */
 .vx-shell {
     display: flex;
-    flex-direction: column;
     min-height: 100vh;
+    background: var(--vx-color-bg-app);
+}
+
+.vx-sidebar {
+    width: 15.5rem;
+    flex-shrink: 0;
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    display: flex;
+    flex-direction: column;
+    background: var(--vx-color-sidebar-bg);
+    color: var(--vx-color-sidebar-text);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 60;
+}
+
+.vx-sidebar__brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--vx-space-2);
+    padding: var(--vx-space-4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.vx-sidebar__brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #FFFFFF;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: var(--vx-font-size-md);
+    letter-spacing: -0.02em;
+}
+
+.vx-sidebar__brand-icon {
+    color: #38BDF8;
+}
+
+.vx-sidebar__brand-name {
+    color: #FFFFFF;
+}
+
+.vx-sidebar__env-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.1rem 0.35rem;
+    border-radius: var(--vx-radius-sm);
+    background: rgba(37, 99, 235, 0.25);
+    color: #60A5FA;
+    border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.vx-sidebar__section {
+    padding: var(--vx-space-4) var(--vx-space-3);
+    flex: 1;
+}
+
+.vx-sidebar__section-title {
+    display: block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748B;
+    padding: 0 var(--vx-space-3) var(--vx-space-2);
+}
+
+.vx-sidebar__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.vx-sidebar__link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.75rem;
+    border-radius: var(--vx-radius-sm);
+    color: #94A3B8;
+    font-size: var(--vx-font-size-sm);
+    font-weight: 500;
+    text-decoration: none;
+    transition: background var(--vx-transition-fast), color var(--vx-transition-fast);
+}
+
+.vx-sidebar__link:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #FFFFFF;
+}
+
+.vx-sidebar__link.active {
+    background: var(--vx-color-primary);
+    color: #FFFFFF;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.vx-sidebar__footer {
+    margin-top: auto;
+    padding: var(--vx-space-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--vx-space-2);
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.vx-sidebar__user {
+    display: flex;
+    align-items: center;
+    gap: var(--vx-space-2);
+    min-width: 0;
+}
+
+.vx-sidebar__user-details {
+    min-width: 0;
+}
+
+.vx-sidebar__user-name {
+    display: block;
+    font-size: var(--vx-font-size-xs);
+    font-weight: 600;
+    color: #F8FAFC;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 6.5rem;
+}
+
+.vx-sidebar__signout-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.35rem 0.5rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--vx-radius-sm);
+    color: #94A3B8;
+    font-size: var(--vx-font-size-xs);
+    cursor: pointer;
+    transition: background var(--vx-transition-fast), color var(--vx-transition-fast), border-color var(--vx-transition-fast);
+}
+
+.vx-sidebar__signout-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #FCA5A5;
+}
+
+.vx-shell__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
 .vx-shell__header {
@@ -674,7 +834,19 @@ a:hover {
     margin: 0 auto;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+    .vx-shell {
+        flex-direction: column;
+    }
+
+    .vx-sidebar {
+        width: 100%;
+        min-height: auto;
+        position: static;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
     .vx-shell__header {
         flex-wrap: wrap;
         padding: var(--vx-space-3) var(--vx-space-4);
