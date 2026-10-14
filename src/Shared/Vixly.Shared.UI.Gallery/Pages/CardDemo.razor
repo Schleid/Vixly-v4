@@ -1,0 +1,28 @@
+@page "/primitives/card"
+
+<div class="gallery-section">
+    <h1>VxCard Primitive</h1>
+    <p>Card container primitive for grouping information, metrics, or forms.</p>
+</div>
+
+<div class="gallery-section">
+    <h2>Standard Card</h2>
+    <VxCard Title="Security Overview">
+        <p>Manage your account security factors, passkeys, and trusted sessions.</p>
+    </VxCard>
+</div>
+
+<div class="gallery-section">
+    <h2>Card with Header Actions and Footer</h2>
+    <VxCard Title="Active Sessions">
+        <HeaderActions>
+            <VxButton Variant="VxButtonVariant.Danger">Revoke All</VxButton>
+        </HeaderActions>
+        <ChildContent>
+            <p>You have 2 active browser sessions signed in across your devices.</p>
+        </ChildContent>
+        <Footer>
+            <small>Last active from IP 192.168.1.1</small>
+        </Footer>
+    </VxCard>
+</div>

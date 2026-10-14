@@ -1,0 +1,1120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="email.invitation.body" xml:space="preserve">
+    <value>Hello {name},
+
+You have been invited to Vixly Control. Open this link within {hours} hours to choose your password:
+
+{link}
+
+If you did not expect this email, you can ignore it.</value>
+  </data>
+  <data name="email.invitation.subject" xml:space="preserve">
+    <value>You are invited to Vixly Control</value>
+  </data>
+  <data name="email.notice.subject" xml:space="preserve">
+    <value>Security notice from Vixly Control</value>
+  </data>
+  <data name="email.reset.body" xml:space="preserve">
+    <value>Hello {name},
+
+Open this link within {minutes} minutes to choose a new password:
+
+{link}
+
+If you did not ask for this, ignore this email. Your password stays the same.</value>
+  </data>
+  <data name="email.reset.subject" xml:space="preserve">
+    <value>Reset your Vixly Control password</value>
+  </data>
+  <data name="platform.auth.account_not_invited" xml:space="preserve">
+    <value>This person has already accepted the invitation.</value>
+  </data>
+  <data name="platform.auth.authority_not_allowed" xml:space="preserve">
+    <value>Only a SuperUser can give this authority level.</value>
+  </data>
+  <data name="platform.auth.code_invalid" xml:space="preserve">
+    <value>That code is not right. Try the newest code.</value>
+  </data>
+  <data name="platform.auth.current_session_not_ended" xml:space="preserve">
+    <value>To end this session, sign out.</value>
+  </data>
+  <data name="platform.auth.link_invalid" xml:space="preserve">
+    <value>This link is not valid any more. Ask for a new one.</value>
+  </data>
+  <data name="platform.auth.no_passkeys" xml:space="preserve">
+    <value>You have no passkey yet. Use your authenticator app.</value>
+  </data>
+  <data name="platform.auth.passkey_not_accepted" xml:space="preserve">
+    <value>That passkey could not be checked. Try again or use your authenticator app.</value>
+  </data>
+  <data name="platform.auth.password_contains_email" xml:space="preserve">
+    <value>The password must not contain your email.</value>
+  </data>
+  <data name="platform.auth.password_incorrect" xml:space="preserve">
+    <value>The current password is not right.</value>
+  </data>
+  <data name="platform.auth.password_too_common" xml:space="preserve">
+    <value>This password is too easy to guess.</value>
+  </data>
+  <data name="platform.auth.password_too_long" xml:space="preserve">
+    <value>Use no more than {maxLength} characters.</value>
+  </data>
+  <data name="platform.auth.password_too_short" xml:space="preserve">
+    <value>Use at least {minLength} characters.</value>
+  </data>
+  <data name="platform.auth.session_ended" xml:space="preserve">
+    <value>Your session has ended. Sign in again.</value>
+  </data>
+  <data name="platform.auth.setup_already_done" xml:space="preserve">
+    <value>Setup has already been done.</value>
+  </data>
+  <data name="platform.auth.sign_in_expired" xml:space="preserve">
+    <value>Your sign-in has expired. Start again.</value>
+  </data>
+  <data name="platform.auth.sign_in_failed" xml:space="preserve">
+    <value>The email or password is not right, or the account cannot sign in right now.</value>
+  </data>
+  <data name="platform.auth.target_authority_higher" xml:space="preserve">
+    <value>You cannot do this to someone with a higher authority level than yours.</value>
+  </data>
+  <data name="platform.common.concurrency_conflict" xml:space="preserve">
+    <value>Someone else changed this at the same time. Reload and try again.</value>
+  </data>
+  <data name="platform.common.email_already_used" xml:space="preserve">
+    <value>This email is already used by another account.</value>
+  </data>
+  <data name="platform.common.not_found" xml:space="preserve">
+    <value>This record does not exist or you cannot see it.</value>
+  </data>
+  <data name="platform.common.permission_unknown" xml:space="preserve">
+    <value>This permission does not exist.</value>
+  </data>
+  <data name="platform.common.request_invalid" xml:space="preserve">
+    <value>Some information is missing or not valid.</value>
+  </data>
+  <data name="platform.common.step_up_required" xml:space="preserve">
+    <value>Confirm it is you before doing this.</value>
+  </data>
+  <data name="platform.departments.department_inactive" xml:space="preserve">
+    <value>This department is inactive. Reactivate it first.</value>
+  </data>
+  <data name="platform.departments.name_already_used" xml:space="preserve">
+    <value>Another department already uses this name.</value>
+  </data>
+  <data name="platform.identity.account_deactivated" xml:space="preserve">
+    <value>This account is deactivated. Reactivate it first.</value>
+  </data>
+  <data name="platform.identity.account_not_active" xml:space="preserve">
+    <value>This account is not active.</value>
+  </data>
+  <data name="platform.identity.account_not_restricted" xml:space="preserve">
+    <value>This account is already active.</value>
+  </data>
+  <data name="platform.identity.actor_required" xml:space="preserve">
+    <value>A signed-in user is required.</value>
+  </data>
+  <data name="platform.identity.already_department_member" xml:space="preserve">
+    <value>This person is already in this department.</value>
+  </data>
+  <data name="platform.identity.assignment_expiry_not_in_future" xml:space="preserve">
+    <value>The end date must be in the future.</value>
+  </data>
+  <data name="platform.identity.audit_action_invalid" xml:space="preserve">
+    <value>This audit action is not valid.</value>
+  </data>
+  <data name="platform.identity.audit_target_invalid" xml:space="preserve">
+    <value>This audit target is not valid.</value>
+  </data>
+  <data name="platform.identity.authenticator_code_reused" xml:space="preserve">
+    <value>That code was already used. Wait for the next one.</value>
+  </data>
+  <data name="platform.identity.authenticator_not_confirmed" xml:space="preserve">
+    <value>No authenticator app is set up.</value>
+  </data>
+  <data name="platform.identity.authenticator_not_pending" xml:space="preserve">
+    <value>An authenticator app is already set up.</value>
+  </data>
+  <data name="platform.identity.authenticator_secret_invalid" xml:space="preserve">
+    <value>The authenticator setup failed. Start again.</value>
+  </data>
+  <data name="platform.identity.authority_level_invalid" xml:space="preserve">
+    <value>This authority level is not valid.</value>
+  </data>
+  <data name="platform.identity.cannot_act_on_own_account" xml:space="preserve">
+    <value>You cannot do this to your own account.</value>
+  </data>
+  <data name="platform.identity.department_already_active" xml:space="preserve">
+    <value>This department is already active.</value>
+  </data>
+  <data name="platform.identity.department_already_inactive" xml:space="preserve">
+    <value>This department is already inactive.</value>
+  </data>
+  <data name="platform.identity.department_required" xml:space="preserve">
+    <value>Choose a department.</value>
+  </data>
+  <data name="platform.identity.description_too_long" xml:space="preserve">
+    <value>The description can have at most {maxLength} characters.</value>
+  </data>
+  <data name="platform.identity.employee_number_too_long" xml:space="preserve">
+    <value>The employee number can have at most {maxLength} characters.</value>
+  </data>
+  <data name="platform.identity.invitation_not_pending" xml:space="preserve">
+    <value>This invitation has already been accepted.</value>
+  </data>
+  <data name="platform.identity.last_second_factor" xml:space="preserve">
+    <value>Add another way to confirm it is you before removing this one.</value>
+  </data>
+  <data name="platform.identity.last_super_user" xml:space="preserve">
+    <value>At least one active SuperUser must remain.</value>
+  </data>
+  <data name="platform.identity.name_required" xml:space="preserve">
+    <value>Enter a name.</value>
+  </data>
+  <data name="platform.identity.name_too_long" xml:space="preserve">
+    <value>Use no more than {maxLength} characters.</value>
+  </data>
+  <data name="platform.identity.not_department_member" xml:space="preserve">
+    <value>This person is not in this department.</value>
+  </data>
+  <data name="platform.identity.passkey_already_registered" xml:space="preserve">
+    <value>This passkey is already registered.</value>
+  </data>
+  <data name="platform.identity.passkey_ceremony_invalid" xml:space="preserve">
+    <value>This passkey request has expired. Start again.</value>
+  </data>
+  <data name="platform.identity.passkey_counter_regressed" xml:space="preserve">
+    <value>This passkey looks copied and was refused. Contact your administrator.</value>
+  </data>
+  <data name="platform.identity.passkey_invalid" xml:space="preserve">
+    <value>This passkey could not be registered.</value>
+  </data>
+  <data name="platform.identity.passkey_limit_reached" xml:space="preserve">
+    <value>You can register at most {maximum} passkeys.</value>
+  </data>
+  <data name="platform.identity.passkey_not_found" xml:space="preserve">
+    <value>This passkey is not registered.</value>
+  </data>
+  <data name="platform.identity.password_hash_required" xml:space="preserve">
+    <value>A password is required.</value>
+  </data>
+  <data name="platform.identity.permission_code_invalid" xml:space="preserve">
+    <value>This permission is not valid.</value>
+  </data>
+  <data name="platform.identity.reason_required" xml:space="preserve">
+    <value>Give a reason.</value>
+  </data>
+  <data name="platform.identity.reason_too_long" xml:space="preserve">
+    <value>The reason can have at most {maxLength} characters.</value>
+  </data>
+  <data name="platform.identity.recovery_code_not_accepted" xml:space="preserve">
+    <value>That recovery code is not right or was already used.</value>
+  </data>
+  <data name="platform.identity.recovery_codes_invalid" xml:space="preserve">
+    <value>Exactly {count} recovery codes are needed.</value>
+  </data>
+  <data name="platform.identity.role_already_active" xml:space="preserve">
+    <value>This role is already active.</value>
+  </data>
+  <data name="platform.identity.role_already_assigned" xml:space="preserve">
+    <value>This person already has this role.</value>
+  </data>
+  <data name="platform.identity.role_already_inactive" xml:space="preserve">
+    <value>This role is already inactive.</value>
+  </data>
+  <data name="platform.identity.role_not_assigned" xml:space="preserve">
+    <value>This person does not have this role.</value>
+  </data>
+  <data name="platform.identity.role_required" xml:space="preserve">
+    <value>Choose a role.</value>
+  </data>
+  <data name="platform.identity.session_ended" xml:space="preserve">
+    <value>Your session has ended. Sign in again.</value>
+  </data>
+  <data name="platform.identity.sign_in_challenge_invalid" xml:space="preserve">
+    <value>Your sign-in has expired. Start again.</value>
+  </data>
+  <data name="platform.identity.super_user_count_invalid" xml:space="preserve">
+    <value>The SuperUser count is not valid.</value>
+  </data>
+  <data name="platform.identity.system_role_key_invalid" xml:space="preserve">
+    <value>This system role key is not valid.</value>
+  </data>
+  <data name="platform.identity.system_role_protected" xml:space="preserve">
+    <value>System roles cannot be changed here.</value>
+  </data>
+  <data name="platform.identity.token_already_used" xml:space="preserve">
+    <value>This link has already been used.</value>
+  </data>
+  <data name="platform.identity.token_expired" xml:space="preserve">
+    <value>This link has expired. Ask for a new one.</value>
+  </data>
+  <data name="platform.identity.token_hash_invalid" xml:space="preserve">
+    <value>This link is not valid.</value>
+  </data>
+  <data name="platform.identity.token_purpose_invalid" xml:space="preserve">
+    <value>This link is not valid for this page.</value>
+  </data>
+  <data name="platform.identity.user_required" xml:space="preserve">
+    <value>A user is required.</value>
+  </data>
+  <data name="platform.notice.passkey_added" xml:space="preserve">
+    <value>A passkey was added to your Vixly Control account. If this was not you, contact your administrator now.</value>
+  </data>
+  <data name="platform.notice.passkey_removed" xml:space="preserve">
+    <value>A passkey was removed from your Vixly Control account. If this was not you, contact your administrator now.</value>
+  </data>
+  <data name="platform.notice.password_changed" xml:space="preserve">
+    <value>Your Vixly Control password was changed. If this was not you, contact your administrator now.</value>
+  </data>
+  <data name="platform.notice.recovery_codes_replaced" xml:space="preserve">
+    <value>New recovery codes were created for your Vixly Control account; the old ones no longer work. If this was not you, contact your administrator now.</value>
+  </data>
+  <data name="platform.notice.second_factor_reset" xml:space="preserve">
+    <value>An administrator removed the passkeys, authenticator app and recovery codes on your Vixly Control account. At your next sign-in you will set up a new one. If you did not ask for this, contact your administrator now.</value>
+  </data>
+  <data name="platform.roles.exceeds_your_access" xml:space="preserve">
+    <value>You can only give permissions that you have yourself.</value>
+  </data>
+  <data name="platform.roles.name_already_used" xml:space="preserve">
+    <value>Another role already uses this name.</value>
+  </data>
+  <data name="platform.roles.role_inactive" xml:space="preserve">
+    <value>This role is inactive. Reactivate it first.</value>
+  </data>
+  <data name="platform.security.access_denied" xml:space="preserve">
+    <value>You do not have permission to do this.</value>
+  </data>
+  <data name="platform.security.authority_level_invalid" xml:space="preserve">
+    <value>This authority level is not valid.</value>
+  </data>
+  <data name="platform.security.user_id_required" xml:space="preserve">
+    <value>A signed-in user is required.</value>
+  </data>
+  <data name="ui.account.add_passkey" xml:space="preserve">
+    <value>Add a passkey</value>
+  </data>
+  <data name="ui.account.change_password" xml:space="preserve">
+    <value>Change password</value>
+  </data>
+  <data name="ui.account.confirm_password" xml:space="preserve">
+    <value>New password again</value>
+  </data>
+  <data name="ui.account.current_password" xml:space="preserve">
+    <value>Current password</value>
+  </data>
+  <data name="ui.account.end_other_sessions" xml:space="preserve">
+    <value>Sign out on all other devices</value>
+  </data>
+  <data name="ui.account.end_session" xml:space="preserve">
+    <value>End</value>
+  </data>
+  <data name="ui.account.language" xml:space="preserve">
+    <value>Language of the console and your emails</value>
+  </data>
+  <data name="ui.account.new_codes" xml:space="preserve">
+    <value>Get new recovery codes</value>
+  </data>
+  <data name="ui.account.no_passkeys" xml:space="preserve">
+    <value>No passkeys yet.</value>
+  </data>
+  <data name="ui.account.passkey_added" xml:space="preserve">
+    <value>The passkey is added. You can now sign in with it.</value>
+  </data>
+  <data name="ui.account.passkey_added_on" xml:space="preserve">
+    <value>Added {time}</value>
+  </data>
+  <data name="ui.account.passkey_last_used" xml:space="preserve">
+    <value>Last used: {time}</value>
+  </data>
+  <data name="ui.account.passkey_name" xml:space="preserve">
+    <value>Name for the new passkey (for example, Work laptop)</value>
+  </data>
+  <data name="ui.account.passkey_removed" xml:space="preserve">
+    <value>The passkey is removed.</value>
+  </data>
+  <data name="ui.account.passkeys" xml:space="preserve">
+    <value>Passkeys</value>
+  </data>
+  <data name="ui.account.passkeys_intro" xml:space="preserve">
+    <value>A passkey signs you in with your device's fingerprint, face or PIN. It cannot be phished, and it replaces both your password and your code.</value>
+  </data>
+  <data name="ui.account.passkeys_unsupported" xml:space="preserve">
+    <value>This browser cannot use passkeys.</value>
+  </data>
+  <data name="ui.account.password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="ui.account.password_changed" xml:space="preserve">
+    <value>Your password is changed. Sessions ended on other devices: {count}.</value>
+  </data>
+  <data name="ui.account.password_mismatch" xml:space="preserve">
+    <value>The two new passwords are not the same.</value>
+  </data>
+  <data name="ui.account.remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ui.account.save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ui.account.session_action" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="ui.account.sessions_ended" xml:space="preserve">
+    <value>Sessions ended: {count}.</value>
+  </data>
+  <data name="ui.account.this_device" xml:space="preserve">
+    <value>This device</value>
+  </data>
+  <data name="ui.account.title" xml:space="preserve">
+    <value>My account</value>
+  </data>
+  <data name="ui.app.name" xml:space="preserve">
+    <value>Vixly Control</value>
+  </data>
+  <data name="ui.codes.continue" xml:space="preserve">
+    <value>I have saved them</value>
+  </data>
+  <data name="ui.codes.intro" xml:space="preserve">
+    <value>Each code works once. Keep them somewhere safe: they are your way in if you lose your authenticator app. They will not be shown again.</value>
+  </data>
+  <data name="ui.codes.title" xml:space="preserve">
+    <value>Save your recovery codes</value>
+  </data>
+  <data name="ui.common.cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="ui.common.loading" xml:space="preserve">
+    <value>Loading…</value>
+  </data>
+  <data name="ui.common.never" xml:space="preserve">
+    <value>Never</value>
+  </data>
+  <data name="ui.common.next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="ui.common.no" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="ui.common.none" xml:space="preserve">
+    <value>Not set</value>
+  </data>
+  <data name="ui.common.page_of" xml:space="preserve">
+    <value>Page {page} of {pages}</value>
+  </data>
+  <data name="ui.common.pages" xml:space="preserve">
+    <value>Pages</value>
+  </data>
+  <data name="ui.common.previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="ui.common.utc_time" xml:space="preserve">
+    <value>{time} UTC</value>
+  </data>
+  <data name="ui.common.yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="ui.departments.actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ui.departments.add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="ui.departments.add_from_user" xml:space="preserve">
+    <value>To add someone, open their page under Users.</value>
+  </data>
+  <data name="ui.departments.add_to" xml:space="preserve">
+    <value>Add to a department</value>
+  </data>
+  <data name="ui.departments.back" xml:space="preserve">
+    <value>Back to departments</value>
+  </data>
+  <data name="ui.departments.choose" xml:space="preserve">
+    <value>Choose a department</value>
+  </data>
+  <data name="ui.departments.create" xml:space="preserve">
+    <value>Create department</value>
+  </data>
+  <data name="ui.departments.deactivate_confirm" xml:space="preserve">
+    <value>Deactivate department</value>
+  </data>
+  <data name="ui.departments.deactivate_help" xml:space="preserve">
+    <value>People stay in an inactive department, but nobody new can be added until it is reactivated.</value>
+  </data>
+  <data name="ui.departments.deactivated" xml:space="preserve">
+    <value>The department was deactivated.</value>
+  </data>
+  <data name="ui.departments.description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="ui.departments.description_optional" xml:space="preserve">
+    <value>Description (optional)</value>
+  </data>
+  <data name="ui.departments.edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="ui.departments.empty" xml:space="preserve">
+    <value>No departments yet.</value>
+  </data>
+  <data name="ui.departments.hide_inactive" xml:space="preserve">
+    <value>Hide inactive departments</value>
+  </data>
+  <data name="ui.departments.make_primary" xml:space="preserve">
+    <value>Make primary</value>
+  </data>
+  <data name="ui.departments.member_added" xml:space="preserve">
+    <value>The person was added to the department.</value>
+  </data>
+  <data name="ui.departments.member_removed" xml:space="preserve">
+    <value>The person was taken out of the department.</value>
+  </data>
+  <data name="ui.departments.members" xml:space="preserve">
+    <value>People in this department</value>
+  </data>
+  <data name="ui.departments.name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ui.departments.new" xml:space="preserve">
+    <value>New department</value>
+  </data>
+  <data name="ui.departments.new_intro" xml:space="preserve">
+    <value>Departments group staff for reference. They do not give any permission.</value>
+  </data>
+  <data name="ui.departments.no_members" xml:space="preserve">
+    <value>Nobody is in this department.</value>
+  </data>
+  <data name="ui.departments.primary" xml:space="preserve">
+    <value>Primary</value>
+  </data>
+  <data name="ui.departments.primary_set" xml:space="preserve">
+    <value>The primary department was changed.</value>
+  </data>
+  <data name="ui.departments.reactivated" xml:space="preserve">
+    <value>The department was reactivated.</value>
+  </data>
+  <data name="ui.departments.save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ui.departments.show_inactive" xml:space="preserve">
+    <value>Show inactive departments</value>
+  </data>
+  <data name="ui.departments.title" xml:space="preserve">
+    <value>Departments</value>
+  </data>
+  <data name="ui.departments.updated" xml:space="preserve">
+    <value>The department was saved.</value>
+  </data>
+  <data name="ui.enrol.intro" xml:space="preserve">
+    <value>Scan this QR code with an authenticator app, or type the setup key into it. Then enter the 6-digit code the app shows.</value>
+  </data>
+  <data name="ui.enrol.key" xml:space="preserve">
+    <value>Setup key</value>
+  </data>
+  <data name="ui.enrol.qr_alt" xml:space="preserve">
+    <value>QR code for your authenticator app</value>
+  </data>
+  <data name="ui.enrol.submit" xml:space="preserve">
+    <value>Turn on</value>
+  </data>
+  <data name="ui.enrol.title" xml:space="preserve">
+    <value>Protect your account</value>
+  </data>
+  <data name="ui.error.generic" xml:space="preserve">
+    <value>Something went wrong. Reference: {reference}</value>
+  </data>
+  <data name="ui.forgot.intro" xml:space="preserve">
+    <value>Enter your email. If it belongs to an account, we will send a link.</value>
+  </data>
+  <data name="ui.forgot.sent" xml:space="preserve">
+    <value>If that email belongs to an account, a link is on its way. It works for 60 minutes.</value>
+  </data>
+  <data name="ui.forgot.submit" xml:space="preserve">
+    <value>Send link</value>
+  </data>
+  <data name="ui.forgot.title" xml:space="preserve">
+    <value>Reset your password</value>
+  </data>
+  <data name="ui.holders.empty" xml:space="preserve">
+    <value>Nobody has this permission.</value>
+  </data>
+  <data name="ui.holders.intro" xml:space="preserve">
+    <value>Everyone whose account is active and who has this permission now.</value>
+  </data>
+  <data name="ui.holders.super_user" xml:space="preserve">
+    <value>SuperUser authority level</value>
+  </data>
+  <data name="ui.holders.through" xml:space="preserve">
+    <value>Through</value>
+  </data>
+  <data name="ui.home.title" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="ui.home.welcome" xml:space="preserve">
+    <value>Signed in as {name}</value>
+  </data>
+  <data name="ui.invite.intro" xml:space="preserve">
+    <value>Choose a password of at least {minLength} characters.</value>
+  </data>
+  <data name="ui.invite.password" xml:space="preserve">
+    <value>New password</value>
+  </data>
+  <data name="ui.invite.submit" xml:space="preserve">
+    <value>Set password</value>
+  </data>
+  <data name="ui.invite.title" xml:space="preserve">
+    <value>Welcome to Vixly Control</value>
+  </data>
+  <data name="ui.language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="ui.language.en" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="ui.language.es" xml:space="preserve">
+    <value>Español</value>
+  </data>
+  <data name="ui.language.fr" xml:space="preserve">
+    <value>Français</value>
+  </data>
+  <data name="ui.nav.label" xml:space="preserve">
+    <value>Main navigation</value>
+  </data>
+  <data name="ui.passkey.cancelled" xml:space="preserve">
+    <value>The passkey was not used. Try again, or use another way.</value>
+  </data>
+  <data name="ui.permission.platform.audit.view" xml:space="preserve">
+    <value>See the audit log</value>
+  </data>
+  <data name="ui.permission.platform.departments.create" xml:space="preserve">
+    <value>Create departments</value>
+  </data>
+  <data name="ui.permission.platform.departments.deactivate" xml:space="preserve">
+    <value>Deactivate and reactivate departments</value>
+  </data>
+  <data name="ui.permission.platform.departments.edit" xml:space="preserve">
+    <value>Edit departments</value>
+  </data>
+  <data name="ui.permission.platform.departments.manage_members" xml:space="preserve">
+    <value>Manage department members</value>
+  </data>
+  <data name="ui.permission.platform.departments.view" xml:space="preserve">
+    <value>See departments</value>
+  </data>
+  <data name="ui.permission.platform.roles.assign" xml:space="preserve">
+    <value>Give and remove roles</value>
+  </data>
+  <data name="ui.permission.platform.roles.create" xml:space="preserve">
+    <value>Create roles</value>
+  </data>
+  <data name="ui.permission.platform.roles.deactivate" xml:space="preserve">
+    <value>Deactivate and reactivate roles</value>
+  </data>
+  <data name="ui.permission.platform.roles.edit" xml:space="preserve">
+    <value>Rename roles</value>
+  </data>
+  <data name="ui.permission.platform.roles.edit_permissions" xml:space="preserve">
+    <value>Change role permissions</value>
+  </data>
+  <data name="ui.permission.platform.roles.view" xml:space="preserve">
+    <value>See roles</value>
+  </data>
+  <data name="ui.permission.platform.users.change_authority" xml:space="preserve">
+    <value>Change authority levels (SuperUser only)</value>
+  </data>
+  <data name="ui.permission.platform.users.create" xml:space="preserve">
+    <value>Add users</value>
+  </data>
+  <data name="ui.permission.platform.users.deactivate" xml:space="preserve">
+    <value>Deactivate accounts</value>
+  </data>
+  <data name="ui.permission.platform.users.edit" xml:space="preserve">
+    <value>Edit user details</value>
+  </data>
+  <data name="ui.permission.platform.users.end_sessions" xml:space="preserve">
+    <value>Sign users out</value>
+  </data>
+  <data name="ui.permission.platform.users.invite" xml:space="preserve">
+    <value>Send and resend invitations</value>
+  </data>
+  <data name="ui.permission.platform.users.lock" xml:space="preserve">
+    <value>Lock accounts</value>
+  </data>
+  <data name="ui.permission.platform.users.reactivate" xml:space="preserve">
+    <value>Reactivate accounts</value>
+  </data>
+  <data name="ui.permission.platform.users.reset_second_factor" xml:space="preserve">
+    <value>Reset second factors</value>
+  </data>
+  <data name="ui.permission.platform.users.send_password_reset" xml:space="preserve">
+    <value>Send password reset links</value>
+  </data>
+  <data name="ui.permission.platform.users.suspend" xml:space="preserve">
+    <value>Suspend accounts</value>
+  </data>
+  <data name="ui.permission.platform.users.view" xml:space="preserve">
+    <value>See users</value>
+  </data>
+  <data name="ui.permission_area.audit" xml:space="preserve">
+    <value>Audit log</value>
+  </data>
+  <data name="ui.permission_area.departments" xml:space="preserve">
+    <value>Departments</value>
+  </data>
+  <data name="ui.permission_area.roles" xml:space="preserve">
+    <value>Roles</value>
+  </data>
+  <data name="ui.permission_area.users" xml:space="preserve">
+    <value>Users</value>
+  </data>
+  <data name="ui.recovery.code_label" xml:space="preserve">
+    <value>Recovery code</value>
+  </data>
+  <data name="ui.recovery.left" xml:space="preserve">
+    <value>Recovery codes left: {count}</value>
+  </data>
+  <data name="ui.recovery.title" xml:space="preserve">
+    <value>Use a recovery code</value>
+  </data>
+  <data name="ui.reset.done" xml:space="preserve">
+    <value>Your password has been changed. Sign in with your new password.</value>
+  </data>
+  <data name="ui.reset.submit" xml:space="preserve">
+    <value>Save password</value>
+  </data>
+  <data name="ui.reset.title" xml:space="preserve">
+    <value>Choose a new password</value>
+  </data>
+  <data name="ui.roles.active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="ui.roles.back" xml:space="preserve">
+    <value>Back to roles</value>
+  </data>
+  <data name="ui.roles.create" xml:space="preserve">
+    <value>Create role</value>
+  </data>
+  <data name="ui.roles.created" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="ui.roles.deactivate" xml:space="preserve">
+    <value>Deactivate</value>
+  </data>
+  <data name="ui.roles.deactivate_confirm" xml:space="preserve">
+    <value>Deactivate role</value>
+  </data>
+  <data name="ui.roles.deactivate_help" xml:space="preserve">
+    <value>Everyone with this role loses its permissions at once. Their grants are kept, so reactivating the role gives the permissions back.</value>
+  </data>
+  <data name="ui.roles.deactivated" xml:space="preserve">
+    <value>The role was deactivated.</value>
+  </data>
+  <data name="ui.roles.details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="ui.roles.empty" xml:space="preserve">
+    <value>No roles yet.</value>
+  </data>
+  <data name="ui.roles.hide_inactive" xml:space="preserve">
+    <value>Hide inactive roles</value>
+  </data>
+  <data name="ui.roles.holder_since" xml:space="preserve">
+    <value>Since</value>
+  </data>
+  <data name="ui.roles.holder_until" xml:space="preserve">
+    <value>Until</value>
+  </data>
+  <data name="ui.roles.holders" xml:space="preserve">
+    <value>People with this role</value>
+  </data>
+  <data name="ui.roles.inactive" xml:space="preserve">
+    <value>Inactive</value>
+  </data>
+  <data name="ui.roles.kind" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ui.roles.kind.custom" xml:space="preserve">
+    <value>Custom</value>
+  </data>
+  <data name="ui.roles.kind.system" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="ui.roles.name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ui.roles.new" xml:space="preserve">
+    <value>New role</value>
+  </data>
+  <data name="ui.roles.new_intro" xml:space="preserve">
+    <value>Give the role a name. You choose its permissions on the next page.</value>
+  </data>
+  <data name="ui.roles.no_end" xml:space="preserve">
+    <value>No end date</value>
+  </data>
+  <data name="ui.roles.no_holders" xml:space="preserve">
+    <value>Nobody has this role.</value>
+  </data>
+  <data name="ui.roles.people" xml:space="preserve">
+    <value>People</value>
+  </data>
+  <data name="ui.roles.permissions" xml:space="preserve">
+    <value>Permissions</value>
+  </data>
+  <data name="ui.roles.permissions_help" xml:space="preserve">
+    <value>Tick what people with this role may do. You can only give permissions that you have yourself.</value>
+  </data>
+  <data name="ui.roles.permissions_saved" xml:space="preserve">
+    <value>The permissions were saved.</value>
+  </data>
+  <data name="ui.roles.permissions_title" xml:space="preserve">
+    <value>Permissions</value>
+  </data>
+  <data name="ui.roles.reactivate" xml:space="preserve">
+    <value>Reactivate</value>
+  </data>
+  <data name="ui.roles.reactivated" xml:space="preserve">
+    <value>The role was reactivated.</value>
+  </data>
+  <data name="ui.roles.rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="ui.roles.renamed" xml:space="preserve">
+    <value>The role was renamed.</value>
+  </data>
+  <data name="ui.roles.save_name" xml:space="preserve">
+    <value>Save name</value>
+  </data>
+  <data name="ui.roles.save_permissions" xml:space="preserve">
+    <value>Save permissions</value>
+  </data>
+  <data name="ui.roles.show_inactive" xml:space="preserve">
+    <value>Show inactive roles</value>
+  </data>
+  <data name="ui.roles.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.roles.system.administrator" xml:space="preserve">
+    <value>Administrator</value>
+  </data>
+  <data name="ui.roles.system.security_administrator" xml:space="preserve">
+    <value>Security administrator</value>
+  </data>
+  <data name="ui.roles.system_note" xml:space="preserve">
+    <value>Vixly sets system roles. Their name and permissions cannot be changed here.</value>
+  </data>
+  <data name="ui.roles.title" xml:space="preserve">
+    <value>Roles</value>
+  </data>
+  <data name="ui.roles.who_has" xml:space="preserve">
+    <value>Who has this?</value>
+  </data>
+  <data name="ui.signin.back" xml:space="preserve">
+    <value>Back to sign in</value>
+  </data>
+  <data name="ui.signin.email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="ui.signin.forgot" xml:space="preserve">
+    <value>Forgot your password?</value>
+  </data>
+  <data name="ui.signin.or" xml:space="preserve">
+    <value>or</value>
+  </data>
+  <data name="ui.signin.passkey" xml:space="preserve">
+    <value>Sign in with a passkey</value>
+  </data>
+  <data name="ui.signin.password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="ui.signin.submit" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="ui.signin.title" xml:space="preserve">
+    <value>Sign in to Vixly Control</value>
+  </data>
+  <data name="ui.signout" xml:space="preserve">
+    <value>Sign out</value>
+  </data>
+  <data name="ui.stepup.intro" xml:space="preserve">
+    <value>Enter the 6-digit code from your authenticator app to continue.</value>
+  </data>
+  <data name="ui.stepup.intro_recovery" xml:space="preserve">
+    <value>Enter one of your recovery codes. Each code works once.</value>
+  </data>
+  <data name="ui.stepup.submit" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="ui.stepup.title" xml:space="preserve">
+    <value>Confirm it is you</value>
+  </data>
+  <data name="ui.stepup.use_app" xml:space="preserve">
+    <value>Use your authenticator app instead</value>
+  </data>
+  <data name="ui.stepup.use_passkey" xml:space="preserve">
+    <value>Use a passkey</value>
+  </data>
+  <data name="ui.user_roles.assign" xml:space="preserve">
+    <value>Give role</value>
+  </data>
+  <data name="ui.user_roles.assign_title" xml:space="preserve">
+    <value>Give a role</value>
+  </data>
+  <data name="ui.user_roles.assigned" xml:space="preserve">
+    <value>The role was given.</value>
+  </data>
+  <data name="ui.user_roles.choose" xml:space="preserve">
+    <value>Choose a role</value>
+  </data>
+  <data name="ui.user_roles.inactive" xml:space="preserve">
+    <value>Inactive role: gives nothing until reactivated</value>
+  </data>
+  <data name="ui.user_roles.none_assignable" xml:space="preserve">
+    <value>There are no other roles you can give.</value>
+  </data>
+  <data name="ui.user_roles.revoke" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ui.user_roles.revoked" xml:space="preserve">
+    <value>The role was removed.</value>
+  </data>
+  <data name="ui.user_roles.role" xml:space="preserve">
+    <value>Role</value>
+  </data>
+  <data name="ui.user_roles.until" xml:space="preserve">
+    <value>Last day (optional)</value>
+  </data>
+  <data name="ui.user_roles.until_help" xml:space="preserve">
+    <value>The role ends at the end of this day (UTC). Leave it empty to keep the role until someone removes it.</value>
+  </data>
+  <data name="ui.users.account_actions" xml:space="preserve">
+    <value>Account status</value>
+  </data>
+  <data name="ui.users.action.deactivate" xml:space="preserve">
+    <value>Deactivate</value>
+  </data>
+  <data name="ui.users.action.deactivate.done" xml:space="preserve">
+    <value>The account is deactivated and its sessions have ended.</value>
+  </data>
+  <data name="ui.users.action.deactivate.help" xml:space="preserve">
+    <value>Deactivating is for people who have left. They cannot sign in, and their history stays in the audit log.</value>
+  </data>
+  <data name="ui.users.action.end_sessions" xml:space="preserve">
+    <value>Sign out everywhere</value>
+  </data>
+  <data name="ui.users.action.end_sessions.done" xml:space="preserve">
+    <value>All sessions have ended.</value>
+  </data>
+  <data name="ui.users.action.end_sessions.help" xml:space="preserve">
+    <value>This ends every open session of this person. They can sign in again.</value>
+  </data>
+  <data name="ui.users.action.lock" xml:space="preserve">
+    <value>Lock</value>
+  </data>
+  <data name="ui.users.action.lock.done" xml:space="preserve">
+    <value>The account is locked and its sessions have ended.</value>
+  </data>
+  <data name="ui.users.action.lock.help" xml:space="preserve">
+    <value>Locking stops this person from signing in and ends their sessions now.</value>
+  </data>
+  <data name="ui.users.action.reactivate" xml:space="preserve">
+    <value>Reactivate</value>
+  </data>
+  <data name="ui.users.action.reactivate.done" xml:space="preserve">
+    <value>The account is active again.</value>
+  </data>
+  <data name="ui.users.action.reactivate.help" xml:space="preserve">
+    <value>Reactivating lets this person sign in again.</value>
+  </data>
+  <data name="ui.users.action.resend_invitation" xml:space="preserve">
+    <value>Resend invitation</value>
+  </data>
+  <data name="ui.users.action.resend_invitation.done" xml:space="preserve">
+    <value>A new invitation is on its way.</value>
+  </data>
+  <data name="ui.users.action.resend_invitation.help" xml:space="preserve">
+    <value>This sends a new invitation link. The earlier link stops working.</value>
+  </data>
+  <data name="ui.users.action.reset_second_factor" xml:space="preserve">
+    <value>Reset second factor</value>
+  </data>
+  <data name="ui.users.action.reset_second_factor.done" xml:space="preserve">
+    <value>The second factors are removed. The person has been emailed.</value>
+  </data>
+  <data name="ui.users.action.reset_second_factor.help" xml:space="preserve">
+    <value>Use this when the person lost their phone or security key. It removes their authenticator app, passkeys and recovery codes and ends their sessions. They set up a new one at their next sign-in.</value>
+  </data>
+  <data name="ui.users.action.send_password_reset" xml:space="preserve">
+    <value>Send password reset link</value>
+  </data>
+  <data name="ui.users.action.send_password_reset.done" xml:space="preserve">
+    <value>A password reset link is on its way.</value>
+  </data>
+  <data name="ui.users.action.send_password_reset.help" xml:space="preserve">
+    <value>This emails the person a link to choose a new password. You never see their password.</value>
+  </data>
+  <data name="ui.users.action.suspend" xml:space="preserve">
+    <value>Suspend</value>
+  </data>
+  <data name="ui.users.action.suspend.done" xml:space="preserve">
+    <value>The account is suspended and its sessions have ended.</value>
+  </data>
+  <data name="ui.users.action.suspend.help" xml:space="preserve">
+    <value>Suspending stops this person from signing in for now and ends their sessions. Reactivate the account later.</value>
+  </data>
+  <data name="ui.users.apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="ui.users.authenticator_off" xml:space="preserve">
+    <value>Authenticator app: not set up</value>
+  </data>
+  <data name="ui.users.authenticator_on" xml:space="preserve">
+    <value>Authenticator app: on</value>
+  </data>
+  <data name="ui.users.authority" xml:space="preserve">
+    <value>Authority level</value>
+  </data>
+  <data name="ui.users.authority.administrator" xml:space="preserve">
+    <value>Administrator</value>
+  </data>
+  <data name="ui.users.authority.manager" xml:space="preserve">
+    <value>Manager</value>
+  </data>
+  <data name="ui.users.authority.standard" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="ui.users.authority.super_user" xml:space="preserve">
+    <value>SuperUser</value>
+  </data>
+  <data name="ui.users.back" xml:space="preserve">
+    <value>Back to users</value>
+  </data>
+  <data name="ui.users.count" xml:space="preserve">
+    <value>Users found: {count}</value>
+  </data>
+  <data name="ui.users.created" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="ui.users.departments" xml:space="preserve">
+    <value>Departments</value>
+  </data>
+  <data name="ui.users.employee_number" xml:space="preserve">
+    <value>Employee number</value>
+  </data>
+  <data name="ui.users.empty" xml:space="preserve">
+    <value>No users match.</value>
+  </data>
+  <data name="ui.users.first_name" xml:space="preserve">
+    <value>First name</value>
+  </data>
+  <data name="ui.users.invite" xml:space="preserve">
+    <value>Invite a user</value>
+  </data>
+  <data name="ui.users.invite_intro" xml:space="preserve">
+    <value>The person gets an email with a link to choose their password and set up their second factor. The link works for 72 hours.</value>
+  </data>
+  <data name="ui.users.invite_submit" xml:space="preserve">
+    <value>Send invitation</value>
+  </data>
+  <data name="ui.users.last_name" xml:space="preserve">
+    <value>Last name</value>
+  </data>
+  <data name="ui.users.last_sign_in" xml:space="preserve">
+    <value>Last sign-in</value>
+  </data>
+  <data name="ui.users.name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ui.users.no_departments" xml:space="preserve">
+    <value>No departments.</value>
+  </data>
+  <data name="ui.users.no_roles" xml:space="preserve">
+    <value>No roles.</value>
+  </data>
+  <data name="ui.users.no_sessions" xml:space="preserve">
+    <value>No open sessions.</value>
+  </data>
+  <data name="ui.users.passkeys" xml:space="preserve">
+    <value>Passkeys: {count}</value>
+  </data>
+  <data name="ui.users.phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="ui.users.profile" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="ui.users.reason" xml:space="preserve">
+    <value>Reason (kept in the audit log)</value>
+  </data>
+  <data name="ui.users.role_until" xml:space="preserve">
+    <value>until {time}</value>
+  </data>
+  <data name="ui.users.roles" xml:space="preserve">
+    <value>Roles</value>
+  </data>
+  <data name="ui.users.search" xml:space="preserve">
+    <value>Search by name or email</value>
+  </data>
+  <data name="ui.users.second_factors" xml:space="preserve">
+    <value>Second factors</value>
+  </data>
+  <data name="ui.users.security_actions" xml:space="preserve">
+    <value>Sign-in and security</value>
+  </data>
+  <data name="ui.users.session_browser" xml:space="preserve">
+    <value>Browser</value>
+  </data>
+  <data name="ui.users.session_ip" xml:space="preserve">
+    <value>IP address</value>
+  </data>
+  <data name="ui.users.session_last_seen" xml:space="preserve">
+    <value>Last active</value>
+  </data>
+  <data name="ui.users.session_started" xml:space="preserve">
+    <value>Started</value>
+  </data>
+  <data name="ui.users.sessions" xml:space="preserve">
+    <value>Open sessions</value>
+  </data>
+  <data name="ui.users.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.users.status.active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="ui.users.status.all" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="ui.users.status.deactivated" xml:space="preserve">
+    <value>Deactivated</value>
+  </data>
+  <data name="ui.users.status.invited" xml:space="preserve">
+    <value>Invited</value>
+  </data>
+  <data name="ui.users.status.locked" xml:space="preserve">
+    <value>Locked</value>
+  </data>
+  <data name="ui.users.status.suspended" xml:space="preserve">
+    <value>Suspended</value>
+  </data>
+  <data name="ui.users.status_reason" xml:space="preserve">
+    <value>Reason: {reason} ({time})</value>
+  </data>
+  <data name="ui.users.title" xml:space="preserve">
+    <value>Users</value>
+  </data>
+  <data name="ui.verify.code_label" xml:space="preserve">
+    <value>6-digit code from your authenticator app</value>
+  </data>
+  <data name="ui.verify.submit" xml:space="preserve">
+    <value>Verify</value>
+  </data>
+  <data name="ui.verify.title" xml:space="preserve">
+    <value>Confirm it is you</value>
+  </data>
+  <data name="ui.verify.use_recovery" xml:space="preserve">
+    <value>Use a recovery code instead</value>
+  </data>
+</root>

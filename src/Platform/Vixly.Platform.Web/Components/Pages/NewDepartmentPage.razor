@@ -1,0 +1,20 @@
+﻿@*
+=========================================================
+FILE: NewDepartmentPage.razor
+
+PURPOSE:
+Create a department.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/departments/new"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.departments.new"]</PageTitle>
+
+<h1>@T["ui.departments.new"]</h1>
+<DepartmentCreateForm />

@@ -1,0 +1,188 @@
+/* =========================================================
+   FILE: vixly-theme.css
+   PURPOSE: Core design tokens for Vixly V4 (Vixly.Shared.UI).
+   NOTES:
+   - Contains palette tokens and semantic tokens for light and dark
+   - WCAG 2.2 AA verified contrast ratios
+   - ThemeProvider (ADR-0012) overrides these tokens for white-label tenants
+   ========================================================= */
+
+:root,
+:root[data-theme="light"] {
+    /* Palette Tokens */
+    --vx-blue-50: #EFF6FF;
+    --vx-blue-100: #DBEAFE;
+    --vx-blue-500: #3B82F6;
+    --vx-blue-600: #2563EB;
+    --vx-blue-700: #1D4ED8;
+    --vx-blue-800: #1E40AF;
+    --vx-sky-400: #38BDF8;
+    --vx-sky-500: #0EA5E9;
+    --vx-slate-50: #F8FAFC;
+    --vx-slate-100: #F1F5F9;
+    --vx-slate-200: #E2E8F0;
+    --vx-slate-400: #94A3B8;
+    --vx-slate-500: #64748B;
+    --vx-slate-600: #475569;
+    --vx-slate-700: #334155;
+    --vx-slate-800: #1E293B;
+    --vx-slate-900: #0F172A;
+
+    /* Semantic Tokens - Surfaces & App */
+    --vx-color-bg-app: #EEF3F8;
+    --vx-color-app: #EEF3F8;
+    --vx-color-surface: #FFFFFF;
+    --vx-color-surface-sunken: #F8FAFC;
+    --vx-color-surface-raised: #FFFFFF;
+
+    /* Semantic Tokens - Text */
+    --vx-color-text: #0F172A;
+    --vx-color-text-muted: #475569;
+    --vx-color-text-subtle: #5B6B80;
+
+    /* Semantic Tokens - Brand & Actions */
+    --vx-color-primary: #2563EB;
+    --vx-color-primary-hover: #1D4ED8;
+    --vx-color-primary-soft: #EFF6FF;
+    --vx-color-on-primary: #FFFFFF;
+    --vx-color-link: #1D4ED8;
+    --vx-color-accent: #0EA5E9;
+    --vx-gradient-brand: linear-gradient(135deg, #2563EB 0%, #0EA5E9 100%);
+
+    /* Semantic Tokens - Borders & Focus */
+    --vx-color-border: #E2E8F0;
+    --vx-color-border-control: #7F8DA3;
+    --vx-color-focus: #2563EB;
+
+    /* Semantic Tokens - Navigation */
+    --vx-color-sidebar-bg: #0F172A;
+    --vx-color-sidebar-text: #CBD5E1;
+
+    /* Semantic Tokens - Feedback / Status */
+    --vx-color-success: #15803D;
+    --vx-color-success-bg: #DCFCE7;
+    --vx-color-warning: #B45309;
+    --vx-color-warning-bg: #FEF3C7;
+    --vx-color-danger: #B91C1C;
+    --vx-color-danger-bg: #FEE2E2;
+    --vx-color-info: #1D4ED8;
+    --vx-color-info-bg: #EFF6FF;
+
+    /* Elevation */
+    --vx-shadow-1: 0 1px 3px 0 rgb(15 23 42 / 0.08), 0 1px 2px -1px rgb(15 23 42 / 0.08);
+    --vx-shadow-2: 0 4px 6px -1px rgb(15 23 42 / 0.1), 0 2px 4px -2px rgb(15 23 42 / 0.1);
+    --vx-shadow-3: 0 20px 25px -5px rgb(15 23 42 / 0.1), 0 8px 10px -6px rgb(15 23 42 / 0.1);
+
+    /* Typography */
+    --vx-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Roboto, system-ui, sans-serif;
+    --vx-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    --vx-font-size-xs: 0.75rem;
+    --vx-font-size-sm: 0.8125rem;
+    --vx-font-size-md: 0.875rem;
+    --vx-font-size-lg: 1rem;
+    --vx-font-size-xl: 1.25rem;
+    --vx-font-size-2xl: 1.5rem;
+    --vx-font-size-3xl: 1.875rem;
+
+    /* Spacing */
+    --vx-space-1: 0.25rem;
+    --vx-space-2: 0.5rem;
+    --vx-space-3: 0.75rem;
+    --vx-space-4: 1rem;
+    --vx-space-5: 1.25rem;
+    --vx-space-6: 1.5rem;
+    --vx-space-8: 2rem;
+    --vx-space-12: 3rem;
+    --vx-space: var(--vx-space-4);
+
+    /* Radius */
+    --vx-radius-sm: 6px;
+    --vx-radius-md: 10px;
+    --vx-radius-lg: 14px;
+    --vx-radius-full: 9999px;
+    --vx-radius: var(--vx-radius-md);
+
+    /* Transitions */
+    --vx-transition-fast: 150ms cubic-bezier(0, 0, 0.2, 1);
+    --vx-transition-normal: 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+:root[data-theme="dark"] {
+    --vx-color-bg-app: #0B1220;
+    --vx-color-app: #0B1220;
+    --vx-color-surface: #111A2E;
+    --vx-color-surface-sunken: #0E1628;
+    --vx-color-surface-raised: #16213A;
+
+    --vx-color-text: #E6EDF7;
+    --vx-color-text-muted: #A3B1C6;
+    --vx-color-text-subtle: #8494AD;
+
+    --vx-color-primary: #2563EB;
+    --vx-color-primary-hover: #1D4ED8;
+    --vx-color-primary-soft: #16264A;
+    --vx-color-on-primary: #FFFFFF;
+    --vx-color-link: #60A5FA;
+    --vx-color-accent: #38BDF8;
+
+    --vx-color-border: #1F2B45;
+    --vx-color-border-control: #5B6D90;
+    --vx-color-focus: #60A5FA;
+
+    --vx-color-sidebar-bg: #0A101E;
+    --vx-color-sidebar-text: #CBD5E1;
+
+    --vx-color-success: #4ADE80;
+    --vx-color-success-bg: #0F2A1C;
+    --vx-color-warning: #FBBF24;
+    --vx-color-warning-bg: #2A2210;
+    --vx-color-danger: #F87171;
+    --vx-color-danger-bg: #2C1414;
+    --vx-color-info: #60A5FA;
+    --vx-color-info-bg: #16264A;
+
+    --vx-shadow-1: 0 0 0 1px var(--vx-color-border);
+    --vx-shadow-2: 0 0 0 1px var(--vx-color-border), 0 4px 12px rgb(0 0 0 / 0.4);
+    --vx-shadow-3: 0 0 0 1px var(--vx-color-border), 0 16px 32px rgb(0 0 0 / 0.5);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --vx-color-bg-app: #0B1220;
+        --vx-color-app: #0B1220;
+        --vx-color-surface: #111A2E;
+        --vx-color-surface-sunken: #0E1628;
+        --vx-color-surface-raised: #16213A;
+
+        --vx-color-text: #E6EDF7;
+        --vx-color-text-muted: #A3B1C6;
+        --vx-color-text-subtle: #8494AD;
+
+        --vx-color-primary: #2563EB;
+        --vx-color-primary-hover: #1D4ED8;
+        --vx-color-primary-soft: #16264A;
+        --vx-color-on-primary: #FFFFFF;
+        --vx-color-link: #60A5FA;
+        --vx-color-accent: #38BDF8;
+
+        --vx-color-border: #1F2B45;
+        --vx-color-border-control: #5B6D90;
+        --vx-color-focus: #60A5FA;
+
+        --vx-color-sidebar-bg: #0A101E;
+        --vx-color-sidebar-text: #CBD5E1;
+
+        --vx-color-success: #4ADE80;
+        --vx-color-success-bg: #0F2A1C;
+        --vx-color-warning: #FBBF24;
+        --vx-color-warning-bg: #2A2210;
+        --vx-color-danger: #F87171;
+        --vx-color-danger-bg: #2C1414;
+        --vx-color-info: #60A5FA;
+        --vx-color-info-bg: #16264A;
+
+        --vx-shadow-1: 0 0 0 1px var(--vx-color-border);
+        --vx-shadow-2: 0 0 0 1px var(--vx-color-border), 0 4px 12px rgb(0 0 0 / 0.4);
+        --vx-shadow-3: 0 0 0 1px var(--vx-color-border), 0 16px 32px rgb(0 0 0 / 0.5);
+    }
+}

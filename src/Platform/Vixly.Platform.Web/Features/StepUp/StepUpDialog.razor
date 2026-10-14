@@ -1,0 +1,111 @@
+﻿@*
+=========================================================
+FILE: StepUpDialog.razor
+
+PURPOSE:
+Asks the signed-in user to confirm it is them before a
+sensitive action (step-up).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Reports OnConfirmed or OnCancelled; the parent retries its
+  action (UI-2)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<StepUpPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<div class="vx-dialog" role="dialog" aria-modal="true" aria-labelledby="@(_id)-title">
+    <h2 id="@(_id)-title">@T["ui.stepup.title"]</h2>
+    <p>@T[Presenter.State.UseRecoveryCode ? "ui.stepup.intro_recovery" : "ui.stepup.intro"]</p>
+    @if (Presenter.State.Error is not null)
+    {
+        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+    }
+    <form class="vx-form" @onsubmit="ConfirmAsync">
+        <label for="@(_id)-code">@T[Presenter.State.UseRecoveryCode ? "ui.recovery.code_label" : "ui.verify.code_label"]</label>
+        <input id="@(_id)-code" @bind="_code" autocomplete="one-time-code" required />
+        <div class="vx-actions">
+            <button type="submit" class="vx-button vx-button--primary" disabled="@Presenter.IsBusy">@T["ui.stepup.submit"]</button>
+            <button type="button" class="vx-button" @onclick="OnCancelled">@T["ui.common.cancel"]</button>
+        </div>
+    </form>
+    <div class="vx-actions">
+        @if (_passkeys)
+        {
+            <button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="UsePasskeyAsync">@T["ui.stepup.use_passkey"]</button>
+        }
+        <button type="button" class="vx-link" @onclick="Presenter.ToggleRecoveryCode">
+            @T[Presenter.State.UseRecoveryCode ? "ui.stepup.use_app" : "ui.verify.use_recovery"]
+        </button>
+    </div>
+</div>
+
+@code {
+    private readonly string _id = "vx-" + Guid.NewGuid().ToString("N")[..8];
+
+    private string _code = string.Empty;
+
+    private bool _passkeys;
+
+    [Parameter]
+    public EventCallback OnConfirmed { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelled { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _passkeys = await JS.InvokeAsync<bool>("vixlyPasskeys.supported");
+            StateHasChanged();
+        }
+    }
+
+    private async Task ConfirmAsync()
+    {
+        bool confirmed = await Presenter.ConfirmAsync(_code);
+        _code = string.Empty;
+        await FinishAsync(confirmed);
+    }
+
+    private async Task UsePasskeyAsync()
+    {
+        PlatformPasskeyStart? started = await Presenter.BeginPasskeyAsync();
+
+        if (started is null)
+        {
+            await FinishAsync(false);
+            return;
+        }
+
+        string? answer = await JS.InvokeAsync<string?>("vixlyPasskeys.get", started.OptionsJson);
+
+        if (answer is null)
+        {
+            Presenter.ReportPasskeyCancelled();
+            return;
+        }
+
+        await FinishAsync(await Presenter.ConfirmPasskeyAsync(started, answer));
+    }
+
+    private async Task FinishAsync(bool confirmed)
+    {
+        if (Presenter.State.SessionEnded)
+        {
+            Navigation.NavigateTo("/sign-in", forceLoad: true);
+        }
+        else if (confirmed)
+        {
+            await OnConfirmed.InvokeAsync();
+        }
+    }
+}

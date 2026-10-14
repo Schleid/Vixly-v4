@@ -1,0 +1,35 @@
+﻿@*
+=========================================================
+FILE: RecoveryPage.razor
+
+PURPOSE:
+Step 2 of sign-in with a single-use recovery code.
+
+IMPORTANT NOTES:
+- Markup only. Text comes from PlatformText (L-10); values
+  come from the endpoint or presenter (ADR-0001)
+- Placeholder look: the Frontend/UI team designs the final
+  experience (Frontend Guide)
+=========================================================
+*@
+@inject IStringLocalizer<PlatformText> T
+
+<AuthShell Title="@T["ui.recovery.title"]">
+    <FormMessage Error="@Error" />
+    <form method="post" action="/sign-in/recovery" class="vx-form">
+        <AntiforgeryToken />
+        <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+        <label for="code">@T["ui.recovery.code_label"]</label>
+        <input id="code" name="code" autocomplete="off" spellcheck="false" required autofocus />
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.verify.submit"]</button>
+    </form>
+    <p><a href="/sign-in">@T["ui.signin.back"]</a></p>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string ReturnUrl { get; set; } = "/";
+
+    [Parameter]
+    public string? Error { get; set; }
+}

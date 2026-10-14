@@ -1,0 +1,1487 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="email.invitation.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Vous avez été invité sur Vixly Control. Ouvrez ce lien dans les {hours} heures pour choisir votre mot de passe :
+
+{link}
+
+Si vous n'attendiez pas cet e-mail, vous pouvez l'ignorer.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.invitation.subject" xml:space="preserve">
+    <value>Vous êtes invité sur Vixly Control</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.notice.subject" xml:space="preserve">
+    <value>Avis de sécurité de Vixly Control</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.reset.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Ouvrez ce lien dans les {minutes} minutes pour choisir un nouveau mot de passe :
+
+{link}
+
+Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste inchangé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.reset.subject" xml:space="preserve">
+    <value>Réinitialisez votre mot de passe Vixly Control</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.account_not_invited" xml:space="preserve">
+    <value>Cette personne a déjà accepté l'invitation.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.authority_not_allowed" xml:space="preserve">
+    <value>Seul un SuperUser peut attribuer ce niveau d'autorité.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.code_invalid" xml:space="preserve">
+    <value>Ce code est incorrect. Essayez le code le plus récent.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.current_session_not_ended" xml:space="preserve">
+    <value>Pour terminer cette session, déconnectez-vous.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.link_invalid" xml:space="preserve">
+    <value>Ce lien n'est plus valide. Demandez-en un nouveau.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.no_passkeys" xml:space="preserve">
+    <value>Vous n'avez pas encore de clé d'accès. Utilisez votre application d'authentification.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.passkey_not_accepted" xml:space="preserve">
+    <value>Cette clé d'accès n'a pas pu être vérifiée. Réessayez ou utilisez votre application d'authentification.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.password_contains_email" xml:space="preserve">
+    <value>Le mot de passe ne doit pas contenir votre e-mail.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.password_incorrect" xml:space="preserve">
+    <value>Le mot de passe actuel est incorrect.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.password_too_common" xml:space="preserve">
+    <value>Ce mot de passe est trop facile à deviner.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.password_too_long" xml:space="preserve">
+    <value>Utilisez au maximum {maxLength} caractères.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.password_too_short" xml:space="preserve">
+    <value>Utilisez au moins {minLength} caractères.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.session_ended" xml:space="preserve">
+    <value>Votre session est terminée. Reconnectez-vous.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.setup_already_done" xml:space="preserve">
+    <value>La configuration a déjà été effectuée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.sign_in_expired" xml:space="preserve">
+    <value>Votre connexion a expiré. Recommencez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.sign_in_failed" xml:space="preserve">
+    <value>L'e-mail ou le mot de passe est incorrect, ou le compte ne peut pas se connecter pour le moment.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.auth.target_authority_higher" xml:space="preserve">
+    <value>Vous ne pouvez pas faire cela à une personne dont le niveau d'autorité est supérieur au vôtre.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.common.concurrency_conflict" xml:space="preserve">
+    <value>Quelqu'un d'autre a modifié cet élément en même temps. Rechargez et réessayez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.common.email_already_used" xml:space="preserve">
+    <value>Cet e-mail est déjà utilisé par un autre compte.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.common.not_found" xml:space="preserve">
+    <value>Cet élément n'existe pas ou vous ne pouvez pas le voir.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.common.permission_unknown" xml:space="preserve">
+    <value>Cette autorisation n'existe pas.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.common.request_invalid" xml:space="preserve">
+    <value>Certaines informations sont manquantes ou non valides.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.common.step_up_required" xml:space="preserve">
+    <value>Confirmez votre identité avant de continuer.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.departments.department_inactive" xml:space="preserve">
+    <value>Ce service est inactif. Réactivez-le d'abord.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.departments.name_already_used" xml:space="preserve">
+    <value>Un autre service utilise déjà ce nom.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.account_deactivated" xml:space="preserve">
+    <value>Ce compte est désactivé. Réactivez-le d'abord.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.account_not_active" xml:space="preserve">
+    <value>Ce compte n'est pas actif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.account_not_restricted" xml:space="preserve">
+    <value>Ce compte est déjà actif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.actor_required" xml:space="preserve">
+    <value>Un utilisateur connecté est requis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.already_department_member" xml:space="preserve">
+    <value>Cette personne fait déjà partie de ce service.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.assignment_expiry_not_in_future" xml:space="preserve">
+    <value>La date de fin doit être dans le futur.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.audit_action_invalid" xml:space="preserve">
+    <value>Cette action d'audit n'est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.audit_target_invalid" xml:space="preserve">
+    <value>Cette cible d'audit n'est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.authenticator_code_reused" xml:space="preserve">
+    <value>Ce code a déjà été utilisé. Attendez le suivant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.authenticator_not_confirmed" xml:space="preserve">
+    <value>Aucune application d'authentification n'est configurée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.authenticator_not_pending" xml:space="preserve">
+    <value>Une application d'authentification est déjà configurée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.authenticator_secret_invalid" xml:space="preserve">
+    <value>La configuration de l'authentificateur a échoué. Recommencez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.authority_level_invalid" xml:space="preserve">
+    <value>Ce niveau d'autorité n'est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.cannot_act_on_own_account" xml:space="preserve">
+    <value>Vous ne pouvez pas faire cela sur votre propre compte.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.department_already_active" xml:space="preserve">
+    <value>Ce service est déjà actif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.department_already_inactive" xml:space="preserve">
+    <value>Ce service est déjà inactif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.department_required" xml:space="preserve">
+    <value>Choisissez un service.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.description_too_long" xml:space="preserve">
+    <value>La description peut contenir au maximum {maxLength} caractères.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.employee_number_too_long" xml:space="preserve">
+    <value>Le matricule peut contenir au maximum {maxLength} caractères.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.invitation_not_pending" xml:space="preserve">
+    <value>Cette invitation a déjà été acceptée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.last_second_factor" xml:space="preserve">
+    <value>Ajoutez une autre méthode de vérification avant de supprimer celle-ci.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.last_super_user" xml:space="preserve">
+    <value>Au moins un SuperUser actif doit rester.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.name_required" xml:space="preserve">
+    <value>Saisissez un nom.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.name_too_long" xml:space="preserve">
+    <value>Utilisez au maximum {maxLength} caractères.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.not_department_member" xml:space="preserve">
+    <value>Cette personne ne fait pas partie de ce service.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.passkey_already_registered" xml:space="preserve">
+    <value>Cette clé d'accès est déjà enregistrée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.passkey_ceremony_invalid" xml:space="preserve">
+    <value>Cette demande de clé d'accès a expiré. Recommencez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.passkey_counter_regressed" xml:space="preserve">
+    <value>Cette clé d'accès semble copiée et a été refusée. Contactez votre administrateur.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.passkey_invalid" xml:space="preserve">
+    <value>Cette clé d'accès n'a pas pu être enregistrée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.passkey_limit_reached" xml:space="preserve">
+    <value>Vous pouvez enregistrer au maximum {maximum} clés d'accès.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.passkey_not_found" xml:space="preserve">
+    <value>Cette clé d'accès n'est pas enregistrée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.password_hash_required" xml:space="preserve">
+    <value>Un mot de passe est requis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.permission_code_invalid" xml:space="preserve">
+    <value>Cette autorisation n'est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.reason_required" xml:space="preserve">
+    <value>Indiquez un motif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.reason_too_long" xml:space="preserve">
+    <value>Le motif peut contenir au maximum {maxLength} caractères.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.recovery_code_not_accepted" xml:space="preserve">
+    <value>Ce code de récupération est incorrect ou a déjà été utilisé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.recovery_codes_invalid" xml:space="preserve">
+    <value>Exactement {count} codes de récupération sont nécessaires.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.role_already_active" xml:space="preserve">
+    <value>Ce rôle est déjà actif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.role_already_assigned" xml:space="preserve">
+    <value>Cette personne a déjà ce rôle.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.role_already_inactive" xml:space="preserve">
+    <value>Ce rôle est déjà inactif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.role_not_assigned" xml:space="preserve">
+    <value>Cette personne n'a pas ce rôle.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.role_required" xml:space="preserve">
+    <value>Choisissez un rôle.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.session_ended" xml:space="preserve">
+    <value>Votre session est terminée. Reconnectez-vous.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.sign_in_challenge_invalid" xml:space="preserve">
+    <value>Votre connexion a expiré. Recommencez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.super_user_count_invalid" xml:space="preserve">
+    <value>Le nombre de SuperUsers n'est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.system_role_key_invalid" xml:space="preserve">
+    <value>Cette clé de rôle système n'est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.system_role_protected" xml:space="preserve">
+    <value>Les rôles système ne peuvent pas être modifiés ici.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.token_already_used" xml:space="preserve">
+    <value>Ce lien a déjà été utilisé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.token_expired" xml:space="preserve">
+    <value>Ce lien a expiré. Demandez-en un nouveau.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.token_hash_invalid" xml:space="preserve">
+    <value>Ce lien n'est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.token_purpose_invalid" xml:space="preserve">
+    <value>Ce lien n'est pas valide pour cette page.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.user_required" xml:space="preserve">
+    <value>Un utilisateur est requis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.notice.passkey_added" xml:space="preserve">
+    <value>Une clé d'accès a été ajoutée à votre compte Vixly Control. Si ce n'était pas vous, contactez immédiatement votre administrateur.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.notice.passkey_removed" xml:space="preserve">
+    <value>Une clé d'accès a été supprimée de votre compte Vixly Control. Si ce n'était pas vous, contactez immédiatement votre administrateur.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.notice.password_changed" xml:space="preserve">
+    <value>Votre mot de passe Vixly Control a été modifié. Si ce n'était pas vous, contactez immédiatement votre administrateur.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.notice.recovery_codes_replaced" xml:space="preserve">
+    <value>De nouveaux codes de récupération ont été créés pour votre compte Vixly Control ; les anciens ne fonctionnent plus. Si ce n'était pas vous, contactez immédiatement votre administrateur.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.notice.second_factor_reset" xml:space="preserve">
+    <value>Un administrateur a supprimé les clés d'accès, l'application d'authentification et les codes de récupération de votre compte Vixly Control. À votre prochaine connexion, vous en configurerez de nouveaux. Si vous n'avez rien demandé, contactez immédiatement votre administrateur.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.roles.exceeds_your_access" xml:space="preserve">
+    <value>Vous ne pouvez accorder que des autorisations que vous possédez vous-même.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.roles.name_already_used" xml:space="preserve">
+    <value>Un autre rôle utilise déjà ce nom.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.roles.role_inactive" xml:space="preserve">
+    <value>Ce rôle est inactif. Réactivez-le d'abord.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.security.access_denied" xml:space="preserve">
+    <value>Vous n'avez pas l'autorisation de faire cela.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.security.authority_level_invalid" xml:space="preserve">
+    <value>Ce niveau d'autorité n'est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.security.user_id_required" xml:space="preserve">
+    <value>Un utilisateur connecté est requis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.add_passkey" xml:space="preserve">
+    <value>Ajouter une clé d'accès</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.change_password" xml:space="preserve">
+    <value>Changer le mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.confirm_password" xml:space="preserve">
+    <value>Confirmez le nouveau mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.current_password" xml:space="preserve">
+    <value>Mot de passe actuel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.end_other_sessions" xml:space="preserve">
+    <value>Se déconnecter sur tous les autres appareils</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.end_session" xml:space="preserve">
+    <value>Terminer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.language" xml:space="preserve">
+    <value>Langue de la console et de vos e-mails</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.new_codes" xml:space="preserve">
+    <value>Obtenir de nouveaux codes de récupération</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.no_passkeys" xml:space="preserve">
+    <value>Aucune clé d'accès pour le moment.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.passkey_added" xml:space="preserve">
+    <value>La clé d'accès est ajoutée. Vous pouvez maintenant vous connecter avec.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.passkey_added_on" xml:space="preserve">
+    <value>Ajoutée le {time}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.passkey_last_used" xml:space="preserve">
+    <value>Dernière utilisation : {time}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.passkey_name" xml:space="preserve">
+    <value>Nom de la nouvelle clé d'accès (par exemple, Ordinateur du bureau)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.passkey_removed" xml:space="preserve">
+    <value>La clé d'accès est supprimée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.passkeys" xml:space="preserve">
+    <value>Clés d'accès</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.passkeys_intro" xml:space="preserve">
+    <value>Une clé d'accès vous connecte avec l'empreinte, le visage ou le code PIN de votre appareil. Elle ne peut pas être hameçonnée et remplace à la fois votre mot de passe et votre code.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.passkeys_unsupported" xml:space="preserve">
+    <value>Ce navigateur ne prend pas en charge les clés d'accès.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.password" xml:space="preserve">
+    <value>Mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.password_changed" xml:space="preserve">
+    <value>Votre mot de passe est modifié. Sessions terminées sur d'autres appareils : {count}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.password_mismatch" xml:space="preserve">
+    <value>Les deux nouveaux mots de passe ne sont pas identiques.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.remove" xml:space="preserve">
+    <value>Supprimer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.save" xml:space="preserve">
+    <value>Enregistrer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.session_action" xml:space="preserve">
+    <value>Action</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.sessions_ended" xml:space="preserve">
+    <value>Sessions terminées : {count}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.this_device" xml:space="preserve">
+    <value>Cet appareil</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.account.title" xml:space="preserve">
+    <value>Mon compte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.app.name" xml:space="preserve">
+    <value>Vixly Control</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.codes.continue" xml:space="preserve">
+    <value>Je les ai enregistrés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.codes.intro" xml:space="preserve">
+    <value>Chaque code ne fonctionne qu'une fois. Conservez-les en lieu sûr : ils vous permettent d'accéder à votre compte si vous perdez votre application d'authentification. Ils ne seront plus affichés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.codes.title" xml:space="preserve">
+    <value>Enregistrez vos codes de récupération</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.common.cancel" xml:space="preserve">
+    <value>Annuler</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.common.loading" xml:space="preserve">
+    <value>Chargement…</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.common.never" xml:space="preserve">
+    <value>Jamais</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.common.next" xml:space="preserve">
+    <value>Suivant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.common.no" xml:space="preserve">
+    <value>Non</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.common.none" xml:space="preserve">
+    <value>Non renseigné</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.common.page_of" xml:space="preserve">
+    <value>Page {page} sur {pages}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.common.pages" xml:space="preserve">
+    <value>Pages</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.common.previous" xml:space="preserve">
+    <value>Précédent</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.common.utc_time" xml:space="preserve">
+    <value>{time} UTC</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.common.yes" xml:space="preserve">
+    <value>Oui</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.actions" xml:space="preserve">
+    <value>Actions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.add" xml:space="preserve">
+    <value>Ajouter</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.add_from_user" xml:space="preserve">
+    <value>Pour ajouter quelqu'un, ouvrez sa page dans Utilisateurs.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.add_to" xml:space="preserve">
+    <value>Ajouter à un service</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.back" xml:space="preserve">
+    <value>Retour aux services</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.choose" xml:space="preserve">
+    <value>Choisissez un service</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.create" xml:space="preserve">
+    <value>Créer le service</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.deactivate_confirm" xml:space="preserve">
+    <value>Désactiver le service</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.deactivate_help" xml:space="preserve">
+    <value>Les personnes restent dans un service inactif, mais personne ne peut y être ajouté tant qu'il n'est pas réactivé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.deactivated" xml:space="preserve">
+    <value>Le service a été désactivé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.description" xml:space="preserve">
+    <value>Description</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.description_optional" xml:space="preserve">
+    <value>Description (facultatif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.edit" xml:space="preserve">
+    <value>Modifier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.empty" xml:space="preserve">
+    <value>Aucun service pour l'instant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.hide_inactive" xml:space="preserve">
+    <value>Masquer les services inactifs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.make_primary" xml:space="preserve">
+    <value>Définir comme principal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.member_added" xml:space="preserve">
+    <value>La personne a été ajoutée au service.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.member_removed" xml:space="preserve">
+    <value>La personne a été retirée du service.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.members" xml:space="preserve">
+    <value>Personnes dans ce service</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.name" xml:space="preserve">
+    <value>Nom</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.new" xml:space="preserve">
+    <value>Nouveau service</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.new_intro" xml:space="preserve">
+    <value>Les services regroupent le personnel à titre indicatif. Ils n'accordent aucune autorisation.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.no_members" xml:space="preserve">
+    <value>Personne n'est dans ce service.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.primary" xml:space="preserve">
+    <value>Principal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.primary_set" xml:space="preserve">
+    <value>Le service principal a été modifié.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.reactivated" xml:space="preserve">
+    <value>Le service a été réactivé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.save" xml:space="preserve">
+    <value>Enregistrer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.show_inactive" xml:space="preserve">
+    <value>Afficher les services inactifs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.title" xml:space="preserve">
+    <value>Services</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.departments.updated" xml:space="preserve">
+    <value>Le service a été enregistré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.enrol.intro" xml:space="preserve">
+    <value>Scannez ce code QR avec une application d'authentification, ou saisissez-y la clé de configuration. Puis entrez le code à 6 chiffres affiché.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.enrol.key" xml:space="preserve">
+    <value>Clé de configuration</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.enrol.qr_alt" xml:space="preserve">
+    <value>Code QR pour votre application d'authentification</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.enrol.submit" xml:space="preserve">
+    <value>Activer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.enrol.title" xml:space="preserve">
+    <value>Protégez votre compte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.error.generic" xml:space="preserve">
+    <value>Une erreur s'est produite. Référence : {reference}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.forgot.intro" xml:space="preserve">
+    <value>Saisissez votre e-mail. S'il correspond à un compte, nous enverrons un lien.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.forgot.sent" xml:space="preserve">
+    <value>Si cet e-mail correspond à un compte, un lien est en route. Il est valable 60 minutes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.forgot.submit" xml:space="preserve">
+    <value>Envoyer le lien</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.forgot.title" xml:space="preserve">
+    <value>Réinitialiser votre mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.holders.empty" xml:space="preserve">
+    <value>Personne n'a cette autorisation.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.holders.intro" xml:space="preserve">
+    <value>Toutes les personnes dont le compte est actif et qui ont cette autorisation actuellement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.holders.super_user" xml:space="preserve">
+    <value>Niveau d'autorité SuperUser</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.holders.through" xml:space="preserve">
+    <value>Par</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.home.title" xml:space="preserve">
+    <value>Accueil</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.home.welcome" xml:space="preserve">
+    <value>Connecté en tant que {name}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invite.intro" xml:space="preserve">
+    <value>Choisissez un mot de passe d'au moins {minLength} caractères.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invite.password" xml:space="preserve">
+    <value>Nouveau mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invite.submit" xml:space="preserve">
+    <value>Définir le mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invite.title" xml:space="preserve">
+    <value>Bienvenue sur Vixly Control</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.language" xml:space="preserve">
+    <value>Langue</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.language.en" xml:space="preserve">
+    <value>English</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.language.es" xml:space="preserve">
+    <value>Español</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.language.fr" xml:space="preserve">
+    <value>Français</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.nav.label" xml:space="preserve">
+    <value>Navigation principale</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.passkey.cancelled" xml:space="preserve">
+    <value>La clé d'accès n'a pas été utilisée. Réessayez ou utilisez un autre moyen.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.audit.view" xml:space="preserve">
+    <value>Voir le journal d'audit</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.departments.create" xml:space="preserve">
+    <value>Créer des services</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.departments.deactivate" xml:space="preserve">
+    <value>Désactiver et réactiver des services</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.departments.edit" xml:space="preserve">
+    <value>Modifier des services</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.departments.manage_members" xml:space="preserve">
+    <value>Gérer les membres des services</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.departments.view" xml:space="preserve">
+    <value>Voir les services</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.roles.assign" xml:space="preserve">
+    <value>Attribuer et retirer des rôles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.roles.create" xml:space="preserve">
+    <value>Créer des rôles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.roles.deactivate" xml:space="preserve">
+    <value>Désactiver et réactiver des rôles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.roles.edit" xml:space="preserve">
+    <value>Renommer des rôles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.roles.edit_permissions" xml:space="preserve">
+    <value>Modifier les autorisations des rôles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.roles.view" xml:space="preserve">
+    <value>Voir les rôles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.users.change_authority" xml:space="preserve">
+    <value>Modifier les niveaux d'autorité (SuperUser uniquement)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.users.create" xml:space="preserve">
+    <value>Ajouter des utilisateurs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.users.deactivate" xml:space="preserve">
+    <value>Désactiver des comptes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.users.edit" xml:space="preserve">
+    <value>Modifier les informations des utilisateurs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.users.end_sessions" xml:space="preserve">
+    <value>Déconnecter des utilisateurs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.users.invite" xml:space="preserve">
+    <value>Envoyer et renvoyer des invitations</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.users.lock" xml:space="preserve">
+    <value>Verrouiller des comptes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.users.reactivate" xml:space="preserve">
+    <value>Réactiver des comptes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.users.reset_second_factor" xml:space="preserve">
+    <value>Réinitialiser les seconds facteurs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.users.send_password_reset" xml:space="preserve">
+    <value>Envoyer des liens de réinitialisation du mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.users.suspend" xml:space="preserve">
+    <value>Suspendre des comptes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.users.view" xml:space="preserve">
+    <value>Voir les utilisateurs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.audit" xml:space="preserve">
+    <value>Journal d'audit</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.departments" xml:space="preserve">
+    <value>Services</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.roles" xml:space="preserve">
+    <value>Rôles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.users" xml:space="preserve">
+    <value>Utilisateurs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.recovery.code_label" xml:space="preserve">
+    <value>Code de récupération</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.recovery.left" xml:space="preserve">
+    <value>Codes de récupération restants : {count}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.recovery.title" xml:space="preserve">
+    <value>Utiliser un code de récupération</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.reset.done" xml:space="preserve">
+    <value>Votre mot de passe a été modifié. Connectez-vous avec le nouveau.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.reset.submit" xml:space="preserve">
+    <value>Enregistrer le mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.reset.title" xml:space="preserve">
+    <value>Choisissez un nouveau mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.active" xml:space="preserve">
+    <value>Actif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.back" xml:space="preserve">
+    <value>Retour aux rôles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.create" xml:space="preserve">
+    <value>Créer le rôle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.created" xml:space="preserve">
+    <value>Créé le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.deactivate" xml:space="preserve">
+    <value>Désactiver</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.deactivate_confirm" xml:space="preserve">
+    <value>Désactiver le rôle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.deactivate_help" xml:space="preserve">
+    <value>Toutes les personnes ayant ce rôle perdent immédiatement ses autorisations. Leurs attributions sont conservées : réactiver le rôle leur rend les autorisations.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.deactivated" xml:space="preserve">
+    <value>Le rôle a été désactivé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.details" xml:space="preserve">
+    <value>Détails</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.empty" xml:space="preserve">
+    <value>Aucun rôle pour l'instant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.hide_inactive" xml:space="preserve">
+    <value>Masquer les rôles inactifs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.holder_since" xml:space="preserve">
+    <value>Depuis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.holder_until" xml:space="preserve">
+    <value>Jusqu'au</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.holders" xml:space="preserve">
+    <value>Personnes ayant ce rôle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.inactive" xml:space="preserve">
+    <value>Inactif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.kind" xml:space="preserve">
+    <value>Type</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.kind.custom" xml:space="preserve">
+    <value>Personnalisé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.kind.system" xml:space="preserve">
+    <value>Système</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.name" xml:space="preserve">
+    <value>Nom</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.new" xml:space="preserve">
+    <value>Nouveau rôle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.new_intro" xml:space="preserve">
+    <value>Donnez un nom au rôle. Vous choisirez ses autorisations sur la page suivante.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.no_end" xml:space="preserve">
+    <value>Sans date de fin</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.no_holders" xml:space="preserve">
+    <value>Personne n'a ce rôle.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.people" xml:space="preserve">
+    <value>Personnes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.permissions" xml:space="preserve">
+    <value>Autorisations</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.permissions_help" xml:space="preserve">
+    <value>Cochez ce que les personnes ayant ce rôle peuvent faire. Vous ne pouvez accorder que des autorisations que vous possédez vous-même.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.permissions_saved" xml:space="preserve">
+    <value>Les autorisations ont été enregistrées.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.permissions_title" xml:space="preserve">
+    <value>Autorisations</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.reactivate" xml:space="preserve">
+    <value>Réactiver</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.reactivated" xml:space="preserve">
+    <value>Le rôle a été réactivé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.rename" xml:space="preserve">
+    <value>Renommer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.renamed" xml:space="preserve">
+    <value>Le rôle a été renommé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.save_name" xml:space="preserve">
+    <value>Enregistrer le nom</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.save_permissions" xml:space="preserve">
+    <value>Enregistrer les autorisations</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.show_inactive" xml:space="preserve">
+    <value>Afficher les rôles inactifs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.system.administrator" xml:space="preserve">
+    <value>Administrateur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.system.security_administrator" xml:space="preserve">
+    <value>Administrateur de la sécurité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.system_note" xml:space="preserve">
+    <value>Vixly définit les rôles système. Leur nom et leurs autorisations ne peuvent pas être modifiés ici.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.title" xml:space="preserve">
+    <value>Rôles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.who_has" xml:space="preserve">
+    <value>Qui l'a ?</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.signin.back" xml:space="preserve">
+    <value>Retour à la connexion</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.signin.email" xml:space="preserve">
+    <value>E-mail</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.signin.forgot" xml:space="preserve">
+    <value>Mot de passe oublié ?</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.signin.or" xml:space="preserve">
+    <value>ou</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.signin.passkey" xml:space="preserve">
+    <value>Se connecter avec une clé d'accès</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.signin.password" xml:space="preserve">
+    <value>Mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.signin.submit" xml:space="preserve">
+    <value>Continuer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.signin.title" xml:space="preserve">
+    <value>Connexion à Vixly Control</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.signout" xml:space="preserve">
+    <value>Se déconnecter</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.stepup.intro" xml:space="preserve">
+    <value>Saisissez le code à 6 chiffres de votre application d'authentification pour continuer.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.stepup.intro_recovery" xml:space="preserve">
+    <value>Saisissez l'un de vos codes de récupération. Chaque code ne fonctionne qu'une fois.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.stepup.submit" xml:space="preserve">
+    <value>Confirmer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.stepup.title" xml:space="preserve">
+    <value>Confirmez votre identité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.stepup.use_app" xml:space="preserve">
+    <value>Utiliser plutôt l'application d'authentification</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.stepup.use_passkey" xml:space="preserve">
+    <value>Utiliser une clé d'accès</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.user_roles.assign" xml:space="preserve">
+    <value>Attribuer le rôle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.user_roles.assign_title" xml:space="preserve">
+    <value>Attribuer un rôle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.user_roles.assigned" xml:space="preserve">
+    <value>Le rôle a été attribué.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.user_roles.choose" xml:space="preserve">
+    <value>Choisissez un rôle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.user_roles.inactive" xml:space="preserve">
+    <value>Rôle inactif : n'accorde rien tant qu'il n'est pas réactivé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.user_roles.none_assignable" xml:space="preserve">
+    <value>Il n'y a aucun autre rôle que vous pouvez attribuer.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.user_roles.revoke" xml:space="preserve">
+    <value>Retirer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.user_roles.revoked" xml:space="preserve">
+    <value>Le rôle a été retiré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.user_roles.role" xml:space="preserve">
+    <value>Rôle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.user_roles.until" xml:space="preserve">
+    <value>Dernier jour (facultatif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.user_roles.until_help" xml:space="preserve">
+    <value>Le rôle prend fin à la fin de ce jour (UTC). Laissez vide pour garder le rôle jusqu'à ce que quelqu'un le retire.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.account_actions" xml:space="preserve">
+    <value>Statut du compte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.deactivate" xml:space="preserve">
+    <value>Désactiver</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.deactivate.done" xml:space="preserve">
+    <value>Le compte est désactivé et ses sessions sont terminées.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.deactivate.help" xml:space="preserve">
+    <value>La désactivation concerne les personnes parties. Elles ne peuvent plus se connecter et leur historique reste dans le journal d'audit.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.end_sessions" xml:space="preserve">
+    <value>Déconnecter partout</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.end_sessions.done" xml:space="preserve">
+    <value>Toutes les sessions sont terminées.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.end_sessions.help" xml:space="preserve">
+    <value>Cela met fin à toutes les sessions ouvertes de cette personne. Elle pourra se reconnecter.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.lock" xml:space="preserve">
+    <value>Verrouiller</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.lock.done" xml:space="preserve">
+    <value>Le compte est verrouillé et ses sessions sont terminées.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.lock.help" xml:space="preserve">
+    <value>Le verrouillage empêche cette personne de se connecter et met fin à ses sessions immédiatement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.reactivate" xml:space="preserve">
+    <value>Réactiver</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.reactivate.done" xml:space="preserve">
+    <value>Le compte est de nouveau actif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.reactivate.help" xml:space="preserve">
+    <value>La réactivation permet à cette personne de se connecter à nouveau.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.resend_invitation" xml:space="preserve">
+    <value>Renvoyer l'invitation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.resend_invitation.done" xml:space="preserve">
+    <value>Une nouvelle invitation est en route.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.resend_invitation.help" xml:space="preserve">
+    <value>Un nouveau lien d'invitation est envoyé. L'ancien lien ne fonctionne plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.reset_second_factor" xml:space="preserve">
+    <value>Réinitialiser le second facteur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.reset_second_factor.done" xml:space="preserve">
+    <value>Les seconds facteurs sont supprimés. La personne a été prévenue par e-mail.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.reset_second_factor.help" xml:space="preserve">
+    <value>À utiliser quand la personne a perdu son téléphone ou sa clé de sécurité. Cela supprime son application d'authentification, ses clés d'accès et ses codes de récupération, et met fin à ses sessions. Elle en configurera un nouveau à sa prochaine connexion.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.send_password_reset" xml:space="preserve">
+    <value>Envoyer un lien de réinitialisation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.send_password_reset.done" xml:space="preserve">
+    <value>Un lien de réinitialisation est en route.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.send_password_reset.help" xml:space="preserve">
+    <value>La personne reçoit par e-mail un lien pour choisir un nouveau mot de passe. Vous ne voyez jamais son mot de passe.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.suspend" xml:space="preserve">
+    <value>Suspendre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.suspend.done" xml:space="preserve">
+    <value>Le compte est suspendu et ses sessions sont terminées.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.action.suspend.help" xml:space="preserve">
+    <value>La suspension empêche cette personne de se connecter pour le moment et met fin à ses sessions. Réactivez le compte plus tard.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.apply" xml:space="preserve">
+    <value>Appliquer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.authenticator_off" xml:space="preserve">
+    <value>Application d'authentification : non configurée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.authenticator_on" xml:space="preserve">
+    <value>Application d'authentification : activée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.authority" xml:space="preserve">
+    <value>Niveau d'autorité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.authority.administrator" xml:space="preserve">
+    <value>Administrateur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.authority.manager" xml:space="preserve">
+    <value>Responsable</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.authority.standard" xml:space="preserve">
+    <value>Standard</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.authority.super_user" xml:space="preserve">
+    <value>SuperUser</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.back" xml:space="preserve">
+    <value>Retour aux utilisateurs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.count" xml:space="preserve">
+    <value>Utilisateurs trouvés : {count}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.created" xml:space="preserve">
+    <value>Créé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.departments" xml:space="preserve">
+    <value>Services</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.employee_number" xml:space="preserve">
+    <value>Matricule</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.empty" xml:space="preserve">
+    <value>Aucun utilisateur ne correspond.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.first_name" xml:space="preserve">
+    <value>Prénom</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.invite" xml:space="preserve">
+    <value>Inviter un utilisateur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.invite_intro" xml:space="preserve">
+    <value>La personne reçoit un e-mail avec un lien pour choisir son mot de passe et configurer son second facteur. Le lien est valable 72 heures.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.invite_submit" xml:space="preserve">
+    <value>Envoyer l'invitation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.last_name" xml:space="preserve">
+    <value>Nom</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.last_sign_in" xml:space="preserve">
+    <value>Dernière connexion</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.name" xml:space="preserve">
+    <value>Nom</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.no_departments" xml:space="preserve">
+    <value>Aucun service.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.no_roles" xml:space="preserve">
+    <value>Aucun rôle.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.no_sessions" xml:space="preserve">
+    <value>Aucune session ouverte.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.passkeys" xml:space="preserve">
+    <value>Clés d'accès : {count}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.phone" xml:space="preserve">
+    <value>Téléphone</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.profile" xml:space="preserve">
+    <value>Profil</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.reason" xml:space="preserve">
+    <value>Motif (conservé dans le journal d'audit)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.role_until" xml:space="preserve">
+    <value>jusqu'au {time}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.roles" xml:space="preserve">
+    <value>Rôles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.search" xml:space="preserve">
+    <value>Rechercher par nom ou e-mail</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.second_factors" xml:space="preserve">
+    <value>Seconds facteurs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.security_actions" xml:space="preserve">
+    <value>Connexion et sécurité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.session_browser" xml:space="preserve">
+    <value>Navigateur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.session_ip" xml:space="preserve">
+    <value>Adresse IP</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.session_last_seen" xml:space="preserve">
+    <value>Dernière activité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.session_started" xml:space="preserve">
+    <value>Début</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.sessions" xml:space="preserve">
+    <value>Sessions ouvertes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.status.active" xml:space="preserve">
+    <value>Actif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.status.all" xml:space="preserve">
+    <value>Tous</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.status.deactivated" xml:space="preserve">
+    <value>Désactivé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.status.invited" xml:space="preserve">
+    <value>Invité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.status.locked" xml:space="preserve">
+    <value>Verrouillé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.status.suspended" xml:space="preserve">
+    <value>Suspendu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.status_reason" xml:space="preserve">
+    <value>Motif : {reason} ({time})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.title" xml:space="preserve">
+    <value>Utilisateurs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.verify.code_label" xml:space="preserve">
+    <value>Code à 6 chiffres de votre application d'authentification</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.verify.submit" xml:space="preserve">
+    <value>Vérifier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.verify.title" xml:space="preserve">
+    <value>Confirmez votre identité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.verify.use_recovery" xml:space="preserve">
+    <value>Utiliser un code de récupération</value>
+    <comment>needs-review</comment>
+  </data>
+</root>

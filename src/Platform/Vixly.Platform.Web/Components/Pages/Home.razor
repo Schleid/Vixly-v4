@@ -1,0 +1,26 @@
+@*
+=========================================================
+FILE: Home.razor
+
+PURPOSE:
+Console home landing page with quick navigation cards.
+
+IMPORTANT NOTES:
+- Page (UI-6): 80 lines or fewer, no business logic
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.home.title"] · @T["ui.app.name"]</PageTitle>
+
+<div class="vx-card">
+    <h1>@T["ui.home.title"]</h1>
+    <p>@T["ui.app.name"]</p>
+    <div class="vx-actions">
+        <a href="/users" class="vx-button vx-button--primary">@T["ui.users.title"]</a>
+        <a href="/account" class="vx-button">@T["ui.account.title"]</a>
+    </div>
+</div>

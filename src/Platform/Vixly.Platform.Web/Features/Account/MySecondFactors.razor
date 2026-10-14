@@ -1,0 +1,169 @@
+﻿@*
+=========================================================
+FILE: MySecondFactors.razor
+
+PURPOSE:
+The sign-in methods of the signed-in user: authenticator app,
+recovery codes (with replacement) and passkeys (add, remove).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Runs the browser passkey ceremony between the two presenter
+  steps (navigator.credentials via passkeys.js)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<MySecondFactorsPresenter>
+@using Vixly.Platform.Web.Features.StepUp
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject IJSRuntime JS
+
+<section class="vx-card" aria-labelledby="my-factors">
+    <h2 id="my-factors">@T["ui.users.second_factors"]</h2>
+    @if (Presenter.State.Error is not null)
+    {
+        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+    }
+    @if (Presenter.State.InfoKey is not null)
+    {
+        <p class="vx-message vx-message--info" role="status">@T[Presenter.State.InfoKey]</p>
+    }
+    @if (Presenter.State.Account is { } account)
+    {
+        <ul>
+            <li>@T[account.HasAuthenticatorApp ? "ui.users.authenticator_on" : "ui.users.authenticator_off"]</li>
+            <li>@VixlyText.Format(T, "ui.recovery.left", "count", account.UnusedRecoveryCodeCount)</li>
+        </ul>
+        @if (Presenter.State.NewRecoveryCodes.Count > 0)
+        {
+            <div class="vx-dialog" role="region" aria-labelledby="new-codes">
+                <h3 id="new-codes">@T["ui.codes.title"]</h3>
+                <p>@T["ui.codes.intro"]</p>
+                <ul class="vx-codes">
+                    @foreach (string recoveryCode in Presenter.State.NewRecoveryCodes)
+                    {
+                        <li><code>@recoveryCode</code></li>
+                    }
+                </ul>
+                <button type="button" class="vx-button vx-button--primary" @onclick="Presenter.DismissCodes">@T["ui.codes.continue"]</button>
+            </div>
+        }
+        else
+        {
+            <div class="vx-actions">
+                <button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="Presenter.RegenerateCodesAsync">@T["ui.account.new_codes"]</button>
+            </div>
+        }
+        <h3>@T["ui.account.passkeys"]</h3>
+        <p>@T["ui.account.passkeys_intro"]</p>
+        @if (account.Passkeys.Count == 0)
+        {
+            <p>@T["ui.account.no_passkeys"]</p>
+        }
+        else
+        {
+            <ul class="vx-list">
+                @foreach (var passkey in account.Passkeys)
+                {
+                    <li>
+                        <strong>@passkey.Name</strong>
+                        <span>@VixlyText.Format(T, "ui.account.passkey_added_on", "time", PlatformDisplay.Utc(T, passkey.CreatedUtc))</span>
+                        <span>@VixlyText.Format(T, "ui.account.passkey_last_used", "time", PlatformDisplay.Utc(T, passkey.LastUsedUtc))</span>
+                        <button type="button" class="vx-button vx-button--danger" disabled="@Presenter.IsBusy" @onclick="() => Presenter.RemoveAsync(passkey.PasskeyId)">@T["ui.account.remove"]</button>
+                    </li>
+                }
+            </ul>
+        }
+        @if (_passkeys)
+        {
+            <form class="vx-form" @onsubmit="AddAsync">
+                <label for="passkey-name">@T["ui.account.passkey_name"]</label>
+                <input id="passkey-name" @bind="_name" maxlength="100" required autocomplete="off" />
+                <div class="vx-actions">
+                    <button type="submit" class="vx-button vx-button--primary" disabled="@Presenter.IsBusy">@T["ui.account.add_passkey"]</button>
+                </div>
+            </form>
+        }
+        else if (_checked)
+        {
+            <p>@T["ui.account.passkeys_unsupported"]</p>
+        }
+        @if (Presenter.State.StepUpPending)
+        {
+            <StepUpDialog OnConfirmed="ResumeAsync" OnCancelled="Presenter.CancelStepUp" />
+        }
+    }
+    else if (Presenter.State.Error is null)
+    {
+        <p role="status">@T["ui.common.loading"]</p>
+    }
+</section>
+
+@code {
+    private string _name = string.Empty;
+
+    private bool _passkeys;
+
+    private bool _checked;
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.State.Account is null ? Presenter.LoadAsync() : Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _passkeys = await JS.InvokeAsync<bool>("vixlyPasskeys.supported");
+            _checked = true;
+            StateHasChanged();
+        }
+    }
+
+    private async Task AddAsync()
+    {
+        PlatformPasskeyStart? started = await Presenter.BeginAddAsync();
+
+        if (started is null)
+        {
+            return;
+        }
+
+        string? answer = await JS.InvokeAsync<string?>("vixlyPasskeys.create", started.OptionsJson);
+
+        if (answer is null)
+        {
+            Presenter.ReportPasskeyCancelled();
+            return;
+        }
+
+        await Presenter.CompleteAddAsync(started, answer, _name);
+
+        if (Presenter.State.Error is null)
+        {
+            _name = string.Empty;
+        }
+    }
+
+    private async Task ResumeAsync()
+    {
+        if (Presenter.State.RemovalWaitsForStepUp is Guid passkeyId)
+        {
+            await Presenter.RemoveAsync(passkeyId);
+            return;
+        }
+
+        if (Presenter.State.CodesWaitForStepUp)
+        {
+            await Presenter.RegenerateCodesAsync();
+            return;
+        }
+
+        Presenter.CancelStepUp();
+        await AddAsync();
+    }
+}

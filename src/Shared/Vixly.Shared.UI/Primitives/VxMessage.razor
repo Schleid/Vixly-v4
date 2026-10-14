@@ -1,0 +1,59 @@
+@namespace Vixly.Shared.UI.Primitives
+@*
+=========================================================
+FILE: VxMessage.razor
+
+PURPOSE:
+Accessible alert or notice message announced to screen readers.
+
+IMPORTANT NOTES:
+- Pure presentational primitive (ADR-0001)
+- Size budgets (UI-7): max 6 parameters, max 250 lines
+=========================================================
+*@
+
+<div class="@GetCssClass()" role="@(Type == VxMessageType.Error ? "alert" : "status")">
+    <div class="vx-message__content">
+        @if (!string.IsNullOrEmpty(Text))
+        {
+            <span>@Text</span>
+        }
+        @ChildContent
+    </div>
+    @if (Dismissible)
+    {
+        <button type="button" class="vx-message__dismiss" aria-label="Dismiss" @onclick="OnDismiss">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public VxMessageType Type { get; set; } = VxMessageType.Info;
+
+    [Parameter]
+    public string? Text { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public bool Dismissible { get; set; }
+
+    [Parameter]
+    public EventCallback OnDismiss { get; set; }
+
+    private string GetCssClass()
+    {
+        string typeModifier = Type switch
+        {
+            VxMessageType.Error => "vx-message--error",
+            VxMessageType.Success => "vx-message--success",
+            VxMessageType.Warning => "vx-message--warning",
+            _ => "vx-message--info"
+        };
+
+        return $"vx-message {typeModifier}";
+    }
+}

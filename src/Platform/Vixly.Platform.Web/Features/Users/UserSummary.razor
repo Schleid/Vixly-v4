@@ -1,0 +1,122 @@
+﻿@*
+=========================================================
+FILE: UserSummary.razor
+
+PURPOSE:
+Shows one staff user: profile, account state, second factors
+and open sessions.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+=========================================================
+*@
+@inherits PlatformPresenterComponent<UserSummaryPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject PlatformUserWorkspace Workspace
+
+@if (Presenter.State.Error is not null)
+{
+    <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+}
+else if (Presenter.State.User is { } user)
+{
+    <PageTitle>@user.FirstName @user.LastName</PageTitle>
+    <h1>@user.FirstName @user.LastName</h1>
+    <section class="vx-card" aria-labelledby="user-profile">
+        <h2 id="user-profile">@T["ui.users.profile"]</h2>
+        <dl class="vx-facts">
+            <dt>@T["ui.signin.email"]</dt><dd>@user.Email</dd>
+            <dt>@T["ui.users.status"]</dt>
+            <dd>
+                <span class="vx-badge vx-badge--@user.Status.ToString().ToLowerInvariant()">@T[PlatformDisplay.StatusKey(user.Status)]</span>
+                @if (!string.IsNullOrEmpty(user.StatusReason))
+                {
+                    <span>@VixlyText.Format(T, "ui.users.status_reason", new Dictionary<string, object> { ["reason"] = user.StatusReason, ["time"] = PlatformDisplay.Utc(T, user.StatusChangedUtc) })</span>
+                }
+            </dd>
+            <dt>@T["ui.users.authority"]</dt><dd>@T[PlatformDisplay.AuthorityKey(user.AuthorityLevel)]</dd>
+            <dt>@T["ui.language"]</dt><dd>@T["ui.language." + user.PreferredLanguage]</dd>
+            <dt>@T["ui.users.employee_number"]</dt><dd>@(user.EmployeeNumber ?? T["ui.common.none"].Value)</dd>
+            <dt>@T["ui.users.phone"]</dt><dd>@(user.PhoneNumber ?? T["ui.common.none"].Value)</dd>
+            <dt>@T["ui.users.created"]</dt><dd>@PlatformDisplay.Utc(T, user.CreatedUtc)</dd>
+            <dt>@T["ui.users.last_sign_in"]</dt><dd>@PlatformDisplay.Utc(T, user.LastSignInUtc)</dd>
+        </dl>
+    </section>
+    <section class="vx-card" aria-labelledby="user-security">
+        <h2 id="user-security">@T["ui.users.second_factors"]</h2>
+        <ul>
+            <li>@T[user.HasAuthenticatorApp ? "ui.users.authenticator_on" : "ui.users.authenticator_off"]</li>
+            <li>@VixlyText.Format(T, "ui.users.passkeys", "count", user.PasskeyCount)</li>
+            <li>@VixlyText.Format(T, "ui.recovery.left", "count", user.UnusedRecoveryCodeCount)</li>
+        </ul>
+    </section>
+    <section class="vx-card" aria-labelledby="user-sessions">
+        <h2 id="user-sessions">@T["ui.users.sessions"]</h2>
+        @if (user.OpenSessions.Count == 0)
+        {
+            <p>@T["ui.users.no_sessions"]</p>
+        }
+        else
+        {
+            <table class="vx-table">
+                <thead>
+                    <tr>
+                        <th scope="col">@T["ui.users.session_started"]</th>
+                        <th scope="col">@T["ui.users.session_last_seen"]</th>
+                        <th scope="col">@T["ui.users.session_ip"]</th>
+                        <th scope="col">@T["ui.users.session_browser"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var session in user.OpenSessions)
+                    {
+                        <tr>
+                            <td>@PlatformDisplay.Utc(T, session.StartedUtc)</td>
+                            <td>@PlatformDisplay.Utc(T, session.LastSeenUtc)</td>
+                            <td>@session.IpAddress</td>
+                            <td class="vx-truncate" title="@session.UserAgent">@session.UserAgent</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+}
+else
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid UserId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Workspace.UserChanged -= OnUserChanged;
+        Workspace.UserChanged += OnUserChanged;
+        await Presenter.LoadAsync(UserId);
+    }
+
+    private void OnUserChanged(Guid platformUserId)
+    {
+        if (platformUserId == UserId)
+        {
+            _ = InvokeAsync(() => Presenter.LoadAsync(UserId));
+        }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            Workspace.UserChanged -= OnUserChanged;
+        }
+
+        base.Dispose(disposing);
+    }
+}

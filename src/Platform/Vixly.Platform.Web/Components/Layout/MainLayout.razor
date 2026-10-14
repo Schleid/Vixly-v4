@@ -1,0 +1,45 @@
+﻿@*
+=========================================================
+FILE: MainLayout.razor
+
+PURPOSE:
+The signed-in console frame: brand, user, sign-out.
+
+IMPORTANT NOTES:
+- Markup only. Text comes from PlatformText (L-10); values
+  come from the endpoint or presenter (ADR-0001)
+- Placeholder look: the Frontend/UI team designs the final
+  experience (Frontend Guide)
+=========================================================
+*@
+@inherits LayoutComponentBase
+@inject IStringLocalizer<PlatformText> T
+
+<div class="vx-shell">
+    <header class="vx-shell__header">
+        <span class="vx-shell__brand">@T["ui.app.name"]</span>
+        <AuthorizeView>
+            <Authorized>
+                <nav class="vx-shell__nav" aria-label="@T["ui.nav.label"]">
+                    <NavLink href="/" Match="NavLinkMatch.All">@T["ui.home.title"]</NavLink>
+                    <NavLink href="/users">@T["ui.users.title"]</NavLink>
+                    <NavLink href="/roles">@T["ui.roles.title"]</NavLink>
+                    <NavLink href="/departments">@T["ui.departments.title"]</NavLink>
+                    <NavLink href="/account">@T["ui.account.title"]</NavLink>
+                </nav>
+            </Authorized>
+        </AuthorizeView>
+        <AuthorizeView>
+            <Authorized>
+                <span class="vx-shell__user">@VixlyText.Format(T, "ui.home.welcome", "name", context.User.Identity?.Name ?? string.Empty)</span>
+                <form method="post" action="/sign-out" data-enhance="false">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button">@T["ui.signout"]</button>
+                </form>
+            </Authorized>
+        </AuthorizeView>
+    </header>
+    <main class="vx-shell__main">
+        @Body
+    </main>
+</div>

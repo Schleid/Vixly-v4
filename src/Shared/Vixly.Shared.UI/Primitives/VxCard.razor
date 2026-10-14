@@ -1,0 +1,52 @@
+@namespace Vixly.Shared.UI.Primitives
+@*
+=========================================================
+FILE: VxCard.razor
+
+PURPOSE:
+Card container primitive for grouping related content and actions.
+
+IMPORTANT NOTES:
+- Pure presentational primitive (ADR-0001)
+- Size budgets (UI-7): max 6 parameters, max 250 lines
+=========================================================
+*@
+
+<section class="vx-card">
+    @if (!string.IsNullOrEmpty(Title) || HeaderActions is not null)
+    {
+        <header class="vx-card__header">
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <h2 class="vx-card__title">@Title</h2>
+            }
+            @if (HeaderActions is not null)
+            {
+                <div class="vx-card__actions">@HeaderActions</div>
+            }
+        </header>
+    }
+    <div class="vx-card__body">
+        @ChildContent
+    </div>
+    @if (Footer is not null)
+    {
+        <footer class="vx-card__footer">
+            @Footer
+        </footer>
+    }
+</section>
+
+@code {
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? HeaderActions { get; set; }
+
+    [Parameter]
+    public RenderFragment? Footer { get; set; }
+}

@@ -1,0 +1,43 @@
+﻿@*
+=========================================================
+FILE: EnrolPage.razor
+
+PURPOSE:
+First sign-in: add an authenticator app (QR code or setup key) and confirm it with a code.
+
+IMPORTANT NOTES:
+- Markup only. Text comes from PlatformText (L-10); values
+  come from the endpoint or presenter (ADR-0001)
+- Placeholder look: the Frontend/UI team designs the final
+  experience (Frontend Guide)
+=========================================================
+*@
+@inject IStringLocalizer<PlatformText> T
+
+<AuthShell Title="@T["ui.enrol.title"]">
+    <FormMessage Error="@Error" />
+    <p>@T["ui.enrol.intro"]</p>
+    <img class="vx-qr" src="@QrDataUri" alt="@T["ui.enrol.qr_alt"]" width="200" height="200" />
+    <p>@T["ui.enrol.key"]: <code class="vx-key">@ManualKey</code></p>
+    <form method="post" action="/sign-in/enrol" class="vx-form">
+        <AntiforgeryToken />
+        <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+        <label for="code">@T["ui.verify.code_label"]</label>
+        <input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{6,7}" maxlength="7" required />
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.enrol.submit"]</button>
+    </form>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string ReturnUrl { get; set; } = "/";
+
+    [Parameter]
+    public string QrDataUri { get; set; } = string.Empty;
+
+    [Parameter]
+    public string ManualKey { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Error { get; set; }
+}

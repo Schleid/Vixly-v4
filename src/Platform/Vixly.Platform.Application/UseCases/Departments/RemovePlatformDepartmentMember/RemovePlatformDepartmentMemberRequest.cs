@@ -1,0 +1,20 @@
+﻿namespace Vixly.Platform.Application.UseCases.Departments.RemovePlatformDepartmentMember;
+
+// =========================================================
+// FILE: RemovePlatformDepartmentMemberRequest.cs
+//
+// PURPOSE:
+// Input for RemovePlatformDepartmentMember.
+//
+// RESPONSIBILITIES:
+// - Carry the caller's input
+//
+// IMPORTANT NOTES:
+// - The actor comes from the authorization context (S-2)
+// =========================================================
+public sealed class RemovePlatformDepartmentMemberRequest
+{
+    public Guid PlatformUserId { get; init; }
+
+    public Guid PlatformDepartmentId { get; init; }
+}

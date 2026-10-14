@@ -1,0 +1,20 @@
+﻿@*
+=========================================================
+FILE: InviteUserPage.razor
+
+PURPOSE:
+Invite a new staff member.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/users/invite"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.users.invite"]</PageTitle>
+
+<h1>@T["ui.users.invite"]</h1>
+<UserInviteForm />

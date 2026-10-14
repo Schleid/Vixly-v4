@@ -19,6 +19,8 @@ namespace Vixly.Platform.Infrastructure.Persistence.Conventions;
 //   this, EF Core treats a new child added to a tracked
 //   aggregate as an existing row and sends an UPDATE instead
 //   of an INSERT (the V3 collections defect)
+// - Works on the property metadata, so owned types (mapped
+//   with OwnsOne) are covered as well as ordinary entities
 // - Called last in OnModelCreating so it also covers entities
 //   configured by IEntityTypeConfiguration classes
 // =========================================================
@@ -35,10 +37,12 @@ public static class ApplicationAssignedKeyConvention
                 continue;
             }
 
-            modelBuilder
-                .Entity(entityType.ClrType)
-                .Property(nameof(AuditableEntity.Id))
-                .ValueGeneratedNever();
+            IMutableProperty? id = entityType.FindProperty(nameof(AuditableEntity.Id));
+
+            if (id is not null)
+            {
+                id.ValueGenerated = ValueGenerated.Never;
+            }
         }
     }
 }

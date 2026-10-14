@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Platform\Vixly.Platform.Web\Vixly.Platform.Web.csproj" />
+  </ItemGroup>
+
+</Project>

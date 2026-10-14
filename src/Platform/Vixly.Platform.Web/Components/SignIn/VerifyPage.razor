@@ -1,0 +1,36 @@
+﻿@*
+=========================================================
+FILE: VerifyPage.razor
+
+PURPOSE:
+Step 2 of sign-in: the authenticator-app code.
+
+IMPORTANT NOTES:
+- Markup only. Text comes from PlatformText (L-10); values
+  come from the endpoint or presenter (ADR-0001)
+- Placeholder look: the Frontend/UI team designs the final
+  experience (Frontend Guide)
+=========================================================
+*@
+@inject IStringLocalizer<PlatformText> T
+
+<AuthShell Title="@T["ui.verify.title"]">
+    <FormMessage Error="@Error" />
+    <form method="post" action="/sign-in/verify" class="vx-form">
+        <AntiforgeryToken />
+        <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+        <label for="code">@T["ui.verify.code_label"]</label>
+        <input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{6,7}" maxlength="7" required autofocus />
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.verify.submit"]</button>
+    </form>
+    <p><a href="/sign-in/recovery?returnUrl=@Uri.EscapeDataString(ReturnUrl)">@T["ui.verify.use_recovery"]</a></p>
+    <p><a href="/sign-in">@T["ui.signin.back"]</a></p>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string ReturnUrl { get; set; } = "/";
+
+    [Parameter]
+    public string? Error { get; set; }
+}

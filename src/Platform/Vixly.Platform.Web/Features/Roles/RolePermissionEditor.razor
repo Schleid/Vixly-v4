@@ -1,0 +1,104 @@
+﻿@*
+=========================================================
+FILE: RolePermissionEditor.razor
+
+PURPOSE:
+The permissions of one role, grouped by area, with a link
+to who holds each one.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Saving asks for step-up (ADR-0006)
+- A system role shows its permissions read-only
+=========================================================
+*@
+@inherits PlatformPresenterComponent<RolePermissionsPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<section class="vx-card" aria-labelledby="role-permissions">
+    <h2 id="role-permissions">@T["ui.roles.permissions_title"]</h2>
+    @if (!Presenter.State.Loaded)
+    {
+        <p role="status">@T["ui.common.loading"]</p>
+    }
+    else
+    {
+        @if (Presenter.State.CanEdit)
+        {
+            <p>@T["ui.roles.permissions_help"]</p>
+        }
+        @if (Presenter.State.Done)
+        {
+            <p class="vx-message vx-message--info" role="status">@T["ui.roles.permissions_saved"]</p>
+        }
+        @if (Presenter.State.Error is not null)
+        {
+            <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+        }
+        <form class="vx-form" @onsubmit="SaveAsync">
+            @foreach (var area in RolePermissionsPresenter.Areas)
+            {
+                <fieldset class="vx-permissions">
+                    <legend>@T[PlatformDisplay.PermissionAreaKey(area.First())]</legend>
+                    @foreach (string permission in area)
+                    {
+                        <div class="vx-permission">
+                            <input type="checkbox" id="perm-@permission" checked="@_ticked.Contains(permission)" disabled="@(!Presenter.State.CanEdit)" @onchange="args => Toggle(permission, args)" />
+                            <label for="perm-@permission">@T[PlatformDisplay.PermissionKey(permission)]</label>
+                            <a href="/roles/permissions/@permission">@T["ui.roles.who_has"]</a>
+                        </div>
+                    }
+                </fieldset>
+            }
+            @if (Presenter.State.CanEdit)
+            {
+                <div class="vx-actions">
+                    <button type="submit" class="vx-button vx-button--primary" disabled="@Presenter.IsBusy">@T["ui.roles.save_permissions"]</button>
+                </div>
+            }
+        </form>
+        @if (Presenter.State.StepUpPending)
+        {
+            <StepUpDialog OnConfirmed="() => Presenter.ResumeAfterStepUpAsync(RoleId)" OnCancelled="Presenter.CancelStepUp" />
+        }
+    }
+</section>
+
+@code {
+    private HashSet<string> _ticked = new(StringComparer.Ordinal);
+
+    [Parameter, EditorRequired]
+    public Guid RoleId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Presenter.LoadAsync(RoleId);
+        _ticked = new HashSet<string>(Presenter.State.Saved, StringComparer.Ordinal);
+    }
+
+    private void Toggle(string code, ChangeEventArgs args)
+    {
+        if (args.Value is true)
+        {
+            _ticked.Add(code);
+        }
+        else
+        {
+            _ticked.Remove(code);
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        await Presenter.SaveAsync(RoleId, _ticked);
+
+        if (Presenter.State.Done)
+        {
+            _ticked = new HashSet<string>(Presenter.State.Saved, StringComparer.Ordinal);
+        }
+    }
+}

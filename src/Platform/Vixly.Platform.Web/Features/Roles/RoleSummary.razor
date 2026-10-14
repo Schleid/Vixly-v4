@@ -1,0 +1,150 @@
+﻿@*
+=========================================================
+FILE: RoleSummary.razor
+
+PURPOSE:
+One role: its name, type and state, the people who hold
+it, and rename, deactivate and reactivate.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Only reactivation asks for step-up (it hands access back to
+  everyone holding the role)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<RoleSummaryPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.Role is { } role)
+{
+    string name = PlatformDisplay.RoleName(T, role.Name, role.SystemKey);
+    <PageTitle>@name</PageTitle>
+    <h1>@name</h1>
+    <section class="vx-card" aria-labelledby="role-details">
+        <h2 id="role-details">@T["ui.roles.details"]</h2>
+        @if (Presenter.State.DoneKey is { } done)
+        {
+            <p class="vx-message vx-message--info" role="status">@T[done]</p>
+        }
+        @if (Presenter.State.Error is not null)
+        {
+            <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+        }
+        <dl class="vx-facts">
+            <dt>@T["ui.roles.kind"]</dt><dd>@T[role.SystemKey is null ? "ui.roles.kind.custom" : "ui.roles.kind.system"]</dd>
+            <dt>@T["ui.roles.status"]</dt>
+            <dd><span class="vx-badge vx-badge--@(role.IsActive ? "active" : "suspended")">@T[role.IsActive ? "ui.roles.active" : "ui.roles.inactive"]</span></dd>
+            <dt>@T["ui.roles.created"]</dt><dd>@PlatformDisplay.Utc(T, role.CreatedUtc)</dd>
+        </dl>
+        @if (role.SystemKey is not null)
+        {
+            <p>@T["ui.roles.system_note"]</p>
+        }
+        @if (Presenter.State.Renaming)
+        {
+            <form class="vx-form" @onsubmit="RenameAsync">
+                <label for="role-rename">@T["ui.roles.name"]</label>
+                <input id="role-rename" @bind="_name" maxlength="100" required autocomplete="off" />
+                <div class="vx-actions">
+                    <button type="submit" class="vx-button vx-button--primary" disabled="@Presenter.IsBusy">@T["ui.roles.save_name"]</button>
+                    <button type="button" class="vx-button" @onclick="Presenter.Cancel">@T["ui.common.cancel"]</button>
+                </div>
+            </form>
+        }
+        else if (Presenter.State.ConfirmingDeactivate)
+        {
+            <p>@T["ui.roles.deactivate_help"]</p>
+            <div class="vx-actions">
+                <button type="button" class="vx-button vx-button--danger" disabled="@Presenter.IsBusy" @onclick="() => Presenter.DeactivateAsync(RoleId)">@T["ui.roles.deactivate_confirm"]</button>
+                <button type="button" class="vx-button" @onclick="Presenter.Cancel">@T["ui.common.cancel"]</button>
+            </div>
+        }
+        else
+        {
+            <div class="vx-actions">
+                @if (Presenter.State.Actions.CanRename)
+                {
+                    <button type="button" class="vx-button" @onclick="StartRename">@T["ui.roles.rename"]</button>
+                }
+                @if (Presenter.State.Actions.CanDeactivate)
+                {
+                    <button type="button" class="vx-button" @onclick="Presenter.StartDeactivate">@T["ui.roles.deactivate"]</button>
+                }
+                @if (Presenter.State.Actions.CanReactivate)
+                {
+                    <button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="() => Presenter.ReactivateAsync(RoleId)">@T["ui.roles.reactivate"]</button>
+                }
+            </div>
+        }
+        @if (Presenter.State.StepUpPending)
+        {
+            <StepUpDialog OnConfirmed="() => Presenter.ReactivateAsync(RoleId)" OnCancelled="Presenter.CancelStepUp" />
+        }
+    </section>
+    <section class="vx-card" aria-labelledby="role-holders">
+        <h2 id="role-holders">@T["ui.roles.holders"]</h2>
+        @if (role.Holders.Count == 0)
+        {
+            <p>@T["ui.roles.no_holders"]</p>
+        }
+        else
+        {
+            <table class="vx-table">
+                <thead>
+                    <tr>
+                        <th scope="col">@T["ui.users.name"]</th>
+                        <th scope="col">@T["ui.signin.email"]</th>
+                        <th scope="col">@T["ui.roles.holder_since"]</th>
+                        <th scope="col">@T["ui.roles.holder_until"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var holder in role.Holders)
+                    {
+                        <tr>
+                            <td><a href="/users/@holder.PlatformUserId">@holder.LastName, @holder.FirstName</a></td>
+                            <td>@holder.Email</td>
+                            <td>@PlatformDisplay.Utc(T, holder.AssignedUtc)</td>
+                            <td>@(holder.ExpiresUtc is null ? T["ui.roles.no_end"].Value : PlatformDisplay.Utc(T, holder.ExpiresUtc))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+}
+else if (Presenter.State.Error is not null)
+{
+    <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+}
+else
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+
+@code {
+    private string _name = string.Empty;
+
+    [Parameter, EditorRequired]
+    public Guid RoleId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(RoleId);
+    }
+
+    private void StartRename()
+    {
+        _name = Presenter.State.Role?.Name ?? string.Empty;
+        Presenter.StartRename();
+    }
+
+    private Task RenameAsync()
+    {
+        return Presenter.RenameAsync(RoleId, _name);
+    }
+}

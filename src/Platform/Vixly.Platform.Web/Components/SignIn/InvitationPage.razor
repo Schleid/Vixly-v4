@@ -1,0 +1,36 @@
+﻿@*
+=========================================================
+FILE: InvitationPage.razor
+
+PURPOSE:
+Accept an invitation: choose a password.
+
+IMPORTANT NOTES:
+- Markup only. Text comes from PlatformText (L-10); values
+  come from the endpoint or presenter (ADR-0001)
+- Placeholder look: the Frontend/UI team designs the final
+  experience (Frontend Guide)
+=========================================================
+*@
+@using Vixly.Platform.Application.Identity
+@inject IStringLocalizer<PlatformText> T
+
+<AuthShell Title="@T["ui.invite.title"]">
+    <FormMessage Error="@Error" />
+    <p>@VixlyText.Format(T, "ui.invite.intro", "minLength", PlatformPasswordPolicy.MinLength)</p>
+    <form method="post" action="/invitation" class="vx-form">
+        <AntiforgeryToken />
+        <input type="hidden" name="token" value="@Token" />
+        <label for="password">@T["ui.invite.password"]</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" minlength="@PlatformPasswordPolicy.MinLength" maxlength="@PlatformPasswordPolicy.MaxLength" required />
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.invite.submit"]</button>
+    </form>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string Token { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Error { get; set; }
+}

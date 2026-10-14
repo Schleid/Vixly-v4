@@ -1,0 +1,27 @@
+@page "/primitives/badge"
+
+<div class="gallery-section">
+    <h1>VxStatusBadge Primitive</h1>
+    <p>Accessible badge component that never conveys status by color alone.</p>
+</div>
+
+<div class="gallery-section">
+    <h2>User & Entity Status Badges</h2>
+    <div class="gallery-grid">
+        <VxStatusBadge Text="Active" Status="VxBadgeStatus.Active" />
+        <VxStatusBadge Text="Invited" Status="VxBadgeStatus.Invited" />
+        <VxStatusBadge Text="Suspended" Status="VxBadgeStatus.Suspended" />
+        <VxStatusBadge Text="Locked" Status="VxBadgeStatus.Locked" />
+        <VxStatusBadge Text="Deactivated" Status="VxBadgeStatus.Deactivated" />
+    </div>
+</div>
+
+<div class="gallery-section">
+    <h2>System Semantic Badges</h2>
+    <div class="gallery-grid">
+        <VxStatusBadge Text="Success / Healthy" Status="VxBadgeStatus.Success" />
+        <VxStatusBadge Text="Warning / Due Soon" Status="VxBadgeStatus.Warning" />
+        <VxStatusBadge Text="Danger / Overdue" Status="VxBadgeStatus.Danger" />
+        <VxStatusBadge Text="Info / Notice" Status="VxBadgeStatus.Info" />
+    </div>
+</div>

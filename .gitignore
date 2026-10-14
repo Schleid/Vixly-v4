@@ -43,3 +43,6 @@ App_Data/
 # OS
 .DS_Store
 Thumbs.db
+
+# Development email pickup folder (contains one-time links)
+.mail/

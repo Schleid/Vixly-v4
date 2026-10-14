@@ -1,0 +1,113 @@
+﻿@*
+=========================================================
+FILE: UserDepartments.razor
+
+PURPOSE:
+The departments a staff user belongs to, with add, remove
+and make primary for an administrator who may manage members.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- No step-up: departments are labels and grant nothing (D-S3)
+- Reports a change through PlatformUserWorkspace (UI-3)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<UserDepartmentsPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject PlatformUserWorkspace Workspace
+
+<section class="vx-card" aria-labelledby="user-departments">
+    <h2 id="user-departments">@T["ui.users.departments"]</h2>
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <p class="vx-message vx-message--info" role="status">@T[done]</p>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+    }
+    @if (!Presenter.State.Loaded)
+    {
+        <p role="status">@T["ui.common.loading"]</p>
+    }
+    else if (Presenter.State.Memberships.Count == 0)
+    {
+        <p>@T["ui.users.no_departments"]</p>
+    }
+    else
+    {
+        <ul class="vx-list">
+            @foreach (var membership in Presenter.State.Memberships)
+            {
+                <li>
+                    <a href="/departments/@membership.PlatformDepartmentId">@membership.Name</a>
+                    @if (membership.IsPrimary)
+                    {
+                        <span class="vx-badge vx-badge--active">@T["ui.departments.primary"]</span>
+                    }
+                    @if (!membership.DepartmentIsActive)
+                    {
+                        <span class="vx-badge vx-badge--suspended">@T["ui.roles.inactive"]</span>
+                    }
+                    @if (Presenter.State.CanManage)
+                    {
+                        @if (!membership.IsPrimary)
+                        {
+                            <button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="() => ChangedAsync(Presenter.MakePrimaryAsync(UserId, membership.PlatformDepartmentId))">@T["ui.departments.make_primary"]</button>
+                        }
+                        <button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="() => ChangedAsync(Presenter.RemoveAsync(UserId, membership.PlatformDepartmentId))">@T["ui.user_roles.revoke"]</button>
+                    }
+                </li>
+            }
+        </ul>
+    }
+    @if (Presenter.State.CanManage && Presenter.State.Joinable.Count > 0)
+    {
+        <form class="vx-form" @onsubmit="AddAsync">
+            <label for="join-department">@T["ui.departments.add_to"]</label>
+            <select id="join-department" @bind="_departmentId" required>
+                <option value="">@T["ui.departments.choose"]</option>
+                @foreach (var department in Presenter.State.Joinable)
+                {
+                    <option value="@department.PlatformDepartmentId">@department.Name</option>
+                }
+            </select>
+            <div class="vx-actions">
+                <button type="submit" class="vx-button vx-button--primary" disabled="@(Presenter.IsBusy || _departmentId is null)">@T["ui.departments.add"]</button>
+            </div>
+        </form>
+    }
+</section>
+
+@code {
+    private Guid? _departmentId;
+
+    [Parameter, EditorRequired]
+    public Guid UserId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(UserId);
+    }
+
+    private async Task AddAsync()
+    {
+        if (_departmentId is Guid departmentId)
+        {
+            await ChangedAsync(Presenter.AddAsync(UserId, departmentId));
+            _departmentId = null;
+        }
+    }
+
+    private async Task ChangedAsync(Task<bool> change)
+    {
+        if (await change)
+        {
+            Workspace.NotifyUserChanged(UserId);
+        }
+    }
+}

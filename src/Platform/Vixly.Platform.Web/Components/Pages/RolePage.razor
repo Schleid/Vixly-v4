@@ -1,0 +1,24 @@
+﻿@*
+=========================================================
+FILE: RolePage.razor
+
+PURPOSE:
+One role: summary, holders and permissions.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/roles/{RoleId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<p><a href="/roles">@T["ui.roles.back"]</a></p>
+<RoleSummary RoleId="@RoleId" />
+<RolePermissionEditor RoleId="@RoleId" />
+
+@code {
+    [Parameter]
+    public Guid RoleId { get; set; }
+}

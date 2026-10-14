@@ -1,0 +1,76 @@
+﻿@*
+=========================================================
+FILE: MyProfile.razor
+
+PURPOSE:
+Who the signed-in user is, and the language of their console
+and emails.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Reloads the page after a language change (the circuit keeps
+  its culture until then)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<MyProfilePresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+<section class="vx-card" aria-labelledby="my-profile">
+    <h2 id="my-profile">@T["ui.users.profile"]</h2>
+    @if (Presenter.State.Error is not null)
+    {
+        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+    }
+    @if (Presenter.State.Account is { } account)
+    {
+        <dl class="vx-facts">
+            <dt>@T["ui.users.name"]</dt><dd>@account.FirstName @account.LastName</dd>
+            <dt>@T["ui.signin.email"]</dt><dd>@account.Email</dd>
+            <dt>@T["ui.users.authority"]</dt><dd>@T[PlatformDisplay.AuthorityKey(account.AuthorityLevel)]</dd>
+        </dl>
+        <form class="vx-form" @onsubmit="ChangeLanguageAsync">
+            <label for="my-language">@T["ui.account.language"]</label>
+            <select id="my-language" @bind="_language">
+                @foreach (string language in VixlyCultures.Supported.Select(culture => culture.TwoLetterISOLanguageName))
+                {
+                    <option value="@language">@T["ui.language." + language]</option>
+                }
+            </select>
+            <div class="vx-actions">
+                <button type="submit" class="vx-button" disabled="@Presenter.IsBusy">@T["ui.account.save"]</button>
+            </div>
+        </form>
+    }
+    else if (Presenter.State.Error is null)
+    {
+        <p role="status">@T["ui.common.loading"]</p>
+    }
+</section>
+
+@code {
+    private string _language = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Presenter.State.Account is null)
+        {
+            await Presenter.LoadAsync();
+            _language = Presenter.State.Account?.PreferredLanguage ?? string.Empty;
+        }
+    }
+
+    private async Task ChangeLanguageAsync()
+    {
+        await Presenter.ChangeLanguageAsync(_language);
+
+        if (Presenter.State.LanguageChanged)
+        {
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+        }
+    }
+}

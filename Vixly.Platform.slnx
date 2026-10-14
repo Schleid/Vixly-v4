@@ -7,9 +7,15 @@
     <Project Path="src/Platform/Vixly.Platform.Application/Vixly.Platform.Application.csproj" />
     <Project Path="src/Platform/Vixly.Platform.Domain/Vixly.Platform.Domain.csproj" />
     <Project Path="src/Platform/Vixly.Platform.Infrastructure/Vixly.Platform.Infrastructure.csproj" />
+    <Project Path="src/Platform/Vixly.Platform.Resources/Vixly.Platform.Resources.csproj" />
+    <Project Path="src/Platform/Vixly.Platform.Web/Vixly.Platform.Web.csproj" />
   </Folder>
   <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/Vixly.Shared.Hosting/Vixly.Shared.Hosting.csproj" />
     <Project Path="src/Shared/Vixly.Shared.Kernel/Vixly.Shared.Kernel.csproj" />
+    <Project Path="src/Shared/Vixly.Shared.Localization/Vixly.Shared.Localization.csproj" />
+    <Project Path="src/Shared/Vixly.Shared.UI/Vixly.Shared.UI.csproj" />
+    <Project Path="src/Shared/Vixly.Shared.UI.Gallery/Vixly.Shared.UI.Gallery.csproj" />
   </Folder>
   <Folder Name="/tests/" />
   <Folder Name="/tests/Architecture/">
@@ -19,6 +25,7 @@
     <Project Path="tests/Platform/Vixly.Platform.Application.Tests/Vixly.Platform.Application.Tests.csproj" />
     <Project Path="tests/Platform/Vixly.Platform.Domain.Tests/Vixly.Platform.Domain.Tests.csproj" />
     <Project Path="tests/Platform/Vixly.Platform.Infrastructure.Tests/Vixly.Platform.Infrastructure.Tests.csproj" />
+    <Project Path="tests/Platform/Vixly.Platform.Web.Tests/Vixly.Platform.Web.Tests.csproj" />
   </Folder>
   <Folder Name="/tests/Shared/">
     <Project Path="tests/Shared/Vixly.Shared.Kernel.Tests/Vixly.Shared.Kernel.Tests.csproj" />

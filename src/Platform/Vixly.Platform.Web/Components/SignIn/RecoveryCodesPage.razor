@@ -1,0 +1,34 @@
+﻿@*
+=========================================================
+FILE: RecoveryCodesPage.razor
+
+PURPOSE:
+Shows the ten recovery codes once, right after enrolment.
+
+IMPORTANT NOTES:
+- Markup only. Text comes from PlatformText (L-10); values
+  come from the endpoint or presenter (ADR-0001)
+- Placeholder look: the Frontend/UI team designs the final
+  experience (Frontend Guide)
+=========================================================
+*@
+@inject IStringLocalizer<PlatformText> T
+
+<AuthShell Title="@T["ui.codes.title"]">
+    <p>@T["ui.codes.intro"]</p>
+    <ol class="vx-codes">
+        @foreach (string recoveryCode in Codes)
+        {
+            <li><code>@recoveryCode</code></li>
+        }
+    </ol>
+    <p><a class="vx-button vx-button--primary" href="@ReturnUrl">@T["ui.codes.continue"]</a></p>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string ReturnUrl { get; set; } = "/";
+
+    [Parameter]
+    public IReadOnlyList<string> Codes { get; set; } = Array.Empty<string>();
+}

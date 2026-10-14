@@ -1,0 +1,25 @@
+﻿@*
+=========================================================
+FILE: RolesPage.razor
+
+PURPOSE:
+The Platform roles.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/roles"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.roles.title"]</PageTitle>
+
+<h1>@T["ui.roles.title"]</h1>
+<RoleList IncludeInactive="@(Inactive == true)" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public bool? Inactive { get; set; }
+}

@@ -1,0 +1,78 @@
+@page "/tokens"
+
+<div class="gallery-section">
+    <h1>Design Tokens & Contrast Verification</h1>
+    <p>Tokens defined in <code>vixly-theme.css</code> and verified against WCAG 2.2 AA (4.5:1 text, 3:1 controls).</p>
+</div>
+
+<div class="gallery-section">
+    <h2>Semantic Surfaces & App</h2>
+    <div class="token-swatch">
+        <div class="token-color" style="background: var(--vx-color-bg-app)"></div>
+        <div>
+            <strong>--vx-color-bg-app</strong>
+            <div>Page canvas background behind cards</div>
+        </div>
+    </div>
+    <div class="token-swatch">
+        <div class="token-color" style="background: var(--vx-color-surface)"></div>
+        <div>
+            <strong>--vx-color-surface</strong>
+            <div>Cards, dialogs, and elevated panels</div>
+        </div>
+    </div>
+    <div class="token-swatch">
+        <div class="token-color" style="background: var(--vx-color-surface-sunken)"></div>
+        <div>
+            <strong>--vx-color-surface-sunken</strong>
+            <div>Table headers, inset fields, code blocks</div>
+        </div>
+    </div>
+</div>
+
+<div class="gallery-section">
+    <h2>Brand & Primary Actions</h2>
+    <div class="token-swatch">
+        <div class="token-color" style="background: var(--vx-color-primary)"></div>
+        <div>
+            <strong>--vx-color-primary</strong>
+            <div>Primary buttons, active indicators (contrast $\ge 5.2:1$ with white text)</div>
+        </div>
+    </div>
+    <div class="token-swatch">
+        <div class="token-color" style="background: var(--vx-color-primary-hover)"></div>
+        <div>
+            <strong>--vx-color-primary-hover</strong>
+            <div>Hover and pressed action states</div>
+        </div>
+    </div>
+    <div class="token-swatch">
+        <div class="token-color" style="background: var(--vx-color-primary-soft)"></div>
+        <div>
+            <strong>--vx-color-primary-soft</strong>
+            <div>Selected rows, active navigation background</div>
+        </div>
+    </div>
+</div>
+
+<div class="gallery-section">
+    <h2>Feedback & Status Tokens</h2>
+    <div class="gallery-grid">
+        <div class="token-swatch">
+            <div class="token-color" style="background: var(--vx-color-success)"></div>
+            <div><strong>--vx-color-success</strong> (Active, Paid)</div>
+        </div>
+        <div class="token-swatch">
+            <div class="token-color" style="background: var(--vx-color-warning)"></div>
+            <div><strong>--vx-color-warning</strong> (Suspended, Watch)</div>
+        </div>
+        <div class="token-swatch">
+            <div class="token-color" style="background: var(--vx-color-danger)"></div>
+            <div><strong>--vx-color-danger</strong> (Locked, Deactivated, Error)</div>
+        </div>
+        <div class="token-swatch">
+            <div class="token-color" style="background: var(--vx-color-info)"></div>
+            <div><strong>--vx-color-info</strong> (Invited, Neutral Notices)</div>
+        </div>
+    </div>
+</div>

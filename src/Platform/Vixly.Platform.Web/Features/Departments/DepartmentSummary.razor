@@ -1,0 +1,114 @@
+﻿@*
+=========================================================
+FILE: DepartmentSummary.razor
+
+PURPOSE:
+One department: name, description and state, with edit,
+deactivate and reactivate.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- No step-up: departments are labels and grant nothing (D-S3)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<DepartmentSummaryPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.Department is { } department)
+{
+    <PageTitle>@department.Name</PageTitle>
+    <h1>@department.Name</h1>
+    <section class="vx-card" aria-labelledby="department-details">
+        <h2 id="department-details">@T["ui.roles.details"]</h2>
+        @if (Presenter.State.DoneKey is { } done)
+        {
+            <p class="vx-message vx-message--info" role="status">@T[done]</p>
+        }
+        @if (Presenter.State.Error is not null)
+        {
+            <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+        }
+        <dl class="vx-facts">
+            <dt>@T["ui.departments.description"]</dt><dd>@(department.Description ?? T["ui.common.none"].Value)</dd>
+            <dt>@T["ui.roles.status"]</dt>
+            <dd><span class="vx-badge vx-badge--@(department.IsActive ? "active" : "suspended")">@T[department.IsActive ? "ui.roles.active" : "ui.roles.inactive"]</span></dd>
+            <dt>@T["ui.roles.created"]</dt><dd>@PlatformDisplay.Utc(T, department.CreatedUtc)</dd>
+        </dl>
+        @if (Presenter.State.Editing)
+        {
+            <form class="vx-form" @onsubmit="SaveAsync">
+                <label for="department-edit-name">@T["ui.departments.name"]</label>
+                <input id="department-edit-name" @bind="_name" maxlength="100" required autocomplete="off" />
+                <label for="department-edit-description">@T["ui.departments.description_optional"]</label>
+                <textarea id="department-edit-description" @bind="_description" maxlength="500"></textarea>
+                <div class="vx-actions">
+                    <button type="submit" class="vx-button vx-button--primary" disabled="@Presenter.IsBusy">@T["ui.departments.save"]</button>
+                    <button type="button" class="vx-button" @onclick="Presenter.Cancel">@T["ui.common.cancel"]</button>
+                </div>
+            </form>
+        }
+        else if (Presenter.State.ConfirmingDeactivate)
+        {
+            <p>@T["ui.departments.deactivate_help"]</p>
+            <div class="vx-actions">
+                <button type="button" class="vx-button vx-button--danger" disabled="@Presenter.IsBusy" @onclick="() => Presenter.DeactivateAsync(DepartmentId)">@T["ui.departments.deactivate_confirm"]</button>
+                <button type="button" class="vx-button" @onclick="Presenter.Cancel">@T["ui.common.cancel"]</button>
+            </div>
+        }
+        else
+        {
+            <div class="vx-actions">
+                @if (Presenter.State.Actions.CanEdit)
+                {
+                    <button type="button" class="vx-button" @onclick="StartEdit">@T["ui.departments.edit"]</button>
+                }
+                @if (Presenter.State.Actions.CanDeactivate)
+                {
+                    <button type="button" class="vx-button" @onclick="Presenter.StartDeactivate">@T["ui.roles.deactivate"]</button>
+                }
+                @if (Presenter.State.Actions.CanReactivate)
+                {
+                    <button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="() => Presenter.ReactivateAsync(DepartmentId)">@T["ui.roles.reactivate"]</button>
+                }
+            </div>
+        }
+    </section>
+}
+else if (Presenter.State.Error is not null)
+{
+    <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+}
+else
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+
+@code {
+    private string _name = string.Empty;
+
+    private string? _description;
+
+    [Parameter, EditorRequired]
+    public Guid DepartmentId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(DepartmentId);
+    }
+
+    private void StartEdit()
+    {
+        _name = Presenter.State.Department?.Name ?? string.Empty;
+        _description = Presenter.State.Department?.Description;
+        Presenter.StartEdit();
+    }
+
+    private Task SaveAsync()
+    {
+        return Presenter.UpdateAsync(DepartmentId, _name, _description);
+    }
+}

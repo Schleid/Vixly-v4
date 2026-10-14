@@ -1,0 +1,77 @@
+@namespace Vixly.Shared.UI.Primitives
+@typeparam TItem
+@*
+=========================================================
+FILE: VxDataTable.razor
+
+PURPOSE:
+Accessible data table primitive with server paging and empty states.
+
+IMPORTANT NOTES:
+- Pure presentational primitive (ADR-0001)
+- Size budgets (UI-7): max 6 parameters, max 250 lines
+=========================================================
+*@
+
+<div class="vx-table-container">
+    <table class="vx-table">
+        @if (!string.IsNullOrEmpty(Caption))
+        {
+            <caption>@Caption</caption>
+        }
+        @if (HeaderContent is not null)
+        {
+            <thead>
+                <tr>@HeaderContent</tr>
+            </thead>
+        }
+        <tbody>
+            @if (IsLoading)
+            {
+                <tr>
+                    <td colspan="100" class="vx-table__loading">
+                        <div class="vx-skeleton-line"></div>
+                    </td>
+                </tr>
+            }
+            else if (Items == null || Items.Count == 0)
+            {
+                <tr>
+                    <td colspan="100" class="vx-table__empty">
+                        @if (EmptyContent is not null)
+                        {
+                            @EmptyContent
+                        }
+                    </td>
+                </tr>
+            }
+            else if (RowTemplate is not null)
+            {
+                @foreach (TItem item in Items)
+                {
+                    <tr>@RowTemplate(item)</tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<TItem> Items { get; set; } = Array.Empty<TItem>();
+
+    [Parameter]
+    public RenderFragment? HeaderContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<TItem>? RowTemplate { get; set; }
+
+    [Parameter]
+    public string? Caption { get; set; }
+
+    [Parameter]
+    public RenderFragment? EmptyContent { get; set; }
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+}

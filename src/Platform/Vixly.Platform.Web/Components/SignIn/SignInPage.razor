@@ -1,0 +1,53 @@
+﻿@*
+=========================================================
+FILE: SignInPage.razor
+
+PURPOSE:
+Step 1 of sign-in: email and password.
+
+IMPORTANT NOTES:
+- Markup only. Text comes from PlatformText (L-10); values
+  come from the endpoint or presenter (ADR-0001)
+- Placeholder look: the Frontend/UI team designs the final
+  experience (Frontend Guide)
+=========================================================
+*@
+@inject IStringLocalizer<PlatformText> T
+
+<AuthShell Title="@T["ui.signin.title"]" ReturnHere="/sign-in">
+    <FormMessage Error="@Error" Info="@Info" />
+    <form method="post" action="/sign-in" class="vx-form">
+        <AntiforgeryToken />
+        <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+        <label for="email">@T["ui.signin.email"]</label>
+        <input id="email" name="email" type="email" autocomplete="username webauthn" required value="@Email" />
+        <label for="password">@T["ui.signin.password"]</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required />
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.signin.submit"]</button>
+    </form>
+    <p><a href="/forgot-password">@T["ui.signin.forgot"]</a></p>
+    <div class="vx-passkey" data-passkey-signin hidden>
+        <p class="vx-divider">@T["ui.signin.or"]</p>
+        <form method="post" action="/sign-in/passkey" data-options="/sign-in/passkey/options">
+            <AntiforgeryToken />
+            <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+            <input type="hidden" name="assertion" />
+            <button type="button" class="vx-button vx-button--wide" data-passkey-start>@T["ui.signin.passkey"]</button>
+        </form>
+        <p class="vx-message vx-message--error" role="alert" data-passkey-error hidden>@T["ui.passkey.cancelled"]</p>
+    </div>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string ReturnUrl { get; set; } = "/";
+
+    [Parameter]
+    public string? Email { get; set; }
+
+    [Parameter]
+    public string? Error { get; set; }
+
+    [Parameter]
+    public string? Info { get; set; }
+}

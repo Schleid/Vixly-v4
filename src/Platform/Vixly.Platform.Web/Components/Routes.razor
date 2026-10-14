@@ -1,0 +1,42 @@
+﻿@*
+=========================================================
+FILE: Routes.razor
+
+PURPOSE:
+Routing with authorization: every console page needs a signed-in user.
+Captures the request facts for the circuit (audit trail, S-2).
+
+IMPORTANT NOTES:
+- Markup only. Text comes from PlatformText (L-10); values
+  come from the endpoint or presenter (ADR-0001)
+- Placeholder look: the Frontend/UI team designs the final
+  experience (Frontend Guide)
+=========================================================
+*@
+@inject PlatformInteractiveRequest Request
+
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
+            <NotAuthorized>
+                <RedirectToSignIn />
+            </NotAuthorized>
+        </AuthorizeRouteView>
+    </Found>
+</Router>
+
+@code {
+    [Parameter]
+    public string? ClientIp { get; set; }
+
+    [Parameter]
+    public string? UserAgent { get; set; }
+
+    [Parameter]
+    public string? CorrelationId { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Request.Capture(ClientIp, UserAgent, CorrelationId);
+    }
+}

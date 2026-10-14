@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: PermissionHoldersPage.razor
+
+PURPOSE:
+Who holds one permission.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/roles/permissions/{Code}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<p><a href="/roles">@T["ui.roles.back"]</a></p>
+<PermissionHolderList Code="@Code" />
+
+@code {
+    [Parameter]
+    public string Code { get; set; } = string.Empty;
+}

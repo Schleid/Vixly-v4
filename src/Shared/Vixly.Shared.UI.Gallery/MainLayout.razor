@@ -1,0 +1,63 @@
+@inherits LayoutComponentBase
+@inject IJSRuntime JS
+
+<div class="gallery-app">
+    <header class="gallery-header">
+        <div class="gallery-brand">
+            <span class="gallery-brand__logo">Vixly</span>
+            <span class="gallery-brand__subtitle">UI Gallery</span>
+        </div>
+        <div class="gallery-toolbar">
+            <label class="gallery-toolbar__item">
+                <span>Theme:</span>
+                <select @bind="SelectedTheme" @bind:after="OnThemeChangedAsync">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+            </label>
+            <label class="gallery-toolbar__item">
+                <span>Viewport:</span>
+                <select @bind="SelectedViewport">
+                    <option value="100%">Full</option>
+                    <option value="1280px">Desktop (1280px)</option>
+                    <option value="768px">Tablet (768px)</option>
+                    <option value="360px">Mobile (360px)</option>
+                </select>
+            </label>
+        </div>
+    </header>
+
+    <div class="gallery-body">
+        <aside class="gallery-sidebar">
+            <nav class="gallery-nav">
+                <h3>Tokens</h3>
+                <NavLink href="/tokens" Match="NavLinkMatch.All">Design Tokens</NavLink>
+
+                <h3>Primitives</h3>
+                <NavLink href="/" Match="NavLinkMatch.All">Overview</NavLink>
+                <NavLink href="/primitives/button">Button</NavLink>
+                <NavLink href="/primitives/input">TextInput</NavLink>
+                <NavLink href="/primitives/badge">StatusBadge</NavLink>
+                <NavLink href="/primitives/message">Message</NavLink>
+                <NavLink href="/primitives/card">Card</NavLink>
+                <NavLink href="/primitives/dialog">Dialog</NavLink>
+                <NavLink href="/primitives/empty-state">EmptyState</NavLink>
+                <NavLink href="/primitives/table">DataTable & Pager</NavLink>
+            </nav>
+        </aside>
+
+        <main class="gallery-main" style="max-width: @SelectedViewport; margin: 0 auto;">
+            @Body
+        </main>
+    </div>
+</div>
+
+@code {
+    private string SelectedTheme { get; set; } = "light";
+    private string SelectedViewport { get; set; } = "100%";
+
+    private async Task OnThemeChangedAsync()
+    {
+        await JS.InvokeVoidAsync("window.setGalleryTheme", SelectedTheme);
+    }
+}

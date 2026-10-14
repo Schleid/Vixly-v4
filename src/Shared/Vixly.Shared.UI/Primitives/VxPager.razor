@@ -1,0 +1,55 @@
+@namespace Vixly.Shared.UI.Primitives
+@*
+=========================================================
+FILE: VxPager.razor
+
+PURPOSE:
+Accessible pagination controls with previous/next and page indicators.
+
+IMPORTANT NOTES:
+- Pure presentational primitive (ADR-0001)
+- Size budgets (UI-7): max 6 parameters, max 250 lines
+=========================================================
+*@
+
+<nav class="vx-pager" aria-label="Pagination">
+    <button type="button"
+            class="vx-button vx-button--subtle"
+            disabled="@(CurrentPage <= 1)"
+            @onclick="() => OnPageClickAsync(CurrentPage - 1)">
+        <span aria-hidden="true">&lsaquo;</span>
+    </button>
+
+    <span class="vx-pager__status">
+        @CurrentPage / @Math.Max(1, TotalPages)
+    </span>
+
+    <button type="button"
+            class="vx-button vx-button--subtle"
+            disabled="@(CurrentPage >= TotalPages)"
+            @onclick="() => OnPageClickAsync(CurrentPage + 1)">
+        <span aria-hidden="true">&rsaquo;</span>
+    </button>
+</nav>
+
+@code {
+    [Parameter]
+    public int CurrentPage { get; set; } = 1;
+
+    [Parameter]
+    public int TotalPages { get; set; } = 1;
+
+    [Parameter]
+    public int? TotalItems { get; set; }
+
+    [Parameter]
+    public EventCallback<int> PageChanged { get; set; }
+
+    private async Task OnPageClickAsync(int targetPage)
+    {
+        if (targetPage >= 1 && targetPage <= TotalPages && targetPage != CurrentPage)
+        {
+            await PageChanged.InvokeAsync(targetPage);
+        }
+    }
+}

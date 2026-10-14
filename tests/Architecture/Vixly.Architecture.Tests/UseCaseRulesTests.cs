@@ -163,12 +163,14 @@ public sealed class UseCaseRulesTests
             return Activator.CreateInstance(type)!;
         }
 
+        if (type == typeof(TimeProvider))
+        {
+            return TimeProvider.System;
+        }
+
         if (type.IsInterface)
         {
-            return typeof(DispatchProxy)
-                .GetMethod(nameof(DispatchProxy.Create))!
-                .MakeGenericMethod(type, typeof(StubProxy))
-                .Invoke(null, null)!;
+            return DispatchProxy.Create(type, typeof(StubProxy));
         }
 
         return RuntimeHelpers.GetUninitializedObject(type);

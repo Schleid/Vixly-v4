@@ -1,0 +1,25 @@
+﻿@*
+=========================================================
+FILE: DepartmentsPage.razor
+
+PURPOSE:
+The departments.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/departments"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.departments.title"]</PageTitle>
+
+<h1>@T["ui.departments.title"]</h1>
+<DepartmentList IncludeInactive="@(Inactive == true)" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public bool? Inactive { get; set; }
+}

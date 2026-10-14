@@ -1,0 +1,20 @@
+﻿@*
+=========================================================
+FILE: NewRolePage.razor
+
+PURPOSE:
+Create a custom role.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/roles/new"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.roles.new"]</PageTitle>
+
+<h1>@T["ui.roles.new"]</h1>
+<RoleCreateForm />

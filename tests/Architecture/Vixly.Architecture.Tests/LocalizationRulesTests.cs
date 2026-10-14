@@ -33,7 +33,8 @@ public sealed class LocalizationRulesTests
     private static readonly (string Prefix, Assembly Assembly)[] ErrorAssemblies =
     {
         ("shared", typeof(DomainException).Assembly),
-        ("platform", typeof(PlatformSecurityErrors).Assembly)
+        ("platform", typeof(PlatformSecurityErrors).Assembly),
+        ("platform", typeof(PlatformUserAuthorityLevel).Assembly)
     };
 
     private static readonly Assembly[] BusinessAssemblies =

@@ -1,0 +1,81 @@
+﻿@*
+=========================================================
+FILE: DepartmentMembers.razor
+
+PURPOSE:
+The people in one department, with remove for an
+administrator who may manage members.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- No step-up: departments are labels and grant nothing (D-S3)
+- People are added from their user page
+=========================================================
+*@
+@inherits PlatformPresenterComponent<DepartmentMembersPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<section class="vx-card" aria-labelledby="department-members">
+    <h2 id="department-members">@T["ui.departments.members"]</h2>
+    @if (Presenter.State.Removed)
+    {
+        <p class="vx-message vx-message--info" role="status">@T["ui.departments.member_removed"]</p>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+    }
+    @if (!Presenter.State.Loaded)
+    {
+        <p role="status">@T["ui.common.loading"]</p>
+    }
+    else if (Presenter.State.Members.Count == 0)
+    {
+        <p>@T["ui.departments.no_members"]</p>
+    }
+    else
+    {
+        <table class="vx-table">
+            <thead>
+                <tr>
+                    <th scope="col">@T["ui.users.name"]</th>
+                    <th scope="col">@T["ui.signin.email"]</th>
+                    <th scope="col">@T["ui.departments.primary"]</th>
+                    @if (Presenter.State.CanManage)
+                    {
+                        <th scope="col"><span class="vx-visually-hidden">@T["ui.departments.actions"]</span></th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var member in Presenter.State.Members)
+                {
+                    <tr>
+                        <td><a href="/users/@member.PlatformUserId">@member.LastName, @member.FirstName</a></td>
+                        <td>@member.Email</td>
+                        <td>@T[member.IsPrimary ? "ui.common.yes" : "ui.common.no"]</td>
+                        @if (Presenter.State.CanManage)
+                        {
+                            <td><button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="() => Presenter.RemoveAsync(DepartmentId, member.PlatformUserId)">@T["ui.user_roles.revoke"]</button></td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    <p>@T["ui.departments.add_from_user"]</p>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid DepartmentId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(DepartmentId);
+    }
+}

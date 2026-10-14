@@ -1,0 +1,137 @@
+﻿@*
+=========================================================
+FILE: UserRoleGrants.razor
+
+PURPOSE:
+The roles a staff user holds, with give and remove for an
+administrator who may change them.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Giving and removing a role asks for step-up (ADR-0006)
+- Reports a change through PlatformUserWorkspace (UI-3)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<UserRoleGrantsPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject PlatformUserWorkspace Workspace
+
+<section class="vx-card" aria-labelledby="user-roles">
+    <h2 id="user-roles">@T["ui.users.roles"]</h2>
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <p class="vx-message vx-message--info" role="status">@T[done]</p>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+    }
+    @if (!Presenter.State.Loaded)
+    {
+        <p role="status">@T["ui.common.loading"]</p>
+    }
+    else if (Presenter.State.Grants.Count == 0)
+    {
+        <p>@T["ui.users.no_roles"]</p>
+    }
+    else
+    {
+        <ul class="vx-list">
+            @foreach (var grant in Presenter.State.Grants)
+            {
+                <li>
+                    <a href="/roles/@grant.PlatformRoleId">@PlatformDisplay.RoleName(T, grant.Name, grant.SystemKey)</a>
+                    @if (grant.ExpiresUtc is not null)
+                    {
+                        <span>@VixlyText.Format(T, "ui.users.role_until", "time", PlatformDisplay.Utc(T, grant.ExpiresUtc))</span>
+                    }
+                    @if (!grant.RoleIsActive)
+                    {
+                        <span class="vx-badge vx-badge--suspended">@T["ui.user_roles.inactive"]</span>
+                    }
+                    @if (Presenter.State.CanManage)
+                    {
+                        <button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="() => RevokeAsync(grant.PlatformRoleId)">@T["ui.user_roles.revoke"]</button>
+                    }
+                </li>
+            }
+        </ul>
+    }
+    @if (Presenter.State.CanManage)
+    {
+        <h3>@T["ui.user_roles.assign_title"]</h3>
+        @if (Presenter.State.Assignable.Count == 0)
+        {
+            <p>@T["ui.user_roles.none_assignable"]</p>
+        }
+        else
+        {
+            <form class="vx-form" @onsubmit="AssignAsync">
+                <label for="assign-role">@T["ui.user_roles.role"]</label>
+                <select id="assign-role" @bind="_roleId" required>
+                    <option value="">@T["ui.user_roles.choose"]</option>
+                    @foreach (var role in Presenter.State.Assignable)
+                    {
+                        <option value="@role.PlatformRoleId">@PlatformDisplay.RoleName(T, role.Name, role.SystemKey)</option>
+                    }
+                </select>
+                <label for="assign-until">@T["ui.user_roles.until"]</label>
+                <input id="assign-until" type="date" @bind="_until" />
+                <p>@T["ui.user_roles.until_help"]</p>
+                <div class="vx-actions">
+                    <button type="submit" class="vx-button vx-button--primary" disabled="@(Presenter.IsBusy || _roleId is null)">@T["ui.user_roles.assign"]</button>
+                </div>
+            </form>
+        }
+    }
+    @if (Presenter.State.Pending is not null)
+    {
+        <StepUpDialog OnConfirmed="ResumeAsync" OnCancelled="Presenter.CancelStepUp" />
+    }
+</section>
+
+@code {
+    private Guid? _roleId;
+
+    private DateOnly? _until;
+
+    [Parameter, EditorRequired]
+    public Guid UserId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(UserId);
+    }
+
+    private async Task AssignAsync()
+    {
+        if (_roleId is Guid roleId && await Presenter.AssignAsync(UserId, roleId, _until))
+        {
+            _roleId = null;
+            _until = null;
+            Workspace.NotifyUserChanged(UserId);
+        }
+    }
+
+    private async Task RevokeAsync(Guid roleId)
+    {
+        if (await Presenter.RevokeAsync(UserId, roleId))
+        {
+            Workspace.NotifyUserChanged(UserId);
+        }
+    }
+
+    private async Task ResumeAsync()
+    {
+        if (await Presenter.ResumeAfterStepUpAsync(UserId))
+        {
+            _roleId = null;
+            _until = null;
+            Workspace.NotifyUserChanged(UserId);
+        }
+    }
+}

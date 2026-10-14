@@ -1,0 +1,24 @@
+﻿@*
+=========================================================
+FILE: DepartmentPage.razor
+
+PURPOSE:
+One department: summary and members.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/departments/{DepartmentId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<p><a href="/departments">@T["ui.departments.back"]</a></p>
+<DepartmentSummary DepartmentId="@DepartmentId" />
+<DepartmentMembers DepartmentId="@DepartmentId" />
+
+@code {
+    [Parameter]
+    public Guid DepartmentId { get; set; }
+}

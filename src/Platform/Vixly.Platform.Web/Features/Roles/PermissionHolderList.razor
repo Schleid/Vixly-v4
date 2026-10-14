@@ -1,0 +1,71 @@
+﻿@*
+=========================================================
+FILE: PermissionHolderList.razor
+
+PURPOSE:
+Everyone who holds one permission now, and through which
+role or the SuperUser authority level.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+=========================================================
+*@
+@inherits PlatformPresenterComponent<PermissionHoldersPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.Error is not null)
+{
+    <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+}
+else if (!Presenter.State.Loaded)
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+else
+{
+    <PageTitle>@T[PlatformDisplay.PermissionKey(Code)]</PageTitle>
+    <h1>@T[PlatformDisplay.PermissionKey(Code)]</h1>
+    <p>@T["ui.holders.intro"]</p>
+    @if (Presenter.State.Holders.Count == 0)
+    {
+        <p role="status">@T["ui.holders.empty"]</p>
+    }
+    else
+    {
+        <table class="vx-table">
+            <thead>
+                <tr>
+                    <th scope="col">@T["ui.users.name"]</th>
+                    <th scope="col">@T["ui.signin.email"]</th>
+                    <th scope="col">@T["ui.holders.through"]</th>
+                    <th scope="col">@T["ui.roles.holder_until"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var holder in Presenter.State.Holders)
+                {
+                    <tr>
+                        <td><a href="/users/@holder.PlatformUserId">@holder.LastName, @holder.FirstName</a></td>
+                        <td>@holder.Email</td>
+                        <td>@(holder.RoleName is null ? T["ui.holders.super_user"].Value : PlatformDisplay.RoleName(T, holder.RoleName, holder.RoleSystemKey))</td>
+                        <td>@(holder.ExpiresUtc is null ? T["ui.roles.no_end"].Value : PlatformDisplay.Utc(T, holder.ExpiresUtc))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string Code { get; set; } = string.Empty;
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(Code);
+    }
+}

@@ -1,0 +1,80 @@
+﻿@*
+=========================================================
+FILE: DepartmentList.razor
+
+PURPOSE:
+The departments: name, description, state and member count.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Inactive departments are shown on request (query string, UI-3)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<DepartmentListPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div class="vx-toolbar">
+    @if (IncludeInactive)
+    {
+        <a href="/departments">@T["ui.departments.hide_inactive"]</a>
+    }
+    else
+    {
+        <a href="/departments?inactive=true">@T["ui.departments.show_inactive"]</a>
+    }
+    @if (Presenter.State.CanCreate)
+    {
+        <a class="vx-button vx-button--primary" href="/departments/new">@T["ui.departments.new"]</a>
+    }
+</div>
+
+@if (Presenter.State.Error is not null)
+{
+    <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+}
+else if (!Presenter.State.Loaded)
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+else if (Presenter.State.Departments.Count == 0)
+{
+    <p role="status">@T["ui.departments.empty"]</p>
+}
+else
+{
+    <table class="vx-table">
+        <thead>
+            <tr>
+                <th scope="col">@T["ui.departments.name"]</th>
+                <th scope="col">@T["ui.departments.description"]</th>
+                <th scope="col">@T["ui.roles.status"]</th>
+                <th scope="col">@T["ui.roles.people"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var department in Presenter.State.Departments)
+            {
+                <tr>
+                    <td><a href="/departments/@department.PlatformDepartmentId">@department.Name</a></td>
+                    <td class="vx-truncate" title="@department.Description">@department.Description</td>
+                    <td><span class="vx-badge vx-badge--@(department.IsActive ? "active" : "suspended")">@T[department.IsActive ? "ui.roles.active" : "ui.roles.inactive"]</span></td>
+                    <td>@department.MemberCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public bool IncludeInactive { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(IncludeInactive);
+    }
+}

@@ -1,0 +1,48 @@
+@namespace Vixly.Shared.UI.Primitives
+@*
+=========================================================
+FILE: VxTextInput.razor
+
+PURPOSE:
+Accessible text input primitive with two-way binding support.
+
+IMPORTANT NOTES:
+- Pure presentational primitive (ADR-0001)
+- Size budgets (UI-7): max 6 parameters, max 250 lines
+=========================================================
+*@
+
+<input id="@Id"
+       type="@Type"
+       class="vx-input"
+       value="@Value"
+       placeholder="@Placeholder"
+       disabled="@Disabled"
+       @oninput="HandleInputAsync" />
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public string Type { get; set; } = "text";
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    private async Task HandleInputAsync(ChangeEventArgs args)
+    {
+        string? newValue = args.Value?.ToString();
+        Value = newValue;
+        await ValueChanged.InvokeAsync(newValue);
+    }
+}

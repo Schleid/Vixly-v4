@@ -13,6 +13,7 @@ namespace Vixly.Platform.Application.Security;
 // RESPONSIBILITIES:
 // - Identify the authenticated Platform user
 // - Carry that user's fixed authority level
+// - Carry the id of the signed-in session, for step-up checks
 //
 // IMPORTANT NOTES:
 // - Built only from the authenticated principal by the host
@@ -28,7 +29,8 @@ public sealed record PlatformAuthorizationContext
 {
     public PlatformAuthorizationContext(
         Guid platformUserId,
-        PlatformUserAuthorityLevel authorityLevel)
+        PlatformUserAuthorityLevel authorityLevel,
+        Guid? sessionId = null)
     {
         if (platformUserId == Guid.Empty)
         {
@@ -42,9 +44,12 @@ public sealed record PlatformAuthorizationContext
 
         PlatformUserId = platformUserId;
         AuthorityLevel = authorityLevel;
+        SessionId = sessionId;
     }
 
     public Guid PlatformUserId { get; }
 
     public PlatformUserAuthorityLevel AuthorityLevel { get; }
+
+    public Guid? SessionId { get; }
 }

@@ -1,0 +1,74 @@
+﻿@*
+=========================================================
+FILE: MySessions.razor
+
+PURPOSE:
+The signed-in user's open sessions, with a way to end them.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+=========================================================
+*@
+@inherits PlatformPresenterComponent<MySessionsPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<section class="vx-card" aria-labelledby="my-sessions">
+    <h2 id="my-sessions">@T["ui.users.sessions"]</h2>
+    @if (Presenter.State.Error is not null)
+    {
+        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+    }
+    @if (Presenter.State.EndedCount is int ended)
+    {
+        <p class="vx-message vx-message--info" role="status">@VixlyText.Format(T, "ui.account.sessions_ended", "count", ended)</p>
+    }
+    <table class="vx-table">
+        <thead>
+            <tr>
+                <th scope="col">@T["ui.users.session_started"]</th>
+                <th scope="col">@T["ui.users.session_last_seen"]</th>
+                <th scope="col">@T["ui.users.session_ip"]</th>
+                <th scope="col">@T["ui.users.session_browser"]</th>
+                <th scope="col"><span class="vx-visually-hidden">@T["ui.account.session_action"]</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var session in Presenter.State.Sessions)
+            {
+                <tr>
+                    <td>@PlatformDisplay.Utc(T, session.StartedUtc)</td>
+                    <td>@PlatformDisplay.Utc(T, session.LastSeenUtc)</td>
+                    <td>@session.IpAddress</td>
+                    <td class="vx-truncate" title="@session.UserAgent">@session.UserAgent</td>
+                    <td>
+                        @if (session.SessionId == Presenter.State.CurrentSessionId)
+                        {
+                            <strong>@T["ui.account.this_device"]</strong>
+                        }
+                        else
+                        {
+                            <button type="button" class="vx-button vx-button--danger" disabled="@Presenter.IsBusy" @onclick="() => Presenter.EndAsync(session.SessionId)">@T["ui.account.end_session"]</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (Presenter.State.Sessions.Count > 1)
+    {
+        <div class="vx-actions">
+            <button type="button" class="vx-button vx-button--danger" disabled="@Presenter.IsBusy" @onclick="() => Presenter.EndAsync(null)">@T["ui.account.end_other_sessions"]</button>
+        </div>
+    }
+</section>
+
+@code {
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync();
+    }
+}

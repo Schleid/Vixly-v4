@@ -1,0 +1,28 @@
+﻿@*
+=========================================================
+FILE: UserPage.razor
+
+PURPOSE:
+One staff user: summary, roles, departments and the
+administrator actions.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/users/{UserId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<p><a href="/users">@T["ui.users.back"]</a></p>
+<UserSummary UserId="@UserId" />
+<UserRoleGrants UserId="@UserId" />
+<UserDepartments UserId="@UserId" />
+<UserActionPanel TPresenter="UserStatusActionsPresenter" UserId="@UserId" TitleKey="ui.users.account_actions" />
+<UserActionPanel TPresenter="UserSecurityActionsPresenter" UserId="@UserId" TitleKey="ui.users.security_actions" />
+
+@code {
+    [Parameter]
+    public Guid UserId { get; set; }
+}

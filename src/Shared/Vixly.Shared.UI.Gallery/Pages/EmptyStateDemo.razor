@@ -1,0 +1,22 @@
+@page "/primitives/empty-state"
+
+<div class="gallery-section">
+    <h1>VxEmptyState Primitive</h1>
+    <p>Provides context and a clear forward path so empty lists are never a dead end.</p>
+</div>
+
+<div class="gallery-section">
+    <h2>Empty State Display</h2>
+    <VxEmptyState Title="No users found"
+                  Description="There are currently no users matching your filter criteria. Try clearing your search or invite a new staff member.">
+        <Icon>
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M8 12h8" />
+            </svg>
+        </Icon>
+        <Action>
+            <VxButton Variant="VxButtonVariant.Primary">Invite User</VxButton>
+        </Action>
+    </VxEmptyState>
+</div>

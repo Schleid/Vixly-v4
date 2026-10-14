@@ -1,0 +1,51 @@
+@namespace Vixly.Shared.UI.Primitives
+@*
+=========================================================
+FILE: VxStatusBadge.razor
+
+PURPOSE:
+Accessible status badge displaying text and optional icon.
+
+IMPORTANT NOTES:
+- Pure presentational primitive (ADR-0001)
+- Never shows status by color alone (WCAG 2.2 AA)
+- Size budgets (UI-7): max 6 parameters, max 250 lines
+=========================================================
+*@
+
+<span class="@GetCssClass()">
+    @if (Icon is not null)
+    {
+        <span class="vx-badge__icon" aria-hidden="true">@Icon</span>
+    }
+    <span class="vx-badge__text">@Text</span>
+</span>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = string.Empty;
+
+    [Parameter]
+    public VxBadgeStatus Status { get; set; } = VxBadgeStatus.Info;
+
+    [Parameter]
+    public RenderFragment? Icon { get; set; }
+
+    private string GetCssClass()
+    {
+        string statusModifier = Status switch
+        {
+            VxBadgeStatus.Active => "vx-badge--active",
+            VxBadgeStatus.Invited => "vx-badge--invited",
+            VxBadgeStatus.Suspended => "vx-badge--suspended",
+            VxBadgeStatus.Locked => "vx-badge--locked",
+            VxBadgeStatus.Deactivated => "vx-badge--deactivated",
+            VxBadgeStatus.Success => "vx-badge--active",
+            VxBadgeStatus.Warning => "vx-badge--suspended",
+            VxBadgeStatus.Danger => "vx-badge--locked",
+            _ => "vx-badge--invited"
+        };
+
+        return $"vx-badge {statusModifier}";
+    }
+}

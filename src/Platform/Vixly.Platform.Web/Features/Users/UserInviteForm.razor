@@ -1,0 +1,86 @@
+﻿@*
+=========================================================
+FILE: UserInviteForm.razor
+
+PURPOSE:
+Invites a new staff member: name, email, language, authority.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Opens the new user's page after a successful invitation
+=========================================================
+*@
+@inherits PlatformPresenterComponent<UserInvitePresenter>
+@using Vixly.Platform.Domain.Identity
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+@if (!Presenter.State.Loaded)
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+else if (!Presenter.State.CanInvite)
+{
+    <p class="vx-message vx-message--error" role="alert">@T["platform.security.access_denied"]</p>
+}
+else
+{
+    <p>@T["ui.users.invite_intro"]</p>
+    @if (Presenter.State.Error is not null)
+    {
+        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+    }
+    <form class="vx-form vx-card" @onsubmit="InviteAsync">
+        <label for="invite-first">@T["ui.users.first_name"]</label>
+        <input id="invite-first" @bind="_input.FirstName" maxlength="100" required autocomplete="off" />
+        <label for="invite-last">@T["ui.users.last_name"]</label>
+        <input id="invite-last" @bind="_input.LastName" maxlength="100" required autocomplete="off" />
+        <label for="invite-email">@T["ui.signin.email"]</label>
+        <input id="invite-email" type="email" @bind="_input.Email" maxlength="254" required autocomplete="off" />
+        <label for="invite-language">@T["ui.language"]</label>
+        <select id="invite-language" @bind="_input.PreferredLanguage">
+            @foreach (string language in VixlyCultures.Supported.Select(culture => culture.TwoLetterISOLanguageName))
+            {
+                <option value="@language">@T["ui.language." + language]</option>
+            }
+        </select>
+        <label for="invite-authority">@T["ui.users.authority"]</label>
+        <select id="invite-authority" @bind="_input.AuthorityLevel" disabled="@(!Presenter.State.CanChooseAuthority)">
+            @foreach (PlatformUserAuthorityLevel level in Enum.GetValues<PlatformUserAuthorityLevel>())
+            {
+                <option value="@level">@T[PlatformDisplay.AuthorityKey(level)]</option>
+            }
+        </select>
+        <label for="invite-employee">@T["ui.users.employee_number"]</label>
+        <input id="invite-employee" @bind="_input.EmployeeNumber" maxlength="50" autocomplete="off" />
+        <label for="invite-phone">@T["ui.users.phone"]</label>
+        <input id="invite-phone" type="tel" @bind="_input.PhoneNumber" maxlength="20" autocomplete="off" />
+        <div class="vx-actions">
+            <button type="submit" class="vx-button vx-button--primary" disabled="@Presenter.IsBusy">@T["ui.users.invite_submit"]</button>
+            <a class="vx-button" href="/users">@T["ui.common.cancel"]</a>
+        </div>
+    </form>
+}
+
+@code {
+    private readonly UserInviteInput _input = new();
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.State.Loaded ? Task.CompletedTask : Presenter.LoadAsync();
+    }
+
+    private async Task InviteAsync()
+    {
+        await Presenter.InviteAsync(_input);
+
+        if (Presenter.State.InvitedUserId is Guid invited)
+        {
+            Navigation.NavigateTo("/users/" + invited);
+        }
+    }
+}

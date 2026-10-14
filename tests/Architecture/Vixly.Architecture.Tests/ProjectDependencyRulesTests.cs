@@ -11,7 +11,8 @@ namespace Vixly.Architecture.Tests;
 // RESPONSIBILITIES:
 // - Fail when a project references something its kind may not
 // - Fail when a project matches no known kind (new kinds need
-//   an ADR and a rule here)
+//   an ADR and a rule here; Shared.Hosting and Worker added by
+//   ADR-0011 and ADR-0007)
 // - Fail when Domain, Contracts or Kernel take package
 //   references
 // - Keep user-facing text out of Domain and Application:
@@ -30,6 +31,7 @@ public sealed class ProjectDependencyRulesTests
     private const string Kernel = "Vixly.Shared.Kernel";
     private const string SharedUi = "Vixly.Shared.UI";
     private const string Localization = "Vixly.Shared.Localization";
+    private const string Hosting = "Vixly.Shared.Hosting";
     private const string ContractsPrefix = "Vixly.Contracts.";
 
     private static readonly string[] Planes = { "Platform", "Operations", "Customer" };
@@ -96,7 +98,7 @@ public sealed class ProjectDependencyRulesTests
             return _ => false;
         }
 
-        if (project == Localization)
+        if (project == Localization || project == Hosting)
         {
             return reference => reference == Kernel;
         }
@@ -139,11 +141,15 @@ public sealed class ProjectDependencyRulesTests
             "Api" => reference =>
                 reference == $"{plane}.Application" || reference == $"{plane}.Infrastructure"
                 || IsContracts(reference)
-                || reference == $"{plane}.Resources" || reference == Localization,
+                || reference == $"{plane}.Resources" || reference == Localization || reference == Hosting,
             "Web" => reference =>
                 reference == $"{plane}.Application" || reference == $"{plane}.Infrastructure"
                 || IsContracts(reference) || reference == SharedUi
-                || reference == $"{plane}.Resources" || reference == Localization,
+                || reference == $"{plane}.Resources" || reference == Localization || reference == Hosting,
+            "Worker" => reference =>
+                reference == $"{plane}.Application" || reference == $"{plane}.Infrastructure"
+                || IsContracts(reference)
+                || reference == $"{plane}.Resources" || reference == Localization || reference == Hosting,
             _ => null
         };
     }

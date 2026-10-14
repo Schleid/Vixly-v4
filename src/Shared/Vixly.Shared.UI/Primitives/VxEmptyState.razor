@@ -1,0 +1,48 @@
+@namespace Vixly.Shared.UI.Primitives
+@*
+=========================================================
+FILE: VxEmptyState.razor
+
+PURPOSE:
+Accessible empty state presentation with illustration, description and action.
+
+IMPORTANT NOTES:
+- Pure presentational primitive (ADR-0001)
+- Never a dead end: always offers explanation and next action
+- Size budgets (UI-7): max 6 parameters, max 250 lines
+=========================================================
+*@
+
+<div class="vx-empty-state">
+    @if (Icon is not null)
+    {
+        <div class="vx-empty-state__icon" aria-hidden="true">
+            @Icon
+        </div>
+    }
+    <h3 class="vx-empty-state__title">@Title</h3>
+    @if (!string.IsNullOrEmpty(Description))
+    {
+        <p class="vx-empty-state__desc">@Description</p>
+    }
+    @if (Action is not null)
+    {
+        <div class="vx-empty-state__action">
+            @Action
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Description { get; set; }
+
+    [Parameter]
+    public RenderFragment? Icon { get; set; }
+
+    [Parameter]
+    public RenderFragment? Action { get; set; }
+}

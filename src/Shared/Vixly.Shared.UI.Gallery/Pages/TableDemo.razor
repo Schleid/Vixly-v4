@@ -1,0 +1,61 @@
+@page "/primitives/table"
+
+<div class="gallery-section">
+    <h1>VxDataTable & VxPager Primitives</h1>
+    <p>Accessible table wrapper supporting server paging, row templates, and loading/empty slots.</p>
+</div>
+
+<div class="gallery-section">
+    <h2>Populated Data Table with Pager</h2>
+    <VxDataTable TItem="SampleUser" Items="_users">
+        <HeaderContent>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+        </HeaderContent>
+        <RowTemplate Context="user">
+            <td><strong>@user.Name</strong></td>
+            <td>@user.Email</td>
+            <td>@user.Role</td>
+            <td><VxStatusBadge Text="@user.StatusText" Status="@user.Status" /></td>
+        </RowTemplate>
+    </VxDataTable>
+
+    <VxPager CurrentPage="_page" TotalPages="5" PageChanged="HandlePageChanged" />
+</div>
+
+<div class="gallery-section">
+    <h2>Empty Table State</h2>
+    <VxDataTable TItem="SampleUser" Items="_emptyUsers">
+        <HeaderContent>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+        </HeaderContent>
+        <EmptyContent>
+            <VxEmptyState Title="No records to display"
+                          Description="No data matches the selected query." />
+        </EmptyContent>
+    </VxDataTable>
+</div>
+
+@code {
+    private int _page = 1;
+
+    private readonly List<SampleUser> _users = new()
+    {
+        new("Alice Smith", "alice@example.com", "Administrator", "Active", VxBadgeStatus.Active),
+        new("Bob Jones", "bob@example.com", "Operator", "Invited", VxBadgeStatus.Invited),
+        new("Charlie Brown", "charlie@example.com", "Support", "Suspended", VxBadgeStatus.Suspended)
+    };
+
+    private readonly IReadOnlyList<SampleUser> _emptyUsers = Array.Empty<SampleUser>();
+
+    private void HandlePageChanged(int newPage)
+    {
+        _page = newPage;
+    }
+
+    private record SampleUser(string Name, string Email, string Role, string StatusText, VxBadgeStatus Status);
+}

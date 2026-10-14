@@ -1,0 +1,63 @@
+﻿@*
+=========================================================
+FILE: RoleCreateForm.razor
+
+PURPOSE:
+Creates a custom role by name, then opens it so its
+permissions can be chosen.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+=========================================================
+*@
+@inherits PlatformPresenterComponent<RoleCreatePresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+@if (!Presenter.State.Loaded)
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+else if (!Presenter.State.CanCreate)
+{
+    <p class="vx-message vx-message--error" role="alert">@T["platform.security.access_denied"]</p>
+}
+else
+{
+    <p>@T["ui.roles.new_intro"]</p>
+    @if (Presenter.State.Error is not null)
+    {
+        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+    }
+    <form class="vx-form vx-card" @onsubmit="CreateAsync">
+        <label for="role-name">@T["ui.roles.name"]</label>
+        <input id="role-name" @bind="_name" maxlength="100" required autocomplete="off" />
+        <div class="vx-actions">
+            <button type="submit" class="vx-button vx-button--primary" disabled="@Presenter.IsBusy">@T["ui.roles.create"]</button>
+            <a class="vx-button" href="/roles">@T["ui.common.cancel"]</a>
+        </div>
+    </form>
+}
+
+@code {
+    private string _name = string.Empty;
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.State.Loaded ? Task.CompletedTask : Presenter.LoadAsync();
+    }
+
+    private async Task CreateAsync()
+    {
+        await Presenter.CreateAsync(_name);
+
+        if (Presenter.State.CreatedRoleId is Guid created)
+        {
+            Navigation.NavigateTo("/roles/" + created);
+        }
+    }
+}

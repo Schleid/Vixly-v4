@@ -1,0 +1,83 @@
+﻿@*
+=========================================================
+FILE: RoleList.razor
+
+PURPOSE:
+The Platform roles: name, type, state, permission and
+holder counts.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Inactive roles are shown on request (query string, UI-3)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<RoleListPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div class="vx-toolbar">
+    @if (IncludeInactive)
+    {
+        <a href="/roles">@T["ui.roles.hide_inactive"]</a>
+    }
+    else
+    {
+        <a href="/roles?inactive=true">@T["ui.roles.show_inactive"]</a>
+    }
+    @if (Presenter.State.CanCreate)
+    {
+        <a class="vx-button vx-button--primary" href="/roles/new">@T["ui.roles.new"]</a>
+    }
+</div>
+
+@if (Presenter.State.Error is not null)
+{
+    <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+}
+else if (!Presenter.State.Loaded)
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+else if (Presenter.State.Roles.Count == 0)
+{
+    <p role="status">@T["ui.roles.empty"]</p>
+}
+else
+{
+    <table class="vx-table">
+        <thead>
+            <tr>
+                <th scope="col">@T["ui.roles.name"]</th>
+                <th scope="col">@T["ui.roles.kind"]</th>
+                <th scope="col">@T["ui.roles.status"]</th>
+                <th scope="col">@T["ui.roles.permissions"]</th>
+                <th scope="col">@T["ui.roles.people"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var role in Presenter.State.Roles)
+            {
+                <tr>
+                    <td><a href="/roles/@role.PlatformRoleId">@PlatformDisplay.RoleName(T, role.Name, role.SystemKey)</a></td>
+                    <td>@T[role.SystemKey is null ? "ui.roles.kind.custom" : "ui.roles.kind.system"]</td>
+                    <td><span class="vx-badge vx-badge--@(role.IsActive ? "active" : "suspended")">@T[role.IsActive ? "ui.roles.active" : "ui.roles.inactive"]</span></td>
+                    <td>@role.PermissionCodes.Count</td>
+                    <td>@role.HolderCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public bool IncludeInactive { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(IncludeInactive);
+    }
+}

@@ -1,0 +1,131 @@
+﻿@*
+=========================================================
+FILE: UserActionPanel.razor
+
+PURPOSE:
+One panel of administrator actions on a staff user: pick an
+action, confirm it (with a reason when needed), step up when
+asked.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Generic over the presenter: the account status panel and the
+  security panel share this markup
+- Reports a change through PlatformUserWorkspace so the summary
+  reloads (UI-3)
+=========================================================
+*@
+@typeparam TPresenter where TPresenter : UserActionsPresenter
+@inherits PlatformPresenterComponent<TPresenter>
+@using Vixly.Platform.Application.UseCases.Users
+@using Vixly.Platform.Web.Features.StepUp
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject PlatformUserWorkspace Workspace
+
+@if (Presenter.State.Available.Count > 0 || Presenter.State.Done is not null || Presenter.State.Error is not null)
+{
+    <section class="vx-card" aria-labelledby="@(_id)-title">
+        <h2 id="@(_id)-title">@T[TitleKey]</h2>
+        @if (Presenter.State.Done is PlatformUserAdminAction done)
+        {
+            <p class="vx-message vx-message--info" role="status">@T[PlatformDisplay.ActionKey(done) + ".done"]</p>
+        }
+        @if (Presenter.State.Error is not null)
+        {
+            <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+        }
+        @if (Presenter.State.Selected is PlatformUserAdminAction selected)
+        {
+            <form class="vx-form" @onsubmit="SubmitAsync">
+                <p>@T[PlatformDisplay.ActionKey(selected) + ".help"]</p>
+                @if (UserActionsPresenter.RequiresReason(selected))
+                {
+                    <label for="@(_id)-reason">@T["ui.users.reason"]</label>
+                    <textarea id="@(_id)-reason" @bind="_reason" maxlength="500" required></textarea>
+                }
+                <div class="vx-actions">
+                    <button type="submit" class="vx-button vx-button--danger" disabled="@Presenter.IsBusy">@T[PlatformDisplay.ActionKey(selected)]</button>
+                    <button type="button" class="vx-button" @onclick="Presenter.Cancel">@T["ui.common.cancel"]</button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="vx-actions">
+                @foreach (PlatformUserAdminAction action in Presenter.State.Available)
+                {
+                    <button type="button" class="vx-button" @onclick="() => Select(action)">@T[PlatformDisplay.ActionKey(action)]</button>
+                }
+            </div>
+        }
+        @if (Presenter.State.StepUpPending)
+        {
+            <StepUpDialog OnConfirmed="ResumeAsync" OnCancelled="Presenter.CancelStepUp" />
+        }
+    </section>
+}
+
+@code {
+    private readonly string _id = "vx-" + Guid.NewGuid().ToString("N")[..8];
+
+    private string _reason = string.Empty;
+
+    [Parameter, EditorRequired]
+    public Guid UserId { get; set; }
+
+    [Parameter, EditorRequired]
+    public string TitleKey { get; set; } = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Workspace.UserChanged -= OnUserChanged;
+        Workspace.UserChanged += OnUserChanged;
+        await Presenter.LoadAsync(UserId);
+    }
+
+    private void Select(PlatformUserAdminAction action)
+    {
+        _reason = string.Empty;
+        Presenter.Select(action);
+    }
+
+    private async Task SubmitAsync()
+    {
+        if (await Presenter.SubmitAsync(UserId, _reason))
+        {
+            _reason = string.Empty;
+            Workspace.NotifyUserChanged(UserId);
+        }
+    }
+
+    private async Task ResumeAsync()
+    {
+        if (await Presenter.ResumeAfterStepUpAsync(UserId))
+        {
+            _reason = string.Empty;
+            Workspace.NotifyUserChanged(UserId);
+        }
+    }
+
+    private void OnUserChanged(Guid platformUserId)
+    {
+        if (platformUserId == UserId && !Presenter.IsBusy)
+        {
+            _ = InvokeAsync(() => Presenter.LoadAsync(UserId));
+        }
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            Workspace.UserChanged -= OnUserChanged;
+        }
+
+        base.Dispose(disposing);
+    }
+}

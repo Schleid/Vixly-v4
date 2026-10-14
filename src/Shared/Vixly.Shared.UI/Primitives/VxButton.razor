@@ -1,0 +1,58 @@
+@namespace Vixly.Shared.UI.Primitives
+@*
+=========================================================
+FILE: VxButton.razor
+
+PURPOSE:
+Accessible button primitive supporting primary, secondary, danger, and subtle variants.
+
+IMPORTANT NOTES:
+- Pure presentational primitive (ADR-0001)
+- Size budgets (UI-7): max 6 parameters, max 250 lines
+=========================================================
+*@
+
+<button type="@Type"
+        class="@GetCssClass()"
+        disabled="@(Disabled || IsBusy)"
+        aria-busy="@(IsBusy ? "true" : null)"
+        @onclick="OnClick">
+    @if (IsBusy)
+    {
+        <span class="vx-button__spinner" aria-hidden="true"></span>
+    }
+    @ChildContent
+</button>
+
+@code {
+    [Parameter]
+    public VxButtonVariant Variant { get; set; } = VxButtonVariant.Secondary;
+
+    [Parameter]
+    public string Type { get; set; } = "button";
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string GetCssClass()
+    {
+        string variantClass = Variant switch
+        {
+            VxButtonVariant.Primary => "vx-button--primary",
+            VxButtonVariant.Danger => "vx-button--danger",
+            VxButtonVariant.Subtle => "vx-button--subtle",
+            _ => string.Empty
+        };
+
+        return string.IsNullOrEmpty(variantClass) ? "vx-button" : $"vx-button {variantClass}";
+    }
+}

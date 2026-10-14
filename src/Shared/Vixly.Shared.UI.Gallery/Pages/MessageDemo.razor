@@ -1,0 +1,35 @@
+@page "/primitives/message"
+
+<div class="gallery-section">
+    <h1>VxMessage Primitive</h1>
+    <p>Alert and notification message primitive supporting screen reader ARIA roles.</p>
+</div>
+
+<div class="gallery-section">
+    <h2>Message Types</h2>
+    <div style="display: grid; gap: 1rem;">
+        <VxMessage Type="VxMessageType.Info" Text="Informational notice: A scheduled maintenance window is upcoming." />
+        <VxMessage Type="VxMessageType.Success" Text="Success: User account created successfully and invitation email dispatched." />
+        <VxMessage Type="VxMessageType.Warning" Text="Warning: 2 of your recovery codes have been used." />
+        <VxMessage Type="VxMessageType.Error" Text="Error: Invalid authenticator code provided. Please try again." />
+    </div>
+</div>
+
+<div class="gallery-section">
+    <h2>Dismissible Message</h2>
+    @if (_showDismissible)
+    {
+        <VxMessage Type="VxMessageType.Info"
+                   Text="This message can be dismissed by clicking the close button."
+                   Dismissible="true"
+                   OnDismiss="() => _showDismissible = false" />
+    }
+    else
+    {
+        <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => _showDismissible = true">Reset Message</VxButton>
+    }
+</div>
+
+@code {
+    private bool _showDismissible = true;
+}

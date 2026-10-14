@@ -1,0 +1,29 @@
+@page "/primitives/input"
+
+<div class="gallery-section">
+    <h1>VxTextInput Primitive</h1>
+    <p>Accessible form input with focus ring and two-way data binding support.</p>
+</div>
+
+<div class="gallery-section">
+    <h2>Input Variants</h2>
+    <div style="max-width: 24rem; display: grid; gap: 1rem;">
+        <div>
+            <label for="demo-text">Standard Text Input</label>
+            <VxTextInput Id="demo-text" @bind-Value="_textValue" Placeholder="Enter your name" />
+            <small>Current value: @_textValue</small>
+        </div>
+        <div>
+            <label for="demo-pwd">Password Input</label>
+            <VxTextInput Id="demo-pwd" Type="password" Placeholder="Enter password" />
+        </div>
+        <div>
+            <label for="demo-disabled">Disabled Input</label>
+            <VxTextInput Id="demo-disabled" Value="Read only value" Disabled="true" />
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? _textValue;
+}

@@ -1,0 +1,27 @@
+@page "/primitives/dialog"
+
+<div class="gallery-section">
+    <h1>VxDialog Primitive</h1>
+    <p>Accessible modal dialog primitive with backdrop and keyboard focus trap.</p>
+</div>
+
+<div class="gallery-section">
+    <h2>Interactive Dialog</h2>
+    <VxButton Variant="VxButtonVariant.Primary" OnClick="() => _isOpen = true">Open Confirm Dialog</VxButton>
+
+    <VxDialog IsOpen="_isOpen" Title="Confirm Action" OnClose="() => _isOpen = false">
+        <ChildContent>
+            <p>Are you sure you want to perform this sensitive administrative action? This action requires step-up confirmation.</p>
+        </ChildContent>
+        <Footer>
+            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                <VxButton Variant="VxButtonVariant.Secondary" OnClick="() => _isOpen = false">Cancel</VxButton>
+                <VxButton Variant="VxButtonVariant.Danger" OnClick="() => _isOpen = false">Confirm</VxButton>
+            </div>
+        </Footer>
+    </VxDialog>
+</div>
+
+@code {
+    private bool _isOpen;
+}
