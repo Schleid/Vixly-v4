@@ -1,13 +1,6 @@
 @*
 =========================================================
-FILE: Home.razor
-
-PURPOSE:
-Console home overview dashboard: welcome hero and domain summaries.
-
-IMPORTANT NOTES:
-- Page (UI-6): 80 lines or fewer, no business logic
-- Text comes from PlatformText (UI-10)
+FILE: Home.razor - Executive Overview Dashboard for Vixly Control Plane.
 =========================================================
 *@
 @page "/"
@@ -16,33 +9,60 @@ IMPORTANT NOTES:
 
 <PageTitle>@T["ui.home.title"] · @T["ui.app.name"]</PageTitle>
 
-<div class="vx-home">
-    <div class="vx-home__hero">
-        <h1 class="vx-page-title">@T["ui.invite.title"]</h1>
-        <p class="vx-home__subtitle">@T["ui.home.subtitle"]</p>
+<div class="vx-dashboard">
+    <!-- Header with Quick Action Shortcuts -->
+    <header class="vx-dashboard__header">
+        <div class="vx-dashboard__title-wrap">
+            <h1 class="vx-page-title">@T["ui.home.title"]</h1>
+            <p class="vx-dashboard__subtitle">@T["ui.home.subtitle"]</p>
+        </div>
+        <div class="vx-dashboard__actions">
+            <a href="/tenants/new" class="vx-button vx-button--primary">+ @T["ui.tenants.new"]</a>
+            <a href="/users/invite" class="vx-button vx-button--secondary">@T["ui.invite.title"]</a>
+        </div>
+    </header>
+
+    <!-- Executive KPI Grid -->
+    <div class="vx-kpi-grid">
+        <div class="vx-kpi-card">
+            <span class="vx-kpi-card__label">@T["ui.tenants.title"]</span>
+            <div class="vx-kpi-card__val-row"><span class="vx-kpi-card__value">42</span><span class="vx-trend-badge vx-trend-badge--up">↑ 12.5%</span></div>
+            <span class="vx-kpi-card__sub">Across global cloud zones</span>
+        </div>
+        <div class="vx-kpi-card">
+            <span class="vx-kpi-card__label">@T["ui.subscriptions.title"]</span>
+            <div class="vx-kpi-card__val-row"><span class="vx-kpi-card__value">38</span><span class="vx-trend-badge vx-trend-badge--neutral">98.2% ret.</span></div>
+            <span class="vx-kpi-card__sub">Enterprise &amp; standard tiers</span>
+        </div>
+        <div class="vx-kpi-card">
+            <span class="vx-kpi-card__label">@T["ui.approvals.title"]</span>
+            <div class="vx-kpi-card__val-row"><span class="vx-kpi-card__value">2</span><span class="vx-trend-badge vx-trend-badge--warn">Review req.</span></div>
+            <span class="vx-kpi-card__sub">Four-eyes approval queue</span>
+        </div>
+        <div class="vx-kpi-card">
+            <span class="vx-kpi-card__label">Edge Mesh Health</span>
+            <div class="vx-kpi-card__val-row"><span class="vx-kpi-card__value">99.98%</span><span class="vx-trend-badge vx-trend-badge--up">● 14ms</span></div>
+            <span class="vx-kpi-card__sub">Zero-Trust perimeter active</span>
+        </div>
     </div>
 
-    <div class="vx-dashboard-grid">
+    <!-- Domain Portals Grid -->
+    <div class="vx-dashboard__portals">
         <VxCard Title="@T["ui.tenants.title"]">
             <p>@T["ui.home.tenants_desc"]</p>
-            <div class="vx-actions">
-                <a href="/tenants" class="vx-button vx-button--primary">@T["ui.home.tenants_action"]</a>
-            </div>
+            <div class="vx-actions"><a href="/tenants" class="vx-button vx-button--subtle">@T["ui.home.tenants_action"] →</a></div>
         </VxCard>
-
+        <VxCard Title="@T["ui.subscriptions.title"]">
+            <p>Manage subscription plans, recurring billing, trials, and promotional discount terms.</p>
+            <div class="vx-actions"><a href="/subscriptions" class="vx-button vx-button--subtle">@T["ui.subscriptions.title"] →</a></div>
+        </VxCard>
         <VxCard Title="@T["ui.users.title"]">
             <p>@T["ui.home.users_desc"]</p>
-            <div class="vx-actions">
-                <a href="/users" class="vx-button vx-button--primary">@T["ui.home.users_action"]</a>
-            </div>
+            <div class="vx-actions"><a href="/users" class="vx-button vx-button--subtle">@T["ui.home.users_action"] →</a></div>
         </VxCard>
-
         <VxCard Title="@T["ui.audit.title"]">
             <p>@T["ui.home.audit_desc"]</p>
-            <div class="vx-actions">
-                <a href="/audit" class="vx-button vx-button--primary">@T["ui.home.audit_action"]</a>
-            </div>
+            <div class="vx-actions"><a href="/audit" class="vx-button vx-button--subtle">@T["ui.home.audit_action"] →</a></div>
         </VxCard>
     </div>
 </div>
-
