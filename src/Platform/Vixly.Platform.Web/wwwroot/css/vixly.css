@@ -943,14 +943,15 @@ body.vx-auth {
 .vx-auth__terminal {
     width: 100%;
     max-width: 27.5rem;
-    background: rgba(12, 18, 32, 0.82);
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: linear-gradient(180deg, #1C263D 0%, #131B2C 100%);
+    border: 1px solid rgba(96, 165, 250, 0.35);
     border-radius: 1.25rem;
     box-shadow: 
-        0 24px 60px -12px rgba(0, 0, 0, 0.75),
-        0 0 0 1px rgba(59, 130, 246, 0.12);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+        0 24px 60px -12px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(96, 165, 250, 0.25),
+        0 0 45px -8px rgba(37, 99, 235, 0.35);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -962,9 +963,9 @@ body.vx-auth {
     top: 0;
     left: 0;
     right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent 0%, #3B82F6 25%, #60A5FA 50%, #3B82F6 75%, transparent 100%);
-    box-shadow: 0 0 12px #3B82F6;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, #2563EB 20%, #60A5FA 50%, #38BDF8 80%, transparent 100%);
+    box-shadow: 0 0 16px #60A5FA;
 }
 
 .vx-auth__header {
@@ -980,30 +981,31 @@ body.vx-auth {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 3rem;
-    height: 3rem;
+    width: 3.25rem;
+    height: 3.25rem;
     border-radius: 0.875rem;
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.25) 0%, rgba(29, 78, 216, 0.1) 100%);
-    border: 1px solid rgba(96, 165, 250, 0.3);
-    color: #60A5FA;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.35) 0%, rgba(29, 78, 216, 0.15) 100%);
+    border: 1px solid rgba(147, 197, 253, 0.6);
+    color: #93C5FD;
     margin-bottom: 0.25rem;
-    box-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 0 24px rgba(37, 99, 235, 0.4);
 }
 
 .vx-auth__title {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.55rem;
     font-weight: 700;
-    letter-spacing: -0.02em;
-    color: #F8FAFC;
+    letter-spacing: -0.025em;
+    color: #FFFFFF;
     line-height: 1.2;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .vx-auth__subtitle {
     margin: 0;
-    font-size: 0.84rem;
+    font-size: 0.85rem;
     color: #94A3B8;
-    line-height: 1.45;
+    line-height: 1.5;
     max-width: 22rem;
 }
 
@@ -1023,13 +1025,13 @@ body.vx-auth {
 .vx-auth__terminal .vx-field {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.45rem;
 }
 
 .vx-auth__terminal .vx-label {
     font-size: 0.8125rem;
-    font-weight: 500;
-    color: #CBD5E1;
+    font-weight: 600;
+    color: #E2E8F0;
     letter-spacing: -0.01em;
 }
 
@@ -1044,7 +1046,7 @@ body.vx-auth {
 .vx-input-icon {
     position: absolute;
     left: 0.95rem;
-    color: #64748B;
+    color: #94A3B8;
     pointer-events: none;
     transition: color 0.15s ease, transform 0.15s ease;
     z-index: 2;
@@ -1052,17 +1054,17 @@ body.vx-auth {
 
 .vx-input-container:focus-within .vx-input-icon {
     color: #60A5FA;
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
 
 .vx-auth__terminal .vx-input {
     width: 100%;
-    height: 2.75rem;
+    height: 2.85rem;
     padding: 0 1rem;
-    background: rgba(15, 23, 42, 0.65);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #0B1120;
+    border: 1px solid rgba(148, 163, 184, 0.28);
     border-radius: 0.625rem;
-    color: #F8FAFC;
+    color: #FFFFFF;
     font-size: 0.875rem;
     font-family: inherit;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
@@ -1070,26 +1072,26 @@ body.vx-auth {
 }
 
 .vx-auth__terminal .vx-input--with-icon {
-    padding-left: 2.65rem;
+    padding-left: 2.75rem;
 }
 
 .vx-auth__terminal .vx-input::placeholder {
     color: #64748B;
-    opacity: 0.8;
+    opacity: 0.85;
 }
 
 .vx-auth__terminal .vx-input:focus {
     outline: none;
-    background: rgba(15, 23, 42, 0.9);
+    background: #0E1628;
     border-color: #3B82F6;
     box-shadow: 
-        0 0 0 3px rgba(59, 130, 246, 0.25),
-        0 0 16px rgba(59, 130, 246, 0.15);
+        0 0 0 3px rgba(59, 130, 246, 0.35),
+        0 0 20px rgba(59, 130, 246, 0.25);
 }
 
 .vx-auth__terminal .vx-input:hover:not(:focus) {
-    border-color: rgba(255, 255, 255, 0.2);
-    background: rgba(15, 23, 42, 0.8);
+    border-color: rgba(148, 163, 184, 0.5);
+    background: #0E1628;
 }
 
 /* Field Header & Links */
@@ -1101,7 +1103,7 @@ body.vx-auth {
 
 .vx-auth__forgot {
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
     color: #60A5FA;
     text-decoration: none;
     transition: color 0.15s ease;
@@ -1115,9 +1117,9 @@ body.vx-auth {
 /* Primary Submit Button */
 .vx-auth__terminal .vx-button,
 .vx-auth__terminal .vx-button--primary {
-    height: 2.75rem;
+    height: 2.85rem;
     width: 100%;
-    margin-top: 0.25rem;
+    margin-top: 0.35rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1128,10 +1130,10 @@ body.vx-auth {
     border-radius: 0.625rem;
     background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
     color: #FFFFFF;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     box-shadow: 
-        0 4px 14px rgba(37, 99, 235, 0.35),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        0 4px 16px rgba(37, 99, 235, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
@@ -1140,8 +1142,8 @@ body.vx-auth {
 .vx-auth__terminal .vx-button--primary:hover {
     filter: brightness(1.1);
     box-shadow: 
-        0 6px 20px rgba(37, 99, 235, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        0 6px 22px rgba(37, 99, 235, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
     transform: translateY(-1px);
 }
 
@@ -1161,7 +1163,7 @@ body.vx-auth {
     display: flex;
     align-items: center;
     text-align: center;
-    color: #64748B;
+    color: #94A3B8;
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -1173,7 +1175,7 @@ body.vx-auth {
 .vx-divider::after {
     content: '';
     flex: 1;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .vx-divider span {
@@ -1186,19 +1188,19 @@ body.vx-auth {
     gap: 0.85rem;
     width: 100%;
     padding: 0.65rem 0.85rem;
-    background: rgba(15, 23, 42, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #0B1120;
+    border: 1px solid rgba(148, 163, 184, 0.25);
     border-radius: 0.625rem;
     cursor: pointer;
     text-align: left;
-    color: #F8FAFC;
+    color: #FFFFFF;
     transition: all 0.2s ease;
 }
 
 .vx-button--passkey:hover {
-    background: rgba(30, 41, 59, 0.7);
-    border-color: rgba(96, 165, 250, 0.4);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    background: #141E33;
+    border-color: rgba(96, 165, 250, 0.5);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     transform: translateY(-1px);
 }
 
@@ -1213,9 +1215,9 @@ body.vx-auth {
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 0.5rem;
-    background: rgba(37, 99, 235, 0.15);
-    border: 1px solid rgba(96, 165, 250, 0.25);
-    color: #60A5FA;
+    background: rgba(37, 99, 235, 0.25);
+    border: 1px solid rgba(96, 165, 250, 0.4);
+    color: #93C5FD;
     flex-shrink: 0;
 }
 
@@ -1228,7 +1230,7 @@ body.vx-auth {
 .vx-passkey__label {
     font-size: 0.8125rem;
     font-weight: 600;
-    color: #F1F5F9;
+    color: #FFFFFF;
 }
 
 .vx-passkey__sub {
@@ -1244,15 +1246,16 @@ body.vx-auth {
     justify-content: center;
     gap: 0.45rem;
     padding: 0.85rem 1.5rem;
-    background: rgba(10, 15, 26, 0.7);
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background: #0A0F1D;
+    border-top: 1px solid rgba(148, 163, 184, 0.15);
     font-size: 0.72rem;
-    color: #64748B;
+    color: #94A3B8;
     letter-spacing: 0.02em;
 }
 
 .vx-auth__terminal-footer svg {
     color: #10B981;
+    filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.5));
     flex-shrink: 0;
 }
 
