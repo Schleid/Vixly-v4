@@ -827,9 +827,16 @@ body.vx-auth {
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 0.625rem;
-    background: rgba(30, 58, 138, 0.25);
-    border: 1px solid rgba(96, 165, 250, 0.3);
-    box-shadow: 0 0 16px rgba(37, 99, 235, 0.25);
+    overflow: hidden;
+    box-shadow: 0 0 16px rgba(37, 99, 235, 0.35);
+}
+
+.vx-auth__brand-emblem-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 0.625rem;
 }
 
 .vx-auth__brand-titles {
@@ -942,7 +949,7 @@ body.vx-auth {
 
 .vx-auth__terminal {
     width: 100%;
-    max-width: 27.5rem;
+    max-width: 38.5rem;
     background: linear-gradient(180deg, #1C263D 0%, #131B2C 100%);
     border: 1px solid rgba(96, 165, 250, 0.35);
     border-radius: 1.25rem;
@@ -981,19 +988,25 @@ body.vx-auth {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 3.25rem;
-    height: 3.25rem;
-    border-radius: 0.875rem;
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.35) 0%, rgba(29, 78, 216, 0.15) 100%);
-    border: 1px solid rgba(147, 197, 253, 0.6);
-    color: #93C5FD;
-    margin-bottom: 0.25rem;
-    box-shadow: 0 0 24px rgba(37, 99, 235, 0.4);
+    width: 4rem;
+    height: 4rem;
+    border-radius: 1.15rem;
+    box-shadow: 0 0 28px rgba(37, 99, 235, 0.45);
+    margin-bottom: 0.35rem;
+    overflow: hidden;
+}
+
+.vx-auth__portal-badge-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 1.15rem;
 }
 
 .vx-auth__title {
     margin: 0;
-    font-size: 1.55rem;
+    font-size: 1.6rem;
     font-weight: 700;
     letter-spacing: -0.025em;
     color: #FFFFFF;
@@ -1003,10 +1016,11 @@ body.vx-auth {
 
 .vx-auth__subtitle {
     margin: 0;
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     color: #94A3B8;
     line-height: 1.5;
-    max-width: 22rem;
+    max-width: none;
+    white-space: nowrap;
 }
 
 .vx-auth__content {
@@ -1500,6 +1514,10 @@ body.vx-auth {
 
     .vx-auth__header {
         padding: 1.75rem 1.25rem 1rem;
+    }
+
+    .vx-auth__subtitle {
+        white-space: normal;
     }
 
     .vx-auth__content {

@@ -21,6 +21,7 @@ IMPORTANT NOTES:
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="referrer" content="no-referrer" />
     <title>@Title · @T["ui.app.name"]</title>
+    <link rel="icon" type="image/png" href="/img/vixly-icon.png" />
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-theme.css" />
     <link rel="stylesheet" href="/css/vixly.css" />
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-primitives.css" />
@@ -39,16 +40,7 @@ IMPORTANT NOTES:
         <div class="vx-auth__topbar-inner">
             <div class="vx-auth__brand">
                 <div class="vx-auth__brand-emblem" aria-hidden="true">
-                    <svg viewBox="0 0 28 28" width="22" height="22" fill="none">
-                        <polygon points="14 2 26 8 26 20 14 26 2 20 2 8" stroke="url(#vx-emblem-grad)" stroke-width="2.2" stroke-linejoin="round" />
-                        <path d="M14 6v16M2 8l12 8 12-8" stroke="rgba(96, 165, 250, 0.7)" stroke-width="1.8" stroke-linejoin="round" />
-                        <defs>
-                            <linearGradient id="vx-emblem-grad" x1="2" y1="2" x2="26" y2="26" gradientUnits="userSpaceOnUse">
-                                <stop stop-color="#60A5FA" />
-                                <stop offset="1" stop-color="#1D4ED8" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
+                    <img src="/img/vixly-icon.png" alt="Vixly" class="vx-auth__brand-emblem-img" width="28" height="28" />
                 </div>
                 <div class="vx-auth__brand-titles">
                     <span class="vx-auth__brand-title">VIXLY</span>
@@ -79,10 +71,7 @@ IMPORTANT NOTES:
             
             <header class="vx-auth__header">
                 <div class="vx-auth__portal-badge" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
+                    <img src="/img/vixly-icon.png" alt="Vixly" class="vx-auth__portal-badge-img" width="48" height="48" />
                 </div>
                 <h1 id="vx-page-title" class="vx-auth__title">@Title</h1>
                 @if (!string.IsNullOrWhiteSpace(Subtitle))
