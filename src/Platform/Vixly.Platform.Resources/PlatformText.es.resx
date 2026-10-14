@@ -2409,6 +2409,34 @@ Vixly</value>
     <value>Sesión iniciada como {name}</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.home.subtitle" xml:space="preserve">
+    <value>Administración central para las operaciones de inquilinos, acceso a la plataforma, gobernanza de roles y registro de auditoría.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.home.tenants_desc" xml:space="preserve">
+    <value>Aprovisionar, configurar y monitorear cuentas de inquilinos, identificadores de portal y registros.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.home.tenants_action" xml:space="preserve">
+    <value>Ver inquilinos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.home.users_desc" xml:space="preserve">
+    <value>Gobernar el acceso del personal, asignaciones de roles, membresías de departamentos y credenciales de seguridad.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.home.users_action" xml:space="preserve">
+    <value>Gestionar personal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.home.audit_desc" xml:space="preserve">
+    <value>Inspeccionar el registro de auditoría inmutable de cambios operativos y eventos administrativos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.home.audit_action" xml:space="preserve">
+    <value>Revisar registro de auditoría</value>
+    <comment>needs-review</comment>
+  </data>
   <data name="ui.invite.intro" xml:space="preserve">
     <value>Elija una contraseña de al menos {minLength} caracteres.</value>
     <comment>needs-review</comment>

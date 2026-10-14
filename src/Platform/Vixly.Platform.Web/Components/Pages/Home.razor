@@ -3,7 +3,7 @@
 FILE: Home.razor
 
 PURPOSE:
-Console home landing page with quick navigation cards.
+Console home overview dashboard: welcome hero and domain summaries.
 
 IMPORTANT NOTES:
 - Page (UI-6): 80 lines or fewer, no business logic
@@ -16,14 +16,33 @@ IMPORTANT NOTES:
 
 <PageTitle>@T["ui.home.title"] · @T["ui.app.name"]</PageTitle>
 
-<VxCard Title="@T["ui.home.title"]">
-    <p>@T["ui.app.name"]</p>
-    <div class="vx-actions">
-        <a href="/tenants" class="vx-button vx-button--primary">@T["ui.tenants.title"]</a>
-        <a href="/users" class="vx-button">@T["ui.users.title"]</a>
-        <a href="/roles" class="vx-button">@T["ui.roles.title"]</a>
-        <a href="/departments" class="vx-button">@T["ui.departments.title"]</a>
-        <a href="/audit" class="vx-button">@T["ui.audit.title"]</a>
-        <a href="/account" class="vx-button">@T["ui.account.title"]</a>
+<div class="vx-home">
+    <div class="vx-home__hero">
+        <h1 class="vx-page-title">@T["ui.invite.title"]</h1>
+        <p class="vx-home__subtitle">@T["ui.home.subtitle"]</p>
     </div>
-</VxCard>
+
+    <div class="vx-dashboard-grid">
+        <VxCard Title="@T["ui.tenants.title"]">
+            <p>@T["ui.home.tenants_desc"]</p>
+            <div class="vx-actions">
+                <a href="/tenants" class="vx-button vx-button--primary">@T["ui.home.tenants_action"]</a>
+            </div>
+        </VxCard>
+
+        <VxCard Title="@T["ui.users.title"]">
+            <p>@T["ui.home.users_desc"]</p>
+            <div class="vx-actions">
+                <a href="/users" class="vx-button vx-button--primary">@T["ui.home.users_action"]</a>
+            </div>
+        </VxCard>
+
+        <VxCard Title="@T["ui.audit.title"]">
+            <p>@T["ui.home.audit_desc"]</p>
+            <div class="vx-actions">
+                <a href="/audit" class="vx-button vx-button--primary">@T["ui.home.audit_action"]</a>
+            </div>
+        </VxCard>
+    </div>
+</div>
+

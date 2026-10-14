@@ -1819,6 +1819,27 @@ Vixly</value>
   <data name="ui.home.welcome" xml:space="preserve">
     <value>Signed in as {name}</value>
   </data>
+  <data name="ui.home.subtitle" xml:space="preserve">
+    <value>Central administration for tenant operations, platform access, role governance, and security audit logging.</value>
+  </data>
+  <data name="ui.home.tenants_desc" xml:space="preserve">
+    <value>Provision, configure, and monitor tenant accounts, portal slugs, and registrations.</value>
+  </data>
+  <data name="ui.home.tenants_action" xml:space="preserve">
+    <value>View tenants</value>
+  </data>
+  <data name="ui.home.users_desc" xml:space="preserve">
+    <value>Govern staff access, role assignments, department memberships, and security credentials.</value>
+  </data>
+  <data name="ui.home.users_action" xml:space="preserve">
+    <value>Manage staff</value>
+  </data>
+  <data name="ui.home.audit_desc" xml:space="preserve">
+    <value>Inspect the immutable audit trail of operational changes and administrative events.</value>
+  </data>
+  <data name="ui.home.audit_action" xml:space="preserve">
+    <value>Review audit log</value>
+  </data>
   <data name="ui.invite.intro" xml:space="preserve">
     <value>Choose a password of at least {minLength} characters.</value>
   </data>

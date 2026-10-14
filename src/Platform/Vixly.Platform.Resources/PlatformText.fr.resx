@@ -2409,6 +2409,34 @@ Vixly</value>
     <value>Connecté en tant que {name}</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.home.subtitle" xml:space="preserve">
+    <value>Administration centrale des opérations des locataires, de l'accès à la plateforme, de la gouvernance des rôles et des journaux d'audit.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.home.tenants_desc" xml:space="preserve">
+    <value>Provisionner, configurer et surveiller les comptes de locataires, les identifiants de portail et les inscriptions.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.home.tenants_action" xml:space="preserve">
+    <value>Voir les locataires</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.home.users_desc" xml:space="preserve">
+    <value>Gérer les accès du personnel, les attributions de rôles, les départements et les identifiants de sécurité.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.home.users_action" xml:space="preserve">
+    <value>Gérer le personnel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.home.audit_desc" xml:space="preserve">
+    <value>Inspecter la piste d'audit immuable des changements opérationnels et des événements administratifs.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.home.audit_action" xml:space="preserve">
+    <value>Consulter le journal d'audit</value>
+    <comment>needs-review</comment>
+  </data>
   <data name="ui.invite.intro" xml:space="preserve">
     <value>Choisissez un mot de passe d'au moins {minLength} caractères.</value>
     <comment>needs-review</comment>

@@ -183,6 +183,56 @@ p {
 }
 
 /* =========================================================
+   HOME & DASHBOARD
+   ========================================================= */
+.vx-home {
+    display: flex;
+    flex-direction: column;
+    gap: var(--vx-space-6);
+}
+
+.vx-home__hero {
+    padding: var(--vx-space-2) 0;
+}
+
+.vx-home__hero h1 {
+    margin-bottom: var(--vx-space-2);
+}
+
+.vx-home__subtitle {
+    font-size: var(--vx-font-size-md);
+    color: var(--vx-color-text-muted);
+    margin: 0;
+    max-width: 48rem;
+}
+
+.vx-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: var(--vx-space-5);
+}
+
+.vx-dashboard-grid .vx-card {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.vx-dashboard-grid .vx-card p {
+    color: var(--vx-color-text-muted);
+    font-size: var(--vx-font-size-sm);
+    line-height: 1.6;
+    flex: 1;
+}
+
+.vx-dashboard-grid .vx-actions {
+    margin-top: var(--vx-space-4);
+    padding-top: var(--vx-space-3);
+    border-top: 1px solid var(--vx-color-border-control);
+}
+
+/* =========================================================
    CARDS & CONTAINERS
    ========================================================= */
 .vx-card {
