@@ -17,12 +17,30 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<PlatformText> T
 
 <!DOCTYPE html>
-<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" data-theme="dark">
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <base href="/" />
     <title>@T["ui.app.name"]</title>
+    <script>
+        (function() {
+            var t = localStorage.getItem('vx-theme');
+            if (t === 'dark' || t === 'light') {
+                document.documentElement.setAttribute('data-theme', t);
+            }
+        })();
+        window.__toggleTheme = function() {
+            var cur = document.documentElement.getAttribute('data-theme');
+            if (!cur) {
+                var isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                cur = isDark ? 'dark' : 'light';
+            }
+            var next = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('vx-theme', next);
+        };
+    </script>
     <link rel="stylesheet" href="@Assets["_content/Vixly.Shared.UI/vixly-theme.css"]" />
     <link rel="stylesheet" href="@Assets["css/vixly.css"]" />
     <link rel="stylesheet" href="@Assets["_content/Vixly.Shared.UI/vixly-primitives.css"]" />
