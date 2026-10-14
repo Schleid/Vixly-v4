@@ -1,6 +1,6 @@
 # ADR-0012: Tenant white label
 
-- Status: **Proposed** (requirement stated by the owner, 2026-10-13; rules below await acceptance)
+- Status: **Accepted** (owner decision, 2026-10-13)
 - Date: 2026-10-13
 - Deciders: Jude (owner)
 - Affects: every tenant-facing surface (Operations, Customer, Edge, tenant landing page, tenant emails and documents); Platform Slices 2 and 3; Shared.UI; Global Standard sections 1 and 5.5

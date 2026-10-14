@@ -40,7 +40,7 @@ V4 is built from scratch. It is not built on top of the legacy system. Where leg
 - **H-1** Base domains are configuration, never code: `TenantHosting:BaseDomains` and `PlatformHosting`. No hostname literal in source. Links in emails and PDFs are built from this configuration.
 - **H-2** Registration rejects reserved slugs: `www`, `mail`, `vixly`, `vixly-control`, `vixly-api`, `control`, `api`, `admin`, `edge`, `status`, `staging`, anything ending `-staging`, and any name TechCrafters already uses in DNS. The list is configuration with this set as its floor.
 
-**White label (ADR-0012, proposed).** Tenant-facing surfaces (Operations, Customer, the tenant landing page, tenant emails and documents) show the tenant's brand, never "Vixly". Tenant text uses `{brandName}`, brand comes from `Contracts.Platform`, theming is presets plus allowlisted tokens through one `ThemeProvider`, and a plan entitlement decides what a tenant may change. The Platform console and the Public site are always Vixly.
+**White label (ADR-0012).** Tenant-facing surfaces (Operations, Customer, the tenant landing page, tenant emails and documents) show the tenant's brand, never "Vixly". Tenant text uses `{brandName}`, brand comes from `Contracts.Platform`, theming is presets plus allowlisted tokens through one `ThemeProvider`, and a plan entitlement decides what a tenant may change. The Platform console and the Public site are always Vixly.
 
 **Languages.** V4 is offered in English (primary, source and fallback), French and Spanish. Every screen, menu, error, email, document and history entry is multilingual. The rules are in 5.5 and ADR-0005.
 
