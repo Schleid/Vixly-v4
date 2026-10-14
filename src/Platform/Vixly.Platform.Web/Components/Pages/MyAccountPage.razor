@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: MyAccountPage.razor
 
@@ -8,6 +8,7 @@ The signed-in user's own account.
 IMPORTANT NOTES:
 - Page (UI-6): route and composition only
 - Text comes from PlatformText (UI-10)
+- Two-column workstation layout on wide viewports (UI-7)
 =========================================================
 *@
 @page "/account"
@@ -17,7 +18,13 @@ IMPORTANT NOTES:
 <PageTitle>@T["ui.account.title"]</PageTitle>
 
 <h1>@T["ui.account.title"]</h1>
-<MyProfile />
-<MyPassword />
-<MySecondFactors />
-<MySessions />
+<div class="vx-layout-columns">
+    <div class="vx-layout-column--main">
+        <MyProfile />
+        <MyPassword />
+    </div>
+    <div class="vx-layout-column--side">
+        <MySecondFactors />
+        <MySessions />
+    </div>
+</div>

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: UserPage.razor
 
@@ -9,6 +9,7 @@ administrator actions.
 IMPORTANT NOTES:
 - Page (UI-6): route and composition only
 - Text comes from PlatformText (UI-10)
+- Two-column workstation layout on wide viewports (UI-7)
 =========================================================
 *@
 @page "/users/{UserId:guid}"
@@ -17,11 +18,17 @@ IMPORTANT NOTES:
 
 <p><a href="/users">@T["ui.users.back"]</a></p>
 <p class="vx-actions"><a href="/audit?target=@UserId">@T["ui.users.activity"]</a> <a href="/audit?actor=@UserId">@T["ui.users.actions_by"]</a></p>
-<UserSummary UserId="@UserId" />
-<UserRoleGrants UserId="@UserId" />
-<UserDepartments UserId="@UserId" />
-<UserActionPanel TPresenter="UserStatusActionsPresenter" UserId="@UserId" TitleKey="ui.users.account_actions" />
-<UserActionPanel TPresenter="UserSecurityActionsPresenter" UserId="@UserId" TitleKey="ui.users.security_actions" />
+<div class="vx-layout-columns">
+    <div class="vx-layout-column--main">
+        <UserSummary UserId="@UserId" />
+        <UserRoleGrants UserId="@UserId" />
+        <UserDepartments UserId="@UserId" />
+    </div>
+    <div class="vx-layout-column--side">
+        <UserActionPanel TPresenter="UserStatusActionsPresenter" UserId="@UserId" TitleKey="ui.users.account_actions" />
+        <UserActionPanel TPresenter="UserSecurityActionsPresenter" UserId="@UserId" TitleKey="ui.users.security_actions" />
+    </div>
+</div>
 
 @code {
     [Parameter]
