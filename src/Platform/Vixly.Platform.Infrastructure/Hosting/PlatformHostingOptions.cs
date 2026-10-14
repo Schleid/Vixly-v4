@@ -20,4 +20,6 @@ public sealed class PlatformHostingOptions
     public const string SectionName = "PlatformHosting";
 
     public string ConsoleBaseUrl { get; set; } = string.Empty;
+
+    public string PublicBaseUrl { get; set; } = string.Empty;
 }

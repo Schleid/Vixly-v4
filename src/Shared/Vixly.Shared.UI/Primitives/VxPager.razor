@@ -16,17 +16,19 @@ IMPORTANT NOTES:
     <button type="button"
             class="vx-button vx-button--subtle"
             disabled="@(CurrentPage <= 1)"
+            aria-label="@(string.IsNullOrEmpty(PreviousAriaLabel) ? "Previous" : PreviousAriaLabel)"
             @onclick="() => OnPageClickAsync(CurrentPage - 1)">
         <span aria-hidden="true">&lsaquo;</span>
     </button>
 
     <span class="vx-pager__status">
-        @CurrentPage / @Math.Max(1, TotalPages)
+        @(string.IsNullOrEmpty(StatusText) ? $"{CurrentPage} / {Math.Max(1, TotalPages)}" : StatusText)
     </span>
 
     <button type="button"
             class="vx-button vx-button--subtle"
             disabled="@(CurrentPage >= TotalPages)"
+            aria-label="@(string.IsNullOrEmpty(NextAriaLabel) ? "Next" : NextAriaLabel)"
             @onclick="() => OnPageClickAsync(CurrentPage + 1)">
         <span aria-hidden="true">&rsaquo;</span>
     </button>
@@ -40,7 +42,13 @@ IMPORTANT NOTES:
     public int TotalPages { get; set; } = 1;
 
     [Parameter]
-    public int? TotalItems { get; set; }
+    public string? PreviousAriaLabel { get; set; }
+
+    [Parameter]
+    public string? NextAriaLabel { get; set; }
+
+    [Parameter]
+    public string? StatusText { get; set; }
 
     [Parameter]
     public EventCallback<int> PageChanged { get; set; }

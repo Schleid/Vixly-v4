@@ -1,0 +1,106 @@
+﻿@*
+=========================================================
+FILE: TenantContactsEditor.razor
+
+PURPOSE:
+The contacts section: owner, billing and technical (D-T15).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Notices and invoices go to these people
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantContactsPresenter>
+@using Vixly.Platform.Application.Queries
+@using Vixly.Platform.Domain.Tenants
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="tenant-contacts"><VxCard Title="@T["ui.tenants.contacts"]">
+    <p class="vx-hint">@T["ui.tenants.contacts_help"]</p>
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Info">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (Presenter.State.Editing)
+    {
+        <form class="vx-form" @onsubmit="SaveAsync">
+            @foreach (TenantContactRow row in _rows)
+            {
+                string id = "tenant-contact-" + row.Role.ToString().ToLowerInvariant();
+                <fieldset class="vx-fieldset">
+                    <legend>@T[PlatformDisplay.ContactRoleKey(row.Role)]</legend>
+                    <label for="@(id + "-name")">@T["ui.tenants.contact_name"]</label>
+                    <input id="@(id + "-name")" @bind="row.Name" maxlength="200" required="@(row.Role == PlatformTenantContactRole.Owner)" />
+                    <label for="@(id + "-email")">@T["ui.signin.email"]</label>
+                    <input id="@(id + "-email")" type="email" @bind="row.Email" maxlength="254" required="@(row.Role == PlatformTenantContactRole.Owner)" />
+                    <label for="@(id + "-phone")">@T["ui.tenants.phone_optional"]</label>
+                    <input id="@(id + "-phone")" type="tel" @bind="row.Phone" maxlength="30" />
+                </fieldset>
+            }
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.departments.save"]</VxButton>
+                <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else
+    {
+        <VxDataTable Items="Tenant.Contacts">
+            <HeaderContent>
+                <th scope="col">@T["ui.tenants.contact_role"]</th>
+                <th scope="col">@T["ui.tenants.contact_name"]</th>
+                <th scope="col">@T["ui.signin.email"]</th>
+                <th scope="col">@T["ui.tenants.phone"]</th>
+            </HeaderContent>
+            <RowTemplate Context="contact">
+                <td>@T[PlatformDisplay.ContactRoleKey(contact.Role)]</td>
+                <td>@contact.Name</td>
+                <td>@contact.Email</td>
+                <td>@(contact.Phone ?? T["ui.common.none"].Value)</td>
+            </RowTemplate>
+        </VxDataTable>
+        @if (CanEdit)
+        {
+            <VxButton OnClick="StartEdit">@T["ui.departments.edit"]</VxButton>
+        }
+    }
+</VxCard></div>
+
+@code {
+    private List<TenantContactRow> _rows = new();
+
+    [Parameter, EditorRequired]
+    public PlatformTenantDetail Tenant { get; set; } = null!;
+
+    [Parameter]
+    public bool CanEdit { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private void StartEdit()
+    {
+        _rows = Enum.GetValues<PlatformTenantContactRole>()
+            .Select(role => Tenant.Contacts.FirstOrDefault(contact => contact.Role == role) is { } contact
+                ? new TenantContactRow { Role = role, Name = contact.Name, Email = contact.Email, Phone = contact.Phone }
+                : new TenantContactRow { Role = role })
+            .ToList();
+        Presenter.StartEdit();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (await Presenter.SaveAsync(Tenant.PlatformTenantId, _rows))
+        {
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

@@ -61,7 +61,25 @@ public static class PlatformAuditActions
         "platform.departments.reactivated",
         "platform.departments.member_added",
         "platform.departments.member_removed",
-        "platform.departments.primary_set"
+        "platform.departments.primary_set",
+        "platform.tenants.created",
+        "platform.tenants.profile_updated",
+        "platform.tenants.contacts_updated",
+        "platform.tenants.settings_updated",
+        "platform.tenants.account_manager_assigned",
+        "platform.tenants.tags_changed",
+        "platform.tenants.note_added",
+        "platform.tenants.slug_corrected",
+        "platform.tenants.activated",
+        "platform.tenants.suspended",
+        "platform.tenants.reactivated",
+        "platform.tenants.deactivated",
+        "platform.tenants.banned",
+        "platform.registrations.started",
+        "platform.registrations.email_verified",
+        "platform.registrations.email_corrected",
+        "platform.registrations.verification_resent",
+        "platform.registrations.cancelled"
     };
 
     private static readonly HashSet<string> Known = new(Catalogue, StringComparer.Ordinal);

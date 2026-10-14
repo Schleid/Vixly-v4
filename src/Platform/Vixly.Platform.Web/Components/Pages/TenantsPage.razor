@@ -1,0 +1,34 @@
+﻿@*
+=========================================================
+FILE: TenantsPage.razor
+
+PURPOSE:
+The tenant directory.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/tenants"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.tenants.title"]</PageTitle>
+<h1>@T["ui.tenants.title"]</h1>
+<p><a href="/tenants/registrations">@T["ui.registrations.title"]</a></p>
+<TenantList Search="@Search" Status="@Status" Tag="@Tag" Page="@Page" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Search { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Tag { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

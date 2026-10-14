@@ -24,6 +24,11 @@ public static class Program
     {
         WebApplication app = PlatformWebHost.Build(args);
 
+        if (args.Contains(PlatformDemoTenantsCommand.Switch, StringComparer.OrdinalIgnoreCase))
+        {
+            return await PlatformDemoTenantsCommand.RunAsync(app);
+        }
+
         if (args.Contains(PlatformFirstSuperUserCommand.Switch, StringComparer.OrdinalIgnoreCase))
         {
             return await PlatformFirstSuperUserCommand.RunAsync(app, args);

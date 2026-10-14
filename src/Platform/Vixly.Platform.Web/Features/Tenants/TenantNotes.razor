@@ -1,0 +1,83 @@
+﻿@*
+=========================================================
+FILE: TenantNotes.razor
+
+PURPOSE:
+The internal notes timeline of a tenant (D-T16).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Notes never leave the console
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantNotesPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="tenant-notes"><VxCard Title="@T["ui.tenants.notes"]">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Info">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (CanAdd)
+    {
+        <form class="vx-form" @onsubmit="AddAsync">
+            <label for="tenant-note">@T["ui.tenants.note_new"]</label>
+            <textarea id="tenant-note" @bind="_note" maxlength="4000" required></textarea>
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.tenants.note_add"]</VxButton>
+            </div>
+        </form>
+    }
+    @if (!Presenter.State.Loaded)
+    {
+        <p role="status">@T["ui.common.loading"]</p>
+    }
+    else if (Presenter.State.Notes.Count == 0)
+    {
+        <VxEmptyState Title="@T["ui.tenants.notes_empty"]" />
+    }
+    else
+    {
+        <ul class="vx-list">
+            @foreach (var note in Presenter.State.Notes)
+            {
+                <li>
+                    <p class="vx-hint">@VixlyText.Format(T, "ui.tenants.note_by", new Dictionary<string, object> { ["name"] = note.AuthorName ?? "-", ["time"] = PlatformDisplay.Utc(T, note.CreatedUtc) })</p>
+                    <p class="vx-note">@note.Body</p>
+                </li>
+            }
+        </ul>
+        <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="page => Presenter.LoadAsync(TenantId, page)" />
+    }
+</VxCard></div>
+
+@code {
+    private string? _note;
+
+    [Parameter, EditorRequired]
+    public Guid TenantId { get; set; }
+
+    [Parameter]
+    public bool CanAdd { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(TenantId, 1);
+    }
+
+    private async Task AddAsync()
+    {
+        if (await Presenter.AddAsync(TenantId, _note))
+        {
+            _note = null;
+        }
+    }
+}

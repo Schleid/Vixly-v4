@@ -21,7 +21,7 @@ IMPORTANT NOTES:
         <input type="hidden" name="returnUrl" value="@ReturnUrl" />
         <label for="code">@T["ui.recovery.code_label"]</label>
         <input id="code" name="code" autocomplete="off" spellcheck="false" required autofocus />
-        <button type="submit" class="vx-button vx-button--primary">@T["ui.verify.submit"]</button>
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.verify.submit"]</VxButton>
     </form>
     <p><a href="/sign-in">@T["ui.signin.back"]</a></p>
 </AuthShell>

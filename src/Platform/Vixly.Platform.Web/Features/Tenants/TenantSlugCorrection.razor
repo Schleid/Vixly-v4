@@ -1,0 +1,97 @@
+﻿@*
+=========================================================
+FILE: TenantSlugCorrection.razor
+
+PURPOSE:
+Correcting the portal address of a tenant that has never been
+active (D-T11).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Hidden once the tenant has been active: the address is then
+  fixed for good, because customers and passkeys depend on it
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantSlugPresenter>
+@using Vixly.Platform.Application.Queries
+@using Vixly.Platform.Domain.Tenants
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (CanCorrect)
+{
+    <div id="tenant-slug"><VxCard Title="@T["ui.tenants.address"]">
+        @if (Presenter.State.DoneKey is { } done)
+        {
+            <VxMessage Type="VxMessageType.Info">@T[done]</VxMessage>
+        }
+        @if (Presenter.State.Error is not null)
+        {
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+        }
+        <p>@VixlyText.Format(T, "ui.tenants.slug_current", "address", PlatformDisplay.TenantAddress(Tenant.Slug, BaseDomain))</p>
+        @if (Presenter.State.Editing)
+        {
+            <form class="vx-form" @onsubmit="CorrectAsync">
+                <p class="vx-hint">@T["ui.tenants.slug_fixed_help"]</p>
+                <label for="tenant-slug-new">@T["ui.tenants.slug"]</label>
+                <input id="tenant-slug-new" @bind="_slug" maxlength="63" required autocomplete="off" />
+                <label for="tenant-slug-reason">@T["ui.tenants.reason"]</label>
+                <textarea id="tenant-slug-reason" @bind="_reason" maxlength="500" required></textarea>
+                <div class="vx-actions">
+                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.tenants.slug_correct"]</VxButton>
+                    <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
+                </div>
+            </form>
+        }
+        else if (CanCorrect)
+        {
+            <p class="vx-hint">@T["ui.tenants.slug_correct_help"]</p>
+            <VxButton OnClick="StartEdit">@T["ui.tenants.slug_correct"]</VxButton>
+        }
+        @if (Presenter.State.StepUpPending)
+        {
+            <StepUpDialog OnConfirmed="CorrectAsync" OnCancelled="Presenter.CancelStepUp" />
+        }
+    </VxCard></div>
+}
+
+@code {
+    private string? _slug;
+
+    private string? _reason;
+
+    [Parameter, EditorRequired]
+    public PlatformTenantDetail Tenant { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public string BaseDomain { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool CanEdit { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private bool CanCorrect => CanEdit
+        && Tenant.ActivatedUtc is null
+        && Tenant.Status is PlatformTenantStatus.Draft or PlatformTenantStatus.PendingActivation;
+
+    private void StartEdit()
+    {
+        _slug = Tenant.Slug;
+        _reason = null;
+        Presenter.StartEdit();
+    }
+
+    private async Task CorrectAsync()
+    {
+        if (await Presenter.CorrectAsync(Tenant.PlatformTenantId, _slug, _reason))
+        {
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

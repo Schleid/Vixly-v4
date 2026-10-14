@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: RegistrationPage.razor
+
+PURPOSE:
+One self-service registration.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/tenants/registrations/{RegistrationId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<p><a href="/tenants/registrations">@T["ui.registrations.back"]</a></p>
+<RegistrationSummary RegistrationId="@RegistrationId" />
+
+@code {
+    [Parameter]
+    public Guid RegistrationId { get; set; }
+}

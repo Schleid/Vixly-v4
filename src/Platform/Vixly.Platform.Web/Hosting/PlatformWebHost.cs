@@ -65,6 +65,8 @@ public static class PlatformWebHost
         builder.Services.AddScoped<PlatformErrorText>();
         builder.Services.AddPlatformPresenters();
         builder.Services.AddHostedService<PlatformSystemRoleStartup>();
+        builder.Services.AddOptions<PlatformOutboxOptions>().Bind(builder.Configuration.GetSection(PlatformOutboxOptions.SectionName));
+        builder.Services.AddHostedService<PlatformOutboxWorker>();
 
         builder.Services.AddPlatformRateLimits();
         builder.Services.AddAntiforgery(options =>

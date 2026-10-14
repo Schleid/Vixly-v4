@@ -26,6 +26,7 @@ IMPORTANT NOTES:
             <Authorized>
                 <nav class="vx-shell__nav" aria-label="@T["ui.nav.label"]">
                     <NavLink href="/" Match="NavLinkMatch.All">@T["ui.home.title"]</NavLink>
+                    <NavLink href="/tenants">@T["ui.tenants.title"]</NavLink>
                     <NavLink href="/users">@T["ui.users.title"]</NavLink>
                     <NavLink href="/roles">@T["ui.roles.title"]</NavLink>
                     <NavLink href="/departments">@T["ui.departments.title"]</NavLink>
@@ -40,7 +41,7 @@ IMPORTANT NOTES:
                     <span>@VixlyText.Format(T, "ui.home.welcome", "name", context.User.Identity?.Name ?? string.Empty)</span>
                     <form method="post" action="/sign-out" data-enhance="false">
                         <AntiforgeryToken />
-                        <button type="submit" class="vx-button">@T["ui.signout"]</button>
+                        <VxButton Variant="VxButtonVariant.Subtle" Type="submit">@T["ui.signout"]</VxButton>
                     </form>
                 </div>
             </Authorized>

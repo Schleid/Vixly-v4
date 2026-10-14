@@ -2,6 +2,7 @@
 using Vixly.Platform.Application.Queries;
 using Vixly.Platform.Domain.Audit;
 using Vixly.Platform.Domain.Identity;
+using Vixly.Platform.Domain.Tenants;
 using Vixly.Shared.Kernel.Paging;
 
 namespace Vixly.Platform.Infrastructure.Persistence.Queries;
@@ -123,7 +124,11 @@ internal sealed class PlatformAuditQueries : IPlatformAuditQueries
                     ? _context.Roles.Where(role => role.Id == entry.TargetId).Select(role => role.Name).FirstOrDefault()
                     : entry.TargetType == nameof(PlatformDepartment)
                         ? _context.Departments.Where(department => department.Id == entry.TargetId).Select(department => department.Name).FirstOrDefault()
-                        : null,
+                        : entry.TargetType == nameof(PlatformTenant)
+                            ? _context.Tenants.Where(tenant => tenant.Id == entry.TargetId).Select(tenant => tenant.Company.TradingName ?? tenant.Company.LegalName).FirstOrDefault()
+                            : entry.TargetType == nameof(PlatformTenantRegistration)
+                                ? _context.TenantRegistrations.Where(item => item.Id == entry.TargetId).Select(item => item.Company.LegalName).FirstOrDefault()
+                                : null,
             entry.TargetType == nameof(PlatformRole)
                 ? _context.Roles.Where(role => role.Id == entry.TargetId).Select(role => role.SystemKey).FirstOrDefault()
                 : null,

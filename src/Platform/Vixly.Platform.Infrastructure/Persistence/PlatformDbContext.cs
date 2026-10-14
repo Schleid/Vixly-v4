@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Vixly.Platform.Domain.Audit;
 using Vixly.Platform.Domain.Identity;
+using Vixly.Platform.Domain.Messaging;
+using Vixly.Platform.Domain.Tenants;
 using Vixly.Platform.Infrastructure.Persistence.Conventions;
 
 namespace Vixly.Platform.Infrastructure.Persistence;
@@ -50,6 +52,20 @@ public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<PlatformPasswordResetRequest> PasswordResetRequests => Set<PlatformPasswordResetRequest>();
 
     public DbSet<PlatformAuditEntry> AuditEntries => Set<PlatformAuditEntry>();
+
+    public DbSet<PlatformTenant> Tenants => Set<PlatformTenant>();
+
+    public DbSet<PlatformTenantLifecycleEvent> TenantLifecycleEvents => Set<PlatformTenantLifecycleEvent>();
+
+    public DbSet<PlatformTenantNote> TenantNotes => Set<PlatformTenantNote>();
+
+    public DbSet<PlatformPortalSlug> PortalSlugs => Set<PlatformPortalSlug>();
+
+    public DbSet<PlatformTenantRegistration> TenantRegistrations => Set<PlatformTenantRegistration>();
+
+    public DbSet<PlatformRegistrationToken> RegistrationTokens => Set<PlatformRegistrationToken>();
+
+    public DbSet<PlatformOutboxMessage> OutboxMessages => Set<PlatformOutboxMessage>();
 
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 

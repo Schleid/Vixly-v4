@@ -20,14 +20,13 @@ IMPORTANT NOTES:
 
 @if (Presenter.State.Error is not null)
 {
-    <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
 }
 else if (Presenter.State.Entry is { } detail)
 {
     <PageTitle>@T["ui.audit.entry_title"]</PageTitle>
     <h1>@T[PlatformDisplay.AuditActionKey(detail.Entry.ActionCode)]</h1>
-    <section class="vx-card" aria-labelledby="audit-entry">
-        <h2 id="audit-entry">@T["ui.audit.entry_title"]</h2>
+    <VxCard Title="@T["ui.audit.entry_title"]">
         <dl class="vx-facts">
             <dt>@T["ui.audit.when"]</dt><dd>@PlatformDisplay.Utc(T, detail.Entry.OccurredUtc)</dd>
             <dt>@T["ui.audit.who"]</dt>
@@ -63,7 +62,7 @@ else if (Presenter.State.Entry is { } detail)
             <h3>@T["ui.audit.after"]</h3>
             <pre class="vx-json">@detail.AfterJson</pre>
         }
-    </section>
+    </VxCard>
 }
 else
 {

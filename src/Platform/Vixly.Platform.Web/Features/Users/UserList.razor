@@ -30,7 +30,7 @@ IMPORTANT NOTES:
             <option value="@status">@T[PlatformDisplay.StatusKey(status)]</option>
         }
     </select>
-    <button type="submit" class="vx-button">@T["ui.users.apply"]</button>
+    <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
     @if (Presenter.State.CanInvite)
     {
         <a class="vx-button vx-button--primary" href="/users/invite">@T["ui.users.invite"]</a>
@@ -39,53 +39,33 @@ IMPORTANT NOTES:
 
 @if (Presenter.State.Error is not null)
 {
-    <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
-}
-else if (!Presenter.State.Loaded)
-{
-    <p role="status">@T["ui.common.loading"]</p>
-}
-else if (Presenter.State.Users.Count == 0)
-{
-    <p role="status">@T["ui.users.empty"]</p>
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
 }
 else
 {
-    <table class="vx-table">
-        <caption>@VixlyText.Format(T, "ui.users.count", "count", Presenter.State.TotalCount)</caption>
-        <thead>
-            <tr>
-                <th scope="col">@T["ui.users.name"]</th>
-                <th scope="col">@T["ui.signin.email"]</th>
-                <th scope="col">@T["ui.users.status"]</th>
-                <th scope="col">@T["ui.users.authority"]</th>
-                <th scope="col">@T["ui.users.last_sign_in"]</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Presenter.State.Users)
-            {
-                <tr>
-                    <td><a href="/users/@user.PlatformUserId">@user.LastName, @user.FirstName</a></td>
-                    <td>@user.Email</td>
-                    <td><span class="vx-badge vx-badge--@user.Status.ToString().ToLowerInvariant()">@T[PlatformDisplay.StatusKey(user.Status)]</span></td>
-                    <td>@T[PlatformDisplay.AuthorityKey(user.AuthorityLevel)]</td>
-                    <td>@PlatformDisplay.Utc(T, user.LastSignInUtc)</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <nav class="vx-pager" aria-label="@T["ui.common.pages"]">
-        @if (Presenter.State.Page > 1)
-        {
-            <a href="@PageUrl(Presenter.State.Page - 1)">@T["ui.common.previous"]</a>
-        }
-        <span>@VixlyText.Format(T, "ui.common.page_of", new Dictionary<string, object> { ["page"] = Presenter.State.Page, ["pages"] = Presenter.State.TotalPages })</span>
-        @if (Presenter.State.Page < Presenter.State.TotalPages)
-        {
-            <a href="@PageUrl(Presenter.State.Page + 1)">@T["ui.common.next"]</a>
-        }
-    </nav>
+    <VxDataTable Items="Presenter.State.Users" IsLoading="@(!Presenter.State.Loaded)" Caption="@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.users.count", "count", Presenter.State.TotalCount) : null)">
+        <HeaderContent>
+            <th scope="col">@T["ui.users.name"]</th>
+            <th scope="col">@T["ui.signin.email"]</th>
+            <th scope="col">@T["ui.users.status"]</th>
+            <th scope="col">@T["ui.users.authority"]</th>
+            <th scope="col">@T["ui.users.last_sign_in"]</th>
+        </HeaderContent>
+        <RowTemplate Context="user">
+            <td><a href="/users/@user.PlatformUserId">@user.LastName, @user.FirstName</a></td>
+            <td>@user.Email</td>
+            <td><VxStatusBadge Status="@PlatformDisplay.UserBadge(user.Status)" Text="@T[PlatformDisplay.StatusKey(user.Status)]" /></td>
+            <td>@T[PlatformDisplay.AuthorityKey(user.AuthorityLevel)]</td>
+            <td>@PlatformDisplay.Utc(T, user.LastSignInUtc)</td>
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.users.empty"]" />
+        </EmptyContent>
+    </VxDataTable>
+    @if (Presenter.State.Loaded && Presenter.State.Users.Count > 0)
+    {
+        <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="GoToPage" />
+    }
 }
 
 @code {
@@ -137,5 +117,10 @@ else
             path,
             query.Where(pair => pair.Value is not null)
                 .Select(pair => new KeyValuePair<string, string?>(pair.Key, Convert.ToString(pair.Value, System.Globalization.CultureInfo.InvariantCulture))));
+    }
+
+    private void GoToPage(int page)
+    {
+        Navigation.NavigateTo(PageUrl(page));
     }
 }

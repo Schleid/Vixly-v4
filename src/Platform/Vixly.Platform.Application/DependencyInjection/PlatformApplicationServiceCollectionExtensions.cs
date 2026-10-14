@@ -1,9 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Vixly.Platform.Application.Audit;
 using Vixly.Platform.Application.Identity;
+using Vixly.Platform.Application.Messaging;
 using Vixly.Platform.Application.Security;
 using Vixly.Platform.Application.UseCases.Departments;
+using Vixly.Platform.Application.UseCases.Registration;
 using Vixly.Platform.Application.UseCases.Roles;
+using Vixly.Platform.Application.UseCases.Tenants;
 using Vixly.Platform.Application.UseCases.Users;
 
 namespace Vixly.Platform.Application.DependencyInjection;
@@ -45,6 +48,12 @@ public static class PlatformApplicationServiceCollectionExtensions
         services.AddScoped<PlatformRoleAdministration>();
         services.AddScoped<PlatformSystemRoleSynchronizer>();
         services.AddScoped<PlatformDepartmentAdministration>();
+        services.AddScoped<PlatformTenantAdministration>();
+        services.AddScoped<PlatformPortalSlugs>();
+        services.AddScoped<PlatformRegistrationLinks>();
+        services.AddScoped<PlatformOutboxWriter>();
+        services.AddScoped<PlatformOutboxDispatcher>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformTenantNoticeHandler>();
 
         foreach (Type useCase in typeof(PlatformApplicationServiceCollectionExtensions).Assembly
             .GetExportedTypes()

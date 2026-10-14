@@ -46,3 +46,4 @@ Thumbs.db
 
 # Development email pickup folder (contains one-time links)
 .mail/
+_to_delete/

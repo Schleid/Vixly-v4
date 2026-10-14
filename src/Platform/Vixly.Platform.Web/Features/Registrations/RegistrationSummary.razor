@@ -1,0 +1,112 @@
+@*
+=========================================================
+FILE: RegistrationSummary.razor
+
+PURPOSE:
+One self-service registration: its steps, consent and actions.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Hashes and tokens are never shown
+=========================================================
+*@
+@inherits PlatformPresenterComponent<RegistrationSummaryPresenter>
+@using Vixly.Platform.Domain.Tenants
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.Registration is { } registration)
+{
+    <PageTitle>@registration.LegalName</PageTitle>
+    <h1>@registration.LegalName</h1>
+    <VxCard Title="@T["ui.registrations.details"]">
+        @if (Presenter.State.DoneKey is { } done)
+        {
+            <VxMessage Type="VxMessageType.Info">@T[done]</VxMessage>
+        }
+        @if (Presenter.State.Error is not null)
+        {
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+        }
+        <dl class="vx-facts">
+            <dt>@T["ui.tenants.status"]</dt><dd><VxStatusBadge Status="@PlatformDisplay.RegistrationBadge(registration.Status)" Text="@T[PlatformDisplay.RegistrationStatusKey(registration.Status)]" /></dd>
+            <dt>@T["ui.tenants.slug"]</dt><dd>@registration.Slug</dd>
+            <dt>@T["ui.tenants.owner"]</dt><dd>@registration.OwnerName, @registration.OwnerEmail, @registration.OwnerPhone</dd>
+            <dt>@T["ui.tenants.company_email"]</dt><dd>@registration.CompanyEmail, @registration.CompanyPhone</dd>
+            <dt>@T["ui.tenants.country"]</dt><dd>@PlatformDisplay.CountryName(T, registration.CountryCode)</dd>
+            <dt>@T["ui.tenants.language"]</dt><dd>@T["ui.language." + registration.Language]</dd>
+            <dt>@T["ui.tenants.time_zone"]</dt><dd>@registration.TimeZone</dd>
+            <dt>@T["ui.registrations.started"]</dt><dd>@PlatformDisplay.Utc(T, registration.CreatedUtc)</dd>
+            <dt>@T["ui.registrations.link_sent"]</dt><dd>@PlatformDisplay.Utc(T, registration.LastVerificationSentUtc)</dd>
+            <dt>@T["ui.registrations.verified"]</dt><dd>@PlatformDisplay.Utc(T, registration.EmailVerifiedUtc)</dd>
+            <dt>@T["ui.registrations.consent"]</dt>
+            <dd>@VixlyText.Format(T, "ui.registrations.consent_value", new Dictionary<string, object> { ["terms"] = registration.TermsVersion, ["privacy"] = registration.PrivacyVersion, ["ip"] = registration.ConsentIpAddress ?? "-" })</dd>
+            @if (registration.ClosedUtc is not null)
+            {
+                <dt>@T["ui.registrations.closed"]</dt><dd>@PlatformDisplay.Utc(T, registration.ClosedUtc)</dd>
+            }
+            @if (registration.CancellationReason is not null)
+            {
+                <dt>@T["ui.tenants.reason"]</dt><dd>@registration.CancellationReason (@registration.CancelledByName)</dd>
+            }
+            @if (registration.PlatformTenantId is Guid tenantId)
+            {
+                <dt>@T["ui.registrations.tenant"]</dt><dd><a href="/tenants/@tenantId">@T["ui.registrations.open_tenant"]</a></dd>
+            }
+        </dl>
+        @if (Presenter.State.CanManage && Open(registration.Status))
+        {
+            @if (Presenter.State.ConfirmingCancel)
+            {
+                <form class="vx-form" @onsubmit="() => Presenter.CancelAsync(RegistrationId, _reason)">
+                    <p>@T["ui.registrations.cancel_help"]</p>
+                    <label for="registration-cancel-reason">@T["ui.tenants.reason"]</label>
+                    <textarea id="registration-cancel-reason" @bind="_reason" maxlength="500" required></textarea>
+                    <div class="vx-actions">
+                        <VxButton Variant="VxButtonVariant.Danger" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.registrations.cancel"]</VxButton>
+                        <VxButton OnClick="Presenter.StopCancel">@T["ui.common.cancel"]</VxButton>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="vx-actions">
+                    @if (registration.Status == PlatformTenantRegistrationStatus.PendingEmailVerification)
+                    {
+                        <VxButton IsBusy="@Presenter.IsBusy" OnClick="() => Presenter.ResendAsync(RegistrationId)">@T["ui.registrations.resend"]</VxButton>
+                    }
+                    <VxButton OnClick="Presenter.StartCancel">@T["ui.registrations.cancel"]</VxButton>
+                </div>
+            }
+        }
+    </VxCard>
+    <p><a href="/audit?target=@RegistrationId">@T["ui.tenants.audit_link"]</a></p>
+}
+else if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+
+@code {
+    private string? _reason;
+
+    [Parameter, EditorRequired]
+    public Guid RegistrationId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(RegistrationId);
+    }
+
+    private static bool Open(PlatformTenantRegistrationStatus status)
+    {
+        return status is not (PlatformTenantRegistrationStatus.Completed or PlatformTenantRegistrationStatus.Cancelled or PlatformTenantRegistrationStatus.Expired);
+    }
+}

@@ -1,0 +1,139 @@
+﻿@*
+=========================================================
+FILE: TenantList.razor
+
+PURPOSE:
+The tenant directory: search, filters, table and pager.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Filters live in the URL so a view can be bookmarked
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantListPresenter>
+@using Vixly.Platform.Domain.Tenants
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+<form class="vx-toolbar" role="search" @onsubmit="ApplyFilters">
+    <label for="tenant-search">@T["ui.tenants.search"]</label>
+    <input id="tenant-search" type="search" @bind="_search" maxlength="100" />
+    <label for="tenant-status">@T["ui.tenants.status"]</label>
+    <select id="tenant-status" @bind="_status">
+        <option value="">@T["ui.tenants.status.all"]</option>
+        @foreach (PlatformTenantStatus status in Enum.GetValues<PlatformTenantStatus>())
+        {
+            <option value="@status">@T[PlatformDisplay.TenantStatusKey(status)]</option>
+        }
+    </select>
+    <label for="tenant-tag">@T["ui.tenants.tag"]</label>
+    <input id="tenant-tag" @bind="_tag" maxlength="32" autocomplete="off" />
+    <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
+    @if (Presenter.State.CanCreate)
+    {
+        <a class="vx-button vx-button--primary" href="/tenants/new">@T["ui.tenants.new"]</a>
+    }
+</form>
+
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else
+{
+    <VxDataTable Items="Presenter.State.Tenants" IsLoading="@(!Presenter.State.Loaded)" Caption="@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.tenants.count", "count", Presenter.State.TotalCount) : null)">
+        <HeaderContent>
+            <th scope="col">@T["ui.tenants.name"]</th>
+            <th scope="col">@T["ui.tenants.code"]</th>
+            <th scope="col">@T["ui.tenants.address"]</th>
+            <th scope="col">@T["ui.tenants.status"]</th>
+            <th scope="col">@T["ui.tenants.country"]</th>
+            <th scope="col">@T["ui.tenants.account_manager"]</th>
+            <th scope="col">@T["ui.tenants.tags"]</th>
+        </HeaderContent>
+        <RowTemplate Context="tenant">
+            <td><a href="/tenants/@tenant.PlatformTenantId">@tenant.DisplayName</a></td>
+            <td>@tenant.TenantCode</td>
+            <td>@PlatformDisplay.TenantAddress(tenant.Slug, Presenter.State.BaseDomain)</td>
+            <td><VxStatusBadge Status="@PlatformDisplay.TenantBadge(tenant.Status)" Text="@T[PlatformDisplay.TenantStatusKey(tenant.Status)]" /></td>
+            <td>@PlatformDisplay.CountryName(T, tenant.CountryCode)</td>
+            <td>
+                @(tenant.AccountManagerName ?? T["ui.common.none"].Value)
+                @if (tenant.AccountManagerName is not null && !tenant.AccountManagerIsActive)
+                {
+                    <VxStatusBadge Status="VxBadgeStatus.Deactivated" Text="@T["ui.tenants.manager_inactive"]" />
+                }
+            </td>
+            <td>@string.Join(", ", tenant.Tags)</td>
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.tenants.empty"]" />
+        </EmptyContent>
+    </VxDataTable>
+    @if (Presenter.State.Loaded && Presenter.State.Tenants.Count > 0)
+    {
+        <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="GoToPage" />
+    }
+}
+
+@code {
+    private string? _search;
+
+    private string _status = string.Empty;
+
+    private string? _tag;
+
+    [Parameter]
+    public string? Search { get; set; }
+
+    [Parameter]
+    public string? Status { get; set; }
+
+    [Parameter]
+    public string? Tag { get; set; }
+
+    [Parameter]
+    public int? Page { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _search = Search;
+        _tag = Tag;
+        PlatformTenantStatus? status = Enum.TryParse(Status, true, out PlatformTenantStatus parsed) ? parsed : null;
+        _status = status?.ToString() ?? string.Empty;
+
+        await Presenter.LoadAsync(Search, status, Tag, Page ?? 1);
+    }
+
+    private void ApplyFilters()
+    {
+        Navigation.NavigateTo(Url(_search, _status, _tag, 1));
+    }
+
+    private string PageUrl(int page)
+    {
+        return Url(Search, _status, Tag, page);
+    }
+
+    private static string Url(string? search, string status, string? tag, int page)
+    {
+        Dictionary<string, string?> query = new()
+        {
+            ["search"] = string.IsNullOrWhiteSpace(search) ? null : search.Trim(),
+            ["status"] = string.IsNullOrEmpty(status) ? null : status,
+            ["tag"] = string.IsNullOrWhiteSpace(tag) ? null : tag.Trim(),
+            ["page"] = page > 1 ? page.ToString(System.Globalization.CultureInfo.InvariantCulture) : null
+        };
+
+        return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString("/tenants", query.Where(pair => pair.Value is not null));
+    }
+
+    private void GoToPage(int page)
+    {
+        Navigation.NavigateTo(PageUrl(page));
+    }
+}

@@ -1,0 +1,20 @@
+﻿@*
+=========================================================
+FILE: NewTenantPage.razor
+
+PURPOSE:
+Create a tenant from the console (D-T8).
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/tenants/new"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.tenants.new"]</PageTitle>
+<p><a href="/tenants">@T["ui.tenants.back"]</a></p>
+<h1>@T["ui.tenants.new"]</h1>
+<TenantCreateForm />

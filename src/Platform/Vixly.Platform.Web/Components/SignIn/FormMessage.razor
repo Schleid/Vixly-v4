@@ -14,11 +14,11 @@ IMPORTANT NOTES:
 *@
 @if (!string.IsNullOrEmpty(Error))
 {
-    <p class="vx-message vx-message--error" role="alert">@Error</p>
+    <VxMessage Type="VxMessageType.Error">@Error</VxMessage>
 }
 @if (!string.IsNullOrEmpty(Info))
 {
-    <p class="vx-message vx-message--info" role="status">@Info</p>
+    <VxMessage Type="VxMessageType.Info">@Info</VxMessage>
 }
 
 @code {

@@ -61,7 +61,16 @@ public static class PlatformSystemRoles
                 PlatformPermissions.UsersView,
                 PlatformPermissions.RolesView,
                 PlatformPermissions.DepartmentsView,
-                PlatformPermissions.DepartmentsManageMembers
+                PlatformPermissions.DepartmentsManageMembers,
+                PlatformPermissions.TenantsView,
+                PlatformPermissions.TenantsCreate,
+                PlatformPermissions.TenantsEdit,
+                PlatformPermissions.TenantsAddNotes,
+                PlatformPermissions.TenantsActivate,
+                PlatformPermissions.TenantsSuspend,
+                PlatformPermissions.TenantsReactivate,
+                PlatformPermissions.TenantsDeactivate,
+                PlatformPermissions.TenantsBan
             }
         };
 }

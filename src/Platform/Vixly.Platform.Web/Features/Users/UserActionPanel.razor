@@ -28,15 +28,14 @@ IMPORTANT NOTES:
 
 @if (Presenter.State.Available.Count > 0 || Presenter.State.Done is not null || Presenter.State.Error is not null)
 {
-    <section class="vx-card" aria-labelledby="@(_id)-title">
-        <h2 id="@(_id)-title">@T[TitleKey]</h2>
+    <VxCard Title="@T[TitleKey]">
         @if (Presenter.State.Done is PlatformUserAdminAction done)
         {
-            <p class="vx-message vx-message--info" role="status">@T[PlatformDisplay.ActionKey(done) + ".done"]</p>
+            <VxMessage Type="VxMessageType.Info">@T[PlatformDisplay.ActionKey(done) + ".done"]</VxMessage>
         }
         @if (Presenter.State.Error is not null)
         {
-            <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
         }
         @if (Presenter.State.Selected is PlatformUserAdminAction selected)
         {
@@ -48,8 +47,8 @@ IMPORTANT NOTES:
                     <textarea id="@(_id)-reason" @bind="_reason" maxlength="500" required></textarea>
                 }
                 <div class="vx-actions">
-                    <button type="submit" class="vx-button vx-button--danger" disabled="@Presenter.IsBusy">@T[PlatformDisplay.ActionKey(selected)]</button>
-                    <button type="button" class="vx-button" @onclick="Presenter.Cancel">@T["ui.common.cancel"]</button>
+                    <VxButton Variant="VxButtonVariant.Danger" Type="submit" IsBusy="@Presenter.IsBusy">@T[PlatformDisplay.ActionKey(selected)]</VxButton>
+                    <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
                 </div>
             </form>
         }
@@ -58,7 +57,7 @@ IMPORTANT NOTES:
             <div class="vx-actions">
                 @foreach (PlatformUserAdminAction action in Presenter.State.Available)
                 {
-                    <button type="button" class="vx-button" @onclick="() => Select(action)">@T[PlatformDisplay.ActionKey(action)]</button>
+                    <VxButton OnClick="() => Select(action)">@T[PlatformDisplay.ActionKey(action)]</VxButton>
                 }
             </div>
         }
@@ -66,7 +65,7 @@ IMPORTANT NOTES:
         {
             <StepUpDialog OnConfirmed="ResumeAsync" OnCancelled="Presenter.CancelStepUp" />
         }
-    </section>
+    </VxCard>
 }
 
 @code {

@@ -35,7 +35,7 @@ IMPORTANT NOTES:
         <input type="hidden" name="returnUrl" value="@ReturnUrl" />
         <label for="code">@T["ui.verify.code_label"]</label>
         <input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{6,7}" maxlength="7" required />
-        <button type="submit" class="vx-button vx-button--primary">@T["ui.enrol.submit"]</button>
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.enrol.submit"]</VxButton>
     </form>
 </AuthShell>
 

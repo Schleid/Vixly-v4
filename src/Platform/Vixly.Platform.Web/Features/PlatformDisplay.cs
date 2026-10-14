@@ -3,7 +3,9 @@ using System.Text;
 using Microsoft.Extensions.Localization;
 using Vixly.Platform.Application.UseCases.Users;
 using Vixly.Platform.Domain.Identity;
+using Vixly.Platform.Domain.Tenants;
 using Vixly.Shared.Localization;
+using Vixly.Shared.UI.Primitives;
 
 namespace Vixly.Platform.Web.Features;
 
@@ -25,6 +27,15 @@ namespace Vixly.Platform.Web.Features;
 // =========================================================
 public static class PlatformDisplay
 {
+    private static readonly Lazy<IReadOnlyList<string>> TimeZones = new(() => TimeZoneInfo.GetSystemTimeZones()
+        .Select(zone => zone.HasIanaId ? zone.Id : TimeZoneInfo.TryConvertWindowsIdToIanaId(zone.Id, out string? iana) ? iana : null)
+        .OfType<string>()
+        .Where(id => id.Contains('/', StringComparison.Ordinal))
+        .Append("UTC")
+        .Distinct(StringComparer.Ordinal)
+        .Order(StringComparer.Ordinal)
+        .ToList());
+
     public static string StatusKey(PlatformUserAccountStatus status)
     {
         return "ui.users.status." + Snake(status.ToString());
@@ -46,6 +57,95 @@ public static class PlatformDisplay
 
         return systemKey is null ? name : text["ui.roles.system." + systemKey].Value;
     }
+
+    public static string TenantStatusKey(PlatformTenantStatus status)
+    {
+        return "ui.tenants.status." + Snake(status.ToString());
+    }
+
+    public static VxBadgeStatus TenantBadge(PlatformTenantStatus status)
+    {
+        return status switch
+        {
+            PlatformTenantStatus.Active => VxBadgeStatus.Active,
+            PlatformTenantStatus.Suspended => VxBadgeStatus.Suspended,
+            PlatformTenantStatus.Deactivated => VxBadgeStatus.Deactivated,
+            PlatformTenantStatus.Banned => VxBadgeStatus.Locked,
+            _ => VxBadgeStatus.Invited
+        };
+    }
+
+    public static VxBadgeStatus RegistrationBadge(PlatformTenantRegistrationStatus status)
+    {
+        return status switch
+        {
+            PlatformTenantRegistrationStatus.Completed => VxBadgeStatus.Active,
+            PlatformTenantRegistrationStatus.Cancelled => VxBadgeStatus.Locked,
+            PlatformTenantRegistrationStatus.Expired => VxBadgeStatus.Deactivated,
+            _ => VxBadgeStatus.Invited
+        };
+    }
+
+    public static VxBadgeStatus UserBadge(PlatformUserAccountStatus status)
+    {
+        return status switch
+        {
+            PlatformUserAccountStatus.Active => VxBadgeStatus.Active,
+            PlatformUserAccountStatus.Suspended => VxBadgeStatus.Suspended,
+            PlatformUserAccountStatus.Locked => VxBadgeStatus.Locked,
+            PlatformUserAccountStatus.Deactivated => VxBadgeStatus.Deactivated,
+            _ => VxBadgeStatus.Invited
+        };
+    }
+
+    public static VxBadgeStatus ActiveBadge(bool isActive)
+    {
+        return isActive ? VxBadgeStatus.Active : VxBadgeStatus.Suspended;
+    }
+
+    public static string CategoryKey(PlatformSuspensionCategory category)
+    {
+        return "ui.tenants.category." + Snake(category.ToString());
+    }
+
+    public static string ContactRoleKey(PlatformTenantContactRole role)
+    {
+        return "ui.tenants.contact_role." + Snake(role.ToString());
+    }
+
+    public static string RegistrationStatusKey(PlatformTenantRegistrationStatus status)
+    {
+        return "ui.registrations.status." + Snake(status.ToString());
+    }
+
+    public static string HistoryKey(string eventCode)
+    {
+        ArgumentNullException.ThrowIfNull(eventCode);
+
+        return "ui." + eventCode["platform.".Length..];
+    }
+
+    public static string TenantAddress(string slug, string baseDomain)
+    {
+        return slug + "." + baseDomain;
+    }
+
+    public static string CountryName(IStringLocalizer text, string code)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+
+        return text["ui.country." + code].Value;
+    }
+
+    public static IReadOnlyList<(string Code, string Name)> Countries(IStringLocalizer text)
+    {
+        return PlatformCountryCodes.All
+            .Select(code => (code, CountryName(text, code)))
+            .OrderBy(country => country.Item2, StringComparer.Create(CultureInfo.CurrentUICulture, true))
+            .ToList();
+    }
+
+    public static IReadOnlyList<string> TimeZoneIds => TimeZones.Value;
 
     public static string AuditActionKey(string actionCode)
     {

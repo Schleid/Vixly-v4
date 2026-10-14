@@ -68,6 +68,11 @@
     --vx-color-info: #1D4ED8;
     --vx-color-info-bg: #EFF6FF;
 
+    /* Semantic Tokens - Neutral / Inactive */
+    --vx-color-inactive: #475569;
+    --vx-color-inactive-bg: #F1F5F9;
+    --vx-color-inactive-border: #CBD5E1;
+
     /* Elevation */
     --vx-shadow-1: 0 1px 3px 0 rgb(15 23 42 / 0.08), 0 1px 2px -1px rgb(15 23 42 / 0.08);
     --vx-shadow-2: 0 4px 6px -1px rgb(15 23 42 / 0.1), 0 2px 4px -2px rgb(15 23 42 / 0.1);
@@ -118,8 +123,8 @@
     --vx-color-text-muted: #A3B1C6;
     --vx-color-text-subtle: #8494AD;
 
-    --vx-color-primary: #2563EB;
-    --vx-color-primary-hover: #1D4ED8;
+    --vx-color-primary: #3B82F6;
+    --vx-color-primary-hover: #60A5FA;
     --vx-color-primary-soft: #16264A;
     --vx-color-on-primary: #FFFFFF;
     --vx-color-link: #60A5FA;
@@ -141,6 +146,10 @@
     --vx-color-info: #60A5FA;
     --vx-color-info-bg: #16264A;
 
+    --vx-color-inactive: #94A3B8;
+    --vx-color-inactive-bg: #1E293B;
+    --vx-color-inactive-border: #334155;
+
     --vx-shadow-1: 0 0 0 1px var(--vx-color-border);
     --vx-shadow-2: 0 0 0 1px var(--vx-color-border), 0 4px 12px rgb(0 0 0 / 0.4);
     --vx-shadow-3: 0 0 0 1px var(--vx-color-border), 0 16px 32px rgb(0 0 0 / 0.5);
@@ -158,8 +167,8 @@
         --vx-color-text-muted: #A3B1C6;
         --vx-color-text-subtle: #8494AD;
 
-        --vx-color-primary: #2563EB;
-        --vx-color-primary-hover: #1D4ED8;
+        --vx-color-primary: #3B82F6;
+        --vx-color-primary-hover: #60A5FA;
         --vx-color-primary-soft: #16264A;
         --vx-color-on-primary: #FFFFFF;
         --vx-color-link: #60A5FA;
@@ -181,8 +190,21 @@
         --vx-color-info: #60A5FA;
         --vx-color-info-bg: #16264A;
 
+        --vx-color-inactive: #94A3B8;
+        --vx-color-inactive-bg: #1E293B;
+        --vx-color-inactive-border: #334155;
+
         --vx-shadow-1: 0 0 0 1px var(--vx-color-border);
         --vx-shadow-2: 0 0 0 1px var(--vx-color-border), 0 4px 12px rgb(0 0 0 / 0.4);
         --vx-shadow-3: 0 0 0 1px var(--vx-color-border), 0 16px 32px rgb(0 0 0 / 0.5);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }

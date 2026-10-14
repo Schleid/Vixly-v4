@@ -20,4 +20,36 @@
     <value>Las horas deben estar en UTC.</value>
     <comment>needs-review</comment>
   </data>
+  <data name="shared.ui.close" xml:space="preserve">
+    <value>Cerrar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="shared.ui.dismiss" xml:space="preserve">
+    <value>Descartar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="shared.ui.empty" xml:space="preserve">
+    <value>No se encontraron registros</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="shared.ui.loading" xml:space="preserve">
+    <value>Cargando…</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="shared.ui.next" xml:space="preserve">
+    <value>Siguiente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="shared.ui.page_of" xml:space="preserve">
+    <value>Página {page} de {pages}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="shared.ui.pages" xml:space="preserve">
+    <value>Páginas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="shared.ui.previous" xml:space="preserve">
+    <value>Anterior</value>
+    <comment>needs-review</comment>
+  </data>
 </root>

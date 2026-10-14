@@ -12,6 +12,7 @@ using Vixly.Platform.Infrastructure.Persistence;
 using Vixly.Platform.Infrastructure.Persistence.Queries;
 using Vixly.Platform.Infrastructure.Persistence.Repositories;
 using Vixly.Platform.Infrastructure.Security;
+using Vixly.Platform.Infrastructure.Tenants;
 
 namespace Vixly.Platform.Infrastructure.DependencyInjection;
 
@@ -89,6 +90,13 @@ public static class PlatformInfrastructureServiceCollectionExtensions
         services.AddScoped<IPlatformRoleQueries, PlatformRoleQueries>();
         services.AddScoped<IPlatformDepartmentQueries, PlatformDepartmentQueries>();
         services.AddScoped<IPlatformAuditQueries, PlatformAuditQueries>();
+        services.AddScoped<IPlatformTenantRepository, PlatformTenantRepository>();
+        services.AddScoped<IPlatformPortalSlugRepository, PlatformPortalSlugRepository>();
+        services.AddScoped<IPlatformTenantRegistrationRepository, PlatformTenantRegistrationRepository>();
+        services.AddScoped<IPlatformOutboxRepository, PlatformOutboxRepository>();
+        services.AddScoped<IPlatformTenantQueries, PlatformTenantQueries>();
+        services.AddScoped<IPlatformTenantPolicy, ConfiguredPlatformTenantPolicy>();
+        services.AddSingleton<IPlatformRandom, PlatformRandom>();
 
         services.AddSingleton<IPlatformPasswordHasher, BCryptPlatformPasswordHasher>();
         services.AddSingleton<IPlatformSecretGenerator, PlatformSecretGenerator>();
@@ -99,7 +107,12 @@ public static class PlatformInfrastructureServiceCollectionExtensions
         services.AddLocalization();
         services.AddOptions<PlatformMailOptions>().Bind(configuration.GetSection(PlatformMailOptions.SectionName));
         services.AddOptions<PlatformHostingOptions>().Bind(configuration.GetSection(PlatformHostingOptions.SectionName));
+        services.AddOptions<PlatformTenantOptions>().Bind(configuration.GetSection(PlatformTenantOptions.SectionName));
+        services.AddOptions<PlatformBotCheckOptions>().Bind(configuration.GetSection(PlatformBotCheckOptions.SectionName));
+        services.AddScoped<PlatformMailSender>();
         services.AddScoped<IPlatformIdentityMailer, SmtpPlatformIdentityMailer>();
+        services.AddScoped<IPlatformTenantMailer, SmtpPlatformTenantMailer>();
+        services.AddHttpClient<IPlatformBotCheck, TurnstilePlatformBotCheck>(client => client.Timeout = TimeSpan.FromSeconds(10));
 
         services.AddHealthChecks()
             .AddDbContextCheck<PlatformDbContext>("platform-database", tags: new[] { "ready" })

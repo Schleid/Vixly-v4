@@ -20,15 +20,14 @@ IMPORTANT NOTES:
 @inject PlatformErrorText Errors
 @inject PlatformUserWorkspace Workspace
 
-<section class="vx-card" aria-labelledby="user-roles">
-    <h2 id="user-roles">@T["ui.users.roles"]</h2>
+<VxCard Title="@T["ui.users.roles"]">
     @if (Presenter.State.DoneKey is { } done)
     {
-        <p class="vx-message vx-message--info" role="status">@T[done]</p>
+        <VxMessage Type="VxMessageType.Info">@T[done]</VxMessage>
     }
     @if (Presenter.State.Error is not null)
     {
-        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
     }
     @if (!Presenter.State.Loaded)
     {
@@ -51,11 +50,11 @@ IMPORTANT NOTES:
                     }
                     @if (!grant.RoleIsActive)
                     {
-                        <span class="vx-badge vx-badge--suspended">@T["ui.user_roles.inactive"]</span>
+                        <VxStatusBadge Status="VxBadgeStatus.Suspended" Text="@T["ui.user_roles.inactive"]" />
                     }
                     @if (Presenter.State.CanManage)
                     {
-                        <button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="() => RevokeAsync(grant.PlatformRoleId)">@T["ui.user_roles.revoke"]</button>
+                        <VxButton IsBusy="@Presenter.IsBusy" OnClick="() => RevokeAsync(grant.PlatformRoleId)">@T["ui.user_roles.revoke"]</VxButton>
                     }
                 </li>
             }
@@ -83,7 +82,7 @@ IMPORTANT NOTES:
                 <input id="assign-until" type="date" @bind="_until" />
                 <p>@T["ui.user_roles.until_help"]</p>
                 <div class="vx-actions">
-                    <button type="submit" class="vx-button vx-button--primary" disabled="@(Presenter.IsBusy || _roleId is null)">@T["ui.user_roles.assign"]</button>
+                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" Disabled="@(Presenter.IsBusy || _roleId is null)">@T["ui.user_roles.assign"]</VxButton>
                 </div>
             </form>
         }
@@ -92,7 +91,7 @@ IMPORTANT NOTES:
     {
         <StepUpDialog OnConfirmed="ResumeAsync" OnCancelled="Presenter.CancelStepUp" />
     }
-</section>
+</VxCard>
 
 @code {
     private Guid? _roleId;

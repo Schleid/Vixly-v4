@@ -71,12 +71,15 @@ public sealed class PlatformConsoleHttpTests
         Assert.Contains("__RequestVerificationToken", page, StringComparison.Ordinal);
     }
 
-    [Fact]
-    public async Task ProtectedPage_SendsAnAnonymousVisitorToSignIn()
+    [Theory]
+    [InlineData("/users")]
+    [InlineData("/tenants")]
+    [InlineData("/tenants/registrations")]
+    public async Task ProtectedPage_SendsAnAnonymousVisitorToSignIn(string path)
     {
         await using PlatformConsoleHost host = await PlatformConsoleHost.StartAsync();
 
-        HttpResponseMessage response = await host.Client().GetAsync("/users");
+        HttpResponseMessage response = await host.Client().GetAsync(path);
 
         Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
         Uri location = response.Headers.Location!;

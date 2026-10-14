@@ -37,4 +37,6 @@ public sealed class PlatformMailOptions
     public string? Password { get; set; }
 
     public string? PickupDirectory { get; set; }
+
+    public string? SupportAddress { get; set; }
 }

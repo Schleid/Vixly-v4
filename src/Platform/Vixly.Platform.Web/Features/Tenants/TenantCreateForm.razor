@@ -1,0 +1,65 @@
+﻿@*
+=========================================================
+FILE: TenantCreateForm.razor
+
+PURPOSE:
+The new-tenant form for sales-led onboarding (D-T8).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- The address preview shows the full hostname before saving
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantCreatePresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+<form class="vx-form" @onsubmit="CreateAsync">
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    <TenantCompanyFields Model="_form" Prefix="new-tenant" />
+    <fieldset class="vx-fieldset">
+        <legend>@T["ui.tenants.owner"]</legend>
+        <label for="new-tenant-owner-name">@T["ui.tenants.contact_name"]</label>
+        <input id="new-tenant-owner-name" @bind="_form.OwnerName" maxlength="200" required />
+        <label for="new-tenant-owner-email">@T["ui.signin.email"]</label>
+        <input id="new-tenant-owner-email" type="email" @bind="_form.OwnerEmail" maxlength="254" required />
+        <label for="new-tenant-owner-phone">@T["ui.tenants.phone_optional"]</label>
+        <input id="new-tenant-owner-phone" type="tel" @bind="_form.OwnerPhone" maxlength="30" />
+    </fieldset>
+    <fieldset class="vx-fieldset">
+        <legend>@T["ui.tenants.address"]</legend>
+        <label for="new-tenant-slug">@T["ui.tenants.slug"]</label>
+        <input id="new-tenant-slug" @bind="_form.Slug" @bind:event="oninput" maxlength="63" required autocomplete="off" aria-describedby="new-tenant-slug-help" />
+        <p id="new-tenant-slug-help" class="vx-hint">
+            @VixlyText.Format(T, "ui.tenants.slug_preview", "address", PlatformDisplay.TenantAddress(Preview, Presenter.State.BaseDomain))
+            @T["ui.tenants.slug_fixed_help"]
+        </p>
+    </fieldset>
+    <div class="vx-actions">
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.tenants.create"]</VxButton>
+        <a class="vx-button" href="/tenants">@T["ui.common.cancel"]</a>
+    </div>
+</form>
+
+@code {
+    private readonly TenantFormModel _form = new();
+
+    private string Preview => string.IsNullOrWhiteSpace(_form.Slug) ? "…" : _form.Slug.Trim().ToLowerInvariant();
+
+    private async Task CreateAsync()
+    {
+        await Presenter.CreateAsync(_form);
+
+        if (Presenter.State.CreatedTenantId is Guid id)
+        {
+            Navigation.NavigateTo("/tenants/" + id);
+        }
+    }
+}

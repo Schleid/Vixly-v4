@@ -24,20 +24,19 @@ IMPORTANT NOTES:
     string name = PlatformDisplay.RoleName(T, role.Name, role.SystemKey);
     <PageTitle>@name</PageTitle>
     <h1>@name</h1>
-    <section class="vx-card" aria-labelledby="role-details">
-        <h2 id="role-details">@T["ui.roles.details"]</h2>
+    <VxCard Title="@T["ui.roles.details"]">
         @if (Presenter.State.DoneKey is { } done)
         {
-            <p class="vx-message vx-message--info" role="status">@T[done]</p>
+            <VxMessage Type="VxMessageType.Info">@T[done]</VxMessage>
         }
         @if (Presenter.State.Error is not null)
         {
-            <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
         }
         <dl class="vx-facts">
             <dt>@T["ui.roles.kind"]</dt><dd>@T[role.SystemKey is null ? "ui.roles.kind.custom" : "ui.roles.kind.system"]</dd>
             <dt>@T["ui.roles.status"]</dt>
-            <dd><span class="vx-badge vx-badge--@(role.IsActive ? "active" : "suspended")">@T[role.IsActive ? "ui.roles.active" : "ui.roles.inactive"]</span></dd>
+            <dd><VxStatusBadge Status="@PlatformDisplay.ActiveBadge(role.IsActive)" Text="@T[role.IsActive ? "ui.roles.active" : "ui.roles.inactive"]" /></dd>
             <dt>@T["ui.roles.created"]</dt><dd>@PlatformDisplay.Utc(T, role.CreatedUtc)</dd>
         </dl>
         @if (role.SystemKey is not null)
@@ -50,8 +49,8 @@ IMPORTANT NOTES:
                 <label for="role-rename">@T["ui.roles.name"]</label>
                 <input id="role-rename" @bind="_name" maxlength="100" required autocomplete="off" />
                 <div class="vx-actions">
-                    <button type="submit" class="vx-button vx-button--primary" disabled="@Presenter.IsBusy">@T["ui.roles.save_name"]</button>
-                    <button type="button" class="vx-button" @onclick="Presenter.Cancel">@T["ui.common.cancel"]</button>
+                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.roles.save_name"]</VxButton>
+                    <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
                 </div>
             </form>
         }
@@ -59,8 +58,8 @@ IMPORTANT NOTES:
         {
             <p>@T["ui.roles.deactivate_help"]</p>
             <div class="vx-actions">
-                <button type="button" class="vx-button vx-button--danger" disabled="@Presenter.IsBusy" @onclick="() => Presenter.DeactivateAsync(RoleId)">@T["ui.roles.deactivate_confirm"]</button>
-                <button type="button" class="vx-button" @onclick="Presenter.Cancel">@T["ui.common.cancel"]</button>
+                <VxButton Variant="VxButtonVariant.Danger" IsBusy="@Presenter.IsBusy" OnClick="() => Presenter.DeactivateAsync(RoleId)">@T["ui.roles.deactivate_confirm"]</VxButton>
+                <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
             </div>
         }
         else
@@ -68,15 +67,15 @@ IMPORTANT NOTES:
             <div class="vx-actions">
                 @if (Presenter.State.Actions.CanRename)
                 {
-                    <button type="button" class="vx-button" @onclick="StartRename">@T["ui.roles.rename"]</button>
+                    <VxButton OnClick="StartRename">@T["ui.roles.rename"]</VxButton>
                 }
                 @if (Presenter.State.Actions.CanDeactivate)
                 {
-                    <button type="button" class="vx-button" @onclick="Presenter.StartDeactivate">@T["ui.roles.deactivate"]</button>
+                    <VxButton OnClick="Presenter.StartDeactivate">@T["ui.roles.deactivate"]</VxButton>
                 }
                 @if (Presenter.State.Actions.CanReactivate)
                 {
-                    <button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="() => Presenter.ReactivateAsync(RoleId)">@T["ui.roles.reactivate"]</button>
+                    <VxButton IsBusy="@Presenter.IsBusy" OnClick="() => Presenter.ReactivateAsync(RoleId)">@T["ui.roles.reactivate"]</VxButton>
                 }
             </div>
         }
@@ -84,42 +83,30 @@ IMPORTANT NOTES:
         {
             <StepUpDialog OnConfirmed="() => Presenter.ReactivateAsync(RoleId)" OnCancelled="Presenter.CancelStepUp" />
         }
-    </section>
-    <section class="vx-card" aria-labelledby="role-holders">
-        <h2 id="role-holders">@T["ui.roles.holders"]</h2>
-        @if (role.Holders.Count == 0)
-        {
-            <p>@T["ui.roles.no_holders"]</p>
-        }
-        else
-        {
-            <table class="vx-table">
-                <thead>
-                    <tr>
-                        <th scope="col">@T["ui.users.name"]</th>
-                        <th scope="col">@T["ui.signin.email"]</th>
-                        <th scope="col">@T["ui.roles.holder_since"]</th>
-                        <th scope="col">@T["ui.roles.holder_until"]</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var holder in role.Holders)
-                    {
-                        <tr>
-                            <td><a href="/users/@holder.PlatformUserId">@holder.LastName, @holder.FirstName</a></td>
-                            <td>@holder.Email</td>
-                            <td>@PlatformDisplay.Utc(T, holder.AssignedUtc)</td>
-                            <td>@(holder.ExpiresUtc is null ? T["ui.roles.no_end"].Value : PlatformDisplay.Utc(T, holder.ExpiresUtc))</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    </section>
+    </VxCard>
+    <VxCard Title="@T["ui.roles.holders"]">
+        <VxDataTable Items="role.Holders">
+            <HeaderContent>
+                <th scope="col">@T["ui.users.name"]</th>
+                <th scope="col">@T["ui.signin.email"]</th>
+                <th scope="col">@T["ui.roles.holder_since"]</th>
+                <th scope="col">@T["ui.roles.holder_until"]</th>
+            </HeaderContent>
+            <RowTemplate Context="holder">
+                <td><a href="/users/@holder.PlatformUserId">@holder.LastName, @holder.FirstName</a></td>
+                <td>@holder.Email</td>
+                <td>@PlatformDisplay.Utc(T, holder.AssignedUtc)</td>
+                <td>@(holder.ExpiresUtc is null ? T["ui.roles.no_end"].Value : PlatformDisplay.Utc(T, holder.ExpiresUtc))</td>
+            </RowTemplate>
+            <EmptyContent>
+                <VxEmptyState Title="@T["ui.roles.no_holders"]" />
+            </EmptyContent>
+        </VxDataTable>
+    </VxCard>
 }
 else if (Presenter.State.Error is not null)
 {
-    <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
 }
 else
 {

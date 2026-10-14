@@ -1,0 +1,104 @@
+@*
+=========================================================
+FILE: TenantSummary.razor
+
+PURPOSE:
+One tenant: overview, then every section of the tenant page.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Sections are separate components with their own presenters;
+  the Frontend/UI team may lay them out as tabs
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantSummaryPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.Tenant is { } tenant)
+{
+    <PageTitle>@(tenant.TradingName ?? tenant.LegalName)</PageTitle>
+    <h1>
+        @(tenant.TradingName ?? tenant.LegalName)
+        <VxStatusBadge Status="@PlatformDisplay.TenantBadge(tenant.Status)" Text="@T[PlatformDisplay.TenantStatusKey(tenant.Status)]" />
+    </h1>
+    <nav class="vx-sections" aria-label="@T["ui.tenants.sections"]">
+        <a href="@Anchor("tenant-overview")">@T["ui.tenants.overview"]</a>
+        <a href="@Anchor("tenant-lifecycle")">@T["ui.tenants.lifecycle"]</a>
+        <a href="@Anchor("tenant-profile")">@T["ui.tenants.company"]</a>
+        <a href="@Anchor("tenant-contacts")">@T["ui.tenants.contacts"]</a>
+        <a href="@Anchor("tenant-management")">@T["ui.tenants.management"]</a>
+        <a href="@Anchor("tenant-notes")">@T["ui.tenants.notes"]</a>
+        <a href="@Anchor("tenant-history")">@T["ui.tenants.history"]</a>
+    </nav>
+    <div id="tenant-overview"><VxCard Title="@T["ui.tenants.overview"]">
+        <dl class="vx-facts">
+            <dt>@T["ui.tenants.code"]</dt><dd>@tenant.TenantCode</dd>
+            <dt>@T["ui.tenants.address"]</dt><dd>@PlatformDisplay.TenantAddress(tenant.Slug, Presenter.State.BaseDomain)</dd>
+            <dt>@T["ui.tenants.origin"]</dt><dd>@T["ui.tenants.origin." + (tenant.Origin == Vixly.Platform.Domain.Tenants.PlatformTenantOrigin.Staff ? "staff" : "self_registration")]</dd>
+            <dt>@T["ui.tenants.status_since"]</dt><dd>@PlatformDisplay.Utc(T, tenant.StatusChangedUtc)</dd>
+            <dt>@T["ui.tenants.activated"]</dt><dd>@PlatformDisplay.Utc(T, tenant.ActivatedUtc)</dd>
+            <dt>@T["ui.roles.created"]</dt><dd>@PlatformDisplay.Utc(T, tenant.CreatedUtc)</dd>
+            <dt>@T["ui.tenants.language"]</dt><dd>@T["ui.language." + tenant.DefaultLanguage]</dd>
+            <dt>@T["ui.tenants.time_zone"]</dt><dd>@tenant.TimeZone</dd>
+            <dt>@T["ui.tenants.account_manager"]</dt>
+            <dd>
+                @(tenant.AccountManagerName ?? T["ui.common.none"].Value)
+                @if (tenant.AccountManagerName is not null && !tenant.AccountManagerIsActive)
+                {
+                    <VxStatusBadge Status="VxBadgeStatus.Deactivated" Text="@T["ui.tenants.manager_inactive"]" />
+                }
+            </dd>
+            <dt>@T["ui.tenants.tags"]</dt><dd>@(tenant.Tags.Count == 0 ? T["ui.common.none"].Value : string.Join(", ", tenant.Tags))</dd>
+        </dl>
+        @if (tenant.OpenSuspension is { } suspension)
+        {
+            <VxMessage Type="VxMessageType.Error">
+                <p>@VixlyText.Format(T, "ui.tenants.suspended_because", "category", T[PlatformDisplay.CategoryKey(suspension.Category)].Value)</p>
+                <p>@suspension.Reason</p>
+                <p>@VixlyText.Format(T, "ui.tenants.suspended_by", new Dictionary<string, object> { ["name"] = suspension.SuspendedByName ?? "-", ["time"] = PlatformDisplay.Utc(T, suspension.SuspendedUtc) })</p>
+            </VxMessage>
+        }
+        <p>
+            <a href="/audit?target=@tenant.PlatformTenantId">@T["ui.tenants.audit_link"]</a>
+        </p>
+    </VxCard></div>
+    <TenantLifecycle Tenant="tenant" Abilities="Presenter.State.Abilities" OnChanged="ReloadAsync" />
+    <TenantSlugCorrection Tenant="tenant" BaseDomain="@Presenter.State.BaseDomain" CanEdit="Presenter.State.Abilities.CanEdit" OnChanged="ReloadAsync" />
+    <TenantProfileEditor Tenant="tenant" CanEdit="Presenter.State.Abilities.CanEdit" OnChanged="ReloadAsync" />
+    <TenantContactsEditor Tenant="tenant" CanEdit="Presenter.State.Abilities.CanEdit" OnChanged="ReloadAsync" />
+    <TenantAccountManagement Tenant="tenant" CanEdit="Presenter.State.Abilities.CanEdit" OnChanged="ReloadAsync" />
+    <TenantNotes TenantId="tenant.PlatformTenantId" CanAdd="Presenter.State.Abilities.CanAddNotes" />
+    <TenantHistory TenantId="tenant.PlatformTenantId" Version="Presenter.State.Version" />
+}
+else if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid TenantId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(TenantId);
+    }
+
+    private Task ReloadAsync()
+    {
+        return Presenter.LoadAsync(TenantId);
+    }
+
+    private string Anchor(string id)
+    {
+        return "/tenants/" + TenantId + "#" + id;
+    }
+}

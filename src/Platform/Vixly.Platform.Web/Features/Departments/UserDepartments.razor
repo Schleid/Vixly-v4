@@ -20,15 +20,14 @@ IMPORTANT NOTES:
 @inject PlatformErrorText Errors
 @inject PlatformUserWorkspace Workspace
 
-<section class="vx-card" aria-labelledby="user-departments">
-    <h2 id="user-departments">@T["ui.users.departments"]</h2>
+<VxCard Title="@T["ui.users.departments"]">
     @if (Presenter.State.DoneKey is { } done)
     {
-        <p class="vx-message vx-message--info" role="status">@T[done]</p>
+        <VxMessage Type="VxMessageType.Info">@T[done]</VxMessage>
     }
     @if (Presenter.State.Error is not null)
     {
-        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
     }
     @if (!Presenter.State.Loaded)
     {
@@ -47,19 +46,19 @@ IMPORTANT NOTES:
                     <a href="/departments/@membership.PlatformDepartmentId">@membership.Name</a>
                     @if (membership.IsPrimary)
                     {
-                        <span class="vx-badge vx-badge--active">@T["ui.departments.primary"]</span>
+                        <VxStatusBadge Status="VxBadgeStatus.Active" Text="@T["ui.departments.primary"]" />
                     }
                     @if (!membership.DepartmentIsActive)
                     {
-                        <span class="vx-badge vx-badge--suspended">@T["ui.roles.inactive"]</span>
+                        <VxStatusBadge Status="VxBadgeStatus.Suspended" Text="@T["ui.roles.inactive"]" />
                     }
                     @if (Presenter.State.CanManage)
                     {
                         @if (!membership.IsPrimary)
                         {
-                            <button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="() => ChangedAsync(Presenter.MakePrimaryAsync(UserId, membership.PlatformDepartmentId))">@T["ui.departments.make_primary"]</button>
+                            <VxButton IsBusy="@Presenter.IsBusy" OnClick="() => ChangedAsync(Presenter.MakePrimaryAsync(UserId, membership.PlatformDepartmentId))">@T["ui.departments.make_primary"]</VxButton>
                         }
-                        <button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="() => ChangedAsync(Presenter.RemoveAsync(UserId, membership.PlatformDepartmentId))">@T["ui.user_roles.revoke"]</button>
+                        <VxButton IsBusy="@Presenter.IsBusy" OnClick="() => ChangedAsync(Presenter.RemoveAsync(UserId, membership.PlatformDepartmentId))">@T["ui.user_roles.revoke"]</VxButton>
                     }
                 </li>
             }
@@ -77,11 +76,11 @@ IMPORTANT NOTES:
                 }
             </select>
             <div class="vx-actions">
-                <button type="submit" class="vx-button vx-button--primary" disabled="@(Presenter.IsBusy || _departmentId is null)">@T["ui.departments.add"]</button>
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit" Disabled="@(Presenter.IsBusy || _departmentId is null)">@T["ui.departments.add"]</VxButton>
             </div>
         </form>
     }
-</section>
+</VxCard>
 
 @code {
     private Guid? _departmentId;

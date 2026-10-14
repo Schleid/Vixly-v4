@@ -1,0 +1,110 @@
+@*
+=========================================================
+FILE: TenantLifecycle.razor
+
+PURPOSE:
+The lifecycle panel: offered moves, the confirmation with
+category and reason, and step-up.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Only moves possible from the current status are offered
+  (TenantMoves); the domain still decides
+- The reason is internal; the tenant sees the category only
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantLifecyclePresenter>
+@using Vixly.Platform.Application.Queries
+@using Vixly.Platform.Application.UseCases.Tenants
+@using Vixly.Platform.Domain.Tenants
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="tenant-lifecycle"><VxCard Title="@T["ui.tenants.lifecycle"]">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Info">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (Presenter.State.Confirming is TenantMove move)
+    {
+        <form class="vx-form" @onsubmit="ApplyAsync">
+            <p>@T["ui.tenants.move_help." + move.ToString().ToLowerInvariant()]</p>
+            @if (move == TenantMove.Suspend)
+            {
+                <label for="tenant-move-category">@T["ui.tenants.category"]</label>
+                <select id="tenant-move-category" @bind="_category">
+                    @foreach (PlatformSuspensionCategory category in Enum.GetValues<PlatformSuspensionCategory>())
+                    {
+                        <option value="@category">@T[PlatformDisplay.CategoryKey(category)]</option>
+                    }
+                </select>
+            }
+            @if (move != TenantMove.Activate)
+            {
+                <label for="tenant-move-reason">@T["ui.tenants.reason"]</label>
+                <textarea id="tenant-move-reason" @bind="_reason" maxlength="500" required aria-describedby="tenant-move-reason-help"></textarea>
+                <p id="tenant-move-reason-help" class="vx-hint">@T["ui.tenants.reason_internal"]</p>
+            }
+            <div class="vx-actions">
+                <VxButton Variant="@(move is TenantMove.Activate or TenantMove.Reactivate ? VxButtonVariant.Primary : VxButtonVariant.Danger)" Type="submit" IsBusy="@Presenter.IsBusy">@T[TenantMoves.Key(move)]</VxButton>
+                <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else
+    {
+        IReadOnlyList<TenantMove> moves = TenantMoves.Offered(Tenant.Status, Abilities);
+
+        if (moves.Count == 0)
+        {
+            <p>@T["ui.tenants.no_moves"]</p>
+        }
+        <div class="vx-actions">
+            @foreach (TenantMove offered in moves)
+            {
+                <VxButton OnClick="() => Start(offered)">@T[TenantMoves.Key(offered)]</VxButton>
+            }
+        </div>
+    }
+    @if (Presenter.State.StepUpPending)
+    {
+        <StepUpDialog OnConfirmed="ApplyAsync" OnCancelled="Presenter.CancelStepUp" />
+    }
+</VxCard></div>
+
+@code {
+    private PlatformSuspensionCategory _category = PlatformSuspensionCategory.Compliance;
+
+    private string? _reason;
+
+    [Parameter, EditorRequired]
+    public PlatformTenantDetail Tenant { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public PlatformTenantAbilities Abilities { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private void Start(TenantMove move)
+    {
+        _reason = null;
+        _category = PlatformSuspensionCategory.Compliance;
+        Presenter.Start(move);
+    }
+
+    private async Task ApplyAsync()
+    {
+        if (await Presenter.ApplyAsync(Tenant.PlatformTenantId, _category, _reason))
+        {
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

@@ -16,11 +16,14 @@ IMPORTANT NOTES:
 
 <PageTitle>@T["ui.home.title"] · @T["ui.app.name"]</PageTitle>
 
-<div class="vx-card">
-    <h1>@T["ui.home.title"]</h1>
+<VxCard Title="@T["ui.home.title"]">
     <p>@T["ui.app.name"]</p>
     <div class="vx-actions">
-        <a href="/users" class="vx-button vx-button--primary">@T["ui.users.title"]</a>
+        <a href="/tenants" class="vx-button vx-button--primary">@T["ui.tenants.title"]</a>
+        <a href="/users" class="vx-button">@T["ui.users.title"]</a>
+        <a href="/roles" class="vx-button">@T["ui.roles.title"]</a>
+        <a href="/departments" class="vx-button">@T["ui.departments.title"]</a>
+        <a href="/audit" class="vx-button">@T["ui.audit.title"]</a>
         <a href="/account" class="vx-button">@T["ui.account.title"]</a>
     </div>
-</div>
+</VxCard>

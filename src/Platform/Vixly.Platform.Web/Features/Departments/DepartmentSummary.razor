@@ -22,20 +22,19 @@ IMPORTANT NOTES:
 {
     <PageTitle>@department.Name</PageTitle>
     <h1>@department.Name</h1>
-    <section class="vx-card" aria-labelledby="department-details">
-        <h2 id="department-details">@T["ui.roles.details"]</h2>
+    <VxCard Title="@T["ui.roles.details"]">
         @if (Presenter.State.DoneKey is { } done)
         {
-            <p class="vx-message vx-message--info" role="status">@T[done]</p>
+            <VxMessage Type="VxMessageType.Info">@T[done]</VxMessage>
         }
         @if (Presenter.State.Error is not null)
         {
-            <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
         }
         <dl class="vx-facts">
             <dt>@T["ui.departments.description"]</dt><dd>@(department.Description ?? T["ui.common.none"].Value)</dd>
             <dt>@T["ui.roles.status"]</dt>
-            <dd><span class="vx-badge vx-badge--@(department.IsActive ? "active" : "suspended")">@T[department.IsActive ? "ui.roles.active" : "ui.roles.inactive"]</span></dd>
+            <dd><VxStatusBadge Status="@PlatformDisplay.ActiveBadge(department.IsActive)" Text="@T[department.IsActive ? "ui.roles.active" : "ui.roles.inactive"]" /></dd>
             <dt>@T["ui.roles.created"]</dt><dd>@PlatformDisplay.Utc(T, department.CreatedUtc)</dd>
         </dl>
         @if (Presenter.State.Editing)
@@ -46,8 +45,8 @@ IMPORTANT NOTES:
                 <label for="department-edit-description">@T["ui.departments.description_optional"]</label>
                 <textarea id="department-edit-description" @bind="_description" maxlength="500"></textarea>
                 <div class="vx-actions">
-                    <button type="submit" class="vx-button vx-button--primary" disabled="@Presenter.IsBusy">@T["ui.departments.save"]</button>
-                    <button type="button" class="vx-button" @onclick="Presenter.Cancel">@T["ui.common.cancel"]</button>
+                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.departments.save"]</VxButton>
+                    <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
                 </div>
             </form>
         }
@@ -55,8 +54,8 @@ IMPORTANT NOTES:
         {
             <p>@T["ui.departments.deactivate_help"]</p>
             <div class="vx-actions">
-                <button type="button" class="vx-button vx-button--danger" disabled="@Presenter.IsBusy" @onclick="() => Presenter.DeactivateAsync(DepartmentId)">@T["ui.departments.deactivate_confirm"]</button>
-                <button type="button" class="vx-button" @onclick="Presenter.Cancel">@T["ui.common.cancel"]</button>
+                <VxButton Variant="VxButtonVariant.Danger" IsBusy="@Presenter.IsBusy" OnClick="() => Presenter.DeactivateAsync(DepartmentId)">@T["ui.departments.deactivate_confirm"]</VxButton>
+                <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
             </div>
         }
         else
@@ -64,23 +63,23 @@ IMPORTANT NOTES:
             <div class="vx-actions">
                 @if (Presenter.State.Actions.CanEdit)
                 {
-                    <button type="button" class="vx-button" @onclick="StartEdit">@T["ui.departments.edit"]</button>
+                    <VxButton OnClick="StartEdit">@T["ui.departments.edit"]</VxButton>
                 }
                 @if (Presenter.State.Actions.CanDeactivate)
                 {
-                    <button type="button" class="vx-button" @onclick="Presenter.StartDeactivate">@T["ui.roles.deactivate"]</button>
+                    <VxButton OnClick="Presenter.StartDeactivate">@T["ui.roles.deactivate"]</VxButton>
                 }
                 @if (Presenter.State.Actions.CanReactivate)
                 {
-                    <button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="() => Presenter.ReactivateAsync(DepartmentId)">@T["ui.roles.reactivate"]</button>
+                    <VxButton IsBusy="@Presenter.IsBusy" OnClick="() => Presenter.ReactivateAsync(DepartmentId)">@T["ui.roles.reactivate"]</VxButton>
                 }
             </div>
         }
-    </section>
+    </VxCard>
 }
 else if (Presenter.State.Error is not null)
 {
-    <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
 }
 else
 {

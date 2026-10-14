@@ -76,7 +76,7 @@ GO
 -- =========================================================
 -- 2. PLATFORM PLANE (schema [platform])
 -- Generated from the EF migrations of
--- Vixly.Platform.Infrastructure: InitialIdentity, SecondFactorsSessionsAudit, DataProtectionKeys, SignInChallenges, SessionStepUpFailures, PasskeyCeremonies
+-- Vixly.Platform.Infrastructure: InitialIdentity, SecondFactorsSessionsAudit, DataProtectionKeys, SignInChallenges, SessionStepUpFailures, PasskeyCeremonies, Tenants
 -- =========================================================
 IF OBJECT_ID(N'[platform].[__EFMigrationsHistory]') IS NULL
 BEGIN
@@ -758,6 +758,458 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE TABLE [platform].[OutboxMessages] (
+        [Id] uniqueidentifier NOT NULL,
+        [Type] varchar(100) NOT NULL,
+        [StreamId] uniqueidentifier NOT NULL,
+        [Payload] nvarchar(max) NOT NULL,
+        [ProcessedUtc] datetimeoffset NULL,
+        [Attempts] int NOT NULL,
+        [NextAttemptUtc] datetimeoffset NULL,
+        [LastErrorCode] varchar(100) NULL,
+        [LeasedUntilUtc] datetimeoffset NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_OutboxMessages] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE TABLE [platform].[Tenants] (
+        [Id] uniqueidentifier NOT NULL,
+        [TenantCode] varchar(50) NOT NULL,
+        [CurrentSlug] varchar(63) NOT NULL,
+        [Status] int NOT NULL,
+        [StatusChangedUtc] datetimeoffset NOT NULL,
+        [ActivatedUtc] datetimeoffset NULL,
+        [Origin] int NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [DefaultLanguage] varchar(8) NOT NULL,
+        [TimeZone] varchar(64) NOT NULL,
+        [AccountManagerUserId] uniqueidentifier NULL,
+        [RowVersion] rowversion NULL,
+        [CompanyEmail] nvarchar(254) NOT NULL,
+        [LegalName] nvarchar(200) NOT NULL,
+        [CompanyPhone] varchar(16) NOT NULL,
+        [TradingName] nvarchar(200) NULL,
+        [City] nvarchar(100) NOT NULL,
+        [CountryCode] char(2) NOT NULL,
+        [AddressLine1] nvarchar(200) NOT NULL,
+        [AddressLine2] nvarchar(200) NULL,
+        [PostalCode] nvarchar(20) NULL,
+        [StateProvince] nvarchar(100) NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_Tenants] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Tenants_Users_AccountManagerUserId] FOREIGN KEY ([AccountManagerUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_Tenants_Users_CreatedByUserId] FOREIGN KEY ([CreatedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE TABLE [platform].[TenantContacts] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [Role] int NOT NULL,
+        [Name] nvarchar(200) NOT NULL,
+        [Email] nvarchar(254) NOT NULL,
+        [Phone] varchar(16) NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_TenantContacts] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TenantContacts_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE TABLE [platform].[TenantLifecycleEvents] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [EventCode] varchar(100) NOT NULL,
+        [FromStatus] int NULL,
+        [ToStatus] int NOT NULL,
+        [Category] int NULL,
+        [Reason] nvarchar(500) NULL,
+        [ActorUserId] uniqueidentifier NULL,
+        [Arguments] nvarchar(max) NOT NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_TenantLifecycleEvents] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TenantLifecycleEvents_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE TABLE [platform].[TenantNotes] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [Body] nvarchar(4000) NOT NULL,
+        [AuthorUserId] uniqueidentifier NOT NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_TenantNotes] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TenantNotes_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_TenantNotes_Users_AuthorUserId] FOREIGN KEY ([AuthorUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE TABLE [platform].[TenantRegistrations] (
+        [Id] uniqueidentifier NOT NULL,
+        [Status] int NOT NULL,
+        [OwnerName] nvarchar(200) NOT NULL,
+        [OwnerEmail] nvarchar(254) NOT NULL,
+        [OwnerPhone] varchar(16) NOT NULL,
+        [Language] varchar(8) NOT NULL,
+        [TimeZone] varchar(64) NOT NULL,
+        [Slug] varchar(63) NOT NULL,
+        [PlatformTenantId] uniqueidentifier NULL,
+        [AccessTokenHash] char(64) NOT NULL,
+        [AccessExpiresUtc] datetimeoffset NOT NULL,
+        [TermsVersion] nvarchar(50) NOT NULL,
+        [PrivacyVersion] nvarchar(50) NOT NULL,
+        [ConsentIpAddress] varchar(45) NULL,
+        [LastVerificationSentUtc] datetimeoffset NULL,
+        [VerificationWindowStartUtc] datetimeoffset NULL,
+        [VerificationSendsInWindow] int NOT NULL,
+        [EmailVerifiedUtc] datetimeoffset NULL,
+        [ClosedUtc] datetimeoffset NULL,
+        [CancelledByUserId] uniqueidentifier NULL,
+        [CancellationReason] nvarchar(500) NULL,
+        [RowVersion] rowversion NULL,
+        [CompanyEmail] nvarchar(254) NOT NULL,
+        [LegalName] nvarchar(200) NOT NULL,
+        [CompanyPhone] varchar(16) NOT NULL,
+        [TradingName] nvarchar(200) NULL,
+        [City] nvarchar(100) NOT NULL,
+        [CountryCode] char(2) NOT NULL,
+        [AddressLine1] nvarchar(200) NOT NULL,
+        [AddressLine2] nvarchar(200) NULL,
+        [PostalCode] nvarchar(20) NULL,
+        [StateProvince] nvarchar(100) NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_TenantRegistrations] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TenantRegistrations_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_TenantRegistrations_Users_CancelledByUserId] FOREIGN KEY ([CancelledByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE TABLE [platform].[TenantSuspensions] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [Category] int NOT NULL,
+        [Reason] nvarchar(500) NOT NULL,
+        [SuspendedByUserId] uniqueidentifier NOT NULL,
+        [ResolvedByUserId] uniqueidentifier NULL,
+        [ResolvedUtc] datetimeoffset NULL,
+        [ResolutionReason] nvarchar(500) NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_TenantSuspensions] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TenantSuspensions_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE TABLE [platform].[TenantTags] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [Value] varchar(32) NOT NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_TenantTags] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TenantTags_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE TABLE [platform].[PortalSlugs] (
+        [Id] uniqueidentifier NOT NULL,
+        [Slug] varchar(63) NOT NULL,
+        [State] int NOT NULL,
+        [PlatformTenantId] uniqueidentifier NULL,
+        [PlatformTenantRegistrationId] uniqueidentifier NULL,
+        [HeldUntilUtc] datetimeoffset NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_PortalSlugs] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_PortalSlugs_TenantRegistrations_PlatformTenantRegistrationId] FOREIGN KEY ([PlatformTenantRegistrationId]) REFERENCES [platform].[TenantRegistrations] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_PortalSlugs_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE TABLE [platform].[RegistrationTokens] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantRegistrationId] uniqueidentifier NOT NULL,
+        [TokenHash] char(64) NOT NULL,
+        [ExpiresUtc] datetimeoffset NOT NULL,
+        [UsedUtc] datetimeoffset NULL,
+        [RevokedUtc] datetimeoffset NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_RegistrationTokens] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_RegistrationTokens_TenantRegistrations_PlatformTenantRegistrationId] FOREIGN KEY ([PlatformTenantRegistrationId]) REFERENCES [platform].[TenantRegistrations] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    EXEC(N'CREATE INDEX [IX_OutboxMessages_NextAttemptUtc_CreatedUtc] ON [platform].[OutboxMessages] ([NextAttemptUtc], [CreatedUtc]) WHERE [ProcessedUtc] IS NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    EXEC(N'CREATE INDEX [IX_OutboxMessages_StreamId_CreatedUtc] ON [platform].[OutboxMessages] ([StreamId], [CreatedUtc]) WHERE [ProcessedUtc] IS NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_PortalSlugs_PlatformTenantId] ON [platform].[PortalSlugs] ([PlatformTenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_PortalSlugs_PlatformTenantRegistrationId] ON [platform].[PortalSlugs] ([PlatformTenantRegistrationId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_PortalSlugs_Slug] ON [platform].[PortalSlugs] ([Slug]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_RegistrationTokens_PlatformTenantRegistrationId_UsedUtc_RevokedUtc] ON [platform].[RegistrationTokens] ([PlatformTenantRegistrationId], [UsedUtc], [RevokedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_RegistrationTokens_TokenHash] ON [platform].[RegistrationTokens] ([TokenHash]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_TenantContacts_Email] ON [platform].[TenantContacts] ([Email]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_TenantContacts_PlatformTenantId_Role] ON [platform].[TenantContacts] ([PlatformTenantId], [Role]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_TenantLifecycleEvents_PlatformTenantId_CreatedUtc] ON [platform].[TenantLifecycleEvents] ([PlatformTenantId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_TenantNotes_AuthorUserId] ON [platform].[TenantNotes] ([AuthorUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_TenantNotes_PlatformTenantId_CreatedUtc] ON [platform].[TenantNotes] ([PlatformTenantId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_TenantRegistrations_AccessTokenHash] ON [platform].[TenantRegistrations] ([AccessTokenHash]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_TenantRegistrations_CancelledByUserId] ON [platform].[TenantRegistrations] ([CancelledByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_TenantRegistrations_OwnerEmail] ON [platform].[TenantRegistrations] ([OwnerEmail]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_TenantRegistrations_PlatformTenantId] ON [platform].[TenantRegistrations] ([PlatformTenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_TenantRegistrations_Status_CreatedUtc] ON [platform].[TenantRegistrations] ([Status], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_Tenants_AccountManagerUserId] ON [platform].[Tenants] ([AccountManagerUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_Tenants_CreatedByUserId] ON [platform].[Tenants] ([CreatedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Tenants_CurrentSlug] ON [platform].[Tenants] ([CurrentSlug]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_Tenants_Status_CreatedUtc] ON [platform].[Tenants] ([Status], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Tenants_TenantCode] ON [platform].[Tenants] ([TenantCode]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_TenantSuspensions_PlatformTenantId_ResolvedUtc] ON [platform].[TenantSuspensions] ([PlatformTenantId], [ResolvedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_TenantTags_PlatformTenantId_Value] ON [platform].[TenantTags] ([PlatformTenantId], [Value]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    CREATE INDEX [IX_TenantTags_Value] ON [platform].[TenantTags] ([Value]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261014085528_Tenants'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261014085528_Tenants', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
 -- =========================================================
 -- 3. LOGINS AND GRANTS (D-1)
 -- Skipped when the passwords in section 0 are empty.
@@ -796,6 +1248,9 @@ BEGIN
 
     -- The audit log is append-only for the app.
     DENY UPDATE, DELETE ON OBJECT::[platform].[AuditEntries] TO [vixly_platform_app];
+    -- Tenant history is append-only too (Slice 2, D-2).
+    DENY UPDATE, DELETE ON OBJECT::[platform].[TenantLifecycleEvents] TO [vixly_platform_app];
+    DENY UPDATE, DELETE ON OBJECT::[platform].[TenantNotes] TO [vixly_platform_app];
 
     -- The migrator changes the platform schema only.
     GRANT ALTER, CONTROL ON SCHEMA::[platform] TO [vixly_platform_migrator];

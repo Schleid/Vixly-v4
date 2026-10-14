@@ -20,19 +20,18 @@ IMPORTANT NOTES:
 
 @if (Presenter.State.Error is not null)
 {
-    <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
 }
 else if (Presenter.State.User is { } user)
 {
     <PageTitle>@user.FirstName @user.LastName</PageTitle>
     <h1>@user.FirstName @user.LastName</h1>
-    <section class="vx-card" aria-labelledby="user-profile">
-        <h2 id="user-profile">@T["ui.users.profile"]</h2>
+    <VxCard Title="@T["ui.users.profile"]">
         <dl class="vx-facts">
             <dt>@T["ui.signin.email"]</dt><dd>@user.Email</dd>
             <dt>@T["ui.users.status"]</dt>
             <dd>
-                <span class="vx-badge vx-badge--@user.Status.ToString().ToLowerInvariant()">@T[PlatformDisplay.StatusKey(user.Status)]</span>
+                <VxStatusBadge Status="@PlatformDisplay.UserBadge(user.Status)" Text="@T[PlatformDisplay.StatusKey(user.Status)]" />
                 @if (!string.IsNullOrEmpty(user.StatusReason))
                 {
                     <span>@VixlyText.Format(T, "ui.users.status_reason", new Dictionary<string, object> { ["reason"] = user.StatusReason, ["time"] = PlatformDisplay.Utc(T, user.StatusChangedUtc) })</span>
@@ -45,46 +44,33 @@ else if (Presenter.State.User is { } user)
             <dt>@T["ui.users.created"]</dt><dd>@PlatformDisplay.Utc(T, user.CreatedUtc)</dd>
             <dt>@T["ui.users.last_sign_in"]</dt><dd>@PlatformDisplay.Utc(T, user.LastSignInUtc)</dd>
         </dl>
-    </section>
-    <section class="vx-card" aria-labelledby="user-security">
-        <h2 id="user-security">@T["ui.users.second_factors"]</h2>
+    </VxCard>
+    <VxCard Title="@T["ui.users.second_factors"]">
         <ul>
             <li>@T[user.HasAuthenticatorApp ? "ui.users.authenticator_on" : "ui.users.authenticator_off"]</li>
             <li>@VixlyText.Format(T, "ui.users.passkeys", "count", user.PasskeyCount)</li>
             <li>@VixlyText.Format(T, "ui.recovery.left", "count", user.UnusedRecoveryCodeCount)</li>
         </ul>
-    </section>
-    <section class="vx-card" aria-labelledby="user-sessions">
-        <h2 id="user-sessions">@T["ui.users.sessions"]</h2>
-        @if (user.OpenSessions.Count == 0)
-        {
-            <p>@T["ui.users.no_sessions"]</p>
-        }
-        else
-        {
-            <table class="vx-table">
-                <thead>
-                    <tr>
-                        <th scope="col">@T["ui.users.session_started"]</th>
-                        <th scope="col">@T["ui.users.session_last_seen"]</th>
-                        <th scope="col">@T["ui.users.session_ip"]</th>
-                        <th scope="col">@T["ui.users.session_browser"]</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var session in user.OpenSessions)
-                    {
-                        <tr>
-                            <td>@PlatformDisplay.Utc(T, session.StartedUtc)</td>
-                            <td>@PlatformDisplay.Utc(T, session.LastSeenUtc)</td>
-                            <td>@session.IpAddress</td>
-                            <td class="vx-truncate" title="@session.UserAgent">@session.UserAgent</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    </section>
+    </VxCard>
+    <VxCard Title="@T["ui.users.sessions"]">
+        <VxDataTable Items="user.OpenSessions">
+            <HeaderContent>
+                <th scope="col">@T["ui.users.session_started"]</th>
+                <th scope="col">@T["ui.users.session_last_seen"]</th>
+                <th scope="col">@T["ui.users.session_ip"]</th>
+                <th scope="col">@T["ui.users.session_browser"]</th>
+            </HeaderContent>
+            <RowTemplate Context="session">
+                <td>@PlatformDisplay.Utc(T, session.StartedUtc)</td>
+                <td>@PlatformDisplay.Utc(T, session.LastSeenUtc)</td>
+                <td>@session.IpAddress</td>
+                <td class="vx-truncate" title="@session.UserAgent">@session.UserAgent</td>
+            </RowTemplate>
+            <EmptyContent>
+                <VxEmptyState Title="@T["ui.users.no_sessions"]" />
+            </EmptyContent>
+        </VxDataTable>
+    </VxCard>
 }
 else
 {

@@ -21,7 +21,7 @@ IMPORTANT NOTES:
         <input type="hidden" name="returnUrl" value="@ReturnUrl" />
         <label for="code">@T["ui.verify.code_label"]</label>
         <input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{6,7}" maxlength="7" required autofocus />
-        <button type="submit" class="vx-button vx-button--primary">@T["ui.verify.submit"]</button>
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.verify.submit"]</VxButton>
     </form>
     <p><a href="/sign-in/recovery?returnUrl=@Uri.EscapeDataString(ReturnUrl)">@T["ui.verify.use_recovery"]</a></p>
     <p><a href="/sign-in">@T["ui.signin.back"]</a></p>

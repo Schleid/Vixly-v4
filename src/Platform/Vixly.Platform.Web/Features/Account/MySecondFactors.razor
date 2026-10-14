@@ -21,15 +21,14 @@ IMPORTANT NOTES:
 @inject PlatformErrorText Errors
 @inject IJSRuntime JS
 
-<section class="vx-card" aria-labelledby="my-factors">
-    <h2 id="my-factors">@T["ui.users.second_factors"]</h2>
+<VxCard Title="@T["ui.users.second_factors"]">
     @if (Presenter.State.Error is not null)
     {
-        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
     }
     @if (Presenter.State.InfoKey is not null)
     {
-        <p class="vx-message vx-message--info" role="status">@T[Presenter.State.InfoKey]</p>
+        <VxMessage Type="VxMessageType.Info">@T[Presenter.State.InfoKey]</VxMessage>
     }
     @if (Presenter.State.Account is { } account)
     {
@@ -48,13 +47,13 @@ IMPORTANT NOTES:
                         <li><code>@recoveryCode</code></li>
                     }
                 </ul>
-                <button type="button" class="vx-button vx-button--primary" @onclick="Presenter.DismissCodes">@T["ui.codes.continue"]</button>
+                <VxButton Variant="VxButtonVariant.Primary" OnClick="Presenter.DismissCodes">@T["ui.codes.continue"]</VxButton>
             </div>
         }
         else
         {
             <div class="vx-actions">
-                <button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="Presenter.RegenerateCodesAsync">@T["ui.account.new_codes"]</button>
+                <VxButton IsBusy="@Presenter.IsBusy" OnClick="Presenter.RegenerateCodesAsync">@T["ui.account.new_codes"]</VxButton>
             </div>
         }
         <h3>@T["ui.account.passkeys"]</h3>
@@ -72,7 +71,7 @@ IMPORTANT NOTES:
                         <strong>@passkey.Name</strong>
                         <span>@VixlyText.Format(T, "ui.account.passkey_added_on", "time", PlatformDisplay.Utc(T, passkey.CreatedUtc))</span>
                         <span>@VixlyText.Format(T, "ui.account.passkey_last_used", "time", PlatformDisplay.Utc(T, passkey.LastUsedUtc))</span>
-                        <button type="button" class="vx-button vx-button--danger" disabled="@Presenter.IsBusy" @onclick="() => Presenter.RemoveAsync(passkey.PasskeyId)">@T["ui.account.remove"]</button>
+                        <VxButton Variant="VxButtonVariant.Danger" IsBusy="@Presenter.IsBusy" OnClick="() => Presenter.RemoveAsync(passkey.PasskeyId)">@T["ui.account.remove"]</VxButton>
                     </li>
                 }
             </ul>
@@ -83,7 +82,7 @@ IMPORTANT NOTES:
                 <label for="passkey-name">@T["ui.account.passkey_name"]</label>
                 <input id="passkey-name" @bind="_name" maxlength="100" required autocomplete="off" />
                 <div class="vx-actions">
-                    <button type="submit" class="vx-button vx-button--primary" disabled="@Presenter.IsBusy">@T["ui.account.add_passkey"]</button>
+                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.account.add_passkey"]</VxButton>
                 </div>
             </form>
         }
@@ -100,7 +99,7 @@ IMPORTANT NOTES:
     {
         <p role="status">@T["ui.common.loading"]</p>
     }
-</section>
+</VxCard>
 
 @code {
     private string _name = string.Empty;

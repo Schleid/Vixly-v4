@@ -1,0 +1,94 @@
+﻿@*
+=========================================================
+FILE: TenantAccountManagement.razor
+
+PURPOSE:
+The account management section: account manager and tags
+(D-T16).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Tags are internal and never shown to the tenant
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantManagementPresenter>
+@using Vixly.Platform.Application.Queries
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="tenant-management"><VxCard Title="@T["ui.tenants.management"]">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Info">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (Presenter.State.Editing)
+    {
+        <form class="vx-form" @onsubmit="SaveAsync">
+            <label for="tenant-manager">@T["ui.tenants.account_manager"]</label>
+            <select id="tenant-manager" @bind="_manager">
+                <option value="">@T["ui.common.none"]</option>
+                @foreach (PlatformStaffOptionItem person in Presenter.State.Staff)
+                {
+                    <option value="@person.PlatformUserId">@person.Name</option>
+                }
+            </select>
+            <label for="tenant-tags">@T["ui.tenants.tags"]</label>
+            <input id="tenant-tags" @bind="_tags" maxlength="400" autocomplete="off" aria-describedby="tenant-tags-help" />
+            <p id="tenant-tags-help" class="vx-hint">@T["ui.tenants.tags_help"]</p>
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.departments.save"]</VxButton>
+                <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else
+    {
+        <dl class="vx-facts">
+            <dt>@T["ui.tenants.account_manager"]</dt><dd>@(Tenant.AccountManagerName ?? T["ui.common.none"].Value)</dd>
+            <dt>@T["ui.tenants.tags"]</dt><dd>@(Tenant.Tags.Count == 0 ? T["ui.common.none"].Value : string.Join(", ", Tenant.Tags))</dd>
+        </dl>
+        @if (CanEdit)
+        {
+            <VxButton IsBusy="@Presenter.IsBusy" OnClick="StartEditAsync">@T["ui.departments.edit"]</VxButton>
+        }
+    }
+</VxCard></div>
+
+@code {
+    private string _manager = string.Empty;
+
+    private string? _tags;
+
+    [Parameter, EditorRequired]
+    public PlatformTenantDetail Tenant { get; set; } = null!;
+
+    [Parameter]
+    public bool CanEdit { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private Task StartEditAsync()
+    {
+        _manager = Tenant.AccountManagerUserId?.ToString() ?? string.Empty;
+        _tags = string.Join(", ", Tenant.Tags);
+        return Presenter.StartEditAsync();
+    }
+
+    private async Task SaveAsync()
+    {
+        Guid? manager = Guid.TryParse(_manager, out Guid id) ? id : null;
+
+        if (await Presenter.SaveAsync(Tenant.PlatformTenantId, manager, _tags))
+        {
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

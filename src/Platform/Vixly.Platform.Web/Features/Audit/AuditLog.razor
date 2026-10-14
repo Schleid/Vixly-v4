@@ -35,79 +35,59 @@ IMPORTANT NOTES:
     <input id="audit-from" type="date" @bind="_from" />
     <label for="audit-to">@T["ui.audit.to"]</label>
     <input id="audit-to" type="date" @bind="_to" />
-    <button type="submit" class="vx-button">@T["ui.audit.apply"]</button>
+    <VxButton Type="submit">@T["ui.audit.apply"]</VxButton>
     <a href="/audit">@T["ui.audit.clear"]</a>
 </form>
 
 @if (Query.ActorUserId is not null)
 {
-    <p class="vx-message vx-message--info">@T["ui.audit.filtered_actor"]</p>
+    <VxMessage Type="VxMessageType.Info">@T["ui.audit.filtered_actor"]</VxMessage>
 }
 @if (Query.TargetId is not null)
 {
-    <p class="vx-message vx-message--info">@T["ui.audit.filtered_target"]</p>
+    <VxMessage Type="VxMessageType.Info">@T["ui.audit.filtered_target"]</VxMessage>
 }
 
 @if (Presenter.State.Error is not null)
 {
-    <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
-}
-else if (!Presenter.State.Loaded)
-{
-    <p role="status">@T["ui.common.loading"]</p>
-}
-else if (Presenter.State.Entries.Count == 0)
-{
-    <p role="status">@T["ui.audit.empty"]</p>
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
 }
 else
 {
-    <table class="vx-table">
-        <caption>@VixlyText.Format(T, "ui.audit.count", "count", Presenter.State.TotalCount)</caption>
-        <thead>
-            <tr>
-                <th scope="col">@T["ui.audit.when"]</th>
-                <th scope="col">@T["ui.audit.who"]</th>
-                <th scope="col">@T["ui.audit.what"]</th>
-                <th scope="col">@T["ui.audit.on"]</th>
-                <th scope="col">@T["ui.audit.ip"]</th>
-                <th scope="col"><span class="vx-visually-hidden">@T["ui.audit.details"]</span></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (PlatformAuditListItem entry in Presenter.State.Entries)
-            {
-                <tr>
-                    <td>@PlatformDisplay.Utc(T, entry.OccurredUtc)</td>
-                    <td>
-                        @if (entry.ActorUserId is Guid actor)
-                        {
-                            <a href="/users/@actor">@(entry.ActorName ?? actor.ToString())</a>
-                        }
-                        else
-                        {
-                            @T["ui.audit.no_actor"]
-                        }
-                    </td>
-                    <td>@T[PlatformDisplay.AuditActionKey(entry.ActionCode)]</td>
-                    <td><AuditTargetLink Entry="@entry" /></td>
-                    <td>@entry.IpAddress</td>
-                    <td><a href="/audit/@entry.AuditEntryId">@T["ui.audit.details"]</a></td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <nav class="vx-pager" aria-label="@T["ui.common.pages"]">
-        @if (Presenter.State.Page > 1)
-        {
-            <a href="@Query.ToUrl(Presenter.State.Page - 1)">@T["ui.common.previous"]</a>
-        }
-        <span>@VixlyText.Format(T, "ui.common.page_of", new Dictionary<string, object> { ["page"] = Presenter.State.Page, ["pages"] = Math.Max(1, Presenter.State.TotalPages) })</span>
-        @if (Presenter.State.Page < Presenter.State.TotalPages)
-        {
-            <a href="@Query.ToUrl(Presenter.State.Page + 1)">@T["ui.common.next"]</a>
-        }
-    </nav>
+    <VxDataTable Items="Presenter.State.Entries" IsLoading="@(!Presenter.State.Loaded)" Caption="@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.audit.count", "count", Presenter.State.TotalCount) : null)">
+        <HeaderContent>
+            <th scope="col">@T["ui.audit.when"]</th>
+            <th scope="col">@T["ui.audit.who"]</th>
+            <th scope="col">@T["ui.audit.what"]</th>
+            <th scope="col">@T["ui.audit.on"]</th>
+            <th scope="col">@T["ui.audit.ip"]</th>
+            <th scope="col"><span class="vx-visually-hidden">@T["ui.audit.details"]</span></th>
+        </HeaderContent>
+        <RowTemplate Context="entry">
+            <td>@PlatformDisplay.Utc(T, entry.OccurredUtc)</td>
+            <td>
+                @if (entry.ActorUserId is Guid actor)
+                {
+                    <a href="/users/@actor">@(entry.ActorName ?? actor.ToString())</a>
+                }
+                else
+                {
+                    @T["ui.audit.no_actor"]
+                }
+            </td>
+            <td>@T[PlatformDisplay.AuditActionKey(entry.ActionCode)]</td>
+            <td><AuditTargetLink Entry="@entry" /></td>
+            <td>@entry.IpAddress</td>
+            <td><a href="/audit/@entry.AuditEntryId">@T["ui.audit.details"]</a></td>
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.audit.empty"]" />
+        </EmptyContent>
+    </VxDataTable>
+    @if (Presenter.State.Loaded && Presenter.State.Entries.Count > 0)
+    {
+        <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="GoToPage" />
+    }
 }
 
 @code {
@@ -133,5 +113,10 @@ else
     {
         AuditLogQuery next = Query with { ActionCode = string.IsNullOrEmpty(_action) ? null : _action, From = _from, To = _to, Page = 1 };
         Navigation.NavigateTo(next.ToUrl(1));
+    }
+
+    private void GoToPage(int page)
+    {
+        Navigation.NavigateTo(Query.ToUrl(page));
     }
 }

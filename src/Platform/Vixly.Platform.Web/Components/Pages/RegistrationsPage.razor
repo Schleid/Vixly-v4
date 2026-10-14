@@ -1,0 +1,31 @@
+﻿@*
+=========================================================
+FILE: RegistrationsPage.razor
+
+PURPOSE:
+Self-service registrations for staff.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/tenants/registrations"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.registrations.title"]</PageTitle>
+<p><a href="/tenants">@T["ui.tenants.back"]</a></p>
+<h1>@T["ui.registrations.title"]</h1>
+<RegistrationList Search="@Search" Status="@Status" Page="@Page" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Search { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

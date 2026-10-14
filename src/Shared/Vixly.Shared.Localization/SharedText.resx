@@ -16,4 +16,28 @@
   <data name="shared.time.must_be_utc" xml:space="preserve">
     <value>Times must be in UTC.</value>
   </data>
+  <data name="shared.ui.close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="shared.ui.dismiss" xml:space="preserve">
+    <value>Dismiss</value>
+  </data>
+  <data name="shared.ui.empty" xml:space="preserve">
+    <value>No records found</value>
+  </data>
+  <data name="shared.ui.loading" xml:space="preserve">
+    <value>Loading…</value>
+  </data>
+  <data name="shared.ui.next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="shared.ui.page_of" xml:space="preserve">
+    <value>Page {page} of {pages}</value>
+  </data>
+  <data name="shared.ui.pages" xml:space="preserve">
+    <value>Pages</value>
+  </data>
+  <data name="shared.ui.previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
 </root>

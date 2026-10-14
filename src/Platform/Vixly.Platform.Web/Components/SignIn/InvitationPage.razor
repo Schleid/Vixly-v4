@@ -23,7 +23,7 @@ IMPORTANT NOTES:
         <input type="hidden" name="token" value="@Token" />
         <label for="password">@T["ui.invite.password"]</label>
         <input id="password" name="password" type="password" autocomplete="new-password" minlength="@PlatformPasswordPolicy.MinLength" maxlength="@PlatformPasswordPolicy.MaxLength" required />
-        <button type="submit" class="vx-button vx-button--primary">@T["ui.invite.submit"]</button>
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.invite.submit"]</VxButton>
     </form>
 </AuthShell>
 

@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: TenantPage.razor
+
+PURPOSE:
+One tenant and all its sections.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/tenants/{TenantId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<p><a href="/tenants">@T["ui.tenants.back"]</a></p>
+<TenantSummary TenantId="@TenantId" />
+
+@code {
+    [Parameter]
+    public Guid TenantId { get; set; }
+}

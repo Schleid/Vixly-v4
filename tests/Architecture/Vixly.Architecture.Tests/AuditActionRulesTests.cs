@@ -19,13 +19,13 @@ namespace Vixly.Architecture.Tests;
 //
 // IMPORTANT NOTES:
 // - Reads the source: an action code is the first platform.*
-//   literal after Record(, RecordFailedAttemptAsync( or
-//   new PlatformUserLifecycleAction(
+//   literal after Record(, RecordChange(, RecordMove(,
+//   RecordFailedAttemptAsync( or new PlatformUserLifecycleAction(
 // =========================================================
 public sealed class AuditActionRulesTests
 {
     private static readonly Regex Written = new(
-        @"(?:\.Record\(|RecordFailedAttemptAsync\(|new PlatformUserLifecycleAction\()[^;]*?""(?<code>platform\.[a-z0-9_.]+)""",
+        @"(?:\.Record\(|\.RecordChange\(|\.RecordMove\(|RecordFailedAttemptAsync\(|new PlatformUserLifecycleAction\()[^;]*?""(?<code>platform\.[a-z0-9_.]+)""",
         RegexOptions.Singleline | RegexOptions.CultureInvariant);
 
     [Fact]

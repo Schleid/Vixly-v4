@@ -1,12 +1,7 @@
-﻿using System.Globalization;
-using System.Net;
-using System.Net.Mail;
-using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Vixly.Platform.Application.Ports;
 using Vixly.Platform.Domain.Identity;
 using Vixly.Platform.Infrastructure.Hosting;
-using Vixly.Platform.Resources;
 using Vixly.Shared.Localization;
 
 namespace Vixly.Platform.Infrastructure.Mail;
@@ -15,37 +10,26 @@ namespace Vixly.Platform.Infrastructure.Mail;
 // FILE: SmtpPlatformIdentityMailer.cs
 //
 // PURPOSE:
-// Sends the identity emails over SMTP, in the recipient's
-// language (L-4).
+// Sends staff identity emails: invitation, password reset and
+// security notices.
 //
 // RESPONSIBILITIES:
-// - Build links from PlatformHosting:ConsoleBaseUrl
-// - Render subject and body from PlatformText in the user's
-//   preferred language
-// - Send through SMTP, or write .eml files to the pickup
-//   directory in development
+// - Build each email from resources in the user's language
+// - Put the console link with the token into the body
 //
 // IMPORTANT NOTES:
-// - Never logs the body or the link: they hold one-time
-//   tokens
-// - Plain text only for now; the Frontend/UI team designs the
-//   HTML templates later, from the same resource keys
+// - Delivery goes through PlatformMailSender
+// - Tokens appear only in the link; never logged (S-11)
 // =========================================================
 public sealed class SmtpPlatformIdentityMailer : IPlatformIdentityMailer
 {
-    private readonly IStringLocalizer<PlatformText> _text;
-
-    private readonly PlatformMailOptions _mail;
+    private readonly PlatformMailSender _sender;
 
     private readonly PlatformHostingOptions _hosting;
 
-    public SmtpPlatformIdentityMailer(
-        IStringLocalizer<PlatformText> text,
-        IOptions<PlatformMailOptions> mail,
-        IOptions<PlatformHostingOptions> hosting)
+    public SmtpPlatformIdentityMailer(PlatformMailSender sender, IOptions<PlatformHostingOptions> hosting)
     {
-        _text = text ?? throw new ArgumentNullException(nameof(text));
-        _mail = mail?.Value ?? throw new ArgumentNullException(nameof(mail));
+        _sender = sender ?? throw new ArgumentNullException(nameof(sender));
         _hosting = hosting?.Value ?? throw new ArgumentNullException(nameof(hosting));
     }
 
@@ -90,62 +74,19 @@ public sealed class SmtpPlatformIdentityMailer : IPlatformIdentityMailer
         return SendAsync(user, "email.notice.subject", noticeCode, null, cancellationToken);
     }
 
-    private async Task SendAsync(
+    private Task SendAsync(
         PlatformUser user,
         string subjectKey,
         string bodyKey,
         IReadOnlyDictionary<string, object>? values,
         CancellationToken cancellationToken)
     {
-        CultureInfo previous = CultureInfo.CurrentUICulture;
-        string subject;
-        string body;
-
-        try
-        {
-            CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(user.PreferredLanguage.Value);
-            subject = VixlyText.Format(_text, subjectKey);
-            body = VixlyText.Format(_text, bodyKey, values);
-        }
-        finally
-        {
-            CultureInfo.CurrentUICulture = previous;
-        }
-
-        using MailMessage message = new()
-        {
-            From = new MailAddress(_mail.FromAddress, _mail.FromName),
-            Subject = subject,
-            Body = body,
-            IsBodyHtml = false
-        };
-        message.To.Add(new MailAddress(user.Email.Value, $"{user.FirstName} {user.LastName}"));
-
-        using SmtpClient client = CreateClient();
-        await client.SendMailAsync(message, cancellationToken);
-    }
-
-    private SmtpClient CreateClient()
-    {
-        if (!string.IsNullOrWhiteSpace(_mail.PickupDirectory))
-        {
-            Directory.CreateDirectory(_mail.PickupDirectory);
-
-            return new SmtpClient
-            {
-                DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory,
-                PickupDirectoryLocation = Path.GetFullPath(_mail.PickupDirectory)
-            };
-        }
-
-        SmtpClient client = new(_mail.SmtpHost, _mail.SmtpPort) { EnableSsl = _mail.UseSsl };
-
-        if (!string.IsNullOrEmpty(_mail.UserName))
-        {
-            client.Credentials = new NetworkCredential(_mail.UserName, _mail.Password);
-        }
-
-        return client;
+        return _sender.SendAsync(
+            user.Email.Value,
+            $"{user.FirstName} {user.LastName}",
+            user.PreferredLanguage,
+            text => (VixlyText.Format(text, subjectKey), VixlyText.Format(text, bodyKey, values)),
+            cancellationToken);
     }
 
     private string Link(string path, string token)

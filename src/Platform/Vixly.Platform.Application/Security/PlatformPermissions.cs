@@ -74,6 +74,24 @@ public static class PlatformPermissions
 
     public const string AuditView = "platform.audit.view";
 
+    public const string TenantsView = "platform.tenants.view";
+
+    public const string TenantsCreate = "platform.tenants.create";
+
+    public const string TenantsEdit = "platform.tenants.edit";
+
+    public const string TenantsAddNotes = "platform.tenants.add_notes";
+
+    public const string TenantsActivate = "platform.tenants.activate";
+
+    public const string TenantsSuspend = "platform.tenants.suspend";
+
+    public const string TenantsReactivate = "platform.tenants.reactivate";
+
+    public const string TenantsDeactivate = "platform.tenants.deactivate";
+
+    public const string TenantsBan = "platform.tenants.ban";
+
     public static IReadOnlyList<string> Catalogue { get; } = new[]
     {
         UsersView,
@@ -99,7 +117,16 @@ public static class PlatformPermissions
         DepartmentsEdit,
         DepartmentsDeactivate,
         DepartmentsManageMembers,
-        AuditView
+        AuditView,
+        TenantsView,
+        TenantsCreate,
+        TenantsEdit,
+        TenantsAddNotes,
+        TenantsActivate,
+        TenantsSuspend,
+        TenantsReactivate,
+        TenantsDeactivate,
+        TenantsBan
     };
 
     public static IReadOnlyCollection<string> All { get; } = new HashSet<string>(Catalogue, StringComparer.Ordinal);

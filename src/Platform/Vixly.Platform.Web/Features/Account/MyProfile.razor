@@ -20,11 +20,10 @@ IMPORTANT NOTES:
 @inject PlatformErrorText Errors
 @inject NavigationManager Navigation
 
-<section class="vx-card" aria-labelledby="my-profile">
-    <h2 id="my-profile">@T["ui.users.profile"]</h2>
+<VxCard Title="@T["ui.users.profile"]">
     @if (Presenter.State.Error is not null)
     {
-        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
     }
     @if (Presenter.State.Account is { } account)
     {
@@ -42,7 +41,7 @@ IMPORTANT NOTES:
                 }
             </select>
             <div class="vx-actions">
-                <button type="submit" class="vx-button" disabled="@Presenter.IsBusy">@T["ui.account.save"]</button>
+                <VxButton Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.account.save"]</VxButton>
             </div>
         </form>
     }
@@ -50,7 +49,7 @@ IMPORTANT NOTES:
     {
         <p role="status">@T["ui.common.loading"]</p>
     }
-</section>
+</VxCard>
 
 @code {
     private string _language = string.Empty;

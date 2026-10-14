@@ -22,6 +22,23 @@ Si vous n'attendiez pas cet e-mail, vous pouvez l'ignorer.</value>
     <value>Avis de sécurité de Vixly Control</value>
     <comment>needs-review</comment>
   </data>
+  <data name="email.registration.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Merci d'avoir inscrit {company} sur Vixly. L'adresse de votre portail sera {address}.
+
+Confirmez votre e-mail dans les {hours} heures avec ce lien :
+{link}
+
+Si vous n'avez rien demandé, ignorez cet e-mail.
+
+Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.registration.subject" xml:space="preserve">
+    <value>Confirmez votre e-mail pour continuer avec Vixly</value>
+    <comment>needs-review</comment>
+  </data>
   <data name="email.reset.body" xml:space="preserve">
     <value>Bonjour {name},
 
@@ -34,6 +51,50 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
   </data>
   <data name="email.reset.subject" xml:space="preserve">
     <value>Réinitialisez votre mot de passe Vixly Control</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.tenant_notice.banned" xml:space="preserve">
+    <value>Bonjour {name},
+
+Le compte Vixly de {company} a été fermé définitivement.
+
+Pour toute question, écrivez-nous à {support}.
+
+Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.tenant_notice.deactivated" xml:space="preserve">
+    <value>Bonjour {name},
+
+Le compte Vixly de {company} a été désactivé. Vos données sont conservées.
+
+Pour le rouvrir, écrivez-nous à {support}.
+
+Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.tenant_notice.reactivated" xml:space="preserve">
+    <value>Bonjour {name},
+
+L'accès à Vixly pour {company} a été rétabli.
+
+Des questions ? Écrivez-nous à {support}.
+
+Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.tenant_notice.subject" xml:space="preserve">
+    <value>L'accès à Vixly pour {company} a changé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.tenant_notice.suspended" xml:space="preserve">
+    <value>Bonjour {name},
+
+L'accès à Vixly pour {company} a été suspendu ({category}). Vos données sont conservées.
+
+Pour régler la situation, écrivez-nous à {support}.
+
+Vixly</value>
     <comment>needs-review</comment>
   </data>
   <data name="platform.auth.account_not_invited" xml:space="preserve">
@@ -344,6 +405,18 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
     <value>Un utilisateur est requis.</value>
     <comment>needs-review</comment>
   </data>
+  <data name="platform.messaging.payload_required" xml:space="preserve">
+    <value>Ce message n'a pas de contenu.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.messaging.stream_required" xml:space="preserve">
+    <value>Ce message n'a pas de flux.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.messaging.type_invalid" xml:space="preserve">
+    <value>Ce type de message n'est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
   <data name="platform.notice.passkey_added" xml:space="preserve">
     <value>Une clé d'accès a été ajoutée à votre compte Vixly Control. Si ce n'était pas vous, contactez immédiatement votre administrateur.</value>
     <comment>needs-review</comment>
@@ -362,6 +435,66 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
   </data>
   <data name="platform.notice.second_factor_reset" xml:space="preserve">
     <value>Un administrateur a supprimé les clés d'accès, l'application d'authentification et les codes de récupération de votre compte Vixly Control. À votre prochaine connexion, vous en configurerez de nouveaux. Si vous n'avez rien demandé, contactez immédiatement votre administrateur.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.access_hash_invalid" xml:space="preserve">
+    <value>Votre session d'inscription n'est pas valide. Recommencez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.already_verified" xml:space="preserve">
+    <value>Cet e-mail est déjà vérifié.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.bot_check_failed" xml:space="preserve">
+    <value>Nous n'avons pas pu confirmer que vous êtes une personne. Rechargez la page et réessayez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.cancelled" xml:space="preserve">
+    <value>Cette inscription a été annulée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.closed" xml:space="preserve">
+    <value>Cette inscription est close.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.email_unchanged" xml:space="preserve">
+    <value>C'est déjà l'e-mail de l'inscription.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.expired" xml:space="preserve">
+    <value>Cette inscription a expiré. Recommencez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.legal_version_invalid" xml:space="preserve">
+    <value>Les conditions acceptées ne sont pas reconnues. Rechargez la page.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.link_invalid" xml:space="preserve">
+    <value>Ce lien n'est plus valide. Demandez-en un nouveau.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.not_found" xml:space="preserve">
+    <value>Cette inscription n'existe pas ou vous ne pouvez pas la voir.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.not_verified" xml:space="preserve">
+    <value>Vérifiez d'abord votre e-mail.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.owner_name_required" xml:space="preserve">
+    <value>Saisissez votre nom.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.owner_name_too_long" xml:space="preserve">
+    <value>Utilisez au maximum {maxLength} caractères pour votre nom.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.resend_too_soon" xml:space="preserve">
+    <value>Vous pouvez demander {maxCount} e-mails par heure. Réessayez plus tard.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.terms_not_accepted" xml:space="preserve">
+    <value>Acceptez les conditions et la politique de confidentialité pour continuer.</value>
     <comment>needs-review</comment>
   </data>
   <data name="platform.roles.exceeds_your_access" xml:space="preserve">
@@ -386,6 +519,150 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
   </data>
   <data name="platform.security.user_id_required" xml:space="preserve">
     <value>Un utilisateur connecté est requis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.account_manager_invalid" xml:space="preserve">
+    <value>Choisissez un membre actif du personnel comme gestionnaire de compte.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.actor_required" xml:space="preserve">
+    <value>Un membre du personnel connecté est requis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.address_required" xml:space="preserve">
+    <value>Saisissez l'adresse.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.address_too_long" xml:space="preserve">
+    <value>Utilisez au maximum {maxLength} caractères par ligne d'adresse.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.already_banned" xml:space="preserve">
+    <value>Ce locataire est déjà banni.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.ban_needs_superuser" xml:space="preserve">
+    <value>Seul un SuperUser peut bannir un locataire.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.city_required" xml:space="preserve">
+    <value>Saisissez la ville.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.city_too_long" xml:space="preserve">
+    <value>Utilisez au maximum {maxLength} caractères pour la ville.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.code_invalid" xml:space="preserve">
+    <value>Ce code de locataire n'est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.code_unavailable" xml:space="preserve">
+    <value>Impossible de générer un code locataire. Réessayez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.contact_name_required" xml:space="preserve">
+    <value>Saisissez le nom du contact.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.contact_name_too_long" xml:space="preserve">
+    <value>Utilisez au maximum {maxLength} caractères pour le nom du contact.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.contact_role_duplicate" xml:space="preserve">
+    <value>Chaque rôle de contact ne peut être utilisé qu'une fois.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.contact_role_invalid" xml:space="preserve">
+    <value>Ce rôle de contact n'est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.country_invalid" xml:space="preserve">
+    <value>Choisissez un pays dans la liste.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.legal_name_required" xml:space="preserve">
+    <value>Saisissez la raison sociale de l'entreprise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.legal_name_too_long" xml:space="preserve">
+    <value>Utilisez au maximum {maxLength} caractères pour la raison sociale.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.move_not_allowed" xml:space="preserve">
+    <value>Ce locataire ne peut pas faire ce changement depuis son statut actuel.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.note_required" xml:space="preserve">
+    <value>Rédigez d'abord la note.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.note_too_long" xml:space="preserve">
+    <value>Utilisez au maximum {maxLength} caractères pour une note.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.owner_contact_required" xml:space="preserve">
+    <value>Un contact propriétaire est requis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.postal_code_too_long" xml:space="preserve">
+    <value>Utilisez au maximum {maxLength} caractères pour le code postal.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.reason_required" xml:space="preserve">
+    <value>Indiquez un motif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.reason_too_long" xml:space="preserve">
+    <value>Utilisez au maximum {maxLength} caractères pour le motif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.slug_fixed" xml:space="preserve">
+    <value>L'adresse ne peut plus changer : ce locataire a déjà été actif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.slug_invalid" xml:space="preserve">
+    <value>Utilisez de {minLength} à {maxLength} lettres minuscules, chiffres ou tirets simples, pas au début ni à la fin.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.slug_reserved" xml:space="preserve">
+    <value>Cette adresse est réservée. Choisissez-en une autre.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.slug_taken" xml:space="preserve">
+    <value>Cette adresse n'est pas disponible. Choisissez-en une autre.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.slug_unchanged" xml:space="preserve">
+    <value>C'est déjà l'adresse de ce locataire.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.state_province_too_long" xml:space="preserve">
+    <value>Utilisez au maximum {maxLength} caractères pour l'État ou la province.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.suspension_category_invalid" xml:space="preserve">
+    <value>Choisissez une catégorie de suspension.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.tag_invalid" xml:space="preserve">
+    <value>Utilisez de {minLength} à {maxLength} lettres minuscules, chiffres ou tirets pour une étiquette.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.tenant_required" xml:space="preserve">
+    <value>Un locataire est requis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.time_zone_invalid" xml:space="preserve">
+    <value>Choisissez un fuseau horaire dans la liste.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.too_many_tags" xml:space="preserve">
+    <value>Utilisez au maximum {maxCount} étiquettes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenants.trading_name_too_long" xml:space="preserve">
+    <value>Utilisez au maximum {maxLength} caractères pour le nom commercial.</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.account.add_passkey" xml:space="preserve">
@@ -596,6 +873,26 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
     <value>Service modifié</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.audit.action.platform.registrations.cancelled" xml:space="preserve">
+    <value>Inscription annulée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.registrations.email_corrected" xml:space="preserve">
+    <value>E-mail d'inscription corrigé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.registrations.email_verified" xml:space="preserve">
+    <value>E-mail d'inscription vérifié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.registrations.started" xml:space="preserve">
+    <value>Inscription commencée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.registrations.verification_resent" xml:space="preserve">
+    <value>Lien de vérification renvoyé</value>
+    <comment>needs-review</comment>
+  </data>
   <data name="ui.audit.action.platform.roles.assigned" xml:space="preserve">
     <value>Rôle attribué</value>
     <comment>needs-review</comment>
@@ -634,6 +931,58 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
   </data>
   <data name="ui.audit.action.platform.setup.first_super_user_invited" xml:space="preserve">
     <value>Premier SuperUser invité lors de l'installation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.account_manager_assigned" xml:space="preserve">
+    <value>Gestionnaire de compte modifié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.activated" xml:space="preserve">
+    <value>Locataire activé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.banned" xml:space="preserve">
+    <value>Locataire banni</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.contacts_updated" xml:space="preserve">
+    <value>Contacts du locataire modifiés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.created" xml:space="preserve">
+    <value>Locataire créé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.deactivated" xml:space="preserve">
+    <value>Locataire désactivé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.note_added" xml:space="preserve">
+    <value>Note ajoutée à un locataire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.profile_updated" xml:space="preserve">
+    <value>Profil du locataire modifié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.reactivated" xml:space="preserve">
+    <value>Locataire réactivé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.settings_updated" xml:space="preserve">
+    <value>Langue ou fuseau horaire du locataire modifié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.slug_corrected" xml:space="preserve">
+    <value>Adresse du locataire corrigée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.suspended" xml:space="preserve">
+    <value>Locataire suspendu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.tags_changed" xml:space="preserve">
+    <value>Étiquettes du locataire modifiées</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.audit.action.platform.users.deactivated" xml:space="preserve">
@@ -768,6 +1117,14 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
     <value>Rôle</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.audit.target.PlatformTenant" xml:space="preserve">
+    <value>Locataire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.target.PlatformTenantRegistration" xml:space="preserve">
+    <value>Inscription</value>
+    <comment>needs-review</comment>
+  </data>
   <data name="ui.audit.target.PlatformUser" xml:space="preserve">
     <value>Utilisateur</value>
     <comment>needs-review</comment>
@@ -808,6 +1165,14 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
     <value>Annuler</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.common.close" xml:space="preserve">
+    <value>Fermer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.common.dismiss" xml:space="preserve">
+    <value>Ignorer</value>
+    <comment>needs-review</comment>
+  </data>
   <data name="ui.common.loading" xml:space="preserve">
     <value>Chargement…</value>
     <comment>needs-review</comment>
@@ -846,6 +1211,1002 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
   </data>
   <data name="ui.common.yes" xml:space="preserve">
     <value>Oui</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AD" xml:space="preserve">
+    <value>Andorre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AE" xml:space="preserve">
+    <value>Émirats arabes unis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AF" xml:space="preserve">
+    <value>Afghanistan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AG" xml:space="preserve">
+    <value>Antigua-et-Barbuda</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AI" xml:space="preserve">
+    <value>Anguilla</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AL" xml:space="preserve">
+    <value>Albanie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AM" xml:space="preserve">
+    <value>Arménie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AO" xml:space="preserve">
+    <value>Angola</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AQ" xml:space="preserve">
+    <value>Antarctique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AR" xml:space="preserve">
+    <value>Argentine</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AS" xml:space="preserve">
+    <value>Samoa américaines</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AT" xml:space="preserve">
+    <value>Autriche</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AU" xml:space="preserve">
+    <value>Australie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AW" xml:space="preserve">
+    <value>Aruba</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AX" xml:space="preserve">
+    <value>Îles Åland</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.AZ" xml:space="preserve">
+    <value>Azerbaïdjan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BA" xml:space="preserve">
+    <value>Bosnie-Herzégovine</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BB" xml:space="preserve">
+    <value>Barbade</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BD" xml:space="preserve">
+    <value>Bangladesh</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BE" xml:space="preserve">
+    <value>Belgique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BF" xml:space="preserve">
+    <value>Burkina Faso</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BG" xml:space="preserve">
+    <value>Bulgarie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BH" xml:space="preserve">
+    <value>Bahreïn</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BI" xml:space="preserve">
+    <value>Burundi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BJ" xml:space="preserve">
+    <value>Bénin</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BL" xml:space="preserve">
+    <value>Saint-Barthélemy</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BM" xml:space="preserve">
+    <value>Bermudes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BN" xml:space="preserve">
+    <value>Brunei</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BO" xml:space="preserve">
+    <value>Bolivie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BQ" xml:space="preserve">
+    <value>Pays-Bas caribéens</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BR" xml:space="preserve">
+    <value>Brésil</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BS" xml:space="preserve">
+    <value>Bahamas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BT" xml:space="preserve">
+    <value>Bhoutan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BV" xml:space="preserve">
+    <value>Île Bouvet</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BW" xml:space="preserve">
+    <value>Botswana</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BY" xml:space="preserve">
+    <value>Biélorussie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.BZ" xml:space="preserve">
+    <value>Belize</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CA" xml:space="preserve">
+    <value>Canada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CC" xml:space="preserve">
+    <value>Îles Cocos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CD" xml:space="preserve">
+    <value>Congo-Kinshasa</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CF" xml:space="preserve">
+    <value>République centrafricaine</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CG" xml:space="preserve">
+    <value>Congo-Brazzaville</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CH" xml:space="preserve">
+    <value>Suisse</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CI" xml:space="preserve">
+    <value>Côte d’Ivoire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CK" xml:space="preserve">
+    <value>Îles Cook</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CL" xml:space="preserve">
+    <value>Chili</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CM" xml:space="preserve">
+    <value>Cameroun</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CN" xml:space="preserve">
+    <value>Chine</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CO" xml:space="preserve">
+    <value>Colombie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CR" xml:space="preserve">
+    <value>Costa Rica</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CU" xml:space="preserve">
+    <value>Cuba</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CV" xml:space="preserve">
+    <value>Cap-Vert</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CW" xml:space="preserve">
+    <value>Curaçao</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CX" xml:space="preserve">
+    <value>Île Christmas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CY" xml:space="preserve">
+    <value>Chypre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.CZ" xml:space="preserve">
+    <value>Tchéquie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.DE" xml:space="preserve">
+    <value>Allemagne</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.DJ" xml:space="preserve">
+    <value>Djibouti</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.DK" xml:space="preserve">
+    <value>Danemark</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.DM" xml:space="preserve">
+    <value>Dominique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.DO" xml:space="preserve">
+    <value>République dominicaine</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.DZ" xml:space="preserve">
+    <value>Algérie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.EC" xml:space="preserve">
+    <value>Équateur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.EE" xml:space="preserve">
+    <value>Estonie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.EG" xml:space="preserve">
+    <value>Égypte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.EH" xml:space="preserve">
+    <value>Sahara occidental</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.ER" xml:space="preserve">
+    <value>Érythrée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.ES" xml:space="preserve">
+    <value>Espagne</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.ET" xml:space="preserve">
+    <value>Éthiopie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.FI" xml:space="preserve">
+    <value>Finlande</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.FJ" xml:space="preserve">
+    <value>Fidji</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.FK" xml:space="preserve">
+    <value>Îles Malouines</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.FM" xml:space="preserve">
+    <value>Micronésie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.FO" xml:space="preserve">
+    <value>Îles Féroé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.FR" xml:space="preserve">
+    <value>France</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GA" xml:space="preserve">
+    <value>Gabon</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GB" xml:space="preserve">
+    <value>Royaume-Uni</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GD" xml:space="preserve">
+    <value>Grenade</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GE" xml:space="preserve">
+    <value>Géorgie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GF" xml:space="preserve">
+    <value>Guyane française</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GG" xml:space="preserve">
+    <value>Guernesey</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GH" xml:space="preserve">
+    <value>Ghana</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GI" xml:space="preserve">
+    <value>Gibraltar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GL" xml:space="preserve">
+    <value>Groenland</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GM" xml:space="preserve">
+    <value>Gambie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GN" xml:space="preserve">
+    <value>Guinée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GP" xml:space="preserve">
+    <value>Guadeloupe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GQ" xml:space="preserve">
+    <value>Guinée équatoriale</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GR" xml:space="preserve">
+    <value>Grèce</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GS" xml:space="preserve">
+    <value>Géorgie du Sud-et-les Îles Sandwich du Sud</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GT" xml:space="preserve">
+    <value>Guatemala</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GU" xml:space="preserve">
+    <value>Guam</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GW" xml:space="preserve">
+    <value>Guinée-Bissau</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.GY" xml:space="preserve">
+    <value>Guyana</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.HK" xml:space="preserve">
+    <value>R.A.S. chinoise de Hong Kong</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.HM" xml:space="preserve">
+    <value>Îles Heard-et-MacDonald</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.HN" xml:space="preserve">
+    <value>Honduras</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.HR" xml:space="preserve">
+    <value>Croatie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.HT" xml:space="preserve">
+    <value>Haïti</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.HU" xml:space="preserve">
+    <value>Hongrie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.ID" xml:space="preserve">
+    <value>Indonésie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.IE" xml:space="preserve">
+    <value>Irlande</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.IL" xml:space="preserve">
+    <value>Israël</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.IM" xml:space="preserve">
+    <value>Île de Man</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.IN" xml:space="preserve">
+    <value>Inde</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.IO" xml:space="preserve">
+    <value>Territoire britannique de l’océan Indien</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.IQ" xml:space="preserve">
+    <value>Irak</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.IR" xml:space="preserve">
+    <value>Iran</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.IS" xml:space="preserve">
+    <value>Islande</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.IT" xml:space="preserve">
+    <value>Italie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.JE" xml:space="preserve">
+    <value>Jersey</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.JM" xml:space="preserve">
+    <value>Jamaïque</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.JO" xml:space="preserve">
+    <value>Jordanie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.JP" xml:space="preserve">
+    <value>Japon</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.KE" xml:space="preserve">
+    <value>Kenya</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.KG" xml:space="preserve">
+    <value>Kirghizstan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.KH" xml:space="preserve">
+    <value>Cambodge</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.KI" xml:space="preserve">
+    <value>Kiribati</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.KM" xml:space="preserve">
+    <value>Comores</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.KN" xml:space="preserve">
+    <value>Saint-Christophe-et-Niévès</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.KP" xml:space="preserve">
+    <value>Corée du Nord</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.KR" xml:space="preserve">
+    <value>Corée du Sud</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.KW" xml:space="preserve">
+    <value>Koweït</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.KY" xml:space="preserve">
+    <value>Îles Caïmans</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.KZ" xml:space="preserve">
+    <value>Kazakhstan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.LA" xml:space="preserve">
+    <value>Laos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.LB" xml:space="preserve">
+    <value>Liban</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.LC" xml:space="preserve">
+    <value>Sainte-Lucie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.LI" xml:space="preserve">
+    <value>Liechtenstein</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.LK" xml:space="preserve">
+    <value>Sri Lanka</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.LR" xml:space="preserve">
+    <value>Liberia</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.LS" xml:space="preserve">
+    <value>Lesotho</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.LT" xml:space="preserve">
+    <value>Lituanie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.LU" xml:space="preserve">
+    <value>Luxembourg</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.LV" xml:space="preserve">
+    <value>Lettonie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.LY" xml:space="preserve">
+    <value>Libye</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MA" xml:space="preserve">
+    <value>Maroc</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MC" xml:space="preserve">
+    <value>Monaco</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MD" xml:space="preserve">
+    <value>Moldavie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.ME" xml:space="preserve">
+    <value>Monténégro</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MF" xml:space="preserve">
+    <value>Saint-Martin</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MG" xml:space="preserve">
+    <value>Madagascar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MH" xml:space="preserve">
+    <value>Îles Marshall</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MK" xml:space="preserve">
+    <value>Macédoine du Nord</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.ML" xml:space="preserve">
+    <value>Mali</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MM" xml:space="preserve">
+    <value>Myanmar (Birmanie)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MN" xml:space="preserve">
+    <value>Mongolie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MO" xml:space="preserve">
+    <value>R.A.S. chinoise de Macao</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MP" xml:space="preserve">
+    <value>Îles Mariannes du Nord</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MQ" xml:space="preserve">
+    <value>Martinique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MR" xml:space="preserve">
+    <value>Mauritanie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MS" xml:space="preserve">
+    <value>Montserrat</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MT" xml:space="preserve">
+    <value>Malte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MU" xml:space="preserve">
+    <value>Maurice</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MV" xml:space="preserve">
+    <value>Maldives</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MW" xml:space="preserve">
+    <value>Malawi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MX" xml:space="preserve">
+    <value>Mexique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MY" xml:space="preserve">
+    <value>Malaisie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.MZ" xml:space="preserve">
+    <value>Mozambique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.NA" xml:space="preserve">
+    <value>Namibie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.NC" xml:space="preserve">
+    <value>Nouvelle-Calédonie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.NE" xml:space="preserve">
+    <value>Niger</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.NF" xml:space="preserve">
+    <value>Île Norfolk</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.NG" xml:space="preserve">
+    <value>Nigeria</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.NI" xml:space="preserve">
+    <value>Nicaragua</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.NL" xml:space="preserve">
+    <value>Pays-Bas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.NO" xml:space="preserve">
+    <value>Norvège</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.NP" xml:space="preserve">
+    <value>Népal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.NR" xml:space="preserve">
+    <value>Nauru</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.NU" xml:space="preserve">
+    <value>Niue</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.NZ" xml:space="preserve">
+    <value>Nouvelle-Zélande</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.OM" xml:space="preserve">
+    <value>Oman</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.PA" xml:space="preserve">
+    <value>Panama</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.PE" xml:space="preserve">
+    <value>Pérou</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.PF" xml:space="preserve">
+    <value>Polynésie française</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.PG" xml:space="preserve">
+    <value>Papouasie-Nouvelle-Guinée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.PH" xml:space="preserve">
+    <value>Philippines</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.PK" xml:space="preserve">
+    <value>Pakistan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.PL" xml:space="preserve">
+    <value>Pologne</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.PM" xml:space="preserve">
+    <value>Saint-Pierre-et-Miquelon</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.PN" xml:space="preserve">
+    <value>Îles Pitcairn</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.PR" xml:space="preserve">
+    <value>Porto Rico</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.PS" xml:space="preserve">
+    <value>Territoires palestiniens</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.PT" xml:space="preserve">
+    <value>Portugal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.PW" xml:space="preserve">
+    <value>Palaos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.PY" xml:space="preserve">
+    <value>Paraguay</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.QA" xml:space="preserve">
+    <value>Qatar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.RE" xml:space="preserve">
+    <value>La Réunion</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.RO" xml:space="preserve">
+    <value>Roumanie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.RS" xml:space="preserve">
+    <value>Serbie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.RU" xml:space="preserve">
+    <value>Russie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.RW" xml:space="preserve">
+    <value>Rwanda</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SA" xml:space="preserve">
+    <value>Arabie saoudite</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SB" xml:space="preserve">
+    <value>Îles Salomon</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SC" xml:space="preserve">
+    <value>Seychelles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SD" xml:space="preserve">
+    <value>Soudan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SE" xml:space="preserve">
+    <value>Suède</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SG" xml:space="preserve">
+    <value>Singapour</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SH" xml:space="preserve">
+    <value>Sainte-Hélène</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SI" xml:space="preserve">
+    <value>Slovénie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SJ" xml:space="preserve">
+    <value>Svalbard et Jan Mayen</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SK" xml:space="preserve">
+    <value>Slovaquie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SL" xml:space="preserve">
+    <value>Sierra Leone</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SM" xml:space="preserve">
+    <value>Saint-Marin</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SN" xml:space="preserve">
+    <value>Sénégal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SO" xml:space="preserve">
+    <value>Somalie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SR" xml:space="preserve">
+    <value>Suriname</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SS" xml:space="preserve">
+    <value>Soudan du Sud</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.ST" xml:space="preserve">
+    <value>Sao Tomé-et-Principe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SV" xml:space="preserve">
+    <value>Salvador</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SX" xml:space="preserve">
+    <value>Saint-Martin (partie néerlandaise)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SY" xml:space="preserve">
+    <value>Syrie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.SZ" xml:space="preserve">
+    <value>Eswatini</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TC" xml:space="preserve">
+    <value>Îles Turques-et-Caïques</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TD" xml:space="preserve">
+    <value>Tchad</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TF" xml:space="preserve">
+    <value>Terres australes françaises</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TG" xml:space="preserve">
+    <value>Togo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TH" xml:space="preserve">
+    <value>Thaïlande</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TJ" xml:space="preserve">
+    <value>Tadjikistan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TK" xml:space="preserve">
+    <value>Tokelau</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TL" xml:space="preserve">
+    <value>Timor oriental</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TM" xml:space="preserve">
+    <value>Turkménistan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TN" xml:space="preserve">
+    <value>Tunisie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TO" xml:space="preserve">
+    <value>Tonga</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TR" xml:space="preserve">
+    <value>Turquie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TT" xml:space="preserve">
+    <value>Trinité-et-Tobago</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TV" xml:space="preserve">
+    <value>Tuvalu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TW" xml:space="preserve">
+    <value>Taïwan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.TZ" xml:space="preserve">
+    <value>Tanzanie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.UA" xml:space="preserve">
+    <value>Ukraine</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.UG" xml:space="preserve">
+    <value>Ouganda</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.UM" xml:space="preserve">
+    <value>Îles mineures éloignées des États-Unis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.US" xml:space="preserve">
+    <value>États-Unis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.UY" xml:space="preserve">
+    <value>Uruguay</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.UZ" xml:space="preserve">
+    <value>Ouzbékistan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.VA" xml:space="preserve">
+    <value>État de la Cité du Vatican</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.VC" xml:space="preserve">
+    <value>Saint-Vincent-et-les Grenadines</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.VE" xml:space="preserve">
+    <value>Venezuela</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.VG" xml:space="preserve">
+    <value>Îles Vierges britanniques</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.VI" xml:space="preserve">
+    <value>Îles Vierges des États-Unis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.VN" xml:space="preserve">
+    <value>Viêt Nam</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.VU" xml:space="preserve">
+    <value>Vanuatu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.WF" xml:space="preserve">
+    <value>Wallis-et-Futuna</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.WS" xml:space="preserve">
+    <value>Samoa</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.YE" xml:space="preserve">
+    <value>Yémen</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.YT" xml:space="preserve">
+    <value>Mayotte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.ZA" xml:space="preserve">
+    <value>Afrique du Sud</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.ZM" xml:space="preserve">
+    <value>Zambie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.country.ZW" xml:space="preserve">
+    <value>Zimbabwe</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.departments.actions" xml:space="preserve">
@@ -1136,6 +2497,42 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
     <value>Voir les rôles</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.permission.platform.tenants.activate" xml:space="preserve">
+    <value>Activer des locataires</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.tenants.add_notes" xml:space="preserve">
+    <value>Ajouter des notes aux locataires</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.tenants.ban" xml:space="preserve">
+    <value>Bannir des locataires (SuperUser uniquement)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.tenants.create" xml:space="preserve">
+    <value>Créer des locataires</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.tenants.deactivate" xml:space="preserve">
+    <value>Désactiver des locataires</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.tenants.edit" xml:space="preserve">
+    <value>Modifier les locataires et gérer les inscriptions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.tenants.reactivate" xml:space="preserve">
+    <value>Réactiver des locataires</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.tenants.suspend" xml:space="preserve">
+    <value>Suspendre des locataires</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.tenants.view" xml:space="preserve">
+    <value>Voir les locataires et les inscriptions</value>
+    <comment>needs-review</comment>
+  </data>
   <data name="ui.permission.platform.users.change_authority" xml:space="preserve">
     <value>Modifier les niveaux d'autorité (SuperUser uniquement)</value>
     <comment>needs-review</comment>
@@ -1196,6 +2593,10 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
     <value>Rôles</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.permission_area.tenants" xml:space="preserve">
+    <value>Locataires</value>
+    <comment>needs-review</comment>
+  </data>
   <data name="ui.permission_area.users" xml:space="preserve">
     <value>Utilisateurs</value>
     <comment>needs-review</comment>
@@ -1210,6 +2611,114 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
   </data>
   <data name="ui.recovery.title" xml:space="preserve">
     <value>Utiliser un code de récupération</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.back" xml:space="preserve">
+    <value>Retour aux inscriptions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.cancel" xml:space="preserve">
+    <value>Annuler l'inscription</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.cancel_help" xml:space="preserve">
+    <value>L'annulation libère l'adresse réservée. L'entreprise pourra s'inscrire à nouveau.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.cancelled" xml:space="preserve">
+    <value>Inscription annulée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.closed" xml:space="preserve">
+    <value>Close</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.consent" xml:space="preserve">
+    <value>Consentement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.consent_value" xml:space="preserve">
+    <value>Conditions {terms}, confidentialité {privacy}, depuis {ip}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.count" xml:space="preserve">
+    <value>Inscriptions : {count}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.details" xml:space="preserve">
+    <value>Inscription</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.empty" xml:space="preserve">
+    <value>Aucune inscription ne correspond à ces filtres.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.link_sent" xml:space="preserve">
+    <value>Dernier lien envoyé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.open_tenant" xml:space="preserve">
+    <value>Ouvrir le locataire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.resend" xml:space="preserve">
+    <value>Renvoyer le lien</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.resent" xml:space="preserve">
+    <value>Un nouveau lien de vérification a été envoyé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.search" xml:space="preserve">
+    <value>Rechercher entreprise, propriétaire, e-mail ou adresse</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.started" xml:space="preserve">
+    <value>Commencée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.status.cancelled" xml:space="preserve">
+    <value>Annulée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.status.completed" xml:space="preserve">
+    <value>Terminée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.status.expired" xml:space="preserve">
+    <value>Expirée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.status.pending_account_setup" xml:space="preserve">
+    <value>Configuration du compte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.status.pending_email_verification" xml:space="preserve">
+    <value>En attente de vérification de l'e-mail</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.status.pending_first_device_registration" xml:space="preserve">
+    <value>Enregistrement du premier appareil</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.status.pending_payment" xml:space="preserve">
+    <value>En attente de paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.status.pending_plan_selection" xml:space="preserve">
+    <value>Choix du forfait</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.tenant" xml:space="preserve">
+    <value>Locataire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.title" xml:space="preserve">
+    <value>Inscriptions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.verified" xml:space="preserve">
+    <value>E-mail vérifié</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.reset.done" xml:space="preserve">
@@ -1446,6 +2955,446 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
   </data>
   <data name="ui.stepup.use_passkey" xml:space="preserve">
     <value>Utiliser une clé d'accès</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_history.activated" xml:space="preserve">
+    <value>Activé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_history.banned" xml:space="preserve">
+    <value>Banni</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_history.created_by_staff" xml:space="preserve">
+    <value>Créé dans la console</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_history.created_from_registration" xml:space="preserve">
+    <value>Créé à partir d'une inscription en ligne</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_history.deactivated" xml:space="preserve">
+    <value>Désactivé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_history.reactivated" xml:space="preserve">
+    <value>Réactivé, désormais {status}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_history.slug_corrected" xml:space="preserve">
+    <value>Adresse corrigée de {from} à {to}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_history.suspended" xml:space="preserve">
+    <value>Suspendu ({category})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_history.terms_accepted" xml:space="preserve">
+    <value>Conditions {termsVersion} et politique de confidentialité {privacyVersion} acceptées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.account_manager" xml:space="preserve">
+    <value>Gestionnaire de compte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.activated" xml:space="preserve">
+    <value>Première activation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.address" xml:space="preserve">
+    <value>Adresse du portail</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.address_line1" xml:space="preserve">
+    <value>Adresse</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.address_line2" xml:space="preserve">
+    <value>Complément d'adresse (facultatif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.audit_link" xml:space="preserve">
+    <value>Entrées d'audit de cet élément</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.back" xml:space="preserve">
+    <value>Retour aux locataires</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.category" xml:space="preserve">
+    <value>Catégorie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.category.administrative" xml:space="preserve">
+    <value>Administratif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.category.compliance" xml:space="preserve">
+    <value>Conformité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.category.fraud_investigation" xml:space="preserve">
+    <value>Enquête pour fraude</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.category.security" xml:space="preserve">
+    <value>Sécurité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.choose_country" xml:space="preserve">
+    <value>Choisissez un pays</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.city" xml:space="preserve">
+    <value>Ville</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.code" xml:space="preserve">
+    <value>Code locataire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.company" xml:space="preserve">
+    <value>Entreprise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.company_email" xml:space="preserve">
+    <value>E-mail de l'entreprise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.company_phone" xml:space="preserve">
+    <value>Téléphone de l'entreprise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.contact_name" xml:space="preserve">
+    <value>Nom</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.contact_role" xml:space="preserve">
+    <value>Rôle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.contact_role.billing" xml:space="preserve">
+    <value>Facturation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.contact_role.owner" xml:space="preserve">
+    <value>Propriétaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.contact_role.technical" xml:space="preserve">
+    <value>Technique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.contacts" xml:space="preserve">
+    <value>Contacts</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.contacts_help" xml:space="preserve">
+    <value>Les contacts facturation et technique sont facultatifs ; s'ils sont vides, le propriétaire est utilisé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.contacts_saved" xml:space="preserve">
+    <value>Contacts enregistrés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.count" xml:space="preserve">
+    <value>Locataires : {count}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.country" xml:space="preserve">
+    <value>Pays</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.create" xml:space="preserve">
+    <value>Créer le locataire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.done.activate" xml:space="preserve">
+    <value>Locataire activé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.done.ban" xml:space="preserve">
+    <value>Locataire banni.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.done.deactivate" xml:space="preserve">
+    <value>Locataire désactivé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.done.reactivate" xml:space="preserve">
+    <value>Locataire réactivé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.done.suspend" xml:space="preserve">
+    <value>Locataire suspendu. Ses contacts seront informés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.empty" xml:space="preserve">
+    <value>Aucun locataire ne correspond à ces filtres.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.history" xml:space="preserve">
+    <value>Historique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.language" xml:space="preserve">
+    <value>Langue</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.legal_name" xml:space="preserve">
+    <value>Raison sociale</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.lifecycle" xml:space="preserve">
+    <value>Accès et statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.management" xml:space="preserve">
+    <value>Gestion du compte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.management_saved" xml:space="preserve">
+    <value>Gestion du compte enregistrée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.manager_inactive" xml:space="preserve">
+    <value>inactif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.move.activate" xml:space="preserve">
+    <value>Activer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.move.ban" xml:space="preserve">
+    <value>Bannir</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.move.deactivate" xml:space="preserve">
+    <value>Désactiver</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.move.reactivate" xml:space="preserve">
+    <value>Réactiver</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.move.suspend" xml:space="preserve">
+    <value>Suspendre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.move_help.activate" xml:space="preserve">
+    <value>Activer ce locataire ? L'adresse de son portail devient définitive.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.move_help.ban" xml:space="preserve">
+    <value>Le bannissement est définitif et irréversible.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.move_help.deactivate" xml:space="preserve">
+    <value>Désactiver ce locataire, par exemple à la fermeture de l'entreprise ? Il pourra être réactivé. Son adresse lui reste réservée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.move_help.reactivate" xml:space="preserve">
+    <value>La réactivation rétablit l'accès et clôt toute suspension en cours.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.move_help.suspend" xml:space="preserve">
+    <value>La suspension coupe l'accès à Vixly jusqu'à la réactivation. Les contacts du locataire sont informés de la catégorie.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.name" xml:space="preserve">
+    <value>Nom</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.new" xml:space="preserve">
+    <value>Nouveau locataire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.no_moves" xml:space="preserve">
+    <value>Aucun changement de statut ne vous est permis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.note_add" xml:space="preserve">
+    <value>Ajouter la note</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.note_added" xml:space="preserve">
+    <value>Note ajoutée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.note_by" xml:space="preserve">
+    <value>{name}, {time}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.note_new" xml:space="preserve">
+    <value>Nouvelle note</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.notes" xml:space="preserve">
+    <value>Notes internes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.notes_empty" xml:space="preserve">
+    <value>Aucune note pour l'instant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.origin" xml:space="preserve">
+    <value>Origine</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.origin.self_registration" xml:space="preserve">
+    <value>Inscription en ligne</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.origin.staff" xml:space="preserve">
+    <value>Créé par le personnel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.overview" xml:space="preserve">
+    <value>Vue d'ensemble</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.owner" xml:space="preserve">
+    <value>Propriétaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.phone" xml:space="preserve">
+    <value>Téléphone</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.phone_optional" xml:space="preserve">
+    <value>Téléphone (facultatif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.postal_address" xml:space="preserve">
+    <value>Adresse</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.postal_code" xml:space="preserve">
+    <value>Code postal (facultatif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.profile_saved" xml:space="preserve">
+    <value>Coordonnées de l'entreprise enregistrées.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.reason" xml:space="preserve">
+    <value>Motif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.reason_internal" xml:space="preserve">
+    <value>Le motif reste interne. Le locataire n'est informé que de la catégorie.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.search" xml:space="preserve">
+    <value>Rechercher nom, code, adresse, e-mail ou téléphone</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.sections" xml:space="preserve">
+    <value>Sections de ce locataire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.settings" xml:space="preserve">
+    <value>Langue et fuseau horaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.slug" xml:space="preserve">
+    <value>Nom de l'adresse du portail</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.slug_correct" xml:space="preserve">
+    <value>Corriger l'adresse</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.slug_correct_help" xml:space="preserve">
+    <value>Ce locataire n'a jamais été actif : son adresse peut encore être corrigée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.slug_corrected" xml:space="preserve">
+    <value>Adresse corrigée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.slug_current" xml:space="preserve">
+    <value>Adresse actuelle : {address}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.slug_fixed_help" xml:space="preserve">
+    <value>Vérifiez-la bien : une fois le locataire actif, l'adresse ne pourra plus changer, car les clients et les clés d'accès en dépendent.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.slug_preview" xml:space="preserve">
+    <value>L'adresse sera {address}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.state_province" xml:space="preserve">
+    <value>État ou province (facultatif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.status.active" xml:space="preserve">
+    <value>Actif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.status.all" xml:space="preserve">
+    <value>Tous les statuts</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.status.banned" xml:space="preserve">
+    <value>Banni</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.status.deactivated" xml:space="preserve">
+    <value>Désactivé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.status.draft" xml:space="preserve">
+    <value>Brouillon</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.status.pending_activation" xml:space="preserve">
+    <value>En attente d'activation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.status.suspended" xml:space="preserve">
+    <value>Suspendu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.status_since" xml:space="preserve">
+    <value>Statut depuis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.suspended_because" xml:space="preserve">
+    <value>Suspendu : {category}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.suspended_by" xml:space="preserve">
+    <value>Par {name}, {time}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.tag" xml:space="preserve">
+    <value>Étiquette</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.tags" xml:space="preserve">
+    <value>Étiquettes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.tags_help" xml:space="preserve">
+    <value>Séparez les étiquettes par des virgules. Minuscules, chiffres et tirets. Réservé au personnel.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.time_zone" xml:space="preserve">
+    <value>Fuseau horaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.title" xml:space="preserve">
+    <value>Locataires</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.trading_name" xml:space="preserve">
+    <value>Nom commercial (facultatif)</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.user_roles.assign" xml:space="preserve">

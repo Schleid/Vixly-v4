@@ -1,0 +1,90 @@
+﻿@*
+=========================================================
+FILE: TenantProfileEditor.razor
+
+PURPOSE:
+The company profile section: legal details, address, language
+and time zone.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantProfilePresenter>
+@using Vixly.Platform.Application.Queries
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="tenant-profile"><VxCard Title="@T["ui.tenants.company"]">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Info">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (Presenter.State.Editing)
+    {
+        <form class="vx-form" @onsubmit="SaveAsync">
+            <TenantCompanyFields Model="_form" Prefix="tenant-profile" />
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.departments.save"]</VxButton>
+                <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else
+    {
+        <dl class="vx-facts">
+            <dt>@T["ui.tenants.legal_name"]</dt><dd>@Tenant.LegalName</dd>
+            <dt>@T["ui.tenants.trading_name"]</dt><dd>@(Tenant.TradingName ?? T["ui.common.none"].Value)</dd>
+            <dt>@T["ui.tenants.company_email"]</dt><dd>@Tenant.CompanyEmail</dd>
+            <dt>@T["ui.tenants.company_phone"]</dt><dd>@Tenant.CompanyPhone</dd>
+            <dt>@T["ui.tenants.postal_address"]</dt>
+            <dd>
+                @Tenant.AddressLine1<br />
+                @if (Tenant.AddressLine2 is not null)
+                {
+                    @Tenant.AddressLine2<br />
+                }
+                @Tenant.City @Tenant.StateProvince @Tenant.PostalCode<br />
+                @PlatformDisplay.CountryName(T, Tenant.CountryCode)
+            </dd>
+        </dl>
+        @if (CanEdit)
+        {
+            <VxButton OnClick="StartEdit">@T["ui.departments.edit"]</VxButton>
+        }
+    }
+</VxCard></div>
+
+@code {
+    private TenantFormModel _form = new();
+
+    [Parameter, EditorRequired]
+    public PlatformTenantDetail Tenant { get; set; } = null!;
+
+    [Parameter]
+    public bool CanEdit { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private void StartEdit()
+    {
+        _form = TenantFormModel.From(Tenant);
+        Presenter.StartEdit();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (await Presenter.SaveAsync(Tenant.PlatformTenantId, _form))
+        {
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

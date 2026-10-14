@@ -19,8 +19,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<PlatformText> T
 @inject PlatformErrorText Errors
 
-<section class="vx-card" aria-labelledby="role-permissions">
-    <h2 id="role-permissions">@T["ui.roles.permissions_title"]</h2>
+<VxCard Title="@T["ui.roles.permissions_title"]">
     @if (!Presenter.State.Loaded)
     {
         <p role="status">@T["ui.common.loading"]</p>
@@ -33,11 +32,11 @@ IMPORTANT NOTES:
         }
         @if (Presenter.State.Done)
         {
-            <p class="vx-message vx-message--info" role="status">@T["ui.roles.permissions_saved"]</p>
+            <VxMessage Type="VxMessageType.Info">@T["ui.roles.permissions_saved"]</VxMessage>
         }
         @if (Presenter.State.Error is not null)
         {
-            <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
         }
         <form class="vx-form" @onsubmit="SaveAsync">
             @foreach (var area in RolePermissionsPresenter.Areas)
@@ -57,7 +56,7 @@ IMPORTANT NOTES:
             @if (Presenter.State.CanEdit)
             {
                 <div class="vx-actions">
-                    <button type="submit" class="vx-button vx-button--primary" disabled="@Presenter.IsBusy">@T["ui.roles.save_permissions"]</button>
+                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.roles.save_permissions"]</VxButton>
                 </div>
             }
         </form>
@@ -66,7 +65,7 @@ IMPORTANT NOTES:
             <StepUpDialog OnConfirmed="() => Presenter.ResumeAfterStepUpAsync(RoleId)" OnCancelled="Presenter.CancelStepUp" />
         }
     }
-</section>
+</VxCard>
 
 @code {
     private HashSet<string> _ticked = new(StringComparer.Ordinal);

@@ -19,56 +19,40 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<PlatformText> T
 @inject PlatformErrorText Errors
 
-<section class="vx-card" aria-labelledby="department-members">
-    <h2 id="department-members">@T["ui.departments.members"]</h2>
+<VxCard Title="@T["ui.departments.members"]">
     @if (Presenter.State.Removed)
     {
-        <p class="vx-message vx-message--info" role="status">@T["ui.departments.member_removed"]</p>
+        <VxMessage Type="VxMessageType.Info">@T["ui.departments.member_removed"]</VxMessage>
     }
     @if (Presenter.State.Error is not null)
     {
-        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
     }
-    @if (!Presenter.State.Loaded)
-    {
-        <p role="status">@T["ui.common.loading"]</p>
-    }
-    else if (Presenter.State.Members.Count == 0)
-    {
-        <p>@T["ui.departments.no_members"]</p>
-    }
-    else
-    {
-        <table class="vx-table">
-            <thead>
-                <tr>
-                    <th scope="col">@T["ui.users.name"]</th>
-                    <th scope="col">@T["ui.signin.email"]</th>
-                    <th scope="col">@T["ui.departments.primary"]</th>
-                    @if (Presenter.State.CanManage)
-                    {
-                        <th scope="col"><span class="vx-visually-hidden">@T["ui.departments.actions"]</span></th>
-                    }
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var member in Presenter.State.Members)
-                {
-                    <tr>
-                        <td><a href="/users/@member.PlatformUserId">@member.LastName, @member.FirstName</a></td>
-                        <td>@member.Email</td>
-                        <td>@T[member.IsPrimary ? "ui.common.yes" : "ui.common.no"]</td>
-                        @if (Presenter.State.CanManage)
-                        {
-                            <td><button type="button" class="vx-button" disabled="@Presenter.IsBusy" @onclick="() => Presenter.RemoveAsync(DepartmentId, member.PlatformUserId)">@T["ui.user_roles.revoke"]</button></td>
-                        }
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+    <VxDataTable Items="Presenter.State.Members" IsLoading="@(!Presenter.State.Loaded)">
+        <HeaderContent>
+            <th scope="col">@T["ui.users.name"]</th>
+            <th scope="col">@T["ui.signin.email"]</th>
+            <th scope="col">@T["ui.departments.primary"]</th>
+            @if (Presenter.State.CanManage)
+            {
+                <th scope="col"><span class="vx-visually-hidden">@T["ui.departments.actions"]</span></th>
+            }
+        </HeaderContent>
+        <RowTemplate Context="member">
+            <td><a href="/users/@member.PlatformUserId">@member.LastName, @member.FirstName</a></td>
+            <td>@member.Email</td>
+            <td>@T[member.IsPrimary ? "ui.common.yes" : "ui.common.no"]</td>
+            @if (Presenter.State.CanManage)
+            {
+                <td><VxButton IsBusy="@Presenter.IsBusy" OnClick="() => Presenter.RemoveAsync(DepartmentId, member.PlatformUserId)">@T["ui.user_roles.revoke"]</VxButton></td>
+            }
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.departments.no_members"]" />
+        </EmptyContent>
+    </VxDataTable>
     <p>@T["ui.departments.add_from_user"]</p>
-</section>
+</VxCard>
 
 @code {
     [Parameter, EditorRequired]

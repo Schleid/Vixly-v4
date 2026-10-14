@@ -22,7 +22,7 @@ IMPORTANT NOTES:
     </div>
     @if (Dismissible)
     {
-        <button type="button" class="vx-message__dismiss" aria-label="Dismiss" @onclick="OnDismiss">
+        <button type="button" class="vx-message__dismiss" aria-label="@(string.IsNullOrEmpty(DismissAriaLabel) ? "Dismiss" : DismissAriaLabel)" @onclick="OnDismiss">
             <span aria-hidden="true">&times;</span>
         </button>
     }
@@ -34,6 +34,9 @@ IMPORTANT NOTES:
 
     [Parameter]
     public string? Text { get; set; }
+
+    [Parameter]
+    public string? DismissAriaLabel { get; set; }
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }

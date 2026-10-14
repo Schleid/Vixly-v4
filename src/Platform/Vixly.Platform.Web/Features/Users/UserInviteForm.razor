@@ -25,14 +25,14 @@ IMPORTANT NOTES:
 }
 else if (!Presenter.State.CanInvite)
 {
-    <p class="vx-message vx-message--error" role="alert">@T["platform.security.access_denied"]</p>
+    <VxMessage Type="VxMessageType.Error">@T["platform.security.access_denied"]</VxMessage>
 }
 else
 {
     <p>@T["ui.users.invite_intro"]</p>
     @if (Presenter.State.Error is not null)
     {
-        <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
     }
     <form class="vx-form vx-card" @onsubmit="InviteAsync">
         <label for="invite-first">@T["ui.users.first_name"]</label>
@@ -60,7 +60,7 @@ else
         <label for="invite-phone">@T["ui.users.phone"]</label>
         <input id="invite-phone" type="tel" @bind="_input.PhoneNumber" maxlength="20" autocomplete="off" />
         <div class="vx-actions">
-            <button type="submit" class="vx-button vx-button--primary" disabled="@Presenter.IsBusy">@T["ui.users.invite_submit"]</button>
+            <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.users.invite_submit"]</VxButton>
             <a class="vx-button" href="/users">@T["ui.common.cancel"]</a>
         </div>
     </form>
