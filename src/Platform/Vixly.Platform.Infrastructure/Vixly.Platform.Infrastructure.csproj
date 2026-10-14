@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vixly.Platform.Application\Vixly.Platform.Application.csproj" />
+    <ProjectReference Include="..\Vixly.Platform.Domain\Vixly.Platform.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\Vixly.Shared.Kernel\Vixly.Shared.Kernel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Vixly.Platform.Infrastructure.Tests" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,26 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Contracts/">
+    <Project Path="src/Contracts/Vixly.Contracts.Platform/Vixly.Contracts.Platform.csproj" />
+  </Folder>
+  <Folder Name="/src/Platform/">
+    <Project Path="src/Platform/Vixly.Platform.Application/Vixly.Platform.Application.csproj" />
+    <Project Path="src/Platform/Vixly.Platform.Domain/Vixly.Platform.Domain.csproj" />
+    <Project Path="src/Platform/Vixly.Platform.Infrastructure/Vixly.Platform.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/Vixly.Shared.Kernel/Vixly.Shared.Kernel.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/Architecture/">
+    <Project Path="tests/Architecture/Vixly.Architecture.Tests/Vixly.Architecture.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Platform/">
+    <Project Path="tests/Platform/Vixly.Platform.Application.Tests/Vixly.Platform.Application.Tests.csproj" />
+    <Project Path="tests/Platform/Vixly.Platform.Domain.Tests/Vixly.Platform.Domain.Tests.csproj" />
+    <Project Path="tests/Platform/Vixly.Platform.Infrastructure.Tests/Vixly.Platform.Infrastructure.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Shared/">
+    <Project Path="tests/Shared/Vixly.Shared.Kernel.Tests/Vixly.Shared.Kernel.Tests.csproj" />
+  </Folder>
+</Solution>

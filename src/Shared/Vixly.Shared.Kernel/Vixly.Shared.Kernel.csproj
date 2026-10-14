@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Base library. BCL only; no package or project references (Global Standard 3). -->
+
+</Project>
