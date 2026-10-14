@@ -16,9 +16,9 @@ namespace Vixly.Platform.Application.UseCases.Roles;
 // =========================================================
 public static class PlatformRoleErrors
 {
-    public static readonly Error NameAlreadyUsed = Error.Create("platform.roles.name_already_used");
+    public static Error NameAlreadyUsed { get; } = Error.Create("platform.roles.name_already_used");
 
-    public static readonly Error RoleInactive = Error.Create("platform.roles.role_inactive");
+    public static Error RoleInactive { get; } = Error.Create("platform.roles.role_inactive");
 
-    public static readonly Error ExceedsYourAccess = Error.Create("platform.roles.exceeds_your_access");
+    public static Error ExceedsYourAccess { get; } = Error.Create("platform.roles.exceeds_your_access");
 }

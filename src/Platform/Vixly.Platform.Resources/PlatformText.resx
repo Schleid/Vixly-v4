@@ -376,6 +376,228 @@ If you did not ask for this, ignore this email. Your password stays the same.</v
   <data name="ui.app.name" xml:space="preserve">
     <value>Vixly Control</value>
   </data>
+  <data name="ui.audit.action.platform.account.language_changed" xml:space="preserve">
+    <value>Own language changed</value>
+  </data>
+  <data name="ui.audit.action.platform.account.passkey_added" xml:space="preserve">
+    <value>Passkey added</value>
+  </data>
+  <data name="ui.audit.action.platform.account.passkey_removed" xml:space="preserve">
+    <value>Passkey removed</value>
+  </data>
+  <data name="ui.audit.action.platform.account.password_changed" xml:space="preserve">
+    <value>Own password changed</value>
+  </data>
+  <data name="ui.audit.action.platform.account.recovery_codes_replaced" xml:space="preserve">
+    <value>New recovery codes</value>
+  </data>
+  <data name="ui.audit.action.platform.account.sessions_ended" xml:space="preserve">
+    <value>Own other sessions ended</value>
+  </data>
+  <data name="ui.audit.action.platform.auth.code_failed" xml:space="preserve">
+    <value>Wrong authenticator code at sign-in</value>
+  </data>
+  <data name="ui.audit.action.platform.auth.invitation_accepted" xml:space="preserve">
+    <value>Invitation accepted</value>
+  </data>
+  <data name="ui.audit.action.platform.auth.passkey_failed" xml:space="preserve">
+    <value>Passkey refused at sign-in</value>
+  </data>
+  <data name="ui.audit.action.platform.auth.password_failed" xml:space="preserve">
+    <value>Wrong password at sign-in</value>
+  </data>
+  <data name="ui.audit.action.platform.auth.password_reset" xml:space="preserve">
+    <value>Password reset with a link</value>
+  </data>
+  <data name="ui.audit.action.platform.auth.password_reset_requested" xml:space="preserve">
+    <value>Password reset requested</value>
+  </data>
+  <data name="ui.audit.action.platform.auth.recovery_code_failed" xml:space="preserve">
+    <value>Wrong recovery code at sign-in</value>
+  </data>
+  <data name="ui.audit.action.platform.auth.sign_in_refused" xml:space="preserve">
+    <value>Sign-in refused</value>
+  </data>
+  <data name="ui.audit.action.platform.auth.signed_in" xml:space="preserve">
+    <value>Signed in</value>
+  </data>
+  <data name="ui.audit.action.platform.auth.signed_out" xml:space="preserve">
+    <value>Signed out</value>
+  </data>
+  <data name="ui.audit.action.platform.auth.step_up_confirmed" xml:space="preserve">
+    <value>Identity confirmed for a sensitive action</value>
+  </data>
+  <data name="ui.audit.action.platform.auth.step_up_failed" xml:space="preserve">
+    <value>Identity confirmation failed</value>
+  </data>
+  <data name="ui.audit.action.platform.departments.created" xml:space="preserve">
+    <value>Department created</value>
+  </data>
+  <data name="ui.audit.action.platform.departments.deactivated" xml:space="preserve">
+    <value>Department deactivated</value>
+  </data>
+  <data name="ui.audit.action.platform.departments.member_added" xml:space="preserve">
+    <value>Added to a department</value>
+  </data>
+  <data name="ui.audit.action.platform.departments.member_removed" xml:space="preserve">
+    <value>Taken out of a department</value>
+  </data>
+  <data name="ui.audit.action.platform.departments.primary_set" xml:space="preserve">
+    <value>Primary department changed</value>
+  </data>
+  <data name="ui.audit.action.platform.departments.reactivated" xml:space="preserve">
+    <value>Department reactivated</value>
+  </data>
+  <data name="ui.audit.action.platform.departments.updated" xml:space="preserve">
+    <value>Department edited</value>
+  </data>
+  <data name="ui.audit.action.platform.roles.assigned" xml:space="preserve">
+    <value>Role given</value>
+  </data>
+  <data name="ui.audit.action.platform.roles.created" xml:space="preserve">
+    <value>Role created</value>
+  </data>
+  <data name="ui.audit.action.platform.roles.deactivated" xml:space="preserve">
+    <value>Role deactivated</value>
+  </data>
+  <data name="ui.audit.action.platform.roles.permissions_changed" xml:space="preserve">
+    <value>Role permissions changed</value>
+  </data>
+  <data name="ui.audit.action.platform.roles.reactivated" xml:space="preserve">
+    <value>Role reactivated</value>
+  </data>
+  <data name="ui.audit.action.platform.roles.renamed" xml:space="preserve">
+    <value>Role renamed</value>
+  </data>
+  <data name="ui.audit.action.platform.roles.revoked" xml:space="preserve">
+    <value>Role removed</value>
+  </data>
+  <data name="ui.audit.action.platform.roles.system_corrected" xml:space="preserve">
+    <value>System role permissions corrected at start</value>
+  </data>
+  <data name="ui.audit.action.platform.roles.system_created" xml:space="preserve">
+    <value>System role created at start</value>
+  </data>
+  <data name="ui.audit.action.platform.setup.first_super_user_invited" xml:space="preserve">
+    <value>First SuperUser invited at setup</value>
+  </data>
+  <data name="ui.audit.action.platform.users.deactivated" xml:space="preserve">
+    <value>Account deactivated</value>
+  </data>
+  <data name="ui.audit.action.platform.users.invitation_resent" xml:space="preserve">
+    <value>Invitation sent again</value>
+  </data>
+  <data name="ui.audit.action.platform.users.invited" xml:space="preserve">
+    <value>User invited</value>
+  </data>
+  <data name="ui.audit.action.platform.users.locked" xml:space="preserve">
+    <value>Account locked</value>
+  </data>
+  <data name="ui.audit.action.platform.users.password_reset_sent" xml:space="preserve">
+    <value>Password reset link sent</value>
+  </data>
+  <data name="ui.audit.action.platform.users.reactivated" xml:space="preserve">
+    <value>Account reactivated</value>
+  </data>
+  <data name="ui.audit.action.platform.users.second_factor_reset" xml:space="preserve">
+    <value>Second factor reset</value>
+  </data>
+  <data name="ui.audit.action.platform.users.sessions_ended" xml:space="preserve">
+    <value>User signed out everywhere</value>
+  </data>
+  <data name="ui.audit.action.platform.users.suspended" xml:space="preserve">
+    <value>Account suspended</value>
+  </data>
+  <data name="ui.audit.action_filter" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="ui.audit.after" xml:space="preserve">
+    <value>After</value>
+  </data>
+  <data name="ui.audit.all_actions" xml:space="preserve">
+    <value>All actions</value>
+  </data>
+  <data name="ui.audit.apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="ui.audit.arguments" xml:space="preserve">
+    <value>Details recorded</value>
+  </data>
+  <data name="ui.audit.back" xml:space="preserve">
+    <value>Back to the audit log</value>
+  </data>
+  <data name="ui.audit.before" xml:space="preserve">
+    <value>Before</value>
+  </data>
+  <data name="ui.audit.browser" xml:space="preserve">
+    <value>Browser</value>
+  </data>
+  <data name="ui.audit.clear" xml:space="preserve">
+    <value>Clear filters</value>
+  </data>
+  <data name="ui.audit.correlation" xml:space="preserve">
+    <value>Correlation id</value>
+  </data>
+  <data name="ui.audit.count" xml:space="preserve">
+    <value>Entries: {count}</value>
+  </data>
+  <data name="ui.audit.details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="ui.audit.empty" xml:space="preserve">
+    <value>No entries match these filters.</value>
+  </data>
+  <data name="ui.audit.entry_title" xml:space="preserve">
+    <value>Audit entry</value>
+  </data>
+  <data name="ui.audit.filtered_actor" xml:space="preserve">
+    <value>Showing what one person did.</value>
+  </data>
+  <data name="ui.audit.filtered_target" xml:space="preserve">
+    <value>Showing what was done to one record.</value>
+  </data>
+  <data name="ui.audit.from" xml:space="preserve">
+    <value>From (UTC)</value>
+  </data>
+  <data name="ui.audit.ip" xml:space="preserve">
+    <value>IP address</value>
+  </data>
+  <data name="ui.audit.no_actor" xml:space="preserve">
+    <value>No signed-in person</value>
+  </data>
+  <data name="ui.audit.on" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="ui.audit.permission" xml:space="preserve">
+    <value>Permission used</value>
+  </data>
+  <data name="ui.audit.reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="ui.audit.target.PlatformDepartment" xml:space="preserve">
+    <value>Department</value>
+  </data>
+  <data name="ui.audit.target.PlatformRole" xml:space="preserve">
+    <value>Role</value>
+  </data>
+  <data name="ui.audit.target.PlatformUser" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="ui.audit.title" xml:space="preserve">
+    <value>Audit log</value>
+  </data>
+  <data name="ui.audit.to" xml:space="preserve">
+    <value>To (UTC)</value>
+  </data>
+  <data name="ui.audit.what" xml:space="preserve">
+    <value>What</value>
+  </data>
+  <data name="ui.audit.when" xml:space="preserve">
+    <value>When</value>
+  </data>
+  <data name="ui.audit.who" xml:space="preserve">
+    <value>Who</value>
+  </data>
   <data name="ui.codes.continue" xml:space="preserve">
     <value>I have saved them</value>
   </data>
@@ -513,6 +735,18 @@ If you did not ask for this, ignore this email. Your password stays the same.</v
   </data>
   <data name="ui.enrol.key" xml:space="preserve">
     <value>Setup key</value>
+  </data>
+  <data name="ui.enrol.or_app" xml:space="preserve">
+    <value>or use an authenticator app</value>
+  </data>
+  <data name="ui.enrol.passkey_button" xml:space="preserve">
+    <value>Create a passkey</value>
+  </data>
+  <data name="ui.enrol.passkey_intro" xml:space="preserve">
+    <value>The simplest way: create a passkey on this device. You then sign in with your fingerprint, face or device PIN, with no code to type.</value>
+  </data>
+  <data name="ui.enrol.passkey_name" xml:space="preserve">
+    <value>First passkey</value>
   </data>
   <data name="ui.enrol.qr_alt" xml:space="preserve">
     <value>QR code for your authenticator app</value>
@@ -963,6 +1197,12 @@ If you did not ask for this, ignore this email. Your password stays the same.</v
   </data>
   <data name="ui.users.action.suspend.help" xml:space="preserve">
     <value>Suspending stops this person from signing in for now and ends their sessions. Reactivate the account later.</value>
+  </data>
+  <data name="ui.users.actions_by" xml:space="preserve">
+    <value>Actions by this person</value>
+  </data>
+  <data name="ui.users.activity" xml:space="preserve">
+    <value>Activity on this account</value>
   </data>
   <data name="ui.users.apply" xml:space="preserve">
     <value>Apply</value>

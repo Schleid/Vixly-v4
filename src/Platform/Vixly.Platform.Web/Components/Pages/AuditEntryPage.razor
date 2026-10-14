@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: AuditEntryPage.razor
+
+PURPOSE:
+One audit entry.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/audit/{AuditEntryId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<p><a href="/audit">@T["ui.audit.back"]</a></p>
+<AuditEntryDetail AuditEntryId="@AuditEntryId" />
+
+@code {
+    [Parameter]
+    public Guid AuditEntryId { get; set; }
+}

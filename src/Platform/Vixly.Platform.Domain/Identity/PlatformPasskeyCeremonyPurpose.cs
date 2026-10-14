@@ -16,5 +16,6 @@ public enum PlatformPasskeyCeremonyPurpose
 {
     Registration = 0,
     SignIn = 1,
-    StepUp = 2
+    StepUp = 2,
+    Enrolment = 3
 }

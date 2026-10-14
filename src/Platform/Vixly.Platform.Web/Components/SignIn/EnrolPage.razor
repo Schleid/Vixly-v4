@@ -16,6 +16,17 @@ IMPORTANT NOTES:
 
 <AuthShell Title="@T["ui.enrol.title"]">
     <FormMessage Error="@Error" />
+    <div class="vx-passkey" data-passkey-enrol hidden>
+        <p>@T["ui.enrol.passkey_intro"]</p>
+        <form method="post" action="/sign-in/enrol/passkey" data-options="/sign-in/enrol/passkey/options">
+            <AntiforgeryToken />
+            <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+            <input type="hidden" name="attestation" />
+            <button type="button" class="vx-button vx-button--primary vx-button--wide" data-passkey-start>@T["ui.enrol.passkey_button"]</button>
+        </form>
+        <p class="vx-message vx-message--error" role="alert" data-passkey-error hidden>@T["ui.passkey.cancelled"]</p>
+        <p class="vx-divider">@T["ui.enrol.or_app"]</p>
+    </div>
     <p>@T["ui.enrol.intro"]</p>
     <img class="vx-qr" src="@QrDataUri" alt="@T["ui.enrol.qr_alt"]" width="200" height="200" />
     <p>@T["ui.enrol.key"]: <code class="vx-key">@ManualKey</code></p>

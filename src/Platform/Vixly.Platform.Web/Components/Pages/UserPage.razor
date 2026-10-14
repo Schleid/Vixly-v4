@@ -16,6 +16,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<PlatformText> T
 
 <p><a href="/users">@T["ui.users.back"]</a></p>
+<p class="vx-actions"><a href="/audit?target=@UserId">@T["ui.users.activity"]</a> <a href="/audit?actor=@UserId">@T["ui.users.actions_by"]</a></p>
 <UserSummary UserId="@UserId" />
 <UserRoleGrants UserId="@UserId" />
 <UserDepartments UserId="@UserId" />

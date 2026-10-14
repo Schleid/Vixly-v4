@@ -5,9 +5,11 @@ using QRCoder;
 using Vixly.Platform.Application.Identity;
 using Vixly.Platform.Application.Security;
 using Vixly.Platform.Application.UseCases.SignIn.AcceptInvitation;
+using Vixly.Platform.Application.UseCases.SignIn.BeginPasskeyEnrolment;
 using Vixly.Platform.Application.UseCases.SignIn.BeginPasskeySignIn;
 using Vixly.Platform.Application.UseCases.SignIn.BeginSignIn;
 using Vixly.Platform.Application.UseCases.SignIn.BeginSignInEnrolment;
+using Vixly.Platform.Application.UseCases.SignIn.CompletePasskeyEnrolment;
 using Vixly.Platform.Application.UseCases.SignIn.CompletePasskeySignIn;
 using Vixly.Platform.Application.UseCases.SignIn.CompleteSignInEnrolment;
 using Vixly.Platform.Application.UseCases.SignIn.CompleteSignInWithAuthenticatorCode;
@@ -245,6 +247,71 @@ public static class PlatformAuthEndpoints
             StartSession(http, response.SessionToken);
             return Page<RecoveryCodesPage>(new { ReturnUrl = LocalUrl(returnUrl), Codes = response.RecoveryCodes });
         }).RequireRateLimiting(PlatformRateLimits.SecondFactor);
+
+        endpoints.MapPost("/sign-in/enrol/passkey/options", async (
+            HttpContext http,
+            BeginPasskeyEnrolmentUseCase useCase) =>
+        {
+            BeginPasskeyEnrolmentResponse response = await useCase.ExecuteAsync(
+                anonymous,
+                new BeginPasskeyEnrolmentRequest { ChallengeToken = Challenge(http) },
+                http.RequestAborted);
+
+            if (!response.Succeeded)
+            {
+                return Results.StatusCode(StatusCodes.Status409Conflict);
+            }
+
+            http.Response.Headers.CacheControl = "no-store";
+            PlatformCookies.Write(http.Response, PlatformCookies.PasskeyCeremony, response.CeremonyToken, PlatformPasskeyCeremony.Lifetime);
+
+            return Results.Content(response.OptionsJson, "application/json");
+        }).RequireRateLimiting(PlatformRateLimits.Passkey);
+
+        endpoints.MapPost("/sign-in/enrol/passkey", async (
+            HttpContext http,
+            [FromForm] string attestation,
+            [FromForm] string? name,
+            [FromForm] string? returnUrl,
+            CompletePasskeyEnrolmentUseCase useCase,
+            BeginSignInEnrolmentUseCase begin,
+            PlatformErrorText text) =>
+        {
+            string ceremony = http.Request.Cookies.TryGetValue(PlatformCookies.PasskeyCeremony, out string? value) ? value ?? string.Empty : string.Empty;
+            PlatformCookies.Delete(http.Response, PlatformCookies.PasskeyCeremony);
+
+            CompletePasskeyEnrolmentResponse response = await useCase.ExecuteAsync(
+                anonymous,
+                new CompletePasskeyEnrolmentRequest
+                {
+                    ChallengeToken = Challenge(http),
+                    CeremonyToken = ceremony,
+                    AttestationJson = attestation,
+                    Name = string.IsNullOrWhiteSpace(name) ? text.Text("ui.enrol.passkey_name") : name
+                },
+                http.RequestAborted);
+
+            if (!response.Succeeded)
+            {
+                BeginSignInEnrolmentResponse again = await begin.ExecuteAsync(
+                    anonymous,
+                    new BeginSignInEnrolmentRequest { ChallengeToken = Challenge(http) },
+                    http.RequestAborted);
+
+                return again.Succeeded
+                    ? Page<EnrolPage>(new
+                    {
+                        ReturnUrl = LocalUrl(returnUrl),
+                        ManualKey = again.ManualKey,
+                        QrDataUri = QrDataUri(again.OtpAuthUri),
+                        Error = text.Describe(response.Error)
+                    })
+                    : Page<SignInPage>(new { ReturnUrl = LocalUrl(returnUrl), Error = text.Describe(response.Error) });
+            }
+
+            StartSession(http, response.SessionToken);
+            return Page<RecoveryCodesPage>(new { ReturnUrl = LocalUrl(returnUrl), Codes = response.RecoveryCodes });
+        }).RequireRateLimiting(PlatformRateLimits.Passkey);
 
         endpoints.MapGet("/invitation", (string? token) =>
             Page<InvitationPage>(new { Token = token ?? string.Empty }));

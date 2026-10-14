@@ -47,6 +47,11 @@ public static class PlatformDisplay
         return systemKey is null ? name : text["ui.roles.system." + systemKey].Value;
     }
 
+    public static string AuditActionKey(string actionCode)
+    {
+        return "ui.audit.action." + actionCode;
+    }
+
     public static string PermissionKey(string permissionCode)
     {
         return "ui.permission." + permissionCode;

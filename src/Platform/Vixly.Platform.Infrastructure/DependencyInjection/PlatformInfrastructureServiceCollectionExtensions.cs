@@ -88,6 +88,7 @@ public static class PlatformInfrastructureServiceCollectionExtensions
         services.AddScoped<IPlatformUserQueries, PlatformUserQueries>();
         services.AddScoped<IPlatformRoleQueries, PlatformRoleQueries>();
         services.AddScoped<IPlatformDepartmentQueries, PlatformDepartmentQueries>();
+        services.AddScoped<IPlatformAuditQueries, PlatformAuditQueries>();
 
         services.AddSingleton<IPlatformPasswordHasher, BCryptPlatformPasswordHasher>();
         services.AddSingleton<IPlatformSecretGenerator, PlatformSecretGenerator>();

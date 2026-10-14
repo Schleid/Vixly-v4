@@ -1,0 +1,43 @@
+﻿@*
+=========================================================
+FILE: AuditTargetLink.razor
+
+PURPOSE:
+The record an audit entry is about, as a link to its page
+when it has one.
+
+IMPORTANT NOTES:
+- Trivial component (UI-5): no use case, so no presenter
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@using Vixly.Platform.Application.Queries
+@inject IStringLocalizer<PlatformText> T
+
+@if (Href is string href)
+{
+    <a href="@href">@Label</a>
+}
+else
+{
+    <span>@Label</span>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public PlatformAuditListItem Entry { get; set; } = null!;
+
+    private string? Href => Entry.TargetId is not Guid id || Entry.TargetName is null
+        ? null
+        : Entry.TargetType switch
+        {
+            "PlatformUser" => "/users/" + id,
+            "PlatformRole" => "/roles/" + id,
+            "PlatformDepartment" => "/departments/" + id,
+            _ => null
+        };
+
+    private string Label => Entry.TargetName is string name
+        ? PlatformDisplay.RoleName(T, name, Entry.TargetSystemKey)
+        : T["ui.audit.target." + Entry.TargetType].Value;
+}

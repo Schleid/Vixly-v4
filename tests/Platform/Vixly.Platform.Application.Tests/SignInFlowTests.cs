@@ -136,6 +136,20 @@ public sealed class SignInFlowTests
     }
 
     [Fact]
+    public async Task PasswordAlone_NeverYieldsASession()
+    {
+        AddEnrolledUser("ada@example.com");
+
+        BeginSignInResponse begin = await Begin("ada@example.com", GoodPassword);
+
+        Assert.True(begin.Succeeded);
+        Assert.False(string.IsNullOrEmpty(begin.ChallengeToken));
+        Assert.Equal(PlatformSignInStage.SecondFactor, _store.Challenges.Single().Stage);
+        Assert.Empty(_store.Sessions);
+        Assert.DoesNotContain(_store.AuditEntries, entry => entry.ActionCode == "platform.auth.signed_in");
+    }
+
+    [Fact]
     public async Task AuthenticatorStep_OpensTheSession_AndTheChallengeIsSingleUse()
     {
         AddEnrolledUser("ada@example.com");

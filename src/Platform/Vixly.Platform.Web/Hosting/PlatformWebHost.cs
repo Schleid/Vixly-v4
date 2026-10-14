@@ -32,10 +32,17 @@ namespace Vixly.Platform.Web.Hosting;
 //   Infrastructure (Global Standard 3)
 // - Data Protection application name differs from V3's
 //   (ADR-0010 M-1)
+// - configure runs last, before Build: the HTTP tests use it
+//   to swap in a test server; production passes nothing
 // =========================================================
 public static class PlatformWebHost
 {
     public static WebApplication Build(string[] args)
+    {
+        return Build(args, null);
+    }
+
+    public static WebApplication Build(string[] args, Action<WebApplicationBuilder>? configure)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +74,8 @@ public static class PlatformWebHost
         });
 
         builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+
+        configure?.Invoke(builder);
 
         WebApplication app = builder.Build();
 

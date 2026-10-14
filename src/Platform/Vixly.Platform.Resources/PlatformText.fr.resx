@@ -496,6 +496,302 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
     <value>Vixly Control</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.audit.action.platform.account.language_changed" xml:space="preserve">
+    <value>Langue personnelle modifiée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.account.passkey_added" xml:space="preserve">
+    <value>Clé d'accès ajoutée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.account.passkey_removed" xml:space="preserve">
+    <value>Clé d'accès supprimée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.account.password_changed" xml:space="preserve">
+    <value>Mot de passe personnel modifié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.account.recovery_codes_replaced" xml:space="preserve">
+    <value>Nouveaux codes de récupération</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.account.sessions_ended" xml:space="preserve">
+    <value>Autres sessions personnelles fermées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.auth.code_failed" xml:space="preserve">
+    <value>Code d'authentification erroné à la connexion</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.auth.invitation_accepted" xml:space="preserve">
+    <value>Invitation acceptée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.auth.passkey_failed" xml:space="preserve">
+    <value>Clé d'accès refusée à la connexion</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.auth.password_failed" xml:space="preserve">
+    <value>Mot de passe erroné à la connexion</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.auth.password_reset" xml:space="preserve">
+    <value>Mot de passe réinitialisé par lien</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.auth.password_reset_requested" xml:space="preserve">
+    <value>Réinitialisation du mot de passe demandée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.auth.recovery_code_failed" xml:space="preserve">
+    <value>Code de récupération erroné à la connexion</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.auth.sign_in_refused" xml:space="preserve">
+    <value>Connexion refusée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.auth.signed_in" xml:space="preserve">
+    <value>Connexion</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.auth.signed_out" xml:space="preserve">
+    <value>Déconnexion</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.auth.step_up_confirmed" xml:space="preserve">
+    <value>Identité confirmée pour une action sensible</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.auth.step_up_failed" xml:space="preserve">
+    <value>Échec de la confirmation d'identité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.departments.created" xml:space="preserve">
+    <value>Service créé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.departments.deactivated" xml:space="preserve">
+    <value>Service désactivé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.departments.member_added" xml:space="preserve">
+    <value>Ajouté à un service</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.departments.member_removed" xml:space="preserve">
+    <value>Retiré d'un service</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.departments.primary_set" xml:space="preserve">
+    <value>Service principal modifié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.departments.reactivated" xml:space="preserve">
+    <value>Service réactivé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.departments.updated" xml:space="preserve">
+    <value>Service modifié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.roles.assigned" xml:space="preserve">
+    <value>Rôle attribué</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.roles.created" xml:space="preserve">
+    <value>Rôle créé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.roles.deactivated" xml:space="preserve">
+    <value>Rôle désactivé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.roles.permissions_changed" xml:space="preserve">
+    <value>Autorisations du rôle modifiées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.roles.reactivated" xml:space="preserve">
+    <value>Rôle réactivé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.roles.renamed" xml:space="preserve">
+    <value>Rôle renommé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.roles.revoked" xml:space="preserve">
+    <value>Rôle retiré</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.roles.system_corrected" xml:space="preserve">
+    <value>Autorisations du rôle système corrigées au démarrage</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.roles.system_created" xml:space="preserve">
+    <value>Rôle système créé au démarrage</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.setup.first_super_user_invited" xml:space="preserve">
+    <value>Premier SuperUser invité lors de l'installation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.users.deactivated" xml:space="preserve">
+    <value>Compte désactivé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.users.invitation_resent" xml:space="preserve">
+    <value>Invitation renvoyée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.users.invited" xml:space="preserve">
+    <value>Utilisateur invité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.users.locked" xml:space="preserve">
+    <value>Compte verrouillé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.users.password_reset_sent" xml:space="preserve">
+    <value>Lien de réinitialisation envoyé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.users.reactivated" xml:space="preserve">
+    <value>Compte réactivé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.users.second_factor_reset" xml:space="preserve">
+    <value>Second facteur réinitialisé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.users.sessions_ended" xml:space="preserve">
+    <value>Utilisateur déconnecté partout</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.users.suspended" xml:space="preserve">
+    <value>Compte suspendu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action_filter" xml:space="preserve">
+    <value>Action</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.after" xml:space="preserve">
+    <value>Après</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.all_actions" xml:space="preserve">
+    <value>Toutes les actions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.apply" xml:space="preserve">
+    <value>Appliquer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.arguments" xml:space="preserve">
+    <value>Détails enregistrés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.back" xml:space="preserve">
+    <value>Retour au journal d'audit</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.before" xml:space="preserve">
+    <value>Avant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.browser" xml:space="preserve">
+    <value>Navigateur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.clear" xml:space="preserve">
+    <value>Effacer les filtres</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.correlation" xml:space="preserve">
+    <value>Identifiant de corrélation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.count" xml:space="preserve">
+    <value>Entrées : {count}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.details" xml:space="preserve">
+    <value>Détails</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.empty" xml:space="preserve">
+    <value>Aucune entrée ne correspond à ces filtres.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.entry_title" xml:space="preserve">
+    <value>Entrée d'audit</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.filtered_actor" xml:space="preserve">
+    <value>Affichage des actions d'une personne.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.filtered_target" xml:space="preserve">
+    <value>Affichage des actions sur un élément.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.from" xml:space="preserve">
+    <value>Du (UTC)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.ip" xml:space="preserve">
+    <value>Adresse IP</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.no_actor" xml:space="preserve">
+    <value>Aucune personne connectée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.on" xml:space="preserve">
+    <value>Sur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.permission" xml:space="preserve">
+    <value>Autorisation utilisée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.reason" xml:space="preserve">
+    <value>Motif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.target.PlatformDepartment" xml:space="preserve">
+    <value>Service</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.target.PlatformRole" xml:space="preserve">
+    <value>Rôle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.target.PlatformUser" xml:space="preserve">
+    <value>Utilisateur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.title" xml:space="preserve">
+    <value>Journal d'audit</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.to" xml:space="preserve">
+    <value>Au (UTC)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.what" xml:space="preserve">
+    <value>Quoi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.when" xml:space="preserve">
+    <value>Quand</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.who" xml:space="preserve">
+    <value>Qui</value>
+    <comment>needs-review</comment>
+  </data>
   <data name="ui.codes.continue" xml:space="preserve">
     <value>Je les ai enregistrés</value>
     <comment>needs-review</comment>
@@ -678,6 +974,22 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
   </data>
   <data name="ui.enrol.key" xml:space="preserve">
     <value>Clé de configuration</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.enrol.or_app" xml:space="preserve">
+    <value>ou utilisez une application d'authentification</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.enrol.passkey_button" xml:space="preserve">
+    <value>Créer une clé d'accès</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.enrol.passkey_intro" xml:space="preserve">
+    <value>Le plus simple : créez une clé d'accès sur cet appareil. Vous vous connecterez ensuite avec votre empreinte, votre visage ou le code de l'appareil, sans code à saisir.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.enrol.passkey_name" xml:space="preserve">
+    <value>Première clé d'accès</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.enrol.qr_alt" xml:space="preserve">
@@ -1278,6 +1590,14 @@ Si vous n'avez rien demandé, ignorez cet e-mail. Votre mot de passe reste incha
   </data>
   <data name="ui.users.action.suspend.help" xml:space="preserve">
     <value>La suspension empêche cette personne de se connecter pour le moment et met fin à ses sessions. Réactivez le compte plus tard.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.actions_by" xml:space="preserve">
+    <value>Actions de cette personne</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.users.activity" xml:space="preserve">
+    <value>Activité sur ce compte</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.users.apply" xml:space="preserve">

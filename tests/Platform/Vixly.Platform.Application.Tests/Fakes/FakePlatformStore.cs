@@ -41,7 +41,8 @@ internal sealed class FakePlatformStore :
     IPlatformRoleRepository,
     IPlatformRoleQueries,
     IPlatformDepartmentRepository,
-    IPlatformDepartmentQueries
+    IPlatformDepartmentQueries,
+    IPlatformAuditQueries
 {
     public List<PlatformUser> Users { get; } = new();
 
@@ -445,5 +446,25 @@ internal sealed class FakePlatformStore :
               select new PlatformUserDepartmentItem(department.Id, department.Name, department.IsActive, membership.IsPrimary);
 
         return Task.FromResult<IReadOnlyList<PlatformUserDepartmentItem>>(memberships.ToList());
+    }
+    public PlatformAuditFilter? LastAuditFilter { get; private set; }
+
+    Task<PagedResult<PlatformAuditListItem>> IPlatformAuditQueries.ListAsync(
+        PlatformAuditFilter filter,
+        PagedRequest page,
+        CancellationToken cancellationToken)
+    {
+        LastAuditFilter = filter;
+        List<PlatformAuditListItem> items = AuditEntries
+            .Where(entry => filter.ActionCode is null || entry.ActionCode == filter.ActionCode)
+            .Select(entry => new PlatformAuditListItem(entry.Id, entry.CreatedUtc, entry.ActorUserId, null, entry.ActionCode, entry.TargetType, entry.TargetId, null, null, entry.IpAddress))
+            .ToList();
+
+        return Task.FromResult(new PagedResult<PlatformAuditListItem>(items, page, items.Count));
+    }
+
+    Task<PlatformAuditEntryDetail?> IPlatformAuditQueries.GetAsync(Guid auditEntryId, CancellationToken cancellationToken)
+    {
+        return Task.FromResult<PlatformAuditEntryDetail?>(null);
     }
 }

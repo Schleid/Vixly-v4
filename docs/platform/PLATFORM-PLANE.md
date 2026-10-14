@@ -46,7 +46,7 @@ Proposed V4 names for the legacy entities. Classes carry the prefix; tables are 
 |---|---|---|
 | Tenant, TenantCompanyProfile | `PlatformTenant`, `PlatformTenantCompanyProfile` | |
 | TenantLifecycleHistory | `PlatformTenantLifecycleEvent` | History is an event log; D-2 requires it to commit with the state change |
-| TenantLandingPageConfiguration | `PlatformTenantLandingPage` | Theming; plan-gated |
+| TenantLandingPageConfiguration | **Moved to Operations** | Tenant brand and landing page are Operations data (ADR-0012 Amendment 1); Control only sells the feature |
 | Registration (+ enums) | `PlatformTenantRegistration` | |
 | SubscriptionPlan, Feature, Limit | `PlatformSubscriptionPlan`, `PlatformSubscriptionPlanFeature`, `PlatformSubscriptionPlanLimit` | |
 | TenantSubscription, TenantLimitOverride | `PlatformTenantSubscription`, `PlatformTenantLimitOverride` | |
@@ -97,7 +97,7 @@ The Platform plane is English, French and Spanish end to end. For this plane tha
 |---|---|
 | 0 | `Error`, `LanguageCode`, `DomainException(Error)`; `PlatformSecurityErrors`; rules that keep text out of Domain and Application |
 | 1 | `PreferredLanguage` on `PlatformUser`; login, reset and invitation emails in the recipient's language; every Identity error has a code; `Vixly.Platform.Resources` project created with the first error texts |
-| 2 | `DefaultLanguage` on `PlatformTenant`; `platform.TenantLandingPageTranslations` (tenant-entered text per language); tenant lifecycle history stored as event code plus arguments (D-4) |
+| 2 | `DefaultLanguage` on `PlatformTenant`; tenant lifecycle history stored as event code plus arguments (D-4). Landing-page text per language moved to Operations (ADR-0012 Amendment 1) |
 | 3 | `platform.SubscriptionPlanTranslations` (name, description, feature and limit labels); pricing shown with the plan's ISO currency code |
 | 4 and 5 | `Language` stored on `PlatformInvoice` and receipts; PDFs regenerated in that language; payment errors as codes |
 | 6 | Collection notices and dunning emails in the tenant's language |

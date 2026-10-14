@@ -1,0 +1,137 @@
+﻿@*
+=========================================================
+FILE: AuditLog.razor
+
+PURPOSE:
+The audit log: who did what, to which record, when and
+from where, newest first, with filters and pages.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Filters and page live in the URL (UI-3)
+- Times are UTC
+=========================================================
+*@
+@inherits PlatformPresenterComponent<AuditLogPresenter>
+@using Vixly.Platform.Application.Audit
+@using Vixly.Platform.Application.Queries
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+<form class="vx-toolbar" role="search" @onsubmit="ApplyFilters">
+    <label for="audit-action">@T["ui.audit.action_filter"]</label>
+    <select id="audit-action" @bind="_action">
+        <option value="">@T["ui.audit.all_actions"]</option>
+        @foreach (string actionCode in PlatformAuditActions.Catalogue)
+        {
+            <option value="@actionCode">@T[PlatformDisplay.AuditActionKey(actionCode)]</option>
+        }
+    </select>
+    <label for="audit-from">@T["ui.audit.from"]</label>
+    <input id="audit-from" type="date" @bind="_from" />
+    <label for="audit-to">@T["ui.audit.to"]</label>
+    <input id="audit-to" type="date" @bind="_to" />
+    <button type="submit" class="vx-button">@T["ui.audit.apply"]</button>
+    <a href="/audit">@T["ui.audit.clear"]</a>
+</form>
+
+@if (Query.ActorUserId is not null)
+{
+    <p class="vx-message vx-message--info">@T["ui.audit.filtered_actor"]</p>
+}
+@if (Query.TargetId is not null)
+{
+    <p class="vx-message vx-message--info">@T["ui.audit.filtered_target"]</p>
+}
+
+@if (Presenter.State.Error is not null)
+{
+    <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+}
+else if (!Presenter.State.Loaded)
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+else if (Presenter.State.Entries.Count == 0)
+{
+    <p role="status">@T["ui.audit.empty"]</p>
+}
+else
+{
+    <table class="vx-table">
+        <caption>@VixlyText.Format(T, "ui.audit.count", "count", Presenter.State.TotalCount)</caption>
+        <thead>
+            <tr>
+                <th scope="col">@T["ui.audit.when"]</th>
+                <th scope="col">@T["ui.audit.who"]</th>
+                <th scope="col">@T["ui.audit.what"]</th>
+                <th scope="col">@T["ui.audit.on"]</th>
+                <th scope="col">@T["ui.audit.ip"]</th>
+                <th scope="col"><span class="vx-visually-hidden">@T["ui.audit.details"]</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (PlatformAuditListItem entry in Presenter.State.Entries)
+            {
+                <tr>
+                    <td>@PlatformDisplay.Utc(T, entry.OccurredUtc)</td>
+                    <td>
+                        @if (entry.ActorUserId is Guid actor)
+                        {
+                            <a href="/users/@actor">@(entry.ActorName ?? actor.ToString())</a>
+                        }
+                        else
+                        {
+                            @T["ui.audit.no_actor"]
+                        }
+                    </td>
+                    <td>@T[PlatformDisplay.AuditActionKey(entry.ActionCode)]</td>
+                    <td><AuditTargetLink Entry="@entry" /></td>
+                    <td>@entry.IpAddress</td>
+                    <td><a href="/audit/@entry.AuditEntryId">@T["ui.audit.details"]</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <nav class="vx-pager" aria-label="@T["ui.common.pages"]">
+        @if (Presenter.State.Page > 1)
+        {
+            <a href="@Query.ToUrl(Presenter.State.Page - 1)">@T["ui.common.previous"]</a>
+        }
+        <span>@VixlyText.Format(T, "ui.common.page_of", new Dictionary<string, object> { ["page"] = Presenter.State.Page, ["pages"] = Math.Max(1, Presenter.State.TotalPages) })</span>
+        @if (Presenter.State.Page < Presenter.State.TotalPages)
+        {
+            <a href="@Query.ToUrl(Presenter.State.Page + 1)">@T["ui.common.next"]</a>
+        }
+    </nav>
+}
+
+@code {
+    private string _action = string.Empty;
+
+    private DateOnly? _from;
+
+    private DateOnly? _to;
+
+    [Parameter, EditorRequired]
+    public AuditLogQuery Query { get; set; } = new(null, null, null, null, null, 1);
+
+    protected override Task OnParametersSetAsync()
+    {
+        _action = Query.ActionCode ?? string.Empty;
+        _from = Query.From;
+        _to = Query.To;
+
+        return Presenter.LoadAsync(Query);
+    }
+
+    private void ApplyFilters()
+    {
+        AuditLogQuery next = Query with { ActionCode = string.IsNullOrEmpty(_action) ? null : _action, From = _from, To = _to, Page = 1 };
+        Navigation.NavigateTo(next.ToUrl(1));
+    }
+}

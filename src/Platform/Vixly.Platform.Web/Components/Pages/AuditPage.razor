@@ -1,0 +1,40 @@
+﻿@*
+=========================================================
+FILE: AuditPage.razor
+
+PURPOSE:
+The audit log.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/audit"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.audit.title"]</PageTitle>
+
+<h1>@T["ui.audit.title"]</h1>
+<AuditLog Query="@(new AuditLogQuery(Actor, Target, Action, From, To, Page ?? 1))" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public Guid? Actor { get; set; }
+
+    [SupplyParameterFromQuery]
+    public Guid? Target { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Action { get; set; }
+
+    [SupplyParameterFromQuery]
+    public DateOnly? From { get; set; }
+
+    [SupplyParameterFromQuery]
+    public DateOnly? To { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

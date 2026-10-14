@@ -1,0 +1,81 @@
+﻿@*
+=========================================================
+FILE: AuditEntryDetail.razor
+
+PURPOSE:
+One audit entry with everything it recorded: permission,
+reason, values before and after, browser and correlation id.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Recorded values are shown as stored (JSON); Razor encodes them
+=========================================================
+*@
+@inherits PlatformPresenterComponent<AuditEntryPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.Error is not null)
+{
+    <p class="vx-message vx-message--error" role="alert">@Errors.Describe(Presenter.State.Error)</p>
+}
+else if (Presenter.State.Entry is { } detail)
+{
+    <PageTitle>@T["ui.audit.entry_title"]</PageTitle>
+    <h1>@T[PlatformDisplay.AuditActionKey(detail.Entry.ActionCode)]</h1>
+    <section class="vx-card" aria-labelledby="audit-entry">
+        <h2 id="audit-entry">@T["ui.audit.entry_title"]</h2>
+        <dl class="vx-facts">
+            <dt>@T["ui.audit.when"]</dt><dd>@PlatformDisplay.Utc(T, detail.Entry.OccurredUtc)</dd>
+            <dt>@T["ui.audit.who"]</dt>
+            <dd>
+                @if (detail.Entry.ActorUserId is Guid actor)
+                {
+                    <a href="/users/@actor">@(detail.Entry.ActorName ?? actor.ToString())</a>
+                }
+                else
+                {
+                    @T["ui.audit.no_actor"]
+                }
+            </dd>
+            <dt>@T["ui.audit.on"]</dt><dd><AuditTargetLink Entry="@detail.Entry" /></dd>
+            <dt>@T["ui.audit.permission"]</dt><dd>@(detail.PermissionCode is null ? T["ui.common.none"].Value : T[PlatformDisplay.PermissionKey(detail.PermissionCode)].Value)</dd>
+            <dt>@T["ui.audit.reason"]</dt><dd>@(detail.Reason ?? T["ui.common.none"].Value)</dd>
+            <dt>@T["ui.audit.ip"]</dt><dd>@(detail.Entry.IpAddress ?? T["ui.common.none"].Value)</dd>
+            <dt>@T["ui.audit.browser"]</dt><dd class="vx-truncate" title="@detail.UserAgent">@(detail.UserAgent ?? T["ui.common.none"].Value)</dd>
+            <dt>@T["ui.audit.correlation"]</dt><dd><code>@(detail.CorrelationId ?? T["ui.common.none"].Value)</code></dd>
+        </dl>
+        @if (detail.ArgumentsJson is not null)
+        {
+            <h3>@T["ui.audit.arguments"]</h3>
+            <pre class="vx-json">@detail.ArgumentsJson</pre>
+        }
+        @if (detail.BeforeJson is not null)
+        {
+            <h3>@T["ui.audit.before"]</h3>
+            <pre class="vx-json">@detail.BeforeJson</pre>
+        }
+        @if (detail.AfterJson is not null)
+        {
+            <h3>@T["ui.audit.after"]</h3>
+            <pre class="vx-json">@detail.AfterJson</pre>
+        }
+    </section>
+}
+else
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid AuditEntryId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(AuditEntryId);
+    }
+}

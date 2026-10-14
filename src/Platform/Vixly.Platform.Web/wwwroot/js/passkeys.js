@@ -7,9 +7,9 @@
 // - window.vixlyPasskeys: supported(), create(json), get(json);
 //   create and get answer null when the user cancels or the
 //   device refuses, so callers never see an exception
-// - Sign-in page: progressive enhancement. The passkey button
-//   stays hidden unless this script runs and the browser can
-//   use passkeys; the password form works without it
+// - Sign-in and enrolment pages: progressive enhancement. The
+//   passkey block stays hidden unless this script runs and the
+//   browser can use passkeys; the forms work without it
 // - No inline script anywhere (CSP script-src 'self')
 // =========================================================
 (function () {
@@ -96,8 +96,8 @@
         }
     }
 
-    function wireSignIn() {
-        var block = document.querySelector("[data-passkey-signin]");
+    function wire(selector, ceremony, field) {
+        var block = document.querySelector(selector);
         if (!block || !supported()) { return; }
         var form = block.querySelector("form");
         var start = block.querySelector("[data-passkey-start]");
@@ -113,25 +113,30 @@
                     credentials: "same-origin",
                     cache: "no-store"
                 });
-                var answer = response.ok ? await get(await response.text()) : null;
+                var answer = response.ok ? await ceremony(await response.text()) : null;
                 if (answer) {
-                    form.querySelector("input[name=assertion]").value = answer;
+                    form.querySelector("input[name=" + field + "]").value = answer;
                     form.submit();
                     return;
                 }
             } catch (error) {
-                // Shown below: the user can retry or use the password form.
+                // Shown below: the user can retry or use the other way.
             }
             failed.hidden = false;
             start.disabled = false;
         });
     }
 
+    function wirePages() {
+        wire("[data-passkey-signin]", get, "assertion");
+        wire("[data-passkey-enrol]", create, "attestation");
+    }
+
     window.vixlyPasskeys = { supported: supported, create: create, get: get };
 
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", wireSignIn);
+        document.addEventListener("DOMContentLoaded", wirePages);
     } else {
-        wireSignIn();
+        wirePages();
     }
 })();
