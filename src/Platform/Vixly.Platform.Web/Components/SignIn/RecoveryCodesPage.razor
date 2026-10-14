@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: RecoveryCodesPage.razor
 
@@ -15,14 +15,16 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<PlatformText> T
 
 <AuthShell Title="@T["ui.codes.title"]">
-    <p>@T["ui.codes.intro"]</p>
+    <p class="vx-auth__intro">@T["ui.codes.intro"]</p>
     <ol class="vx-codes">
         @foreach (string recoveryCode in Codes)
         {
             <li><code>@recoveryCode</code></li>
         }
     </ol>
-    <p><a class="vx-button vx-button--primary" href="@ReturnUrl">@T["ui.codes.continue"]</a></p>
+    <div class="vx-auth__actions">
+        <a class="vx-button vx-button--primary vx-button--wide" href="@ReturnUrl">@T["ui.codes.continue"]</a>
+    </div>
 </AuthShell>
 
 @code {

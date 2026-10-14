@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: EnrolPage.razor
 
@@ -17,7 +17,7 @@ IMPORTANT NOTES:
 <AuthShell Title="@T["ui.enrol.title"]">
     <FormMessage Error="@Error" />
     <div class="vx-passkey" data-passkey-enrol hidden>
-        <p>@T["ui.enrol.passkey_intro"]</p>
+        <p class="vx-auth__intro">@T["ui.enrol.passkey_intro"]</p>
         <form method="post" action="/sign-in/enrol/passkey" data-options="/sign-in/enrol/passkey/options">
             <AntiforgeryToken />
             <input type="hidden" name="returnUrl" value="@ReturnUrl" />
@@ -25,16 +25,23 @@ IMPORTANT NOTES:
             <button type="button" class="vx-button vx-button--primary vx-button--wide" data-passkey-start>@T["ui.enrol.passkey_button"]</button>
         </form>
         <p class="vx-message vx-message--error" role="alert" data-passkey-error hidden>@T["ui.passkey.cancelled"]</p>
-        <p class="vx-divider">@T["ui.enrol.or_app"]</p>
+        <p class="vx-divider"><span>@T["ui.enrol.or_app"]</span></p>
     </div>
-    <p>@T["ui.enrol.intro"]</p>
-    <img class="vx-qr" src="@QrDataUri" alt="@T["ui.enrol.qr_alt"]" width="200" height="200" />
-    <p>@T["ui.enrol.key"]: <code class="vx-key">@ManualKey</code></p>
+    <p class="vx-auth__intro">@T["ui.enrol.intro"]</p>
+    <div class="vx-qr-container">
+        <img class="vx-qr" src="@QrDataUri" alt="@T["ui.enrol.qr_alt"]" width="200" height="200" />
+    </div>
+    <div class="vx-key-display">
+        <span class="vx-key-label">@T["ui.enrol.key"]</span>
+        <code class="vx-key">@ManualKey</code>
+    </div>
     <form method="post" action="/sign-in/enrol" class="vx-form">
         <AntiforgeryToken />
         <input type="hidden" name="returnUrl" value="@ReturnUrl" />
-        <label for="code">@T["ui.verify.code_label"]</label>
-        <input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{6,7}" maxlength="7" required />
+        <div class="vx-field">
+            <label for="code" class="vx-label">@T["ui.verify.code_label"]</label>
+            <input id="code" name="code" class="vx-input vx-input--code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{6,7}" maxlength="7" required />
+        </div>
         <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.enrol.submit"]</VxButton>
     </form>
 </AuthShell>

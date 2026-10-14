@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: SignInPage.razor
 
@@ -19,20 +19,32 @@ IMPORTANT NOTES:
     <form method="post" action="/sign-in" class="vx-form">
         <AntiforgeryToken />
         <input type="hidden" name="returnUrl" value="@ReturnUrl" />
-        <label for="email">@T["ui.signin.email"]</label>
-        <input id="email" name="email" type="email" autocomplete="username webauthn" required value="@Email" />
-        <label for="password">@T["ui.signin.password"]</label>
-        <input id="password" name="password" type="password" autocomplete="current-password" required />
+        <div class="vx-field">
+            <label for="email" class="vx-label">@T["ui.signin.email"]</label>
+            <input id="email" name="email" type="email" class="vx-input" autocomplete="username webauthn" required value="@Email" />
+        </div>
+        <div class="vx-field">
+            <div class="vx-field__header">
+                <label for="password" class="vx-label">@T["ui.signin.password"]</label>
+                <a href="/forgot-password" class="vx-auth__forgot">@T["ui.signin.forgot"]</a>
+            </div>
+            <input id="password" name="password" type="password" class="vx-input" autocomplete="current-password" required />
+        </div>
         <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.signin.submit"]</VxButton>
     </form>
-    <p><a href="/forgot-password">@T["ui.signin.forgot"]</a></p>
     <div class="vx-passkey" data-passkey-signin hidden>
-        <p class="vx-divider">@T["ui.signin.or"]</p>
+        <p class="vx-divider"><span>@T["ui.signin.or"]</span></p>
         <form method="post" action="/sign-in/passkey" data-options="/sign-in/passkey/options">
             <AntiforgeryToken />
             <input type="hidden" name="returnUrl" value="@ReturnUrl" />
             <input type="hidden" name="assertion" />
-            <button type="button" class="vx-button vx-button--wide" data-passkey-start>@T["ui.signin.passkey"]</button>
+            <button type="button" class="vx-button vx-button--wide vx-button--subtle" data-passkey-start>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <span>@T["ui.signin.passkey"]</span>
+            </button>
         </form>
         <p class="vx-message vx-message--error" role="alert" data-passkey-error hidden>@T["ui.passkey.cancelled"]</p>
     </div>

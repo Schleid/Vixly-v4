@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: RecoveryPage.razor
 
@@ -19,11 +19,15 @@ IMPORTANT NOTES:
     <form method="post" action="/sign-in/recovery" class="vx-form">
         <AntiforgeryToken />
         <input type="hidden" name="returnUrl" value="@ReturnUrl" />
-        <label for="code">@T["ui.recovery.code_label"]</label>
-        <input id="code" name="code" autocomplete="off" spellcheck="false" required autofocus />
+        <div class="vx-field">
+            <label for="code" class="vx-label">@T["ui.recovery.code_label"]</label>
+            <input id="code" name="code" class="vx-input vx-input--code" autocomplete="off" spellcheck="false" required autofocus />
+        </div>
         <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.verify.submit"]</VxButton>
     </form>
-    <p><a href="/sign-in">@T["ui.signin.back"]</a></p>
+    <div class="vx-auth__links">
+        <p><a href="/sign-in">@T["ui.signin.back"]</a></p>
+    </div>
 </AuthShell>
 
 @code {

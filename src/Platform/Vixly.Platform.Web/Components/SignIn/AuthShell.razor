@@ -39,15 +39,17 @@ IMPORTANT NOTES:
         </header>
         @ChildContent
         <nav class="vx-auth__languages" aria-label="@T["ui.language"]">
-            <a href="/culture/en?returnUrl=@ReturnHere" hreflang="en" lang="en">English</a>
-            <a href="/culture/fr?returnUrl=@ReturnHere" hreflang="fr" lang="fr">Français</a>
-            <a href="/culture/es?returnUrl=@ReturnHere" hreflang="es" lang="es">Español</a>
+            <a href="/culture/en?returnUrl=@ReturnHere" hreflang="en" lang="en" class="@(CurrentLang == "en" ? "active" : null)">English</a>
+            <a href="/culture/fr?returnUrl=@ReturnHere" hreflang="fr" lang="fr" class="@(CurrentLang == "fr" ? "active" : null)">Français</a>
+            <a href="/culture/es?returnUrl=@ReturnHere" hreflang="es" lang="es" class="@(CurrentLang == "es" ? "active" : null)">Español</a>
         </nav>
     </main>
 </body>
 </html>
 
 @code {
+    private string CurrentLang => System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
     [Parameter, EditorRequired]
     public string Title { get; set; } = string.Empty;
 

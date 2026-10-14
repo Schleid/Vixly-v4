@@ -745,91 +745,225 @@ a:focus-visible {
     display: grid;
     min-height: 100vh;
     place-items: center;
-    padding: var(--vx-space-4);
-    background: var(--vx-color-app);
+    padding: var(--vx-space-6) var(--vx-space-4);
+    background: radial-gradient(ellipse at 50% 0%, var(--vx-color-surface-sunken) 0%, var(--vx-color-app) 75%);
 }
 
 .vx-auth__card {
     width: min(28rem, 100%);
     background: var(--vx-color-surface);
     border: 1px solid var(--vx-color-border);
-    border-radius: var(--vx-radius-lg);
+    border-radius: var(--vx-radius-xl);
     padding: var(--vx-space-8);
-    box-shadow: var(--vx-shadow-2);
+    box-shadow: var(--vx-shadow-3);
 }
 
 .vx-auth__header {
     text-align: center;
-    margin-bottom: var(--vx-space-5);
+    margin-bottom: var(--vx-space-6);
 }
 
 .vx-auth__brand {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.65rem;
     font-weight: 700;
-    font-size: var(--vx-font-size-xl);
+    font-size: var(--vx-font-size-lg);
+    letter-spacing: -0.02em;
+    color: var(--vx-color-text);
+    margin-bottom: var(--vx-space-4);
+}
+
+.vx-auth__brand svg {
     color: var(--vx-color-primary);
-    margin-bottom: var(--vx-space-2);
+    background: var(--vx-color-primary-soft);
+    padding: 6px;
+    border-radius: var(--vx-radius-md);
+    box-sizing: content-box;
+    border: 1px solid color-mix(in srgb, var(--vx-color-primary) 20%, transparent);
 }
 
 .vx-auth__title {
-    font-size: var(--vx-font-size-xl);
+    font-size: var(--vx-font-size-2xl);
     font-weight: 700;
     color: var(--vx-color-text);
+    letter-spacing: -0.025em;
     margin: 0;
+}
+
+.vx-auth__intro {
+    font-size: var(--vx-font-size-sm);
+    color: var(--vx-color-text-muted);
+    line-height: 1.5;
+    margin-bottom: var(--vx-space-4);
+}
+
+.vx-auth__card .vx-form {
+    margin: 0;
+    max-width: none;
+    gap: var(--vx-space-4);
+}
+
+.vx-auth__card .vx-form .vx-button {
+    width: 100%;
+    margin-top: var(--vx-space-2);
+}
+
+.vx-field__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--vx-space-1);
+}
+
+.vx-auth__forgot {
+    font-size: var(--vx-font-size-xs);
+    font-weight: 500;
+    color: var(--vx-color-link);
+}
+
+.vx-auth__links {
+    text-align: center;
+    margin-top: var(--vx-space-4);
+}
+
+.vx-auth__links p {
+    margin: var(--vx-space-2) 0;
+    font-size: var(--vx-font-size-sm);
+}
+
+.vx-auth__actions {
+    margin-top: var(--vx-space-5);
+}
+
+.vx-auth__actions .vx-button {
+    width: 100%;
 }
 
 .vx-auth__languages {
     display: flex;
     justify-content: center;
-    gap: var(--vx-space-4);
+    align-items: center;
+    gap: var(--vx-space-2);
     margin-top: var(--vx-space-6);
     padding-top: var(--vx-space-4);
     border-top: 1px solid var(--vx-color-border);
+}
+
+.vx-auth__languages a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--vx-radius-full);
+    color: var(--vx-color-text-muted);
     font-size: var(--vx-font-size-xs);
+    font-weight: 500;
+    text-decoration: none;
+    transition: background var(--vx-transition-fast), color var(--vx-transition-fast);
+}
+
+.vx-auth__languages a:hover {
+    color: var(--vx-color-text);
+    background: var(--vx-color-surface-sunken);
+    text-decoration: none;
+}
+
+.vx-auth__languages a.active {
+    color: var(--vx-color-primary);
+    background: var(--vx-color-primary-soft);
+    font-weight: 600;
+}
+
+.vx-input--code {
+    font-family: var(--vx-font-mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.35em;
+    padding: 0.65rem 1rem;
+}
+
+.vx-qr-container {
+    display: flex;
+    justify-content: center;
+    margin: var(--vx-space-4) 0;
 }
 
 .vx-qr {
     display: block;
-    margin: var(--vx-space-4) auto;
     background: #FFFFFF;
-    padding: var(--vx-space-2);
+    padding: var(--vx-space-3);
     border: 1px solid var(--vx-color-border);
-    border-radius: var(--vx-radius-md);
-    box-shadow: var(--vx-shadow-1);
+    border-radius: var(--vx-radius-lg);
+    box-shadow: var(--vx-shadow-2);
+}
+
+.vx-key-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--vx-space-1);
+    margin-bottom: var(--vx-space-4);
+}
+
+.vx-key-label {
+    font-size: var(--vx-font-size-xs);
+    color: var(--vx-color-text-muted);
+    font-weight: 500;
 }
 
 .vx-key {
     display: inline-block;
-    padding: 0.2rem 0.5rem;
+    padding: 0.35rem 0.75rem;
     background: var(--vx-color-surface-sunken);
-    border: 1px solid var(--vx-color-border);
-    border-radius: var(--vx-radius-sm);
+    border: 1px solid var(--vx-color-border-control);
+    border-radius: var(--vx-radius-md);
     font-family: var(--vx-font-mono);
-    font-size: 0.9rem;
-    letter-spacing: 0.08em;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--vx-color-text);
 }
 
 .vx-codes {
     columns: 2;
-    gap: var(--vx-space-4);
+    gap: var(--vx-space-3);
+    list-style: none;
     padding: var(--vx-space-4);
     background: var(--vx-color-surface-sunken);
     border: 1px solid var(--vx-color-border);
-    border-radius: var(--vx-radius-md);
+    border-radius: var(--vx-radius-lg);
     margin: var(--vx-space-4) 0;
 }
 
+.vx-codes li {
+    padding: 0.25rem 0;
+    text-align: center;
+}
+
 .vx-codes code {
-    display: block;
     font-family: var(--vx-font-mono);
     font-size: var(--vx-font-size-md);
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    padding: 0.2rem 0;
+    font-weight: 700;
+    letter-spacing: 0.1em;
     color: var(--vx-color-text);
+}
+
+@media print {
+    body.vx-auth {
+        background: #FFFFFF;
+        padding: 0;
+    }
+    .vx-auth__card {
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        width: 100%;
+    }
+    .vx-auth__languages, .vx-button {
+        display: none !important;
+    }
 }
 
 /* =========================================================
