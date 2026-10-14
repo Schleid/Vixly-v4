@@ -1,0 +1,91 @@
+﻿@*
+=========================================================
+FILE: OfferFields.razor
+
+PURPOSE:
+The agreed terms of an offer link: who it is for, the plan, term
+and licences, the discount, setup fee and one-time charges, and
+how long and how often the link works (D-S21).
+
+IMPORTANT NOTES:
+- UI glue only: the create form and the offer page own the model
+  and save it through their presenter
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Amounts are in the chosen plan's currency, before tax (D-S9)
+- A blank setup fee keeps the plan's own; zero waives it
+=========================================================
+*@
+@using Vixly.Platform.Domain.Subscriptions
+@inject IStringLocalizer<PlatformText> T
+
+<fieldset class="vx-fieldset">
+    <legend>@T["ui.offers.customer"]</legend>
+    <label for="offer-company">@T["ui.offers.company"]</label>
+    <input id="offer-company" @bind="Model.CompanyName" maxlength="200" required />
+    <label for="offer-email">@T["ui.offers.bound_email"]</label>
+    <input id="offer-email" type="email" @bind="Model.BoundEmail" maxlength="254" aria-describedby="offer-email-help" />
+    <p id="offer-email-help" class="vx-hint">@T["ui.offers.bound_email_help"]</p>
+    <label for="offer-reason">@T["ui.offers.reason"]</label>
+    <textarea id="offer-reason" @bind="Model.Reason" maxlength="500" required aria-describedby="offer-reason-help"></textarea>
+    <p id="offer-reason-help" class="vx-hint">@T["ui.offers.reason_help"]</p>
+</fieldset>
+<fieldset class="vx-fieldset">
+    <legend>@T["ui.offers.subscription"]</legend>
+    <label for="offer-plan">@T["ui.subscriptions.plan"]</label>
+    <select id="offer-plan" @bind="Model.PlanId" required>
+        <option value="">@T["ui.subscriptions.choose_plan"]</option>
+        @foreach (PlanChoice plan in Plans)
+        {
+            <option value="@plan.PlatformPlanId">@plan.Name (@plan.Code, @plan.CurrencyCode)</option>
+        }
+    </select>
+    <label for="offer-term">@T["ui.subscriptions.term"]</label>
+    <select id="offer-term" @bind="Model.Term">
+        @foreach (PlatformSubscriptionTerm term in Enum.GetValues<PlatformSubscriptionTerm>())
+        {
+            <option value="@term">@T[SubscriptionDisplay.TermKey(term)]</option>
+        }
+    </select>
+    <label for="offer-licences">@T["ui.subscriptions.licences"]</label>
+    <input id="offer-licences" type="number" min="1" @bind="Model.Licences" required />
+    <label><input type="checkbox" @bind="Model.StartTrial" /> @T["ui.offers.start_trial"]</label>
+</fieldset>
+<label><input type="checkbox" @bind="Model.HasDiscount" /> @T["ui.offers.with_discount"]</label>
+@if (Model.HasDiscount)
+{
+    <DiscountTermsFields Model="Model.Discount" Prefix="offer-discount" CurrencyCode="@Currency" />
+}
+<fieldset class="vx-fieldset">
+    <legend>@T["ui.offers.charges"]</legend>
+    <label for="offer-setup-fee">@T["ui.charges.setup_fee"]</label>
+    <input id="offer-setup-fee" type="number" min="0" step="0.01" @bind="Model.SetupFeeOverride" aria-describedby="offer-setup-fee-help" />
+    <p id="offer-setup-fee-help" class="vx-hint">@T["ui.offers.setup_fee_help"]</p>
+    @foreach (OfferFormModel.ChargeRow row in Model.Charges)
+    {
+        <div class="vx-toolbar">
+            <input aria-label="@T["ui.charges.description"]" @bind="row.Description" maxlength="200" required />
+            <input aria-label="@T["ui.charges.amount"]" type="number" min="0.01" step="0.01" @bind="row.Amount" required />
+            <VxButton OnClick="() => Model.Charges.Remove(row)">@T["ui.common.remove"]</VxButton>
+        </div>
+    }
+    <VxButton OnClick="() => Model.Charges.Add(new OfferFormModel.ChargeRow())">@T["ui.charges.add"]</VxButton>
+</fieldset>
+<fieldset class="vx-fieldset">
+    <legend>@T["ui.offers.link"]</legend>
+    <label for="offer-expires">@T["ui.offers.expires"]</label>
+    <input id="offer-expires" type="date" @bind="Model.ExpiresOn" required aria-describedby="offer-expires-help" />
+    <p id="offer-expires-help" class="vx-hint">@T["ui.offers.expires_help"]</p>
+    <label for="offer-uses">@T["ui.offers.uses_allowed"]</label>
+    <input id="offer-uses" type="number" min="1" max="100" @bind="Model.UsesAllowed" required />
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired]
+    public OfferFormModel Model { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PlanChoice> Plans { get; set; } = Array.Empty<PlanChoice>();
+
+    private string? Currency => Plans.FirstOrDefault(plan => plan.PlatformPlanId == Model.PlatformPlanId)?.CurrencyCode;
+}

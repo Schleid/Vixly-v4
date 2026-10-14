@@ -9,7 +9,8 @@
 //
 // RESPONSIBILITIES:
 // - Refuse outside the Development environment
-// - Run PlatformDemoTenants and print what was added
+// - Run PlatformDemoTenants, then PlatformDemoSubscriptions,
+//   then PlatformDemoSales, and print what was added
 //
 // IMPORTANT NOTES:
 // - Usage: dotnet run -- --seed-demo-tenants
@@ -34,6 +35,12 @@ public static class PlatformDemoTenantsCommand
         PlatformDemoTenants demo = ActivatorUtilities.CreateInstance<PlatformDemoTenants>(scope.ServiceProvider);
 
         Console.WriteLine(await demo.SeedAsync(CancellationToken.None));
+
+        PlatformDemoSubscriptions subscriptions = ActivatorUtilities.CreateInstance<PlatformDemoSubscriptions>(scope.ServiceProvider);
+        Console.WriteLine(await subscriptions.SeedAsync(CancellationToken.None));
+
+        PlatformDemoSales sales = ActivatorUtilities.CreateInstance<PlatformDemoSales>(scope.ServiceProvider);
+        Console.WriteLine(await sales.SeedAsync(CancellationToken.None));
         return 0;
     }
 }

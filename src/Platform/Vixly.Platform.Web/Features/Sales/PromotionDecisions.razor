@@ -1,0 +1,98 @@
+﻿@*
+=========================================================
+FILE: PromotionDecisions.razor
+
+PURPOSE:
+The CFO's decision on a submitted promotion, and pausing,
+resuming or ending a live one (D-S20, D-S26).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Four eyes: whoever designed the promotion cannot approve it;
+  approving and rejecting ask for step-up
+- Ending is final; customers who already redeemed keep their
+  discount for its agreed duration
+=========================================================
+*@
+@inherits PlatformPresenterComponent<PromotionDecisionPresenter>
+@using Vixly.Platform.Application.UseCases.Sales
+@using Vixly.Platform.Domain.Sales
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.DoneKey is { } done)
+{
+    <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+}
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+@if (Promotion.Status == PlatformPromotionStatus.PendingApproval && Abilities.CanDecide)
+{
+    <div id="promotion-decision"><VxCard Title="@T["ui.approvals.decision"]">
+        <p>@T["ui.promotions.decision_help"]</p>
+        <form class="vx-form" @onsubmit="() => RunAsync(() => Presenter.RejectAsync(Promotion.PromotionId, _reason))">
+            <label for="promotion-decision-reason">@T["ui.approvals.reason"]</label>
+            <textarea id="promotion-decision-reason" @bind="_reason" maxlength="500" aria-describedby="promotion-decision-reason-help"></textarea>
+            <p id="promotion-decision-reason-help" class="vx-hint">@T["ui.approvals.reason_help"]</p>
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" OnClick="() => RunAsync(() => Presenter.ApproveAsync(Promotion.PromotionId, _reason))" IsBusy="@Presenter.IsBusy">@T["ui.approvals.approve"]</VxButton>
+                <VxButton Variant="VxButtonVariant.Danger" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.approvals.reject"]</VxButton>
+            </div>
+        </form>
+    </VxCard></div>
+}
+@if (Abilities.CanManage && Promotion.Status is PlatformPromotionStatus.Active or PlatformPromotionStatus.Paused)
+{
+    <div class="vx-actions">
+        @if (Promotion.Status == PlatformPromotionStatus.Active)
+        {
+            <VxButton OnClick="() => RunAsync(() => Presenter.PauseAsync(Promotion.PromotionId))" IsBusy="@Presenter.IsBusy">@T["ui.promotions.pause"]</VxButton>
+        }
+        else
+        {
+            <VxButton OnClick="() => RunAsync(() => Presenter.ResumeAsync(Promotion.PromotionId))" IsBusy="@Presenter.IsBusy">@T["ui.promotions.resume"]</VxButton>
+        }
+        <VxButton Variant="VxButtonVariant.Danger" OnClick="() => RunAsync(() => Presenter.EndAsync(Promotion.PromotionId))" IsBusy="@Presenter.IsBusy">@T["ui.promotions.end"]</VxButton>
+    </div>
+    <p class="vx-hint">@T["ui.promotions.end_help"]</p>
+}
+@if (Presenter.State.StepUpPending)
+{
+    <StepUpDialog OnConfirmed="ConfirmedAsync" OnCancelled="Presenter.CancelStepUp" />
+}
+
+@code {
+    private string? _reason;
+
+    private Func<Task<bool>>? _pending;
+
+    [Parameter, EditorRequired]
+    public PlatformPromotionDetail Promotion { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public PlatformSalesAbilities Abilities { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private Task RunAsync(Func<Task<bool>> work)
+    {
+        _pending = work;
+        return ConfirmedAsync();
+    }
+
+    private async Task ConfirmedAsync()
+    {
+        if (_pending is not null && await _pending())
+        {
+            _pending = null;
+            _reason = null;
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

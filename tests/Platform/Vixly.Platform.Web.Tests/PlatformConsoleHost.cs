@@ -43,7 +43,8 @@ internal sealed class PlatformConsoleHost : IAsyncDisposable
                 "--environment=Production",
                 "--applicationName=Vixly.Platform.Web",
                 "--ConnectionStrings:Platform=Server=127.0.0.1,1;Database=None;User Id=none;Password=none;Connect Timeout=1;TrustServerCertificate=True",
-                "--PlatformOutbox:Enabled=false"
+                "--PlatformOutbox:Enabled=false",
+                "--PlatformSubscriptionClock:Enabled=false"
             },
             builder =>
             {

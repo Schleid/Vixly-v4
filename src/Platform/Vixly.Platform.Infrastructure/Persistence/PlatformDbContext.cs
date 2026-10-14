@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Vixly.Platform.Domain.Audit;
 using Vixly.Platform.Domain.Identity;
 using Vixly.Platform.Domain.Messaging;
+using Vixly.Platform.Domain.Sales;
+using Vixly.Platform.Domain.Subscriptions;
 using Vixly.Platform.Domain.Tenants;
 using Vixly.Platform.Infrastructure.Persistence.Conventions;
 
@@ -66,6 +68,20 @@ public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<PlatformRegistrationToken> RegistrationTokens => Set<PlatformRegistrationToken>();
 
     public DbSet<PlatformOutboxMessage> OutboxMessages => Set<PlatformOutboxMessage>();
+
+    public DbSet<PlatformPlan> Plans => Set<PlatformPlan>();
+
+    public DbSet<PlatformSubscription> Subscriptions => Set<PlatformSubscription>();
+
+    public DbSet<PlatformSubscriptionEvent> SubscriptionEvents => Set<PlatformSubscriptionEvent>();
+
+    public DbSet<PlatformTenantLimitOverride> TenantLimitOverrides => Set<PlatformTenantLimitOverride>();
+
+    public DbSet<PlatformSalesSettings> SalesSettings => Set<PlatformSalesSettings>();
+
+    public DbSet<PlatformPromotion> Promotions => Set<PlatformPromotion>();
+
+    public DbSet<PlatformOffer> Offers => Set<PlatformOffer>();
 
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 

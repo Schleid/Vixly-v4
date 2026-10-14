@@ -23,4 +23,5 @@ public sealed record PlatformPermissionHolderItem(
     PlatformUserAuthorityLevel AuthorityLevel,
     string? RoleName,
     string? RoleSystemKey,
-    DateTimeOffset? ExpiresUtc);
+    DateTimeOffset? ExpiresUtc,
+    string? Language = null);

@@ -1,0 +1,20 @@
+﻿@*
+=========================================================
+FILE: SalesSettingsPage.razor
+
+PURPOSE:
+The sales manager's limits for discounts and offers (D-S22).
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/sales/settings"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.sales_settings.title"]</PageTitle>
+<p><a href="/approvals">@T["ui.approvals.title"]</a></p>
+<h1>@T["ui.sales_settings.title"]</h1>
+<SalesSettingsForm />

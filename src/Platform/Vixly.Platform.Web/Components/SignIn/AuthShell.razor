@@ -27,106 +27,87 @@ IMPORTANT NOTES:
     <script src="/js/passkeys.js" defer></script>
 </head>
 <body class="vx-auth">
-    <div class="vx-auth__card">
-        <aside class="vx-auth__showcase" aria-label="@T["ui.auth.headline"]">
-            <div class="vx-auth__showcase-glow" aria-hidden="true"></div>
-            <div class="vx-auth__showcase-inner">
-                <div class="vx-auth__badge">
-                    <span class="vx-auth__badge-dot" aria-hidden="true"></span>
-                    <span>@T["ui.auth.badge"]</span>
+    <!-- Atmospheric backdrop & micro-mesh -->
+    <div class="vx-auth__backdrop" aria-hidden="true">
+        <div class="vx-auth__glow-primary"></div>
+        <div class="vx-auth__glow-secondary"></div>
+        <div class="vx-auth__grid-texture"></div>
+    </div>
+
+    <!-- Top Executive Nav Header -->
+    <header class="vx-auth__topbar">
+        <div class="vx-auth__topbar-inner">
+            <div class="vx-auth__brand">
+                <div class="vx-auth__brand-emblem" aria-hidden="true">
+                    <svg viewBox="0 0 28 28" width="22" height="22" fill="none">
+                        <polygon points="14 2 26 8 26 20 14 26 2 20 2 8" stroke="url(#vx-emblem-grad)" stroke-width="2.2" stroke-linejoin="round" />
+                        <path d="M14 6v16M2 8l12 8 12-8" stroke="rgba(96, 165, 250, 0.7)" stroke-width="1.8" stroke-linejoin="round" />
+                        <defs>
+                            <linearGradient id="vx-emblem-grad" x1="2" y1="2" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#60A5FA" />
+                                <stop offset="1" stop-color="#1D4ED8" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
                 </div>
-                <div class="vx-auth__showcase-hero">
-                    <div class="vx-auth__logo-squircle" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                        </svg>
-                    </div>
-                    <h2 class="vx-auth__showcase-title">@T["ui.auth.headline"]</h2>
-                    <p class="vx-auth__showcase-desc">@T["ui.auth.description"]</p>
+                <div class="vx-auth__brand-titles">
+                    <span class="vx-auth__brand-title">VIXLY</span>
+                    <span class="vx-auth__brand-badge">@T["ui.auth.badge"]</span>
                 </div>
-                <div class="vx-auth__telemetry" role="region" aria-label="@T["ui.auth.telemetry.badge"]">
-                    <div class="vx-auth__telemetry-header">
-                        <span class="vx-auth__telemetry-dot" aria-hidden="true"></span>
-                        <span class="vx-auth__telemetry-badge">@T["ui.auth.telemetry.badge"]</span>
-                    </div>
-                    <div class="vx-auth__telemetry-grid">
-                        <div class="vx-auth__telemetry-item">
-                            <div class="vx-auth__telemetry-icon" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                                    <path d="M9 12l2 2 4-4" />
-                                </svg>
-                            </div>
-                            <div class="vx-auth__telemetry-text">
-                                <div class="vx-auth__telemetry-title">@T["ui.auth.telemetry.p1_title"]</div>
-                                <div class="vx-auth__telemetry-desc">@T["ui.auth.telemetry.p1_desc"]</div>
-                            </div>
-                        </div>
-                        <div class="vx-auth__telemetry-item">
-                            <div class="vx-auth__telemetry-icon" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
-                                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
-                                    <line x1="6" y1="6" x2="6.01" y2="6" />
-                                    <line x1="6" y1="18" x2="6.01" y2="18" />
-                                </svg>
-                            </div>
-                            <div class="vx-auth__telemetry-text">
-                                <div class="vx-auth__telemetry-title">@T["ui.auth.telemetry.p2_title"]</div>
-                                <div class="vx-auth__telemetry-desc">@T["ui.auth.telemetry.p2_desc"]</div>
-                            </div>
-                        </div>
-                        <div class="vx-auth__telemetry-item">
-                            <div class="vx-auth__telemetry-icon" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                                </svg>
-                            </div>
-                            <div class="vx-auth__telemetry-text">
-                                <div class="vx-auth__telemetry-title">@T["ui.auth.telemetry.p3_title"]</div>
-                                <div class="vx-auth__telemetry-desc">@T["ui.auth.telemetry.p3_desc"]</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="vx-auth__telemetry-footer">
-                        <span>@T["ui.auth.telemetry.footer"]</span>
-                    </div>
-                </div>
-                <div class="vx-auth__compliance">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            </div>
+
+            <div class="vx-auth__telemetry-pill" role="status" aria-label="@T["ui.auth.telemetry_status"]">
+                <span class="vx-auth__status-dot" aria-hidden="true"></span>
+                <span class="vx-auth__telemetry-label">@T["ui.auth.telemetry_status"]</span>
+            </div>
+
+            <div class="vx-auth__topbar-actions">
+                <span class="vx-auth__security-tag">@T["ui.auth.zero_trust"]</span>
+                <nav class="vx-auth__languages" aria-label="@T["ui.language"]">
+                    <a href="/culture/en?returnUrl=@ReturnHere" hreflang="en" lang="en" class="@(CurrentLang == "en" ? "active" : null)">EN</a>
+                    <a href="/culture/fr?returnUrl=@ReturnHere" hreflang="fr" lang="fr" class="@(CurrentLang == "fr" ? "active" : null)">FR</a>
+                    <a href="/culture/es?returnUrl=@ReturnHere" hreflang="es" lang="es" class="@(CurrentLang == "es" ? "active" : null)">ES</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Stage: Focused Command Terminal -->
+    <main id="main-content" class="vx-auth__stage" aria-labelledby="vx-page-title">
+        <div class="vx-auth__terminal">
+            <div class="vx-auth__horizon-line" aria-hidden="true"></div>
+            
+            <header class="vx-auth__header">
+                <div class="vx-auth__portal-badge" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                     </svg>
-                    <span>@T["ui.auth.compliance"]</span>
                 </div>
-            </div>
-        </aside>
-        <main id="main-content" class="vx-auth__form-pane" aria-labelledby="vx-page-title">
-            <div class="vx-auth__form-badge">
-                <span class="vx-auth__badge-dot" aria-hidden="true"></span>
-                <span>@T["ui.auth.form_badge"]</span>
-            </div>
-            <header class="vx-auth__header">
                 <h1 id="vx-page-title" class="vx-auth__title">@Title</h1>
                 @if (!string.IsNullOrWhiteSpace(Subtitle))
                 {
                     <p class="vx-auth__subtitle">@Subtitle</p>
                 }
             </header>
-            @ChildContent
-            <div class="vx-auth__disclaimer">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+
+            <div class="vx-auth__content">
+                @ChildContent
+            </div>
+
+            <div class="vx-auth__terminal-footer">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
                 <span>@T["ui.auth.authorized_only"]</span>
             </div>
-            <nav class="vx-auth__languages" aria-label="@T["ui.language"]">
-                <a href="/culture/en?returnUrl=@ReturnHere" hreflang="en" lang="en" class="@(CurrentLang == "en" ? "active" : null)">English</a>
-                <a href="/culture/fr?returnUrl=@ReturnHere" hreflang="fr" lang="fr" class="@(CurrentLang == "fr" ? "active" : null)">Français</a>
-                <a href="/culture/es?returnUrl=@ReturnHere" hreflang="es" lang="es" class="@(CurrentLang == "es" ? "active" : null)">Español</a>
-            </nav>
-        </main>
-    </div>
+        </div>
+    </main>
+
+    <!-- Global System Footer -->
+    <footer class="vx-auth__footer">
+        <p>@T["ui.auth.footer_text"]</p>
+    </footer>
 </body>
 </html>
 

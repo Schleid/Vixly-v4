@@ -1,0 +1,95 @@
+﻿@*
+=========================================================
+FILE: PlanTranslations.razor
+
+PURPOSE:
+The plan's name and description in each language, with the
+form to set one.
+
+IMPORTANT NOTES:
+- UI glue only: the plan presenter saves through OnSave
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- A language without a translation falls back to the default
+  language's name (ADR-0005)
+=========================================================
+*@
+@using Vixly.Platform.Application.UseCases.Plans
+@inject IStringLocalizer<PlatformText> T
+
+<div id="plan-translations"><VxCard Title="@T["ui.plans.translations"]">
+    <VxDataTable Items="Translations" IsLoading="false">
+        <HeaderContent>
+            <th scope="col">@T["ui.language"]</th>
+            <th scope="col">@T["ui.plans.name"]</th>
+            <th scope="col">@T["ui.plans.description"]</th>
+        </HeaderContent>
+        <RowTemplate Context="translation">
+            <td>@T["ui.language." + translation.Language]</td>
+            <td>@translation.Name</td>
+            <td>@translation.Description</td>
+        </RowTemplate>
+    </VxDataTable>
+    @if (CanEdit)
+    {
+        <form class="vx-form" @onsubmit="SaveAsync">
+            <label for="plan-translation-language">@T["ui.language"]</label>
+            <select id="plan-translation-language" value="@_language" @onchange="PickLanguage">
+                @foreach (string language in VixlyCultures.Supported.Select(culture => culture.TwoLetterISOLanguageName))
+                {
+                    <option value="@language">@T["ui.language." + language]</option>
+                }
+            </select>
+            <label for="plan-translation-name">@T["ui.plans.name"]</label>
+            <input id="plan-translation-name" @bind="_name" maxlength="100" required />
+            <label for="plan-translation-description">@T["ui.plans.description"]</label>
+            <textarea id="plan-translation-description" @bind="_description" maxlength="1000"></textarea>
+            <div class="vx-actions">
+                <VxButton Type="submit" IsBusy="@IsBusy">@T["ui.plans.save_translation"]</VxButton>
+            </div>
+        </form>
+    }
+</VxCard></div>
+
+@code {
+    private string _language = VixlyCultures.Default.TwoLetterISOLanguageName;
+
+    private string? _name;
+
+    private string? _description;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PlatformPlanTranslationItem> Translations { get; set; } = Array.Empty<PlatformPlanTranslationItem>();
+
+    [Parameter]
+    public bool CanEdit { get; set; }
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public Func<string, string?, string?, Task>? OnSave { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        Fill();
+    }
+
+    private void PickLanguage(ChangeEventArgs args)
+    {
+        _language = args.Value?.ToString() ?? _language;
+        Fill();
+    }
+
+    private void Fill()
+    {
+        PlatformPlanTranslationItem? existing = Translations.FirstOrDefault(item => item.Language == _language);
+        _name = existing?.Name;
+        _description = existing?.Description;
+    }
+
+    private Task SaveAsync()
+    {
+        return OnSave is null ? Task.CompletedTask : OnSave(_language, _name, _description);
+    }
+}

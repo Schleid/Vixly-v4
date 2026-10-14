@@ -1,0 +1,43 @@
+﻿@*
+=========================================================
+FILE: SubscriptionsPage.razor
+
+PURPOSE:
+All tenant subscriptions, filtered by status, plan and renewal.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/subscriptions"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.subscriptions.title"]</PageTitle>
+<h1>@T["ui.subscriptions.title"]</h1>
+<p><a href="/plans">@T["ui.plans.title"]</a></p>
+<SubscriptionList Search="@Search" Status="@Status" PlanId="@Plan" RenewsWithin="@Renews" IncludeEnded="@(Ended ?? false)" Discounted="@(Discounted ?? false)" Page="@Page" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Search { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+
+    [SupplyParameterFromQuery]
+    public Guid? Plan { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Renews { get; set; }
+
+    [SupplyParameterFromQuery]
+    public bool? Ended { get; set; }
+
+    [SupplyParameterFromQuery]
+    public bool? Discounted { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

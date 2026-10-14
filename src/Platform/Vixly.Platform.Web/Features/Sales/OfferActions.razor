@@ -1,0 +1,140 @@
+﻿@*
+=========================================================
+FILE: OfferActions.razor
+
+PURPOSE:
+What can be done with an offer link: submit it, the sales
+manager's decision, get a new link, or revoke it (D-S21).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Within the sales manager's limits Submit issues the link at
+  once; beyond them it asks for approval (D-S22)
+- Only a hash of the link is stored, so the link is shown once;
+  "Get a new link" replaces it and the old one stops working
+- Four eyes: whoever prepared the offer cannot approve it
+=========================================================
+*@
+@inherits PlatformPresenterComponent<OfferActionsPresenter>
+@using Vixly.Platform.Application.UseCases.Sales
+@using Vixly.Platform.Domain.Sales
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject TimeProvider Clock
+
+@if (Presenter.State.DoneKey is { } done)
+{
+    <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+}
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+@if (Presenter.State.Link is { } link)
+{
+    <div id="offer-link"><VxCard Title="@T["ui.offers.link"]">
+        <p>@T["ui.offers.link_once"]</p>
+        <label for="offer-link-value">@T["ui.offers.link"]</label>
+        <input id="offer-link-value" readonly value="@link" size="90" />
+    </VxCard></div>
+}
+@if (Offer.Status == PlatformOfferStatus.PendingApproval && Abilities.CanDecide)
+{
+    <div id="offer-decision"><VxCard Title="@T["ui.approvals.decision"]">
+        <p>@T["ui.offers.decision_help"]</p>
+        <form class="vx-form" @onsubmit="() => RunAsync(() => Presenter.RejectAsync(Offer.OfferId, _reason))">
+            <label for="offer-decision-reason">@T["ui.approvals.reason"]</label>
+            <textarea id="offer-decision-reason" @bind="_reason" maxlength="500" aria-describedby="offer-decision-reason-help"></textarea>
+            <p id="offer-decision-reason-help" class="vx-hint">@T["ui.approvals.reason_help"]</p>
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" OnClick="() => RunAsync(() => Presenter.ApproveAsync(Offer.OfferId, _reason))" IsBusy="@Presenter.IsBusy">@T["ui.approvals.approve"]</VxButton>
+                <VxButton Variant="VxButtonVariant.Danger" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.approvals.reject"]</VxButton>
+            </div>
+        </form>
+    </VxCard></div>
+}
+@if (Abilities.CanManage)
+{
+    <div class="vx-actions">
+        @if (Offer.Status is PlatformOfferStatus.Draft or PlatformOfferStatus.Rejected)
+        {
+            <VxButton Variant="VxButtonVariant.Primary" OnClick="() => RunAsync(() => Presenter.SubmitAsync(Offer.OfferId))" IsBusy="@Presenter.IsBusy">@T["ui.offers.submit"]</VxButton>
+        }
+        @if (Offer.Status == PlatformOfferStatus.Issued && Offer.ExpiresUtc > Clock.GetUtcNow())
+        {
+            <VxButton OnClick="() => RunAsync(() => Presenter.ReplaceLinkAsync(Offer.OfferId))" IsBusy="@Presenter.IsBusy">@T["ui.offers.new_link"]</VxButton>
+        }
+        @if (Offer.Status is not (PlatformOfferStatus.Used or PlatformOfferStatus.Revoked) && !_revoking)
+        {
+            <VxButton Variant="VxButtonVariant.Danger" OnClick="() => _revoking = true">@T["ui.offers.revoke"]</VxButton>
+        }
+    </div>
+    @if (Offer.Status is PlatformOfferStatus.Draft or PlatformOfferStatus.Rejected)
+    {
+        <p class="vx-hint">@T["ui.offers.submit_help"]</p>
+    }
+    @if (_revoking)
+    {
+        <form class="vx-form" @onsubmit="RevokeAsync">
+            <label for="offer-revoke-reason">@T["ui.offers.revoke_reason"]</label>
+            <textarea id="offer-revoke-reason" @bind="_revokeReason" maxlength="500" required></textarea>
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Danger" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.offers.revoke"]</VxButton>
+                <VxButton OnClick="() => _revoking = false">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+}
+@if (Presenter.State.StepUpPending)
+{
+    <StepUpDialog OnConfirmed="ConfirmedAsync" OnCancelled="Presenter.CancelStepUp" />
+}
+
+@code {
+    private string? _reason;
+
+    private string? _revokeReason;
+
+    private bool _revoking;
+
+    private Func<Task<bool>>? _pending;
+
+    [Parameter, EditorRequired]
+    public PlatformOfferDetail Offer { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public PlatformSalesAbilities Abilities { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private async Task RevokeAsync()
+    {
+        await RunAsync(() => Presenter.RevokeAsync(Offer.OfferId, _revokeReason));
+
+        if (Presenter.State.Error is null)
+        {
+            _revoking = false;
+            _revokeReason = null;
+        }
+    }
+
+    private Task RunAsync(Func<Task<bool>> work)
+    {
+        _pending = work;
+        return ConfirmedAsync();
+    }
+
+    private async Task ConfirmedAsync()
+    {
+        if (_pending is not null && await _pending())
+        {
+            _pending = null;
+            _reason = null;
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

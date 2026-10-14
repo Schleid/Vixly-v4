@@ -1,0 +1,82 @@
+﻿@*
+=========================================================
+FILE: PromotionFields.razor
+
+PURPOSE:
+The terms of a promotion code: the discount, when it is valid,
+which plans and term it applies to, where it can be used and how
+often (D-S20).
+
+IMPORTANT NOTES:
+- UI glue only: the create form and the promotion page own the
+  model and save it through their presenters
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- No plan chosen means every plan; no term means either term
+- A fixed amount is taken in the subscription's own currency
+=========================================================
+*@
+@using Vixly.Platform.Domain.Subscriptions
+@inject IStringLocalizer<PlatformText> T
+
+<DiscountTermsFields Model="Model.Terms" Prefix="promotion-terms" Disabled="Disabled" />
+<fieldset class="vx-fieldset" disabled="@Disabled">
+    <legend>@T["ui.promotions.validity"]</legend>
+    <label for="promotion-valid-from">@T["ui.promotions.valid_from"]</label>
+    <input id="promotion-valid-from" type="date" @bind="Model.ValidFrom" required />
+    <label for="promotion-valid-to">@T["ui.promotions.valid_to"]</label>
+    <input id="promotion-valid-to" type="date" @bind="Model.ValidTo" aria-describedby="promotion-valid-to-help" />
+    <p id="promotion-valid-to-help" class="vx-hint">@T["ui.promotions.valid_to_help"]</p>
+</fieldset>
+<fieldset class="vx-fieldset" disabled="@Disabled">
+    <legend>@T["ui.promotions.where"]</legend>
+    <label><input type="checkbox" @bind="Model.AtRegistration" /> @T["ui.promotions.at_registration"]</label>
+    <label><input type="checkbox" @bind="Model.ByStaff" /> @T["ui.promotions.by_staff"]</label>
+    <label for="promotion-limit">@T["ui.promotions.redemption_limit"]</label>
+    <input id="promotion-limit" type="number" min="1" @bind="Model.RedemptionLimit" aria-describedby="promotion-limit-help" />
+    <p id="promotion-limit-help" class="vx-hint">@T["ui.promotions.redemption_limit_help"]</p>
+</fieldset>
+<fieldset class="vx-fieldset" disabled="@Disabled">
+    <legend>@T["ui.promotions.plans"]</legend>
+    <p class="vx-hint">@T["ui.promotions.plans_help"]</p>
+    @foreach (PlanChoice plan in Plans)
+    {
+        <label><input type="checkbox" checked="@Model.PlanIds.Contains(plan.PlatformPlanId)" @onchange="args => Toggle(plan.PlatformPlanId, args)" /> @plan.Name <span class="vx-hint">@plan.Code</span></label>
+    }
+    <label for="promotion-term">@T["ui.subscriptions.term"]</label>
+    <select id="promotion-term" value="@(Model.Term?.ToString() ?? string.Empty)" @onchange="PickTerm">
+        <option value="">@T["ui.promotions.any_term"]</option>
+        @foreach (PlatformSubscriptionTerm term in Enum.GetValues<PlatformSubscriptionTerm>())
+        {
+            <option value="@term">@T[SubscriptionDisplay.TermKey(term)]</option>
+        }
+    </select>
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired]
+    public PromotionFormModel Model { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PlanChoice> Plans { get; set; } = Array.Empty<PlanChoice>();
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    private void Toggle(Guid planId, ChangeEventArgs args)
+    {
+        if (args.Value is true)
+        {
+            Model.PlanIds.Add(planId);
+        }
+        else
+        {
+            Model.PlanIds.Remove(planId);
+        }
+    }
+
+    private void PickTerm(ChangeEventArgs args)
+    {
+        Model.Term = Enum.TryParse(args.Value?.ToString(), out PlatformSubscriptionTerm term) ? term : null;
+    }
+}

@@ -4,8 +4,11 @@ using Vixly.Platform.Application.Identity;
 using Vixly.Platform.Application.Messaging;
 using Vixly.Platform.Application.Security;
 using Vixly.Platform.Application.UseCases.Departments;
+using Vixly.Platform.Application.UseCases.Plans;
+using Vixly.Platform.Application.UseCases.Sales;
 using Vixly.Platform.Application.UseCases.Registration;
 using Vixly.Platform.Application.UseCases.Roles;
+using Vixly.Platform.Application.UseCases.Subscriptions;
 using Vixly.Platform.Application.UseCases.Tenants;
 using Vixly.Platform.Application.UseCases.Users;
 
@@ -54,6 +57,14 @@ public static class PlatformApplicationServiceCollectionExtensions
         services.AddScoped<PlatformOutboxWriter>();
         services.AddScoped<PlatformOutboxDispatcher>();
         services.AddScoped<IPlatformOutboxHandler, PlatformTenantNoticeHandler>();
+        services.AddScoped<PlatformPlanAdministration>();
+        services.AddScoped<PlatformSubscriptionAdministration>();
+        services.AddScoped<PlatformSubscriptionClock>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformSubscriptionTenantStatusHandler>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformPriceIncreaseNoticeHandler>();
+        services.AddScoped<PlatformSalesAdministration>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformApprovalRequestHandler>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformDiscountEndingHandler>();
 
         foreach (Type useCase in typeof(PlatformApplicationServiceCollectionExtensions).Assembly
             .GetExportedTypes()

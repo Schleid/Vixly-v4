@@ -1,0 +1,116 @@
+﻿@*
+=========================================================
+FILE: SalesSettingsForm.razor
+
+PURPOSE:
+The limits the sales manager sets: what salespeople may offer on
+their own, how long offer links last and when customers are told
+a discount is ending (D-S22, D-S25).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- No hard-coded limits: a blank limit means everything needs the
+  sales manager's approval; a blank notice means no email
+- Saving asks for step-up; four eyes apply to every approval
+=========================================================
+*@
+@inherits PlatformPresenterComponent<SalesSettingsPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="sales-settings"><VxCard Title="@T["ui.sales_settings.title"]">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (!Presenter.State.Loaded)
+    {
+        <p role="status">@T["ui.common.loading"]</p>
+    }
+    else if (Presenter.State.Settings is { } settings)
+    {
+        <p class="vx-hint">@T["ui.sales_settings.help"]</p>
+        @if (settings.UpdatedUtc is { } updated)
+        {
+            <p class="vx-hint">@VixlyText.Format(T, "ui.sales_settings.updated", new Dictionary<string, object> { ["name"] = settings.UpdatedByName ?? string.Empty, ["time"] = PlatformDisplay.Utc(T, updated) })</p>
+        }
+        <form class="vx-form" @onsubmit="SaveAsync">
+            <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)">
+                <legend>@T["ui.sales_settings.discounts"]</legend>
+                <label for="sales-max-percent">@T["ui.sales_settings.max_percent"]</label>
+                <input id="sales-max-percent" type="number" min="0" max="100" step="0.01" @bind="_model.MaxPercentWithoutApproval" aria-describedby="sales-max-percent-help" />
+                <p id="sales-max-percent-help" class="vx-hint">@T["ui.sales_settings.max_percent_help"]</p>
+                <p>@T["ui.sales_settings.fixed_limits"]</p>
+                @for (int index = 0; index < _model.FixedLimits.Count; index++)
+                {
+                    SalesSettingsModel.FixedLimitRow row = _model.FixedLimits[index];
+                    <div class="vx-toolbar">
+                        <input aria-label="@T["ui.plans.currency"]" @bind="row.CurrencyCode" maxlength="3" required autocomplete="off" />
+                        <input aria-label="@T["ui.sales_settings.fixed_amount"]" type="number" min="0" step="0.01" @bind="row.Amount" />
+                        <VxButton OnClick="() => _model.FixedLimits.Remove(row)">@T["ui.common.remove"]</VxButton>
+                    </div>
+                }
+                <VxButton OnClick="() => _model.FixedLimits.Add(new SalesSettingsModel.FixedLimitRow())">@T["ui.sales_settings.add_limit"]</VxButton>
+                <p class="vx-hint">@T["ui.sales_settings.fixed_limits_help"]</p>
+                <label><input type="checkbox" @bind="_model.NoEndWithoutApproval" /> @T["ui.sales_settings.no_end"]</label>
+            </fieldset>
+            <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)">
+                <legend>@T["ui.sales_settings.offers"]</legend>
+                <label for="sales-offer-days">@T["ui.sales_settings.max_offer_days"]</label>
+                <input id="sales-offer-days" type="number" min="1" max="365" @bind="_model.MaxOfferValidityDays" aria-describedby="sales-offer-days-help" />
+                <p id="sales-offer-days-help" class="vx-hint">@T["ui.sales_settings.max_offer_days_help"]</p>
+            </fieldset>
+            <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)">
+                <legend>@T["ui.sales_settings.customers"]</legend>
+                <label for="sales-notice-days">@T["ui.sales_settings.notice_days"]</label>
+                <input id="sales-notice-days" type="number" min="1" max="90" @bind="_model.DiscountEndNoticeDays" aria-describedby="sales-notice-days-help" />
+                <p id="sales-notice-days-help" class="vx-hint">@T["ui.sales_settings.notice_days_help"]</p>
+                <label><input type="checkbox" @bind="_model.PromotionCodesAtRegistration" /> @T["ui.sales_settings.codes_at_registration"]</label>
+            </fieldset>
+            @if (Presenter.State.CanEdit)
+            {
+                <div class="vx-actions">
+                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.sales_settings.save"]</VxButton>
+                </div>
+            }
+        </form>
+        @if (Presenter.State.StepUpPending)
+        {
+            <StepUpDialog OnConfirmed="SaveAsync" OnCancelled="Presenter.CancelStepUp" />
+        }
+    }
+</VxCard></div>
+
+@code {
+    private SalesSettingsModel _model = new();
+
+    private int _seenVersion = -1;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Presenter.LoadAsync();
+        Sync();
+    }
+
+    private async Task SaveAsync()
+    {
+        await Presenter.SaveAsync(_model);
+        Sync();
+    }
+
+    private void Sync()
+    {
+        if (Presenter.State.Settings is { } settings && _seenVersion != Presenter.State.Version)
+        {
+            _seenVersion = Presenter.State.Version;
+            _model = SalesSettingsModel.From(settings);
+        }
+    }
+}

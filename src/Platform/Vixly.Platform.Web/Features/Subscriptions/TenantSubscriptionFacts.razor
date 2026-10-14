@@ -1,0 +1,100 @@
+﻿@*
+=========================================================
+FILE: TenantSubscriptionFacts.razor
+
+PURPOSE:
+The facts of the tenant's current subscription: plan, status,
+access, term, licences, amounts, dates, scheduled change and
+features.
+
+IMPORTANT NOTES:
+- Display only: no presenter, the subscription section passes
+  the subscription
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Amounts are before tax (D-S9)
+=========================================================
+*@
+@using Vixly.Platform.Application.UseCases.Subscriptions
+@using Vixly.Platform.Domain.Subscriptions
+@inject IStringLocalizer<PlatformText> T
+
+<dl class="vx-facts">
+    <dt>@T["ui.subscriptions.plan"]</dt>
+    <dd>
+        @Subscription.PlanName (@Subscription.PlanCode, @VixlyText.Format(T, "ui.plans.version_number", "number", Subscription.VersionNumber))
+        @if (Subscription.NewerVersionAtRenewal)
+        {
+            <span class="vx-hint">@T["ui.subscriptions.newer_version"]</span>
+        }
+    </dd>
+    <dt>@T["ui.subscriptions.status"]</dt>
+    <dd>
+        <VxStatusBadge Status="@SubscriptionDisplay.Badge(Subscription.Status)" Text="@T[SubscriptionDisplay.StatusKey(Subscription.Status)]" />
+        @VixlyText.Format(T, "ui.subscriptions.since", "time", PlatformDisplay.Utc(T, Subscription.StatusChangedUtc))
+    </dd>
+    <dt>@T["ui.subscriptions.access"]</dt><dd>@T[SubscriptionDisplay.AccessKey(Subscription.Access)]</dd>
+    <dt>@T["ui.subscriptions.term"]</dt><dd>@T[SubscriptionDisplay.TermKey(Subscription.Term)]</dd>
+    <dt>@T["ui.subscriptions.licences"]</dt>
+    <dd>@VixlyText.Format(T, "ui.subscriptions.licences_used", new Dictionary<string, object> { ["active"] = Subscription.ActiveLicences, ["total"] = Subscription.Licences })</dd>
+    <dt>@T["ui.subscriptions.price_per_licence"]</dt><dd>@SubscriptionDisplay.Money(Subscription.PricePerLicence, Subscription.CurrencyCode)</dd>
+    <dt>@T["ui.subscriptions.period_amount"]</dt><dd>@SubscriptionDisplay.Money(Subscription.PeriodAmount, Subscription.CurrencyCode)</dd>
+    @if (Subscription.CurrentPeriodDiscount > 0)
+    {
+        <dt>@T["ui.discounts.current_period"]</dt><dd>@SubscriptionDisplay.Money(-Subscription.CurrentPeriodDiscount, Subscription.CurrencyCode)</dd>
+    }
+    <dt>@T["ui.subscriptions.next_period_amount"]</dt>
+    <dd>
+        @SubscriptionDisplay.Money(Subscription.NextPeriodNetAmount, Subscription.CurrencyCode)
+        @if (Subscription.NextPeriodNetAmount != Subscription.NextPeriodAmount)
+        {
+            <span class="vx-hint">@VixlyText.Format(T, "ui.discounts.before_discount", "amount", SubscriptionDisplay.Money(Subscription.NextPeriodAmount, Subscription.CurrencyCode))</span>
+        }
+    </dd>
+    @if (Subscription.Discount is { } discount)
+    {
+        <dt>@T["ui.discounts.title"]</dt><dd><a href="#tenant-discount">@SalesDisplay.Describe(T, discount.Terms, Subscription.CurrencyCode)</a></dd>
+    }
+    <dt>@T["ui.plans.setup_fee"]</dt>
+    <dd>
+        @SubscriptionDisplay.Money(Subscription.SetupFee, Subscription.CurrencyCode)
+        @if (Subscription.SetupFeeOverridden)
+        {
+            <span class="vx-hint">@T["ui.charges.setup_fee_overridden"]</span>
+        }
+        @if (Subscription.SetupFee > 0)
+        {
+            <span class="vx-hint">@(Subscription.SetupFeeCharged ? T["ui.subscriptions.setup_fee_charged"] : T["ui.subscriptions.setup_fee_due"])</span>
+        }
+    </dd>
+    @if (Subscription.TrialEndsUtc is { } trialEnds)
+    {
+        <dt>@T["ui.subscriptions.trial_ends"]</dt><dd>@SubscriptionDisplay.Date(trialEnds)</dd>
+    }
+    <dt>@T["ui.subscriptions.period"]</dt>
+    <dd>@VixlyText.Format(T, "ui.subscriptions.period_range", new Dictionary<string, object> { ["from"] = SubscriptionDisplay.Date(Subscription.PeriodStartUtc), ["to"] = SubscriptionDisplay.Date(Subscription.PeriodEndUtc) })</dd>
+    <dt>@T["ui.plans.features"]</dt>
+    <dd>@(Subscription.Features.Count == 0 ? T["ui.common.none"].Value : string.Join(", ", Subscription.Features.Select(feature => T[SubscriptionDisplay.FeatureKey(feature)].Value)))</dd>
+</dl>
+@if (Subscription.CancelAtPeriodEnd)
+{
+    <VxMessage Type="VxMessageType.Warning">@VixlyText.Format(T, "ui.subscriptions.cancels_on", "date", SubscriptionDisplay.Date(Subscription.PeriodEndUtc))</VxMessage>
+}
+@if (Subscription.ScheduledChange is { } change)
+{
+    <VxMessage Type="VxMessageType.Info">
+        @VixlyText.Format(T, "ui.subscriptions.scheduled_change", new Dictionary<string, object>
+        {
+            ["plan"] = change.PlanName,
+            ["term"] = T[SubscriptionDisplay.TermKey(change.Term)].Value,
+            ["licences"] = change.Licences,
+            ["date"] = SubscriptionDisplay.Date(change.EffectiveUtc),
+            ["amount"] = SubscriptionDisplay.Money(change.PeriodAmount, Subscription.CurrencyCode)
+        })
+    </VxMessage>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public PlatformTenantSubscriptionDetail Subscription { get; set; } = null!;
+}

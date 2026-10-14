@@ -31,6 +31,8 @@ public static class PlatformApiRateLimits
 
     public const string Status = "registration-status";
 
+    public const string Catalogue = "registration-catalogue";
+
     public static IServiceCollection AddPlatformApiRateLimits(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
@@ -43,6 +45,7 @@ public static class PlatformApiRateLimits
             AddPerIp(options, Verify, 10, TimeSpan.FromHours(1));
             AddPerIp(options, Change, 10, TimeSpan.FromHours(1));
             AddPerIp(options, Status, 60, TimeSpan.FromHours(1));
+            AddPerIp(options, Catalogue, 60, TimeSpan.FromMinutes(1));
         });
 
         return services;

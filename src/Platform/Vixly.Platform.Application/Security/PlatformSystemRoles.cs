@@ -27,6 +27,12 @@ public static class PlatformSystemRoles
 
     public const string Administrator = "administrator";
 
+    public const string Salesperson = "salesperson";
+
+    public const string SalesManager = "sales_manager";
+
+    public const string ChiefFinancialOfficer = "chief_financial_officer";
+
     public static IReadOnlyDictionary<string, IReadOnlyCollection<string>> Definitions { get; } =
         new Dictionary<string, IReadOnlyCollection<string>>(StringComparer.Ordinal)
         {
@@ -70,7 +76,53 @@ public static class PlatformSystemRoles
                 PlatformPermissions.TenantsSuspend,
                 PlatformPermissions.TenantsReactivate,
                 PlatformPermissions.TenantsDeactivate,
-                PlatformPermissions.TenantsBan
+                PlatformPermissions.TenantsBan,
+                PlatformPermissions.PlansView,
+                PlatformPermissions.PlansManage,
+                PlatformPermissions.PlansPublish,
+                PlatformPermissions.SubscriptionsView,
+                PlatformPermissions.SubscriptionsManage,
+                PlatformPermissions.SubscriptionsOverrideLimits,
+                PlatformPermissions.DiscountsGrant,
+                PlatformPermissions.DiscountsApprove,
+                PlatformPermissions.OffersManage,
+                PlatformPermissions.PromotionsManage,
+                PlatformPermissions.PromotionsApprove,
+                PlatformPermissions.SubscriptionsCharges,
+                PlatformPermissions.SalesConfigure
+            },
+            [Salesperson] = new[]
+            {
+                PlatformPermissions.TenantsView,
+                PlatformPermissions.PlansView,
+                PlatformPermissions.PlansManage,
+                PlatformPermissions.SubscriptionsView,
+                PlatformPermissions.DiscountsGrant,
+                PlatformPermissions.OffersManage,
+                PlatformPermissions.PromotionsManage,
+                PlatformPermissions.SubscriptionsCharges
+            },
+            [SalesManager] = new[]
+            {
+                PlatformPermissions.TenantsView,
+                PlatformPermissions.PlansView,
+                PlatformPermissions.PlansManage,
+                PlatformPermissions.SubscriptionsView,
+                PlatformPermissions.SubscriptionsManage,
+                PlatformPermissions.DiscountsGrant,
+                PlatformPermissions.DiscountsApprove,
+                PlatformPermissions.OffersManage,
+                PlatformPermissions.PromotionsManage,
+                PlatformPermissions.SubscriptionsCharges,
+                PlatformPermissions.SalesConfigure
+            },
+            [ChiefFinancialOfficer] = new[]
+            {
+                PlatformPermissions.TenantsView,
+                PlatformPermissions.PlansView,
+                PlatformPermissions.PlansPublish,
+                PlatformPermissions.SubscriptionsView,
+                PlatformPermissions.PromotionsApprove
             }
         };
 }

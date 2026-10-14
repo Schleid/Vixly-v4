@@ -54,11 +54,11 @@ public sealed class PlatformRoleAdministrationTests
         PlatformSystemRoleSyncResult first = await Synchronizer().SynchronizeAsync(CancellationToken.None);
         PlatformSystemRoleSyncResult second = await Synchronizer().SynchronizeAsync(CancellationToken.None);
 
-        Assert.Equal(new[] { PlatformSystemRoles.SecurityAdministrator, PlatformSystemRoles.Administrator }, first.Created);
+        Assert.Equal(PlatformSystemRoles.Definitions.Keys, first.Created);
         Assert.Empty(second.Created);
         Assert.Empty(second.Corrected);
         Assert.Equal(1, _store.Saves);
-        Assert.Equal(2, _store.AuditEntries.Count(entry => entry.ActionCode == "platform.roles.system_created"));
+        Assert.Equal(PlatformSystemRoles.Definitions.Count, _store.AuditEntries.Count(entry => entry.ActionCode == "platform.roles.system_created"));
         Assert.True(_store.Roles.Single(role => role.SystemKey == PlatformSystemRoles.Administrator).Grants(PlatformPermissions.UsersView));
     }
 

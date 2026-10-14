@@ -100,6 +100,12 @@ public sealed class PlatformTenant : AuditableEntity
     public bool CanCorrectSlug => !HasBeenActive
         && Status is PlatformTenantStatus.Draft or PlatformTenantStatus.PendingActivation;
 
+    // A new subscription needs an open account: a suspended tenant is
+    // reactivated first, a deactivated one too, a banned one never.
+    public bool CanStartSubscription => Status is PlatformTenantStatus.Draft
+        or PlatformTenantStatus.PendingActivation
+        or PlatformTenantStatus.Active;
+
     // =====================================================
     // METHOD: CREATE
     // =====================================================

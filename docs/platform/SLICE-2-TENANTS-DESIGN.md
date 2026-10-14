@@ -266,11 +266,11 @@ The tenant page grows one section per slice that owns the data. Each section is 
 | Subscription | Current plan, term, renewal date, status, add-ons | Slice 3 (Subscriptions) |
 | Finance | Invoices (paged), total invoiced, paid and due, overdue amount, last payment | Slice 4 (Billing), Slice 5 (Payment collection) |
 | Licensing | Licenses purchased, allocated and free; list of licenses with device, status and allocation date (paged) | Slice 7 (Licensing) |
-| Activity | Sign-ins by the tenant's staff: person, time (tenant time zone), device type, approximate location; paged, newest first | Operations through `Contracts.Platform` (Stage 3, extends D-T14) |
+| Activity | Sign-ins by the tenant's staff: person, time (tenant time zone), device type, country; paged, newest first | Operations through `Contracts.Platform` (Stage 3, extends D-T14) |
 
-To settle when Activity is designed (proposals):
+Activity privacy, **owner decision 2026-10-14**:
 
-- Location is approximate (city and country from the IP address); the console never shows the raw IP.
-- Sign-in events are kept 90 days, then only daily counts remain.
-- Reading a tenant's activity is its own permission, `platform.tenants.view_activity`, and is audited.
-- The tenant's privacy notice says Vixly staff can see sign-in activity for support and security.
+- Location is the **country only**, derived from the IP address; no city, and the console never shows the raw IP.
+- Sign-in events are kept **90 days**, then only daily counts remain.
+- Reading a tenant's activity needs its own permission, `platform.tenants.view_activity`, and every read is audited.
+- The tenant's privacy notice says Vixly staff can see sign-in activity (person, time, device type, country) for support and security.

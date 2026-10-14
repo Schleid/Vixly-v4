@@ -20,6 +20,10 @@ Governed by the [Global Standard](../../../docs/global/VIXLY-GLOBAL-STANDARD.md)
 | `POST /registration/verify` | 10 per hour |
 | `POST /registration/email`, `POST /registration/resend` | 10 per hour, and 3 links per hour per registration |
 | `GET /registration/status` | 60 per hour |
+| `GET /registration/plans` (Slice 3: public plan catalogue, cached 5 minutes) | 60 per minute |
+| `POST /registration/plan` (Slice 3: choose plan, term, licences, trial; Slice 3b: optional promotion code or offer token) | 10 per hour |
+| `POST /registration/offer` (Slice 3b: terms of an offer link; token in the body, email masked) | 30 per minute |
+| `GET /registration/promotions/{code}?plan=&term=` (Slice 3b: check a promotion code) | 30 per minute |
 
 The access token travels as `Authorization: Bearer <token>`. Errors are `{ code, message }`, with the message in the caller's `Accept-Language`. Request bodies are capped at 16 KB. Internal endpoints for Edge and Operations (JWT, `Contracts.Platform`) arrive in Slice 9.
 

@@ -1,14 +1,7 @@
 ﻿@*
 =========================================================
 FILE: SignInPage.razor
-
-PURPOSE:
-Step 1 of sign-in: email and password.
-
-IMPORTANT NOTES:
-- Markup only. Text comes from PlatformText (L-10); values
-  come from the endpoint or presenter (ADR-0001)
-- Polished by Frontend/UI per ADR-0013 and Frontend Guide
+PURPOSE: Step 1 of sign-in: email, password, and passkeys.
 =========================================================
 *@
 @inject IStringLocalizer<PlatformText> T
@@ -20,29 +13,37 @@ IMPORTANT NOTES:
         <input type="hidden" name="returnUrl" value="@ReturnUrl" />
         <div class="vx-field">
             <label for="email" class="vx-label">@T["ui.signin.email"]</label>
-            <input id="email" name="email" type="email" class="vx-input" autocomplete="username webauthn" placeholder="@T["ui.auth.email_placeholder"]" required value="@Email" />
+            <div class="vx-input-container">
+                <svg class="vx-input-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
+                <input id="email" name="email" type="email" class="vx-input vx-input--with-icon" autocomplete="username webauthn" placeholder="@T["ui.auth.email_placeholder"]" required value="@Email" />
+            </div>
         </div>
         <div class="vx-field">
             <div class="vx-field__header">
                 <label for="password" class="vx-label">@T["ui.signin.password"]</label>
                 <a href="/forgot-password" class="vx-auth__forgot">@T["ui.signin.forgot"]</a>
             </div>
-            <input id="password" name="password" type="password" class="vx-input" autocomplete="current-password" placeholder="@T["ui.auth.password_placeholder"]" required />
+            <div class="vx-input-container">
+                <svg class="vx-input-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+                <input id="password" name="password" type="password" class="vx-input vx-input--with-icon" autocomplete="current-password" placeholder="@T["ui.auth.password_placeholder"]" required />
+            </div>
         </div>
         <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.auth.signin_button"]</VxButton>
     </form>
     <div class="vx-passkey" data-passkey-signin hidden>
-        <p class="vx-divider"><span>@T["ui.signin.or"]</span></p>
+        <div class="vx-divider"><span>@T["ui.signin.or"]</span></div>
         <form method="post" action="/sign-in/passkey" data-options="/sign-in/passkey/options">
             <AntiforgeryToken />
             <input type="hidden" name="returnUrl" value="@ReturnUrl" />
             <input type="hidden" name="assertion" />
-            <button type="button" class="vx-button vx-button--wide vx-button--subtle" data-passkey-start>
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-                <span>@T["ui.signin.passkey"]</span>
+            <button type="button" class="vx-button--passkey" data-passkey-start>
+                <div class="vx-passkey__icon-box" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19 12a7 7 0 1 0-14 0" /><path d="M12 5v2" /><path d="M12 17v2" /><path d="M5 12H3" /><path d="M21 12h-2" /></svg>
+                </div>
+                <div class="vx-passkey__info">
+                    <span class="vx-passkey__label">@T["ui.signin.passkey"]</span>
+                    <span class="vx-passkey__sub">@T["ui.auth.passkey_hint"]</span>
+                </div>
             </button>
         </form>
         <p class="vx-message vx-message--error" role="alert" data-passkey-error hidden>@T["ui.passkey.cancelled"]</p>

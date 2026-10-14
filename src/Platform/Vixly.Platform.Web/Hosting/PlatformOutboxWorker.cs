@@ -66,6 +66,19 @@ public sealed class PlatformOutboxWorker : BackgroundService
                 _logger.LogError(exception, "Outbox dispatch failed; it will run again.");
             }
         }
-        while (await timer.WaitForNextTickAsync(stoppingToken));
+        while (await NextTickAsync(timer, stoppingToken));
+    }
+
+    // Stopping the host cancels the wait: a normal end, not an error.
+    private static async Task<bool> NextTickAsync(PeriodicTimer timer, CancellationToken stoppingToken)
+    {
+        try
+        {
+            return await timer.WaitForNextTickAsync(stoppingToken);
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            return false;
+        }
     }
 }

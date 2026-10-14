@@ -59,4 +59,7 @@ public static class PlatformRegistrationErrors
 
     public static Error AccessHashInvalid { get; } =
         Error.Create("platform.registrations.access_hash_invalid");
+
+    public static Error PlanAlreadyChosen { get; } =
+        Error.Create("platform.registrations.plan_already_chosen");
 }

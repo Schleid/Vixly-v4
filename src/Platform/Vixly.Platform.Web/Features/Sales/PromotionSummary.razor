@@ -1,0 +1,179 @@
+﻿@*
+=========================================================
+FILE: PromotionSummary.razor
+
+PURPOSE:
+One promotion code: its terms and state, the CFO's decision, the
+draft editor, and its name in each language (D-S20).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Terms can change only while the promotion is a draft or was
+  sent back; Submit saves the form first (D-S26)
+- Approving, pausing and ending live in PromotionDecisions
+=========================================================
+*@
+@inherits PlatformPresenterComponent<PromotionPresenter>
+@using Vixly.Platform.Domain.Sales
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.Promotion is { } promotion)
+{
+    <PageTitle>@promotion.Name</PageTitle>
+    <h1>
+        @promotion.Name
+        <VxStatusBadge Status="@SalesDisplay.PromotionBadge(promotion.Status)" Text="@T[SalesDisplay.PromotionStatusKey(promotion.Status)]" />
+    </h1>
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (promotion.Status == PlatformPromotionStatus.PendingApproval)
+    {
+        <VxMessage Type="VxMessageType.Info">@T["ui.promotions.waiting_for_cfo"]</VxMessage>
+    }
+    else if (promotion.Status == PlatformPromotionStatus.Rejected && promotion.DecisionReason is { } reason)
+    {
+        <VxMessage Type="VxMessageType.Warning">@VixlyText.Format(T, "ui.plans.sent_back", "reason", reason)</VxMessage>
+    }
+    <div id="promotion-overview"><VxCard Title="@T["ui.promotions.overview"]">
+        <dl class="vx-facts">
+            <dt>@T["ui.promotions.code"]</dt><dd><code>@promotion.Code</code></dd>
+            <dt>@T["ui.discounts.title"]</dt><dd>@SalesDisplay.Describe(T, promotion.Terms, null)</dd>
+            <dt>@T["ui.promotions.validity"]</dt>
+            <dd>@VixlyText.Format(T, "ui.promotions.valid_range", new Dictionary<string, object> { ["from"] = SubscriptionDisplay.Date(promotion.ValidFromUtc), ["to"] = promotion.ValidToUtc is { } to ? SubscriptionDisplay.Date(to) : T["ui.promotions.no_end"].Value })</dd>
+            <dt>@T["ui.promotions.plans"]</dt><dd>@(promotion.PlanNames.Count == 0 ? T["ui.promotions.all_plans"].Value : string.Join(", ", promotion.PlanNames))</dd>
+            <dt>@T["ui.subscriptions.term"]</dt><dd>@(promotion.Term is { } term ? T[SubscriptionDisplay.TermKey(term)].Value : T["ui.promotions.any_term"].Value)</dd>
+            <dt>@T["ui.promotions.where"]</dt><dd>@Where(promotion.AtRegistration, promotion.ByStaff)</dd>
+            <dt>@T["ui.promotions.redemptions"]</dt>
+            <dd>@(promotion.RedemptionLimit is int limit ? VixlyText.Format(T, "ui.promotions.redeemed_of", new Dictionary<string, object> { ["count"] = promotion.Redemptions, ["limit"] = limit }) : promotion.Redemptions.ToString(System.Globalization.CultureInfo.CurrentCulture))</dd>
+            <dt>@T["ui.promotions.designed_by"]</dt><dd>@promotion.DesignedByName (@PlatformDisplay.Utc(T, promotion.CreatedUtc))</dd>
+            @if (promotion.DecidedUtc is { } decided)
+            {
+                <dt>@T["ui.approvals.decision"]</dt>
+                <dd>@promotion.DecidedByName (@PlatformDisplay.Utc(T, decided)) @promotion.DecisionReason</dd>
+            }
+        </dl>
+    </VxCard></div>
+    <PromotionDecisions Promotion="promotion" Abilities="Presenter.State.Abilities" OnChanged="ReloadAsync" />
+    @if (Presenter.State.Abilities.CanManage && promotion.Status is PlatformPromotionStatus.Draft or PlatformPromotionStatus.Rejected)
+    {
+        <div id="promotion-edit"><VxCard Title="@T["ui.promotions.edit"]">
+            <form class="vx-form" @onsubmit="SaveAsync">
+                <PromotionFields Model="_model" Plans="Presenter.State.Plans" />
+                <div class="vx-actions">
+                    <VxButton Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.promotions.save"]</VxButton>
+                    <VxButton Variant="VxButtonVariant.Primary" OnClick="SubmitAsync" IsBusy="@Presenter.IsBusy">@T["ui.plans.submit"]</VxButton>
+                </div>
+            </form>
+        </VxCard></div>
+    }
+    <div id="promotion-names"><VxCard Title="@T["ui.promotions.names"]">
+        <VxDataTable Items="promotion.Names.ToList()" IsLoading="false">
+            <HeaderContent>
+                <th scope="col">@T["ui.language"]</th>
+                <th scope="col">@T["ui.promotions.name"]</th>
+            </HeaderContent>
+            <RowTemplate Context="name">
+                <td>@T["ui.language." + name.Key]</td>
+                <td>@name.Value</td>
+            </RowTemplate>
+        </VxDataTable>
+        @if (Presenter.State.Abilities.CanManage && promotion.Status != PlatformPromotionStatus.Ended)
+        {
+            <form class="vx-form" @onsubmit="() => Presenter.SetNameAsync(PromotionId, _language, _name)">
+                <label for="promotion-name-language">@T["ui.language"]</label>
+                <select id="promotion-name-language" @bind="_language">
+                    @foreach (string language in VixlyCultures.Supported.Select(culture => culture.TwoLetterISOLanguageName))
+                    {
+                        <option value="@language">@T["ui.language." + language]</option>
+                    }
+                </select>
+                <label for="promotion-name-text">@T["ui.promotions.name"]</label>
+                <input id="promotion-name-text" @bind="_name" maxlength="100" aria-describedby="promotion-name-help" />
+                <p id="promotion-name-help" class="vx-hint">@T["ui.promotions.name_help"]</p>
+                <div class="vx-actions">
+                    <VxButton Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.promotions.save_name"]</VxButton>
+                </div>
+            </form>
+        }
+    </VxCard></div>
+}
+else if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+
+@code {
+    private PromotionFormModel _model = new();
+
+    private int _seenVersion = -1;
+
+    private string _language = VixlyCultures.Default.TwoLetterISOLanguageName;
+
+    private string? _name;
+
+    [Parameter, EditorRequired]
+    public Guid PromotionId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return ReloadAsync();
+    }
+
+    private async Task ReloadAsync()
+    {
+        await Presenter.LoadAsync(PromotionId);
+        Sync();
+    }
+
+    private async Task SaveAsync()
+    {
+        await Presenter.SaveAsync(PromotionId, _model);
+        Sync();
+    }
+
+    private async Task SubmitAsync()
+    {
+        await Presenter.SaveAsync(PromotionId, _model);
+
+        if (Presenter.State.Error is null)
+        {
+            await Presenter.SubmitAsync(PromotionId);
+        }
+
+        Sync();
+    }
+
+    private void Sync()
+    {
+        if (Presenter.State.Promotion is { } promotion && _seenVersion != Presenter.State.Version)
+        {
+            _seenVersion = Presenter.State.Version;
+            _model = PromotionFormModel.From(promotion);
+        }
+    }
+
+    private string Where(bool atRegistration, bool byStaff)
+    {
+        return (atRegistration, byStaff) switch
+        {
+            (true, true) => T["ui.promotions.where.both"].Value,
+            (true, false) => T["ui.promotions.where.registration"].Value,
+            (false, true) => T["ui.promotions.where.staff"].Value,
+            _ => T["ui.common.none"].Value
+        };
+    }
+}

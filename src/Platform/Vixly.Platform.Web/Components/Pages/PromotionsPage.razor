@@ -1,0 +1,30 @@
+﻿@*
+=========================================================
+FILE: PromotionsPage.razor
+
+PURPOSE:
+The promotion codes, filtered by status (D-S20).
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/promotions"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.promotions.title"]</PageTitle>
+<h1>@T["ui.promotions.title"]</h1>
+<PromotionList Search="@Search" Status="@Status" Page="@Page" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Search { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

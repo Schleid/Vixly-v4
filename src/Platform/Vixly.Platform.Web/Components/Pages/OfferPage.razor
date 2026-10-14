@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: OfferPage.razor
+
+PURPOSE:
+One offer link: terms, actions and decision.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/offers/{OfferId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<p><a href="/offers">@T["ui.offers.back"]</a></p>
+<OfferSummary OfferId="@OfferId" />
+
+@code {
+    [Parameter]
+    public Guid OfferId { get; set; }
+}

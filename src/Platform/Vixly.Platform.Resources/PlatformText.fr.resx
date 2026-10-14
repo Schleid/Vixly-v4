@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
@@ -3031,6 +3031,22 @@ Vixly</value>
   </data>
   <data name="ui.auth.authorized_only" xml:space="preserve">
     <value>Personnel de plateforme Vixly autorisé uniquement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.telemetry_status" xml:space="preserve">
+    <value>RÉSEAU EDGE: ACTIF · 14ms</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.zero_trust" xml:space="preserve">
+    <value>PÉRIMÈTRE ZERO-TRUST</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.passkey_hint" xml:space="preserve">
+    <value>FIDO2 / Clé matérielle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.auth.footer_text" xml:space="preserve">
+    <value>Infrastructure de plateforme TechCrafters · Version 4.0.0 · Toutes les connexions administratives sont journalisées et auditées</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.signout" xml:space="preserve">

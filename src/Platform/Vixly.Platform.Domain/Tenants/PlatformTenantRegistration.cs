@@ -20,7 +20,8 @@ namespace Vixly.Platform.Domain.Tenants;
 // - Expire on its own deadlines; let staff cancel it
 //
 // IMPORTANT NOTES:
-// - Aggregate root. Slice 2 reaches PendingPlanSelection (D-T4)
+// - Aggregate root. Slice 2 reaches PendingPlanSelection (D-T4);
+//   Slice 3 records the plan choice (trial or awaiting payment)
 // - The registrant proves who they are with an access token kept
 //   by Public.Web; only its hash is stored
 // - The verification deadline follows the latest link: 24 hours
@@ -245,6 +246,34 @@ public sealed class PlatformTenantRegistration : AuditableEntity
         EmailVerifiedUtc = utcNow;
         Status = PlatformTenantRegistrationStatus.PendingPlanSelection;
         AccessExpiresUtc = utcNow.Add(PlatformTenantLimits.PlanSelectionWindow);
+        MarkAsModified(utcNow);
+    }
+
+    // =====================================================
+    // METHOD: PLAN (Slice 3, D-S12)
+    // =====================================================
+    public void RecordPlanChosen(bool trialStarted, DateTimeOffset utcNow)
+    {
+        EnsureOpen();
+
+        if (Status == PlatformTenantRegistrationStatus.PendingEmailVerification)
+        {
+            throw new DomainException(PlatformRegistrationErrors.NotVerified);
+        }
+
+        if (Status != PlatformTenantRegistrationStatus.PendingPlanSelection)
+        {
+            throw new DomainException(PlatformRegistrationErrors.PlanAlreadyChosen);
+        }
+
+        if (ExpireIfDue(utcNow))
+        {
+            throw new DomainException(PlatformRegistrationErrors.Expired);
+        }
+
+        Status = trialStarted
+            ? PlatformTenantRegistrationStatus.PendingAccountSetup
+            : PlatformTenantRegistrationStatus.PendingPayment;
         MarkAsModified(utcNow);
     }
 

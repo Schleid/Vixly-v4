@@ -1,0 +1,83 @@
+﻿@*
+=========================================================
+FILE: PlanApproval.razor
+
+PURPOSE:
+The CFO's decision on a submitted plan version: approve and
+publish, or send back with a reason (D-S26).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Shown only to someone who may decide and did not submit it;
+  both actions need step-up
+=========================================================
+*@
+@inherits PlatformPresenterComponent<PlanApprovalPresenter>
+@using Vixly.Platform.Application.UseCases.Plans
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Plan.Draft is { Status: Vixly.Platform.Domain.Subscriptions.PlatformPlanVersionStatus.PendingApproval } draft && CanDecide)
+{
+    <div id="plan-approval"><VxCard Title="@T["ui.plans.approval"]">
+        @if (Presenter.State.Error is not null)
+        {
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+        }
+        <p>@VixlyText.Format(T, "ui.plans.approval_help", "number", draft.Number)</p>
+        <form class="vx-form" @onsubmit="() => DecideAsync(false)">
+            <label for="plan-approval-reason">@T["ui.approvals.reason"]</label>
+            <textarea id="plan-approval-reason" @bind="_reason" maxlength="500" aria-describedby="plan-approval-reason-help"></textarea>
+            <p id="plan-approval-reason-help" class="vx-hint">@T["ui.approvals.reason_help"]</p>
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" OnClick="() => DecideAsync(true)" IsBusy="@Presenter.IsBusy">@T["ui.plans.approve_publish"]</VxButton>
+                <VxButton Variant="VxButtonVariant.Danger" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.approvals.reject"]</VxButton>
+            </div>
+        </form>
+        @if (Presenter.State.StepUpPending)
+        {
+            <StepUpDialog OnConfirmed="ConfirmedAsync" OnCancelled="Presenter.CancelStepUp" />
+        }
+    </VxCard></div>
+}
+else if (Presenter.State.DoneKey is { } done)
+{
+    <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+}
+
+@code {
+    private string? _reason;
+
+    private bool _approving;
+
+    [Parameter, EditorRequired]
+    public PlatformPlanDetail Plan { get; set; } = null!;
+
+    [Parameter]
+    public bool CanDecide { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private async Task DecideAsync(bool approve)
+    {
+        _approving = approve;
+        await ConfirmedAsync();
+    }
+
+    private async Task ConfirmedAsync()
+    {
+        bool done = _approving
+            ? await Presenter.ApproveAsync(Plan.PlatformPlanId)
+            : await Presenter.RejectAsync(Plan.PlatformPlanId, _reason);
+
+        if (done)
+        {
+            _reason = null;
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

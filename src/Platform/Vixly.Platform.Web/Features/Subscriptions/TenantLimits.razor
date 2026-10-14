@@ -1,0 +1,147 @@
+﻿@*
+=========================================================
+FILE: TenantLimits.razor
+
+PURPOSE:
+The tenant's effective limits: plan value, override and who
+set it; set or remove an override with a reason and step-up
+(D-S8).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- An override without an end date stays until removed
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantLimitsPresenter>
+@using Vixly.Platform.Application.UseCases.Subscriptions
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="tenant-limits"><VxCard Title="@T["ui.subscriptions.limits"]">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    <VxDataTable Items="Limits" IsLoading="false">
+        <HeaderContent>
+            <th scope="col">@T["ui.subscriptions.limit"]</th>
+            <th scope="col">@T["ui.subscriptions.plan_value"]</th>
+            <th scope="col">@T["ui.subscriptions.effective_value"]</th>
+            <th scope="col">@T["ui.subscriptions.override"]</th>
+            @if (CanOverride)
+            {
+                <th scope="col"><span class="vx-visually-hidden">@T["ui.subscriptions.actions"]</span></th>
+            }
+        </HeaderContent>
+        <RowTemplate Context="limit">
+            <td>@T[SubscriptionDisplay.LimitKey(limit.Kind)]</td>
+            <td>@limit.PlanValue</td>
+            <td>@limit.Effective</td>
+            <td>
+                @if (limit.OverrideValue is int value)
+                {
+                    @VixlyText.Format(T, "ui.subscriptions.override_detail", new Dictionary<string, object>
+                    {
+                        ["value"] = value,
+                        ["until"] = limit.OverrideEndsUtc is null ? T["ui.subscriptions.no_end"].Value : SubscriptionDisplay.Date(limit.OverrideEndsUtc),
+                        ["name"] = limit.OverrideSetByName ?? "-"
+                    })
+                    <br /><span class="vx-hint">@limit.OverrideReason</span>
+                }
+                else
+                {
+                    @T["ui.common.none"]
+                }
+            </td>
+            @if (CanOverride)
+            {
+                <td>
+                    <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => Edit(limit)">@T["ui.subscriptions.set_override"]</VxButton>
+                    @if (limit.OverrideId is Guid id)
+                    {
+                        <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => AskRemove(id)">@T["ui.subscriptions.remove_override"]</VxButton>
+                    }
+                </td>
+            }
+        </RowTemplate>
+    </VxDataTable>
+    @if (Presenter.State.Editing is { } kind)
+    {
+        <form class="vx-form" @onsubmit="ApplyAsync">
+            <p>@VixlyText.Format(T, "ui.subscriptions.override_for", "limit", T[SubscriptionDisplay.LimitKey(kind)].Value)</p>
+            <label for="override-value">@T["ui.subscriptions.override_value"]</label>
+            <input id="override-value" type="number" min="0" @bind="_value" required />
+            <label for="override-ends">@T["ui.subscriptions.override_ends"]</label>
+            <input id="override-ends" type="date" @bind="_endsOn" aria-describedby="override-ends-help" />
+            <p id="override-ends-help" class="vx-hint">@T["ui.subscriptions.override_ends_help"]</p>
+            <label for="override-reason">@T["ui.tenants.reason"]</label>
+            <textarea id="override-reason" @bind="_reason" maxlength="500" required></textarea>
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.subscriptions.set_override"]</VxButton>
+                <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else if (Presenter.State.Removing is not null)
+    {
+        <form class="vx-form" @onsubmit="ApplyAsync">
+            <p>@T["ui.subscriptions.remove_override_help"]</p>
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Danger" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.subscriptions.remove_override"]</VxButton>
+                <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    @if (Presenter.State.StepUpPending)
+    {
+        <StepUpDialog OnConfirmed="ApplyAsync" OnCancelled="Presenter.CancelStepUp" />
+    }
+</VxCard></div>
+
+@code {
+    private int _value;
+
+    private DateTime? _endsOn;
+
+    private string? _reason;
+
+    [Parameter, EditorRequired]
+    public Guid TenantId { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PlatformLimitItem> Limits { get; set; } = Array.Empty<PlatformLimitItem>();
+
+    [Parameter]
+    public bool CanOverride { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private void Edit(PlatformLimitItem limit)
+    {
+        _value = limit.OverrideValue ?? limit.PlanValue;
+        _endsOn = limit.OverrideEndsUtc?.UtcDateTime.Date;
+        _reason = null;
+        Presenter.Edit(limit.Kind);
+    }
+
+    private void AskRemove(Guid overrideId)
+    {
+        Presenter.AskRemove(overrideId);
+    }
+
+    private async Task ApplyAsync()
+    {
+        if (await Presenter.ApplyAsync(TenantId, _value, _endsOn, _reason))
+        {
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

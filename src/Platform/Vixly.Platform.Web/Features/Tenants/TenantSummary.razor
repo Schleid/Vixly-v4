@@ -28,6 +28,7 @@ IMPORTANT NOTES:
     <nav class="vx-sections" aria-label="@T["ui.tenants.sections"]">
         <a href="@Anchor("tenant-overview")">@T["ui.tenants.overview"]</a>
         <a href="@Anchor("tenant-lifecycle")">@T["ui.tenants.lifecycle"]</a>
+        <a href="@Anchor("tenant-subscription")">@T["ui.subscriptions.section"]</a>
         <a href="@Anchor("tenant-profile")">@T["ui.tenants.company"]</a>
         <a href="@Anchor("tenant-contacts")">@T["ui.tenants.contacts"]</a>
         <a href="@Anchor("tenant-management")">@T["ui.tenants.management"]</a>
@@ -67,6 +68,7 @@ IMPORTANT NOTES:
         </p>
     </VxCard></div>
     <TenantLifecycle Tenant="tenant" Abilities="Presenter.State.Abilities" OnChanged="ReloadAsync" />
+    <TenantSubscription TenantId="tenant.PlatformTenantId" TenantStatus="tenant.Status" />
     <TenantSlugCorrection Tenant="tenant" BaseDomain="@Presenter.State.BaseDomain" CanEdit="Presenter.State.Abilities.CanEdit" OnChanged="ReloadAsync" />
     <TenantProfileEditor Tenant="tenant" CanEdit="Presenter.State.Abilities.CanEdit" OnChanged="ReloadAsync" />
     <TenantContactsEditor Tenant="tenant" CanEdit="Presenter.State.Abilities.CanEdit" OnChanged="ReloadAsync" />

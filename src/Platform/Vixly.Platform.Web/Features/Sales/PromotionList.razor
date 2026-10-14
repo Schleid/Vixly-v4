@@ -1,0 +1,133 @@
+﻿@*
+=========================================================
+FILE: PromotionList.razor
+
+PURPOSE:
+The promotion codes: what they give, when and where they can be
+used and how often they have been redeemed (D-S20).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Filters live in the query string so the list can be bookmarked
+- A fixed-amount promotion is in the subscription's own currency
+=========================================================
+*@
+@inherits PlatformPresenterComponent<PromotionListPresenter>
+@using Vixly.Platform.Application.UseCases.Sales
+@using Vixly.Platform.Domain.Sales
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+<form class="vx-toolbar" role="search" @onsubmit="ApplyFilters">
+    <label for="promotion-search">@T["ui.promotions.search"]</label>
+    <input id="promotion-search" type="search" @bind="_search" maxlength="100" />
+    <label for="promotion-status">@T["ui.promotions.status"]</label>
+    <select id="promotion-status" @bind="_status">
+        <option value="">@T["ui.promotions.status.all"]</option>
+        @foreach (PlatformPromotionStatus status in Enum.GetValues<PlatformPromotionStatus>())
+        {
+            <option value="@status">@T[SalesDisplay.PromotionStatusKey(status)]</option>
+        }
+    </select>
+    <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
+    @if (Presenter.State.Abilities.CanManage)
+    {
+        <a class="vx-button vx-button--primary" href="/promotions/new">@T["ui.promotions.new"]</a>
+    }
+</form>
+
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else
+{
+    <VxDataTable Items="Presenter.State.Promotions" IsLoading="@(!Presenter.State.Loaded)" Caption="@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.promotions.count", "count", Presenter.State.TotalCount) : null)">
+        <HeaderContent>
+            <th scope="col">@T["ui.promotions.name"]</th>
+            <th scope="col">@T["ui.promotions.code"]</th>
+            <th scope="col">@T["ui.promotions.status"]</th>
+            <th scope="col">@T["ui.discounts.title"]</th>
+            <th scope="col">@T["ui.promotions.validity"]</th>
+            <th scope="col">@T["ui.promotions.where"]</th>
+            <th scope="col">@T["ui.promotions.redemptions"]</th>
+        </HeaderContent>
+        <RowTemplate Context="item">
+            <td><a href="/promotions/@item.PromotionId">@item.Name</a></td>
+            <td><code>@item.Code</code></td>
+            <td><VxStatusBadge Status="@SalesDisplay.PromotionBadge(item.Status)" Text="@T[SalesDisplay.PromotionStatusKey(item.Status)]" /></td>
+            <td>@SalesDisplay.Describe(T, new PlatformDiscountTermsItem(item.Kind, item.Value, item.Duration, item.Periods, item.EndsUtc), null)</td>
+            <td>@VixlyText.Format(T, "ui.promotions.valid_range", new Dictionary<string, object> { ["from"] = SubscriptionDisplay.Date(item.ValidFromUtc), ["to"] = item.ValidToUtc is { } to ? SubscriptionDisplay.Date(to) : T["ui.promotions.no_end"].Value })</td>
+            <td>@Where(item.AtRegistration, item.ByStaff)</td>
+            <td>@(item.RedemptionLimit is int limit ? VixlyText.Format(T, "ui.promotions.redeemed_of", new Dictionary<string, object> { ["count"] = item.Redemptions, ["limit"] = limit }) : item.Redemptions.ToString(System.Globalization.CultureInfo.CurrentCulture))</td>
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.promotions.empty"]" />
+        </EmptyContent>
+    </VxDataTable>
+    @if (Presenter.State.Loaded && Presenter.State.Promotions.Count > 0)
+    {
+        <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="GoToPage" />
+    }
+}
+
+@code {
+    private string? _search;
+
+    private string _status = string.Empty;
+
+    [Parameter]
+    public string? Search { get; set; }
+
+    [Parameter]
+    public string? Status { get; set; }
+
+    [Parameter]
+    public int? Page { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _search = Search;
+        PlatformPromotionStatus? status = Enum.TryParse(Status, true, out PlatformPromotionStatus parsed) ? parsed : null;
+        _status = status?.ToString() ?? string.Empty;
+
+        await Presenter.LoadAsync(status, Search, Page ?? 1);
+    }
+
+    private string Where(bool atRegistration, bool byStaff)
+    {
+        return (atRegistration, byStaff) switch
+        {
+            (true, true) => T["ui.promotions.where.both"].Value,
+            (true, false) => T["ui.promotions.where.registration"].Value,
+            (false, true) => T["ui.promotions.where.staff"].Value,
+            _ => T["ui.common.none"].Value
+        };
+    }
+
+    private void ApplyFilters()
+    {
+        Navigation.NavigateTo(Url(_search, _status, 1));
+    }
+
+    private void GoToPage(int page)
+    {
+        Navigation.NavigateTo(Url(Search, _status, page));
+    }
+
+    private static string Url(string? search, string status, int page)
+    {
+        Dictionary<string, string?> query = new()
+        {
+            ["search"] = string.IsNullOrWhiteSpace(search) ? null : search.Trim(),
+            ["status"] = string.IsNullOrEmpty(status) ? null : status,
+            ["page"] = page > 1 ? page.ToString(System.Globalization.CultureInfo.InvariantCulture) : null
+        };
+
+        return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString("/promotions", query.Where(pair => pair.Value is not null));
+    }
+}

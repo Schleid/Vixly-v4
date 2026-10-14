@@ -1,0 +1,20 @@
+﻿@*
+=========================================================
+FILE: NewPromotionPage.razor
+
+PURPOSE:
+Design a promotion code; it starts as a draft (D-S20).
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/promotions/new"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.promotions.new"]</PageTitle>
+<p><a href="/promotions">@T["ui.promotions.back"]</a></p>
+<h1>@T["ui.promotions.new"]</h1>
+<PromotionCreateForm />

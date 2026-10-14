@@ -92,6 +92,32 @@ public static class PlatformPermissions
 
     public const string TenantsBan = "platform.tenants.ban";
 
+    public const string PlansView = "platform.plans.view";
+
+    public const string PlansManage = "platform.plans.manage";
+
+    public const string PlansPublish = "platform.plans.publish";
+
+    public const string SubscriptionsView = "platform.subscriptions.view";
+
+    public const string SubscriptionsManage = "platform.subscriptions.manage";
+
+    public const string SubscriptionsOverrideLimits = "platform.subscriptions.override_limits";
+
+    public const string DiscountsGrant = "platform.discounts.grant";
+
+    public const string DiscountsApprove = "platform.discounts.approve";
+
+    public const string OffersManage = "platform.offers.manage";
+
+    public const string PromotionsManage = "platform.promotions.manage";
+
+    public const string PromotionsApprove = "platform.promotions.approve";
+
+    public const string SubscriptionsCharges = "platform.subscriptions.charges";
+
+    public const string SalesConfigure = "platform.sales.configure";
+
     public static IReadOnlyList<string> Catalogue { get; } = new[]
     {
         UsersView,
@@ -126,7 +152,20 @@ public static class PlatformPermissions
         TenantsSuspend,
         TenantsReactivate,
         TenantsDeactivate,
-        TenantsBan
+        TenantsBan,
+        PlansView,
+        PlansManage,
+        PlansPublish,
+        SubscriptionsView,
+        SubscriptionsManage,
+        SubscriptionsOverrideLimits,
+        DiscountsGrant,
+        DiscountsApprove,
+        OffersManage,
+        PromotionsManage,
+        PromotionsApprove,
+        SubscriptionsCharges,
+        SalesConfigure
     };
 
     public static IReadOnlyCollection<string> All { get; } = new HashSet<string>(Catalogue, StringComparer.Ordinal);

@@ -1,0 +1,20 @@
+﻿@*
+=========================================================
+FILE: NewOfferPage.razor
+
+PURPOSE:
+Prepare an offer link for a valued customer (D-S21).
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/offers/new"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.offers.new"]</PageTitle>
+<p><a href="/offers">@T["ui.offers.back"]</a></p>
+<h1>@T["ui.offers.new"]</h1>
+<OfferCreateForm />

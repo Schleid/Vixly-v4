@@ -1,0 +1,59 @@
+﻿@*
+=========================================================
+FILE: PlanVersions.razor
+
+PURPOSE:
+The version history of one plan: prices, limits and who
+published each version.
+
+IMPORTANT NOTES:
+- Display only: no presenter, the plan page passes the versions
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Existing subscribers keep their version until renewal (D-S2)
+=========================================================
+*@
+@using Vixly.Platform.Application.UseCases.Plans
+@inject IStringLocalizer<PlatformText> T
+
+<div id="plan-versions"><VxCard Title="@T["ui.plans.versions"]">
+    <VxDataTable Items="Versions" IsLoading="false">
+        <HeaderContent>
+            <th scope="col">@T["ui.plans.version"]</th>
+            <th scope="col">@T["ui.plans.status"]</th>
+            <th scope="col">@T["ui.plans.monthly_price"]</th>
+            <th scope="col">@T["ui.plans.annual_price"]</th>
+            <th scope="col">@T["ui.plans.setup_fee"]</th>
+            <th scope="col">@T["ui.plans.minimum_licences"]</th>
+            <th scope="col">@T["ui.plans.trial_days"]</th>
+            <th scope="col">@T["ui.plans.limit.max_licensed_devices"]</th>
+            <th scope="col">@T["ui.plans.limit.max_warehouses"]</th>
+            <th scope="col">@T["ui.plans.published_on"]</th>
+        </HeaderContent>
+        <RowTemplate Context="version">
+            <td>@VixlyText.Format(T, "ui.plans.version_number", "number", version.Number)</td>
+            <td>@T[SubscriptionDisplay.VersionStatusKey(version.Status)]</td>
+            <td>@SubscriptionDisplay.Money(version.MonthlyPricePerLicence, version.CurrencyCode)</td>
+            <td>@SubscriptionDisplay.Money(version.AnnualPricePerLicence, version.CurrencyCode)</td>
+            <td>@SubscriptionDisplay.Money(version.SetupFee, version.CurrencyCode)</td>
+            <td>@version.MinimumLicences</td>
+            <td>@(version.TrialDays?.ToString(System.Globalization.CultureInfo.CurrentCulture) ?? T["ui.common.none"].Value)</td>
+            <td>@version.MaxLicensedDevices</td>
+            <td>@version.MaxWarehouses</td>
+            <td>
+                @if (version.PublishedUtc is { } published)
+                {
+                    @VixlyText.Format(T, "ui.plans.published_by", new Dictionary<string, object> { ["time"] = PlatformDisplay.Utc(T, published), ["name"] = version.PublishedByName ?? "-" })
+                }
+            </td>
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.plans.no_versions"]" />
+        </EmptyContent>
+    </VxDataTable>
+</VxCard></div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PlatformPlanVersionItem> Versions { get; set; } = Array.Empty<PlatformPlanVersionItem>();
+}

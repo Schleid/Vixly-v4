@@ -1,0 +1,63 @@
+﻿@*
+=========================================================
+FILE: DiscountTermsFields.razor
+
+PURPOSE:
+The discount fields shared by the tenant Discount panel, the
+promotion form and the offer form (D-S18, D-S19).
+
+IMPORTANT NOTES:
+- UI glue only: edits the model it is given
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- A percentage of 100 for 1 period is "first month free"
+=========================================================
+*@
+@using Vixly.Platform.Domain.Subscriptions
+@inject IStringLocalizer<PlatformText> T
+
+<fieldset class="vx-fieldset" disabled="@Disabled">
+    <legend>@T["ui.discounts.terms"]</legend>
+    <label for="@(Prefix)-kind">@T["ui.discounts.kind"]</label>
+    <select id="@(Prefix)-kind" @bind="Model.Kind">
+        @foreach (PlatformDiscountKind kind in Enum.GetValues<PlatformDiscountKind>())
+        {
+            <option value="@kind">@T[SalesDisplay.KindKey(kind)]</option>
+        }
+    </select>
+    <label for="@(Prefix)-value">@(Model.Kind == PlatformDiscountKind.Percent ? T["ui.discounts.percent"] : (CurrencyCode is null ? T["ui.discounts.amount_plan_currency"] : VixlyText.Format(T, "ui.discounts.amount_in", "currency", CurrencyCode)))</label>
+    <input id="@(Prefix)-value" type="number" min="0.01" step="0.01" @bind="Model.Value" required />
+    <label for="@(Prefix)-duration">@T["ui.discounts.duration"]</label>
+    <select id="@(Prefix)-duration" @bind="Model.Duration">
+        @foreach (PlatformDiscountDuration duration in Enum.GetValues<PlatformDiscountDuration>())
+        {
+            <option value="@duration">@T[SalesDisplay.DurationKey(duration)]</option>
+        }
+    </select>
+    @if (Model.Duration == PlatformDiscountDuration.Periods)
+    {
+        <label for="@(Prefix)-periods">@T["ui.discounts.periods"]</label>
+        <input id="@(Prefix)-periods" type="number" min="1" max="120" @bind="Model.Periods" required aria-describedby="@(Prefix)-periods-help" />
+        <p id="@(Prefix)-periods-help" class="vx-hint">@T["ui.discounts.periods_help"]</p>
+    }
+    else if (Model.Duration == PlatformDiscountDuration.UntilDate)
+    {
+        <label for="@(Prefix)-ends">@T["ui.discounts.ends_on"]</label>
+        <input id="@(Prefix)-ends" type="date" @bind="Model.EndsOn" required aria-describedby="@(Prefix)-ends-help" />
+        <p id="@(Prefix)-ends-help" class="vx-hint">@T["ui.discounts.ends_on_help"]</p>
+    }
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired]
+    public DiscountTermsModel Model { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public string Prefix { get; set; } = "discount";
+
+    [Parameter]
+    public string? CurrencyCode { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+}

@@ -1,0 +1,128 @@
+﻿@*
+=========================================================
+FILE: PlanList.razor
+
+PURPOSE:
+The plan catalogue for staff: search, status filter, table
+and pager.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Prices shown are the published version's, before tax (D-S9)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<PlanListPresenter>
+@using Vixly.Platform.Domain.Subscriptions
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+<form class="vx-toolbar" role="search" @onsubmit="ApplyFilters">
+    <label for="plan-search">@T["ui.plans.search"]</label>
+    <input id="plan-search" type="search" @bind="_search" maxlength="100" />
+    <label for="plan-status">@T["ui.plans.status"]</label>
+    <select id="plan-status" @bind="_status">
+        <option value="">@T["ui.plans.status.all"]</option>
+        @foreach (PlatformPlanStatus status in Enum.GetValues<PlatformPlanStatus>())
+        {
+            <option value="@status">@T[SubscriptionDisplay.PlanStatusKey(status)]</option>
+        }
+    </select>
+    <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
+    @if (Presenter.State.Abilities.CanManage)
+    {
+        <a class="vx-button vx-button--primary" href="/plans/new">@T["ui.plans.new"]</a>
+    }
+</form>
+
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else
+{
+    <VxDataTable Items="Presenter.State.Plans" IsLoading="@(!Presenter.State.Loaded)" Caption="@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.plans.count", "count", Presenter.State.TotalCount) : null)">
+        <HeaderContent>
+            <th scope="col">@T["ui.plans.name"]</th>
+            <th scope="col">@T["ui.plans.code"]</th>
+            <th scope="col">@T["ui.plans.status"]</th>
+            <th scope="col">@T["ui.plans.version"]</th>
+            <th scope="col">@T["ui.plans.monthly_price"]</th>
+            <th scope="col">@T["ui.plans.annual_price"]</th>
+            <th scope="col">@T["ui.plans.public"]</th>
+            <th scope="col">@T["ui.plans.subscribers"]</th>
+        </HeaderContent>
+        <RowTemplate Context="plan">
+            <td><a href="/plans/@plan.PlatformPlanId">@plan.Name</a></td>
+            <td>@plan.Code</td>
+            <td><VxStatusBadge Status="@SubscriptionDisplay.PlanBadge(plan.Status)" Text="@T[SubscriptionDisplay.PlanStatusKey(plan.Status)]" /></td>
+            <td>
+                @(plan.CurrentVersionNumber is int number ? VixlyText.Format(T, "ui.plans.version_number", "number", number) : T["ui.plans.not_published"].Value)
+                @if (plan.HasDraft)
+                {
+                    <VxStatusBadge Status="VxBadgeStatus.Invited" Text="@T["ui.plans.has_draft"]" />
+                }
+            </td>
+            <td>@SubscriptionDisplay.Money(plan.MonthlyPricePerLicence, plan.CurrencyCode)</td>
+            <td>@SubscriptionDisplay.Money(plan.AnnualPricePerLicence, plan.CurrencyCode)</td>
+            <td>@(plan.IsPublic ? T["ui.common.yes"].Value : T["ui.common.no"].Value)</td>
+            <td><a href="/subscriptions?plan=@plan.PlatformPlanId">@plan.Subscribers</a></td>
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.plans.empty"]" />
+        </EmptyContent>
+    </VxDataTable>
+    @if (Presenter.State.Loaded && Presenter.State.Plans.Count > 0)
+    {
+        <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="GoToPage" />
+    }
+}
+
+@code {
+    private string? _search;
+
+    private string _status = string.Empty;
+
+    [Parameter]
+    public string? Search { get; set; }
+
+    [Parameter]
+    public string? Status { get; set; }
+
+    [Parameter]
+    public int? Page { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _search = Search;
+        PlatformPlanStatus? status = Enum.TryParse(Status, true, out PlatformPlanStatus parsed) ? parsed : null;
+        _status = status?.ToString() ?? string.Empty;
+
+        await Presenter.LoadAsync(status, Search, Page ?? 1);
+    }
+
+    private void ApplyFilters()
+    {
+        Navigation.NavigateTo(Url(_search, _status, 1));
+    }
+
+    private void GoToPage(int page)
+    {
+        Navigation.NavigateTo(Url(Search, _status, page));
+    }
+
+    private static string Url(string? search, string status, int page)
+    {
+        Dictionary<string, string?> query = new()
+        {
+            ["search"] = string.IsNullOrWhiteSpace(search) ? null : search.Trim(),
+            ["status"] = string.IsNullOrEmpty(status) ? null : status,
+            ["page"] = page > 1 ? page.ToString(System.Globalization.CultureInfo.InvariantCulture) : null
+        };
+
+        return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString("/plans", query.Where(pair => pair.Value is not null));
+    }
+}

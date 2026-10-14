@@ -67,6 +67,14 @@ public static class PlatformWebHost
         builder.Services.AddHostedService<PlatformSystemRoleStartup>();
         builder.Services.AddOptions<PlatformOutboxOptions>().Bind(builder.Configuration.GetSection(PlatformOutboxOptions.SectionName));
         builder.Services.AddHostedService<PlatformOutboxWorker>();
+        builder.Services.AddOptions<PlatformSubscriptionClockOptions>().Bind(builder.Configuration.GetSection(PlatformSubscriptionClockOptions.SectionName));
+        builder.Services.AddHostedService<PlatformSubscriptionClockWorker>();
+
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddOptions<PlatformDemoDataOptions>().Bind(builder.Configuration.GetSection(PlatformDemoDataOptions.SectionName));
+            builder.Services.AddHostedService<PlatformDemoDataWorker>();
+        }
 
         builder.Services.AddPlatformRateLimits();
         builder.Services.AddAntiforgery(options =>

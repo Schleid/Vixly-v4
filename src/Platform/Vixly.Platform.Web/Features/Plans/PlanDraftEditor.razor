@@ -1,0 +1,206 @@
+﻿@*
+=========================================================
+FILE: PlanDraftEditor.razor
+
+PURPOSE:
+The plan's draft version: prices, trial, limits and features,
+saved as a draft and submitted for CFO approval (D-S26); plus a
+price preview of the published version.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Publishing never changes a subscriber's current period: the
+  new version applies at renewal (D-S2)
+- The currency is fixed once a version is published (D-S7)
+- Submit saves the form first, so unsaved edits are not lost
+- A submitted draft is read-only until the CFO decides
+  (PlanApproval); a rejection reason is shown to sales
+=========================================================
+*@
+@inherits PlatformPresenterComponent<PlanDraftPresenter>
+@using Vixly.Platform.Application.UseCases.Plans
+@using Vixly.Platform.Domain.Subscriptions
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="plan-draft"><VxCard Title="@T["ui.plans.draft"]">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (Plan.Draft is null)
+    {
+        <p>@T["ui.plans.no_draft"]</p>
+        @if (Abilities.CanManage)
+        {
+            <VxButton OnClick="() => RunAsync(() => Presenter.StartDraftAsync(Plan.PlatformPlanId))" IsBusy="@Presenter.IsBusy">@T["ui.plans.start_draft"]</VxButton>
+        }
+    }
+    else
+    {
+        <p class="vx-hint">@VixlyText.Format(T, "ui.plans.draft_help", "number", Plan.Draft.Number)</p>
+        @if (Submitted)
+        {
+            <VxMessage Type="VxMessageType.Info">@VixlyText.Format(T, "ui.plans.waiting_for_cfo", "time", PlatformDisplay.Utc(T, Plan.Draft.SubmittedUtc))</VxMessage>
+        }
+        else if (Plan.Draft.RejectionReason is { } rejected)
+        {
+            <VxMessage Type="VxMessageType.Warning">@VixlyText.Format(T, "ui.plans.sent_back", "reason", rejected)</VxMessage>
+        }
+        <form class="vx-form" @onsubmit="() => RunAsync(() => Presenter.SaveAsync(Plan.PlatformPlanId, _model))">
+            <fieldset class="vx-fieldset" disabled="@(!Editable)">
+                <legend>@T["ui.plans.prices"]</legend>
+                <label for="plan-draft-currency">@T["ui.plans.currency"]</label>
+                <input id="plan-draft-currency" @bind="_model.CurrencyCode" maxlength="3" required readonly="@(Plan.Current is not null)" />
+                <label for="plan-draft-monthly">@T["ui.plans.monthly_price"]</label>
+                <input id="plan-draft-monthly" type="number" min="0" step="0.01" @bind="_model.MonthlyPricePerLicence" aria-describedby="plan-draft-prices-help" />
+                <label for="plan-draft-annual">@T["ui.plans.annual_price"]</label>
+                <input id="plan-draft-annual" type="number" min="0" step="0.01" @bind="_model.AnnualPricePerLicence" aria-describedby="plan-draft-prices-help" />
+                <p id="plan-draft-prices-help" class="vx-hint">@T["ui.plans.prices_help"]</p>
+                <label for="plan-draft-setup">@T["ui.plans.setup_fee"]</label>
+                <input id="plan-draft-setup" type="number" min="0" step="0.01" @bind="_model.SetupFee" />
+                <label for="plan-draft-minimum">@T["ui.plans.minimum_licences"]</label>
+                <input id="plan-draft-minimum" type="number" min="1" @bind="_model.MinimumLicences" />
+                <label for="plan-draft-trial">@T["ui.plans.trial_days"]</label>
+                <input id="plan-draft-trial" type="number" min="1" max="365" @bind="_model.TrialDays" aria-describedby="plan-draft-trial-help" />
+                <p id="plan-draft-trial-help" class="vx-hint">@T["ui.plans.trial_help"]</p>
+            </fieldset>
+            <fieldset class="vx-fieldset" disabled="@(!Editable)">
+                <legend>@T["ui.plans.limits"]</legend>
+                <label for="plan-draft-devices">@T["ui.plans.limit.max_licensed_devices"]</label>
+                <input id="plan-draft-devices" type="number" min="0" @bind="_model.MaxLicensedDevices" />
+                <label for="plan-draft-warehouses">@T["ui.plans.limit.max_warehouses"]</label>
+                <input id="plan-draft-warehouses" type="number" min="0" @bind="_model.MaxWarehouses" />
+            </fieldset>
+            <fieldset class="vx-fieldset" disabled="@(!Editable)">
+                <legend>@T["ui.plans.features"]</legend>
+                @foreach (PlatformPlanFeature feature in Enum.GetValues<PlatformPlanFeature>())
+                {
+                    <label><input type="checkbox" checked="@_model.Features.Contains(feature)" @onchange="args => Toggle(feature, args)" /> @T[SubscriptionDisplay.FeatureKey(feature)]</label>
+                }
+            </fieldset>
+            <div class="vx-actions">
+                @if (Editable)
+                {
+                    <VxButton Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.plans.save_draft"]</VxButton>
+                    <VxButton Variant="VxButtonVariant.Primary" OnClick="SubmitAsync" IsBusy="@Presenter.IsBusy">@T["ui.plans.submit"]</VxButton>
+                }
+                @if (Editable && Plan.Current is not null)
+                {
+                    <VxButton Variant="VxButtonVariant.Danger" OnClick="() => RunAsync(() => Presenter.DiscardDraftAsync(Plan.PlatformPlanId))">@T["ui.plans.discard_draft"]</VxButton>
+                }
+            </div>
+        </form>
+    }
+    @if (Plan.Current is not null)
+    {
+        <form class="vx-toolbar" @onsubmit="() => Presenter.PreviewAsync(Plan.PlatformPlanId, _previewTerm, _previewLicences)">
+            <label for="plan-preview-term">@T["ui.subscriptions.term"]</label>
+            <select id="plan-preview-term" @bind="_previewTerm">
+                @foreach (PlatformSubscriptionTerm term in Enum.GetValues<PlatformSubscriptionTerm>())
+                {
+                    <option value="@term">@T[SubscriptionDisplay.TermKey(term)]</option>
+                }
+            </select>
+            <label for="plan-preview-licences">@T["ui.subscriptions.licences"]</label>
+            <input id="plan-preview-licences" type="number" min="1" @bind="_previewLicences" />
+            <VxButton Type="submit">@T["ui.plans.preview_price"]</VxButton>
+            @if (Presenter.State.Preview is { } preview)
+            {
+                <output for="plan-preview-term plan-preview-licences">@VixlyText.Format(T, "ui.plans.preview_result", "amount", preview)</output>
+            }
+        </form>
+    }
+</VxCard></div>
+
+@code {
+    private PlanDraftModel _model = new();
+
+    private int _seenVersion = -1;
+
+    private PlatformSubscriptionTerm _previewTerm = PlatformSubscriptionTerm.Monthly;
+
+    private int _previewLicences = PlatformSubscriptionLimits.DefaultMinimumLicences;
+
+    [Parameter, EditorRequired]
+    public PlatformPlanDetail Plan { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public PlatformPlanAbilities Abilities { get; set; } = null!;
+
+    [Parameter]
+    public int Version { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (_seenVersion != Version)
+        {
+            _seenVersion = Version;
+            _model = Model(Plan.Draft);
+        }
+    }
+
+    private static PlanDraftModel Model(PlatformPlanVersionItem? draft)
+    {
+        PlanDraftModel model = new();
+
+        if (draft is not null)
+        {
+            model.CurrencyCode = draft.CurrencyCode;
+            model.MonthlyPricePerLicence = Math.Round(draft.MonthlyPricePerLicence, 2);
+            model.AnnualPricePerLicence = Math.Round(draft.AnnualPricePerLicence, 2);
+            model.SetupFee = Math.Round(draft.SetupFee, 2);
+            model.MinimumLicences = draft.MinimumLicences;
+            model.TrialDays = draft.TrialDays;
+            model.MaxLicensedDevices = draft.MaxLicensedDevices;
+            model.MaxWarehouses = draft.MaxWarehouses;
+            model.Features.UnionWith(draft.Features);
+        }
+
+        return model;
+    }
+
+    private void Toggle(PlatformPlanFeature feature, ChangeEventArgs args)
+    {
+        if (args.Value is true)
+        {
+            _model.Features.Add(feature);
+        }
+        else
+        {
+            _model.Features.Remove(feature);
+        }
+    }
+
+    private bool Submitted => Plan.Draft?.Status == PlatformPlanVersionStatus.PendingApproval;
+
+    private bool Editable => Abilities.CanManage && !Submitted;
+
+    private async Task SubmitAsync()
+    {
+        if (!await Presenter.SaveAsync(Plan.PlatformPlanId, _model))
+        {
+            return;
+        }
+
+        await RunAsync(() => Presenter.SubmitAsync(Plan.PlatformPlanId));
+    }
+
+    private async Task RunAsync(Func<Task<bool>> work)
+    {
+        if (await work())
+        {
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

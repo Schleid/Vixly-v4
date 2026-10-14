@@ -2,12 +2,18 @@
 using Vixly.Platform.Api.Hosting;
 using Vixly.Platform.Application.Security;
 using Vixly.Platform.Application.UseCases.Registration.CheckPortalSlugAvailability;
+using Vixly.Platform.Application.UseCases.Registration.CheckRegistrationPromotion;
 using Vixly.Platform.Application.UseCases.Registration.CorrectRegistrationEmail;
 using Vixly.Platform.Application.UseCases.Registration.GetMyRegistrationStatus;
+using Vixly.Platform.Application.UseCases.Registration.GetRegistrationOffer;
+using Vixly.Platform.Application.UseCases.Registration.ListPublicPlatformPlans;
 using Vixly.Platform.Application.UseCases.Registration.ResendMyRegistrationVerification;
+using Vixly.Platform.Application.UseCases.Registration.SelectRegistrationPlan;
 using Vixly.Platform.Application.UseCases.Registration.StartPlatformTenantRegistration;
 using Vixly.Platform.Application.UseCases.Registration.VerifyRegistrationEmail;
+using Vixly.Platform.Application.UseCases.Sales;
 using Vixly.Platform.Application.UseCases.Tenants;
+using Vixly.Platform.Domain.Subscriptions;
 using Vixly.Platform.Domain.Tenants;
 using Vixly.Shared.Kernel.Errors;
 
@@ -144,6 +150,119 @@ public static class PlatformRegistrationEndpoints
             return response.Succeeded ? Results.NoContent() : errors.Problem(response.Error!);
         }).RequireRateLimiting(PlatformApiRateLimits.Change);
 
+        group.MapGet("/plans", async (
+            HttpContext http,
+            ListPublicPlatformPlansUseCase useCase,
+            CancellationToken cancellationToken) =>
+        {
+            ListPublicPlatformPlansResponse response = await useCase.ExecuteAsync(
+                Anonymous,
+                new ListPublicPlatformPlansRequest { Language = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName },
+                cancellationToken);
+
+            http.Response.Headers.CacheControl = "public, max-age=300";
+            http.Response.Headers.Vary = "Accept-Language";
+
+            return Results.Ok(response.Plans.Select(plan => new PlatformPublicPlan(
+                plan.Code,
+                plan.Name,
+                plan.Description,
+                plan.CurrencyCode,
+                plan.MonthlyPricePerLicence,
+                plan.AnnualPricePerLicence,
+                plan.SetupFee,
+                plan.MinimumLicences,
+                plan.MaxLicensedDevices,
+                plan.MaxWarehouses,
+                plan.Features.Select(FeatureCode).ToArray(),
+                plan.TrialDays)).ToArray());
+        }).RequireRateLimiting(PlatformApiRateLimits.Catalogue).RequireCors(PlatformApiHost.CorsPolicy);
+
+        group.MapPost("/plan", async (
+            HttpContext http,
+            SelectPlatformRegistrationPlanBody body,
+            SelectRegistrationPlanUseCase useCase,
+            PlatformApiErrors errors,
+            CancellationToken cancellationToken) =>
+        {
+            SelectRegistrationPlanResponse response = await useCase.ExecuteAsync(
+                Anonymous,
+                new SelectRegistrationPlanRequest
+                {
+                    AccessToken = Bearer(http),
+                    PlanCode = body.PlanCode,
+                    Term = TermFrom(body.Term),
+                    Licences = body.Licences,
+                    StartTrial = body.StartTrial,
+                    PromotionCode = body.PromotionCode,
+                    OfferToken = body.OfferToken
+                },
+                cancellationToken);
+
+            return response.Succeeded
+                ? Results.Ok(new PlatformPlanChoice(StepCode(response.Step), response.TrialEndsUtc))
+                : errors.Problem(response.Error!);
+        }).RequireRateLimiting(PlatformApiRateLimits.Change);
+
+        group.MapPost("/offer", async (
+            PlatformOfferTokenBody body,
+            GetRegistrationOfferUseCase useCase,
+            PlatformApiErrors errors,
+            CancellationToken cancellationToken) =>
+        {
+            GetRegistrationOfferResponse response = await useCase.ExecuteAsync(
+                Anonymous,
+                new GetRegistrationOfferRequest { Token = body.Token, Language = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName },
+                cancellationToken);
+
+            if (!response.Succeeded)
+            {
+                return errors.Problem(response.Error!);
+            }
+
+            Vixly.Platform.Application.UseCases.Registration.PlatformRegistrationOfferPreview offer = response.Offer!;
+
+            return Results.Ok(new PlatformRegistrationOffer(
+                offer.CompanyName,
+                offer.MaskedEmail,
+                offer.PlanCode,
+                offer.PlanName,
+                offer.CurrencyCode,
+                offer.Term == PlatformSubscriptionTerm.Annual ? "annual" : "monthly",
+                offer.Licences,
+                offer.PeriodAmount,
+                offer.Discount is null ? null : Discount(offer.Discount),
+                offer.SetupFee,
+                offer.Charges.Select(item => new PlatformOfferChargeLine(item.Description, item.Amount)).ToArray(),
+                offer.StartTrial,
+                offer.TrialDays,
+                offer.ExpiresUtc));
+        }).RequireRateLimiting(PlatformApiRateLimits.SlugCheck).RequireCors(PlatformApiHost.CorsPolicy);
+
+        group.MapGet("/promotions/{code}", async (
+            string code,
+            string? plan,
+            string? term,
+            CheckRegistrationPromotionUseCase useCase,
+            PlatformApiErrors errors,
+            CancellationToken cancellationToken) =>
+        {
+            CheckRegistrationPromotionResponse response = await useCase.ExecuteAsync(
+                Anonymous,
+                new CheckRegistrationPromotionRequest
+                {
+                    Code = code,
+                    PlanCode = plan ?? string.Empty,
+                    Term = TermFrom(term),
+                    Language = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
+                },
+                cancellationToken);
+
+            return response.Succeeded
+                ? Results.Ok(new PlatformPromotionCheck(response.Name, Discount(response.Terms!)))
+                : errors.Problem(response.Error!);
+        }).RequireRateLimiting(PlatformApiRateLimits.SlugCheck).RequireCors(PlatformApiHost.CorsPolicy);
+
         group.MapGet("/status", async (
             HttpContext http,
             GetMyRegistrationStatusUseCase useCase,
@@ -161,6 +280,46 @@ public static class PlatformRegistrationEndpoints
         }).RequireRateLimiting(PlatformApiRateLimits.Status);
 
         return endpoints;
+    }
+
+    public static string FeatureCode(PlatformPlanFeature feature)
+    {
+        return feature switch
+        {
+            PlatformPlanFeature.HomepageContentCustomization => "homepage_content_customization",
+            PlatformPlanFeature.PortalThemeCustomization => "portal_theme_customization",
+            PlatformPlanFeature.CustomDomain => "custom_domain",
+            PlatformPlanFeature.WhiteLabelPortal => "white_label_portal",
+            PlatformPlanFeature.AdvancedAnalytics => "advanced_analytics",
+            _ => "data_export"
+        };
+    }
+
+    public static PlatformDiscountOffer Discount(PlatformDiscountTermsItem terms)
+    {
+        ArgumentNullException.ThrowIfNull(terms);
+
+        return new PlatformDiscountOffer(
+            terms.Kind == PlatformDiscountKind.Percent ? "percent" : "fixed_amount",
+            terms.Value,
+            terms.Duration switch
+            {
+                PlatformDiscountDuration.Periods => "periods",
+                PlatformDiscountDuration.UntilDate => "until_date",
+                _ => "no_end"
+            },
+            terms.Periods,
+            terms.EndsUtc);
+    }
+
+    public static PlatformSubscriptionTerm TermFrom(string? value)
+    {
+        return value?.Trim().ToLowerInvariant() switch
+        {
+            "monthly" => PlatformSubscriptionTerm.Monthly,
+            "annual" => PlatformSubscriptionTerm.Annual,
+            _ => (PlatformSubscriptionTerm)0
+        };
     }
 
     public static string StepCode(PlatformTenantRegistrationStatus status)

@@ -1,0 +1,114 @@
+﻿@*
+=========================================================
+FILE: TenantSubscription.razor
+
+PURPOSE:
+The Subscription section of the tenant page: the current
+subscription, start or change it, and the panels for actions,
+trial, limits and history.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Every change is previewed first: upgrades apply now and are
+  prorated, downgrades wait for renewal (D-S4)
+- Staff may start a subscription for a tenant without one (D-S15),
+  only while the tenant is draft, pending activation or active
+- Discounts and one-time charges have their own panels (Slice 3b)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantSubscriptionPresenter>
+@using Vixly.Platform.Domain.Tenants
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="tenant-subscription"><VxCard Title="@T["ui.subscriptions.section"]">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (!Presenter.State.Loaded)
+    {
+        <p role="status">@T["ui.common.loading"]</p>
+    }
+    else if (Presenter.State.Subscription is { } subscription)
+    {
+        <TenantSubscriptionFacts Subscription="subscription" />
+        <div class="vx-actions">
+            @if (Presenter.State.Abilities.CanChange && Presenter.State.Mode == TenantSubscriptionMode.None)
+            {
+                <VxButton OnClick="() => Presenter.Open(TenantSubscriptionMode.Change)">@T["ui.subscriptions.change"]</VxButton>
+            }
+            @if (Presenter.State.Abilities.CanCancelScheduledChange)
+            {
+                <VxButton OnClick="() => Presenter.CancelScheduledAsync(TenantId)" IsBusy="@Presenter.IsBusy">@T["ui.subscriptions.cancel_scheduled"]</VxButton>
+            }
+        </div>
+    }
+    else
+    {
+        <p>@T["ui.subscriptions.none"]</p>
+        @switch (TenantStatus)
+        {
+            case PlatformTenantStatus.Suspended:
+                <p class="vx-hint">@T["ui.subscriptions.start_blocked.suspended"]</p>
+                break;
+            case PlatformTenantStatus.Deactivated:
+                <p class="vx-hint">@T["ui.subscriptions.start_blocked.deactivated"]</p>
+                break;
+            case PlatformTenantStatus.Banned:
+                <p class="vx-hint">@T["ui.subscriptions.start_blocked.banned"]</p>
+                break;
+        }
+        @if (Presenter.State.Abilities.CanStart && Presenter.State.Mode == TenantSubscriptionMode.None)
+        {
+            <VxButton Variant="VxButtonVariant.Primary" OnClick="() => Presenter.Open(TenantSubscriptionMode.Start)">@T["ui.subscriptions.start"]</VxButton>
+        }
+    }
+    @if (Presenter.State.Mode != TenantSubscriptionMode.None)
+    {
+        <TenantSubscriptionForm Mode="Presenter.State.Mode"
+                                Options="Presenter.State.PlanOptions"
+                                Current="Presenter.State.Subscription"
+                                Quote="Presenter.State.Quote"
+                                IsBusy="Presenter.IsBusy"
+                                OnPreview="model => Presenter.PreviewAsync(TenantId, model)"
+                                OnSubmit="model => Presenter.SubmitAsync(TenantId, model)"
+                                OnCancel="() => Presenter.Open(TenantSubscriptionMode.None)" />
+    }
+</VxCard></div>
+@if (Presenter.State.Loaded)
+{
+    if (Presenter.State.Subscription is { } current)
+    {
+        <TenantSubscriptionActions TenantId="TenantId" Subscription="current" Abilities="Presenter.State.Abilities" OnChanged="ReloadAsync" />
+        <TenantDiscount TenantId="TenantId" Subscription="current" Abilities="Presenter.State.Abilities" OnChanged="ReloadAsync" />
+        <TenantCharges TenantId="TenantId" Subscription="current" CanManage="Presenter.State.Abilities.CanManageCharges" OnChanged="ReloadAsync" />
+    }
+    <TenantLimits TenantId="TenantId" Limits="Presenter.State.Limits" CanOverride="Presenter.State.Abilities.CanOverrideLimits" OnChanged="ReloadAsync" />
+    <TenantSubscriptionHistory TenantId="TenantId" Version="Presenter.State.Version" />
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid TenantId { get; set; }
+
+    [Parameter]
+    public PlatformTenantStatus TenantStatus { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(TenantId);
+    }
+
+    private Task ReloadAsync()
+    {
+        return Presenter.LoadAsync(TenantId);
+    }
+}

@@ -144,7 +144,8 @@ internal sealed class PlatformRoleQueries : IPlatformRoleQueries
                     user.AuthorityLevel,
                     role.Name,
                     role.SystemKey,
-                    assignment.ExpiresUtc))
+                    assignment.ExpiresUtc,
+                    (string)(object)user.PreferredLanguage))
             .ToListAsync(cancellationToken);
 
         List<PlatformPermissionHolderItem> superUsers = await _context.Users
@@ -159,7 +160,8 @@ internal sealed class PlatformRoleQueries : IPlatformRoleQueries
                 user.AuthorityLevel,
                 null,
                 null,
-                null))
+                null,
+                (string)(object)user.PreferredLanguage))
             .ToListAsync(cancellationToken);
 
         return superUsers

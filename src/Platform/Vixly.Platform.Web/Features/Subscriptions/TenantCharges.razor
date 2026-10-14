@@ -1,0 +1,173 @@
+﻿@*
+=========================================================
+FILE: TenantCharges.razor
+
+PURPOSE:
+One-time charges and the setup fee of the tenant's subscription
+(D-S23).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Charges are billed on the next invoice (Slice 4); the setup
+  fee can change only until it is charged
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantChargesPresenter>
+@using Vixly.Platform.Application.UseCases.Subscriptions
+@using Vixly.Platform.Domain.Subscriptions
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="tenant-charges"><VxCard Title="@T["ui.charges.title"]">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    <p>
+        @VixlyText.Format(T, "ui.charges.setup_fee_line", "amount", SubscriptionDisplay.Money(Subscription.SetupFee, Subscription.CurrencyCode))
+        <span class="vx-hint">@T[Subscription.SetupFeeCharged ? "ui.subscriptions.setup_fee_charged" : Subscription.SetupFeeOverridden ? "ui.charges.setup_fee_custom" : "ui.charges.setup_fee_plan"]</span>
+    </p>
+    <VxDataTable Items="Subscription.Charges" IsLoading="false">
+        <HeaderContent>
+            <th scope="col">@T["ui.charges.description"]</th>
+            <th scope="col">@T["ui.charges.amount"]</th>
+            <th scope="col">@T["ui.charges.status"]</th>
+            <th scope="col">@T["ui.audit.who"]</th>
+            <th scope="col">@T["ui.tenants.reason"]</th>
+            @if (CanManage)
+            {
+                <th scope="col"><span class="vx-visually-hidden">@T["ui.subscriptions.actions"]</span></th>
+            }
+        </HeaderContent>
+        <RowTemplate Context="charge">
+            <td>@charge.Description</td>
+            <td>@SubscriptionDisplay.Money(charge.Amount, charge.CurrencyCode)</td>
+            <td>@T["ui.charges.status." + charge.Status.ToString().ToLowerInvariant()]</td>
+            <td>@(charge.AddedByName ?? "-") <span class="vx-hint">@PlatformDisplay.Utc(T, charge.CreatedUtc)</span></td>
+            <td>@charge.Reason</td>
+            @if (CanManage)
+            {
+                <td>
+                    @if (charge.Status == PlatformOneTimeChargeStatus.Pending)
+                    {
+                        <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => Open(Mode.Cancel, charge.ChargeId)">@T["ui.charges.cancel"]</VxButton>
+                    }
+                </td>
+            }
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.charges.empty"]" />
+        </EmptyContent>
+    </VxDataTable>
+    @if (_mode != Mode.None)
+    {
+        <form class="vx-form" @onsubmit="SubmitAsync">
+            @if (_mode == Mode.Add)
+            {
+                <label for="charge-description">@T["ui.charges.description"]</label>
+                <input id="charge-description" @bind="_description" maxlength="200" required />
+            }
+            @if (_mode is Mode.Add or Mode.SetupFee)
+            {
+                <label for="charge-amount">@VixlyText.Format(T, "ui.discounts.amount_in", "currency", Subscription.CurrencyCode)</label>
+                <input id="charge-amount" type="number" min="0" step="0.01" @bind="_amount" required="@(_mode == Mode.Add)" aria-describedby="charge-amount-help" />
+                @if (_mode == Mode.SetupFee)
+                {
+                    <p id="charge-amount-help" class="vx-hint">@T["ui.charges.setup_fee_help"]</p>
+                }
+            }
+            <label for="charge-reason">@T["ui.tenants.reason"]</label>
+            <textarea id="charge-reason" @bind="_reason" maxlength="500" required></textarea>
+            <div class="vx-actions">
+                <VxButton Variant="@(_mode == Mode.Cancel ? VxButtonVariant.Danger : VxButtonVariant.Primary)" Type="submit" IsBusy="@Presenter.IsBusy">@T[ActionKey(_mode)]</VxButton>
+                <VxButton OnClick="() => Open(Mode.None, null)">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else if (CanManage)
+    {
+        <div class="vx-actions">
+            <VxButton OnClick="() => Open(Mode.Add, null)">@T["ui.charges.add"]</VxButton>
+            @if (!Subscription.SetupFeeCharged)
+            {
+                <VxButton OnClick="() => Open(Mode.SetupFee, null)">@T["ui.charges.change_setup_fee"]</VxButton>
+            }
+        </div>
+    }
+</VxCard></div>
+
+@code {
+    private enum Mode
+    {
+        None,
+        Add,
+        Cancel,
+        SetupFee
+    }
+
+    private Mode _mode;
+
+    private Guid? _chargeId;
+
+    private string? _description;
+
+    private decimal? _amount;
+
+    private string? _reason;
+
+    [Parameter, EditorRequired]
+    public Guid TenantId { get; set; }
+
+    [Parameter, EditorRequired]
+    public PlatformTenantSubscriptionDetail Subscription { get; set; } = null!;
+
+    [Parameter]
+    public bool CanManage { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private void Open(Mode mode, Guid? chargeId)
+    {
+        _mode = mode;
+        _chargeId = chargeId;
+        _description = null;
+        _amount = mode == Mode.SetupFee && Subscription.SetupFeeOverridden ? Math.Round(Subscription.SetupFee, 2) : null;
+        _reason = null;
+        Presenter.Clear();
+    }
+
+    private static string ActionKey(Mode mode)
+    {
+        return mode switch
+        {
+            Mode.Add => "ui.charges.add",
+            Mode.Cancel => "ui.charges.cancel",
+            _ => "ui.charges.change_setup_fee"
+        };
+    }
+
+    private async Task SubmitAsync()
+    {
+        bool done = _mode switch
+        {
+            Mode.Add => await Presenter.AddAsync(TenantId, _description, _amount ?? 0m, _reason),
+            Mode.Cancel => await Presenter.CancelAsync(TenantId, _chargeId!.Value, _reason),
+            Mode.SetupFee => await Presenter.ChangeSetupFeeAsync(TenantId, _amount, _reason),
+            _ => false
+        };
+
+        if (done)
+        {
+            _mode = Mode.None;
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

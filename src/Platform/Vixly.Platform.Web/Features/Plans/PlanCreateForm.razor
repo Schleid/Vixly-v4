@@ -1,0 +1,60 @@
+﻿@*
+=========================================================
+FILE: PlanCreateForm.razor
+
+PURPOSE:
+The new-plan form: code, name, description and currency.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- A new plan starts with an empty draft; prices, limits and
+  features are set on the plan page, then published (D-S2)
+- The code and the currency cannot change later (D-S7)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<PlanCreatePresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+<form class="vx-form" @onsubmit="CreateAsync">
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    <label for="new-plan-code">@T["ui.plans.code"]</label>
+    <input id="new-plan-code" @bind="_code" maxlength="32" required autocomplete="off" aria-describedby="new-plan-code-help" />
+    <p id="new-plan-code-help" class="vx-hint">@T["ui.plans.code_help"]</p>
+    <label for="new-plan-name">@T["ui.plans.name"]</label>
+    <input id="new-plan-name" @bind="_name" maxlength="100" required />
+    <label for="new-plan-description">@T["ui.plans.description"]</label>
+    <textarea id="new-plan-description" @bind="_description" maxlength="1000"></textarea>
+    <label for="new-plan-currency">@T["ui.plans.currency"]</label>
+    <input id="new-plan-currency" @bind="_currency" maxlength="3" required autocomplete="off" aria-describedby="new-plan-currency-help" />
+    <p id="new-plan-currency-help" class="vx-hint">@T["ui.plans.currency_help"]</p>
+    <div class="vx-actions">
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.plans.create"]</VxButton>
+        <a class="vx-button" href="/plans">@T["ui.common.cancel"]</a>
+    </div>
+</form>
+
+@code {
+    private string? _code;
+
+    private string? _name;
+
+    private string? _description;
+
+    private string? _currency = "USD";
+
+    private async Task CreateAsync()
+    {
+        if (await Presenter.CreateAsync(_code, _name, _description, _currency) is Guid id)
+        {
+            Navigation.NavigateTo("/plans/" + id);
+        }
+    }
+}

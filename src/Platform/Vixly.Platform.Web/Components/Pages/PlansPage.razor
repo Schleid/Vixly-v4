@@ -1,0 +1,31 @@
+﻿@*
+=========================================================
+FILE: PlansPage.razor
+
+PURPOSE:
+The plan catalogue.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/plans"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.plans.title"]</PageTitle>
+<h1>@T["ui.plans.title"]</h1>
+<p><a href="/subscriptions">@T["ui.subscriptions.title"]</a></p>
+<PlanList Search="@Search" Status="@Status" Page="@Page" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Search { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

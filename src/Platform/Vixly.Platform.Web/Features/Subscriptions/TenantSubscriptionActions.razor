@@ -1,0 +1,122 @@
+﻿@*
+=========================================================
+FILE: TenantSubscriptionActions.razor
+
+PURPOSE:
+Subscription actions on the tenant page: cancel at period end,
+resume, record an offline payment, end now; each confirmed
+with a reason, with step-up where the use case asks for it.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Only actions the abilities allow are offered; the domain
+  still decides
+- Trial actions live in TenantTrialActions
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantSubscriptionActionsPresenter>
+@using Vixly.Platform.Application.UseCases.Subscriptions
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="tenant-subscription-actions"><VxCard Title="@T["ui.subscriptions.actions"]">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (Presenter.State.Confirming is TenantSubscriptionAction action)
+    {
+        <form class="vx-form" @onsubmit="ApplyAsync">
+            <p>@T[Key(action, "help")]</p>
+            <label for="subscription-action-reason">@T["ui.tenants.reason"]</label>
+            <textarea id="subscription-action-reason" @bind="_reason" maxlength="500" required></textarea>
+            <div class="vx-actions">
+                <VxButton Variant="@(action == TenantSubscriptionAction.RecordPayment ? VxButtonVariant.Primary : VxButtonVariant.Danger)" Type="submit" IsBusy="@Presenter.IsBusy">@T[Key(action, "action")]</VxButton>
+                <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else
+    {
+        <div class="vx-actions">
+            @if (Abilities.CanRecordPayment)
+            {
+                <VxButton OnClick="() => Start(TenantSubscriptionAction.RecordPayment)">@T[Key(TenantSubscriptionAction.RecordPayment, "action")]</VxButton>
+            }
+            @if (Abilities.CanResume)
+            {
+                <VxButton OnClick="ResumeAsync" IsBusy="@Presenter.IsBusy">@T["ui.subscriptions.resume"]</VxButton>
+            }
+            @if (Abilities.CanCancel)
+            {
+                <VxButton OnClick="() => Start(TenantSubscriptionAction.Cancel)">@T[Key(TenantSubscriptionAction.Cancel, "action")]</VxButton>
+            }
+            @if (Abilities.CanEndNow)
+            {
+                <VxButton Variant="VxButtonVariant.Danger" OnClick="() => Start(TenantSubscriptionAction.EndNow)">@T[Key(TenantSubscriptionAction.EndNow, "action")]</VxButton>
+            }
+        </div>
+        @if (!Abilities.CanRecordPayment && !Abilities.CanResume && !Abilities.CanCancel && !Abilities.CanEndNow)
+        {
+            <p>@T["ui.subscriptions.no_actions"]</p>
+        }
+    }
+    @if (Abilities.CanExtendTrial || Abilities.CanEndTrial)
+    {
+        <TenantTrialActions TenantId="TenantId" TrialEndsUtc="Subscription.TrialEndsUtc" CanExtend="Abilities.CanExtendTrial" CanEnd="Abilities.CanEndTrial" OnChanged="OnChanged" />
+    }
+    @if (Presenter.State.StepUpPending)
+    {
+        <StepUpDialog OnConfirmed="ApplyAsync" OnCancelled="Presenter.CancelStepUp" />
+    }
+</VxCard></div>
+
+@code {
+    private string? _reason;
+
+    [Parameter, EditorRequired]
+    public Guid TenantId { get; set; }
+
+    [Parameter, EditorRequired]
+    public PlatformTenantSubscriptionDetail Subscription { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public PlatformSubscriptionAbilities Abilities { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private static string Key(TenantSubscriptionAction action, string part)
+    {
+        return "ui.subscriptions." + part + "." + action.ToString().ToLowerInvariant();
+    }
+
+    private void Start(TenantSubscriptionAction action)
+    {
+        _reason = null;
+        Presenter.Start(action);
+    }
+
+    private async Task ResumeAsync()
+    {
+        if (await Presenter.ResumeAsync(TenantId))
+        {
+            await OnChanged.InvokeAsync();
+        }
+    }
+
+    private async Task ApplyAsync()
+    {
+        if (await Presenter.ApplyAsync(TenantId, _reason))
+        {
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

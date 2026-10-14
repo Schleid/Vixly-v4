@@ -1,0 +1,97 @@
+﻿@*
+=========================================================
+FILE: TenantTrialActions.razor
+
+PURPOSE:
+Extend or end the tenant's trial, with a reason (D-S12).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- The new end date is the end of that day, UTC
+- Ending a trial leaves the subscription pending payment
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantTrialPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<section aria-labelledby="tenant-trial-title">
+    <h3 id="tenant-trial-title">@VixlyText.Format(T, "ui.subscriptions.trial_title", "date", SubscriptionDisplay.Date(TrialEndsUtc))</h3>
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (Presenter.State.Confirming is TenantSubscriptionAction action)
+    {
+        <form class="vx-form" @onsubmit="ApplyAsync">
+            <p>@T["ui.subscriptions.help." + action.ToString().ToLowerInvariant()]</p>
+            @if (action == TenantSubscriptionAction.ExtendTrial)
+            {
+                <label for="trial-new-end">@T["ui.subscriptions.trial_new_end"]</label>
+                <input id="trial-new-end" type="date" @bind="_newEnd" required />
+            }
+            <label for="trial-reason">@T["ui.tenants.reason"]</label>
+            <textarea id="trial-reason" @bind="_reason" maxlength="500" required></textarea>
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.subscriptions.action." + action.ToString().ToLowerInvariant()]</VxButton>
+                <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else
+    {
+        <div class="vx-actions">
+            @if (CanExtend)
+            {
+                <VxButton OnClick="() => Start(TenantSubscriptionAction.ExtendTrial)">@T["ui.subscriptions.action.extendtrial"]</VxButton>
+            }
+            @if (CanEnd)
+            {
+                <VxButton OnClick="() => Start(TenantSubscriptionAction.EndTrial)">@T["ui.subscriptions.action.endtrial"]</VxButton>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    private DateTime? _newEnd;
+
+    private string? _reason;
+
+    [Parameter, EditorRequired]
+    public Guid TenantId { get; set; }
+
+    [Parameter]
+    public DateTimeOffset? TrialEndsUtc { get; set; }
+
+    [Parameter]
+    public bool CanExtend { get; set; }
+
+    [Parameter]
+    public bool CanEnd { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private void Start(TenantSubscriptionAction action)
+    {
+        _reason = null;
+        _newEnd = TrialEndsUtc?.UtcDateTime.Date.AddDays(14);
+        Presenter.Start(action);
+    }
+
+    private async Task ApplyAsync()
+    {
+        if (await Presenter.ApplyAsync(TenantId, _newEnd, _reason))
+        {
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

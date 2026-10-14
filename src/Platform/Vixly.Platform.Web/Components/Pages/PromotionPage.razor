@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: PromotionPage.razor
+
+PURPOSE:
+One promotion code: terms, decision and names.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/promotions/{PromotionId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<p><a href="/promotions">@T["ui.promotions.back"]</a></p>
+<PromotionSummary PromotionId="@PromotionId" />
+
+@code {
+    [Parameter]
+    public Guid PromotionId { get; set; }
+}

@@ -196,7 +196,7 @@ public sealed class PlatformDemoTenants
                 events.Add(tenant.Deactivate("Business closed at year end.", actor, verified.AddDays(150)));
                 break;
             case 17:
-                events.Add(tenant.Deactivate("Moved to another provider.", actor, verified.AddDays(120)));
+                events.Add(tenant.Deactivate("Moved to another provider.", actor, verified.AddDays(80)));
                 break;
             case 15:
                 events.Add(tenant.Suspend(PlatformSuspensionCategory.FraudInvestigation, "Chargebacks on several card payments.", actor, verified.AddDays(40)));

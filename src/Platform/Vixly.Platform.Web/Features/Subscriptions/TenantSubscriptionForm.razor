@@ -1,0 +1,165 @@
+﻿@*
+=========================================================
+FILE: TenantSubscriptionForm.razor
+
+PURPOSE:
+Choose plan, term and licences to start a subscription or
+change the current one; shows the preview before confirming.
+
+IMPORTANT NOTES:
+- UI glue only: the subscription presenter previews and
+  submits through the callbacks
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- A change must be previewed before it can be confirmed, so
+  staff see the charge now and the date it applies (D-S4)
+- The trial is offered only when the plan version has one (D-S12)
+=========================================================
+*@
+@using Vixly.Platform.Application.UseCases.Subscriptions
+@using Vixly.Platform.Domain.Subscriptions
+@inject IStringLocalizer<PlatformText> T
+
+<form class="vx-form" @onsubmit="SubmitAsync">
+    <fieldset class="vx-fieldset">
+        <legend>@(Mode == TenantSubscriptionMode.Start ? T["ui.subscriptions.start"] : T["ui.subscriptions.change"])</legend>
+        <label for="subscription-plan">@T["ui.subscriptions.plan"]</label>
+        <select id="subscription-plan" value="@_planId" @onchange="PickPlan" required>
+            <option value="">@T["ui.subscriptions.choose_plan"]</option>
+            @foreach (PlatformPlanOption option in Options)
+            {
+                <option value="@option.PlatformPlanId">@VixlyText.Format(T, "ui.subscriptions.plan_option", new Dictionary<string, object>
+                {
+                    ["name"] = option.Name,
+                    ["monthly"] = SubscriptionDisplay.Money(option.MonthlyPricePerLicence, option.CurrencyCode),
+                    ["annual"] = SubscriptionDisplay.Money(option.AnnualPricePerLicence, option.CurrencyCode)
+                })</option>
+            }
+        </select>
+        <label for="subscription-term">@T["ui.subscriptions.term"]</label>
+        <select id="subscription-term" value="@_model.Term" @onchange="PickTerm">
+            @foreach (PlatformSubscriptionTerm term in Enum.GetValues<PlatformSubscriptionTerm>())
+            {
+                <option value="@term">@T[SubscriptionDisplay.TermKey(term)]</option>
+            }
+        </select>
+        <label for="subscription-licences">@T["ui.subscriptions.licences"]</label>
+        <input id="subscription-licences" type="number" min="@(Chosen?.MinimumLicences ?? 1)" max="@(Chosen?.MaxLicences ?? 100000)" value="@_model.Licences" @onchange="PickLicences" aria-describedby="subscription-licences-help" />
+        @if (Chosen is { } chosen)
+        {
+            <p id="subscription-licences-help" class="vx-hint">@VixlyText.Format(T, "ui.subscriptions.licences_range", new Dictionary<string, object> { ["min"] = chosen.MinimumLicences, ["max"] = chosen.MaxLicences })</p>
+            @if (Mode == TenantSubscriptionMode.Start && chosen.TrialDays is int days)
+            {
+                <label><input type="checkbox" @bind="_model.StartTrial" /> @VixlyText.Format(T, "ui.subscriptions.start_trial", "days", days)</label>
+            }
+        }
+    </fieldset>
+    @if (Mode == TenantSubscriptionMode.Change && Quote is { } quote)
+    {
+        <VxMessage Type="VxMessageType.Info">
+            <p>@(quote.Timing == PlatformSubscriptionChangeTiming.Now ? T["ui.subscriptions.quote_now"] : VixlyText.Format(T, "ui.subscriptions.quote_at_renewal", "date", SubscriptionDisplay.Date(quote.EffectiveUtc)))</p>
+            <p>@VixlyText.Format(T, "ui.subscriptions.quote_charge", "amount", SubscriptionDisplay.Money(quote.ChargeNow, quote.CurrencyCode))</p>
+            <p>@VixlyText.Format(T, "ui.subscriptions.quote_next", "amount", SubscriptionDisplay.Money(quote.NextPeriodNetAmount, quote.CurrencyCode))</p>
+            @if (quote.NextPeriodNetAmount != quote.NextPeriodAmount)
+            {
+                <p class="vx-hint">@VixlyText.Format(T, "ui.discounts.before_discount", "amount", SubscriptionDisplay.Money(quote.NextPeriodAmount, quote.CurrencyCode))</p>
+            }
+            @if (quote.EndsTrial)
+            {
+                <p>@T["ui.subscriptions.quote_ends_trial"]</p>
+            }
+        </VxMessage>
+    }
+    <div class="vx-actions">
+        @if (Mode == TenantSubscriptionMode.Change)
+        {
+            <VxButton OnClick="PreviewAsync" IsBusy="@IsBusy" Disabled="@(Chosen is null)">@T["ui.subscriptions.preview"]</VxButton>
+        }
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@IsBusy" Disabled="@(Chosen is null || (Mode == TenantSubscriptionMode.Change && Quote is null))">@T["ui.subscriptions.confirm"]</VxButton>
+        <VxButton OnClick="() => OnCancel.InvokeAsync()">@T["ui.common.cancel"]</VxButton>
+    </div>
+</form>
+
+@code {
+    private readonly TenantSubscriptionModel _model = new();
+
+    private string _planId = string.Empty;
+
+    [Parameter, EditorRequired]
+    public TenantSubscriptionMode Mode { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PlatformPlanOption> Options { get; set; } = Array.Empty<PlatformPlanOption>();
+
+    [Parameter]
+    public PlatformTenantSubscriptionDetail? Current { get; set; }
+
+    [Parameter]
+    public PlatformSubscriptionQuoteItem? Quote { get; set; }
+
+    [Parameter]
+    public bool IsBusy { get; set; }
+
+    [Parameter]
+    public EventCallback<TenantSubscriptionModel> OnPreview { get; set; }
+
+    [Parameter]
+    public EventCallback<TenantSubscriptionModel> OnSubmit { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    private PlatformPlanOption? Chosen => Options.FirstOrDefault(option => option.PlatformPlanId.ToString() == _planId);
+
+    protected override void OnInitialized()
+    {
+        if (Current is { } current)
+        {
+            _planId = current.PlatformPlanId.ToString();
+            _model.PlatformPlanId = current.PlatformPlanId;
+            _model.Term = current.Term;
+            _model.Licences = current.Licences;
+        }
+    }
+
+    private Task PickPlan(ChangeEventArgs args)
+    {
+        _planId = args.Value?.ToString() ?? string.Empty;
+        _model.PlatformPlanId = Chosen?.PlatformPlanId ?? Guid.Empty;
+
+        if (Chosen is { } chosen && Current is null)
+        {
+            _model.Licences = Math.Max(_model.Licences, chosen.MinimumLicences);
+            _model.StartTrial = chosen.TrialDays is not null;
+        }
+
+        return ChangedAsync();
+    }
+
+    private Task PickTerm(ChangeEventArgs args)
+    {
+        _model.Term = Enum.TryParse(args.Value?.ToString(), out PlatformSubscriptionTerm term) ? term : _model.Term;
+        return ChangedAsync();
+    }
+
+    private Task PickLicences(ChangeEventArgs args)
+    {
+        _model.Licences = int.TryParse(args.Value?.ToString(), out int licences) ? licences : _model.Licences;
+        return ChangedAsync();
+    }
+
+    private Task ChangedAsync()
+    {
+        return Quote is null ? Task.CompletedTask : OnPreview.InvokeAsync(_model);
+    }
+
+    private Task PreviewAsync()
+    {
+        return OnPreview.InvokeAsync(_model);
+    }
+
+    private Task SubmitAsync()
+    {
+        return Chosen is null ? Task.CompletedTask : OnSubmit.InvokeAsync(_model);
+    }
+}

@@ -12,6 +12,7 @@ using Vixly.Platform.Infrastructure.Persistence;
 using Vixly.Platform.Infrastructure.Persistence.Queries;
 using Vixly.Platform.Infrastructure.Persistence.Repositories;
 using Vixly.Platform.Infrastructure.Security;
+using Vixly.Platform.Infrastructure.Subscriptions;
 using Vixly.Platform.Infrastructure.Tenants;
 
 namespace Vixly.Platform.Infrastructure.DependencyInjection;
@@ -96,6 +97,16 @@ public static class PlatformInfrastructureServiceCollectionExtensions
         services.AddScoped<IPlatformOutboxRepository, PlatformOutboxRepository>();
         services.AddScoped<IPlatformTenantQueries, PlatformTenantQueries>();
         services.AddScoped<IPlatformTenantPolicy, ConfiguredPlatformTenantPolicy>();
+        services.AddScoped<IPlatformPlanRepository, PlatformPlanRepository>();
+        services.AddScoped<IPlatformSubscriptionRepository, PlatformSubscriptionRepository>();
+        services.AddScoped<IPlatformLimitOverrideRepository, PlatformLimitOverrideRepository>();
+        services.AddScoped<IPlatformSalesSettingsRepository, PlatformSalesSettingsRepository>();
+        services.AddScoped<IPlatformPromotionRepository, PlatformPromotionRepository>();
+        services.AddScoped<IPlatformOfferRepository, PlatformOfferRepository>();
+        services.AddScoped<IPlatformPublicLinks, PlatformPublicLinks>();
+        services.AddScoped<IPlatformSubscriptionQueries, PlatformSubscriptionQueries>();
+        services.AddScoped<IPlatformSubscriptionPolicy, ConfiguredPlatformSubscriptionPolicy>();
+        services.AddScoped<IPlatformLicenceCounter, PendingPlatformLicenceCounter>();
         services.AddSingleton<IPlatformRandom, PlatformRandom>();
 
         services.AddSingleton<IPlatformPasswordHasher, BCryptPlatformPasswordHasher>();
@@ -109,9 +120,12 @@ public static class PlatformInfrastructureServiceCollectionExtensions
         services.AddOptions<PlatformHostingOptions>().Bind(configuration.GetSection(PlatformHostingOptions.SectionName));
         services.AddOptions<PlatformTenantOptions>().Bind(configuration.GetSection(PlatformTenantOptions.SectionName));
         services.AddOptions<PlatformBotCheckOptions>().Bind(configuration.GetSection(PlatformBotCheckOptions.SectionName));
+        services.AddOptions<PlatformSubscriptionOptions>().Bind(configuration.GetSection(PlatformSubscriptionOptions.SectionName));
         services.AddScoped<PlatformMailSender>();
         services.AddScoped<IPlatformIdentityMailer, SmtpPlatformIdentityMailer>();
         services.AddScoped<IPlatformTenantMailer, SmtpPlatformTenantMailer>();
+        services.AddScoped<IPlatformSubscriptionMailer, SmtpPlatformSubscriptionMailer>();
+        services.AddScoped<IPlatformSalesMailer, SmtpPlatformSalesMailer>();
         services.AddHttpClient<IPlatformBotCheck, TurnstilePlatformBotCheck>(client => client.Timeout = TimeSpan.FromSeconds(10));
 
         services.AddHealthChecks()

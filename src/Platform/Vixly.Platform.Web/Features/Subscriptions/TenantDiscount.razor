@@ -1,0 +1,189 @@
+﻿@*
+=========================================================
+FILE: TenantDiscount.razor
+
+PURPOSE:
+The Discount panel of the tenant page: the current discount,
+one waiting for approval, granting, ending and applying a
+promotion code (D-S18 to D-S24).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- One discount at a time; what needs approval is decided by
+  the Sales settings, never here
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantDiscountPresenter>
+@using Vixly.Platform.Application.UseCases.Subscriptions
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="tenant-discount"><VxCard Title="@T["ui.discounts.title"]">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (Subscription.Discount is { } active)
+    {
+        <p><strong>@SalesDisplay.Describe(T, active.Terms, Subscription.CurrencyCode)</strong></p>
+        <p class="vx-hint">@Granted(active)</p>
+    }
+    else
+    {
+        <p>@T["ui.discounts.none"]</p>
+    }
+    @if (Subscription.PendingDiscount is { } pending)
+    {
+        <VxMessage Type="VxMessageType.Warning">
+            <p>@VixlyText.Format(T, "ui.discounts.pending", "terms", SalesDisplay.Describe(T, pending.Terms, Subscription.CurrencyCode))</p>
+            <p>@Granted(pending)</p>
+        </VxMessage>
+    }
+    @if (_mode == Mode.Grant)
+    {
+        <form class="vx-form" @onsubmit="SubmitAsync">
+            <DiscountTermsFields Model="_terms" Prefix="tenant-discount" CurrencyCode="@Subscription.CurrencyCode" />
+            <label for="tenant-discount-reason">@T["ui.tenants.reason"]</label>
+            <textarea id="tenant-discount-reason" @bind="_text" maxlength="500" required></textarea>
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.discounts.grant"]</VxButton>
+                <VxButton OnClick="() => Open(Mode.None)">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else if (_mode == Mode.Promotion)
+    {
+        <form class="vx-form" @onsubmit="SubmitAsync">
+            <label for="tenant-discount-code">@T["ui.discounts.promotion_code"]</label>
+            <input id="tenant-discount-code" @bind="_text" maxlength="32" required autocomplete="off" />
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.discounts.apply_promotion"]</VxButton>
+                <VxButton OnClick="() => Open(Mode.None)">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else if (_mode is Mode.End or Mode.Approve or Mode.Reject)
+    {
+        <form class="vx-form" @onsubmit="SubmitAsync">
+            <label for="tenant-discount-why">@T[_mode == Mode.Approve ? "ui.approvals.reason" : "ui.tenants.reason"]</label>
+            <textarea id="tenant-discount-why" @bind="_text" maxlength="500" required="@(_mode != Mode.Approve)"></textarea>
+            <div class="vx-actions">
+                <VxButton Variant="@(_mode == Mode.Approve ? VxButtonVariant.Primary : VxButtonVariant.Danger)" Type="submit" IsBusy="@Presenter.IsBusy">@T[ActionKey(_mode)]</VxButton>
+                <VxButton OnClick="() => Open(Mode.None)">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else
+    {
+        <div class="vx-actions">
+            @if (Abilities.CanDecideDiscount)
+            {
+                <VxButton Variant="VxButtonVariant.Primary" OnClick="() => Open(Mode.Approve)">@T["ui.approvals.approve"]</VxButton>
+                <VxButton Variant="VxButtonVariant.Danger" OnClick="() => Open(Mode.Reject)">@T["ui.approvals.reject"]</VxButton>
+            }
+            @if (Abilities.CanGrantDiscount)
+            {
+                <VxButton OnClick="() => Open(Mode.Grant)">@T[Subscription.Discount is null ? "ui.discounts.grant" : "ui.discounts.replace"]</VxButton>
+                @if (Subscription.Discount is null && Subscription.PendingDiscount is null)
+                {
+                    <VxButton OnClick="() => Open(Mode.Promotion)">@T["ui.discounts.apply_promotion"]</VxButton>
+                }
+                @if (Subscription.Discount is not null)
+                {
+                    <VxButton Variant="VxButtonVariant.Danger" OnClick="() => Open(Mode.End)">@T["ui.discounts.end"]</VxButton>
+                }
+            }
+        </div>
+    }
+    @if (Presenter.State.StepUpPending)
+    {
+        <StepUpDialog OnConfirmed="SubmitAsync" OnCancelled="Presenter.CancelStepUp" />
+    }
+</VxCard></div>
+
+@code {
+    private enum Mode
+    {
+        None,
+        Grant,
+        Promotion,
+        End,
+        Approve,
+        Reject
+    }
+
+    private Mode _mode;
+
+    private DiscountTermsModel _terms = new();
+
+    private string? _text;
+
+    [Parameter, EditorRequired]
+    public Guid TenantId { get; set; }
+
+    [Parameter, EditorRequired]
+    public PlatformTenantSubscriptionDetail Subscription { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public PlatformSubscriptionAbilities Abilities { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private void Open(Mode mode)
+    {
+        _mode = mode;
+        _text = null;
+        _terms = new DiscountTermsModel();
+        Presenter.Clear();
+    }
+
+    private static string ActionKey(Mode mode)
+    {
+        return mode switch
+        {
+            Mode.Approve => "ui.approvals.approve",
+            Mode.Reject => "ui.approvals.reject",
+            _ => "ui.discounts.end"
+        };
+    }
+
+    private string Granted(PlatformDiscountItem item)
+    {
+        string lasts = item.LastsUntil is { } until ? " " + VixlyText.Format(T, "ui.discounts.lasts_until", "date", SubscriptionDisplay.Date(until)) : string.Empty;
+
+        return VixlyText.Format(T, "ui.discounts.granted_by", new Dictionary<string, object>
+        {
+            ["source"] = T[SalesDisplay.SourceKey(item.Source)].Value,
+            ["name"] = item.GrantedByName ?? "-",
+            ["time"] = PlatformDisplay.Utc(T, item.GrantedUtc),
+            ["reason"] = item.Reason
+        }) + lasts;
+    }
+
+    private async Task SubmitAsync()
+    {
+        bool done = _mode switch
+        {
+            Mode.Grant => await Presenter.GrantAsync(TenantId, _terms, _text),
+            Mode.Promotion => await Presenter.ApplyPromotionAsync(TenantId, _text),
+            Mode.End => await Presenter.EndAsync(TenantId, _text),
+            Mode.Approve => await Presenter.ApproveAsync(TenantId, Subscription.PendingDiscount!.DiscountId, _text),
+            Mode.Reject => await Presenter.RejectAsync(TenantId, Subscription.PendingDiscount!.DiscountId, _text),
+            _ => false
+        };
+
+        if (done)
+        {
+            _mode = Mode.None;
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

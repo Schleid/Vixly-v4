@@ -1,0 +1,20 @@
+﻿@*
+=========================================================
+FILE: NewPlanPage.razor
+
+PURPOSE:
+Create a plan; it starts as a draft (D-S2).
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/plans/new"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.plans.new"]</PageTitle>
+<p><a href="/plans">@T["ui.plans.back"]</a></p>
+<h1>@T["ui.plans.new"]</h1>
+<PlanCreateForm />

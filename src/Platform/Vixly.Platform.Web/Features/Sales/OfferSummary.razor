@@ -1,0 +1,131 @@
+﻿@*
+=========================================================
+FILE: OfferSummary.razor
+
+PURPOSE:
+One offer link: the agreed terms and state, its actions, and the
+draft editor (D-S21).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Terms can change only while the offer is a draft or was sent
+  back; an issued offer keeps its terms (locked terms)
+- Amounts are in the plan's currency, before tax (D-S9)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<OfferPresenter>
+@using Vixly.Platform.Application.UseCases.Sales
+@using Vixly.Platform.Domain.Sales
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject TimeProvider Clock
+
+@if (Presenter.State.Offer is { } offer)
+{
+    DateTimeOffset now = Clock.GetUtcNow();
+    <PageTitle>@offer.CompanyName</PageTitle>
+    <h1>
+        @offer.CompanyName
+        <VxStatusBadge Status="@SalesDisplay.OfferBadge(offer.Status, offer.ExpiresUtc, now)" Text="@T[SalesDisplay.OfferStatusKey(offer.Status, offer.ExpiresUtc, now)]" />
+    </h1>
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (offer.Status == PlatformOfferStatus.PendingApproval)
+    {
+        <VxMessage Type="VxMessageType.Info">@T["ui.offers.waiting_for_manager"]</VxMessage>
+    }
+    else if (offer.Status == PlatformOfferStatus.Rejected && offer.DecisionReason is { } reason)
+    {
+        <VxMessage Type="VxMessageType.Warning">@VixlyText.Format(T, "ui.plans.sent_back", "reason", reason)</VxMessage>
+    }
+    <div id="offer-overview"><VxCard Title="@T["ui.offers.overview"]">
+        <dl class="vx-facts">
+            <dt>@T["ui.offers.bound_email"]</dt><dd>@(offer.BoundEmail ?? T["ui.offers.any_email"].Value)</dd>
+            <dt>@T["ui.offers.reason"]</dt><dd>@offer.Reason</dd>
+            <dt>@T["ui.subscriptions.plan"]</dt><dd>@offer.PlanName (@offer.PlanCode)</dd>
+            <dt>@T["ui.subscriptions.term"]</dt><dd>@T[SubscriptionDisplay.TermKey(offer.Term)]</dd>
+            <dt>@T["ui.subscriptions.licences"]</dt><dd>@offer.Licences</dd>
+            <dt>@T["ui.offers.start_trial"]</dt><dd>@(offer.StartTrial ? T["ui.common.yes"].Value : T["ui.common.no"].Value)</dd>
+            <dt>@T["ui.discounts.title"]</dt><dd>@SalesDisplay.Describe(T, offer.Discount, offer.CurrencyCode)</dd>
+            <dt>@T["ui.charges.setup_fee"]</dt>
+            <dd>@(offer.SetupFeeOverride is decimal fee ? SubscriptionDisplay.Money(fee, offer.CurrencyCode) : T["ui.offers.plan_setup_fee"].Value)</dd>
+            <dt>@T["ui.offers.one_time_charges"]</dt>
+            <dd>@(offer.Charges.Count == 0 ? T["ui.common.none"].Value : string.Join(", ", offer.Charges.Select(charge => charge.Description + " " + SubscriptionDisplay.Money(charge.Amount, offer.CurrencyCode))))</dd>
+            <dt>@T["ui.offers.expires"]</dt><dd>@SubscriptionDisplay.Date(offer.ExpiresUtc)</dd>
+            <dt>@T["ui.offers.uses"]</dt><dd>@VixlyText.Format(T, "ui.offers.uses_of", new Dictionary<string, object> { ["count"] = offer.Uses, ["allowed"] = offer.UsesAllowed })</dd>
+            <dt>@T["ui.offers.prepared_by"]</dt><dd>@offer.PreparedByName (@PlatformDisplay.Utc(T, offer.CreatedUtc))</dd>
+            @if (offer.DecidedUtc is { } decided)
+            {
+                <dt>@T["ui.approvals.decision"]</dt><dd>@offer.DecidedByName (@PlatformDisplay.Utc(T, decided)) @offer.DecisionReason</dd>
+            }
+            @if (offer.IssuedUtc is { } issued)
+            {
+                <dt>@T["ui.offers.issued"]</dt><dd>@PlatformDisplay.Utc(T, issued)</dd>
+            }
+        </dl>
+    </VxCard></div>
+    <OfferActions Offer="offer" Abilities="Presenter.State.Abilities" OnChanged="ReloadAsync" />
+    @if (Presenter.State.Abilities.CanManage && offer.Status is PlatformOfferStatus.Draft or PlatformOfferStatus.Rejected)
+    {
+        <div id="offer-edit"><VxCard Title="@T["ui.offers.edit"]">
+            <form class="vx-form" @onsubmit="SaveAsync">
+                <OfferFields Model="_model" Plans="Presenter.State.Plans" />
+                <div class="vx-actions">
+                    <VxButton Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.offers.save"]</VxButton>
+                </div>
+            </form>
+        </VxCard></div>
+    }
+}
+else if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+
+@code {
+    private OfferFormModel _model = new();
+
+    private int _seenVersion = -1;
+
+    [Parameter, EditorRequired]
+    public Guid OfferId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return ReloadAsync();
+    }
+
+    private async Task ReloadAsync()
+    {
+        await Presenter.LoadAsync(OfferId);
+        Sync();
+    }
+
+    private async Task SaveAsync()
+    {
+        await Presenter.SaveAsync(OfferId, _model);
+        Sync();
+    }
+
+    private void Sync()
+    {
+        if (Presenter.State.Offer is { } offer && _seenVersion != Presenter.State.Version)
+        {
+            _seenVersion = Presenter.State.Version;
+            _model = OfferFormModel.From(offer);
+        }
+    }
+}

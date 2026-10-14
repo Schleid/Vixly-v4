@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: PlanPage.razor
+
+PURPOSE:
+One plan: draft, versions and translations.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/plans/{PlanId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<p><a href="/plans">@T["ui.plans.back"]</a></p>
+<PlanSummary PlanId="@PlanId" />
+
+@code {
+    [Parameter]
+    public Guid PlanId { get; set; }
+}

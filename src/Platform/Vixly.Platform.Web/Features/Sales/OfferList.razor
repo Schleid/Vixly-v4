@@ -1,0 +1,139 @@
+﻿@*
+=========================================================
+FILE: OfferList.razor
+
+PURPOSE:
+The offer links prepared for valued customers: who they are for,
+the agreed terms, their state and when they expire (D-S21).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Filters live in the query string so the list can be bookmarked
+- Expiry is a date, not a status: an issued offer past its date
+  shows as expired (D-S24)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<OfferListPresenter>
+@using Vixly.Platform.Domain.Sales
+@using Vixly.Platform.Domain.Subscriptions
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+@inject TimeProvider Clock
+
+<form class="vx-toolbar" role="search" @onsubmit="ApplyFilters">
+    <label for="offer-search">@T["ui.offers.search"]</label>
+    <input id="offer-search" type="search" @bind="_search" maxlength="100" />
+    <label for="offer-status">@T["ui.offers.status"]</label>
+    <select id="offer-status" @bind="_status">
+        <option value="">@T["ui.offers.status.all"]</option>
+        @foreach (PlatformOfferStatus status in Enum.GetValues<PlatformOfferStatus>())
+        {
+            <option value="@status">@T[SalesDisplay.OfferStatusKey(status, DateTimeOffset.MaxValue, DateTimeOffset.MinValue)]</option>
+        }
+    </select>
+    <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
+    @if (Presenter.State.Abilities.CanManage)
+    {
+        <a class="vx-button vx-button--primary" href="/offers/new">@T["ui.offers.new"]</a>
+    }
+</form>
+
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else
+{
+    DateTimeOffset now = Clock.GetUtcNow();
+    <VxDataTable Items="Presenter.State.Offers" IsLoading="@(!Presenter.State.Loaded)" Caption="@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.offers.count", "count", Presenter.State.TotalCount) : null)">
+        <HeaderContent>
+            <th scope="col">@T["ui.offers.company"]</th>
+            <th scope="col">@T["ui.subscriptions.plan"]</th>
+            <th scope="col">@T["ui.subscriptions.term"]</th>
+            <th scope="col">@T["ui.subscriptions.licences"]</th>
+            <th scope="col">@T["ui.discounts.title"]</th>
+            <th scope="col">@T["ui.offers.status"]</th>
+            <th scope="col">@T["ui.offers.expires"]</th>
+            <th scope="col">@T["ui.offers.uses"]</th>
+            <th scope="col">@T["ui.offers.prepared_by"]</th>
+        </HeaderContent>
+        <RowTemplate Context="item">
+            <td><a href="/offers/@item.OfferId">@item.CompanyName</a> <span class="vx-hint">@item.BoundEmail</span></td>
+            <td>@item.PlanName <span class="vx-hint">@item.PlanCode</span></td>
+            <td>@T[SubscriptionDisplay.TermKey(item.Term)]</td>
+            <td>@item.Licences</td>
+            <td>@Discount(item.Kind, item.Value)</td>
+            <td><VxStatusBadge Status="@SalesDisplay.OfferBadge(item.Status, item.ExpiresUtc, now)" Text="@T[SalesDisplay.OfferStatusKey(item.Status, item.ExpiresUtc, now)]" /></td>
+            <td>@SubscriptionDisplay.Date(item.ExpiresUtc)</td>
+            <td>@VixlyText.Format(T, "ui.offers.uses_of", new Dictionary<string, object> { ["count"] = item.Uses, ["allowed"] = item.UsesAllowed })</td>
+            <td>@item.PreparedByName</td>
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.offers.empty"]" />
+        </EmptyContent>
+    </VxDataTable>
+    @if (Presenter.State.Loaded && Presenter.State.Offers.Count > 0)
+    {
+        <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="GoToPage" />
+    }
+}
+
+@code {
+    private string? _search;
+
+    private string _status = string.Empty;
+
+    [Parameter]
+    public string? Search { get; set; }
+
+    [Parameter]
+    public string? Status { get; set; }
+
+    [Parameter]
+    public int? Page { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _search = Search;
+        PlatformOfferStatus? status = Enum.TryParse(Status, true, out PlatformOfferStatus parsed) ? parsed : null;
+        _status = status?.ToString() ?? string.Empty;
+
+        await Presenter.LoadAsync(status, Search, Page ?? 1);
+    }
+
+    private string Discount(PlatformDiscountKind? kind, decimal? value)
+    {
+        return kind switch
+        {
+            PlatformDiscountKind.Percent => VixlyText.Format(T, "ui.discounts.percent_value", "value", (value ?? 0m).ToString("0.##", System.Globalization.CultureInfo.CurrentCulture)),
+            PlatformDiscountKind.FixedAmount => (value ?? 0m).ToString("N2", System.Globalization.CultureInfo.CurrentCulture),
+            _ => T["ui.discounts.none"].Value
+        };
+    }
+
+    private void ApplyFilters()
+    {
+        Navigation.NavigateTo(Url(_search, _status, 1));
+    }
+
+    private void GoToPage(int page)
+    {
+        Navigation.NavigateTo(Url(Search, _status, page));
+    }
+
+    private static string Url(string? search, string status, int page)
+    {
+        Dictionary<string, string?> query = new()
+        {
+            ["search"] = string.IsNullOrWhiteSpace(search) ? null : search.Trim(),
+            ["status"] = string.IsNullOrEmpty(status) ? null : status,
+            ["page"] = page > 1 ? page.ToString(System.Globalization.CultureInfo.InvariantCulture) : null
+        };
+
+        return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString("/offers", query.Where(pair => pair.Value is not null));
+    }
+}

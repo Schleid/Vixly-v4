@@ -1,0 +1,57 @@
+﻿@*
+=========================================================
+FILE: ApprovalList.razor
+
+PURPOSE:
+Everything waiting for a decision: discounts and offers for the
+sales manager, plan versions and promotions for the CFO (D-S26).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Shows only what the viewer may decide; the decision itself is
+  made on the item's own page, never by the requester (four eyes)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<ApprovalListPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<p class="vx-hint">@T["ui.approvals.help"]</p>
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else
+{
+    <VxDataTable Items="Presenter.State.Items" IsLoading="@(!Presenter.State.Loaded)" Caption="@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.approvals.count", "count", Presenter.State.Items.Count) : null)">
+        <HeaderContent>
+            <th scope="col">@T["ui.approvals.kind"]</th>
+            <th scope="col">@T["ui.approvals.item"]</th>
+            <th scope="col">@T["ui.approvals.detail"]</th>
+            <th scope="col">@T["ui.approvals.requested_by"]</th>
+            <th scope="col">@T["ui.approvals.requested"]</th>
+            <th scope="col">@T["ui.approvals.reason"]</th>
+        </HeaderContent>
+        <RowTemplate Context="item">
+            <td>@T[SalesDisplay.ApprovalKindKey(item.Kind)]</td>
+            <td><a href="@SalesDisplay.ApprovalLink(item)">@item.Title</a></td>
+            <td>@item.Detail</td>
+            <td>@item.RequestedByName</td>
+            <td>@PlatformDisplay.Utc(T, item.RequestedUtc)</td>
+            <td>@item.Reason</td>
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.approvals.empty"]" />
+        </EmptyContent>
+    </VxDataTable>
+}
+
+@code {
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync();
+    }
+}

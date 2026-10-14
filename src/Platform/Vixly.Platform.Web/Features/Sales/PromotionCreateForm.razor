@@ -1,0 +1,56 @@
+﻿@*
+=========================================================
+FILE: PromotionCreateForm.razor
+
+PURPOSE:
+Design a new promotion code; it starts as a draft and goes live
+only once the CFO approves it (D-S20, D-S26).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- The name is the default-language name; other languages are
+  added on the promotion's page
+=========================================================
+*@
+@inherits PlatformPresenterComponent<PromotionCreatePresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+<form class="vx-form" @onsubmit="CreateAsync">
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    <p class="vx-hint">@T["ui.promotions.create_help"]</p>
+    <label for="new-promotion-code">@T["ui.promotions.code"]</label>
+    <input id="new-promotion-code" @bind="_model.Code" maxlength="32" required autocomplete="off" aria-describedby="new-promotion-code-help" />
+    <p id="new-promotion-code-help" class="vx-hint">@T["ui.promotions.code_help"]</p>
+    <label for="new-promotion-name">@T["ui.promotions.name"]</label>
+    <input id="new-promotion-name" @bind="_model.Name" maxlength="100" required />
+    <PromotionFields Model="_model" Plans="Presenter.State.Plans" />
+    <div class="vx-actions">
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.promotions.create"]</VxButton>
+        <a class="vx-button" href="/promotions">@T["ui.common.cancel"]</a>
+    </div>
+</form>
+
+@code {
+    private readonly PromotionFormModel _model = new();
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync();
+    }
+
+    private async Task CreateAsync()
+    {
+        if (await Presenter.CreateAsync(_model) is Guid id)
+        {
+            Navigation.NavigateTo("/promotions/" + id);
+        }
+    }
+}

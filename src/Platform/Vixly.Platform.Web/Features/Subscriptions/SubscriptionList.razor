@@ -1,0 +1,169 @@
+﻿@*
+=========================================================
+FILE: SubscriptionList.razor
+
+PURPOSE:
+All tenant subscriptions: search, status, plan and renewal
+filters, table and pager.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Ended subscriptions are hidden unless asked for (D-S3)
+- Filters live in the URL so a view can be bookmarked
+=========================================================
+*@
+@inherits PlatformPresenterComponent<SubscriptionListPresenter>
+@using Vixly.Platform.Domain.Subscriptions
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+<form class="vx-toolbar" role="search" @onsubmit="ApplyFilters">
+    <label for="subscription-search">@T["ui.subscriptions.search"]</label>
+    <input id="subscription-search" type="search" @bind="_search" maxlength="100" />
+    <label for="subscription-status">@T["ui.subscriptions.status"]</label>
+    <select id="subscription-status" @bind="_status">
+        <option value="">@T["ui.subscriptions.status.all"]</option>
+        @foreach (PlatformSubscriptionStatus status in Enum.GetValues<PlatformSubscriptionStatus>())
+        {
+            <option value="@status">@T[SubscriptionDisplay.StatusKey(status)]</option>
+        }
+    </select>
+    <label for="subscription-renews">@T["ui.subscriptions.renews_within"]</label>
+    <select id="subscription-renews" @bind="_renews">
+        <option value="">@T["ui.subscriptions.renews_any"]</option>
+        <option value="7">@VixlyText.Format(T, "ui.subscriptions.days", "count", 7)</option>
+        <option value="30">@VixlyText.Format(T, "ui.subscriptions.days", "count", 30)</option>
+    </select>
+    <label><input type="checkbox" @bind="_includeEnded" /> @T["ui.subscriptions.include_ended"]</label>
+    <label><input type="checkbox" @bind="_discounted" /> @T["ui.discounts.filter"]</label>
+    <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
+    @if (PlanId is not null)
+    {
+        <a class="vx-button vx-button--subtle" href="/subscriptions">@T["ui.subscriptions.all_plans"]</a>
+    }
+</form>
+
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else
+{
+    <VxDataTable Items="Presenter.State.Subscriptions" IsLoading="@(!Presenter.State.Loaded)" Caption="@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.subscriptions.count", "count", Presenter.State.TotalCount) : null)">
+        <HeaderContent>
+            <th scope="col">@T["ui.subscriptions.tenant"]</th>
+            <th scope="col">@T["ui.subscriptions.plan"]</th>
+            <th scope="col">@T["ui.subscriptions.status"]</th>
+            <th scope="col">@T["ui.subscriptions.term"]</th>
+            <th scope="col">@T["ui.subscriptions.licences"]</th>
+            <th scope="col">@T["ui.subscriptions.period_amount"]</th>
+            <th scope="col">@T["ui.subscriptions.renews"]</th>
+            <th scope="col">@T["ui.subscriptions.notes"]</th>
+        </HeaderContent>
+        <RowTemplate Context="item">
+            <td><a href="/tenants/@item.PlatformTenantId#tenant-subscription">@item.TenantName</a> <span class="vx-hint">@item.TenantCode</span></td>
+            <td>@item.PlanName <span class="vx-hint">@VixlyText.Format(T, "ui.plans.version_number", "number", item.VersionNumber)</span></td>
+            <td><VxStatusBadge Status="@SubscriptionDisplay.Badge(item.Status)" Text="@T[SubscriptionDisplay.StatusKey(item.Status)]" /></td>
+            <td>@T[SubscriptionDisplay.TermKey(item.Term)]</td>
+            <td>@item.Licences</td>
+            <td>@SubscriptionDisplay.Money(item.PeriodAmount, item.CurrencyCode)</td>
+            <td>@SubscriptionDisplay.Date(item.Status == PlatformSubscriptionStatus.Trialing ? item.TrialEndsUtc : item.PeriodEndUtc)</td>
+            <td>
+                @if (item.CancelAtPeriodEnd)
+                {
+                    <VxStatusBadge Status="VxBadgeStatus.Suspended" Text="@T["ui.subscriptions.cancels_at_period_end"]" />
+                }
+                @if (item.HasDiscount)
+                {
+                    <VxStatusBadge Status="VxBadgeStatus.Active" Text="@T["ui.discounts.badge"]" />
+                }
+                @if (item.HasScheduledChange)
+                {
+                    <VxStatusBadge Status="VxBadgeStatus.Invited" Text="@T["ui.subscriptions.change_scheduled"]" />
+                }
+            </td>
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.subscriptions.empty"]" />
+        </EmptyContent>
+    </VxDataTable>
+    @if (Presenter.State.Loaded && Presenter.State.Subscriptions.Count > 0)
+    {
+        <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="GoToPage" />
+    }
+}
+
+@code {
+    private string? _search;
+
+    private string _status = string.Empty;
+
+    private string _renews = string.Empty;
+
+    private bool _includeEnded;
+
+    private bool _discounted;
+
+    [Parameter]
+    public string? Search { get; set; }
+
+    [Parameter]
+    public string? Status { get; set; }
+
+    [Parameter]
+    public Guid? PlanId { get; set; }
+
+    [Parameter]
+    public int? RenewsWithin { get; set; }
+
+    [Parameter]
+    public bool IncludeEnded { get; set; }
+
+    [Parameter]
+    public bool Discounted { get; set; }
+
+    [Parameter]
+    public int? Page { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _search = Search;
+        _includeEnded = IncludeEnded;
+        _discounted = Discounted;
+        PlatformSubscriptionStatus? status = Enum.TryParse(Status, true, out PlatformSubscriptionStatus parsed) ? parsed : null;
+        _status = status?.ToString() ?? string.Empty;
+        _renews = RenewsWithin?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty;
+
+        await Presenter.LoadAsync(status, PlanId, RenewsWithin, Search, IncludeEnded, Discounted, Page ?? 1);
+    }
+
+    private void ApplyFilters()
+    {
+        Navigation.NavigateTo(Url(_search, _status, _renews, _includeEnded, _discounted, 1));
+    }
+
+    private void GoToPage(int page)
+    {
+        Navigation.NavigateTo(Url(Search, _status, _renews, IncludeEnded, Discounted, page));
+    }
+
+    private string Url(string? search, string status, string renews, bool includeEnded, bool discounted, int page)
+    {
+        Dictionary<string, string?> query = new()
+        {
+            ["search"] = string.IsNullOrWhiteSpace(search) ? null : search.Trim(),
+            ["status"] = string.IsNullOrEmpty(status) ? null : status,
+            ["plan"] = PlanId?.ToString(),
+            ["renews"] = string.IsNullOrEmpty(renews) ? null : renews,
+            ["ended"] = includeEnded ? "true" : null,
+            ["discounted"] = discounted ? "true" : null,
+            ["page"] = page > 1 ? page.ToString(System.Globalization.CultureInfo.InvariantCulture) : null
+        };
+
+        return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString("/subscriptions", query.Where(pair => pair.Value is not null));
+    }
+}
