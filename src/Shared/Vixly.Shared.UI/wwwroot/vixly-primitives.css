@@ -84,8 +84,8 @@
 /* ---------- Data table ---------- */
 .vx-table-container {
     width: 100%;
-    max-width: 72rem;
     overflow-x: auto;
+    box-sizing: border-box;
 }
 
 .vx-card .vx-table-container .vx-table {

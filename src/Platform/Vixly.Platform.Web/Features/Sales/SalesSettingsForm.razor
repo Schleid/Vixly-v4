@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: SalesSettingsForm.razor
 
@@ -21,7 +21,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<PlatformText> T
 @inject PlatformErrorText Errors
 
-<div id="sales-settings"><VxCard Title="@T["ui.sales_settings.title"]">
+<div id="sales-settings"><VxCard>
     @if (Presenter.State.DoneKey is { } done)
     {
         <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
