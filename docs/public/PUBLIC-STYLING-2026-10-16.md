@@ -29,3 +29,7 @@ The existing Stage 2 delivery was uncommitted when this pass began. Its applicat
 ## Screenshot correction
 
 Owner screenshots exposed invisible primary link-button labels. The zero-specificity `:where()` action variant lost to Public's generic `a` colour rule, producing blue text on blue fill. Primary variants now retain class specificity in normal and hover states; all existing labels and actions are preserved. Diff validation passes. Browser visual verification remains pending; no preview process was started for this correction.
+
+## Logistics imagery
+
+Added locally hosted, generated warehouse-scanning and morning-dispatch WebP images (approximately 288 KB combined). Decorative CSS integrates a two-column home hero and workflow banner, stacked at the tablet breakpoint. Prompts, provenance and checks are recorded in wwwroot/images/README.md. Backend and page composition are unchanged; live browser verification remains pending.

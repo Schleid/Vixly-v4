@@ -92,3 +92,39 @@ p { margin: 0 0 var(--vx-space-4); }
     .pub-feature, .pub-footer { grid-template-columns: 1fr; }
     .pub-footer { padding-inline: var(--vx-space-4); }
 }
+
+/* Decorative logistics photography; content and actions remain localized HTML. */
+.pub-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    column-gap: var(--vx-space-12);
+    align-items: start;
+}
+.pub-hero > * { grid-column: 1; min-width: 0; }
+.pub-hero h1 { font-size: var(--vx-font-size-heading); }
+.pub-hero::after {
+    content: '';
+    grid-column: 2;
+    grid-row: 1 / span 6;
+    align-self: stretch;
+    border-radius: var(--vx-radius-lg);
+    background: url('../images/warehouse-scanning.webp') center / cover no-repeat;
+    box-shadow: var(--vx-shadow-3);
+}
+.pub-section:has(> #home-flow)::before {
+    content: '';
+    display: block;
+    aspect-ratio: 16 / 5;
+    margin-bottom: var(--vx-space-12);
+    border-radius: var(--vx-radius-lg);
+    background: url('../images/morning-dispatch.webp') center / cover no-repeat;
+}
+@media (max-width: 1024px) {
+    .pub-hero { grid-template-columns: minmax(0, 1fr); }
+    .pub-hero::after { grid-column: 1; grid-row: auto; aspect-ratio: 16 / 10; margin-top: var(--vx-space-6); }
+    .pub-section:has(> #home-flow)::before { aspect-ratio: 16 / 7; }
+}
+@media (max-width: 640px) {
+    .pub-hero::after { aspect-ratio: 4 / 3; }
+    .pub-section:has(> #home-flow)::before { aspect-ratio: 4 / 3; }
+}
