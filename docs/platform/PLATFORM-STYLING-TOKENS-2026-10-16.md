@@ -36,3 +36,7 @@ Owner rejected the background, card style and menu and approved trying a crisp w
 Login becomes an open, left-aligned form on a plain surface, without a floating card, decorative grid/glows, oversized logo tile or telemetry chrome. Functional forms, passkeys, language links, errors, recovery and menu composition remain unchanged. Wider recovery-code and QR flows retain additional room. Print styles remain outside the screen-only trial rules.
 
 Static verification: balanced CSS blocks, all token references defined, no raw console colours, clean diff whitespace. No backend changes or preview processes. Live light/dark, responsive and keyboard visual review is pending owner feedback on this design direction.
+
+## Trial withdrawn
+
+Owner rejected the quiet workspace trial. Restored the console stylesheet and theme tokens from e40ffab. Removed the explanatory passkey helper line from sign-in markup. Scoped hidden-attribute enforcement prevents passkey feedback from showing before the existing browser flow reveals it; sign-in actions and actual error feedback are preserved. Diff whitespace checks pass. No backend or authentication logic changed.

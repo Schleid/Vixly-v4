@@ -29,13 +29,6 @@
     --vx-tracking-label: 0.1em;
     --vx-color-overlay: rgb(15 23 42 / 0.6);
 
-    /* Quiet workspace: plane consumers opt in without changing Public. */
-    --vx-color-workspace-bg: #F5F6F8;
-    --vx-radius-panel: 6px;
-    --vx-width-navigation: 15rem;
-    --vx-width-auth: 26rem;
-    --vx-width-auth-wide: 38rem;
-
     /* Dedicated application chrome: deliberately dark in both themes. */
     --vx-color-chrome-text: #CBD5E1;
     --vx-color-chrome-text-strong: #FFFFFF;
@@ -165,7 +158,6 @@
 }
 
 :root[data-theme="dark"] {
-    --vx-color-workspace-bg: #10151D;
     --vx-color-bg-app: #0B1220;
     --vx-color-app: #0B1220;
     --vx-color-surface: #111A2E;
@@ -210,7 +202,6 @@
 
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        --vx-color-workspace-bg: #10151D;
         --vx-color-bg-app: #0B1220;
         --vx-color-app: #0B1220;
         --vx-color-surface: #111A2E;
