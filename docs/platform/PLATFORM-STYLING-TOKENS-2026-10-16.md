@@ -1,0 +1,30 @@
+﻿# Platform styling — token layer (2026-10-16)
+
+Owner: Frontend/UI. Presentation changes only; no presenter, state, resource key, use case, security or backend changes.
+
+## Changes
+
+- Fixed stylesheet order: Shared.UI theme, Shared.UI primitives, Platform layout.
+- Added dedicated semantic chrome tokens, keeping the navigation rail dark in both themes as requested by the owner.
+- Removed all hex/RGB colour literals from the console stylesheet. General surfaces, text, borders and elevation use existing shared tokens; print and QR surfaces use explicit invariant tokens.
+- Removed duplicate dark-mode paint overrides. Theme-dependent icon visibility and native date-indicator adjustment remain presentation rules.
+- Simplified glowing chrome decoration, increased secondary-label contrast, added visible keyboard focus, and established 44px minimum targets for navigation, theme, language and sign-out controls.
+- Sign-in now uses semantic app surfaces instead of a fixed dark background. Primary actions use matched link/surface colours in both themes.
+
+## Checks
+
+- Balanced CSS braces, no undefined token references, no hex/RGB literals, correct stylesheet ordering, clean diff whitespace.
+- Calculated contrast: chrome text 12.02:1, secondary text 8.76:1, active navigation text 12.62:1, active accent 7.00:1, danger 7.73:1; primary actions 6.70:1 light and 6.82:1 dark.
+- Shared control conflicts reviewed: table loading/empty states and card headers retain their more-specific primitive rules; plane button variants follow the fixed load order.
+- Automated test results recorded after the run below. Initial parallel builds collided on shared output files; verification rerun sequentially.
+- Live visual review remains required for light/dark, en/fr/es, keyboard navigation and 375/768/1280/1600 widths. No preview host was started or left running in this pass.
+
+## Next layer
+
+Reusable shell/navigation, forms, toolbars, badges, KPI and auth styles still require extraction into Shared.UI with Gallery coverage. Existing literal geometry, inline SVG icons, inline layout styles and self-hosted Inter remain follow-up foundation work. This record does not declare the entire Platform styling migration complete.
+
+Pre-existing uncommitted Stage 2 delivery files are excluded from this commit.
+
+## Automated results
+
+Platform Web: 32 passed, 0 failed. Architecture: 6,363 passed, 0 failed. Sequential reruns completed successfully. Static CSS checks and diff whitespace checks passed.

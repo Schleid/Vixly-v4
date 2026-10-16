@@ -29,6 +29,31 @@
     --vx-tracking-label: 0.1em;
     --vx-color-overlay: rgb(15 23 42 / 0.6);
 
+    /* Dedicated application chrome: deliberately dark in both themes. */
+    --vx-color-chrome-text: #CBD5E1;
+    --vx-color-chrome-text-strong: #FFFFFF;
+    --vx-color-chrome-text-muted: #A8B7CC;
+    --vx-color-chrome-border: #2B3950;
+    --vx-color-chrome-scrollbar: #475569;
+    --vx-color-chrome-hover: #1C2A42;
+    --vx-color-chrome-active: #1B3359;
+    --vx-color-chrome-active-border: #6094DB;
+    --vx-color-chrome-accent: #93C5FD;
+    --vx-color-chrome-accent-soft: #1D3154;
+    --vx-color-chrome-footer: #0A101E;
+    --vx-color-chrome-success: #34D399;
+    --vx-color-chrome-danger: #FCA5A5;
+    --vx-color-chrome-danger-soft: #3B202D;
+    --vx-color-chrome-danger-border: #B65E6B;
+    --vx-color-chrome-avatar: #1D4ED8;
+    --vx-color-chrome-surface: #0F172A;
+
+    /* Invariant machine-readable and printed surfaces. */
+    --vx-color-mask-opaque: #000000;
+    --vx-color-qr-surface: #FFFFFF;
+    --vx-color-print-surface: #FFFFFF;
+    --vx-color-print-text: #000000;
+
     /* Palette Tokens */
     --vx-blue-50: #EFF6FF;
     --vx-blue-100: #DBEAFE;
