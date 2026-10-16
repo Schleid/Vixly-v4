@@ -1,4 +1,4 @@
-/* =========================================================
+﻿/* =========================================================
    FILE: vixly-theme.css
    PURPOSE: Core design tokens for Vixly V4 (Vixly.Shared.UI).
    NOTES:
@@ -9,6 +9,26 @@
 
 :root,
 :root[data-theme="light"] {
+    /* Shared layout and accessible control metrics. */
+    --vx-content-wide: 76rem;
+    --vx-content-reading: 44rem;
+    --vx-content-form: 38rem;
+    --vx-grid-card-min: 17rem;
+    --vx-grid-step-min: 12rem;
+    --vx-control-min: 2.75rem;
+    --vx-border-width: 1px;
+    --vx-focus-width: 2px;
+    --vx-space-16: 4rem;
+    --vx-space-20: 5rem;
+    --vx-space-24: 6rem;
+    --vx-font-size-display: clamp(2.5rem, 5vw, 4.5rem);
+    --vx-font-size-heading: clamp(1.875rem, 3vw, 2.75rem);
+    --vx-leading-body: 1.65;
+    --vx-leading-heading: 1.1;
+    --vx-tracking-heading: -0.04em;
+    --vx-tracking-label: 0.1em;
+    --vx-color-overlay: rgb(15 23 42 / 0.6);
+
     /* Palette Tokens */
     --vx-blue-50: #EFF6FF;
     --vx-blue-100: #DBEAFE;

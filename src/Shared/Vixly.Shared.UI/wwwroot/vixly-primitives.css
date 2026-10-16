@@ -1,4 +1,4 @@
-/* =========================================================
+﻿/* =========================================================
    FILE: vixly-primitives.css
    PURPOSE: Styles for the parts of the Vixly.Shared.UI
    primitives that no stylesheet covered yet (card header and
@@ -8,10 +8,40 @@
    - Added by the Control team on 2026-10-14 so the owner can try
      the primitives in the console. Frontend/UI owns this file and
      may rewrite or fold it into vixly-theme.css.
-   - Tokens only (ADR-0013 F-5). Loaded after the app stylesheet,
-     so it never overrides a rule Frontend/UI already wrote: it
-     only adds selectors that did not exist.
+   - Load after theme tokens and before plane layout styles (ADR-0013).
    ========================================================= */
+
+/* Shared controls work without loading a plane stylesheet. */
+:where(.vx-button) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--vx-space-2);
+    box-sizing: border-box;
+    min-height: var(--vx-control-min);
+    padding: var(--vx-space-3) var(--vx-space-5);
+    border: var(--vx-border-width) solid var(--vx-color-border-control);
+    border-radius: var(--vx-radius-sm);
+    background: var(--vx-color-surface);
+    color: var(--vx-color-text);
+    font: inherit;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--vx-transition-fast), border-color var(--vx-transition-fast);
+}
+:where(.vx-button:hover:not(:disabled)) { background: var(--vx-color-surface-sunken); }
+:where(.vx-button--primary) { background: var(--vx-color-link); border-color: var(--vx-color-link); color: var(--vx-color-surface); }
+:where(.vx-button--primary:hover:not(:disabled)) { background: var(--vx-color-link); border-color: var(--vx-color-text-muted); }
+:where(.vx-button:focus-visible) { outline: var(--vx-focus-width) solid var(--vx-color-focus); outline-offset: var(--vx-space-1); }
+:where(.vx-button:disabled) { cursor: not-allowed; opacity: 0.6; }
+:where(.vx-card) { background: var(--vx-color-surface); border: var(--vx-border-width) solid var(--vx-color-border); border-radius: var(--vx-radius-lg); box-shadow: var(--vx-shadow-1); }
+:where(.vx-message) { padding: var(--vx-space-4); border: var(--vx-border-width) solid var(--vx-color-info); border-radius: var(--vx-radius-md); background: var(--vx-color-info-bg); color: var(--vx-color-info); }
+:where(.vx-message--error) { background: var(--vx-color-danger-bg); border-color: var(--vx-color-danger); color: var(--vx-color-danger); }
+.vx-input { box-sizing: border-box; width: 100%; min-width: 0; min-height: var(--vx-control-min); }
+textarea.vx-input { resize: vertical; }
 
 /* ---------- Button ---------- */
 .vx-button--subtle {
@@ -208,7 +238,7 @@ div.vx-message {
     display: grid;
     place-items: center;
     padding: var(--vx-space-4);
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--vx-color-overlay);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
 }
