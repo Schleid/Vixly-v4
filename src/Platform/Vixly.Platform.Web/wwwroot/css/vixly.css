@@ -834,6 +834,33 @@ p {
     letter-spacing: -0.01em;
 }
 
+.vx-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--vx-space-3);
+    flex-wrap: wrap;
+    margin: 0 0 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--vx-color-border);
+}
+
+.vx-card .vx-card__header .vx-card__title,
+.vx-card__header .vx-card__title,
+.vx-card .vx-card__header h2,
+.vx-card__header h2 {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.vx-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
 .vx-card h3 {
     margin: 1.25rem 0 0.5rem;
     font-size: 0.75rem;
@@ -899,6 +926,13 @@ p {
     width: 100%;
     box-sizing: border-box;
     box-shadow: var(--vx-shadow-1);
+}
+
+/* Plan Preview & Term Bar Toolbar (All Plans) */
+.vx-plan-term-bar,
+#plan-draft .vx-toolbar,
+.vx-card > .vx-toolbar:last-child {
+    margin-top: 2.25rem;
 }
 
 .vx-toolbar label {

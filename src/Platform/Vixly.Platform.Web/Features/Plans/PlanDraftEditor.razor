@@ -27,22 +27,25 @@ IMPORTANT NOTES:
 @inject PlatformErrorText Errors
 
 <div id="plan-draft"><VxCard Title="@T["ui.plans.draft"]">
-    @if (Presenter.State.DoneKey is { } done)
-    {
-        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
-    }
-    @if (Presenter.State.Error is not null)
-    {
-        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
-    }
-    @if (Plan.Draft is null)
-    {
-        <p>@T["ui.plans.no_draft"]</p>
-        @if (Abilities.CanManage)
+    <HeaderActions>
+        @if (Plan.Draft is null && Abilities.CanManage)
         {
-            <VxButton OnClick="() => RunAsync(() => Presenter.StartDraftAsync(Plan.PlatformPlanId))" IsBusy="@Presenter.IsBusy">@T["ui.plans.start_draft"]</VxButton>
+            <VxButton Variant="VxButtonVariant.Primary" OnClick="() => RunAsync(() => Presenter.StartDraftAsync(Plan.PlatformPlanId))" IsBusy="@Presenter.IsBusy">@T["ui.plans.start_draft"]</VxButton>
         }
-    }
+    </HeaderActions>
+    <ChildContent>
+        @if (Presenter.State.DoneKey is { } done)
+        {
+            <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+        }
+        @if (Presenter.State.Error is not null)
+        {
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+        }
+        @if (Plan.Draft is null)
+        {
+            <p>@T["ui.plans.no_draft"]</p>
+        }
     else
     {
         <p class="vx-hint">@VixlyText.Format(T, "ui.plans.draft_help", "number", Plan.Draft.Number)</p>
@@ -101,7 +104,7 @@ IMPORTANT NOTES:
     }
     @if (Plan.Current is not null)
     {
-        <form class="vx-toolbar" @onsubmit="() => Presenter.PreviewAsync(Plan.PlatformPlanId, _previewTerm, _previewLicences)">
+        <form class="vx-toolbar vx-plan-term-bar" @onsubmit="() => Presenter.PreviewAsync(Plan.PlatformPlanId, _previewTerm, _previewLicences)">
             <label for="plan-preview-term">@T["ui.subscriptions.term"]</label>
             <select id="plan-preview-term" @bind="_previewTerm">
                 @foreach (PlatformSubscriptionTerm term in Enum.GetValues<PlatformSubscriptionTerm>())
@@ -118,6 +121,7 @@ IMPORTANT NOTES:
             }
         </form>
     }
+    </ChildContent>
 </VxCard></div>
 
 @code {
