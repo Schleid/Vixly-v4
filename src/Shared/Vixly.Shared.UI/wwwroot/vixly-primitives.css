@@ -11,7 +11,8 @@
    - Load after theme tokens and before plane layout styles (ADR-0013).
    ========================================================= */
 
-/* Shared controls work without loading a plane stylesheet. */
+/* Shared controls work without loading a plane stylesheet.
+   Action variants retain class specificity so generic link colours cannot hide labels. */
 :where(.vx-button) {
     display: inline-flex;
     align-items: center;
@@ -33,8 +34,8 @@
     transition: background var(--vx-transition-fast), border-color var(--vx-transition-fast);
 }
 :where(.vx-button:hover:not(:disabled)) { background: var(--vx-color-surface-sunken); }
-:where(.vx-button--primary) { background: var(--vx-color-link); border-color: var(--vx-color-link); color: var(--vx-color-surface); }
-:where(.vx-button--primary:hover:not(:disabled)) { background: var(--vx-color-link); border-color: var(--vx-color-text-muted); }
+.vx-button--primary { background: var(--vx-color-link); border-color: var(--vx-color-link); color: var(--vx-color-surface); }
+.vx-button--primary:hover:not(:disabled) { background: var(--vx-color-link); border-color: var(--vx-color-text-muted); }
 :where(.vx-button:focus-visible) { outline: var(--vx-focus-width) solid var(--vx-color-focus); outline-offset: var(--vx-space-1); }
 :where(.vx-button:disabled) { cursor: not-allowed; opacity: 0.6; }
 :where(.vx-card) { background: var(--vx-color-surface); border: var(--vx-border-width) solid var(--vx-color-border); border-radius: var(--vx-radius-lg); box-shadow: var(--vx-shadow-1); }

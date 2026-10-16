@@ -25,3 +25,7 @@ Owner: Frontend/UI. Scope: presentation only; no backend, presenter, state, reso
 - Shared Inter font hosting remains an existing foundation task; this pass preserves the current fallback stack.
 
 The existing Stage 2 delivery was uncommitted when this pass began. Its application files are deliberately excluded from this styling commit.
+
+## Screenshot correction
+
+Owner screenshots exposed invisible primary link-button labels. The zero-specificity `:where()` action variant lost to Public's generic `a` colour rule, producing blue text on blue fill. Primary variants now retain class specificity in normal and hover states; all existing labels and actions are preserved. Diff validation passes. Browser visual verification remains pending; no preview process was started for this correction.
