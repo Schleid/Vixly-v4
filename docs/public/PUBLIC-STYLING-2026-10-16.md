@@ -33,3 +33,9 @@ Owner screenshots exposed invisible primary link-button labels. The zero-specifi
 ## Logistics imagery
 
 Added locally hosted, generated warehouse-scanning and morning-dispatch WebP images (approximately 288 KB combined). Decorative CSS integrates a two-column home hero and workflow banner, stacked at the tablet breakpoint. Prompts, provenance and checks are recorded in wwwroot/images/README.md. Backend and page composition are unchanged; live browser verification remains pending.
+
+## Features imagery and inventory content
+
+Added `warehouse-inventory.webp` (149 KB) to the Features introduction, responsive and decorative. Built-in imagegen prompt: premium editorial warehouse inventory aisle, organized blue-framed shelving, parcels and reusable bins in storage locations, warehouse professional checking stock with a scanner and tablet, natural light, cobalt and warm cardboard, landscape crop; no readable text, logos, watermark or software overlays. Generated source visually inspected; original retained in Codex generated-images storage.
+
+The existing warehouse section now explicitly covers warehouse management and inventory: receiving quantities, storage locations, stock movements, and inventory across sites. Five existing keys updated in en/fr/es; French and Spanish additions carry `needs-review`. No backend functionality has been added or changed. This is Public marketing content for the requested product scope. Live browser verification remains pending.

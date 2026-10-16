@@ -1,0 +1,817 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="public.brand" xml:space="preserve">
+    <value>Vixly</value>
+  </data>
+  <data name="public.meta.description" xml:space="preserve">
+    <value>Vixly is the logistics operating platform for shipments, parcels, dispatch, warehouses and billing.</value>
+  </data>
+  <data name="public.nav.label" xml:space="preserve">
+    <value>Main</value>
+  </data>
+  <data name="public.nav.home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="public.nav.features" xml:space="preserve">
+    <value>Features</value>
+  </data>
+  <data name="public.nav.plans" xml:space="preserve">
+    <value>Plans</value>
+  </data>
+  <data name="public.nav.contact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="public.nav.legal" xml:space="preserve">
+    <value>Legal</value>
+  </data>
+  <data name="public.layout.skip" xml:space="preserve">
+    <value>Skip to content</value>
+  </data>
+  <data name="public.language.label" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="public.language.en" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="public.language.fr" xml:space="preserve">
+    <value>Français</value>
+  </data>
+  <data name="public.language.es" xml:space="preserve">
+    <value>Español</value>
+  </data>
+  <data name="public.cta.start" xml:space="preserve">
+    <value>Get started</value>
+  </data>
+  <data name="public.cta.talk" xml:space="preserve">
+    <value>Talk to sales</value>
+  </data>
+  <data name="public.cta.plans" xml:space="preserve">
+    <value>View plans</value>
+  </data>
+  <data name="public.cta.features" xml:space="preserve">
+    <value>See the features</value>
+  </data>
+  <data name="public.footer.about" xml:space="preserve">
+    <value>Vixly helps logistics companies run shipments, parcels, warehouses, dispatch and billing from one connected platform.</value>
+  </data>
+  <data name="public.footer.label" xml:space="preserve">
+    <value>Site</value>
+  </data>
+  <data name="public.footer.copyright" xml:space="preserve">
+    <value>© {year} Vixly by TechCrafters. All rights reserved.</value>
+  </data>
+  <data name="public.error.title" xml:space="preserve">
+    <value>Something went wrong</value>
+  </data>
+  <data name="public.error.unavailable" xml:space="preserve">
+    <value>We cannot reach our service right now. Please try again in a few minutes.</value>
+  </data>
+  <data name="public.error.reference" xml:space="preserve">
+    <value>Reference: {id}</value>
+  </data>
+  <data name="public.platform_unavailable" xml:space="preserve">
+    <value>We cannot reach our service right now. Please try again in a few minutes.</value>
+  </data>
+  <data name="public.not_found.title" xml:space="preserve">
+    <value>Page not found</value>
+  </data>
+  <data name="public.not_found.text" xml:space="preserve">
+    <value>The page you asked for does not exist or has moved.</value>
+  </data>
+  <data name="public.not_found.home" xml:space="preserve">
+    <value>Back to the home page</value>
+  </data>
+  <data name="public.home.title" xml:space="preserve">
+    <value>Logistics operating platform</value>
+  </data>
+  <data name="public.home.description" xml:space="preserve">
+    <value>Run shipments, dispatch, warehouses and billing from one system. Built for courier companies, freight handlers and warehouse teams.</value>
+  </data>
+  <data name="public.home.eyebrow" xml:space="preserve">
+    <value>Logistics operating platform</value>
+  </data>
+  <data name="public.home.headline" xml:space="preserve">
+    <value>Run shipments, dispatch, warehouses and billing from one system.</value>
+  </data>
+  <data name="public.home.lead" xml:space="preserve">
+    <value>Vixly gives logistics teams one platform to manage shipments, parcels, warehouse work, dispatch, invoices, payments and customer visibility across every location.</value>
+  </data>
+  <data name="public.home.audience_line" xml:space="preserve">
+    <value>Built for courier companies, freight handlers, warehouse teams and multi-branch logistics.</value>
+  </data>
+  <data name="public.home.modules.title" xml:space="preserve">
+    <value>One platform for the work you do every day</value>
+  </data>
+  <data name="public.home.modules.lead" xml:space="preserve">
+    <value>Vixly connects shipment intake, parcel handling, barcode scans, warehouse movement, dispatch, invoicing and payment into one operational record.</value>
+  </data>
+  <data name="public.home.module.shipments.title" xml:space="preserve">
+    <value>Shipments from start to delivery</value>
+  </data>
+  <data name="public.home.module.shipments.text" xml:space="preserve">
+    <value>Create shipments, follow their status and keep parcels, charges and history together.</value>
+  </data>
+  <data name="public.home.module.parcels.title" xml:space="preserve">
+    <value>Parcels and barcode scans</value>
+  </data>
+  <data name="public.home.module.parcels.text" xml:space="preserve">
+    <value>Every parcel movement is a scan with a time and a place, so nothing is reconciled by hand.</value>
+  </data>
+  <data name="public.home.module.dispatch.title" xml:space="preserve">
+    <value>Dispatch and bundles</value>
+  </data>
+  <data name="public.home.module.dispatch.text" xml:space="preserve">
+    <value>Group parcels into bundles, plan route legs and move them through dispatch with a clear view.</value>
+  </data>
+  <data name="public.home.module.warehouse.title" xml:space="preserve">
+    <value>Warehouse work</value>
+  </data>
+  <data name="public.home.module.warehouse.text" xml:space="preserve">
+    <value>Receiving, staging and routing, in one warehouse or many.</value>
+  </data>
+  <data name="public.home.module.billing.title" xml:space="preserve">
+    <value>Invoices and payments</value>
+  </data>
+  <data name="public.home.module.billing.text" xml:space="preserve">
+    <value>Invoices come from shipment activity; payments stay linked to the work they pay for.</value>
+  </data>
+  <data name="public.home.module.tenants.title" xml:space="preserve">
+    <value>Your own secure space</value>
+  </data>
+  <data name="public.home.module.tenants.text" xml:space="preserve">
+    <value>Each company works in its own space with its own users, roles and data, never visible to others.</value>
+  </data>
+  <data name="public.home.flow.title" xml:space="preserve">
+    <value>How the work flows</value>
+  </data>
+  <data name="public.home.flow.customer.title" xml:space="preserve">
+    <value>Register the customer</value>
+  </data>
+  <data name="public.home.flow.customer.text" xml:space="preserve">
+    <value>Create the customer and their shipping details once.</value>
+  </data>
+  <data name="public.home.flow.shipment.title" xml:space="preserve">
+    <value>Create the shipment</value>
+  </data>
+  <data name="public.home.flow.shipment.text" xml:space="preserve">
+    <value>Capture parcels, weights, charges and the route.</value>
+  </data>
+  <data name="public.home.flow.scan.title" xml:space="preserve">
+    <value>Scan the parcels</value>
+  </data>
+  <data name="public.home.flow.scan.text" xml:space="preserve">
+    <value>Follow every parcel through the warehouse and into bundles.</value>
+  </data>
+  <data name="public.home.flow.dispatch.title" xml:space="preserve">
+    <value>Dispatch the bundles</value>
+  </data>
+  <data name="public.home.flow.dispatch.text" xml:space="preserve">
+    <value>Move grouped parcels along their route legs.</value>
+  </data>
+  <data name="public.home.flow.payment.title" xml:space="preserve">
+    <value>Collect the payment</value>
+  </data>
+  <data name="public.home.flow.payment.text" xml:space="preserve">
+    <value>Close the loop with an invoice you can trace back to the work.</value>
+  </data>
+  <data name="public.home.audience.title" xml:space="preserve">
+    <value>Who Vixly serves</value>
+  </data>
+  <data name="public.home.audience.courier.title" xml:space="preserve">
+    <value>Courier companies</value>
+  </data>
+  <data name="public.home.audience.courier.text" xml:space="preserve">
+    <value>Parcel intake, deliveries, billing and customer visibility.</value>
+  </data>
+  <data name="public.home.audience.freight.title" xml:space="preserve">
+    <value>Freight handlers</value>
+  </data>
+  <data name="public.home.audience.freight.text" xml:space="preserve">
+    <value>Shipments, warehouses, dispatch and financial records together.</value>
+  </data>
+  <data name="public.home.audience.warehouse.title" xml:space="preserve">
+    <value>Warehouse operators</value>
+  </data>
+  <data name="public.home.audience.warehouse.text" xml:space="preserve">
+    <value>Barcode-driven handling, staging and routing.</value>
+  </data>
+  <data name="public.home.audience.multi_branch.title" xml:space="preserve">
+    <value>Multi-branch logistics</value>
+  </data>
+  <data name="public.home.audience.multi_branch.text" xml:space="preserve">
+    <value>The same way of working in every location, with a view across all of them.</value>
+  </data>
+  <data name="public.home.why.title" xml:space="preserve">
+    <value>Fewer systems, fewer handoffs, more control</value>
+  </data>
+  <data name="public.home.why.lead" xml:space="preserve">
+    <value>Replace disconnected tools with one platform built around how freight, parcels, warehouses, dispatch and billing really work.</value>
+  </data>
+  <data name="public.home.why.visibility.title" xml:space="preserve">
+    <value>See everything</value>
+  </data>
+  <data name="public.home.why.visibility.text" xml:space="preserve">
+    <value>Shipment status, parcel movement, warehouse activity, dispatch progress and invoices in one place.</value>
+  </data>
+  <data name="public.home.why.branches.title" xml:space="preserve">
+    <value>Work branch by branch</value>
+  </data>
+  <data name="public.home.why.branches.text" xml:space="preserve">
+    <value>Each location keeps its own workflow while you keep the overview.</value>
+  </data>
+  <data name="public.home.why.barcodes.title" xml:space="preserve">
+    <value>Barcode-first accuracy</value>
+  </data>
+  <data name="public.home.why.barcodes.text" xml:space="preserve">
+    <value>Parcel movement rests on scans with times and places, not on memory.</value>
+  </data>
+  <data name="public.home.closing.title" xml:space="preserve">
+    <value>Bring your operation onto one platform</value>
+  </data>
+  <data name="public.home.closing.text" xml:space="preserve">
+    <value>Tell us about your operation and we will show you Vixly with your own workflow.</value>
+  </data>
+  <data name="public.features.page_title" xml:space="preserve">
+    <value>Features</value>
+  </data>
+  <data name="public.features.description" xml:space="preserve">
+    <value>What Vixly does: shipments, parcels and scanning, dispatch, warehouses, invoices and payments, customer portal and multi-branch work.</value>
+  </data>
+  <data name="public.features.title" xml:space="preserve">
+    <value>Everything a logistics operation runs on</value>
+  </data>
+  <data name="public.features.lead" xml:space="preserve">
+    <value>Vixly is not a tracking page or a generic delivery app. It is an operating platform with structured work, visibility, barcode accuracy and financial accountability.</value>
+  </data>
+  <data name="public.features.shipments.title" xml:space="preserve">
+    <value>Shipments</value>
+  </data>
+  <data name="public.features.shipments.text" xml:space="preserve">
+    <value>From creation to delivery, every shipment keeps its parcels, charges, status and history.</value>
+  </data>
+  <data name="public.features.shipments.point1" xml:space="preserve">
+    <value>Status at every step</value>
+  </data>
+  <data name="public.features.shipments.point2" xml:space="preserve">
+    <value>Charges and parcels on one record</value>
+  </data>
+  <data name="public.features.shipments.point3" xml:space="preserve">
+    <value>Full history for every change</value>
+  </data>
+  <data name="public.features.parcels.title" xml:space="preserve">
+    <value>Parcels and scanning</value>
+  </data>
+  <data name="public.features.parcels.text" xml:space="preserve">
+    <value>Scan-based work keeps parcels accurate from intake to delivery.</value>
+  </data>
+  <data name="public.features.parcels.point1" xml:space="preserve">
+    <value>Labels and barcodes for every parcel</value>
+  </data>
+  <data name="public.features.parcels.point2" xml:space="preserve">
+    <value>Every scan with a time and place</value>
+  </data>
+  <data name="public.features.parcels.point3" xml:space="preserve">
+    <value>Exceptions shown at once</value>
+  </data>
+  <data name="public.features.dispatch.title" xml:space="preserve">
+    <value>Dispatch and bundles</value>
+  </data>
+  <data name="public.features.dispatch.text" xml:space="preserve">
+    <value>Prepare bundles, plan route legs and follow them to the destination.</value>
+  </data>
+  <data name="public.features.dispatch.point1" xml:space="preserve">
+    <value>Bundles built by scan</value>
+  </data>
+  <data name="public.features.dispatch.point2" xml:space="preserve">
+    <value>Route legs and hand-overs</value>
+  </data>
+  <data name="public.features.dispatch.point3" xml:space="preserve">
+    <value>Progress you can see</value>
+  </data>
+  <data name="public.features.warehouse.title" xml:space="preserve">
+    <value>Warehouse management and inventory</value>
+  </data>
+  <data name="public.features.warehouse.text" xml:space="preserve">
+    <value>Connect receiving, storage and dispatch with a clear view of stock across your warehouses.</value>
+  </data>
+  <data name="public.features.warehouse.point1" xml:space="preserve">
+    <value>Receive goods and check incoming quantities</value>
+  </data>
+  <data name="public.features.warehouse.point2" xml:space="preserve">
+    <value>Organize storage locations and track stock movements</value>
+  </data>
+  <data name="public.features.warehouse.point3" xml:space="preserve">
+    <value>See inventory across warehouses and branches</value>
+  </data>
+  <data name="public.features.billing.title" xml:space="preserve">
+    <value>Invoices and payments</value>
+  </data>
+  <data name="public.features.billing.text" xml:space="preserve">
+    <value>Invoices come from the work done, and payments stay linked to them.</value>
+  </data>
+  <data name="public.features.billing.point1" xml:space="preserve">
+    <value>Invoices from shipment activity</value>
+  </data>
+  <data name="public.features.billing.point2" xml:space="preserve">
+    <value>Payments recorded against invoices</value>
+  </data>
+  <data name="public.features.billing.point3" xml:space="preserve">
+    <value>Balances always up to date</value>
+  </data>
+  <data name="public.features.customers.title" xml:space="preserve">
+    <value>Customer portal</value>
+  </data>
+  <data name="public.features.customers.text" xml:space="preserve">
+    <value>Your customers follow their shipments and invoices under your brand.</value>
+  </data>
+  <data name="public.features.customers.point1" xml:space="preserve">
+    <value>Shipments and tracking</value>
+  </data>
+  <data name="public.features.customers.point2" xml:space="preserve">
+    <value>Invoices and payments</value>
+  </data>
+  <data name="public.features.customers.point3" xml:space="preserve">
+    <value>Your name and colours</value>
+  </data>
+  <data name="public.features.organization.title" xml:space="preserve">
+    <value>Branches, people and security</value>
+  </data>
+  <data name="public.features.organization.text" xml:space="preserve">
+    <value>Each company works in its own space, with roles for every team and branch.</value>
+  </data>
+  <data name="public.features.organization.point1" xml:space="preserve">
+    <value>Roles and permissions</value>
+  </data>
+  <data name="public.features.organization.point2" xml:space="preserve">
+    <value>Approved devices only</value>
+  </data>
+  <data name="public.features.organization.point3" xml:space="preserve">
+    <value>English, French and Spanish</value>
+  </data>
+  <data name="public.plans.page_title" xml:space="preserve">
+    <value>Plans and prices</value>
+  </data>
+  <data name="public.plans.description" xml:space="preserve">
+    <value>Vixly plans: price per licence, monthly or annual, with the limits and features of each plan.</value>
+  </data>
+  <data name="public.plans.title" xml:space="preserve">
+    <value>Plans and prices</value>
+  </data>
+  <data name="public.plans.lead" xml:space="preserve">
+    <value>Pay per licensed device, monthly or annually. Every plan includes shipments, parcels, dispatch, warehouses and billing.</value>
+  </data>
+  <data name="public.plans.monthly" xml:space="preserve">
+    <value>{price} per licence per month</value>
+  </data>
+  <data name="public.plans.annual" xml:space="preserve">
+    <value>or {price} per licence per year</value>
+  </data>
+  <data name="public.plans.minimum" xml:space="preserve">
+    <value>At least {count} licences</value>
+  </data>
+  <data name="public.plans.devices" xml:space="preserve">
+    <value>Up to {count} licensed devices</value>
+  </data>
+  <data name="public.plans.warehouses" xml:space="preserve">
+    <value>Up to {count} warehouses</value>
+  </data>
+  <data name="public.plans.setup_fee" xml:space="preserve">
+    <value>One-time setup: {price}</value>
+  </data>
+  <data name="public.plans.trial" xml:space="preserve">
+    <value>{days}-day free trial</value>
+  </data>
+  <data name="public.plans.choose" xml:space="preserve">
+    <value>Choose this plan</value>
+  </data>
+  <data name="public.plans.tax_note" xml:space="preserve">
+    <value>Prices are before tax.</value>
+  </data>
+  <data name="public.plans.empty" xml:space="preserve">
+    <value>No plans are on offer right now. Talk to our sales team.</value>
+  </data>
+  <data name="public.plans.feature.homepage_content_customization" xml:space="preserve">
+    <value>Your own landing page text</value>
+  </data>
+  <data name="public.plans.feature.portal_theme_customization" xml:space="preserve">
+    <value>Customer portal in your colours</value>
+  </data>
+  <data name="public.plans.feature.custom_domain" xml:space="preserve">
+    <value>Your own domain</value>
+  </data>
+  <data name="public.plans.feature.white_label_portal" xml:space="preserve">
+    <value>Fully white-label portal</value>
+  </data>
+  <data name="public.plans.feature.advanced_analytics" xml:space="preserve">
+    <value>Advanced reports</value>
+  </data>
+  <data name="public.plans.feature.data_export" xml:space="preserve">
+    <value>Data export</value>
+  </data>
+  <data name="public.legal.page_title" xml:space="preserve">
+    <value>Terms and policies</value>
+  </data>
+  <data name="public.legal.description" xml:space="preserve">
+    <value>The current Vixly Terms of Service and the policies they include.</value>
+  </data>
+  <data name="public.legal.title" xml:space="preserve">
+    <value>Terms and policies</value>
+  </data>
+  <data name="public.legal.lead" xml:space="preserve">
+    <value>These are the documents that apply to Vixly accounts today.</value>
+  </data>
+  <data name="public.legal.terms_version" xml:space="preserve">
+    <value>Terms of Service, version {version}</value>
+  </data>
+  <data name="public.legal.effective" xml:space="preserve">
+    <value>In force from {date}</value>
+  </data>
+  <data name="public.legal.download_terms" xml:space="preserve">
+    <value>Download the Terms (PDF)</value>
+  </data>
+  <data name="public.legal.includes" xml:space="preserve">
+    <value>Included documents</value>
+  </data>
+  <data name="public.legal.part_version" xml:space="preserve">
+    <value>Version {version}</value>
+  </data>
+  <data name="public.legal.kind.terms" xml:space="preserve">
+    <value>Terms of Service</value>
+  </data>
+  <data name="public.legal.kind.privacy" xml:space="preserve">
+    <value>Privacy Policy</value>
+  </data>
+  <data name="public.legal.kind.data_processing" xml:space="preserve">
+    <value>Data Processing Agreement</value>
+  </data>
+  <data name="public.legal.kind.acceptable_use" xml:space="preserve">
+    <value>Acceptable Use Policy</value>
+  </data>
+  <data name="public.legal.kind.service_level" xml:space="preserve">
+    <value>Service Level Agreement</value>
+  </data>
+  <data name="public.contact.page_title" xml:space="preserve">
+    <value>Talk to sales</value>
+  </data>
+  <data name="public.contact.description" xml:space="preserve">
+    <value>Tell Vixly about your logistics operation and our team will get back to you.</value>
+  </data>
+  <data name="public.contact.title" xml:space="preserve">
+    <value>Talk to our team</value>
+  </data>
+  <data name="public.contact.lead" xml:space="preserve">
+    <value>Tell us about your operation. We will reply within one business day.</value>
+  </data>
+  <data name="public.contact.company" xml:space="preserve">
+    <value>Company</value>
+  </data>
+  <data name="public.contact.name" xml:space="preserve">
+    <value>Your name</value>
+  </data>
+  <data name="public.contact.email" xml:space="preserve">
+    <value>Work email</value>
+  </data>
+  <data name="public.contact.phone" xml:space="preserve">
+    <value>Phone (optional)</value>
+  </data>
+  <data name="public.contact.kind" xml:space="preserve">
+    <value>Your operation</value>
+  </data>
+  <data name="public.contact.kind.courier" xml:space="preserve">
+    <value>Courier company</value>
+  </data>
+  <data name="public.contact.kind.freight" xml:space="preserve">
+    <value>Freight handling</value>
+  </data>
+  <data name="public.contact.kind.warehouse" xml:space="preserve">
+    <value>Warehouse operation</value>
+  </data>
+  <data name="public.contact.kind.multi_branch" xml:space="preserve">
+    <value>Multi-branch logistics</value>
+  </data>
+  <data name="public.contact.kind.other" xml:space="preserve">
+    <value>Something else</value>
+  </data>
+  <data name="public.contact.message" xml:space="preserve">
+    <value>What would you like to improve? (optional)</value>
+  </data>
+  <data name="public.contact.privacy" xml:space="preserve">
+    <value>We use these details only to answer your request.</value>
+  </data>
+  <data name="public.contact.send" xml:space="preserve">
+    <value>Send</value>
+  </data>
+  <data name="public.contact.sent" xml:space="preserve">
+    <value>Thank you. Our team will contact you soon.</value>
+  </data>
+  <data name="public.contact.direct" xml:space="preserve">
+    <value>You can also write to {email}.</value>
+  </data>
+  <data name="public.pay.title" xml:space="preserve">
+    <value>Pay your invoice</value>
+  </data>
+  <data name="public.pay.invoice" xml:space="preserve">
+    <value>Invoice</value>
+  </data>
+  <data name="public.pay.balance" xml:space="preserve">
+    <value>Amount due</value>
+  </data>
+  <data name="public.pay.due" xml:space="preserve">
+    <value>Due date</value>
+  </data>
+  <data name="public.pay.settled" xml:space="preserve">
+    <value>This invoice is paid. Thank you.</value>
+  </data>
+  <data name="public.pay.card_link_used" xml:space="preserve">
+    <value>This link was already used to save a card.</value>
+  </data>
+  <data name="public.pay.card_title" xml:space="preserve">
+    <value>Pay by card</value>
+  </data>
+  <data name="public.pay.card_text" xml:space="preserve">
+    <value>You will pay on our card provider’s secure page. Vixly never sees your card number.</value>
+  </data>
+  <data name="public.pay.save_card" xml:space="preserve">
+    <value>Save this card for future invoices</value>
+  </data>
+  <data name="public.pay.card_go" xml:space="preserve">
+    <value>Continue to payment</value>
+  </data>
+  <data name="public.pay.save_title" xml:space="preserve">
+    <value>Save a card</value>
+  </data>
+  <data name="public.pay.save_text" xml:space="preserve">
+    <value>Save a card on our card provider’s secure page. Nothing is charged now.</value>
+  </data>
+  <data name="public.pay.save_go" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="public.pay.consent.2026_10" xml:space="preserve">
+    <value>Charge this card automatically for my Vixly invoices on their due date. I can turn this off at any time by contacting Vixly billing.</value>
+  </data>
+  <data name="public.pay.done" xml:space="preserve">
+    <value>Thank you. Your payment is being confirmed; you will receive a receipt by email.</value>
+  </data>
+  <data name="public.pay.card_saved" xml:space="preserve">
+    <value>Thank you. Your card is being saved.</value>
+  </data>
+  <data name="public.pay.cancelled" xml:space="preserve">
+    <value>The payment was cancelled. Nothing was charged.</value>
+  </data>
+  <data name="public.pay.none" xml:space="preserve">
+    <value>Online payment is not available for this invoice. Please contact Vixly billing.</value>
+  </data>
+  <data name="public.pay.zelle_title" xml:space="preserve">
+    <value>Pay with Zelle</value>
+  </data>
+  <data name="public.pay.zelle_text" xml:space="preserve">
+    <value>Send the amount from your bank’s Zelle service to the details below, then tell us below so we can match it.</value>
+  </data>
+  <data name="public.pay.zelle_recipient" xml:space="preserve">
+    <value>Recipient</value>
+  </data>
+  <data name="public.pay.zelle_email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="public.pay.zelle_tag" xml:space="preserve">
+    <value>Zelle tag</value>
+  </data>
+  <data name="public.pay.zelle_phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="public.pay.zelle_qr" xml:space="preserve">
+    <value>Zelle QR code</value>
+  </data>
+  <data name="public.pay.zelle_report" xml:space="preserve">
+    <value>I sent a Zelle payment</value>
+  </data>
+  <data name="public.pay.zelle_amount" xml:space="preserve">
+    <value>Amount sent</value>
+  </data>
+  <data name="public.pay.zelle_sent_on" xml:space="preserve">
+    <value>Date sent</value>
+  </data>
+  <data name="public.pay.zelle_sender" xml:space="preserve">
+    <value>Name on the sending account</value>
+  </data>
+  <data name="public.pay.zelle_reference" xml:space="preserve">
+    <value>Zelle confirmation code</value>
+  </data>
+  <data name="public.pay.zelle_send" xml:space="preserve">
+    <value>Tell Vixly</value>
+  </data>
+  <data name="public.pay.zelle_reported" xml:space="preserve">
+    <value>Thank you. We will confirm your Zelle payment once it reaches our bank.</value>
+  </data>
+  <data name="public.pay.zelle_waiting" xml:space="preserve">
+    <value>We are checking your Zelle payment of {amount} sent on {date}.</value>
+  </data>
+  <data name="public.register.title" xml:space="preserve">
+    <value>Create your Vixly account</value>
+  </data>
+  <data name="public.register.closed_title" xml:space="preserve">
+    <value>Sign-up opens soon</value>
+  </data>
+  <data name="public.register.closed_text" xml:space="preserve">
+    <value>Online sign-up is not open yet. Our team can set up your company with you today.</value>
+  </data>
+  <data name="public.register.ended" xml:space="preserve">
+    <value>Your earlier sign-up ended. Please start again.</value>
+  </data>
+  <data name="public.register.company" xml:space="preserve">
+    <value>Company</value>
+  </data>
+  <data name="public.register.legal_name" xml:space="preserve">
+    <value>Legal name</value>
+  </data>
+  <data name="public.register.trading_name" xml:space="preserve">
+    <value>Trading name (optional)</value>
+  </data>
+  <data name="public.register.company_email" xml:space="preserve">
+    <value>Company email</value>
+  </data>
+  <data name="public.register.company_phone" xml:space="preserve">
+    <value>Company phone</value>
+  </data>
+  <data name="public.register.address" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="public.register.line1" xml:space="preserve">
+    <value>Address line 1</value>
+  </data>
+  <data name="public.register.line2" xml:space="preserve">
+    <value>Address line 2 (optional)</value>
+  </data>
+  <data name="public.register.city" xml:space="preserve">
+    <value>City</value>
+  </data>
+  <data name="public.register.state" xml:space="preserve">
+    <value>State or province</value>
+  </data>
+  <data name="public.register.postal" xml:space="preserve">
+    <value>Postal code</value>
+  </data>
+  <data name="public.register.country" xml:space="preserve">
+    <value>Country</value>
+  </data>
+  <data name="public.register.address_confirm" xml:space="preserve">
+    <value>This address is correct; it will appear on invoices.</value>
+  </data>
+  <data name="public.register.address_confirm_required" xml:space="preserve">
+    <value>Please confirm the address before continuing.</value>
+  </data>
+  <data name="public.register.owner" xml:space="preserve">
+    <value>Account owner</value>
+  </data>
+  <data name="public.register.owner_name" xml:space="preserve">
+    <value>Full name</value>
+  </data>
+  <data name="public.register.owner_email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="public.register.owner_phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="public.register.portal" xml:space="preserve">
+    <value>Your Vixly address</value>
+  </data>
+  <data name="public.register.slug" xml:space="preserve">
+    <value>Address name</value>
+  </data>
+  <data name="public.register.slug_help" xml:space="preserve">
+    <value>Lowercase letters, numbers and hyphens. Your team and customers will use it, and it cannot be changed later.</value>
+  </data>
+  <data name="public.register.accept" xml:space="preserve">
+    <value>I accept the Vixly</value>
+  </data>
+  <data name="public.register.accept_link" xml:space="preserve">
+    <value>Terms of Service and Privacy Policy</value>
+  </data>
+  <data name="public.register.start" xml:space="preserve">
+    <value>Create account</value>
+  </data>
+  <data name="public.register.offer_title" xml:space="preserve">
+    <value>Offer for {company}</value>
+  </data>
+  <data name="public.register.offer_plan" xml:space="preserve">
+    <value>Plan</value>
+  </data>
+  <data name="public.register.offer_term" xml:space="preserve">
+    <value>Billing</value>
+  </data>
+  <data name="public.register.offer_amount" xml:space="preserve">
+    <value>Amount per period</value>
+  </data>
+  <data name="public.register.offer_setup" xml:space="preserve">
+    <value>Setup</value>
+  </data>
+  <data name="public.register.offer_trial" xml:space="preserve">
+    <value>Trial</value>
+  </data>
+  <data name="public.register.offer_expires" xml:space="preserve">
+    <value>Offer valid until</value>
+  </data>
+  <data name="public.register.offer_email" xml:space="preserve">
+    <value>This offer is for {email}.</value>
+  </data>
+  <data name="public.register.offer_accept" xml:space="preserve">
+    <value>Accept this offer</value>
+  </data>
+  <data name="public.register.email_title" xml:space="preserve">
+    <value>Check your email</value>
+  </data>
+  <data name="public.register.email_sent" xml:space="preserve">
+    <value>We sent a link to {email}. Open it to confirm your email address.</value>
+  </data>
+  <data name="public.register.email_deadline" xml:space="preserve">
+    <value>The link works until {date}.</value>
+  </data>
+  <data name="public.register.resend" xml:space="preserve">
+    <value>Send the link again</value>
+  </data>
+  <data name="public.register.resent" xml:space="preserve">
+    <value>We sent a new link.</value>
+  </data>
+  <data name="public.register.correct_email" xml:space="preserve">
+    <value>Wrong address? Enter the right one</value>
+  </data>
+  <data name="public.register.correct" xml:space="preserve">
+    <value>Change email</value>
+  </data>
+  <data name="public.register.corrected" xml:space="preserve">
+    <value>We sent a new link to the new address.</value>
+  </data>
+  <data name="public.register.verify_title" xml:space="preserve">
+    <value>Confirm your email</value>
+  </data>
+  <data name="public.register.verify_text" xml:space="preserve">
+    <value>Confirm your email address to continue setting up your account.</value>
+  </data>
+  <data name="public.register.verify" xml:space="preserve">
+    <value>Confirm my email</value>
+  </data>
+  <data name="public.register.verify_missing" xml:space="preserve">
+    <value>This link is incomplete. Open the link from the email again.</value>
+  </data>
+  <data name="public.register.plan_title" xml:space="preserve">
+    <value>Choose your plan</value>
+  </data>
+  <data name="public.register.plan" xml:space="preserve">
+    <value>Plan</value>
+  </data>
+  <data name="public.register.term" xml:space="preserve">
+    <value>Billing</value>
+  </data>
+  <data name="public.register.term.monthly" xml:space="preserve">
+    <value>Monthly</value>
+  </data>
+  <data name="public.register.term.annual" xml:space="preserve">
+    <value>Annual</value>
+  </data>
+  <data name="public.register.licences" xml:space="preserve">
+    <value>Licences</value>
+  </data>
+  <data name="public.register.trial" xml:space="preserve">
+    <value>Start with the free trial (when the plan has one)</value>
+  </data>
+  <data name="public.register.promotion" xml:space="preserve">
+    <value>Promotion code (optional)</value>
+  </data>
+  <data name="public.register.choose" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="public.register.pay_title" xml:space="preserve">
+    <value>Pay your first invoice</value>
+  </data>
+  <data name="public.register.payment_title" xml:space="preserve">
+    <value>Payment</value>
+  </data>
+  <data name="public.register.payment_processing" xml:space="preserve">
+    <value>Thank you. We are confirming your payment; this page will show the next step once it is done.</value>
+  </data>
+  <data name="public.register.payment_waiting" xml:space="preserve">
+    <value>Your first invoice is waiting for payment.</value>
+  </data>
+  <data name="public.register.pay_again" xml:space="preserve">
+    <value>Go to payment</value>
+  </data>
+  <data name="public.register.done_page" xml:space="preserve">
+    <value>Account created</value>
+  </data>
+  <data name="public.register.done_title" xml:space="preserve">
+    <value>Your account is ready for setup</value>
+  </data>
+  <data name="public.register.done_text" xml:space="preserve">
+    <value>Your workspace {slug} is being prepared.</value>
+  </data>
+  <data name="public.register.done_email" xml:space="preserve">
+    <value>We will email {email} with the link to set up your team’s sign-in.</value>
+  </data>
+  <data name="public.too_many" xml:space="preserve">
+    <value>Too many attempts. Please wait a while and try again.</value>
+  </data>
+</root>

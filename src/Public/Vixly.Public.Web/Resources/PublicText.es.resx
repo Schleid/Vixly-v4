@@ -1,0 +1,1087 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="public.brand" xml:space="preserve">
+    <value>Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.meta.description" xml:space="preserve">
+    <value>Vixly es la plataforma logística para envíos, paquetes, despacho, almacenes y facturación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.nav.label" xml:space="preserve">
+    <value>Principal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.nav.home" xml:space="preserve">
+    <value>Inicio</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.nav.features" xml:space="preserve">
+    <value>Funciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.nav.plans" xml:space="preserve">
+    <value>Planes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.nav.contact" xml:space="preserve">
+    <value>Contacto</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.nav.legal" xml:space="preserve">
+    <value>Legal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.layout.skip" xml:space="preserve">
+    <value>Ir al contenido</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.language.label" xml:space="preserve">
+    <value>Idioma</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.language.en" xml:space="preserve">
+    <value>English</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.language.fr" xml:space="preserve">
+    <value>Français</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.language.es" xml:space="preserve">
+    <value>Español</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.cta.start" xml:space="preserve">
+    <value>Empezar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.cta.talk" xml:space="preserve">
+    <value>Hablar con ventas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.cta.plans" xml:space="preserve">
+    <value>Ver los planes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.cta.features" xml:space="preserve">
+    <value>Ver las funciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.footer.about" xml:space="preserve">
+    <value>Vixly ayuda a las empresas de logística a gestionar envíos, paquetes, almacenes, despacho y facturación desde una sola plataforma.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.footer.label" xml:space="preserve">
+    <value>Sitio</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.footer.copyright" xml:space="preserve">
+    <value>© {year} Vixly de TechCrafters. Todos los derechos reservados.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.error.title" xml:space="preserve">
+    <value>Algo salió mal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.error.unavailable" xml:space="preserve">
+    <value>No podemos acceder a nuestro servicio en este momento. Vuelva a intentarlo en unos minutos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.error.reference" xml:space="preserve">
+    <value>Referencia: {id}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.platform_unavailable" xml:space="preserve">
+    <value>No podemos acceder a nuestro servicio en este momento. Vuelva a intentarlo en unos minutos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.not_found.title" xml:space="preserve">
+    <value>Página no encontrada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.not_found.text" xml:space="preserve">
+    <value>La página que buscó no existe o se movió.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.not_found.home" xml:space="preserve">
+    <value>Volver al inicio</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.title" xml:space="preserve">
+    <value>Plataforma logística</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.description" xml:space="preserve">
+    <value>Gestione envíos, despacho, almacenes y facturación en un solo sistema. Pensado para mensajerías, operadores de carga y almacenes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.eyebrow" xml:space="preserve">
+    <value>Plataforma logística</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.headline" xml:space="preserve">
+    <value>Gestione envíos, despacho, almacenes y facturación en un solo sistema.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.lead" xml:space="preserve">
+    <value>Vixly ofrece a los equipos de logística una sola plataforma para gestionar envíos, paquetes, almacenes, despacho, facturas, pagos y visibilidad para sus clientes en todas las sedes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.audience_line" xml:space="preserve">
+    <value>Pensado para mensajerías, operadores de carga, almacenes y logística con varias sucursales.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.modules.title" xml:space="preserve">
+    <value>Una plataforma para el trabajo de cada día</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.modules.lead" xml:space="preserve">
+    <value>Vixly une la recepción de envíos, el manejo de paquetes, el escaneo, el movimiento en almacén, el despacho, la facturación y el cobro en un solo registro.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.module.shipments.title" xml:space="preserve">
+    <value>Envíos de principio a fin</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.module.shipments.text" xml:space="preserve">
+    <value>Cree envíos, siga su estado y mantenga juntos paquetes, cargos e historial.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.module.parcels.title" xml:space="preserve">
+    <value>Paquetes y escaneo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.module.parcels.text" xml:space="preserve">
+    <value>Cada movimiento de paquete es un escaneo con hora y lugar, sin conciliaciones manuales.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.module.dispatch.title" xml:space="preserve">
+    <value>Despacho y lotes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.module.dispatch.text" xml:space="preserve">
+    <value>Agrupe paquetes en lotes, planifique tramos y muévalos por el despacho con claridad.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.module.warehouse.title" xml:space="preserve">
+    <value>Trabajo en almacén</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.module.warehouse.text" xml:space="preserve">
+    <value>Recepción, preparación y enrutamiento, en uno o varios almacenes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.module.billing.title" xml:space="preserve">
+    <value>Facturas y pagos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.module.billing.text" xml:space="preserve">
+    <value>Las facturas surgen de la actividad; los pagos quedan unidos al trabajo que pagan.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.module.tenants.title" xml:space="preserve">
+    <value>Su propio espacio seguro</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.module.tenants.text" xml:space="preserve">
+    <value>Cada empresa trabaja en su propio espacio, con sus usuarios, roles y datos, nunca visibles para otros.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.flow.title" xml:space="preserve">
+    <value>Cómo fluye el trabajo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.flow.customer.title" xml:space="preserve">
+    <value>Registrar al cliente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.flow.customer.text" xml:space="preserve">
+    <value>Cree al cliente y sus datos de envío una sola vez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.flow.shipment.title" xml:space="preserve">
+    <value>Crear el envío</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.flow.shipment.text" xml:space="preserve">
+    <value>Registre paquetes, pesos, cargos y ruta.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.flow.scan.title" xml:space="preserve">
+    <value>Escanear los paquetes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.flow.scan.text" xml:space="preserve">
+    <value>Siga cada paquete por el almacén y hasta los lotes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.flow.dispatch.title" xml:space="preserve">
+    <value>Despachar los lotes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.flow.dispatch.text" xml:space="preserve">
+    <value>Mueva los paquetes agrupados por sus tramos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.flow.payment.title" xml:space="preserve">
+    <value>Cobrar el pago</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.flow.payment.text" xml:space="preserve">
+    <value>Cierre el ciclo con una factura ligada al trabajo realizado.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.audience.title" xml:space="preserve">
+    <value>Para quién</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.audience.courier.title" xml:space="preserve">
+    <value>Mensajerías</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.audience.courier.text" xml:space="preserve">
+    <value>Recepción, entregas, facturación y visibilidad para el cliente.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.audience.freight.title" xml:space="preserve">
+    <value>Operadores de carga</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.audience.freight.text" xml:space="preserve">
+    <value>Envíos, almacenes, despacho y registros financieros juntos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.audience.warehouse.title" xml:space="preserve">
+    <value>Operadores de almacén</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.audience.warehouse.text" xml:space="preserve">
+    <value>Manejo, preparación y enrutamiento con códigos de barras.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.audience.multi_branch.title" xml:space="preserve">
+    <value>Logística con varias sucursales</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.audience.multi_branch.text" xml:space="preserve">
+    <value>La misma forma de trabajar en cada sede, con una vista de todas.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.why.title" xml:space="preserve">
+    <value>Menos sistemas, menos traspasos, más control</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.why.lead" xml:space="preserve">
+    <value>Reemplace herramientas sueltas por una plataforma pensada para la carga, los paquetes, los almacenes, el despacho y la facturación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.why.visibility.title" xml:space="preserve">
+    <value>Verlo todo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.why.visibility.text" xml:space="preserve">
+    <value>Estado de envíos, movimiento de paquetes, almacén, despacho y facturas en un solo lugar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.why.branches.title" xml:space="preserve">
+    <value>Trabajar por sucursal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.why.branches.text" xml:space="preserve">
+    <value>Cada sede mantiene su forma de trabajar y usted la visión general.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.why.barcodes.title" xml:space="preserve">
+    <value>Precisión con códigos de barras</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.why.barcodes.text" xml:space="preserve">
+    <value>El movimiento se basa en escaneos con hora y lugar, no en la memoria.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.closing.title" xml:space="preserve">
+    <value>Lleve su operación a una sola plataforma</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.home.closing.text" xml:space="preserve">
+    <value>Cuéntenos sobre su operación y le mostraremos Vixly con su propia forma de trabajar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.page_title" xml:space="preserve">
+    <value>Funciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.description" xml:space="preserve">
+    <value>Lo que hace Vixly: envíos, paquetes y escaneo, despacho, almacenes, facturas y pagos, portal de clientes y varias sucursales.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.title" xml:space="preserve">
+    <value>Todo lo que necesita una operación logística</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.lead" xml:space="preserve">
+    <value>Vixly no es una página de rastreo ni una app de entregas genérica. Es una plataforma operativa: procesos estructurados, visibilidad, precisión y control financiero.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.shipments.title" xml:space="preserve">
+    <value>Envíos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.shipments.text" xml:space="preserve">
+    <value>De la creación a la entrega, cada envío guarda sus paquetes, cargos, estado e historial.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.shipments.point1" xml:space="preserve">
+    <value>Estado en cada paso</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.shipments.point2" xml:space="preserve">
+    <value>Cargos y paquetes en un solo registro</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.shipments.point3" xml:space="preserve">
+    <value>Historial completo de cada cambio</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.parcels.title" xml:space="preserve">
+    <value>Paquetes y escaneo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.parcels.text" xml:space="preserve">
+    <value>El trabajo con escaneo mantiene los paquetes exactos de la recepción a la entrega.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.parcels.point1" xml:space="preserve">
+    <value>Etiquetas y códigos para cada paquete</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.parcels.point2" xml:space="preserve">
+    <value>Cada escaneo con hora y lugar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.parcels.point3" xml:space="preserve">
+    <value>Excepciones visibles al instante</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.dispatch.title" xml:space="preserve">
+    <value>Despacho y lotes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.dispatch.text" xml:space="preserve">
+    <value>Prepare lotes, planifique tramos y sígalos hasta el destino.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.dispatch.point1" xml:space="preserve">
+    <value>Lotes armados por escaneo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.dispatch.point2" xml:space="preserve">
+    <value>Tramos y entregas intermedias</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.dispatch.point3" xml:space="preserve">
+    <value>Avance a la vista</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.warehouse.title" xml:space="preserve">
+    <value>Gestión de almacenes e inventario</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.warehouse.text" xml:space="preserve">
+    <value>Conecte la recepción, el almacenamiento y la expedición con una visión clara del inventario de sus almacenes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.warehouse.point1" xml:space="preserve">
+    <value>Reciba mercancías y compruebe las cantidades recibidas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.warehouse.point2" xml:space="preserve">
+    <value>Organice las ubicaciones y siga los movimientos de existencias</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.warehouse.point3" xml:space="preserve">
+    <value>Consulte el inventario de almacenes y sucursales</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.billing.title" xml:space="preserve">
+    <value>Facturas y pagos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.billing.text" xml:space="preserve">
+    <value>Las facturas surgen del trabajo hecho y los pagos quedan unidos a ellas.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.billing.point1" xml:space="preserve">
+    <value>Facturas a partir de la actividad</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.billing.point2" xml:space="preserve">
+    <value>Pagos registrados contra facturas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.billing.point3" xml:space="preserve">
+    <value>Saldos siempre al día</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.customers.title" xml:space="preserve">
+    <value>Portal de clientes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.customers.text" xml:space="preserve">
+    <value>Sus clientes siguen sus envíos y facturas con su marca.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.customers.point1" xml:space="preserve">
+    <value>Envíos y rastreo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.customers.point2" xml:space="preserve">
+    <value>Facturas y pagos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.customers.point3" xml:space="preserve">
+    <value>Su nombre y sus colores</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.organization.title" xml:space="preserve">
+    <value>Sucursales, personas y seguridad</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.organization.text" xml:space="preserve">
+    <value>Cada empresa trabaja en su espacio, con roles para cada equipo y sucursal.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.organization.point1" xml:space="preserve">
+    <value>Roles y permisos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.organization.point2" xml:space="preserve">
+    <value>Solo dispositivos aprobados</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.features.organization.point3" xml:space="preserve">
+    <value>Inglés, francés y español</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.page_title" xml:space="preserve">
+    <value>Planes y precios</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.description" xml:space="preserve">
+    <value>Planes de Vixly: precio por licencia, mensual o anual, con los límites y funciones de cada plan.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.title" xml:space="preserve">
+    <value>Planes y precios</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.lead" xml:space="preserve">
+    <value>Pague por dispositivo con licencia, mensual o anual. Cada plan incluye envíos, paquetes, despacho, almacenes y facturación.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.monthly" xml:space="preserve">
+    <value>{price} por licencia al mes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.annual" xml:space="preserve">
+    <value>o {price} por licencia al año</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.minimum" xml:space="preserve">
+    <value>Al menos {count} licencias</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.devices" xml:space="preserve">
+    <value>Hasta {count} dispositivos con licencia</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.warehouses" xml:space="preserve">
+    <value>Hasta {count} almacenes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.setup_fee" xml:space="preserve">
+    <value>Cargo único de alta: {price}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.trial" xml:space="preserve">
+    <value>Prueba gratis de {days} días</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.choose" xml:space="preserve">
+    <value>Elegir este plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.tax_note" xml:space="preserve">
+    <value>Precios sin impuestos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.empty" xml:space="preserve">
+    <value>No hay planes disponibles por ahora. Hable con nuestro equipo de ventas.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.feature.homepage_content_customization" xml:space="preserve">
+    <value>Texto propio en la página de inicio</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.feature.portal_theme_customization" xml:space="preserve">
+    <value>Portal de clientes con sus colores</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.feature.custom_domain" xml:space="preserve">
+    <value>Su propio dominio</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.feature.white_label_portal" xml:space="preserve">
+    <value>Portal totalmente con su marca</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.feature.advanced_analytics" xml:space="preserve">
+    <value>Informes avanzados</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.feature.data_export" xml:space="preserve">
+    <value>Exportación de datos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.legal.page_title" xml:space="preserve">
+    <value>Términos y políticas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.legal.description" xml:space="preserve">
+    <value>Los términos de servicio vigentes de Vixly y las políticas que incluyen.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.legal.title" xml:space="preserve">
+    <value>Términos y políticas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.legal.lead" xml:space="preserve">
+    <value>Estos son los documentos que se aplican hoy a las cuentas de Vixly.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.legal.terms_version" xml:space="preserve">
+    <value>Términos de servicio, versión {version}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.legal.effective" xml:space="preserve">
+    <value>Vigentes desde el {date}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.legal.download_terms" xml:space="preserve">
+    <value>Descargar los términos (PDF)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.legal.includes" xml:space="preserve">
+    <value>Documentos incluidos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.legal.part_version" xml:space="preserve">
+    <value>Versión {version}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.legal.kind.terms" xml:space="preserve">
+    <value>Términos de servicio</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.legal.kind.privacy" xml:space="preserve">
+    <value>Política de privacidad</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.legal.kind.data_processing" xml:space="preserve">
+    <value>Acuerdo de tratamiento de datos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.legal.kind.acceptable_use" xml:space="preserve">
+    <value>Política de uso aceptable</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.legal.kind.service_level" xml:space="preserve">
+    <value>Acuerdo de nivel de servicio</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.page_title" xml:space="preserve">
+    <value>Hablar con ventas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.description" xml:space="preserve">
+    <value>Cuéntenos sobre su operación logística y nuestro equipo le responderá.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.title" xml:space="preserve">
+    <value>Hable con nuestro equipo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.lead" xml:space="preserve">
+    <value>Cuéntenos sobre su operación. Respondemos en un día hábil.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.company" xml:space="preserve">
+    <value>Empresa</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.name" xml:space="preserve">
+    <value>Su nombre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.email" xml:space="preserve">
+    <value>Correo de trabajo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.phone" xml:space="preserve">
+    <value>Teléfono (opcional)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.kind" xml:space="preserve">
+    <value>Su operación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.kind.courier" xml:space="preserve">
+    <value>Mensajería</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.kind.freight" xml:space="preserve">
+    <value>Manejo de carga</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.kind.warehouse" xml:space="preserve">
+    <value>Operación de almacén</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.kind.multi_branch" xml:space="preserve">
+    <value>Logística con varias sucursales</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.kind.other" xml:space="preserve">
+    <value>Otra</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.message" xml:space="preserve">
+    <value>¿Qué le gustaría mejorar? (opcional)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.privacy" xml:space="preserve">
+    <value>Usamos estos datos solo para responder a su solicitud.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.send" xml:space="preserve">
+    <value>Enviar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.sent" xml:space="preserve">
+    <value>Gracias. Nuestro equipo se pondrá en contacto pronto.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.contact.direct" xml:space="preserve">
+    <value>También puede escribir a {email}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.title" xml:space="preserve">
+    <value>Pagar su factura</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.invoice" xml:space="preserve">
+    <value>Factura</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.balance" xml:space="preserve">
+    <value>Importe pendiente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.due" xml:space="preserve">
+    <value>Vencimiento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.settled" xml:space="preserve">
+    <value>Esta factura está pagada. Gracias.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.card_link_used" xml:space="preserve">
+    <value>Este enlace ya se usó para guardar una tarjeta.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.card_title" xml:space="preserve">
+    <value>Pagar con tarjeta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.card_text" xml:space="preserve">
+    <value>Pagará en la página segura de nuestro proveedor. Vixly nunca ve el número de su tarjeta.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.save_card" xml:space="preserve">
+    <value>Guardar esta tarjeta para próximas facturas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.card_go" xml:space="preserve">
+    <value>Continuar al pago</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.save_title" xml:space="preserve">
+    <value>Guardar una tarjeta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.save_text" xml:space="preserve">
+    <value>Guarde una tarjeta en la página segura de nuestro proveedor. No se cobra nada ahora.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.save_go" xml:space="preserve">
+    <value>Continuar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.consent.2026_10" xml:space="preserve">
+    <value>Cobrar automáticamente esta tarjeta por mis facturas de Vixly en su vencimiento. Puedo desactivarlo en cualquier momento contactando a facturación de Vixly.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.done" xml:space="preserve">
+    <value>Gracias. Su pago se está confirmando; recibirá un recibo por correo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.card_saved" xml:space="preserve">
+    <value>Gracias. Su tarjeta se está guardando.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.cancelled" xml:space="preserve">
+    <value>El pago se canceló. No se cobró nada.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.none" xml:space="preserve">
+    <value>El pago en línea no está disponible para esta factura. Contacte a facturación de Vixly.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_title" xml:space="preserve">
+    <value>Pagar con Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_text" xml:space="preserve">
+    <value>Envíe el importe desde Zelle en su banco a los datos de abajo y luego avísenos abajo para que lo identifiquemos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_recipient" xml:space="preserve">
+    <value>Destinatario</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_email" xml:space="preserve">
+    <value>Correo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_tag" xml:space="preserve">
+    <value>Etiqueta Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_phone" xml:space="preserve">
+    <value>Teléfono</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_qr" xml:space="preserve">
+    <value>Código QR de Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_report" xml:space="preserve">
+    <value>Envié un pago por Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_amount" xml:space="preserve">
+    <value>Importe enviado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_sent_on" xml:space="preserve">
+    <value>Fecha de envío</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_sender" xml:space="preserve">
+    <value>Nombre en la cuenta de origen</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_reference" xml:space="preserve">
+    <value>Código de confirmación de Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_send" xml:space="preserve">
+    <value>Avisar a Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_reported" xml:space="preserve">
+    <value>Gracias. Confirmaremos su pago por Zelle cuando llegue a nuestro banco.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.zelle_waiting" xml:space="preserve">
+    <value>Estamos verificando su pago por Zelle de {amount} enviado el {date}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.title" xml:space="preserve">
+    <value>Crear su cuenta de Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.closed_title" xml:space="preserve">
+    <value>El registro abre pronto</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.closed_text" xml:space="preserve">
+    <value>El registro en línea aún no está abierto. Nuestro equipo puede dar de alta su empresa con usted hoy.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.ended" xml:space="preserve">
+    <value>Su registro anterior terminó. Vuelva a empezar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.company" xml:space="preserve">
+    <value>Empresa</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.legal_name" xml:space="preserve">
+    <value>Razón social</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.trading_name" xml:space="preserve">
+    <value>Nombre comercial (opcional)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.company_email" xml:space="preserve">
+    <value>Correo de la empresa</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.company_phone" xml:space="preserve">
+    <value>Teléfono de la empresa</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.address" xml:space="preserve">
+    <value>Dirección</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.line1" xml:space="preserve">
+    <value>Dirección línea 1</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.line2" xml:space="preserve">
+    <value>Dirección línea 2 (opcional)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.city" xml:space="preserve">
+    <value>Ciudad</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.state" xml:space="preserve">
+    <value>Estado o provincia</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.postal" xml:space="preserve">
+    <value>Código postal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.country" xml:space="preserve">
+    <value>País</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.address_confirm" xml:space="preserve">
+    <value>Esta dirección es correcta; aparecerá en las facturas.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.address_confirm_required" xml:space="preserve">
+    <value>Confirme la dirección antes de continuar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.owner" xml:space="preserve">
+    <value>Propietario de la cuenta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.owner_name" xml:space="preserve">
+    <value>Nombre completo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.owner_email" xml:space="preserve">
+    <value>Correo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.owner_phone" xml:space="preserve">
+    <value>Teléfono</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.portal" xml:space="preserve">
+    <value>Su dirección de Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.slug" xml:space="preserve">
+    <value>Nombre de la dirección</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.slug_help" xml:space="preserve">
+    <value>Minúsculas, números y guiones. Su equipo y sus clientes la usarán y no se podrá cambiar después.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.accept" xml:space="preserve">
+    <value>Acepto los</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.accept_link" xml:space="preserve">
+    <value>términos de servicio y la política de privacidad de Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.start" xml:space="preserve">
+    <value>Crear la cuenta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.offer_title" xml:space="preserve">
+    <value>Oferta para {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.offer_plan" xml:space="preserve">
+    <value>Plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.offer_term" xml:space="preserve">
+    <value>Facturación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.offer_amount" xml:space="preserve">
+    <value>Importe por periodo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.offer_setup" xml:space="preserve">
+    <value>Alta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.offer_trial" xml:space="preserve">
+    <value>Prueba</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.offer_expires" xml:space="preserve">
+    <value>Oferta válida hasta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.offer_email" xml:space="preserve">
+    <value>Esta oferta es para {email}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.offer_accept" xml:space="preserve">
+    <value>Aceptar esta oferta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.email_title" xml:space="preserve">
+    <value>Revise su correo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.email_sent" xml:space="preserve">
+    <value>Enviamos un enlace a {email}. Ábralo para confirmar su correo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.email_deadline" xml:space="preserve">
+    <value>El enlace funciona hasta el {date}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.resend" xml:space="preserve">
+    <value>Enviar el enlace de nuevo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.resent" xml:space="preserve">
+    <value>Enviamos un enlace nuevo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.correct_email" xml:space="preserve">
+    <value>¿Dirección incorrecta? Escriba la correcta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.correct" xml:space="preserve">
+    <value>Cambiar el correo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.corrected" xml:space="preserve">
+    <value>Enviamos un enlace nuevo a la nueva dirección.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.verify_title" xml:space="preserve">
+    <value>Confirmar su correo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.verify_text" xml:space="preserve">
+    <value>Confirme su correo para seguir creando su cuenta.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.verify" xml:space="preserve">
+    <value>Confirmar mi correo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.verify_missing" xml:space="preserve">
+    <value>Este enlace está incompleto. Abra de nuevo el enlace del correo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.plan_title" xml:space="preserve">
+    <value>Elegir su plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.plan" xml:space="preserve">
+    <value>Plan</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.term" xml:space="preserve">
+    <value>Facturación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.term.monthly" xml:space="preserve">
+    <value>Mensual</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.term.annual" xml:space="preserve">
+    <value>Anual</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.licences" xml:space="preserve">
+    <value>Licencias</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.trial" xml:space="preserve">
+    <value>Empezar con la prueba gratis (si el plan la tiene)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.promotion" xml:space="preserve">
+    <value>Código promocional (opcional)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.choose" xml:space="preserve">
+    <value>Continuar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.pay_title" xml:space="preserve">
+    <value>Pagar su primera factura</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.payment_title" xml:space="preserve">
+    <value>Pago</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.payment_processing" xml:space="preserve">
+    <value>Gracias. Estamos confirmando su pago; esta página mostrará el siguiente paso cuando termine.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.payment_waiting" xml:space="preserve">
+    <value>Su primera factura espera el pago.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.pay_again" xml:space="preserve">
+    <value>Ir al pago</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.done_page" xml:space="preserve">
+    <value>Cuenta creada</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.done_title" xml:space="preserve">
+    <value>Su cuenta está lista para configurarse</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.done_text" xml:space="preserve">
+    <value>Su espacio {slug} se está preparando.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.register.done_email" xml:space="preserve">
+    <value>Enviaremos a {email} el enlace para configurar el acceso de su equipo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.too_many" xml:space="preserve">
+    <value>Demasiados intentos. Espere un momento y vuelva a intentarlo.</value>
+    <comment>needs-review</comment>
+  </data>
+</root>

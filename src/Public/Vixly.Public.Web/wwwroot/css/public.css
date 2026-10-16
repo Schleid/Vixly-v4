@@ -128,3 +128,25 @@ p { margin: 0 0 var(--vx-space-4); }
     .pub-hero::after { aspect-ratio: 4 / 3; }
     .pub-section:has(> #home-flow)::before { aspect-ratio: 4 / 3; }
 }
+
+/* Feature introduction: decorative inventory photography alongside localized copy. */
+.pub-section:has(+ .pub-feature) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--vx-space-5) var(--vx-space-12);
+    align-items: center;
+}
+.pub-section:has(+ .pub-feature) > * { grid-column: 1; min-width: 0; }
+.pub-section:has(+ .pub-feature)::after {
+    content: '';
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    aspect-ratio: 16 / 10;
+    border-radius: var(--vx-radius-lg);
+    background: url('../images/warehouse-inventory.webp') center / cover no-repeat;
+    box-shadow: var(--vx-shadow-2);
+}
+@media (max-width: 768px) {
+    .pub-section:has(+ .pub-feature) { grid-template-columns: minmax(0, 1fr); }
+    .pub-section:has(+ .pub-feature)::after { grid-column: 1; grid-row: auto; }
+}
