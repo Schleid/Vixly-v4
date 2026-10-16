@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+<resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+<resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+<data name="title" xml:space="preserve"><value>Banco de componentes operativos</value><comment>needs-review</comment></data>
+<data name="preview" xml:space="preserve"><value>Solo datos de ejemplo: vista de componentes, sin operaciones reales.</value><comment>needs-review</comment></data>
+<data name="active" xml:space="preserve"><value>Envíos activos</value><comment>needs-review</comment></data>
+<data name="received" xml:space="preserve"><value>Paquetes recibidos hoy</value><comment>needs-review</comment></data>
+<data name="revenue" xml:space="preserve"><value>Ingresos cobrados (USD)</value><comment>needs-review</comment></data>
+<data name="exceptions" xml:space="preserve"><value>Incidencias abiertas</value><comment>needs-review</comment></data>
+<data name="comparison" xml:space="preserve"><value>respecto al período anterior</value><comment>needs-review</comment></data>
+<data name="search" xml:space="preserve"><value>Buscar números de seguimiento</value><comment>needs-review</comment></data>
+<data name="branch" xml:space="preserve"><value>Sucursal</value><comment>needs-review</comment></data>
+<data name="all" xml:space="preserve"><value>Todos</value><comment>needs-review</comment></data>
+<data name="status" xml:space="preserve"><value>Estado</value><comment>needs-review</comment></data>
+<data name="tracking" xml:space="preserve"><value>Número de seguimiento</value><comment>needs-review</comment></data>
+<data name="customer" xml:space="preserve"><value>Cliente</value><comment>needs-review</comment></data>
+<data name="weight" xml:space="preserve"><value>Peso (kg)</value><comment>needs-review</comment></data>
+<data name="amount" xml:space="preserve"><value>Importe (USD)</value><comment>needs-review</comment></data>
+<data name="actions" xml:space="preserve"><value>Acciones</value><comment>needs-review</comment></data>
+<data name="open" xml:space="preserve"><value>Abrir detalle</value><comment>needs-review</comment></data>
+<data name="select" xml:space="preserve"><value>Seleccionar fila</value><comment>needs-review</comment></data>
+<data name="selectall" xml:space="preserve"><value>Seleccionar esta página</value><comment>needs-review</comment></data>
+<data name="empty" xml:space="preserve"><value>No hay envíos coincidentes</value><comment>needs-review</comment></data>
+<data name="clear" xml:space="preserve"><value>Borrar filtros</value><comment>needs-review</comment></data>
+<data name="previous" xml:space="preserve"><value>Página anterior</value><comment>needs-review</comment></data>
+<data name="next" xml:space="preserve"><value>Página siguiente</value><comment>needs-review</comment></data>
+<data name="registered" xml:space="preserve"><value>Registrado</value><comment>needs-review</comment></data>
+<data name="staged" xml:space="preserve"><value>En almacén</value><comment>needs-review</comment></data>
+<data name="transit" xml:space="preserve"><value>En tránsito</value><comment>needs-review</comment></data>
+<data name="delivered" xml:space="preserve"><value>Entregado</value><comment>needs-review</comment></data>
+<data name="hold" xml:space="preserve"><value>Incidencia / retenido</value><comment>needs-review</comment></data>
+<data name="feed" xml:space="preserve"><value>Escaneos recientes</value><comment>needs-review</comment></data>
+<data name="queue" xml:space="preserve"><value>Cola de preparación</value><comment>needs-review</comment></data>
+<data name="dispatch" xml:space="preserve"><value>Vista de preparación de despachos</value><comment>needs-review</comment></data>
+<data name="route" xml:space="preserve"><value>Tramo de ruta</value><comment>needs-review</comment></data>
+<data name="review" xml:space="preserve"><value>Revisar selección</value><comment>needs-review</comment></data>
+<data name="selected" xml:space="preserve"><value>Paquetes seleccionados</value><comment>needs-review</comment></data>
+<data name="sample" xml:space="preserve"><value>Solo vista previa. No se despacha ni guarda nada.</value><comment>needs-review</comment></data>
+<data name="detail" xml:space="preserve"><value>Componentes del detalle del envío</value><comment>needs-review</comment></data>
+<data name="lifecycle" xml:space="preserve"><value>Ciclo del envío</value><comment>needs-review</comment></data>
+<data name="intake" xml:space="preserve"><value>Recepción del cliente</value><comment>needs-review</comment></data>
+<data name="scan" xml:space="preserve"><value>Escaneo en almacén</value><comment>needs-review</comment></data>
+<data name="bundle" xml:space="preserve"><value>Formación de lote</value><comment>needs-review</comment></data>
+<data name="dispatchstep" xml:space="preserve"><value>Despacho</value><comment>needs-review</comment></data>
+<data name="delivery" xml:space="preserve"><value>Entrega final</value><comment>needs-review</comment></data>
+<data name="cargo" xml:space="preserve"><value>Detalles de carga</value><comment>needs-review</comment></data>
+<data name="barcodes" xml:space="preserve"><value>Códigos de barras</value><comment>needs-review</comment></data>
+<data name="ledger" xml:space="preserve"><value>Libro de facturación</value><comment>needs-review</comment></data>
+<data name="audit" xml:space="preserve"><value>Registro de auditoría</value><comment>needs-review</comment></data>
+<data name="dimensions" xml:space="preserve"><value>Dimensiones (cm)</value><comment>needs-review</comment></data>
+<data name="actual" xml:space="preserve"><value>Peso real (kg)</value><comment>needs-review</comment></data>
+<data name="dim" xml:space="preserve"><value>Peso volumétrico (kg)</value><comment>needs-review</comment></data>
+<data name="formula" xml:space="preserve"><value>Ejemplo DIM: 60 × 40 × 35 ÷ 5000 = 16,8 kg. El divisor depende del transportista.</value><comment>needs-review</comment></data>
+<data name="views" xml:space="preserve"><value>Vistas de detalle</value><comment>needs-review</comment></data>
+<data name="loading" xml:space="preserve"><value>Estado de carga</value><comment>needs-review</comment></data>
+<data name="table" xml:space="preserve"><value>Componentes de tabla de envíos</value><comment>needs-review</comment></data>
+<data name="english" xml:space="preserve"><value>English</value></data>
+<data name="french" xml:space="preserve"><value>Français</value></data>
+<data name="spanish" xml:space="preserve"><value>Español</value></data>
+<data name="shortcut" xml:space="preserve"><value>Ctrl / ⌘ K</value></data>
+<data name="language" xml:space="preserve"><value>Idioma</value></data>
+</root>

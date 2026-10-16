@@ -26,9 +26,7 @@ IMPORTANT NOTES:
     <script>
         (function() {
             var t = localStorage.getItem('vx-theme');
-            if (t === 'dark' || t === 'light') {
-                document.documentElement.setAttribute('data-theme', t);
-            }
+            document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
         })();
         window.__toggleTheme = function() {
             var cur = document.documentElement.getAttribute('data-theme');

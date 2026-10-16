@@ -24,3 +24,7 @@ Platform Slice 1 needed the presenter base before this project's stage opened, s
 | `Presenters/PresenterRunOutcome.cs` | `Completed`, `Denied`, `Failed`, `Cancelled` |
 
 No primitives yet: those remain Frontend/UI work.
+
+## Workbench catalogue
+
+VxMetricCard and VxLifecycleStepper, additive Progress status badges, compact table states and self-hosted Inter are described in [the shared verification record](../../../docs/shared/ENTERPRISE-WORKBENCH-2026-10-16.md). Primitive labels and workflow mappings remain consumer-owned. New APIs require C-1 owner/consumer review.

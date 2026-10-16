@@ -1304,67 +1304,6 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 /* =========================================================
-   STATUS BADGES
-   ========================================================= */
-.vx-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.2rem 0.65rem;
-    border-radius: var(--vx-radius-full);
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    border: 1px solid transparent;
-}
-
-.vx-badge::before {
-    content: "";
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    flex-shrink: 0;
-}
-
-.vx-badge--active {
-    background: var(--vx-color-success-bg);
-    color: var(--vx-color-success);
-    border-color: var(--vx-color-success);
-}
-
-.vx-badge--invited {
-    background: var(--vx-color-info-bg);
-    color: var(--vx-color-info);
-    border-color: var(--vx-color-info);
-}
-
-.vx-badge--suspended {
-    background: var(--vx-color-warning-bg);
-    color: var(--vx-color-warning);
-    border-color: var(--vx-color-warning);
-}
-
-.vx-badge--locked {
-    background: var(--vx-color-danger-bg);
-    color: var(--vx-color-danger);
-    border-color: var(--vx-color-danger);
-}
-
-.vx-badge--deactivated,
-.vx-badge--inactive {
-    background: var(--vx-color-inactive-bg);
-    color: var(--vx-color-inactive);
-    border-color: var(--vx-color-inactive-border);
-}
-
-.vx-badge--primary {
-    background: var(--vx-color-primary-soft);
-    color: var(--vx-color-primary);
-    border-color: var(--vx-color-primary);
-}
-
-/* =========================================================
    FACTS & KEY-VALUE LISTS
    ========================================================= */
 .vx-facts {
@@ -2498,3 +2437,40 @@ body.vx-auth {
 
 /* Hidden passkey feedback must remain hidden until the browser flow reveals it. */
 .vx-passkey[hidden], .vx-passkey [hidden] { display: none !important; }
+
+/* Enterprise Control density: preserve routes/data, sharpen scanning hierarchy. */
+@media screen {
+    .vx-shell { background: var(--vx-color-surface-sunken); }
+    .vx-shell__main { padding: var(--vx-space-6) var(--vx-space-8); }
+    .vx-dashboard { gap: var(--vx-space-5); }
+    .vx-page-title { font-size: var(--vx-font-size-2xl); font-weight: 700; }
+    .vx-card, .vx-kpi-card, .vx-dashboard__portals .vx-card { border-radius: var(--vx-radius-workbench); padding: var(--vx-space-5); box-shadow: var(--vx-shadow-1); }
+    .vx-card:hover, .vx-kpi-card:hover { transform: none; box-shadow: var(--vx-shadow-1); border-color: var(--vx-color-border-control); }
+    .vx-kpi-grid { gap: var(--vx-space-4); }
+    .vx-kpi-card__label { text-transform: none; font-size: var(--vx-font-size-md); letter-spacing: normal; }
+    .vx-kpi-card__value { font-variant-numeric: tabular-nums; font-size: var(--vx-font-size-3xl); }
+    .vx-nav-item { border-radius: var(--vx-radius-sm); }
+    .vx-nav-item.active { border-inline-start: var(--vx-focus-width) solid var(--vx-color-chrome-accent); }
+    .vx-topbar { backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .vx-table-container { max-height: var(--vx-table-viewport); overflow: auto; border-radius: var(--vx-radius-workbench); box-shadow: var(--vx-shadow-1); }
+    .vx-table { border-collapse: separate; border-spacing: 0; font-size: var(--vx-font-size-md); font-variant-numeric: tabular-nums; }
+    .vx-table th, .vx-table td { padding: var(--vx-density-cell-y) var(--vx-space-4); }
+    .vx-table th { position: sticky; top: 0; z-index: 2; background: var(--vx-color-surface-sunken); }
+    .vx-table td:last-child:has(.vx-actions), .vx-table td:last-child:has(> .vx-button) { position: sticky; inset-inline-end: 0; background: var(--vx-color-surface); border-inline-start: var(--vx-border-width) solid var(--vx-color-border); }
+    .vx-table tbody tr:hover td { background: var(--vx-color-primary-soft); }
+    .vx-toolbar { padding: var(--vx-space-3) var(--vx-space-4); box-shadow: none; border-radius: var(--vx-radius-workbench); }
+}
+@media screen and (max-width: 640px) {
+    .vx-shell__main { padding: var(--vx-space-4); }
+    .vx-table { display: table; }
+    .vx-table td, .vx-table th { padding-block: var(--vx-space-3); }
+}
+
+/* Native disclosure groups keep navigation usable without a circuit. */
+details.vx-nav-group { display: block; }
+details.vx-nav-group > summary { display: flex; align-items: center; justify-content: space-between; cursor: pointer; list-style: none; min-height: var(--vx-control-min); }
+details.vx-nav-group > summary::-webkit-details-marker { display: none; }
+details.vx-nav-group > summary::after { content: '+'; font-size: var(--vx-font-size-md); }
+details.vx-nav-group[open] > summary::after { content: '−'; }
+details.vx-nav-group > summary:focus-visible { outline: var(--vx-focus-width) solid var(--vx-color-chrome-accent); outline-offset: var(--vx-space-1); }
+details.vx-nav-group .vx-nav-item { margin-block: var(--vx-space-1); }

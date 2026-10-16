@@ -1,4 +1,4 @@
-@namespace Vixly.Shared.UI.Primitives
+﻿@namespace Vixly.Shared.UI.Primitives
 @*
 =========================================================
 FILE: VxStatusBadge.razor
@@ -35,6 +35,7 @@ IMPORTANT NOTES:
     {
         string statusModifier = Status switch
         {
+            VxBadgeStatus.Progress => "vx-badge--progress",
             VxBadgeStatus.Active => "vx-badge--active",
             VxBadgeStatus.Invited => "vx-badge--invited",
             VxBadgeStatus.Suspended => "vx-badge--suspended",

@@ -1,0 +1,26 @@
+﻿@namespace Vixly.Shared.UI.Primitives
+@* =========================================================
+   FILE: VxLifecycleStepper.razor
+
+   PURPOSE:
+   Ordered progress through caller-defined stages.
+
+   RESPONSIBILITIES:
+   Mark completed, current and upcoming stages.
+
+   IMPORTANT NOTES:
+   Labels and current index belong to the consumer.
+   ========================================================= *@
+<ol class="vx-lifecycle" aria-label="@Label">
+    @for (int i = 0; i < Steps.Count; i++)
+    {
+        <li class="@(i < CurrentIndex ? "vx-lifecycle__complete" : i == CurrentIndex ? "vx-lifecycle__current" : null)" aria-current="@(i == CurrentIndex ? "step" : null)">
+            <span class="vx-lifecycle__number" aria-hidden="true">@(i + 1)</span><span>@Steps[i]</span>
+        </li>
+    }
+</ol>
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<string> Steps { get; set; } = Array.Empty<string>();
+    [Parameter] public int CurrentIndex { get; set; }
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+}
