@@ -7677,4 +7677,20 @@ Questions? Contact us at {support}.</value>
   <data name="platform.internal.too_many_items" xml:space="preserve">
     <value>Send at most {max} items at once.</value>
   </data>
+  <data name="ui.control.workspace" xml:space="preserve"><value>Platform administration</value></data>
+  <data name="ui.control.shortcuts" xml:space="preserve"><value>Administration shortcuts</value></data>
+  <data name="ui.control.view_all" xml:space="preserve"><value>View all</value></data>
+  <data name="ui.control.tenants_context" xml:space="preserve"><value>Tenant directory · first 5 results</value></data>
+  <data name="ui.control.subscriptions_context" xml:space="preserve"><value>Current subscriptions · first 5 results</value></data>
+  <data name="ui.control.invoices_context" xml:space="preserve"><value>Overdue invoices · first 5 results</value></data>
+  <data name="ui.control.approvals_context" xml:space="preserve"><value>Your approval queue · first 5 results</value></data>
+  <data name="ui.control.overdue_invoices" xml:space="preserve"><value>Overdue invoices</value></data>
+  <data name="ui.control.filtered_results" xml:space="preserve"><value>Matching current filters</value></data>
+  <data name="ui.control.overview" xml:space="preserve"><value>Overview</value></data>
+  <data name="ui.control.organizations" xml:space="preserve"><value>Organizations</value></data>
+  <data name="ui.control.commercial" xml:space="preserve"><value>Commercial</value></data>
+  <data name="ui.control.security" xml:space="preserve"><value>Security &amp; access</value></data>
+  <data name="ui.control.system" xml:space="preserve"><value>Settings</value></data>
+  <data name="ui.control.theme" xml:space="preserve"><value>Switch light or dark theme</value></data>
+  <data name="ui.control.skip" xml:space="preserve"><value>Skip to workspace</value></data>
 </root>

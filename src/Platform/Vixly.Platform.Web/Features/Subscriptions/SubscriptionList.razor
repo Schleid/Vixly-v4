@@ -22,22 +22,22 @@ IMPORTANT NOTES:
 @inject NavigationManager Navigation
 
 <form class="vx-toolbar" role="search" @onsubmit="ApplyFilters">
-    <label for="subscription-search">@T["ui.subscriptions.search"]</label>
-    <input id="subscription-search" type="search" @bind="_search" maxlength="100" />
-    <label for="subscription-status">@T["ui.subscriptions.status"]</label>
+    <div class="vx-control-filter"><label for="subscription-search">@T["ui.subscriptions.search"]</label>
+    <input id="subscription-search" type="search" @bind="_search" maxlength="100" /></div>
+    <div class="vx-control-filter"><label for="subscription-status">@T["ui.subscriptions.status"]</label>
     <select id="subscription-status" @bind="_status">
         <option value="">@T["ui.subscriptions.status.all"]</option>
         @foreach (PlatformSubscriptionStatus status in Enum.GetValues<PlatformSubscriptionStatus>())
         {
             <option value="@status">@T[SubscriptionDisplay.StatusKey(status)]</option>
         }
-    </select>
-    <label for="subscription-renews">@T["ui.subscriptions.renews_within"]</label>
+    </select></div>
+    <div class="vx-control-filter"><label for="subscription-renews">@T["ui.subscriptions.renews_within"]</label>
     <select id="subscription-renews" @bind="_renews">
         <option value="">@T["ui.subscriptions.renews_any"]</option>
         <option value="7">@VixlyText.Format(T, "ui.subscriptions.days", "count", 7)</option>
         <option value="30">@VixlyText.Format(T, "ui.subscriptions.days", "count", 30)</option>
-    </select>
+    </select></div>
     <label><input type="checkbox" @bind="_includeEnded" /> @T["ui.subscriptions.include_ended"]</label>
     <label><input type="checkbox" @bind="_discounted" /> @T["ui.discounts.filter"]</label>
     <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
@@ -46,6 +46,10 @@ IMPORTANT NOTES:
         <a class="vx-button vx-button--subtle" href="/subscriptions">@T["ui.subscriptions.all_plans"]</a>
     }
 </form>
+
+<div class="vx-control-list-summary" aria-live="polite">
+    <VxMetricCard Label="@T["ui.subscriptions.title"]" Value="@(Presenter.State.Loaded && Presenter.State.Error is null ? Presenter.State.TotalCount.ToString("N0") : "—")" Detail="@T["ui.control.filtered_results"]" />
+</div>
 
 @if (Presenter.State.Error is not null)
 {
@@ -69,8 +73,8 @@ else
             <td>@item.PlanName <span class="vx-hint">@VixlyText.Format(T, "ui.plans.version_number", "number", item.VersionNumber)</span></td>
             <td><VxStatusBadge Status="@SubscriptionDisplay.Badge(item.Status)" Text="@T[SubscriptionDisplay.StatusKey(item.Status)]" /></td>
             <td>@T[SubscriptionDisplay.TermKey(item.Term)]</td>
-            <td>@item.Licences</td>
-            <td>@SubscriptionDisplay.Money(item.PeriodAmount, item.CurrencyCode)</td>
+            <td class="vx-table__number">@item.Licences</td>
+            <td class="vx-table__number">@SubscriptionDisplay.Money(item.PeriodAmount, item.CurrencyCode)</td>
             <td>@SubscriptionDisplay.Date(item.Status == PlatformSubscriptionStatus.Trialing ? item.TrialEndsUtc : item.PeriodEndUtc)</td>
             <td>
                 @if (item.CancelAtPeriodEnd)

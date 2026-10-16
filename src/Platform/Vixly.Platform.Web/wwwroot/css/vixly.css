@@ -2474,3 +2474,44 @@ details.vx-nav-group > summary::after { content: '+'; font-size: var(--vx-font-s
 details.vx-nav-group[open] > summary::after { content: '−'; }
 details.vx-nav-group > summary:focus-visible { outline: var(--vx-focus-width) solid var(--vx-color-chrome-accent); outline-offset: var(--vx-space-1); }
 details.vx-nav-group .vx-nav-item { margin-block: var(--vx-space-1); }
+
+/* Live Control workbench adoption: the same primitives used in the Gallery. */
+.vx-control-overview { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--vx-space-4); }
+.vx-control-module { display: contents; }
+.vx-control-metric-link { order: 0; color: inherit; min-width: 0; }
+.vx-control-metric-link:hover { text-decoration: none; }
+.vx-control-metric-link .vx-metric { height: 100%; border-top: var(--vx-space-1) solid var(--vx-color-primary); }
+.vx-control-metric-link:hover .vx-metric { border-color: var(--vx-color-primary); }
+.vx-control-panel { order: 1; grid-column: span 2; min-width: 0; background: var(--vx-color-surface); border: 1px solid var(--vx-color-border); border-radius: var(--vx-radius-workbench); overflow: hidden; box-shadow: var(--vx-shadow-1); }
+.vx-control-panel__header { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: var(--vx-space-3); padding: var(--vx-space-4); border-bottom: 1px solid var(--vx-color-border); }
+.vx-control-panel__header h2 { margin: 0; font-size: var(--vx-font-size-md); }
+.vx-control-panel__header a { font-size: var(--vx-font-size-sm); }
+.vx-control-panel .vx-table-container { border: 0; border-radius: 0; box-shadow: none; margin: 0; }
+.vx-control-panel .vx-table { min-width: 0; width: 100%; }
+.vx-control-panel .vx-table td { white-space: normal; overflow-wrap: anywhere; }
+.vx-control-panel .vx-table td:last-child, .vx-control-panel .vx-table th:last-child { position: static; }
+.vx-control-panel .vx-table caption { text-align: start; padding: var(--vx-space-3) var(--vx-space-4); color: var(--vx-color-text-muted); font-size: var(--vx-font-size-sm); }
+.vx-control-panel .vx-message { margin: var(--vx-space-4); }
+.vx-control-eyebrow { color: var(--vx-color-primary); font-size: var(--vx-font-size-sm); font-weight: 600; margin-bottom: var(--vx-space-2); }
+.vx-control-shortcuts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--vx-space-3); margin-top: var(--vx-space-5); }
+.vx-control-shortcuts a { display: flex; justify-content: space-between; gap: var(--vx-space-3); align-items: center; padding: var(--vx-space-4); border: 1px solid var(--vx-color-border); border-radius: var(--vx-radius-workbench); background: var(--vx-color-surface); }
+.vx-control-list-summary { max-width: 100%; margin-block: var(--vx-space-4); }
+.vx-control-list-summary .vx-metric { display: flex; align-items: center; flex-wrap: wrap; gap: var(--vx-space-4); padding: var(--vx-space-3) var(--vx-space-4); }
+.vx-control-list-summary .vx-metric__value { font-size: var(--vx-font-size-xl); }
+.vx-control-list-summary .vx-metric__label, .vx-control-list-summary .vx-metric__detail { margin: 0; }
+.vx-control-filter { display: flex; flex-direction: column; gap: var(--vx-space-1); min-width: 0; flex: 1 1 auto; }
+.vx-toolbar { align-items: end; }
+.vx-topbar__search-input { min-width: 0; cursor: text; }
+.vx-topbar__search:focus-within { outline: var(--vx-focus-width) solid var(--vx-color-focus); outline-offset: var(--vx-space-1); }
+.vx-skip-link { position: fixed; inset-inline-start: var(--vx-space-4); top: var(--vx-space-4); transform: translateY(-200%); z-index: 100; padding: var(--vx-space-3); background: var(--vx-color-surface); border: 1px solid var(--vx-color-primary); }
+.vx-skip-link:focus { transform: none; }
+@media screen and (max-width: 1280px) { .vx-control-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); } .vx-control-panel { grid-column: span 2; } }
+@media screen and (max-width: 640px) {
+    .vx-control-overview, .vx-control-shortcuts { grid-template-columns: minmax(0, 1fr); }
+    .vx-control-panel { grid-column: auto; }
+    .vx-topbar { height: auto; min-height: var(--vx-control-min); padding-block: var(--vx-space-3); flex-wrap: wrap; gap: var(--vx-space-3); }
+    .vx-topbar__search { display: flex; width: 100%; }
+    .vx-topbar__actions { margin-inline-start: auto; }
+    .vx-control-filter { flex-basis: 100%; }
+    .vx-control-panel .vx-table { display: table; }
+}

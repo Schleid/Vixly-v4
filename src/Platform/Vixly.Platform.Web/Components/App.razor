@@ -28,6 +28,12 @@ IMPORTANT NOTES:
             var t = localStorage.getItem('vx-theme');
             document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
         })();
+        document.addEventListener('keydown', function(event) {
+            if ((event.ctrlKey || event.metaKey) && event.code === 'KeyK') {
+                var search = document.getElementById('vx-tenant-search');
+                if (search) { event.preventDefault(); search.focus(); }
+            }
+        });
         window.__toggleTheme = function() {
             var cur = document.documentElement.getAttribute('data-theme');
             if (!cur) {

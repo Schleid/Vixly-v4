@@ -44,3 +44,7 @@ Owner rejected the quiet workspace trial. Restored the console stylesheet and th
 ## Enterprise workbench implementation
 
 See [the shared implementation and verification record](../shared/ENTERPRISE-WORKBENCH-2026-10-16.md). The owner supplied a new dense enterprise brief after the rejected workspace trial. This pass adds compact tables/panels, canonical shared status styling and native collapsible navigation while preserving current Control workflows. New operational screens remain labelled Gallery fixtures pending ADR-0016 and Stage 3 integration.
+
+## Direct Control adoption
+
+See [Control workbench adoption](CONTROL-WORKBENCH-ADOPTION-2026-10-16.md): shared metrics now bind directly to existing Control presenters on the home page and tenant/subscription/invoice directories, with localized navigation and functional tenant search.
