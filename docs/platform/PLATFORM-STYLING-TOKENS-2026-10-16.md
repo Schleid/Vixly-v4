@@ -40,3 +40,11 @@ Static verification: balanced CSS blocks, all token references defined, no raw c
 ## Trial withdrawn
 
 Owner rejected the quiet workspace trial. Restored the console stylesheet and theme tokens from e40ffab. Removed the explanatory passkey helper line from sign-in markup. Scoped hidden-attribute enforcement prevents passkey feedback from showing before the existing browser flow reveals it; sign-in actions and actual error feedback are preserved. Diff whitespace checks pass. No backend or authentication logic changed.
+
+## Enterprise workbench implementation
+
+See [the shared implementation and verification record](../shared/ENTERPRISE-WORKBENCH-2026-10-16.md). The owner supplied a new dense enterprise brief after the rejected workspace trial. This pass adds compact tables/panels, canonical shared status styling and native collapsible navigation while preserving current Control workflows. New operational screens remain labelled Gallery fixtures pending ADR-0016 and Stage 3 integration.
+
+## Direct Control adoption
+
+See [Control workbench adoption](CONTROL-WORKBENCH-ADOPTION-2026-10-16.md): shared metrics now bind directly to existing Control presenters on the home page and tenant/subscription/invoice directories, with localized navigation and functional tenant search.

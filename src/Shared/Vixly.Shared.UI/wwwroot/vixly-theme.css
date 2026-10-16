@@ -1,4 +1,13 @@
-﻿/* =========================================================
+﻿/* Inter variable, self-hosted under SIL OFL; no font CDN request. */
+@font-face {
+    font-family: "Inter";
+    src: url("fonts/InterVariable.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+}
+
+/* =========================================================
    FILE: vixly-theme.css
    PURPOSE: Core design tokens for Vixly V4 (Vixly.Shared.UI).
    NOTES:
@@ -9,6 +18,30 @@
 
 :root,
 :root[data-theme="light"] {
+    --vx-color-status-received: #1D4ED8;
+    --vx-color-status-received-bg: #EFF6FF;
+    --vx-color-status-staged: #B45309;
+    --vx-color-status-staged-bg: #FFFBEB;
+    --vx-color-status-completed: #047857;
+    --vx-color-status-completed-bg: #ECFDF5;
+    --vx-color-status-exception: #BE123C;
+    --vx-color-status-exception-bg: #FFF1F2;
+
+    /* Dense enterprise workbench metrics. */
+    --vx-density-row: 2.5rem;
+    --vx-density-cell-y: 0.625rem;
+    --vx-radius-workbench: 8px;
+    --vx-table-viewport: 34rem;
+    --vx-table-min-width: 50rem;
+    --vx-metric-chart-height: 2rem;
+    --vx-color-progress: #7E22CE;
+    --vx-color-progress-bg: #FAF5FF;
+    --vx-color-progress-border: #E9D5FF;
+    --vx-color-status-info-border: #BFDBFE;
+    --vx-color-status-warning-border: #FDE68A;
+    --vx-color-status-success-border: #A7F3D0;
+    --vx-color-status-danger-border: #FECDD3;
+
     /* Shared layout and accessible control metrics. */
     --vx-content-wide: 76rem;
     --vx-content-reading: 44rem;
@@ -158,6 +191,23 @@
 }
 
 :root[data-theme="dark"] {
+    --vx-color-status-received: #93C5FD;
+    --vx-color-status-received-bg: #16264A;
+    --vx-color-status-staged: #FCD34D;
+    --vx-color-status-staged-bg: #332711;
+    --vx-color-status-completed: #6EE7B7;
+    --vx-color-status-completed-bg: #0D2B23;
+    --vx-color-status-exception: #FDA4AF;
+    --vx-color-status-exception-bg: #2C141F;
+
+    --vx-color-progress: #D8B4FE;
+    --vx-color-progress-bg: #2D1944;
+    --vx-color-progress-border: #6B3A91;
+    --vx-color-status-info-border: #274C83;
+    --vx-color-status-warning-border: #725519;
+    --vx-color-status-success-border: #215A42;
+    --vx-color-status-danger-border: #713443;
+
     --vx-color-bg-app: #0B1220;
     --vx-color-app: #0B1220;
     --vx-color-surface: #111A2E;
@@ -202,6 +252,23 @@
 
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
+        --vx-color-status-received: #93C5FD;
+        --vx-color-status-received-bg: #16264A;
+        --vx-color-status-staged: #FCD34D;
+        --vx-color-status-staged-bg: #332711;
+        --vx-color-status-completed: #6EE7B7;
+        --vx-color-status-completed-bg: #0D2B23;
+        --vx-color-status-exception: #FDA4AF;
+        --vx-color-status-exception-bg: #2C141F;
+
+        --vx-color-progress: #D8B4FE;
+        --vx-color-progress-bg: #2D1944;
+        --vx-color-progress-border: #6B3A91;
+        --vx-color-status-info-border: #274C83;
+        --vx-color-status-warning-border: #725519;
+        --vx-color-status-success-border: #215A42;
+        --vx-color-status-danger-border: #713443;
+
         --vx-color-bg-app: #0B1220;
         --vx-color-app: #0B1220;
         --vx-color-surface: #111A2E;

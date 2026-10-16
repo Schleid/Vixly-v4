@@ -1,4 +1,4 @@
-<Solution>
+﻿<Solution>
   <Folder Name="/src/" />
   <Folder Name="/src/Contracts/">
     <Project Path="src/Contracts/Vixly.Contracts.Platform/Vixly.Contracts.Platform.csproj" />
@@ -31,5 +31,6 @@
   </Folder>
   <Folder Name="/tests/Shared/">
     <Project Path="tests/Shared/Vixly.Shared.Kernel.Tests/Vixly.Shared.Kernel.Tests.csproj" />
+    <Project Path="tests/Shared/Vixly.Shared.UI.Tests/Vixly.Shared.UI.Tests.csproj" />
   </Folder>
 </Solution>

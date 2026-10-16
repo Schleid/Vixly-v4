@@ -24,24 +24,28 @@ IMPORTANT NOTES:
 @if (TenantId is null)
 {
     <form class="vx-toolbar" role="search" @onsubmit="ApplyFilters">
-        <label for="invoice-search">@T["ui.invoices.search"]</label>
-        <input id="invoice-search" type="search" @bind="_search" maxlength="100" />
-        <label for="invoice-status">@T["ui.invoices.status"]</label>
-        <select id="invoice-status" @bind="_status">
+        <div class="vx-control-filter"><label for="invoice-search">@T["ui.invoices.search"]</label>
+    <input id="invoice-search" type="search" @bind="_search" maxlength="100" /></div>
+        <div class="vx-control-filter"><label for="invoice-status">@T["ui.invoices.status"]</label>
+    <select id="invoice-status" @bind="_status">
             <option value="">@T["ui.invoices.status.all"]</option>
             @foreach (PlatformInvoiceStatus status in Enum.GetValues<PlatformInvoiceStatus>())
             {
                 <option value="@status">@T[BillingDisplay.StatusKey(status)]</option>
             }
-        </select>
-        <label for="invoice-from">@T["ui.invoices.issued_from"]</label>
-        <input id="invoice-from" type="date" @bind="_from" />
-        <label for="invoice-to">@T["ui.invoices.issued_to"]</label>
-        <input id="invoice-to" type="date" @bind="_to" />
+        </select></div>
+        <div class="vx-control-filter"><label for="invoice-from">@T["ui.invoices.issued_from"]</label>
+    <input id="invoice-from" type="date" @bind="_from" /></div>
+        <div class="vx-control-filter"><label for="invoice-to">@T["ui.invoices.issued_to"]</label>
+    <input id="invoice-to" type="date" @bind="_to" /></div>
         <label><input type="checkbox" @bind="_overdue" /> @T["ui.invoices.overdue_only"]</label>
         <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
     </form>
 }
+
+<div class="vx-control-list-summary" aria-live="polite">
+    <VxMetricCard Label="@T["ui.invoices.title"]" Value="@(Presenter.State.Loaded && Presenter.State.Error is null ? Presenter.State.TotalCount.ToString("N0") : "—")" Detail="@T["ui.control.filtered_results"]" />
+</div>
 
 @if (Presenter.State.Error is not null)
 {
@@ -83,8 +87,8 @@ else
             </td>
             <td>@SubscriptionDisplay.Date(item.IssuedUtc)</td>
             <td>@SubscriptionDisplay.Date(item.DueUtc)</td>
-            <td>@BillingDisplay.Money(item.Total, item.CurrencyCode)</td>
-            <td>@BillingDisplay.Money(item.Balance, item.CurrencyCode)</td>
+            <td class="vx-table__number">@BillingDisplay.Money(item.Total, item.CurrencyCode)</td>
+            <td class="vx-table__number">@BillingDisplay.Money(item.Balance, item.CurrencyCode)</td>
         </RowTemplate>
         <EmptyContent>
             <VxEmptyState Title="@T["ui.invoices.empty"]" />

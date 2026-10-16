@@ -1,76 +1,33 @@
-﻿@*
-=========================================================
-FILE: Home.razor - Executive Overview Dashboard for Vixly Control Plane.
-=========================================================
-*@
-@page "/"
+﻿@page "/"
 @attribute [Authorize]
+@using Vixly.Platform.Web.Features.Dashboard
 @inject IStringLocalizer<PlatformText> T
+@* =========================================================
+   FILE: Home.razor
 
+   PURPOSE:
+   The signed-in Control overview and administration shortcuts.
+
+   RESPONSIBILITIES:
+   Present existing authorized Control data and navigation.
+
+   IMPORTANT NOTES:
+   Uses existing presenters; no business rules or sample values.
+   ========================================================= *@
 <PageTitle>@T["ui.home.title"] · @T["ui.app.name"]</PageTitle>
-
 <div class="vx-dashboard">
-    <!-- Header with Quick Action Shortcuts -->
     <header class="vx-dashboard__header">
-        <div class="vx-dashboard__title-wrap">
-            <h1 class="vx-page-title">@T["ui.home.title"]</h1>
-            <p class="vx-dashboard__subtitle">@T["ui.home.subtitle"]</p>
-        </div>
+        <div><p class="vx-control-eyebrow">@T["ui.control.workspace"]</p><h1 class="vx-page-title">@T["ui.home.title"]</h1><p class="vx-dashboard__subtitle">@T["ui.home.subtitle"]</p></div>
         <div class="vx-dashboard__actions">
-            <a href="/tenants/new" class="vx-button vx-button--primary">+ @T["ui.tenants.new"]</a>
+            <a href="/offers/new" class="vx-button vx-button--primary">+ @T["ui.offers.new"]</a>
             <a href="/users/invite" class="vx-button vx-button--secondary">@T["ui.invite.title"]</a>
         </div>
     </header>
-
-    <!-- Executive KPI Grid -->
-    <div class="vx-kpi-grid">
-        <div class="vx-kpi-card">
-            <span class="vx-kpi-card__label">@T["ui.tenants.title"]</span>
-            <div class="vx-kpi-card__val-row"><span class="vx-kpi-card__value">42</span><span class="vx-trend-badge vx-trend-badge--up">↑ 12.5%</span></div>
-            <span class="vx-kpi-card__sub">Across global cloud zones</span>
-        </div>
-        <div class="vx-kpi-card">
-            <span class="vx-kpi-card__label">@T["ui.subscriptions.title"]</span>
-            <div class="vx-kpi-card__val-row"><span class="vx-kpi-card__value">38</span><span class="vx-trend-badge vx-trend-badge--neutral">98.2% ret.</span></div>
-            <span class="vx-kpi-card__sub">Enterprise &amp; standard tiers</span>
-        </div>
-        <div class="vx-kpi-card">
-            <span class="vx-kpi-card__label">@T["ui.approvals.title"]</span>
-            <div class="vx-kpi-card__val-row"><span class="vx-kpi-card__value">2</span><span class="vx-trend-badge vx-trend-badge--warn">Review req.</span></div>
-            <span class="vx-kpi-card__sub">Four-eyes approval queue</span>
-        </div>
-        <div class="vx-kpi-card">
-            <span class="vx-kpi-card__label">Edge Mesh Health</span>
-            <div class="vx-kpi-card__val-row"><span class="vx-kpi-card__value">99.98%</span><span class="vx-trend-badge vx-trend-badge--up">● 14ms</span></div>
-            <span class="vx-kpi-card__sub">Zero-Trust perimeter active</span>
-        </div>
-    </div>
-
-    <!-- Domain Portals Grid -->
-    <div class="vx-dashboard__portals">
-        <VxCard Title="@T["ui.tenants.title"]">
-            <p>@T["ui.home.tenants_desc"]</p>
-            <div class="vx-actions"><a href="/tenants" class="vx-button vx-button--subtle">@T["ui.home.tenants_action"] →</a></div>
-        </VxCard>
-        <VxCard Title="@T["ui.subscriptions.title"]">
-            <p>Manage subscription plans, recurring billing, trials, and promotional discount terms.</p>
-            <div class="vx-actions"><a href="/subscriptions" class="vx-button vx-button--subtle">@T["ui.subscriptions.title"] →</a></div>
-        </VxCard>
-        <VxCard Title="@T["ui.invoices.title"]">
-            <p>Manage commercial invoices, tax lines, credit adjustments, and payment tracking.</p>
-            <div class="vx-actions"><a href="/invoices" class="vx-button vx-button--subtle">@T["ui.invoices.title"] →</a></div>
-        </VxCard>
-        <VxCard Title="@T["ui.collections.title"]">
-            <p>Oversee dunning timelines, overdue recovery, extensions, and automated access blocks.</p>
-            <div class="vx-actions"><a href="/collections" class="vx-button vx-button--subtle">@T["ui.collections.title"] →</a></div>
-        </VxCard>
-        <VxCard Title="@T["ui.users.title"]">
-            <p>@T["ui.home.users_desc"]</p>
-            <div class="vx-actions"><a href="/users" class="vx-button vx-button--subtle">@T["ui.home.users_action"] →</a></div>
-        </VxCard>
-        <VxCard Title="@T["ui.audit.title"]">
-            <p>@T["ui.home.audit_desc"]</p>
-            <div class="vx-actions"><a href="/audit" class="vx-button vx-button--subtle">@T["ui.home.audit_action"] →</a></div>
-        </VxCard>
-    </div>
+    <ControlOverview />
+    <nav class="vx-control-shortcuts" aria-label="@T["ui.control.shortcuts"]">
+        <a href="/collections"><span>@T["ui.collections.title"]</span><span aria-hidden="true">↗</span></a>
+        <a href="/plans"><span>@T["ui.plans.title"]</span><span aria-hidden="true">↗</span></a>
+        <a href="/users"><span>@T["ui.users.title"]</span><span aria-hidden="true">↗</span></a>
+        <a href="/audit"><span>@T["ui.audit.title"]</span><span aria-hidden="true">↗</span></a>
+    </nav>
 </div>
