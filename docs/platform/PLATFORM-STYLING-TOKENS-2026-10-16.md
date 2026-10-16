@@ -28,3 +28,11 @@ Pre-existing uncommitted Stage 2 delivery files are excluded from this commit.
 ## Automated results
 
 Platform Web: 32 passed, 0 failed. Architecture: 6,363 passed, 0 failed. Sequential reruns completed successfully. Static CSS checks and diff whitespace checks passed.
+
+## Quiet workspace trial (owner feedback)
+
+Owner rejected the background, card style and menu and approved trying a crisp workspace direction. This presentation-only trial uses an opt-in neutral workspace token, flat lightly bordered panels, restrained headings, simpler dark navigation and a narrow active marker. Cards and KPIs do not lift on hover. Public is unaffected by the new workspace tokens.
+
+Login becomes an open, left-aligned form on a plain surface, without a floating card, decorative grid/glows, oversized logo tile or telemetry chrome. Functional forms, passkeys, language links, errors, recovery and menu composition remain unchanged. Wider recovery-code and QR flows retain additional room. Print styles remain outside the screen-only trial rules.
+
+Static verification: balanced CSS blocks, all token references defined, no raw console colours, clean diff whitespace. No backend changes or preview processes. Live light/dark, responsive and keyboard visual review is pending owner feedback on this design direction.
