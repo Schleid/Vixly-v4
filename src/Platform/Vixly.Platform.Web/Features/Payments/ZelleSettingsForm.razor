@@ -1,0 +1,131 @@
+﻿@*
+=========================================================
+FILE: ZelleSettingsForm.razor
+
+PURPOSE:
+Vixly's Zelle details shown at checkout: on or off, recipient
+name, email, Zelle tag, phone and the QR code image (Slice 5
+update).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Hidden for staff without platform.payments.configure
+- Zelle is offered for US-dollar invoices only
+=========================================================
+*@
+@inherits PlatformPresenterComponent<ZelleSettingsPresenter>
+@using Vixly.Platform.Application.Security
+@using Vixly.Platform.Domain.Payments
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (!PlatformSecurityErrors.AccessDenied.Equals(Presenter.State.Error))
+{
+    <div id="zelle-settings"><VxCard Title="@T["ui.zelle_settings.title"]">
+        @if (Presenter.State.DoneKey is { } done)
+        {
+            <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+        }
+        @if (Presenter.State.Error is not null)
+        {
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+        }
+        @if (!Presenter.State.Loaded)
+        {
+            <p role="status">@T["ui.common.loading"]</p>
+        }
+        else
+        {
+            <p class="vx-hint">@T["ui.zelle_settings.help"]</p>
+            <form class="vx-form" @onsubmit="SaveAsync">
+                <label><input id="zelle-enabled" type="checkbox" @bind="_enabled" /> @T["ui.zelle_settings.enabled"]</label>
+                <label for="zelle-recipient">@T["ui.zelle_settings.recipient"]</label>
+                <input id="zelle-recipient" @bind="_recipient" maxlength="@PlatformZelleLimits.RecipientMaxLength" />
+                <label for="zelle-email">@T["ui.zelle_settings.email"]</label>
+                <input id="zelle-email" type="email" @bind="_email" maxlength="@PlatformZelleLimits.EmailMaxLength" />
+                <label for="zelle-tag">@T["ui.zelle_settings.tag"]</label>
+                <input id="zelle-tag" @bind="_tag" maxlength="@PlatformZelleLimits.TagMaxLength" />
+                <label for="zelle-phone">@T["ui.zelle_settings.phone"]</label>
+                <input id="zelle-phone" type="tel" @bind="_phone" maxlength="@PlatformZelleLimits.PhoneMaxLength" aria-describedby="zelle-ways-help" />
+                <p id="zelle-ways-help" class="vx-hint">@T["ui.zelle_settings.ways_help"]</p>
+                <div class="vx-actions">
+                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.zelle_settings.save"]</VxButton>
+                </div>
+            </form>
+            <h3>@T["ui.zelle_settings.qr"]</h3>
+            @if (Presenter.State.QrCode is { } qr)
+            {
+                <p><img id="zelle-qr" src="@($"data:{qr.ContentType};base64,{Convert.ToBase64String(qr.Content)}")" alt="@T["ui.zelle_settings.qr_alt"]" width="160" height="160" /></p>
+                <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => Presenter.SetQrCodeAsync(null, null)" IsBusy="@Presenter.IsBusy">@T["ui.zelle_settings.qr_remove"]</VxButton>
+            }
+            else
+            {
+                <p class="vx-hint">@T["ui.zelle_settings.qr_none"]</p>
+            }
+            <label for="zelle-qr-file">@T["ui.zelle_settings.qr_upload"]</label>
+            <InputFile id="zelle-qr-file" accept="image/png,image/jpeg" OnChange="UploadAsync" aria-describedby="zelle-qr-help" />
+            <p id="zelle-qr-help" class="vx-hint">@VixlyText.Format(T, "ui.zelle_settings.qr_help", "maxKilobytes", PlatformZelleLimits.MaxQrKilobytes)</p>
+        }
+    </VxCard></div>
+    @if (Presenter.State.StepUpPending)
+    {
+        <StepUpDialog OnConfirmed="Presenter.ConfirmStepUpAsync" OnCancelled="Presenter.CancelStepUp" />
+    }
+}
+
+@code {
+    private bool _enabled;
+
+    private string? _recipient;
+
+    private string? _email;
+
+    private string? _tag;
+
+    private string? _phone;
+
+    private bool _started;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!_started)
+        {
+            _started = true;
+            await Presenter.LoadAsync();
+
+            // The form starts from what is saved; later saves keep what the user typed.
+            if (Presenter.State.Account is { } account)
+            {
+                _enabled = account.Enabled;
+                _recipient = account.RecipientName;
+                _email = account.Email;
+                _tag = account.Tag;
+                _phone = account.Phone;
+            }
+        }
+    }
+
+    private Task SaveAsync()
+    {
+        return Presenter.SaveAsync(_enabled, _recipient, _email, _tag, _phone);
+    }
+
+    private async Task UploadAsync(InputFileChangeEventArgs args)
+    {
+        long limit = PlatformZelleLimits.MaxQrKilobytes * 1024L;
+
+        if (args.File.Size > limit)
+        {
+            Presenter.Fail(PlatformZelleErrors.QrCodeInvalid);
+            return;
+        }
+
+        using MemoryStream buffer = new();
+        await using Stream stream = args.File.OpenReadStream(limit);
+        await stream.CopyToAsync(buffer);
+        await Presenter.SetQrCodeAsync(buffer.ToArray(), args.File.ContentType);
+    }
+}

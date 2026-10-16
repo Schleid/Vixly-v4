@@ -1,0 +1,20 @@
+﻿@*
+=========================================================
+FILE: BillingSettingsPage.razor
+
+PURPOSE:
+Billing settings and the company profile printed on documents.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/billing/settings"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.billing_settings.title"]</PageTitle>
+<h1>@T["ui.billing_settings.title"]</h1>
+<p><a href="/invoices">@T["ui.invoices.title"]</a> · <a href="/billing/tax-rates">@T["ui.tax_rates.title"]</a></p>
+<BillingSettingsForm />

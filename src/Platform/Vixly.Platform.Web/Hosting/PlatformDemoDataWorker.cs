@@ -57,6 +57,18 @@ public sealed class PlatformDemoDataWorker : BackgroundService
             await using AsyncServiceScope third = _scopes.CreateAsyncScope();
             string sales = await ActivatorUtilities.CreateInstance<PlatformDemoSales>(third.ServiceProvider).SeedAsync(stoppingToken);
             _logger.LogInformation("Demo data: {Result}", sales);
+
+            await using AsyncServiceScope fourth = _scopes.CreateAsyncScope();
+            string billing = await ActivatorUtilities.CreateInstance<PlatformDemoBilling>(fourth.ServiceProvider).SeedAsync(stoppingToken);
+            _logger.LogInformation("Demo data: {Result}", billing);
+
+            await using AsyncServiceScope fifth = _scopes.CreateAsyncScope();
+            string licensing = await ActivatorUtilities.CreateInstance<PlatformDemoLicensing>(fifth.ServiceProvider).SeedAsync(stoppingToken);
+            _logger.LogInformation("Demo data: {Result}", licensing);
+
+            await using AsyncServiceScope sixth = _scopes.CreateAsyncScope();
+            string legal = await ActivatorUtilities.CreateInstance<PlatformDemoLegal>(sixth.ServiceProvider).SeedAsync(stoppingToken);
+            _logger.LogInformation("Demo data: {Result}", legal);
         }
         catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
         {

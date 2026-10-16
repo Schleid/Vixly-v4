@@ -44,7 +44,7 @@ public sealed class PlatformSubscriptionAdministration
 
     private readonly PlatformOutboxWriter _outbox;
 
-    private readonly IPlatformSubscriptionPolicy _policy;
+    private readonly IPlatformCollectionsRepository _collections;
 
     private readonly TimeProvider _timeProvider;
 
@@ -58,7 +58,7 @@ public sealed class PlatformSubscriptionAdministration
         IPlatformLicenceCounter licences,
         PlatformAuditTrail audit,
         PlatformOutboxWriter outbox,
-        IPlatformSubscriptionPolicy policy,
+        IPlatformCollectionsRepository collections,
         TimeProvider timeProvider)
     {
         _gate = gate ?? throw new ArgumentNullException(nameof(gate));
@@ -70,7 +70,7 @@ public sealed class PlatformSubscriptionAdministration
         _licences = licences ?? throw new ArgumentNullException(nameof(licences));
         _audit = audit ?? throw new ArgumentNullException(nameof(audit));
         _outbox = outbox ?? throw new ArgumentNullException(nameof(outbox));
-        _policy = policy ?? throw new ArgumentNullException(nameof(policy));
+        _collections = collections ?? throw new ArgumentNullException(nameof(collections));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
@@ -82,7 +82,11 @@ public sealed class PlatformSubscriptionAdministration
 
     public IPlatformLimitOverrideRepository Overrides => _overrides;
 
-    public TimeSpan UnpaidReadOnlyPeriod => _policy.UnpaidReadOnlyPeriod;
+    // Read-only periods come from Collections settings (Slice 6, D-C4, D-C5); defaults until the row exists.
+    public async Task<PlatformSubscriptionAccessRules> AccessRulesAsync(CancellationToken cancellationToken)
+    {
+        return ((await _collections.FindSettingsAsync(cancellationToken)) ?? Vixly.Platform.Domain.Collections.PlatformCollectionsSettings.Create(UtcNow)).AccessRules;
+    }
 
     public static LanguageCode Language(string? value)
     {
@@ -187,28 +191,37 @@ public sealed class PlatformSubscriptionAdministration
     public async Task<IReadOnlyList<PlatformPlanOption>> PlanOptionsAsync(
         Guid platformTenantId,
         LanguageCode language,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        bool publicOnly = false)
     {
-        IReadOnlyList<PlatformPlan> plans = await _plans.ListChoosableAsync(publicOnly: false, cancellationToken);
+        IReadOnlyList<PlatformPlan> plans = await _plans.ListChoosableAsync(publicOnly, cancellationToken);
         List<PlatformPlanOption> options = new();
 
         foreach (PlatformPlan plan in plans)
         {
-            PlatformPlanVersion version = plan.Current!;
-            options.Add(new PlatformPlanOption(
-                plan.Id,
-                plan.Code,
-                plan.NameIn(language),
-                version.CurrencyCode,
-                version.MonthlyPricePerLicence,
-                version.AnnualPricePerLicence,
-                version.SetupFee,
-                version.MinimumLicences,
-                await MaxLicencesAsync(platformTenantId, version, cancellationToken),
-                version.TrialDays));
+            options.Add(await OptionAsync(platformTenantId, plan, language, cancellationToken));
         }
 
         return options;
+    }
+
+    public async Task<PlatformPlanOption> OptionAsync(Guid platformTenantId, PlatformPlan plan, LanguageCode language, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(plan);
+
+        PlatformPlanVersion version = plan.Current ?? throw new InvalidOperationException("The plan has no current version.");
+
+        return new PlatformPlanOption(
+            plan.Id,
+            plan.Code,
+            plan.NameIn(language),
+            version.CurrencyCode,
+            version.MonthlyPricePerLicence,
+            version.AnnualPricePerLicence,
+            version.SetupFee,
+            version.MinimumLicences,
+            await MaxLicencesAsync(platformTenantId, version, cancellationToken),
+            version.TrialDays);
     }
 
     // =====================================================
@@ -249,7 +262,7 @@ public sealed class PlatformSubscriptionAdministration
             CanChange: manage && changeable && !subscription.CancelAtPeriodEnd,
             CanExtendTrial: manage && status == PlatformSubscriptionStatus.Trialing,
             CanEndTrial: manage && status == PlatformSubscriptionStatus.Trialing,
-            CanRecordPayment: manage && status is PlatformSubscriptionStatus.PendingPayment or PlatformSubscriptionStatus.PastDue,
+            CanRecordPayment: false, // Slice 4: payments are recorded on the invoice (D-B7); paying it activates the subscription
             CanCancel: manage && changeable && !subscription.CancelAtPeriodEnd,
             CanResume: manage && paid && subscription.CancelAtPeriodEnd,
             CanEndNow: manage && status != PlatformSubscriptionStatus.Ended,
@@ -270,7 +283,8 @@ public sealed class PlatformSubscriptionAdministration
         PlatformSubscriptionEvent change,
         string? permissionCode,
         string actionCode,
-        decimal chargeNow = 0m)
+        decimal chargeNow = 0m,
+        PlatformTenantAuthorizationContext? tenantActor = null)
     {
         ArgumentNullException.ThrowIfNull(subscription);
         ArgumentNullException.ThrowIfNull(plan);
@@ -285,7 +299,9 @@ public sealed class PlatformSubscriptionAdministration
             subscription.Id,
             arguments: change.Arguments,
             before: new { status = change.FromStatus?.ToString() },
-            after: new { status = change.ToStatus.ToString(), plan = plan.Code, licences = subscription.Licences, term = subscription.Term.ToString() },
+            after: tenantActor is null
+                ? new { status = change.ToStatus.ToString(), plan = plan.Code, licences = subscription.Licences, term = subscription.Term.ToString() }
+                : (object)new { status = change.ToStatus.ToString(), plan = plan.Code, licences = subscription.Licences, term = subscription.Term.ToString(), actor = tenantActor.ActorReference, actorName = tenantActor.ActorName, role = PlatformTenantAccess.RoleName(tenantActor.Role) },
             reason: change.Reason);
         _outbox.Write(MessageTypeFor(change.EventCode), subscription.PlatformTenantId, Message(subscription, plan, change, chargeNow));
     }

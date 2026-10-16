@@ -1,0 +1,184 @@
+﻿@*
+=========================================================
+FILE: InvoicePayments.razor
+
+PURPOSE:
+Payments on an invoice: receipts, record a payment received by
+hand, reverse one (D-B7, D-B11).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Card payments come from the provider (Slice 5) and are not
+  offered here
+- Overpayment is refused by the domain; the amount starts at
+  the balance
+=========================================================
+*@
+@inherits PlatformPresenterComponent<InvoicePaymentsPresenter>
+@using Vixly.Platform.Application.UseCases.Billing
+@using Vixly.Platform.Domain.Billing
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="invoice-payments"><VxCard Title="@T["ui.payments.title"]">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    <VxDataTable Items="Invoice.Payments" IsLoading="false">
+        <HeaderContent>
+            <th scope="col">@T["ui.payments.receipt"]</th>
+            <th scope="col">@T["ui.billing_document.received"]</th>
+            <th scope="col">@T["ui.billing_document.method"]</th>
+            <th scope="col">@T["ui.billing_document.reference"]</th>
+            <th scope="col">@T["ui.billing_document.amount"]</th>
+            <th scope="col">@T["ui.payments.status"]</th>
+            <th scope="col">@T["ui.audit.who"]</th>
+            @if (CanRecord)
+            {
+                <th scope="col"><span class="vx-visually-hidden">@T["ui.subscriptions.actions"]</span></th>
+            }
+        </HeaderContent>
+        <RowTemplate Context="payment">
+            <td><a href="@BillingDisplay.DocumentLink(PlatformBillingDocumentKind.Receipt, payment.PaymentId)" download>@payment.ReceiptNumber</a></td>
+            <td>@SubscriptionDisplay.Date(payment.ReceivedUtc)</td>
+            <td>@T[BillingDisplay.MethodKey(payment.Method)]</td>
+            <td>@payment.Reference <span class="vx-hint">@payment.Note</span></td>
+            <td>@BillingDisplay.Money(payment.Amount, Invoice.CurrencyCode)</td>
+            <td>
+                @T[BillingDisplay.PaymentStatusKey(payment.Status)]
+                @if (payment.ReversalReason is { } why)
+                {
+                    <br /><span class="vx-hint">@why (@payment.ReversedByName)</span>
+                }
+            </td>
+            <td>@payment.RecordedByName</td>
+            @if (CanRecord)
+            {
+                <td>
+                    @if (payment.Status == PlatformPaymentStatus.Recorded)
+                    {
+                        <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => Open(Mode.Reverse, payment.PaymentId)">@T["ui.payments.reverse"]</VxButton>
+                    }
+                </td>
+            }
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.payments.empty"]" />
+        </EmptyContent>
+    </VxDataTable>
+    @if (_mode == Mode.Record)
+    {
+        <form class="vx-form" @onsubmit="SubmitAsync">
+            <label for="payment-amount">@VixlyText.Format(T, "ui.discounts.amount_in", "currency", Invoice.CurrencyCode)</label>
+            <input id="payment-amount" type="number" min="0.01" step="0.01" max="@Invoice.Balance" @bind="_amount" required />
+            <label for="payment-method">@T["ui.billing_document.method"]</label>
+            <select id="payment-method" @bind="_method">
+                @foreach (PlatformPaymentMethod method in BillingDisplay.ManualMethods)
+                {
+                    <option value="@method">@T[BillingDisplay.MethodKey(method)]</option>
+                }
+            </select>
+            <label for="payment-received">@T["ui.billing_document.received"]</label>
+            <input id="payment-received" type="date" @bind="_received" />
+            <label for="payment-reference">@T["ui.billing_document.reference"]</label>
+            <input id="payment-reference" @bind="_reference" maxlength="100" required="@(_method != PlatformPaymentMethod.Cash)" aria-describedby="payment-reference-help" />
+            <p id="payment-reference-help" class="vx-hint">@T["ui.payments.reference_help"]</p>
+            <label for="payment-note">@T["ui.payments.note"]</label>
+            <textarea id="payment-note" @bind="_note" maxlength="500"></textarea>
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.payments.record"]</VxButton>
+                <VxButton OnClick="() => Open(Mode.None, null)">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else if (_mode == Mode.Reverse)
+    {
+        <form class="vx-form" @onsubmit="SubmitAsync">
+            <p>@T["ui.payments.reverse_help"]</p>
+            <label for="payment-reason">@T["ui.tenants.reason"]</label>
+            <textarea id="payment-reason" @bind="_note" maxlength="500" required></textarea>
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Danger" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.payments.reverse"]</VxButton>
+                <VxButton OnClick="() => Open(Mode.None, null)">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else if (CanRecord && Invoice.Status == PlatformInvoiceStatus.Issued && Invoice.Balance > 0m)
+    {
+        <div class="vx-actions">
+            <VxButton Variant="VxButtonVariant.Primary" OnClick="() => Open(Mode.Record, null)">@T["ui.payments.record"]</VxButton>
+        </div>
+    }
+    @if (Presenter.State.StepUpPending)
+    {
+        <StepUpDialog OnConfirmed="SubmitAsync" OnCancelled="Presenter.CancelStepUp" />
+    }
+</VxCard></div>
+
+@code {
+    private enum Mode
+    {
+        None,
+        Record,
+        Reverse
+    }
+
+    private Mode _mode;
+
+    private Guid? _paymentId;
+
+    private decimal? _amount;
+
+    private PlatformPaymentMethod _method = PlatformPaymentMethod.BankTransfer;
+
+    private DateTime? _received;
+
+    private string? _reference;
+
+    private string? _note;
+
+    [Parameter, EditorRequired]
+    public PlatformInvoiceDetail Invoice { get; set; } = null!;
+
+    [Parameter]
+    public bool CanRecord { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private void Open(Mode mode, Guid? paymentId)
+    {
+        _mode = mode;
+        _paymentId = paymentId;
+        _amount = mode == Mode.Record ? Invoice.Balance : null;
+        _method = PlatformPaymentMethod.BankTransfer;
+        _received = DateTime.Today;
+        _reference = null;
+        _note = null;
+        Presenter.Clear();
+    }
+
+    private async Task SubmitAsync()
+    {
+        bool done = _mode switch
+        {
+            Mode.Record => await Presenter.RecordAsync(Invoice.PlatformInvoiceId, _amount ?? 0m, _method, _received, _reference, _note),
+            Mode.Reverse => await Presenter.ReverseAsync(Invoice.PlatformInvoiceId, _paymentId!.Value, _note),
+            _ => false
+        };
+
+        if (done)
+        {
+            _mode = Mode.None;
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

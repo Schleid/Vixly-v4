@@ -6437,4 +6437,3735 @@ Vixly</value>
     <value>Frais ponctuels</value>
     <comment>needs-review</comment>
   </data>
+  <data name="platform.billing.invoice_not_found" xml:space="preserve">
+    <value>La facture est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.nothing_to_bill" xml:space="preserve">
+    <value>Rien à facturer : le total est nul.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.line_invalid" xml:space="preserve">
+    <value>Une ligne de facture n’est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.currency_invalid" xml:space="preserve">
+    <value>La devise n’est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.invoice_void" xml:space="preserve">
+    <value>Cette facture est annulée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.invoice_paid" xml:space="preserve">
+    <value>Cette facture est déjà payée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.amount_invalid" xml:space="preserve">
+    <value>Saisissez un montant supérieur à zéro, au centime près.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.amount_above_balance" xml:space="preserve">
+    <value>Le montant dépasse le solde dû.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.reference_required" xml:space="preserve">
+    <value>Saisissez la référence du paiement (inutile pour les espèces).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.reference_too_long" xml:space="preserve">
+    <value>La référence est trop longue.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.note_too_long" xml:space="preserve">
+    <value>La note est trop longue.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.received_date_invalid" xml:space="preserve">
+    <value>La date de réception ne peut pas être future ni plus d’un an avant la facture.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.method_not_allowed" xml:space="preserve">
+    <value>Les paiements par carte proviennent du prestataire de cartes ; ils ne peuvent pas être saisis à la main.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.payment_not_found" xml:space="preserve">
+    <value>Le paiement est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.payment_reversed" xml:space="preserve">
+    <value>Ce paiement est déjà annulé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.reason_required" xml:space="preserve">
+    <value>Saisissez un motif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.reason_too_long" xml:space="preserve">
+    <value>Le motif est trop long.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.credit_above_remaining" xml:space="preserve">
+    <value>L’avoir dépasse ce qu’il reste à créditer sur cette facture.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.credit_pending" xml:space="preserve">
+    <value>Un avoir pour cette facture attend déjà une approbation.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.credit_not_found" xml:space="preserve">
+    <value>L’avoir est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.credit_not_pending" xml:space="preserve">
+    <value>Cet avoir a déjà été tranché.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.own_request" xml:space="preserve">
+    <value>Vous ne pouvez pas décider de votre propre demande.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.void_after_payment" xml:space="preserve">
+    <value>Une facture ayant reçu des paiements ne peut pas être annulée ; utilisez un avoir.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.actor_required" xml:space="preserve">
+    <value>La personne qui décide est requise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.tax_rate_invalid" xml:space="preserve">
+    <value>Saisissez un taux de taxe entre 0 et 100 %.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.tax_label_required" xml:space="preserve">
+    <value>Saisissez le libellé de taxe affiché sur les factures (par exemple TVA).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.country_invalid" xml:space="preserve">
+    <value>Choisissez un pays valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.region_invalid" xml:space="preserve">
+    <value>La région n’est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.tax_rate_not_found" xml:space="preserve">
+    <value>Le taux de taxe est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.setting_invalid" xml:space="preserve">
+    <value>Un paramètre de facturation n’est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.prefix_invalid" xml:space="preserve">
+    <value>Les préfixes de numéro comptent 1 à 8 majuscules ou chiffres.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.text_too_long" xml:space="preserve">
+    <value>Le texte est trop long.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.profile_invalid" xml:space="preserve">
+    <value>Le profil de l’entreprise est incomplet ou invalide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.logo_invalid" xml:space="preserve">
+    <value>Le logo doit être un PNG ou un JPEG de {maxKilobytes} Ko au plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.profile_missing" xml:space="preserve">
+    <value>Renseignez le profil de l’entreprise dans les paramètres de facturation avant d’émettre des factures.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.tax_id_too_long" xml:space="preserve">
+    <value>Le numéro fiscal est trop long.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.document_not_found" xml:space="preserve">
+    <value>Le document est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.sequence_exhausted" xml:space="preserve">
+    <value>La séquence de numéros de cette année est épuisée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.invoice_issued" xml:space="preserve">
+    <value>Facture émise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.payment_recorded" xml:space="preserve">
+    <value>Paiement enregistré</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.payment_reversed" xml:space="preserve">
+    <value>Paiement annulé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.credit_requested" xml:space="preserve">
+    <value>Avoir demandé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.void_requested" xml:space="preserve">
+    <value>Annulation demandée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.credit_issued" xml:space="preserve">
+    <value>Avoir émis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.credit_rejected" xml:space="preserve">
+    <value>Avoir renvoyé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.invoice_voided" xml:space="preserve">
+    <value>Facture annulée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.invoice_past_due" xml:space="preserve">
+    <value>Facture en retard</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.invoice_emailed" xml:space="preserve">
+    <value>Document de facturation envoyé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.settings_updated" xml:space="preserve">
+    <value>Paramètres de facturation modifiés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.tax_rate_added" xml:space="preserve">
+    <value>Taux de taxe ajouté</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.company_profile_updated" xml:space="preserve">
+    <value>Profil de l’entreprise modifié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.company_logo_updated" xml:space="preserve">
+    <value>Logo de l’entreprise modifié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.billing.tenant_tax_updated" xml:space="preserve">
+    <value>Données fiscales du client modifiées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.invoice_paid" xml:space="preserve">
+    <value>Facture d’abonnement payée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.past_due" xml:space="preserve">
+    <value>Abonnement en retard de paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.billing.view" xml:space="preserve">
+    <value>Voir les factures et paiements</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.billing.record_payments" xml:space="preserve">
+    <value>Enregistrer et annuler des paiements</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.billing.request_credits" xml:space="preserve">
+    <value>Demander des avoirs et des annulations</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.billing.approve_credits" xml:space="preserve">
+    <value>Approuver les avoirs et les annulations</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.billing.configure" xml:space="preserve">
+    <value>Modifier les paramètres de facturation, le profil de l’entreprise et les taux de taxe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.billing" xml:space="preserve">
+    <value>Facturation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.system.billing_clerk" xml:space="preserve">
+    <value>Agent de facturation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.approvals.kind.credit_note" xml:space="preserve">
+    <value>Avoir</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.past_due" xml:space="preserve">
+    <value>En retard : la facture {invoice} est impayée après son échéance</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.invoice_paid" xml:space="preserve">
+    <value>Facture {invoice} payée ; la période court jusqu’au {periodEnd}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.issued" xml:space="preserve">
+    <value>Émise sous le numéro {number} : {total} {currency}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.emailed" xml:space="preserve">
+    <value>{number} envoyé au contact de facturation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.payment_recorded" xml:space="preserve">
+    <value>Paiement de {amount} {currency} enregistré, reçu {receipt}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.payment_reversed" xml:space="preserve">
+    <value>Paiement de {amount} {currency} annulé (reçu {receipt})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.credit_requested" xml:space="preserve">
+    <value>Avoir de {amount} {currency} demandé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.void_requested" xml:space="preserve">
+    <value>Annulation demandée ({amount} {currency})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.credit_issued" xml:space="preserve">
+    <value>Avoir {number} émis : {amount} {currency}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.credit_rejected" xml:space="preserve">
+    <value>Avoir de {amount} {currency} renvoyé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.voided" xml:space="preserve">
+    <value>Facture annulée par l’avoir {number}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.past_due" xml:space="preserve">
+    <value>En retard : impayée après l’échéance</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_line.plan_period" xml:space="preserve">
+    <value>Offre {plan}, {term}, {licences} licences</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_line.plan_period_dates" xml:space="preserve">
+    <value>Offre {plan}, {term}, {licences} licences, du {from} au {to}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_line.setup_fee" xml:space="preserve">
+    <value>Frais de mise en service, offre {plan}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_line.change" xml:space="preserve">
+    <value>Offre {plan}, passage à {licences} licences jusqu’au {to}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_line.charge" xml:space="preserve">
+    <value>{description}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_line.discount" xml:space="preserve">
+    <value>Remise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.invoice" xml:space="preserve">
+    <value>Facture</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.credit_note" xml:space="preserve">
+    <value>Avoir</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.void" xml:space="preserve">
+    <value>Annulée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.receipt" xml:space="preserve">
+    <value>Reçu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.issued" xml:space="preserve">
+    <value>Date d’émission</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.due" xml:space="preserve">
+    <value>Échéance</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.period" xml:space="preserve">
+    <value>Période</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.bill_to" xml:space="preserve">
+    <value>Facturé à</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.tax_id" xml:space="preserve">
+    <value>N° fiscal : {taxId}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.how_to_pay" xml:space="preserve">
+    <value>Comment payer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.description" xml:space="preserve">
+    <value>Description</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.quantity" xml:space="preserve">
+    <value>Qté</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.unit_price" xml:space="preserve">
+    <value>Prix unitaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.tax" xml:space="preserve">
+    <value>Taxe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.amount" xml:space="preserve">
+    <value>Montant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.subtotal" xml:space="preserve">
+    <value>Sous-total</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.discount" xml:space="preserve">
+    <value>Remise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.total" xml:space="preserve">
+    <value>Total</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.no_tax" xml:space="preserve">
+    <value>Aucune taxe n’a été facturée sur cette facture.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.for_invoice" xml:space="preserve">
+    <value>Pour la facture</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.reason" xml:space="preserve">
+    <value>Motif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.invoice_total" xml:space="preserve">
+    <value>Total de la facture</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.of_which_tax" xml:space="preserve">
+    <value>dont taxes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.credited" xml:space="preserve">
+    <value>Crédité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.received" xml:space="preserve">
+    <value>Reçu le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.method" xml:space="preserve">
+    <value>Mode</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.reference" xml:space="preserve">
+    <value>Référence</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.amount_received" xml:space="preserve">
+    <value>Montant reçu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_document.balance" xml:space="preserve">
+    <value>Solde dû</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.method.bank_transfer" xml:space="preserve">
+    <value>Virement bancaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.method.cash" xml:space="preserve">
+    <value>Espèces</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.method.cheque" xml:space="preserve">
+    <value>Chèque</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.method.zelle" xml:space="preserve">
+    <value>Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.method.other" xml:space="preserve">
+    <value>Autre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.method.card" xml:space="preserve">
+    <value>Carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.invoice.subject" xml:space="preserve">
+    <value>Facture {number}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.invoice.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Vous trouverez ci-joint la facture {number} pour {company} : {amount}, à régler le {due}.
+
+Les instructions de paiement figurent sur la facture. Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.credit_note.subject" xml:space="preserve">
+    <value>Avoir {number}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.credit_note.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Vous trouverez ci-joint l’avoir {number} sur la facture {invoice} ({company}). Le solde de la facture est désormais de {balance}.
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.receipt.subject" xml:space="preserve">
+    <value>Reçu {number}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.receipt.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Merci pour votre paiement de la facture {invoice} ({company}). Vous trouverez ci-joint le reçu {number}. Le solde de la facture est désormais de {balance}.
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.title" xml:space="preserve">
+    <value>Factures</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.back" xml:space="preserve">
+    <value>Retour aux factures</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.page_title" xml:space="preserve">
+    <value>Facture {number}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.search" xml:space="preserve">
+    <value>Numéro ou client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.status.all" xml:space="preserve">
+    <value>Tous les statuts</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.status.issued" xml:space="preserve">
+    <value>Émise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.status.paid" xml:space="preserve">
+    <value>Payée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.status.void" xml:space="preserve">
+    <value>Annulée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.kind" xml:space="preserve">
+    <value>Type</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.kind.first_period" xml:space="preserve">
+    <value>Première période</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.kind.change" xml:space="preserve">
+    <value>Modification</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.kind.renewal" xml:space="preserve">
+    <value>Renouvellement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.kind.charges" xml:space="preserve">
+    <value>Frais ponctuels</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.issued_from" xml:space="preserve">
+    <value>Émise depuis le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.issued_to" xml:space="preserve">
+    <value>Émise jusqu’au</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.overdue_only" xml:space="preserve">
+    <value>En retard uniquement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.overdue" xml:space="preserve">
+    <value>En retard</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.credit_pending" xml:space="preserve">
+    <value>Avoir en attente d’approbation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.count" xml:space="preserve">
+    <value>{count} factures</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.empty" xml:space="preserve">
+    <value>Aucune facture ne correspond.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.number" xml:space="preserve">
+    <value>Numéro</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.issued" xml:space="preserve">
+    <value>Émise le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.due" xml:space="preserve">
+    <value>Échéance</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.total" xml:space="preserve">
+    <value>Total</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.balance" xml:space="preserve">
+    <value>Solde</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.paid" xml:space="preserve">
+    <value>Payé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.language" xml:space="preserve">
+    <value>Langue</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.history" xml:space="preserve">
+    <value>Historique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.no_lines" xml:space="preserve">
+    <value>Aucune ligne.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.download" xml:space="preserve">
+    <value>Télécharger le PDF</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.resend" xml:space="preserve">
+    <value>Renvoyer par e-mail</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.resent" xml:space="preserve">
+    <value>La facture sera envoyée au contact de facturation.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.refund_owed" xml:space="preserve">
+    <value>Remboursement dû</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.refund_owed_help" xml:space="preserve">
+    <value>Crédité après paiement ; à rembourser à la main (remboursements par carte : étape 5).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.title" xml:space="preserve">
+    <value>Paiements</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.receipt" xml:space="preserve">
+    <value>Reçu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.status.recorded" xml:space="preserve">
+    <value>Enregistré</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.status.reversed" xml:space="preserve">
+    <value>Annulé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.empty" xml:space="preserve">
+    <value>Aucun paiement pour l’instant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.record" xml:space="preserve">
+    <value>Enregistrer un paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.recorded" xml:space="preserve">
+    <value>Paiement enregistré ; un reçu a été émis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.reverse" xml:space="preserve">
+    <value>Annuler</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.reversed" xml:space="preserve">
+    <value>Paiement annulé ; le solde est de nouveau ouvert.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.reverse_help" xml:space="preserve">
+    <value>Annulez un paiement rejeté ou saisi par erreur. Le reçu reste archivé ; le solde se rouvre.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.reference_help" xml:space="preserve">
+    <value>Référence de virement, de chèque ou Zelle. Inutile pour les espèces.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.note" xml:space="preserve">
+    <value>Note</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.title" xml:space="preserve">
+    <value>Avoirs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.status.requested" xml:space="preserve">
+    <value>En attente d’approbation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.status.issued" xml:space="preserve">
+    <value>Émis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.status.rejected" xml:space="preserve">
+    <value>Renvoyé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.empty" xml:space="preserve">
+    <value>Aucun avoir.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.request" xml:space="preserve">
+    <value>Demander un avoir</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.request_void" xml:space="preserve">
+    <value>Demander l’annulation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.request_help" xml:space="preserve">
+    <value>Un avoir réduit ce que doit le client. Le directeur commercial l’approuve ; vous ne pouvez pas approuver votre propre demande.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.void_help" xml:space="preserve">
+    <value>L’annulation annule toute la facture par un avoir de son total. Possible seulement tant que rien n’est payé ; le directeur commercial l’approuve.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.decide_help" xml:space="preserve">
+    <value>L’approbation émet l’avoir avec le numéro suivant et l’envoie au client.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.submit" xml:space="preserve">
+    <value>Envoyer pour approbation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.requested" xml:space="preserve">
+    <value>Avoir envoyé pour approbation.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.void_requested" xml:space="preserve">
+    <value>Annulation envoyée pour approbation.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.approved" xml:space="preserve">
+    <value>Avoir émis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.credit_notes.rejected" xml:space="preserve">
+    <value>Demande renvoyée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.title" xml:space="preserve">
+    <value>Paramètres de facturation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.documents" xml:space="preserve">
+    <value>Factures et documents</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.payment_terms" xml:space="preserve">
+    <value>Délai de paiement (jours)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.payment_terms_help" xml:space="preserve">
+    <value>Jours entre l’émission et l’échéance. Vide : les factures sont dues à l’émission.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.invoice_prefix" xml:space="preserve">
+    <value>Préfixe des factures</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.credit_note_prefix" xml:space="preserve">
+    <value>Préfixe des avoirs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.receipt_prefix" xml:space="preserve">
+    <value>Préfixe des reçus</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.prefix_help" xml:space="preserve">
+    <value>Les numéros s’écrivent PRÉFIXE-ANNÉE-000001 et repartent chaque année. Un nouveau préfixe s’applique au document suivant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.paper_size" xml:space="preserve">
+    <value>Format de papier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.paper.a4" xml:space="preserve">
+    <value>A4</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.paper.letter" xml:space="preserve">
+    <value>Lettre US</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.email_documents" xml:space="preserve">
+    <value>Envoyer factures, avoirs et reçus au contact de facturation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.footer" xml:space="preserve">
+    <value>Pied de page</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.save" xml:space="preserve">
+    <value>Enregistrer les paramètres</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.saved" xml:space="preserve">
+    <value>Paramètres de facturation enregistrés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.company_profile" xml:space="preserve">
+    <value>Profil de l’entreprise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.company_profile_help" xml:space="preserve">
+    <value>Imprimé comme émetteur sur chaque facture, avoir et reçu. Les documents déjà émis gardent leurs informations d’origine.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.email" xml:space="preserve">
+    <value>E-mail de facturation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.phone" xml:space="preserve">
+    <value>Téléphone</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.tax_id" xml:space="preserve">
+    <value>Numéro fiscal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.website" xml:space="preserve">
+    <value>Site web</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.save_profile" xml:space="preserve">
+    <value>Enregistrer le profil</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.profile_saved" xml:space="preserve">
+    <value>Profil de l’entreprise enregistré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.logo" xml:space="preserve">
+    <value>Logo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.logo_help" xml:space="preserve">
+    <value>PNG ou JPEG, {maxKilobytes} Ko au plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.logo_set" xml:space="preserve">
+    <value>Un logo est imprimé sur les documents.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.logo_none" xml:space="preserve">
+    <value>Pas encore de logo ; le nom de l’entreprise est imprimé à la place.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.logo_saved" xml:space="preserve">
+    <value>Logo enregistré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tax_rates.title" xml:space="preserve">
+    <value>Taux de taxe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tax_rates.help" xml:space="preserve">
+    <value>Le taux en vigueur le jour de l’émission est enregistré sur les lignes de la facture. Un taux régional prime sur le taux national ; sans taux, aucune taxe n’est facturée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tax_rates.all_countries" xml:space="preserve">
+    <value>Tous les pays</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tax_rates.label" xml:space="preserve">
+    <value>Libellé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tax_rates.rate" xml:space="preserve">
+    <value>Taux (%)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tax_rates.valid_from" xml:space="preserve">
+    <value>Valable à partir du</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tax_rates.in_force" xml:space="preserve">
+    <value>En vigueur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tax_rates.empty" xml:space="preserve">
+    <value>Aucun taux de taxe pour l’instant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tax_rates.add" xml:space="preserve">
+    <value>Ajouter un taux</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tax_rates.added" xml:space="preserve">
+    <value>Taux de taxe ajouté.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tax_rates.region_help" xml:space="preserve">
+    <value>Code de région facultatif, par exemple QC. Vide : tout le pays.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.title" xml:space="preserve">
+    <value>Facturation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.open_balance" xml:space="preserve">
+    <value>Solde ouvert ({currency})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.open_invoices" xml:space="preserve">
+    <value>{count} factures ouvertes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.overdue" xml:space="preserve">
+    <value>{amount} en retard</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.tax" xml:space="preserve">
+    <value>Taxe sur les nouvelles factures</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.no_tax" xml:space="preserve">
+    <value>Aucune taxe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.exempt" xml:space="preserve">
+    <value>Exonéré de taxe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.exempt_reason" xml:space="preserve">
+    <value>Motif de l’exonération</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.exempt_reference" xml:space="preserve">
+    <value>Référence de l’exonération</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.edit_tax" xml:space="preserve">
+    <value>Modifier les données fiscales</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.save_tax" xml:space="preserve">
+    <value>Enregistrer les données fiscales</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.tax_saved" xml:space="preserve">
+    <value>Données fiscales enregistrées ; elles s’appliquent à la prochaine facture.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.bill_charges" xml:space="preserve">
+    <value>Facturer les frais en attente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.charges_billed" xml:space="preserve">
+    <value>Frais en attente facturés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_billing.all_invoices" xml:space="preserve">
+    <value>Ouvrir dans Factures</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.not_ready" xml:space="preserve">
+    <value>Les paiements par carte ne sont pas disponibles pour le moment.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.currency_not_accepted" xml:space="preserve">
+    <value>Les paiements par carte ne sont pas acceptés dans cette devise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.publishable_key_invalid" xml:space="preserve">
+    <value>La clé publiable ne correspond pas au prestataire ou au mode test/réel de la clé secrète configurée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.currency_invalid" xml:space="preserve">
+    <value>Saisissez les devises en codes de trois lettres, par exemple USD, EUR.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.too_many_currencies" xml:space="preserve">
+    <value>{max} devises au plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.mode_mismatch" xml:space="preserve">
+    <value>Les clés de carte configurées ne correspondent pas à cet environnement : clés réelles en production uniquement, clés de test ailleurs.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.secret_missing" xml:space="preserve">
+    <value>Les clés du prestataire de cartes ne sont pas configurées sur ce serveur.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.provider_unavailable" xml:space="preserve">
+    <value>Le prestataire de cartes est injoignable. Rien n’a été débité deux fois ; réessayez dans un instant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.provider_refused" xml:space="preserve">
+    <value>Le prestataire de cartes a refusé la demande.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.provider_reference_invalid" xml:space="preserve">
+    <value>Le prestataire de cartes a envoyé une référence inutilisable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.card_not_found" xml:space="preserve">
+    <value>La carte enregistrée est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.no_saved_card" xml:space="preserve">
+    <value>Le client n’a pas de carte enregistrée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.card_expired" xml:space="preserve">
+    <value>La carte enregistrée a expiré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.card_removed" xml:space="preserve">
+    <value>Cette carte a déjà été retirée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.card_invalid" xml:space="preserve">
+    <value>Les données de carte du prestataire ne sont pas valides.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.charge_open" xml:space="preserve">
+    <value>Un paiement par carte pour cette facture est déjà en cours.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.nothing_to_charge" xml:space="preserve">
+    <value>Il ne reste rien à payer sur cette facture.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.amount_invalid" xml:space="preserve">
+    <value>Saisissez un montant supérieur à zéro, au centime près.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.link_invalid" xml:space="preserve">
+    <value>Ce lien n’est pas valide ou a expiré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.refund_not_allowed" xml:space="preserve">
+    <value>Un remboursement par carte nécessite un avoir émis sur une facture payée par carte.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.refund_above_charged" xml:space="preserve">
+    <value>Le remboursement dépasse ce qui peut encore être remboursé sur la carte.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.transaction_not_found" xml:space="preserve">
+    <value>La transaction par carte est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.transaction_closed" xml:space="preserve">
+    <value>Cette transaction par carte est déjà close.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.consent_invalid" xml:space="preserve">
+    <value>Le prélèvement automatique nécessite le consentement d’un contact identifié.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.auto_charge_off" xml:space="preserve">
+    <value>Le prélèvement automatique est déjà désactivé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.event_invalid" xml:space="preserve">
+    <value>Le message du prestataire n’a pas pu être vérifié.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.actor_required" xml:space="preserve">
+    <value>La personne qui fait la modification est requise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.merchant_updated" xml:space="preserve">
+    <value>Paramètres de paiement par carte modifiés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.merchant_checked" xml:space="preserve">
+    <value>Connexion au prestataire de cartes vérifiée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.checkout_started" xml:space="preserve">
+    <value>Paiement par carte ouvert</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_saved" xml:space="preserve">
+    <value>Carte enregistrée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_removed" xml:space="preserve">
+    <value>Carte enregistrée retirée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.auto_charge_on" xml:space="preserve">
+    <value>Prélèvement automatique accepté par le client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.auto_charge_off" xml:space="preserve">
+    <value>Prélèvement automatique désactivé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.save_card_link_sent" xml:space="preserve">
+    <value>Lien d’enregistrement de carte envoyé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_charge_started" xml:space="preserve">
+    <value>Carte enregistrée débitée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_charge_succeeded" xml:space="preserve">
+    <value>Paiement par carte confirmé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_charge_failed" xml:space="preserve">
+    <value>Paiement par carte échoué</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_action_required" xml:space="preserve">
+    <value>Le paiement par carte nécessite le titulaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_refund_started" xml:space="preserve">
+    <value>Remboursement par carte envoyé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_refunded" xml:space="preserve">
+    <value>Remboursement par carte confirmé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_refund_failed" xml:space="preserve">
+    <value>Remboursement par carte échoué</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.excess_refund_started" xml:space="preserve">
+    <value>Trop-perçu par carte remboursé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.dispute_open" xml:space="preserve">
+    <value>Paiement par carte contesté par la banque</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.dispute_won" xml:space="preserve">
+    <value>Contestation de carte gagnée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.dispute_lost" xml:space="preserve">
+    <value>Contestation de carte perdue</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.registrations.paid" xml:space="preserve">
+    <value>Facture d’inscription payée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.billing.charge_cards" xml:space="preserve">
+    <value>Débiter et gérer les cartes enregistrées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.billing.refund_cards" xml:space="preserve">
+    <value>Rembourser sur les cartes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.payments.configure" xml:space="preserve">
+    <value>Modifier les paramètres de paiement par carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.payments" xml:space="preserve">
+    <value>Paiements</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.card_refunded" xml:space="preserve">
+    <value>{amount} {currency} remboursés sur la carte ({reference})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.card_failed" xml:space="preserve">
+    <value>Paiement par carte de {amount} {currency} échoué ({code})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.card_action_required" xml:space="preserve">
+    <value>Le paiement par carte de {amount} {currency} nécessite le titulaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.disputed" xml:space="preserve">
+    <value>Contestation bancaire sur le paiement par carte {receipt}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.dispute_won" xml:space="preserve">
+    <value>Contestation gagnée sur le paiement par carte {receipt}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoice_history.dispute_lost" xml:space="preserve">
+    <value>Contestation perdue : paiement par carte {receipt} de {amount} {currency} annulé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.title" xml:space="preserve">
+    <value>Paiements par carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.list_title" xml:space="preserve">
+    <value>Paiements par carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.count" xml:space="preserve">
+    <value>{count} transactions par carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.empty" xml:space="preserve">
+    <value>Aucune transaction par carte.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.kind" xml:space="preserve">
+    <value>Type</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.kind.charge" xml:space="preserve">
+    <value>Débit</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.kind.refund" xml:space="preserve">
+    <value>Remboursement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.origin" xml:space="preserve">
+    <value>Origine</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.origin.all" xml:space="preserve">
+    <value>Toutes les origines</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.origin.pay_link" xml:space="preserve">
+    <value>Lien de paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.origin.registration" xml:space="preserve">
+    <value>Inscription</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.origin.staff_charge" xml:space="preserve">
+    <value>Débit par le personnel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.origin.automatic" xml:space="preserve">
+    <value>Automatique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.origin.refund" xml:space="preserve">
+    <value>Remboursement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.origin.excess_refund" xml:space="preserve">
+    <value>Remboursement de trop-perçu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.status.created" xml:space="preserve">
+    <value>Ouverte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.status.pending" xml:space="preserve">
+    <value>En attente du prestataire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.status.requires_action" xml:space="preserve">
+    <value>Nécessite le titulaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.status.succeeded" xml:space="preserve">
+    <value>Réussie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.status.failed" xml:space="preserve">
+    <value>Échouée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.status.cancelled" xml:space="preserve">
+    <value>Annulée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.dispute.open" xml:space="preserve">
+    <value>Contestée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.dispute.won" xml:space="preserve">
+    <value>Contestation gagnée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.dispute.lost" xml:space="preserve">
+    <value>Contestation perdue</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.disputed_only" xml:space="preserve">
+    <value>Contestées uniquement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.not_ready" xml:space="preserve">
+    <value>Les paiements par carte sont désactivés ou non configurés pour cette devise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.default_card" xml:space="preserve">
+    <value>Carte enregistrée : {card}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.no_card" xml:space="preserve">
+    <value>Aucune carte enregistrée. Envoyez au client un lien depuis sa section Facturation.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.charge" xml:space="preserve">
+    <value>Débiter la carte de {amount}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.charge_sent" xml:space="preserve">
+    <value>Débit envoyé. Le paiement et le reçu apparaissent dès la confirmation du prestataire.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.charge_action_required" xml:space="preserve">
+    <value>La banque demande la confirmation du titulaire ; un lien a été envoyé au client.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.charge_declined" xml:space="preserve">
+    <value>La carte a été refusée ({code}). Un lien a été envoyé au client pour payer autrement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.refund_credit" xml:space="preserve">
+    <value>Avoir</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.refundable" xml:space="preserve">
+    <value>jusqu’à {amount}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.refund" xml:space="preserve">
+    <value>Rembourser sur la carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.refund_sent" xml:space="preserve">
+    <value>Remboursement envoyé au prestataire ; il est enregistré dès sa confirmation.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.title" xml:space="preserve">
+    <value>Paramètres de paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.provider" xml:space="preserve">
+    <value>Prestataire de cartes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.provider.stripe" xml:space="preserve">
+    <value>Stripe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.provider.simulated" xml:space="preserve">
+    <value>Simulé (développement)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.mode" xml:space="preserve">
+    <value>Mode</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.mode.test" xml:space="preserve">
+    <value>Test</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.mode.live" xml:space="preserve">
+    <value>Réel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.keys" xml:space="preserve">
+    <value>Clés secrètes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.keys_configured" xml:space="preserve">
+    <value>Configurées sur ce serveur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.keys_help" xml:space="preserve">
+    <value>Définies par l’administrateur du serveur dans les variables d’environnement ; jamais saisies ici.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.last_check" xml:space="preserve">
+    <value>Dernière vérification</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.check_ok" xml:space="preserve">
+    <value>Connecté</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.check_failed" xml:space="preserve">
+    <value>Échec</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.check" xml:space="preserve">
+    <value>Vérifier la connexion</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.connected" xml:space="preserve">
+    <value>Le prestataire de cartes a répondu.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.status" xml:space="preserve">
+    <value>Paiements par carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.ready" xml:space="preserve">
+    <value>Prêts</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.not_ready" xml:space="preserve">
+    <value>Indisponibles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.cards" xml:space="preserve">
+    <value>Paiements par carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.publishable_key" xml:space="preserve">
+    <value>Clé publiable</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.publishable_key_help" xml:space="preserve">
+    <value>La clé publique du prestataire (pk_test_… ou pk_live_…), conforme au mode configuré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.currencies" xml:space="preserve">
+    <value>Devises acceptées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.currencies_help" xml:space="preserve">
+    <value>Codes de trois lettres séparés par des virgules, par exemple USD, EUR. Les factures dans d’autres devises ne proposent pas le paiement par carte.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.enabled" xml:space="preserve">
+    <value>Accepter les paiements par carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.save" xml:space="preserve">
+    <value>Enregistrer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.saved" xml:space="preserve">
+    <value>Paramètres de paiement enregistrés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.title" xml:space="preserve">
+    <value>Cartes enregistrées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.card" xml:space="preserve">
+    <value>Carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.expires" xml:space="preserve">
+    <value>Expire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.added" xml:space="preserve">
+    <value>Ajoutée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.default" xml:space="preserve">
+    <value>Par défaut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.expired" xml:space="preserve">
+    <value>Expirée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.empty" xml:space="preserve">
+    <value>Aucune carte enregistrée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.remove" xml:space="preserve">
+    <value>Retirer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.removed" xml:space="preserve">
+    <value>Carte retirée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.auto_charge_on" xml:space="preserve">
+    <value>Prélèvement automatique actif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.auto_charge_off" xml:space="preserve">
+    <value>Prélèvement automatique inactif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.consent" xml:space="preserve">
+    <value>Accepté par {email} le {time}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.send_link" xml:space="preserve">
+    <value>Envoyer un lien pour enregistrer une carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.link_sent" xml:space="preserve">
+    <value>Lien envoyé au contact de facturation.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.turn_off" xml:space="preserve">
+    <value>Désactiver le prélèvement automatique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.saved_cards.auto_charge_turned_off" xml:space="preserve">
+    <value>Prélèvement automatique désactivé. Seul le client peut le réactiver.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.invoice.pay_by_card" xml:space="preserve">
+    <value>Payer par carte : {link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.save_card.subject" xml:space="preserve">
+    <value>Enregistrez une carte pour vos factures Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.save_card.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Vous pouvez enregistrer une carte pour {company} sur la page sécurisée de notre prestataire de paiement :
+{link}
+
+Le lien est valable jusqu’au {expires}. Le numéro de carte n’est saisi que sur cette page ; Vixly ne le voit jamais.
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.card_failed.subject" xml:space="preserve">
+    <value>Échec du paiement par carte de la facture {invoice}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.card_failed.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Nous n’avons pas pu débiter la carte enregistrée pour la facture {invoice} ({company}). {amount} reste dû.
+
+Vous pouvez payer ou utiliser une autre carte ici :
+{link}
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.card_failed.body_no_link" xml:space="preserve">
+    <value>Bonjour {name},
+
+Nous n’avons pas pu débiter la carte enregistrée pour la facture {invoice} ({company}). {amount} reste dû. Écrivez-nous à {support} pour organiser le paiement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.card_action_required.subject" xml:space="preserve">
+    <value>Merci de confirmer le paiement par carte de la facture {invoice}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.card_action_required.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Votre banque vous demande de confirmer le paiement de {amount} pour la facture {invoice} ({company}). Merci de le finaliser ici :
+{link}
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.card_action_required.body_no_link" xml:space="preserve">
+    <value>Bonjour {name},
+
+Votre banque vous demande de confirmer le paiement de {amount} pour la facture {invoice} ({company}). Écrivez-nous à {support} pour le finaliser.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.collections.settings_invalid" xml:space="preserve">
+    <value>Le calendrier n’est pas valide : chaque étape doit suivre la précédente, le jour du blocage est au plus 60 et l’avertissement final doit précéder le blocage d’au moins le préavis minimum.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.collections.actor_required" xml:space="preserve">
+    <value>Un membre du personnel connecté est requis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.collections.case_not_found" xml:space="preserve">
+    <value>Le dossier de recouvrement est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.collections.case_closed" xml:space="preserve">
+    <value>Ce dossier de recouvrement est clos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.collections.reason_required" xml:space="preserve">
+    <value>Indiquez un motif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.collections.note_invalid" xml:space="preserve">
+    <value>Rédigez une note de 1 000 caractères au plus (un motif : 500 au plus).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.collections.extension_date_invalid" xml:space="preserve">
+    <value>Choisissez une date à partir d’aujourd’hui.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.collections.extension_too_long" xml:space="preserve">
+    <value>Un délai peut durer au plus {days} jours.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.collections.extension_limit" xml:space="preserve">
+    <value>Ce dossier a déjà eu {max} délais ; un autre nécessite un responsable commercial.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.collections.view" xml:space="preserve">
+    <value>Voir le recouvrement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.collections.manage" xml:space="preserve">
+    <value>Ajouter des notes de recouvrement et revérifier un client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.collections.extend" xml:space="preserve">
+    <value>Accorder un délai de paiement à un client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.collections.extend_beyond_limit" xml:space="preserve">
+    <value>Accorder un délai au-delà de la limite par dossier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.collections.configure" xml:space="preserve">
+    <value>Modifier les paramètres de recouvrement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.collections" xml:space="preserve">
+    <value>Recouvrement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.collections.settings_updated" xml:space="preserve">
+    <value>Paramètres de recouvrement modifiés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.collections.case_opened" xml:space="preserve">
+    <value>Dossier de recouvrement ouvert</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.collections.reminder_sent" xml:space="preserve">
+    <value>Rappel de paiement envoyé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.collections.final_warning_sent" xml:space="preserve">
+    <value>Dernier avertissement envoyé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.collections.blocked" xml:space="preserve">
+    <value>Abonnement bloqué pour non-paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.collections.no_access" xml:space="preserve">
+    <value>Période en lecture seule terminée : paiement requis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.collections.card_retry" xml:space="preserve">
+    <value>Nouvelle tentative de débit de la carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.collections.extension_granted" xml:space="preserve">
+    <value>Délai accordé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.collections.extension_ended" xml:space="preserve">
+    <value>Délai terminé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.collections.note_added" xml:space="preserve">
+    <value>Note de recouvrement ajoutée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.collections.checked" xml:space="preserve">
+    <value>Recouvrement revérifié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.collections.case_closed" xml:space="preserve">
+    <value>Dossier de recouvrement clos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.blocked_for_non_payment" xml:space="preserve">
+    <value>Abonnement bloqué pour non-paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.block_lifted" xml:space="preserve">
+    <value>Blocage pour non-paiement levé pendant un délai</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.status.blocked_for_non_payment" xml:space="preserve">
+    <value>Bloqué pour non-paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.access.payment_required" xml:space="preserve">
+    <value>Paiement requis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.blocked_for_non_payment" xml:space="preserve">
+    <value>Bloqué pour non-paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.block_lifted" xml:space="preserve">
+    <value>Blocage levé jusqu’au {through} (délai)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.card_payments.origin.retry" xml:space="preserve">
+    <value>Nouvelle tentative</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collection_history.opened" xml:space="preserve">
+    <value>Dossier ouvert ; plus ancienne échéance impayée le {due}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collection_history.reminder_1" xml:space="preserve">
+    <value>Premier rappel envoyé (jour {day})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collection_history.reminder_2" xml:space="preserve">
+    <value>Deuxième rappel envoyé (jour {day})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collection_history.final_warning" xml:space="preserve">
+    <value>Dernier avertissement envoyé (jour {day}) ; blocage le {blockDate}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collection_history.blocked" xml:space="preserve">
+    <value>Bloqué pour non-paiement (jour {day})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collection_history.no_access" xml:space="preserve">
+    <value>Période en lecture seule terminée : paiement requis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collection_history.card_retry" xml:space="preserve">
+    <value>Nouvelle tentative de débit pour {invoice} (jour {day})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collection_history.extension_granted" xml:space="preserve">
+    <value>Délai jusqu’au {through} (n° {count})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collection_history.extension_ended" xml:space="preserve">
+    <value>Délai jusqu’au {through} terminé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collection_history.note" xml:space="preserve">
+    <value>Note</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collection_history.checked" xml:space="preserve">
+    <value>Revérifié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collection_history.unblocked" xml:space="preserve">
+    <value>Payé : accès rétabli</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collection_history.closed" xml:space="preserve">
+    <value>Dossier clos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.title" xml:space="preserve">
+    <value>Recouvrement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.dashboard" xml:space="preserve">
+    <value>Vue d’ensemble</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.case" xml:space="preserve">
+    <value>Dossier de recouvrement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.actions" xml:space="preserve">
+    <value>Actions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.history" xml:space="preserve">
+    <value>Historique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.what" xml:space="preserve">
+    <value>Événement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.stage" xml:space="preserve">
+    <value>Étape</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.stage.all" xml:space="preserve">
+    <value>Toutes les étapes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.stage.opened" xml:space="preserve">
+    <value>Ouvert</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.stage.reminder1" xml:space="preserve">
+    <value>Premier rappel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.stage.reminder2" xml:space="preserve">
+    <value>Deuxième rappel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.stage.final_warning" xml:space="preserve">
+    <value>Dernier avertissement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.stage.blocked" xml:space="preserve">
+    <value>Bloqué</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.case_status.open" xml:space="preserve">
+    <value>Ouvert</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.case_status.closed" xml:space="preserve">
+    <value>Clos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.close_reason.settled" xml:space="preserve">
+    <value>Plus rien d’impayé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.close_reason.subscription_ended" xml:space="preserve">
+    <value>Abonnement terminé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.close_reason.tenant_closed" xml:space="preserve">
+    <value>Compte fermé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.ageing.1" xml:space="preserve">
+    <value>Impayé 1 à 30 jours</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.ageing.2" xml:space="preserve">
+    <value>Impayé 31 à 60 jours</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.ageing.3" xml:space="preserve">
+    <value>Impayé 61 à 90 jours</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.ageing.4" xml:space="preserve">
+    <value>Impayé plus de 90 jours</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.blocked_subscriptions" xml:space="preserve">
+    <value>Abonnements bloqués</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.overdue_total" xml:space="preserve">
+    <value>Total impayé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.extensions_ending" xml:space="preserve">
+    <value>Délais se terminant sous 7 jours</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.long_blocks" xml:space="preserve">
+    <value>Bloqués depuis longtemps</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.failed_retries" xml:space="preserve">
+    <value>Nouvelles tentatives de carte échouées (7 jours)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.recovered" xml:space="preserve">
+    <value>Recouvré (30 jours)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.search" xml:space="preserve">
+    <value>Client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.currency" xml:space="preserve">
+    <value>Devise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.in_extension" xml:space="preserve">
+    <value>Avec délai en cours</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.count" xml:space="preserve">
+    <value>{count} dossiers</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.empty" xml:space="preserve">
+    <value>Aucun dossier de recouvrement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.overdue" xml:space="preserve">
+    <value>Impayé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.oldest_due" xml:space="preserve">
+    <value>Plus ancienne échéance</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.next" xml:space="preserve">
+    <value>Suite</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.subscription" xml:space="preserve">
+    <value>Abonnement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.held" xml:space="preserve">
+    <value>En attente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.held_help" xml:space="preserve">
+    <value>Une demande d’avoir attend une décision ; l’étape suivante attend aussi.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.extended_through" xml:space="preserve">
+    <value>Délai jusqu’au {date}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.blocked_since" xml:space="preserve">
+    <value>Bloqué depuis le {date}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.block_on" xml:space="preserve">
+    <value>Blocage le {date}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.closed_on" xml:space="preserve">
+    <value>Clos le {date}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.opened" xml:space="preserve">
+    <value>Ouvert le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.block_date" xml:space="preserve">
+    <value>Date du blocage</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.blocked_at" xml:space="preserve">
+    <value>Bloqué le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.level.read_only" xml:space="preserve">
+    <value>Lecture seule pour le personnel du client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.level.payment_required" xml:space="preserve">
+    <value>Paiement requis : seuls le propriétaire et le contact facturation peuvent se connecter, pour payer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.customers_unaffected" xml:space="preserve">
+    <value>Les clients du client ne sont jamais touchés : portail, suivi, réservations et notifications continuent de fonctionner.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.extensions" xml:space="preserve">
+    <value>Délais</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.extensions_used" xml:space="preserve">
+    <value>{count} accordé(s)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.overdue_invoices" xml:space="preserve">
+    <value>Factures impayées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.credit_requested" xml:space="preserve">
+    <value>Avoir demandé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.extend_through" xml:space="preserve">
+    <value>Accorder un délai jusqu’au (inclus)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.extension_reason" xml:space="preserve">
+    <value>Motif (interne)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.extension_help" xml:space="preserve">
+    <value>Les rappels sont suspendus et tout blocage est levé jusqu’à cette date. Le client ne voit que la date.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.extension_beyond_help" xml:space="preserve">
+    <value>La limite par dossier est atteinte : seul un responsable commercial peut accorder un délai.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.extend" xml:space="preserve">
+    <value>Accorder le délai</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.note" xml:space="preserve">
+    <value>Note (interne)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.add_note" xml:space="preserve">
+    <value>Ajouter la note</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.check_now" xml:space="preserve">
+    <value>Revérifier maintenant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.note_added" xml:space="preserve">
+    <value>Note ajoutée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.checked" xml:space="preserve">
+    <value>Revérifié.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.extension_granted" xml:space="preserve">
+    <value>Délai accordé. La date a été envoyée au client.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.tenant_page" xml:space="preserve">
+    <value>Fiche du client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.tenant_summary" xml:space="preserve">
+    <value>{amount} impayé depuis le {date}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.open_case" xml:space="preserve">
+    <value>Ouvrir le dossier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.up_to_date" xml:space="preserve">
+    <value>Rien d’impayé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.title" xml:space="preserve">
+    <value>Paramètres de recouvrement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.timeline" xml:space="preserve">
+    <value>Calendrier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.timeline_help" xml:space="preserve">
+    <value>Jours après l’échéance de la facture. Le jour 1 est le premier jour de retard.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.enabled" xml:space="preserve">
+    <value>Recouvrement activé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.reminder1" xml:space="preserve">
+    <value>Premier rappel (jour)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.reminder2" xml:space="preserve">
+    <value>Deuxième rappel (jour)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.final_warning" xml:space="preserve">
+    <value>Dernier avertissement (jour)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.block_day" xml:space="preserve">
+    <value>Blocage (jour)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.minimum_notice" xml:space="preserve">
+    <value>Préavis minimum avant un blocage (jours)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.minimum_notice_help" xml:space="preserve">
+    <value>Le blocage intervient toujours au moins ce délai après le dernier avertissement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.retry_days" xml:space="preserve">
+    <value>Nouvelles tentatives de carte (jours)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.retry_days_help" xml:space="preserve">
+    <value>Par exemple 3, 7. Uniquement pour les clients ayant accepté le prélèvement automatique.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.blocking" xml:space="preserve">
+    <value>Blocage</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.blocking_help" xml:space="preserve">
+    <value>Une fois bloqué, le personnel du client a d’abord un accès en lecture seule, puis plus d’accès sauf la page de paiement. Les clients du client ne sont jamais touchés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.read_only_days" xml:space="preserve">
+    <value>Jours en lecture seule après le blocage</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.read_only_days_help" xml:space="preserve">
+    <value>0 signifie aucun accès immédiatement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.stay_read_only" xml:space="preserve">
+    <value>Rester en lecture seule jusqu’au paiement (jamais coupé)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.pending_days" xml:space="preserve">
+    <value>Jours en lecture seule pour un nouvel abonnement impayé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.pending_days_help" xml:space="preserve">
+    <value>Après un essai ou la première facture ; ensuite il est bloqué comme toute facture impayée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.long_block_days" xml:space="preserve">
+    <value>Signaler les blocages de plus de (jours)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.long_block_days_help" xml:space="preserve">
+    <value>Affichés dans la vue d’ensemble pour décider de mettre fin à l’abonnement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.extensions" xml:space="preserve">
+    <value>Délais</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.extension_days" xml:space="preserve">
+    <value>Délai le plus long (jours)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.extensions_per_case" xml:space="preserve">
+    <value>Délais par dossier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.extensions_per_case_help" xml:space="preserve">
+    <value>Au-delà, un responsable commercial est requis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.save" xml:space="preserve">
+    <value>Enregistrer les paramètres</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections_settings.saved" xml:space="preserve">
+    <value>Paramètres de recouvrement enregistrés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.invoice_line" xml:space="preserve">
+    <value>- {invoice}, échéance {due} : {amount} - payer par carte : {link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.invoice_line_no_link" xml:space="preserve">
+    <value>- {invoice}, échéance {due} : {amount}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.total" xml:space="preserve">
+    <value>Total dû : {amounts}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.instructions" xml:space="preserve">
+    <value>Comment payer :</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.closing" xml:space="preserve">
+    <value>Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.reminder_1.subject" xml:space="preserve">
+    <value>Rappel de paiement - {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.reminder_1.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Petit rappel : les factures Vixly suivantes de {company} ont dépassé leur échéance :</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.reminder_2.subject" xml:space="preserve">
+    <value>Deuxième rappel de paiement - {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.reminder_2.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Nous n’avons pas encore reçu le paiement des factures Vixly suivantes de {company}. Merci de les régler au plus vite :</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.final_warning.subject" xml:space="preserve">
+    <value>Dernier avis : l’accès sera limité le {blockDate} - {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.final_warning.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Les factures Vixly suivantes de {company} sont toujours impayées. Sans paiement d’ici le {blockDate}, l’accès de votre équipe à Vixly sera limité jusqu’au paiement. Vos clients ne seront pas touchés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.blocked.subject" xml:space="preserve">
+    <value>Accès limité pour non-paiement - {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.blocked.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Les factures Vixly suivantes de {company} étant impayées, l’accès de votre équipe à Vixly est désormais limité. Vos clients ne sont pas touchés. L’accès est rétabli dès réception du paiement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.extension_granted.subject" xml:space="preserve">
+    <value>Délai de paiement jusqu’au {through} - {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.extension_granted.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Comme convenu, {company} dispose jusqu’au {through} pour régler les factures Vixly suivantes. Votre équipe garde un accès complet d’ici là.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.extension_ending.subject" xml:space="preserve">
+    <value>Votre délai se termine le {through} - {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.extension_ending.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Le délai accordé à {company} se termine le {through}. Merci de régler les factures Vixly suivantes d’ici là :</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.access_restored.subject" xml:space="preserve">
+    <value>Accès rétabli - {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.access_restored.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Merci : nous avons reçu le paiement et l’accès complet à Vixly est rétabli pour {company}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.no_free_seat" xml:space="preserve">
+    <value>Aucune licence n’est libre : {inUse} sur {seats} sont utilisées. Libérez un appareil ou ajoutez des licences.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.too_many_pending" xml:space="preserve">
+    <value>Trop d’appareils attendent une approbation ({max} au plus). Approuvez-en ou refusez-en d’abord.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.device_not_found" xml:space="preserve">
+    <value>L’appareil est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.not_allowed_in_status" xml:space="preserve">
+    <value>Impossible dans l’état actuel de l’appareil.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.name_invalid" xml:space="preserve">
+    <value>Donnez à l’appareil un nom de 80 caractères au plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.kind_invalid" xml:space="preserve">
+    <value>Choisissez le type d’appareil.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.public_key_invalid" xml:space="preserve">
+    <value>La clé de l’appareil n’est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.link_invalid" xml:space="preserve">
+    <value>Ce lien n’est pas valide ou a expiré. Demandez-en un nouveau.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.tenant_not_active" xml:space="preserve">
+    <value>Le compte n’est pas actif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.access_not_full" xml:space="preserve">
+    <value>Les nouveaux appareils ne peuvent être approuvés que si l’abonnement est pleinement actif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.reason_required" xml:space="preserve">
+    <value>Indiquez un motif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.actor_required" xml:space="preserve">
+    <value>Un utilisateur connecté est requis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.proof_invalid" xml:space="preserve">
+    <value>L’appareil n’a pas pu prouver son identité.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.release_not_pending" xml:space="preserve">
+    <value>Cet appareil n’attend pas de décision de libération.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.registration_not_ready" xml:space="preserve">
+    <value>L’inscription n’est pas encore prête pour son premier appareil.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.licensing.too_many_links" xml:space="preserve">
+    <value>Trop de liens ont été demandés. Réessayez dans une heure.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.licensing.view" xml:space="preserve">
+    <value>Voir les appareils et licences des clients</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.licensing.manage" xml:space="preserve">
+    <value>Révoquer des appareils et envoyer des liens au propriétaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.licensing.approve_release" xml:space="preserve">
+    <value>Décider des libérations au-delà du quota</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.licensing" xml:space="preserve">
+    <value>Licences</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.licensing.device_requested" xml:space="preserve">
+    <value>Appareil demandé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.licensing.device_approved" xml:space="preserve">
+    <value>Appareil approuvé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.licensing.device_denied" xml:space="preserve">
+    <value>Appareil refusé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.licensing.device_released" xml:space="preserve">
+    <value>Appareil libéré</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.licensing.release_requested" xml:space="preserve">
+    <value>Libération envoyée pour examen</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.licensing.release_decided" xml:space="preserve">
+    <value>Libération décidée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.licensing.release_withdrawn" xml:space="preserve">
+    <value>Libération retirée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.licensing.device_revoked" xml:space="preserve">
+    <value>Appareil révoqué</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.licensing.device_expired" xml:space="preserve">
+    <value>Demande d’appareil expirée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.licensing.device_enrolled_by_link" xml:space="preserve">
+    <value>Appareil ajouté par lien du propriétaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.licensing.first_device_link_requested" xml:space="preserve">
+    <value>Lien du premier appareil envoyé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.licensing.owner_recovery_started" xml:space="preserve">
+    <value>Récupération du propriétaire lancée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.activated_by_registration" xml:space="preserve">
+    <value>Client activé par l’inscription</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device_history.requested" xml:space="preserve">
+    <value>Demandé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device_history.approved" xml:space="preserve">
+    <value>Approuvé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device_history.denied" xml:space="preserve">
+    <value>Refusé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device_history.released" xml:space="preserve">
+    <value>Libéré</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device_history.release_requested" xml:space="preserve">
+    <value>Libération envoyée à Vixly pour examen</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device_history.release_approved" xml:space="preserve">
+    <value>Libération approuvée par Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device_history.release_refused" xml:space="preserve">
+    <value>Libération refusée par Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device_history.release_withdrawn" xml:space="preserve">
+    <value>Libération retirée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device_history.revoked" xml:space="preserve">
+    <value>Révoqué</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device_history.expired" xml:space="preserve">
+    <value>Demande expirée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device_history.enrolled_by_link" xml:space="preserve">
+    <value>Ajouté par le lien du propriétaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device_history.link_sent" xml:space="preserve">
+    <value>Lien envoyé au propriétaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.status.pending" xml:space="preserve">
+    <value>En attente d’approbation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.status.active" xml:space="preserve">
+    <value>Actif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.status.release_pending" xml:space="preserve">
+    <value>Libération en examen</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.status.released" xml:space="preserve">
+    <value>Libéré</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.status.revoked" xml:space="preserve">
+    <value>Révoqué</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.status.denied" xml:space="preserve">
+    <value>Refusé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.status.expired" xml:space="preserve">
+    <value>Expiré</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.kind.pc" xml:space="preserve">
+    <value>Ordinateur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.kind.phone" xml:space="preserve">
+    <value>Téléphone</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.kind.scanner" xml:space="preserve">
+    <value>Scanner</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.kind.tablet" xml:space="preserve">
+    <value>Tablette</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.kind.other" xml:space="preserve">
+    <value>Autre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.proof.key_pair" xml:space="preserve">
+    <value>Clé d’appareil</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.proof.secret" xml:space="preserve">
+    <value>Secret renouvelé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.reason.replaced" xml:space="preserve">
+    <value>Remplacé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.reason.lost_or_stolen" xml:space="preserve">
+    <value>Perdu ou volé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.reason.broken" xml:space="preserve">
+    <value>En panne</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.reason.staff_left" xml:space="preserve">
+    <value>Départ d’un employé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.reason.other" xml:space="preserve">
+    <value>Autre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.reason.credential_reused" xml:space="preserve">
+    <value>Ancien secret réutilisé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.reason.subscription_ended" xml:space="preserve">
+    <value>Abonnement terminé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.reason.tenant_closed" xml:space="preserve">
+    <value>Compte fermé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.reason.security" xml:space="preserve">
+    <value>Sécurité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.reason.replaced_by_recovery" xml:space="preserve">
+    <value>Remplacé lors de la récupération du propriétaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.reason.not_recognized" xml:space="preserve">
+    <value>Non reconnu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.title" xml:space="preserve">
+    <value>Appareil</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.actions" xml:space="preserve">
+    <value>Actions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.approve_release" xml:space="preserve">
+    <value>Approuver la libération</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.refuse_release" xml:space="preserve">
+    <value>Refuser la libération</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.revoke" xml:space="preserve">
+    <value>Révoquer l’appareil</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.approved" xml:space="preserve">
+    <value>Approuvé le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.ended" xml:space="preserve">
+    <value>Terminé le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.history" xml:space="preserve">
+    <value>Historique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.kind" xml:space="preserve">
+    <value>Type</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.proof" xml:space="preserve">
+    <value>Preuve</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.note" xml:space="preserve">
+    <value>Note</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.note_help" xml:space="preserve">
+    <value>Obligatoire. Le client voit la décision de libération ; la note reste interne.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.release_requested" xml:space="preserve">
+    <value>Libération demandée le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.requested_by" xml:space="preserve">
+    <value>Demandé par</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.seat_held" xml:space="preserve">
+    <value>La licence reste occupée jusqu’à ce que Vixly approuve la libération.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.what" xml:space="preserve">
+    <value>Quoi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.done.approve" xml:space="preserve">
+    <value>Libération approuvée. La licence est de nouveau libre.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.done.refuse" xml:space="preserve">
+    <value>Libération refusée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.device.done.revoke" xml:space="preserve">
+    <value>Appareil révoqué.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.devices.title" xml:space="preserve">
+    <value>Appareils</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.devices.review_queue" xml:space="preserve">
+    <value>Libérations à examiner</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.devices.awaiting_review" xml:space="preserve">
+    <value>En attente d’examen</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.devices.clear_tenant" xml:space="preserve">
+    <value>Tous les clients</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.devices.tenant_filter" xml:space="preserve">
+    <value>Retour au client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.devices.count" xml:space="preserve">
+    <value>{count} appareil(s)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.devices.last_seen" xml:space="preserve">
+    <value>Vu pour la dernière fois</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.devices.name" xml:space="preserve">
+    <value>Nom</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.devices.number" xml:space="preserve">
+    <value>Numéro</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.devices.requested" xml:space="preserve">
+    <value>Demandé le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.devices.search" xml:space="preserve">
+    <value>Rechercher</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.devices.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.devices.status.all" xml:space="preserve">
+    <value>Tous les statuts</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.devices.tenant" xml:space="preserve">
+    <value>Client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.licensing.title" xml:space="preserve">
+    <value>Licences</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.licensing.seats" xml:space="preserve">
+    <value>Licences</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.licensing.seats_used" xml:space="preserve">
+    <value>{inUse} sur {seats} utilisées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.licensing.seats_scheduled" xml:space="preserve">
+    <value>{seats} à partir de la prochaine période</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.licensing.pending" xml:space="preserve">
+    <value>En attente d’approbation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.licensing.awaiting_review" xml:space="preserve">
+    <value>Libérations en examen</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.licensing.allowance" xml:space="preserve">
+    <value>Quota de libérations</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.licensing.allowance_value" xml:space="preserve">
+    <value>{count} par 30 jours</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.licensing.all_devices" xml:space="preserve">
+    <value>Tous les appareils de ce client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.licensing.send_first_link" xml:space="preserve">
+    <value>Renvoyer le lien du premier appareil</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.licensing.start_recovery" xml:space="preserve">
+    <value>Lancer la récupération du propriétaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.licensing.recovery_help" xml:space="preserve">
+    <value>Les deux envoient un lien à usage unique à l’e-mail du propriétaire. Le personnel ne voit jamais le lien.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.licensing.first_link_sent" xml:space="preserve">
+    <value>Le lien du premier appareil a été envoyé au propriétaire.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.licensing.recovery_sent" xml:space="preserve">
+    <value>Le lien de récupération a été envoyé au propriétaire.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.first_device.subject" xml:space="preserve">
+    <value>Configurez le premier appareil de {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.first_device.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Ouvrez ce lien sur l’appareil que vous utiliserez en premier pour terminer la configuration de {company} sur Vixly :
+{link}
+
+Le lien ne fonctionne qu’une fois et expire le {expires} (UTC).
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.recovery.subject" xml:space="preserve">
+    <value>Récupérez l’accès à {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.recovery.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Le support Vixly a lancé une récupération du propriétaire pour {company}. Ouvrez ce lien sur l’appareil que vous voulez utiliser :
+{link}
+
+Le lien ne fonctionne qu’une fois et expire le {expires} (UTC). Si vous n’avez rien demandé, contactez-nous immédiatement.
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.device_added.subject" xml:space="preserve">
+    <value>Nouvel appareil approuvé pour {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.device_added.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+L’appareil {device} ({number}) a été approuvé et utilise désormais une des licences de {company}.
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.device_replaced.subject" xml:space="preserve">
+    <value>Un appareil de {company} a été remplacé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.device_replaced.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Lors de la récupération du propriétaire, l’appareil {device} ({number}) a été remplacé par un nouvel appareil. Si ce n’était pas vous, contactez-nous immédiatement.
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.release_approved.subject" xml:space="preserve">
+    <value>Libération d’appareil approuvée pour {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.release_approved.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Vixly a approuvé la libération de {device} ({number}). Sa licence est de nouveau libre.
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.release_refused.subject" xml:space="preserve">
+    <value>Libération d’appareil refusée pour {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.release_refused.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Vixly n’a pas approuvé la libération de {device} ({number}). Il conserve sa licence.
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.devices_revoked.subject" xml:space="preserve">
+    <value>Les appareils de {company} ont été déconnectés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.devices_revoked.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+{count} appareil(s) de {company} ne peuvent plus utiliser Vixly, car le compte ou l’abonnement a pris fin.
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.credential_reused.subject" xml:space="preserve">
+    <value>Un appareil de {company} a été bloqué par sécurité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.credential_reused.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+L’appareil {device} ({number}) a réutilisé un ancien secret, ce qui peut signifier qu’il a été copié. Nous l’avons révoqué pour protéger {company}. Approuvez-le de nouveau depuis un appareil de confiance si c’était prévu.
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_not_available" xml:space="preserve">
+    <value>Zelle n’est pas disponible pour ce paiement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_settings_invalid" xml:space="preserve">
+    <value>Pour activer Zelle, indiquez le nom du bénéficiaire et au moins un e-mail, un identifiant Zelle ou un numéro de téléphone.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_recipient_invalid" xml:space="preserve">
+    <value>Indiquez un nom de bénéficiaire de 100 caractères au plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_email_invalid" xml:space="preserve">
+    <value>L’e-mail Zelle n’est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_tag_invalid" xml:space="preserve">
+    <value>L’identifiant Zelle doit compter 50 caractères au plus, sans espaces.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_phone_invalid" xml:space="preserve">
+    <value>Le numéro de téléphone Zelle n’est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_qr_invalid" xml:space="preserve">
+    <value>Le code QR doit être une image PNG ou JPEG de {max} Ko au plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_amount_invalid" xml:space="preserve">
+    <value>Saisissez le montant envoyé, avec deux décimales au plus, sans dépasser le solde dû.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_date_invalid" xml:space="preserve">
+    <value>Saisissez le jour de l’envoi : pas dans le futur et il y a {days} jours au plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_sender_invalid" xml:space="preserve">
+    <value>Saisissez le nom de l’expéditeur (100 caractères au plus).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_reference_invalid" xml:space="preserve">
+    <value>Saisissez le code de confirmation Zelle de votre banque (60 caractères au plus).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_claim_waiting" xml:space="preserve">
+    <value>Un paiement Zelle pour cette facture est déjà en cours de vérification.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_too_many_claims" xml:space="preserve">
+    <value>Trop de paiements Zelle ont été signalés pour cette facture. Veuillez nous contacter.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_claim_not_found" xml:space="preserve">
+    <value>Le signalement de paiement Zelle est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_claim_decided" xml:space="preserve">
+    <value>Ce signalement de paiement Zelle a déjà été traité.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_reason_required" xml:space="preserve">
+    <value>Indiquez le motif que lira le client (500 caractères au plus).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.zelle_actor_required" xml:space="preserve">
+    <value>Un membre du personnel connecté est requis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.zelle_updated" xml:space="preserve">
+    <value>Paramètres Zelle modifiés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.zelle_qr_updated" xml:space="preserve">
+    <value>Code QR Zelle modifié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.zelle_claim_submitted" xml:space="preserve">
+    <value>Paiement Zelle signalé par le client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.zelle_claim_confirmed" xml:space="preserve">
+    <value>Paiement Zelle confirmé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.zelle_claim_rejected" xml:space="preserve">
+    <value>Paiement Zelle rejeté</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collections.held_help_any" xml:space="preserve">
+    <value>Une demande d’avoir ou un signalement de paiement Zelle attend une décision ; l’étape suivante attend aussi.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.title" xml:space="preserve">
+    <value>Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.help" xml:space="preserve">
+    <value>Les clients qui règlent une facture en dollars américains voient ces informations au paiement, envoient l’argent depuis leur banque puis le signalent. Rien n’est payé tant que le personnel n’a pas confirmé la réception.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.enabled" xml:space="preserve">
+    <value>Proposer Zelle au paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.recipient" xml:space="preserve">
+    <value>Nom du bénéficiaire (tel qu’il apparaît dans la banque du client)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.email" xml:space="preserve">
+    <value>E-mail Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.tag" xml:space="preserve">
+    <value>Identifiant Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.phone" xml:space="preserve">
+    <value>Téléphone Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.ways_help" xml:space="preserve">
+    <value>Indiquez au moins un élément : e-mail, identifiant Zelle ou téléphone.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.save" xml:space="preserve">
+    <value>Enregistrer les paramètres Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.saved" xml:space="preserve">
+    <value>Paramètres Zelle enregistrés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.qr" xml:space="preserve">
+    <value>Code QR</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.qr_alt" xml:space="preserve">
+    <value>Code QR Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.qr_none" xml:space="preserve">
+    <value>Pas encore de code QR.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.qr_upload" xml:space="preserve">
+    <value>Téléverser un code QR</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.qr_help" xml:space="preserve">
+    <value>PNG ou JPEG, {maxKilobytes} Ko au plus. Utilisez le code QR de réception Zelle affiché par votre application bancaire.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.qr_remove" xml:space="preserve">
+    <value>Retirer le code QR</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.qr_saved" xml:space="preserve">
+    <value>Code QR enregistré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle_settings.qr_removed" xml:space="preserve">
+    <value>Code QR retiré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.title" xml:space="preserve">
+    <value>Paiements Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.claim" xml:space="preserve">
+    <value>Signalement de paiement Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.search" xml:space="preserve">
+    <value>Rechercher</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.status.all" xml:space="preserve">
+    <value>Tous</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.status.waiting" xml:space="preserve">
+    <value>À vérifier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.status.confirmed" xml:space="preserve">
+    <value>Confirmé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.status.rejected" xml:space="preserve">
+    <value>Rejeté</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.source.payment_link" xml:space="preserve">
+    <value>Depuis un lien de paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.source.registration" xml:space="preserve">
+    <value>Depuis l’inscription</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.count" xml:space="preserve">
+    <value>{count} signalement(s)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.reported" xml:space="preserve">
+    <value>Signalé le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.tenant" xml:space="preserve">
+    <value>Client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.amount" xml:space="preserve">
+    <value>Montant signalé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.sender" xml:space="preserve">
+    <value>Envoyé par</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.reference" xml:space="preserve">
+    <value>Code de confirmation Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.sent_on" xml:space="preserve">
+    <value>Envoyé le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.balance_now" xml:space="preserve">
+    <value>Solde actuel de la facture</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.decided" xml:space="preserve">
+    <value>Traité le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.received" xml:space="preserve">
+    <value>Montant reçu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.note" xml:space="preserve">
+    <value>Note interne</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.confirm_title" xml:space="preserve">
+    <value>Confirmer le paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.confirm_help" xml:space="preserve">
+    <value>Ne confirmez qu’une fois l’argent arrivé sur le compte bancaire de Vixly. Un paiement Zelle est enregistré sur la facture et le reçu est envoyé par e-mail.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.received_amount" xml:space="preserve">
+    <value>Montant reçu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.received_on" xml:space="preserve">
+    <value>Reçu le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.confirm" xml:space="preserve">
+    <value>Confirmer le paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.confirmed" xml:space="preserve">
+    <value>Paiement confirmé et enregistré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.reject_title" xml:space="preserve">
+    <value>Rejeter le signalement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.reject_reason" xml:space="preserve">
+    <value>Motif pour le client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.reject_help" xml:space="preserve">
+    <value>Le client reçoit ce motif par e-mail. Gardez les détails internes dans la note.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.reject" xml:space="preserve">
+    <value>Rejeter</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.zelle.rejected" xml:space="preserve">
+    <value>Signalement rejeté ; le client a été informé du motif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.zelle.received.subject" xml:space="preserve">
+    <value>Nous avons reçu votre avis de paiement Zelle pour {invoice}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.zelle.received.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Merci. Nous avons bien reçu votre avis d’envoi de {amount} par Zelle le {date} pour la facture {invoice} de {company}. Nous vérifierons notre banque et enverrons le reçu une fois le paiement confirmé.
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.zelle.rejected.subject" xml:space="preserve">
+    <value>Nous n’avons pas pu confirmer votre paiement Zelle pour {invoice}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.zelle.rejected.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Nous n’avons pas pu confirmer le paiement Zelle de {amount} envoyé le {date} pour la facture {invoice} de {company}.
+
+Motif : {reason}
+
+La facture reste ouverte. Vérifiez auprès de votre banque, puis signalez de nouveau le paiement ou contactez-nous.
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.invoice.pay_online" xml:space="preserve">
+    <value>Payer en ligne : {link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.collections.invoice_line_online" xml:space="preserve">
+    <value>- {invoice}, échéance {due} : {amount} - payer en ligne : {link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.document_not_found" xml:space="preserve">
+    <value>Le document juridique est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.not_draft" xml:space="preserve">
+    <value>Seul un brouillon peut être modifié. Créez plutôt une nouvelle version.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.version_invalid" xml:space="preserve">
+    <value>Indiquez un libellé de version de 20 caractères au plus, sans espaces.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.version_taken" xml:space="preserve">
+    <value>Ce libellé de version est déjà utilisé pour ce document.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.kind_invalid" xml:space="preserve">
+    <value>Choisissez le type de document.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.file_invalid" xml:space="preserve">
+    <value>Le fichier doit être un PDF de {max} Mo au plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.summary_invalid" xml:space="preserve">
+    <value>Le résumé doit être du texte simple de 2 000 caractères au plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.languages_missing" xml:space="preserve">
+    <value>Téléversez le PDF en anglais, français et espagnol avant de publier.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.parts_invalid" xml:space="preserve">
+    <value>Les conditions doivent inclure la politique de confidentialité et l’accord de traitement des données publiés, ainsi que chaque autre document publié, une seule fois chacun.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.effective_date_invalid" xml:space="preserve">
+    <value>Les conditions à accepter prennent effet au moins {days} jours après publication ; les dates ne peuvent pas être passées.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.nothing_to_accept" xml:space="preserve">
+    <value>Il n’y a aucune condition à accepter pour le moment.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.version_changed" xml:space="preserve">
+    <value>Les conditions ont changé depuis leur affichage. Veuillez lire la nouvelle version.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.owner_only" xml:space="preserve">
+    <value>Seul le propriétaire du compte peut accepter les conditions.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.already_accepted" xml:space="preserve">
+    <value>Ce client a déjà accepté cette version.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.evidence_invalid" xml:space="preserve">
+    <value>Joignez le document signé en PDF, PNG ou JPEG de {max} Mo au plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.reason_required" xml:space="preserve">
+    <value>Indiquez un motif (500 caractères au plus).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.reminder_too_soon" xml:space="preserve">
+    <value>Un rappel a été envoyé au cours des dernières 24 heures. Réessayez plus tard.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.actor_required" xml:space="preserve">
+    <value>Un utilisateur connecté est requis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.legal.tenant_not_asked" xml:space="preserve">
+    <value>Ce client n’a rien à accepter.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.billing.support_contact_invalid" xml:space="preserve">
+    <value>L’e-mail ou le téléphone du support n’est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.legal.view" xml:space="preserve">
+    <value>Voir les documents juridiques et les acceptations</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.legal.manage" xml:space="preserve">
+    <value>Préparer les brouillons de documents juridiques</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.legal.publish" xml:space="preserve">
+    <value>Publier les documents juridiques</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.legal.remind" xml:space="preserve">
+    <value>Envoyer des rappels des conditions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.legal.record_acceptance" xml:space="preserve">
+    <value>Enregistrer une acceptation sur papier signé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.legal" xml:space="preserve">
+    <value>Juridique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.legal.draft_created" xml:space="preserve">
+    <value>Brouillon juridique créé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.legal.draft_updated" xml:space="preserve">
+    <value>Brouillon juridique modifié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.legal.file_set" xml:space="preserve">
+    <value>Fichier juridique téléversé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.legal.draft_deleted" xml:space="preserve">
+    <value>Brouillon juridique supprimé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.legal.published" xml:space="preserve">
+    <value>Document juridique publié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.legal.reminder_sent" xml:space="preserve">
+    <value>Rappel des conditions envoyé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.legal.acceptance_recorded" xml:space="preserve">
+    <value>Acceptation hors ligne enregistrée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.legal.terms_accepted" xml:space="preserve">
+    <value>Conditions acceptées par le propriétaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.legal.accepted_at_registration" xml:space="preserve">
+    <value>Conditions acceptées à l’inscription</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.kind.terms" xml:space="preserve">
+    <value>Conditions d’utilisation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.kind.privacy" xml:space="preserve">
+    <value>Politique de confidentialité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.kind.data_processing" xml:space="preserve">
+    <value>Accord de traitement des données</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.kind.acceptable_use" xml:space="preserve">
+    <value>Politique d’utilisation acceptable</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.kind.service_level" xml:space="preserve">
+    <value>Accord de niveau de service</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.kind.all" xml:space="preserve">
+    <value>Tous les documents</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.document_status.draft" xml:space="preserve">
+    <value>Brouillon</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.document_status.published" xml:space="preserve">
+    <value>Publié</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.document_status.superseded" xml:space="preserve">
+    <value>Remplacé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.status.not_required" xml:space="preserve">
+    <value>Rien à accepter</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.status.accepted" xml:space="preserve">
+    <value>Accepté</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.status.due" xml:space="preserve">
+    <value>À accepter</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.status.overdue" xml:space="preserve">
+    <value>En retard : lecture seule</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.status.all" xml:space="preserve">
+    <value>Tous</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.source.registration" xml:space="preserve">
+    <value>À l’inscription</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.source.operations" xml:space="preserve">
+    <value>Par le propriétaire dans Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.source.staff_record" xml:space="preserve">
+    <value>Enregistré par le personnel (papier signé)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.step.published" xml:space="preserve">
+    <value>Avis de nouvelle version</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.step.before14_days" xml:space="preserve">
+    <value>Rappel 14 jours avant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.step.before7_days" xml:space="preserve">
+    <value>Rappel 7 jours avant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.step.before1_day" xml:space="preserve">
+    <value>Rappel 1 jour avant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.step.after1_week" xml:space="preserve">
+    <value>En retard : 1 semaine</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.step.after2_weeks" xml:space="preserve">
+    <value>En retard : 2 semaines</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.step.after3_weeks" xml:space="preserve">
+    <value>En retard : 3 semaines</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.step.after4_weeks" xml:space="preserve">
+    <value>En retard : 4 semaines</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.step.manual" xml:space="preserve">
+    <value>Rappel envoyé par le personnel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.language.en" xml:space="preserve">
+    <value>Anglais</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.language.fr" xml:space="preserve">
+    <value>Français</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.language.es" xml:space="preserve">
+    <value>Espagnol</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.title" xml:space="preserve">
+    <value>Documents juridiques</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.register" xml:space="preserve">
+    <value>Registre des acceptations</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.document" xml:space="preserve">
+    <value>Document juridique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.tenant_title" xml:space="preserve">
+    <value>Juridique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.kind" xml:space="preserve">
+    <value>Document</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.version" xml:space="preserve">
+    <value>Version</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.document_status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.effective" xml:space="preserve">
+    <value>Entrée en vigueur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.deadline" xml:space="preserve">
+    <value>À accepter avant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.published" xml:space="preserve">
+    <value>Publié le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.includes" xml:space="preserve">
+    <value>Comprend</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.acceptance" xml:space="preserve">
+    <value>Acceptation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.acceptance_required" xml:space="preserve">
+    <value>Les clients doivent accepter cette version</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.notice_only" xml:space="preserve">
+    <value>Avis seulement (rien à accepter)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.acceptance_help" xml:space="preserve">
+    <value>Décochez pour les corrections qui ne changent aucun droit, comme des fautes ou des coordonnées : les clients sont informés, rien à accepter.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.effective_help" xml:space="preserve">
+    <value>Vide : {days} jours après publication pour les conditions à accepter, immédiatement sinon. Les clients ont jusqu’à ce jour pour accepter.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.new_draft" xml:space="preserve">
+    <value>Nouvelle version</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.new_draft_help" xml:space="preserve">
+    <value>Un nouveau brouillon des conditions part des versions publiées des autres documents.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.create_draft" xml:space="preserve">
+    <value>Créer le brouillon</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.draft" xml:space="preserve">
+    <value>Brouillon</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.save_draft" xml:space="preserve">
+    <value>Enregistrer le brouillon</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.draft_saved" xml:space="preserve">
+    <value>Brouillon enregistré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.files" xml:space="preserve">
+    <value>Fichiers</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.files_help" xml:space="preserve">
+    <value>Un PDF approuvé par langue, {max} Mo au plus. Les clients téléchargent le fichier ; il n’est jamais affiché comme page web.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.no_file" xml:space="preserve">
+    <value>Pas encore de fichier.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.download" xml:space="preserve">
+    <value>Télécharger le PDF</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.summary" xml:space="preserve">
+    <value>Ce qui change (texte simple, affiché dans les e-mails)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.upload" xml:space="preserve">
+    <value>Téléverser le PDF</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.file_saved" xml:space="preserve">
+    <value>Fichier enregistré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.actions" xml:space="preserve">
+    <value>Actions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.publish_help" xml:space="preserve">
+    <value>La publication exige les trois langues et est définitive. La version ne pourra plus être modifiée ; les clients sont informés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.publish" xml:space="preserve">
+    <value>Publier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.published_done" xml:space="preserve">
+    <value>Publié. Les clients seront informés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.delete_draft" xml:space="preserve">
+    <value>Supprimer le brouillon</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.nothing_required" xml:space="preserve">
+    <value>Aucune version des conditions n’attend d’acceptation pour l’instant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.register_for" xml:space="preserve">
+    <value>Conditions {version}, à accepter avant le {deadline} (30 jours pour les nouveaux clients).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.read_only_help" xml:space="preserve">
+    <value>Après l’échéance, le personnel du client passe en lecture seule jusqu’à l’acceptation par le propriétaire. Les clients du client ne sont jamais touchés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.search" xml:space="preserve">
+    <value>Rechercher</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.count" xml:space="preserve">
+    <value>{count} client(s)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.tenant" xml:space="preserve">
+    <value>Client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.accepted" xml:space="preserve">
+    <value>Accepté le</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.last_reminder" xml:space="preserve">
+    <value>Dernier rappel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.acceptances" xml:space="preserve">
+    <value>Acceptations</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.by" xml:space="preserve">
+    <value>Par</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.evidence" xml:space="preserve">
+    <value>Preuve</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.reminders" xml:space="preserve">
+    <value>Rappels</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.what" xml:space="preserve">
+    <value>Quoi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.remind_reason" xml:space="preserve">
+    <value>Motif d’un rappel maintenant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.send_reminder" xml:space="preserve">
+    <value>Envoyer un rappel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.reminder_sent" xml:space="preserve">
+    <value>Rappel envoyé au propriétaire.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.record_title" xml:space="preserve">
+    <value>Enregistrer une acceptation sur papier signé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.record_help" xml:space="preserve">
+    <value>Uniquement si le propriétaire a signé les conditions actuelles sur papier. Joignez la copie signée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.owner_name" xml:space="preserve">
+    <value>Nom du propriétaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.language" xml:space="preserve">
+    <value>Langue de la version signée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.record_reason" xml:space="preserve">
+    <value>Motif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.record" xml:space="preserve">
+    <value>Enregistrer l’acceptation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.legal.acceptance_recorded" xml:space="preserve">
+    <value>Acceptation enregistrée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.support_email" xml:space="preserve">
+    <value>E-mail du support</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.support_phone" xml:space="preserve">
+    <value>Téléphone du support</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.support_help" xml:space="preserve">
+    <value>Indiqués aux clients pour joindre le support Vixly.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.legal.published.subject" xml:space="preserve">
+    <value>Nouvelles conditions Vixly à accepter avant le {deadline}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.legal.published.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Nous avons mis à jour les conditions d’utilisation de Vixly (version {version}). En tant que propriétaire de {company}, veuillez les lire et les accepter avant le {deadline} :
+{link}
+
+Ce qui change :
+{summary}
+
+Sans acceptation à cette date, votre équipe passera en lecture seule jusqu’à votre acceptation. Vos clients ne sont pas touchés.
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.legal.reminder.subject" xml:space="preserve">
+    <value>Rappel : acceptez les conditions Vixly avant le {deadline}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.legal.reminder.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Les conditions d’utilisation de Vixly, version {version}, attendent toujours votre acceptation pour {company}. Veuillez les accepter avant le {deadline} :
+{link}
+
+Après cette date, votre équipe passera en lecture seule jusqu’à votre acceptation. Vos clients ne sont pas touchés.
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.legal.overdue.subject" xml:space="preserve">
+    <value>Action requise : votre équipe est en lecture seule jusqu’à l’acceptation des conditions Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.legal.overdue.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Les conditions d’utilisation de Vixly, version {version}, devaient être acceptées avant le {deadline}. Jusqu’à votre acceptation, votre équipe de {company} est en lecture seule. Vos clients ne sont pas touchés.
+
+Acceptez maintenant :
+{link}
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.legal.notice.subject" xml:space="preserve">
+    <value>Conditions Vixly mises à jour (version {version})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.legal.notice.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Nous avons apporté de petites corrections aux conditions d’utilisation de Vixly (version {version}). Rien à accepter ; vos droits ne changent pas. Vous pouvez les lire ici :
+{link}
+
+Ce qui change :
+{summary}
+
+Des questions ? Écrivez-nous à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.common.role_not_allowed" xml:space="preserve">
+    <value>Votre rôle dans ce compte ne permet pas cette action.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_account.owner_contact_locked" xml:space="preserve">
+    <value>Le contact propriétaire ne peut être modifié que par le support Vixly.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_account.plan_not_offered" xml:space="preserve">
+    <value>Ce forfait n’est pas proposé pour un changement depuis votre compte. Contactez l’équipe commerciale de Vixly.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_account.too_many" xml:space="preserve">
+    <value>Demandez au plus {max} clients à la fois.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.internal.token_invalid" xml:space="preserve">
+    <value>Le jeton de service est absent, expiré ou non valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.internal.scope_not_allowed" xml:space="preserve">
+    <value>Cet appelant ne peut pas utiliser cet appel.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.internal.tenant_required" xml:space="preserve">
+    <value>Cet appel nécessite un client dans le jeton de service.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.internal.too_many_items" xml:space="preserve">
+    <value>Envoyez au plus {max} éléments à la fois.</value>
+    <comment>needs-review</comment>
+  </data>
 </root>

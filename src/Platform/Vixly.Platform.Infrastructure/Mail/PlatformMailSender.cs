@@ -36,11 +36,23 @@ public sealed class PlatformMailSender
 
     public string SupportAddress => string.IsNullOrWhiteSpace(_mail.SupportAddress) ? _mail.FromAddress : _mail.SupportAddress;
 
+    public Task SendAsync(
+        string toAddress,
+        string toName,
+        LanguageCode language,
+        Func<IStringLocalizer, (string Subject, string Body)> compose,
+        CancellationToken cancellationToken)
+    {
+        return SendAsync(toAddress, toName, language, compose, null, cancellationToken);
+    }
+
+    // Billing (Slice 4): the same mail with one PDF attached (invoice, credit note or receipt).
     public async Task SendAsync(
         string toAddress,
         string toName,
         LanguageCode language,
         Func<IStringLocalizer, (string Subject, string Body)> compose,
+        (string FileName, byte[] Content)? attachment,
         CancellationToken cancellationToken)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(toAddress);
@@ -69,6 +81,11 @@ public sealed class PlatformMailSender
         };
         message.To.Add(new MailAddress(toAddress, toName));
 
+        if (attachment is { } file)
+        {
+            message.Attachments.Add(new Attachment(new MemoryStream(file.Content), file.FileName, "application/pdf"));
+        }
+
         using SmtpClient client = CreateClient();
         await client.SendMailAsync(message, cancellationToken);
     }
@@ -81,11 +98,13 @@ public sealed class PlatformMailSender
             return new SmtpClient
             {
                 DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory,
-                PickupDirectoryLocation = Path.GetFullPath(_mail.PickupDirectory)
+                PickupDirectoryLocation = Path.GetFullPath(_mail.PickupDirectory),
+                DeliveryFormat = SmtpDeliveryFormat.International
             };
         }
 
-        SmtpClient client = new(_mail.SmtpHost, _mail.SmtpPort) { EnableSsl = _mail.UseSsl };
+        // International: addresses such as lucía@example.com are valid and must not fail the message (SMTPUTF8).
+        SmtpClient client = new(_mail.SmtpHost, _mail.SmtpPort) { EnableSsl = _mail.UseSsl, DeliveryFormat = SmtpDeliveryFormat.International };
 
         if (!string.IsNullOrEmpty(_mail.UserName))
         {

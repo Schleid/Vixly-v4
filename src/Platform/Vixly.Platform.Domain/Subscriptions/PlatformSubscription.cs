@@ -80,6 +80,10 @@ public sealed class PlatformSubscription : AuditableEntity
 
     public PlatformSubscriptionStatus? StatusBeforeSuspension { get; private set; }
 
+    public PlatformSubscriptionStatus? StatusBeforeBlock { get; private set; }
+
+    public DateTimeOffset? BlockedUtc { get; private set; }
+
     public DateTimeOffset? EndedUtc { get; private set; }
 
     public PlatformSubscriptionEndReason? EndReason { get; private set; }
@@ -150,14 +154,65 @@ public sealed class PlatformSubscription : AuditableEntity
     // =====================================================
     // METHOD: ACCESS (D-S14)
     // =====================================================
-    public PlatformSubscriptionAccess AccessAt(DateTimeOffset utcNow, TimeSpan unpaidReadOnlyPeriod)
+    // Unpaid (Pending payment or Blocked): read-only for the period in settings, then payment
+    // required. Suspended (account) and Ended: none. Customers are never affected (D-C4).
+    public PlatformSubscriptionAccess AccessAt(DateTimeOffset utcNow, PlatformSubscriptionAccessRules rules)
     {
+        ArgumentNullException.ThrowIfNull(rules);
+
         return Status switch
         {
             PlatformSubscriptionStatus.Trialing or PlatformSubscriptionStatus.Active or PlatformSubscriptionStatus.PastDue => PlatformSubscriptionAccess.Full,
-            PlatformSubscriptionStatus.PendingPayment when utcNow < StatusChangedUtc.Add(unpaidReadOnlyPeriod) => PlatformSubscriptionAccess.ReadOnly,
+            PlatformSubscriptionStatus.PendingPayment => utcNow < StatusChangedUtc.Add(rules.UnpaidReadOnly)
+                ? PlatformSubscriptionAccess.ReadOnly
+                : PlatformSubscriptionAccess.PaymentRequired,
+            PlatformSubscriptionStatus.BlockedForNonPayment => rules.BlockedReadOnly is not { } period || utcNow < (BlockedUtc ?? StatusChangedUtc).Add(period)
+                ? PlatformSubscriptionAccess.ReadOnly
+                : PlatformSubscriptionAccess.PaymentRequired,
             _ => PlatformSubscriptionAccess.None
         };
+    }
+
+    // =====================================================
+    // METHOD: NON-PAYMENT (Slice 6, D-C4, D-C5, D-C7)
+    // =====================================================
+    public PlatformSubscriptionEvent? BlockForNonPayment(string? invoiceNumber, DateTimeOffset utcNow)
+    {
+        if (Status is not (PlatformSubscriptionStatus.Active or PlatformSubscriptionStatus.PastDue or PlatformSubscriptionStatus.PendingPayment))
+        {
+            return null;
+        }
+
+        PlatformSubscriptionStatus from = Status;
+        StatusBeforeBlock = from;
+        BlockedUtc = utcNow;
+        MoveTo(PlatformSubscriptionStatus.BlockedForNonPayment, utcNow);
+
+        Dictionary<string, string> arguments = new(StringComparer.Ordinal);
+
+        if (invoiceNumber is not null)
+        {
+            arguments["invoice"] = invoiceNumber;
+        }
+
+        return PlatformSubscriptionEvent.Record(this, PlatformSubscriptionEventCodes.BlockedForNonPayment, from, null, utcNow, arguments: arguments);
+    }
+
+    // An extension lifts the block while it runs; the status before the block comes back.
+    public PlatformSubscriptionEvent? LiftBlockForExtension(DateTime extendedThrough, Guid actorUserId, DateTimeOffset utcNow)
+    {
+        if (Status != PlatformSubscriptionStatus.BlockedForNonPayment)
+        {
+            return null;
+        }
+
+        PlatformSubscriptionStatus target = StatusBeforeBlock ?? PlatformSubscriptionStatus.PastDue;
+        StatusBeforeBlock = null;
+        BlockedUtc = null;
+        MoveTo(target, utcNow);
+
+        return PlatformSubscriptionEvent.Record(this, PlatformSubscriptionEventCodes.BlockLifted, PlatformSubscriptionStatus.BlockedForNonPayment, actorUserId, utcNow,
+            arguments: new Dictionary<string, string>(StringComparer.Ordinal) { ["through"] = extendedThrough.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) });
     }
 
     // =====================================================
@@ -171,18 +226,77 @@ public sealed class PlatformSubscription : AuditableEntity
         return Activate(PlatformSubscriptionEventCodes.OfflinePaymentRecorded, actor, why, utcNow);
     }
 
-    public PlatformSubscriptionEvent Activate(string eventCode, Guid? actorUserId, string? reason, DateTimeOffset utcNow)
+    // Billing (Slice 4): the invoice this subscription waits for is paid. Activates a
+    // subscription awaiting payment, or clears Past due once nothing else is overdue (D-B8).
+    public PlatformSubscriptionEvent? InvoicePaid(string invoiceNumber, bool otherInvoicesOverdue, DateTimeOffset utcNow)
+    {
+        if (Status == PlatformSubscriptionStatus.PendingPayment
+            || (Status is PlatformSubscriptionStatus.PastDue or PlatformSubscriptionStatus.BlockedForNonPayment && !otherInvoicesOverdue))
+        {
+            return Activate(PlatformSubscriptionEventCodes.InvoicePaid, null, null, utcNow, invoiceNumber);
+        }
+
+        return null;
+    }
+
+    // Billing (Slice 4): a renewal or change invoice is unpaid after its due date (D-B8).
+    public PlatformSubscriptionEvent? MarkPastDue(string invoiceNumber, DateTimeOffset utcNow)
+    {
+        if (Status != PlatformSubscriptionStatus.Active)
+        {
+            return null;
+        }
+
+        MoveTo(PlatformSubscriptionStatus.PastDue, utcNow);
+
+        return PlatformSubscriptionEvent.Record(
+            this,
+            PlatformSubscriptionEventCodes.PastDue,
+            PlatformSubscriptionStatus.Active,
+            null,
+            utcNow,
+            arguments: new Dictionary<string, string>(StringComparer.Ordinal) { ["invoice"] = invoiceNumber });
+    }
+
+    public IReadOnlyList<PlatformOneTimeCharge> PendingCharges => _charges.Where(item => item.Status == PlatformOneTimeChargeStatus.Pending).ToArray();
+
+    // Billing (Slice 4): the pending charges went onto an invoice.
+    public void MarkChargesBilled(IEnumerable<Guid> chargeIds, DateTimeOffset utcNow)
+    {
+        ArgumentNullException.ThrowIfNull(chargeIds);
+
+        foreach (Guid chargeId in chargeIds)
+        {
+            (_charges.FirstOrDefault(item => item.Id == chargeId) ?? throw new DomainException(PlatformDiscountErrors.ChargeNotFound)).MarkBilled(utcNow);
+        }
+
+        MarkAsModified(utcNow);
+    }
+
+    public PlatformSubscriptionEvent Activate(string eventCode, Guid? actorUserId, string? reason, DateTimeOffset utcNow, string? invoiceNumber = null)
     {
         PlatformSubscriptionStatus from = Status;
 
-        if (from is not (PlatformSubscriptionStatus.PendingPayment or PlatformSubscriptionStatus.PastDue))
+        if (from is not (PlatformSubscriptionStatus.PendingPayment or PlatformSubscriptionStatus.PastDue or PlatformSubscriptionStatus.BlockedForNonPayment))
         {
             throw new DomainException(PlatformSubscriptionErrors.NotAwaitingPayment);
         }
 
+        // Paying clears a block (D-C6): it continues from the status before the block.
+        PlatformSubscriptionStatus effective = from == PlatformSubscriptionStatus.BlockedForNonPayment
+            ? StatusBeforeBlock ?? PlatformSubscriptionStatus.PastDue
+            : from;
+        StatusBeforeBlock = null;
+        BlockedUtc = null;
+
         Dictionary<string, string> arguments = new(StringComparer.Ordinal);
 
-        if (from == PlatformSubscriptionStatus.PendingPayment)
+        if (invoiceNumber is not null)
+        {
+            arguments["invoice"] = invoiceNumber;
+        }
+
+        if (effective == PlatformSubscriptionStatus.PendingPayment)
         {
             arguments["setupFee"] = SetupFeeCharged ? "false" : "true";
             SetupFeeCharged = true;
@@ -864,6 +978,8 @@ public sealed class PlatformSubscription : AuditableEntity
         ScheduledChange = null;
         CancelAtPeriodEnd = false;
         StatusBeforeSuspension = null;
+        StatusBeforeBlock = null;
+        BlockedUtc = null;
 
         foreach (PlatformSubscriptionDiscount discount in _discounts.Where(item => item.IsActive || item.IsPending))
         {
@@ -909,7 +1025,7 @@ public sealed class PlatformSubscription : AuditableEntity
     {
         RequireNotEnded();
 
-        if (Status == PlatformSubscriptionStatus.Suspended)
+        if (Status is PlatformSubscriptionStatus.Suspended or PlatformSubscriptionStatus.BlockedForNonPayment)
         {
             throw new DomainException(PlatformSubscriptionErrors.NotAllowedInStatus(Status));
         }

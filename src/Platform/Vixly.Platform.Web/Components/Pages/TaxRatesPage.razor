@@ -1,0 +1,21 @@
+﻿@*
+=========================================================
+FILE: TaxRatesPage.razor
+
+PURPOSE:
+Tax rates by country and region.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/billing/tax-rates"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.tax_rates.title"]</PageTitle>
+<p><a href="/invoices">@T["ui.invoices.title"]</a> · <a href="/billing/settings">@T["ui.billing_settings.title"]</a></p>
+<h1>@T["ui.tax_rates.title"]</h1>
+<p class="vx-hint">@T["ui.tax_rates.help"]</p>
+<TaxRateList />

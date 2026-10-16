@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: LegalDocumentPage.razor
+
+PURPOSE:
+One legal document version.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/legal/{DocumentId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.legal.document"]</PageTitle>
+<LegalDocumentView DocumentId="DocumentId" />
+
+@code {
+    [Parameter]
+    public Guid DocumentId { get; set; }
+}

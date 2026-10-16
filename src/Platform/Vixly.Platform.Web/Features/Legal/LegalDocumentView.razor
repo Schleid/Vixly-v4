@@ -1,0 +1,241 @@
+﻿@*
+=========================================================
+FILE: LegalDocumentView.razor
+
+PURPOSE:
+One legal document version: its dates and status, the PDF per
+language with its summary, the versions a Terms version
+includes, and the draft actions (save, upload, publish,
+delete) (Slice 8).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- A published version is read-only; files are downloads, never
+  shown inline
+=========================================================
+*@
+@inherits PlatformPresenterComponent<LegalDocumentPresenter>
+@using Vixly.Platform.Application.Queries
+@using Vixly.Platform.Domain.Legal
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+@if (Presenter.State.DoneKey is { } done)
+{
+    <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+}
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+@if (!Presenter.State.Loaded)
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+else if (Presenter.State.Detail is { } detail)
+{
+    PlatformLegalDocumentItem document = detail.Document;
+    bool editable = document.Status == PlatformLegalDocumentStatus.Draft && detail.Abilities.CanManage;
+    <h1>@T[LegalDisplay.KindKey(document.Kind)] · @document.Version</h1>
+    <p><a href="/legal">@T["ui.legal.title"]</a> · <a href="/legal/register">@T["ui.legal.register"]</a></p>
+    <div id="legal-document"><VxCard Title="@T["ui.legal.document"]">
+        <dl class="vx-facts">
+            <dt>@T["ui.legal.document_status"]</dt>
+            <dd><VxStatusBadge Status="@LegalDisplay.DocumentBadge(document.Status)" Text="@T[LegalDisplay.DocumentStatusKey(document.Status)]" /></dd>
+            @if (document.Kind == PlatformLegalDocumentKind.Terms)
+            {
+                <dt>@T["ui.legal.acceptance"]</dt>
+                <dd>@T[document.AcceptanceRequired ? "ui.legal.acceptance_required" : "ui.legal.notice_only"]</dd>
+            }
+            <dt>@T["ui.legal.effective"]</dt>
+            <dd>@LegalDisplay.Date(document.EffectiveUtc)</dd>
+            @if (document.DeadlineUtc is { } deadline)
+            {
+                <dt>@T["ui.legal.deadline"]</dt>
+                <dd>@LegalDisplay.Date(deadline)</dd>
+            }
+            @if (document.PublishedUtc is { } published)
+            {
+                <dt>@T["ui.legal.published"]</dt>
+                <dd>@PlatformDisplay.Utc(T, published) <span class="vx-hint">@document.PublishedByName</span></dd>
+            }
+            @if (detail.Parts.Count > 0)
+            {
+                <dt>@T["ui.legal.includes"]</dt>
+                <dd>@string.Join(", ", detail.Parts.Select(part => T[LegalDisplay.KindKey(part.Kind)].Value + " " + part.Version))</dd>
+            }
+        </dl>
+    </VxCard></div>
+
+    @if (editable)
+    {
+        <div id="legal-draft"><VxCard Title="@T["ui.legal.draft"]">
+            <form class="vx-form" @onsubmit="SaveAsync">
+                <label for="legal-version">@T["ui.legal.version"]</label>
+                <input id="legal-version" @bind="_version" maxlength="@PlatformLegalLimits.VersionMaxLength" required />
+                @if (document.Kind == PlatformLegalDocumentKind.Terms)
+                {
+                    <label><input id="legal-required" type="checkbox" @bind="_required" /> @T["ui.legal.acceptance_required"]</label>
+                    <p class="vx-hint">@T["ui.legal.acceptance_help"]</p>
+                    <fieldset>
+                        <legend>@T["ui.legal.includes"]</legend>
+                        @foreach (PlatformLegalDocumentItem option in detail.PartOptions)
+                        {
+                            <label><input type="checkbox" checked="@_parts.Contains(option.DocumentId)" @onchange="args => Toggle(option.DocumentId, args)" /> @T[LegalDisplay.KindKey(option.Kind)] @option.Version</label>
+                        }
+                    </fieldset>
+                }
+                <label for="legal-effective">@T["ui.legal.effective"]</label>
+                <input id="legal-effective" type="date" @bind="_effective" aria-describedby="legal-effective-help" />
+                <p id="legal-effective-help" class="vx-hint">@VixlyText.Format(T, "ui.legal.effective_help", "days", PlatformLegalLimits.NoticeDays)</p>
+                <div class="vx-actions">
+                    <VxButton Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.legal.save_draft"]</VxButton>
+                </div>
+            </form>
+        </VxCard></div>
+    }
+
+    <div id="legal-files"><VxCard Title="@T["ui.legal.files"]">
+        <p class="vx-hint">@VixlyText.Format(T, "ui.legal.files_help", "max", PlatformLegalLimits.MaxFileMegabytes)</p>
+        @foreach (string language in new[] { "en", "fr", "es" })
+        {
+            PlatformLegalFileItem? file = detail.Files.FirstOrDefault(item => item.Language == language);
+            <div class="vx-form" id="legal-file-@language">
+                <h3>@T[LegalDisplay.LanguageKey(language)]</h3>
+                @if (file is not null)
+                {
+                    <p>
+                        <a href="/legal/files/@document.DocumentId/@language" download>@T["ui.legal.download"]</a>
+                        <span class="vx-hint">@LegalDisplay.Size(file.SizeBytes) · SHA-256 @file.Sha256[..12]…</span>
+                    </p>
+                    @if (file.Summary is { } summary)
+                    {
+                        <p class="vx-hint" style="white-space: pre-line">@summary</p>
+                    }
+                }
+                else
+                {
+                    <p class="vx-hint">@T["ui.legal.no_file"]</p>
+                }
+                @if (editable)
+                {
+                    <label for="legal-summary-@language">@T["ui.legal.summary"]</label>
+                    <textarea id="legal-summary-@language" @bind="_summaries[language]" @bind:event="oninput" maxlength="@PlatformLegalLimits.SummaryMaxLength" rows="3"></textarea>
+                    <label for="legal-upload-@language">@T["ui.legal.upload"]</label>
+                    <InputFile id="@($"legal-upload-{language}")" accept="application/pdf" OnChange="args => UploadAsync(language, args)" />
+                }
+            </div>
+        }
+    </VxCard></div>
+
+    @if (document.Status == PlatformLegalDocumentStatus.Draft && (detail.Abilities.CanPublish || detail.Abilities.CanManage))
+    {
+        <div id="legal-actions"><VxCard Title="@T["ui.legal.actions"]">
+            <p class="vx-hint">@T["ui.legal.publish_help"]</p>
+            <div class="vx-actions">
+                @if (detail.Abilities.CanPublish)
+                {
+                    <VxButton Variant="VxButtonVariant.Primary" OnClick="() => Presenter.PublishAsync(DocumentId)" IsBusy="@Presenter.IsBusy">@T["ui.legal.publish"]</VxButton>
+                }
+                @if (detail.Abilities.CanManage)
+                {
+                    <VxButton Variant="VxButtonVariant.Danger" OnClick="DeleteAsync" IsBusy="@Presenter.IsBusy">@T["ui.legal.delete_draft"]</VxButton>
+                }
+            </div>
+        </VxCard></div>
+    }
+    @if (Presenter.State.StepUpPending)
+    {
+        <StepUpDialog OnConfirmed="() => Presenter.PublishAsync(DocumentId)" OnCancelled="Presenter.CancelStepUp" />
+    }
+}
+
+@code {
+    private string? _version;
+
+    private bool _required;
+
+    private DateTime? _effective;
+
+    private HashSet<Guid> _parts = new();
+
+    private readonly Dictionary<string, string?> _summaries = new(StringComparer.Ordinal) { ["en"] = null, ["fr"] = null, ["es"] = null };
+
+    private Guid _loaded;
+
+    [Parameter, EditorRequired]
+    public Guid DocumentId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_loaded != DocumentId)
+        {
+            _loaded = DocumentId;
+            await Presenter.LoadAsync(DocumentId);
+            Fill();
+        }
+    }
+
+    private void Fill()
+    {
+        if (Presenter.State.Detail is { } detail)
+        {
+            _version = detail.Document.Version;
+            _required = detail.Document.AcceptanceRequired;
+            _effective = detail.Document.EffectiveUtc?.UtcDateTime.Date;
+            _parts = detail.Parts.Select(part => part.DocumentId).ToHashSet();
+
+            foreach (PlatformLegalFileItem file in detail.Files)
+            {
+                _summaries[file.Language] = file.Summary;
+            }
+        }
+    }
+
+    private void Toggle(Guid id, ChangeEventArgs args)
+    {
+        if (args.Value is true)
+        {
+            _parts.Add(id);
+        }
+        else
+        {
+            _parts.Remove(id);
+        }
+    }
+
+    private Task SaveAsync()
+    {
+        return Presenter.SaveAsync(DocumentId, _version, _required, _effective, _parts.ToArray());
+    }
+
+    private async Task UploadAsync(string language, InputFileChangeEventArgs args)
+    {
+        long limit = PlatformLegalLimits.MaxFileMegabytes * 1024L * 1024L;
+
+        if (args.File.Size > limit)
+        {
+            Presenter.Fail(PlatformLegalErrors.FileInvalid);
+            return;
+        }
+
+        using MemoryStream buffer = new();
+        await using Stream stream = args.File.OpenReadStream(limit);
+        await stream.CopyToAsync(buffer);
+        await Presenter.SetFileAsync(DocumentId, language, buffer.ToArray(), _summaries[language]);
+    }
+
+    private async Task DeleteAsync()
+    {
+        await Presenter.DeleteAsync(DocumentId);
+
+        if (Presenter.State.Deleted)
+        {
+            Navigation.NavigateTo("/legal");
+        }
+    }
+}

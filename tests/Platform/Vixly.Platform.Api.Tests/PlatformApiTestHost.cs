@@ -27,7 +27,7 @@ internal static class PlatformApiTestHost
 {
     public const string Host = "vixly-api.techcrafters.ltd";
 
-    public static async Task<(WebApplication App, HttpClient Client)> StartAsync()
+    public static async Task<(WebApplication App, HttpClient Client)> StartAsync(IReadOnlyDictionary<string, string?>? settings = null)
     {
         WebApplication app = PlatformApiHost.Build(
             new[]
@@ -45,6 +45,11 @@ internal static class PlatformApiTestHost
                     ["PlatformBotCheck:Enabled"] = "true",
                     ["PlatformBotCheck:SecretKey"] = string.Empty
                 });
+
+                if (settings is not null)
+                {
+                    builder.Configuration.AddInMemoryCollection(settings);
+                }
             });
 
         await app.StartAsync();

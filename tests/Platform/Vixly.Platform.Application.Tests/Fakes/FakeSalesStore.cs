@@ -86,6 +86,16 @@ internal sealed class FakeSalesStore :
         return "https://vixly.test/register?offer=" + token;
     }
 
+    public string PayLink(string token) => "https://vixly.test/pay/" + token;
+
+    public string SaveCardLink(string token) => "https://vixly.test/cards/" + token;
+
+    public string RegistrationPayment() => "https://vixly.test/register/payment";
+
+    public string DeviceLink(string portalSlug, Vixly.Platform.Domain.Licensing.PlatformDeviceLinkKind kind, string token) => $"https://{portalSlug}.vixly.test/devices/{kind}#{token}";
+
+    public string LegalLink(string portalSlug) => $"https://{portalSlug}.vixly.test/legal";
+
     public Task SendApprovalRequestAsync(PlatformPermissionHolderItem recipient, string kindKey, string subject, CancellationToken cancellationToken)
     {
         ApprovalMails.Add((recipient.Email, kindKey, subject));

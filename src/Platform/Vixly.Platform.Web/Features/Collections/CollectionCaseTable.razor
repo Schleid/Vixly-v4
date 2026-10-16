@@ -1,0 +1,75 @@
+﻿@*
+=========================================================
+FILE: CollectionCaseTable.razor
+
+PURPOSE:
+A table of collections cases.
+
+IMPORTANT NOTES:
+- Markup only; values come from the caller
+=========================================================
+*@
+@using Vixly.Platform.Application.Queries
+@inject IStringLocalizer<PlatformText> T
+
+<VxDataTable Items="Items" IsLoading="false">
+    <HeaderContent>
+        <th scope="col">@T["ui.subscriptions.tenant"]</th>
+        <th scope="col">@T["ui.collections.stage"]</th>
+        <th scope="col">@T["ui.collections.overdue"]</th>
+        <th scope="col">@T["ui.collections.oldest_due"]</th>
+        <th scope="col">@T["ui.collections.next"]</th>
+        <th scope="col">@T["ui.collections.subscription"]</th>
+    </HeaderContent>
+    <RowTemplate Context="item">
+        <td><a href="/collections/@item.CaseId">@item.TenantName</a></td>
+        <td>
+            @if (item.Status == Vixly.Platform.Domain.Collections.PlatformCollectionCaseStatus.Closed)
+            {
+                <VxStatusBadge Status="VxBadgeStatus.Deactivated" Text="@T[CollectionsDisplay.StatusKey(item.Status)]" />
+            }
+            else
+            {
+                <VxStatusBadge Status="@CollectionsDisplay.StageBadge(item.Stage)" Text="@T[CollectionsDisplay.StageKey(item.Stage)]" />
+                @if (item.Held)
+                {
+                    <span class="vx-hint">@T["ui.collections.held"]</span>
+                }
+            }
+        </td>
+        <td>@CollectionsDisplay.Amounts(item.Overdue)</td>
+        <td>@CollectionsDisplay.Date(item.OldestDueUtc)</td>
+        <td>
+            @if (item.ExtendedThrough is { } through)
+            {
+                @VixlyText.Format(T, "ui.collections.extended_through", "date", CollectionsDisplay.Date(through))
+            }
+            else if (item.BlockedUtc is { } blocked)
+            {
+                @VixlyText.Format(T, "ui.collections.blocked_since", "date", CollectionsDisplay.Date(blocked))
+            }
+            else if (item.PlannedBlockUtc is { } planned)
+            {
+                @VixlyText.Format(T, "ui.collections.block_on", "date", CollectionsDisplay.Date(planned))
+            }
+            else if (item.ClosedUtc is { } closed)
+            {
+                @VixlyText.Format(T, "ui.collections.closed_on", "date", CollectionsDisplay.Date(closed))
+            }
+        </td>
+        <td>
+            @if (item.SubscriptionStatus is { } status)
+            {
+                <VxStatusBadge Status="@SubscriptionDisplay.Badge(status)" Text="@T[SubscriptionDisplay.StatusKey(status)]" />
+            }
+        </td>
+    </RowTemplate>
+    <EmptyContent>
+        <VxEmptyState Title="@T["ui.collections.empty"]" />
+    </EmptyContent>
+</VxDataTable>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PlatformCollectionCaseItem> Items { get; set; } = Array.Empty<PlatformCollectionCaseItem>();
+}

@@ -1,0 +1,66 @@
+﻿@*
+=========================================================
+FILE: CardTransactionTable.razor
+
+PURPOSE:
+A table of card charges and refunds.
+
+IMPORTANT NOTES:
+- Markup only; values come from the caller
+- Failure codes are short provider codes, never provider text
+=========================================================
+*@
+@using Vixly.Platform.Application.Queries
+@inject IStringLocalizer<PlatformText> T
+
+<VxDataTable Items="Items" IsLoading="false">
+    <HeaderContent>
+        <th scope="col">@T["ui.audit.when"]</th>
+        @if (ShowInvoice)
+        {
+            <th scope="col">@T["ui.invoices.number"]</th>
+            <th scope="col">@T["ui.subscriptions.tenant"]</th>
+        }
+        <th scope="col">@T["ui.card_payments.kind"]</th>
+        <th scope="col">@T["ui.card_payments.origin"]</th>
+        <th scope="col">@T["ui.billing_document.amount"]</th>
+        <th scope="col">@T["ui.card_payments.status"]</th>
+        <th scope="col">@T["ui.billing_document.reference"]</th>
+        <th scope="col">@T["ui.audit.who"]</th>
+    </HeaderContent>
+    <RowTemplate Context="item">
+        <td>@PlatformDisplay.Utc(T, item.CreatedUtc)</td>
+        @if (ShowInvoice)
+        {
+            <td><a href="/invoices/@item.PlatformInvoiceId#invoice-card-payments">@item.InvoiceNumber</a></td>
+            <td><a href="/tenants/@item.PlatformTenantId#tenant-billing">@item.TenantName</a></td>
+        }
+        <td>@T[PaymentsDisplay.KindKey(item.Kind)]</td>
+        <td>@T[PaymentsDisplay.OriginKey(item.Origin)]</td>
+        <td>@Vixly.Platform.Web.Features.Billing.BillingDisplay.Money(item.Amount, item.CurrencyCode)</td>
+        <td>
+            <VxStatusBadge Status="@PaymentsDisplay.Badge(item.Status)" Text="@T[PaymentsDisplay.StatusKey(item.Status)]" />
+            @if (item.FailureCode is { } failure)
+            {
+                <span class="vx-hint">@failure</span>
+            }
+            @if (item.Dispute is { } dispute)
+            {
+                <VxStatusBadge Status="VxBadgeStatus.Danger" Text="@T[PaymentsDisplay.DisputeKey(dispute)]" />
+            }
+        </td>
+        <td><span class="vx-hint">@item.ProviderReference</span></td>
+        <td>@(item.CreatedByName ?? T["ui.audit.no_actor"].Value)</td>
+    </RowTemplate>
+    <EmptyContent>
+        <VxEmptyState Title="@T["ui.card_payments.empty"]" />
+    </EmptyContent>
+</VxDataTable>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PlatformCardTransactionItem> Items { get; set; } = Array.Empty<PlatformCardTransactionItem>();
+
+    [Parameter]
+    public bool ShowInvoice { get; set; } = true;
+}

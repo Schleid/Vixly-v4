@@ -80,12 +80,21 @@ h1, .vx-page-title {
     }
 }
 
-.vx-shell__main > p:first-of-type:has(> a) {
-    margin-bottom: 0.85rem;
+.vx-shell__main > p:first-of-type:has(> a),
+.vx-shell__main > h1 + p:has(> a:first-child),
+.vx-shell__main > .vx-page-title + p:has(> a:first-child) {
+    margin-bottom: 1rem;
     font-size: 0.8125rem;
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    color: var(--vx-color-text-muted);
 }
 
-.vx-shell__main > p:first-of-type a {
+.vx-shell__main > p:first-of-type a,
+.vx-shell__main > h1 + p:has(> a:first-child) a,
+.vx-shell__main > .vx-page-title + p:has(> a:first-child) a {
     color: var(--vx-color-text-muted);
     font-weight: 600;
     display: inline-flex;
@@ -99,11 +108,47 @@ h1, .vx-page-title {
     transition: all var(--vx-transition-fast);
 }
 
-.vx-shell__main > p:first-of-type a:hover {
+.vx-shell__main > p:first-of-type a:hover,
+.vx-shell__main > h1 + p:has(> a:first-child) a:hover,
+.vx-shell__main > .vx-page-title + p:has(> a:first-child) a:hover {
     color: var(--vx-color-primary);
     background: var(--vx-color-surface-sunken);
     border-color: var(--vx-color-primary);
     text-decoration: none;
+}
+
+:root[data-theme="dark"] .vx-shell__main > p:first-of-type a,
+:root[data-theme="dark"] .vx-shell__main > h1 + p:has(> a:first-child) a,
+:root[data-theme="dark"] .vx-shell__main > .vx-page-title + p:has(> a:first-child) a {
+    background: rgba(20, 30, 50, 0.6);
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #94A3B8;
+}
+
+:root[data-theme="dark"] .vx-shell__main > p:first-of-type a:hover,
+:root[data-theme="dark"] .vx-shell__main > h1 + p:has(> a:first-child) a:hover,
+:root[data-theme="dark"] .vx-shell__main > .vx-page-title + p:has(> a:first-child) a:hover {
+    color: #FFFFFF;
+    background: rgba(37, 99, 235, 0.15);
+    border-color: var(--vx-color-primary);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .vx-shell__main > p:first-of-type a,
+    :root:not([data-theme="light"]) .vx-shell__main > h1 + p:has(> a:first-child) a,
+    :root:not([data-theme="light"]) .vx-shell__main > .vx-page-title + p:has(> a:first-child) a {
+        background: rgba(20, 30, 50, 0.6);
+        border-color: rgba(255, 255, 255, 0.08);
+        color: #94A3B8;
+    }
+
+    :root:not([data-theme="light"]) .vx-shell__main > p:first-of-type a:hover,
+    :root:not([data-theme="light"]) .vx-shell__main > h1 + p:has(> a:first-child) a:hover,
+    :root:not([data-theme="light"]) .vx-shell__main > .vx-page-title + p:has(> a:first-child) a:hover {
+        color: #FFFFFF;
+        background: rgba(37, 99, 235, 0.15);
+        border-color: var(--vx-color-primary);
+    }
 }
 
 p {
@@ -672,8 +717,14 @@ p {
 /* Domain Portals */
 .vx-dashboard__portals {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
     gap: 1.25rem;
+}
+
+@media (min-width: 1280px) {
+    .vx-dashboard__portals {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
 .vx-dashboard__portals .vx-card {
@@ -1013,6 +1064,95 @@ a:focus-visible {
 .vx-form textarea {
     min-height: 6rem;
     resize: vertical;
+}
+
+/* File Inputs & Upload Controls */
+.vx-form input[type="file"],
+.vx-card input[type="file"],
+input[type="file"] {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    background: var(--vx-color-surface-sunken);
+    border: 1px dashed var(--vx-color-border-control);
+    border-radius: var(--vx-radius-sm);
+    color: var(--vx-color-text-muted);
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color var(--vx-transition-fast), background var(--vx-transition-fast);
+}
+
+.vx-form input[type="file"]:hover,
+.vx-card input[type="file"]:hover,
+input[type="file"]:hover {
+    border-color: var(--vx-color-primary);
+    background: var(--vx-color-surface);
+}
+
+input[type="file"]::file-selector-button {
+    padding: 0.35rem 0.75rem;
+    margin-right: 0.75rem;
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-sm);
+    color: var(--vx-color-text);
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--vx-transition-fast);
+}
+
+input[type="file"]::file-selector-button:hover {
+    background: var(--vx-color-primary);
+    border-color: var(--vx-color-primary);
+    color: var(--vx-color-on-primary);
+}
+
+:root[data-theme="dark"] input[type="file"]::file-selector-button {
+    background: #1E293B;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #F1F5F9;
+}
+
+:root[data-theme="dark"] input[type="file"]::file-selector-button:hover {
+    background: var(--vx-color-primary);
+    border-color: var(--vx-color-primary);
+    color: #FFFFFF;
+}
+
+/* Date Input Indicator */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    border-radius: var(--vx-radius-sm);
+    opacity: 0.7;
+    transition: opacity var(--vx-transition-fast);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+:root[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.85);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) input[type="file"]::file-selector-button {
+        background: #1E293B;
+        border-color: rgba(255, 255, 255, 0.12);
+        color: #F1F5F9;
+    }
+
+    :root:not([data-theme="light"]) input[type="file"]::file-selector-button:hover {
+        background: var(--vx-color-primary);
+        border-color: var(--vx-color-primary);
+        color: #FFFFFF;
+    }
+
+    :root:not([data-theme="light"]) input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(0.85);
+    }
 }
 
 /* =========================================================
@@ -2433,6 +2573,32 @@ body.vx-auth {
     opacity: 0.85;
 }
 
+/* Nested Fieldsets & Cards within Fieldsets */
+.vx-fieldset .vx-fieldset {
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-sm);
+    padding: 1.15rem;
+    margin: 0.75rem 0;
+}
+
+.vx-fieldset .vx-card {
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    box-shadow: none;
+    margin: 0.75rem 0;
+    padding: 1.25rem;
+}
+
+#zelle-qr {
+    display: inline-block;
+    padding: 0.5rem;
+    background: #FFFFFF;
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-md);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
 .vx-fieldset .vx-toolbar {
     display: flex;
     align-items: center;
@@ -2477,6 +2643,12 @@ body.vx-auth {
     border-color: rgba(255, 255, 255, 0.08);
 }
 
+:root[data-theme="dark"] .vx-fieldset .vx-fieldset,
+:root[data-theme="dark"] .vx-fieldset .vx-card {
+    background: rgba(22, 32, 53, 0.85);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
 :root[data-theme="dark"] .vx-fieldset legend {
     background: #111A2E;
     border-color: rgba(255, 255, 255, 0.12);
@@ -2496,6 +2668,11 @@ body.vx-auth {
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .vx-fieldset {
         background: rgba(13, 21, 39, 0.7);
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+    :root:not([data-theme="light"]) .vx-fieldset .vx-fieldset,
+    :root:not([data-theme="light"]) .vx-fieldset .vx-card {
+        background: rgba(22, 32, 53, 0.85);
         border-color: rgba(255, 255, 255, 0.08);
     }
     :root:not([data-theme="light"]) .vx-fieldset legend {

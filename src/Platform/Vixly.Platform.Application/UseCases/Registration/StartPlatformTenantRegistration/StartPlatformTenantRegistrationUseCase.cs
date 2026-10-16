@@ -54,6 +54,8 @@ public sealed class StartPlatformTenantRegistrationUseCase
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly IPlatformLegalRepository _legal;
+
     public StartPlatformTenantRegistrationUseCase(
         IPlatformBotCheck botCheck,
         IPlatformRequestMetadata metadata,
@@ -66,8 +68,10 @@ public sealed class StartPlatformTenantRegistrationUseCase
         IPlatformTenantMailer mailer,
         PlatformAuditTrail audit,
         IPlatformUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IPlatformLegalRepository legal)
     {
+        _legal = legal ?? throw new ArgumentNullException(nameof(legal));
         _botCheck = botCheck ?? throw new ArgumentNullException(nameof(botCheck));
         _metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
         _policy = policy ?? throw new ArgumentNullException(nameof(policy));
@@ -100,7 +104,14 @@ public sealed class StartPlatformTenantRegistrationUseCase
             return StartPlatformTenantRegistrationResponse.Failure(PlatformRegistrationErrors.TermsNotAccepted);
         }
 
-        if (request.TermsVersion != _policy.TermsVersion || request.PrivacyVersion != _policy.PrivacyVersion)
+        // Slice 8: the published Terms (and the Privacy version it includes); before the first publish, the configured versions.
+        Vixly.Platform.Domain.Legal.PlatformLegalDocument? terms = await _legal.GetPublishedAsync(Vixly.Platform.Domain.Legal.PlatformLegalDocumentKind.Terms, cancellationToken);
+        string termsVersion = terms?.Version ?? _policy.TermsVersion;
+        string privacyVersion = terms is null
+            ? _policy.PrivacyVersion
+            : terms.Parts.FirstOrDefault(part => part.Kind == Vixly.Platform.Domain.Legal.PlatformLegalDocumentKind.Privacy)?.Version ?? string.Empty;
+
+        if (request.TermsVersion != termsVersion || request.PrivacyVersion != privacyVersion)
         {
             return StartPlatformTenantRegistrationResponse.Failure(PlatformRegistrationErrors.LegalVersionInvalid);
         }

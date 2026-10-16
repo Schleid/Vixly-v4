@@ -1,0 +1,160 @@
+﻿@*
+=========================================================
+FILE: TenantBilling.razor
+
+PURPOSE:
+The Billing section of the tenant page: open and overdue
+balances, the tax applied, tax ID and exemption, pending
+charges billed now, and the tenant's invoices.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Hidden for staff without billing access
+- The tax rate shown is the one a new invoice would use today
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantBillingPresenter>
+@using Vixly.Platform.Application.Security
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (!PlatformSecurityErrors.AccessDenied.Equals(Presenter.State.Error))
+{
+    <div id="tenant-billing"><VxCard Title="@T["ui.tenant_billing.title"]">
+        @if (Presenter.State.DoneKey is { } done)
+        {
+            <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+        }
+        @if (Presenter.State.Error is not null)
+        {
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+        }
+        @if (Presenter.State.Billing is { } billing)
+        {
+            <dl class="vx-facts">
+                @foreach (var balance in billing.Balances)
+                {
+                    <dt>@VixlyText.Format(T, "ui.tenant_billing.open_balance", "currency", balance.CurrencyCode)</dt>
+                    <dd>
+                        @BillingDisplay.Money(balance.OpenBalance, balance.CurrencyCode)
+                        <span class="vx-hint">@VixlyText.Format(T, "ui.tenant_billing.open_invoices", "count", balance.OpenInvoices)</span>
+                        @if (balance.OverdueBalance > 0m)
+                        {
+                            <VxStatusBadge Status="VxBadgeStatus.Danger" Text="@VixlyText.Format(T, "ui.tenant_billing.overdue", "amount", BillingDisplay.Money(balance.OverdueBalance, balance.CurrencyCode))" />
+                        }
+                    </dd>
+                }
+                <dt>@T["ui.tenant_billing.tax"]</dt>
+                <dd>
+                    @(billing.TaxLabel is null ? T["ui.tenant_billing.no_tax"].Value : billing.TaxLabel + " " + BillingDisplay.Rate(billing.TaxRate))
+                    <span class="vx-hint">@PlatformDisplay.CountryName(T, billing.CountryCode) @billing.StateProvince</span>
+                </dd>
+                <dt>@T["ui.billing_settings.tax_id"]</dt>
+                <dd>@(billing.TaxId ?? "-")</dd>
+                @if (billing.TaxExempt)
+                {
+                    <dt>@T["ui.tenant_billing.exempt"]</dt>
+                    <dd>@billing.TaxExemptionReason <span class="vx-hint">@billing.TaxExemptionReference</span></dd>
+                }
+            </dl>
+            @if (_editing)
+            {
+                <form class="vx-form" @onsubmit="SaveTaxAsync">
+                    <label for="tenant-tax-id">@T["ui.billing_settings.tax_id"]</label>
+                    <input id="tenant-tax-id" @bind="_taxId" maxlength="50" />
+                    <label><input type="checkbox" @bind="_exempt" /> @T["ui.tenant_billing.exempt"]</label>
+                    @if (_exempt)
+                    {
+                        <label for="tenant-tax-reason">@T["ui.tenant_billing.exempt_reason"]</label>
+                        <input id="tenant-tax-reason" @bind="_reason" maxlength="200" required />
+                        <label for="tenant-tax-reference">@T["ui.tenant_billing.exempt_reference"]</label>
+                        <input id="tenant-tax-reference" @bind="_reference" maxlength="100" required />
+                    }
+                    <div class="vx-actions">
+                        <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.tenant_billing.save_tax"]</VxButton>
+                        <VxButton OnClick="() => _editing = false">@T["ui.common.cancel"]</VxButton>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="vx-actions">
+                    @if (billing.CanEditTax)
+                    {
+                        <VxButton OnClick="() => Edit(billing)">@T["ui.tenant_billing.edit_tax"]</VxButton>
+                    }
+                    @if (billing.CanBillCharges)
+                    {
+                        <VxButton OnClick="BillAsync" IsBusy="@Presenter.IsBusy">@T["ui.tenant_billing.bill_charges"]</VxButton>
+                    }
+                    <a class="vx-button vx-button--subtle" href="/invoices?search=@Uri.EscapeDataString(TenantName)">@T["ui.tenant_billing.all_invoices"]</a>
+                </div>
+            }
+            <TenantCards TenantId="TenantId" />
+            <TenantCollections TenantId="TenantId" />
+            <InvoiceList TenantId="TenantId" Version="Presenter.State.Version" />
+        }
+        @if (Presenter.State.StepUpPending)
+        {
+            <StepUpDialog OnConfirmed="RetryAsync" OnCancelled="Presenter.CancelStepUp" />
+        }
+    </VxCard></div>
+}
+
+@code {
+    private bool _editing;
+
+    private bool _billing;
+
+    private string? _taxId;
+
+    private bool _exempt;
+
+    private string? _reason;
+
+    private string? _reference;
+
+    [Parameter, EditorRequired]
+    public Guid TenantId { get; set; }
+
+    [Parameter]
+    public string TenantName { get; set; } = string.Empty;
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(TenantId);
+    }
+
+    private void Edit(Vixly.Platform.Application.UseCases.Billing.PlatformTenantBillingDetail billing)
+    {
+        _taxId = billing.TaxId;
+        _exempt = billing.TaxExempt;
+        _reason = billing.TaxExemptionReason;
+        _reference = billing.TaxExemptionReference;
+        _editing = true;
+    }
+
+    private async Task SaveTaxAsync()
+    {
+        _billing = false;
+
+        if (await Presenter.SetTaxAsync(TenantId, _taxId, _exempt, _exempt ? _reason : null, _exempt ? _reference : null))
+        {
+            _editing = false;
+        }
+    }
+
+    private async Task BillAsync()
+    {
+        _billing = true;
+        await Presenter.BillChargesAsync(TenantId);
+    }
+
+    private Task RetryAsync()
+    {
+        return _billing ? BillAsync() : SaveTaxAsync();
+    }
+}

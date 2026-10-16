@@ -139,6 +139,7 @@ public static class SalesDisplay
             PlatformApprovalKind.Discount => "ui.approvals.kind.discount",
             PlatformApprovalKind.Offer => "ui.approvals.kind.offer",
             PlatformApprovalKind.Promotion => "ui.approvals.kind.promotion",
+            PlatformApprovalKind.CreditNote => "ui.approvals.kind.credit_note",
             _ => "ui.approvals.kind.plan_version"
         };
     }
@@ -152,6 +153,7 @@ public static class SalesDisplay
             PlatformApprovalKind.Discount => "/tenants/" + item.PlatformTenantId + "#tenant-discount",
             PlatformApprovalKind.Offer => "/offers/" + item.TargetId,
             PlatformApprovalKind.Promotion => "/promotions/" + item.TargetId,
+            PlatformApprovalKind.CreditNote => "/invoices/" + item.TargetId + "#invoice-credits",
             _ => "/plans/" + item.TargetId + "#plan-approval"
         };
     }

@@ -65,6 +65,11 @@ public sealed class ListPlatformApprovalsUseCase
             kinds.Add(PlatformApprovalKind.PlanVersion);
         }
 
+        if (await _sales.HoldsAsync(context, PlatformPermissions.BillingApproveCredits, cancellationToken))
+        {
+            kinds.Add(PlatformApprovalKind.CreditNote);
+        }
+
         if (kinds.Count == 0)
         {
             Error? refused = await _sales.AuthorizeAsync(context, PlatformPermissions.DiscountsApprove, requireStepUp: false, cancellationToken);

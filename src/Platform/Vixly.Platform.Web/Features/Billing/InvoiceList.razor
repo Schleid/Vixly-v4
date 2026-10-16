@@ -1,0 +1,182 @@
+﻿@*
+=========================================================
+FILE: InvoiceList.razor
+
+PURPOSE:
+Invoices: number, status, overdue and date filters, table and pager;
+embedded on the tenant page for one tenant.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Filters live in the URL so a view can be bookmarked; the
+  tenant section pages in place
+=========================================================
+*@
+@inherits PlatformPresenterComponent<InvoiceListPresenter>
+@using Vixly.Platform.Domain.Billing
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+@if (TenantId is null)
+{
+    <form class="vx-toolbar" role="search" @onsubmit="ApplyFilters">
+        <label for="invoice-search">@T["ui.invoices.search"]</label>
+        <input id="invoice-search" type="search" @bind="_search" maxlength="100" />
+        <label for="invoice-status">@T["ui.invoices.status"]</label>
+        <select id="invoice-status" @bind="_status">
+            <option value="">@T["ui.invoices.status.all"]</option>
+            @foreach (PlatformInvoiceStatus status in Enum.GetValues<PlatformInvoiceStatus>())
+            {
+                <option value="@status">@T[BillingDisplay.StatusKey(status)]</option>
+            }
+        </select>
+        <label for="invoice-from">@T["ui.invoices.issued_from"]</label>
+        <input id="invoice-from" type="date" @bind="_from" />
+        <label for="invoice-to">@T["ui.invoices.issued_to"]</label>
+        <input id="invoice-to" type="date" @bind="_to" />
+        <label><input type="checkbox" @bind="_overdue" /> @T["ui.invoices.overdue_only"]</label>
+        <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
+    </form>
+}
+
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else
+{
+    <VxDataTable Items="Presenter.State.Invoices" IsLoading="@(!Presenter.State.Loaded)" Caption="@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.invoices.count", "count", Presenter.State.TotalCount) : null)">
+        <HeaderContent>
+            <th scope="col">@T["ui.invoices.number"]</th>
+            @if (TenantId is null)
+            {
+                <th scope="col">@T["ui.subscriptions.tenant"]</th>
+            }
+            <th scope="col">@T["ui.invoices.kind"]</th>
+            <th scope="col">@T["ui.invoices.status"]</th>
+            <th scope="col">@T["ui.invoices.issued"]</th>
+            <th scope="col">@T["ui.invoices.due"]</th>
+            <th scope="col">@T["ui.invoices.total"]</th>
+            <th scope="col">@T["ui.invoices.balance"]</th>
+        </HeaderContent>
+        <RowTemplate Context="item">
+            <td><a href="/invoices/@item.PlatformInvoiceId">@item.Number</a></td>
+            @if (TenantId is null)
+            {
+                <td><a href="/tenants/@item.PlatformTenantId#tenant-billing">@item.TenantName</a></td>
+            }
+            <td>@T[BillingDisplay.KindKey(item.Kind)]</td>
+            <td>
+                <VxStatusBadge Status="@BillingDisplay.Badge(item.Status, item.Overdue)" Text="@T[BillingDisplay.StatusKey(item.Status)]" />
+                @if (item.Overdue)
+                {
+                    <VxStatusBadge Status="VxBadgeStatus.Danger" Text="@T["ui.invoices.overdue"]" />
+                }
+                @if (item.CreditPending)
+                {
+                    <VxStatusBadge Status="VxBadgeStatus.Warning" Text="@T["ui.invoices.credit_pending"]" />
+                }
+            </td>
+            <td>@SubscriptionDisplay.Date(item.IssuedUtc)</td>
+            <td>@SubscriptionDisplay.Date(item.DueUtc)</td>
+            <td>@BillingDisplay.Money(item.Total, item.CurrencyCode)</td>
+            <td>@BillingDisplay.Money(item.Balance, item.CurrencyCode)</td>
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.invoices.empty"]" />
+        </EmptyContent>
+    </VxDataTable>
+    @if (Presenter.State.Loaded && Presenter.State.TotalPages > 1)
+    {
+        <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="GoToPage" />
+    }
+}
+
+@code {
+    private string? _search;
+
+    private string _status = string.Empty;
+
+    private DateTime? _from;
+
+    private DateTime? _to;
+
+    private bool _overdue;
+
+    [Parameter]
+    public Guid? TenantId { get; set; }
+
+    [Parameter]
+    public string? Search { get; set; }
+
+    [Parameter]
+    public string? Status { get; set; }
+
+    [Parameter]
+    public bool OverdueOnly { get; set; }
+
+    [Parameter]
+    public DateTime? From { get; set; }
+
+    [Parameter]
+    public DateTime? To { get; set; }
+
+    [Parameter]
+    public int? Page { get; set; }
+
+    [Parameter]
+    public int Version { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        _search = Search;
+        _overdue = OverdueOnly;
+        _from = From;
+        _to = To;
+        _status = ParsedStatus?.ToString() ?? string.Empty;
+
+        return LoadAsync(Page ?? 1);
+    }
+
+    private PlatformInvoiceStatus? ParsedStatus => Enum.TryParse(Status, true, out PlatformInvoiceStatus parsed) ? parsed : null;
+
+    private Task LoadAsync(int page)
+    {
+        return Presenter.LoadAsync(ParsedStatus, OverdueOnly, TenantId, Search, SalesDisplay.StartOfDay(From), SalesDisplay.EndOfDay(To), page);
+    }
+
+    private void ApplyFilters()
+    {
+        Navigation.NavigateTo(Url(_search, _status, _overdue, _from, _to, 1));
+    }
+
+    private async Task GoToPage(int page)
+    {
+        if (TenantId is not null)
+        {
+            await LoadAsync(page);
+            return;
+        }
+
+        Navigation.NavigateTo(Url(Search, _status, OverdueOnly, From, To, page));
+    }
+
+    private static string Url(string? search, string status, bool overdue, DateTime? from, DateTime? to, int page)
+    {
+        Dictionary<string, string?> query = new()
+        {
+            ["search"] = string.IsNullOrWhiteSpace(search) ? null : search.Trim(),
+            ["status"] = string.IsNullOrEmpty(status) ? null : status,
+            ["overdue"] = overdue ? "true" : null,
+            ["from"] = from?.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
+            ["to"] = to?.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
+            ["page"] = page > 1 ? page.ToString(System.Globalization.CultureInfo.InvariantCulture) : null
+        };
+
+        return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString("/invoices", query.Where(pair => pair.Value is not null));
+    }
+}

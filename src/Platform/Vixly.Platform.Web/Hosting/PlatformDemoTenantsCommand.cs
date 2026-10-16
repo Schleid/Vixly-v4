@@ -10,7 +10,10 @@
 // RESPONSIBILITIES:
 // - Refuse outside the Development environment
 // - Run PlatformDemoTenants, then PlatformDemoSubscriptions,
-//   then PlatformDemoSales, and print what was added
+//   then PlatformDemoSales, then PlatformDemoBilling, then
+//   PlatformDemoLicensing (Slice 7), then PlatformDemoLegal
+//   (Slice 8), and print
+//   what was added
 //
 // IMPORTANT NOTES:
 // - Usage: dotnet run -- --seed-demo-tenants
@@ -41,6 +44,15 @@ public static class PlatformDemoTenantsCommand
 
         PlatformDemoSales sales = ActivatorUtilities.CreateInstance<PlatformDemoSales>(scope.ServiceProvider);
         Console.WriteLine(await sales.SeedAsync(CancellationToken.None));
+
+        PlatformDemoBilling billing = ActivatorUtilities.CreateInstance<PlatformDemoBilling>(scope.ServiceProvider);
+        Console.WriteLine(await billing.SeedAsync(CancellationToken.None));
+
+        PlatformDemoLicensing licensing = ActivatorUtilities.CreateInstance<PlatformDemoLicensing>(scope.ServiceProvider);
+        Console.WriteLine(await licensing.SeedAsync(CancellationToken.None));
+
+        PlatformDemoLegal legal = ActivatorUtilities.CreateInstance<PlatformDemoLegal>(scope.ServiceProvider);
+        Console.WriteLine(await legal.SeedAsync(CancellationToken.None));
         return 0;
     }
 }

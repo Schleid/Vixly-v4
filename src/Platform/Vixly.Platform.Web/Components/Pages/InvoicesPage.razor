@@ -1,0 +1,41 @@
+﻿@*
+=========================================================
+FILE: InvoicesPage.razor
+
+PURPOSE:
+All invoices, filtered by status, overdue, number or tenant,
+and issue date.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/invoices"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.invoices.title"]</PageTitle>
+<h1>@T["ui.invoices.title"]</h1>
+<p><a href="/billing/settings">@T["ui.billing_settings.title"]</a> · <a href="/billing/tax-rates">@T["ui.tax_rates.title"]</a></p>
+<InvoiceList Search="@Search" Status="@Status" OverdueOnly="@(Overdue ?? false)" From="@From" To="@To" Page="@Page" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Search { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+
+    [SupplyParameterFromQuery]
+    public bool? Overdue { get; set; }
+
+    [SupplyParameterFromQuery]
+    public DateTime? From { get; set; }
+
+    [SupplyParameterFromQuery]
+    public DateTime? To { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

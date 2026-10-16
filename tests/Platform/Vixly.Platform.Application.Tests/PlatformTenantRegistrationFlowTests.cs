@@ -278,7 +278,8 @@ public sealed class PlatformTenantRegistrationFlowTests
             _kit.Tenants,
             _kit.Audit(),
             _kit.Store,
-            _kit.Clock).ExecuteAsync(
+            _kit.Clock,
+            _kit.Legal).ExecuteAsync(
                 PlatformAnonymousAuthorizationContext.Instance,
                 new StartPlatformTenantRegistrationRequest
                 {

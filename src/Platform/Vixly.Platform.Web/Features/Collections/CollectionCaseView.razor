@@ -1,0 +1,219 @@
+﻿@*
+=========================================================
+FILE: CollectionCaseView.razor
+
+PURPOSE:
+A collections case: where it stands, the overdue invoices, the
+history with notes, and the actions (note, check again,
+extension) (D-C7, D-C8).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Notes and extension reasons are internal; the tenant only
+  sees the extension date
+- There is no manual block or unblock: paying clears the block
+=========================================================
+*@
+@inherits PlatformPresenterComponent<CollectionCasePresenter>
+@using Vixly.Platform.Application.Queries
+@using Vixly.Platform.Domain.Collections
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.DoneKey is { } done)
+{
+    <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+}
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+@if (!Presenter.State.Loaded)
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+else if (Presenter.State.Detail is { } detail)
+{
+    PlatformCollectionCaseItem item = detail.Case;
+    <h1>@item.TenantName</h1>
+    <p><a href="/tenants/@item.PlatformTenantId#tenant-billing">@T["ui.collections.tenant_page"]</a> · <a href="/collections">@T["ui.collections.title"]</a></p>
+    <div id="collection-overview"><VxCard Title="@T["ui.collections.case"]">
+        <dl class="vx-facts">
+            <dt>@T["ui.collections.stage"]</dt>
+            <dd>
+                @if (item.Status == PlatformCollectionCaseStatus.Closed)
+                {
+                    <VxStatusBadge Status="VxBadgeStatus.Deactivated" Text="@T[CollectionsDisplay.StatusKey(item.Status)]" />
+                    @if (item.CloseReason is { } reason)
+                    {
+                        <span class="vx-hint">@T[CollectionsDisplay.CloseReasonKey(reason)]</span>
+                    }
+                }
+                else
+                {
+                    <VxStatusBadge Status="@CollectionsDisplay.StageBadge(item.Stage)" Text="@T[CollectionsDisplay.StageKey(item.Stage)]" />
+                }
+            </dd>
+            <dt>@T["ui.collections.subscription"]</dt>
+            <dd>
+                @if (item.SubscriptionStatus is { } status)
+                {
+                    <VxStatusBadge Status="@SubscriptionDisplay.Badge(status)" Text="@T[SubscriptionDisplay.StatusKey(status)]" />
+                }
+            </dd>
+            <dt>@T["ui.collections.overdue"]</dt>
+            <dd>@CollectionsDisplay.Amounts(item.Overdue)</dd>
+            <dt>@T["ui.collections.oldest_due"]</dt>
+            <dd>@CollectionsDisplay.Date(item.OldestDueUtc)</dd>
+            <dt>@T["ui.collections.opened"]</dt>
+            <dd>@PlatformDisplay.Utc(T, item.OpenedUtc)</dd>
+            @if (item.PlannedBlockUtc is { } planned)
+            {
+                <dt>@T["ui.collections.block_date"]</dt>
+                <dd>@CollectionsDisplay.Date(planned)</dd>
+            }
+            @if (item.BlockedUtc is { } blocked)
+            {
+                <dt>@T["ui.collections.blocked_at"]</dt>
+                <dd>
+                    @PlatformDisplay.Utc(T, blocked)
+                    <span class="vx-hint">@T[item.NoAccessUtc is null ? "ui.collections.level.read_only" : "ui.collections.level.payment_required"]</span>
+                </dd>
+            }
+            <dt>@T["ui.collections.extensions"]</dt>
+            <dd>
+                @VixlyText.Format(T, "ui.collections.extensions_used", "count", item.ExtensionsUsed)
+                @if (item.ExtendedThrough is { } through)
+                {
+                    <span>@VixlyText.Format(T, "ui.collections.extended_through", "date", CollectionsDisplay.Date(through))</span>
+                }
+            </dd>
+            @if (item.Held)
+            {
+                <dt>@T["ui.collections.held"]</dt>
+                <dd>@T["ui.collections.held_help_any"]</dd>
+            }
+        </dl>
+        <p class="vx-hint">@T["ui.collections.customers_unaffected"]</p>
+    </VxCard></div>
+
+    @if (detail.Invoices.Count > 0)
+    {
+        <div id="collection-invoices"><VxCard Title="@T["ui.collections.overdue_invoices"]">
+            <VxDataTable Items="detail.Invoices" IsLoading="false">
+                <HeaderContent>
+                    <th scope="col">@T["ui.invoices.number"]</th>
+                    <th scope="col">@T["ui.invoices.due"]</th>
+                    <th scope="col">@T["ui.invoices.balance"]</th>
+                </HeaderContent>
+                <RowTemplate Context="invoice">
+                    <td>
+                        <a href="/invoices/@invoice.PlatformInvoiceId">@invoice.Number</a>
+                        @if (invoice.CreditRequested)
+                        {
+                            <span class="vx-hint">@T["ui.collections.credit_requested"]</span>
+                        }
+                    </td>
+                    <td>@CollectionsDisplay.Date(invoice.DueUtc)</td>
+                    <td>@Vixly.Platform.Web.Features.Billing.BillingDisplay.Money(invoice.Balance, invoice.CurrencyCode)</td>
+                </RowTemplate>
+            </VxDataTable>
+        </VxCard></div>
+    }
+
+    @if (item.Status == PlatformCollectionCaseStatus.Open && (detail.Abilities.CanManage || detail.Abilities.CanExtend))
+    {
+        <div id="collection-actions"><VxCard Title="@T["ui.collections.actions"]">
+            @if (detail.Abilities.CanExtend)
+            {
+                <form class="vx-form" @onsubmit="ExtendAsync">
+                    <label for="collection-through">@T["ui.collections.extend_through"]</label>
+                    <input id="collection-through" type="date" @bind="_through" min="@DateTime.UtcNow.Date.ToString("yyyy-MM-dd")" max="@detail.Abilities.LatestExtensionDate.ToString("yyyy-MM-dd")" required />
+                    <label for="collection-reason">@T["ui.collections.extension_reason"]</label>
+                    <input id="collection-reason" @bind="_reason" maxlength="500" required aria-describedby="collection-reason-help" />
+                    <p id="collection-reason-help" class="vx-hint">@T[detail.Abilities.NeedsBeyondLimit ? "ui.collections.extension_beyond_help" : "ui.collections.extension_help"]</p>
+                    <div class="vx-actions">
+                        <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.collections.extend"]</VxButton>
+                    </div>
+                </form>
+            }
+            @if (detail.Abilities.CanManage)
+            {
+                <form class="vx-form" @onsubmit="NoteAsync">
+                    <label for="collection-note">@T["ui.collections.note"]</label>
+                    <textarea id="collection-note" @bind="_note" maxlength="1000" rows="3" required></textarea>
+                    <div class="vx-actions">
+                        <VxButton Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.collections.add_note"]</VxButton>
+                        <VxButton Variant="VxButtonVariant.Subtle" OnClick="CheckAsync" IsBusy="@Presenter.IsBusy">@T["ui.collections.check_now"]</VxButton>
+                    </div>
+                </form>
+            }
+        </VxCard></div>
+    }
+
+    <div id="collection-history"><VxCard Title="@T["ui.collections.history"]">
+        <VxDataTable Items="detail.History" IsLoading="false">
+            <HeaderContent>
+                <th scope="col">@T["ui.audit.when"]</th>
+                <th scope="col">@T["ui.collections.what"]</th>
+                <th scope="col">@T["ui.audit.who"]</th>
+            </HeaderContent>
+            <RowTemplate Context="line">
+                <td>@PlatformDisplay.Utc(T, line.OccurredUtc)</td>
+                <td>
+                    @CollectionsDisplay.History(T, line.EventCode, line.Arguments)
+                    @if (line.Note is { } text)
+                    {
+                        <div class="vx-hint">@text</div>
+                    }
+                </td>
+                <td>@(line.ActorName ?? T["ui.audit.no_actor"].Value)</td>
+            </RowTemplate>
+        </VxDataTable>
+    </VxCard></div>
+    @if (Presenter.State.StepUpPending)
+    {
+        <StepUpDialog OnConfirmed="ExtendAsync" OnCancelled="Presenter.CancelStepUp" />
+    }
+}
+
+@code {
+    private DateTime? _through;
+
+    private string? _reason;
+
+    private string? _note;
+
+    [Parameter, EditorRequired]
+    public Guid CaseId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(CaseId);
+    }
+
+    private async Task ExtendAsync()
+    {
+        if (_through is { } through && await Presenter.ExtendAsync(CaseId, through, _reason))
+        {
+            _through = null;
+            _reason = null;
+        }
+    }
+
+    private async Task NoteAsync()
+    {
+        if (await Presenter.AddNoteAsync(CaseId, _note))
+        {
+            _note = null;
+        }
+    }
+
+    private Task CheckAsync()
+    {
+        return Presenter.State.Detail is { } detail ? Presenter.CheckAsync(CaseId, detail.Case.PlatformTenantId) : Task.CompletedTask;
+    }
+}

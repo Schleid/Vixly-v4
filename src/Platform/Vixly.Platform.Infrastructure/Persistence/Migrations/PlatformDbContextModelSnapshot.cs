@@ -117,6 +117,718 @@ namespace Vixly.Platform.Infrastructure.Persistence.Migrations
                     b.ToTable("AuditEntries", "platform");
                 });
 
+            modelBuilder.Entity("Vixly.Platform.Domain.Billing.PlatformBillingDocument", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("Content")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(8)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(32)");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlatformInvoiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Sha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("char(64)")
+                        .IsFixedLength();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlatformInvoiceId");
+
+                    b.HasIndex("Kind", "OwnerId")
+                        .IsUnique();
+
+                    b.ToTable("BillingDocuments", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Billing.PlatformBillingSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CreditNotePrefix")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(8)");
+
+                    b.Property<bool>("EmailDocuments")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("InvoicePrefix")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(8)");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(16)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("PaperSize")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PaymentTermsDays")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReceiptPrefix")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(8)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.HasIndex("UpdatedByUserId");
+
+                    b.ToTable("BillingSettings", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Billing.PlatformCompanyProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(16)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte[]>("Logo")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("LogoContentType")
+                        .HasMaxLength(16)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(16)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("SupportEmail")
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)");
+
+                    b.Property<string>("SupportPhone")
+                        .HasMaxLength(32)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(32)");
+
+                    b.Property<string>("TaxId")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Website")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Company", "Vixly.Platform.Domain.Billing.PlatformCompanyProfile.Company#PlatformCompanyDetails", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Email")
+                                .IsRequired()
+                                .HasMaxLength(254)
+                                .HasColumnType("nvarchar(254)")
+                                .HasColumnName("Email");
+
+                            b1.Property<string>("LegalName")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("LegalName");
+
+                            b1.Property<string>("Phone")
+                                .IsRequired()
+                                .HasMaxLength(16)
+                                .IsUnicode(false)
+                                .HasColumnType("varchar(16)")
+                                .HasColumnName("Phone");
+
+                            b1.Property<string>("TradingName")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("TradingName");
+
+                            b1.ComplexProperty(typeof(Dictionary<string, object>), "Address", "Vixly.Platform.Domain.Billing.PlatformCompanyProfile.Company#PlatformCompanyDetails.Address#PlatformPostalAddress", b2 =>
+                                {
+                                    b2.IsRequired();
+
+                                    b2.Property<string>("City")
+                                        .IsRequired()
+                                        .HasMaxLength(100)
+                                        .HasColumnType("nvarchar(100)")
+                                        .HasColumnName("City");
+
+                                    b2.Property<string>("CountryCode")
+                                        .IsRequired()
+                                        .HasMaxLength(2)
+                                        .IsUnicode(false)
+                                        .HasColumnType("char(2)")
+                                        .HasColumnName("CountryCode")
+                                        .IsFixedLength();
+
+                                    b2.Property<string>("Line1")
+                                        .IsRequired()
+                                        .HasMaxLength(200)
+                                        .HasColumnType("nvarchar(200)")
+                                        .HasColumnName("AddressLine1");
+
+                                    b2.Property<string>("Line2")
+                                        .HasMaxLength(200)
+                                        .HasColumnType("nvarchar(200)")
+                                        .HasColumnName("AddressLine2");
+
+                                    b2.Property<string>("PostalCode")
+                                        .HasMaxLength(20)
+                                        .HasColumnType("nvarchar(20)")
+                                        .HasColumnName("PostalCode");
+
+                                    b2.Property<string>("StateProvince")
+                                        .HasMaxLength(100)
+                                        .HasColumnType("nvarchar(100)")
+                                        .HasColumnName("StateProvince");
+                                });
+                        });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.HasIndex("UpdatedByUserId");
+
+                    b.ToTable("CompanyProfile", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Billing.PlatformInvoice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Balance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("CreditedTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("CurrencyCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .IsUnicode(false)
+                        .HasColumnType("char(3)")
+                        .IsFixedLength();
+
+                    b.Property<decimal>("DiscountTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTimeOffset>("DueUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("IssuedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(8)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("NetTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(32)");
+
+                    b.Property<decimal>("PaidTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTimeOffset?>("PastDueUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("PeriodEndUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("PeriodStartUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("PlatformSubscriptionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("RefundedTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("SourceKey")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(120)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TaxTotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Total")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.ComplexProperty(typeof(Dictionary<string, object>), "Customer", "Vixly.Platform.Domain.Billing.PlatformInvoice.Customer#PlatformInvoiceParty", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<string>("Address")
+                                .IsRequired()
+                                .HasMaxLength(600)
+                                .HasColumnType("nvarchar(600)")
+                                .HasColumnName("CustomerAddress");
+
+                            b1.Property<string>("Email")
+                                .IsRequired()
+                                .HasMaxLength(254)
+                                .HasColumnType("nvarchar(254)")
+                                .HasColumnName("CustomerEmail");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("CustomerName");
+
+                            b1.Property<string>("TaxId")
+                                .HasMaxLength(40)
+                                .HasColumnType("nvarchar(40)")
+                                .HasColumnName("CustomerTaxId");
+                        });
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Number")
+                        .IsUnique();
+
+                    b.HasIndex("SourceKey")
+                        .IsUnique();
+
+                    b.HasIndex("PlatformSubscriptionId", "Status");
+
+                    b.HasIndex("PlatformTenantId", "IssuedUtc");
+
+                    b.HasIndex("Status", "DueUtc");
+
+                    b.ToTable("Invoices", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Billing.PlatformInvoiceEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ActorUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Arguments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("EventCode")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("PlatformInvoiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlatformInvoiceId", "CreatedUtc");
+
+                    b.ToTable("InvoiceEvents", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Billing.PlatformNumberSequence", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("NextValue")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Kind", "Year")
+                        .IsUnique();
+
+                    b.ToTable("NumberSequences", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Billing.PlatformTaxRate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .IsUnicode(false)
+                        .HasColumnType("char(2)")
+                        .IsFixedLength();
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("Rate")
+                        .HasPrecision(9, 4)
+                        .HasColumnType("decimal(9,4)");
+
+                    b.Property<string>("RegionCode")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTimeOffset>("ValidFromUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("CountryCode", "RegionCode", "ValidFromUtc");
+
+                    b.ToTable("TaxRates", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Collections.PlatformCollectionCase", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("BlockedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("CloseReason")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("ClosedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("ExtensionEndingNoticeSent")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("ExtensionUntilUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("ExtensionsUsed")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Held")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LastCheckedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("LastStepUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("NoAccessUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("OldestDueUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("PlannedBlockUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("PlatformSubscriptionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("Stage")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlatformSubscriptionId");
+
+                    b.HasIndex("PlatformTenantId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_CollectionCases_OneOpenCasePerTenant")
+                        .HasFilter("[Status] = 1");
+
+                    b.HasIndex("Status", "Stage");
+
+                    b.ToTable("CollectionCases", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Collections.PlatformCollectionCaseEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ActorUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Arguments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("EventCode")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid>("PlatformCollectionCaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RetryKey")
+                        .HasMaxLength(80)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(80)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActorUserId");
+
+                    b.HasIndex("PlatformTenantId");
+
+                    b.HasIndex("RetryKey")
+                        .IsUnique()
+                        .HasFilter("[RetryKey] IS NOT NULL");
+
+                    b.HasIndex("PlatformCollectionCaseId", "CreatedUtc");
+
+                    b.ToTable("CollectionCaseEvents", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Collections.PlatformCollectionsSettings", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("BlockDay")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("BlockedReadOnlyDays")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ExtensionMaxDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ExtensionsPerCase")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FinalWarningDay")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("LongBlockDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MinimumNoticeDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PendingPaymentReadOnlyDays")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Reminder1Day")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Reminder2Day")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RetryDays")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.HasIndex("UpdatedByUserId");
+
+                    b.ToTable("CollectionsSettings", "platform");
+                });
+
             modelBuilder.Entity("Vixly.Platform.Domain.Identity.PlatformAccountToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -573,6 +1285,544 @@ namespace Vixly.Platform.Infrastructure.Persistence.Migrations
                     b.ToTable("UserSessions", "platform");
                 });
 
+            modelBuilder.Entity("Vixly.Platform.Domain.Legal.PlatformLegalDocument", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("AcceptanceRequired")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DeadlineUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("EffectiveUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("PublishedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("PublishedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("PublishedByUserId");
+
+                    b.HasIndex("Kind", "PublishedUtc");
+
+                    b.HasIndex("Kind", "Version")
+                        .IsUnique();
+
+                    b.HasIndex(new[] { "Kind" }, "IX_LegalDocuments_OnePublished")
+                        .IsUnique()
+                        .HasFilter("[Status] = 2");
+
+                    b.ToTable("LegalDocuments", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Legal.PlatformLegalDocumentFile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("Content")
+                        .IsRequired()
+                        .HasMaxLength(10485760)
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(8)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("PlatformLegalDocumentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Sha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("char(64)")
+                        .IsFixedLength();
+
+                    b.Property<int>("SizeBytes")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Summary")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlatformLegalDocumentId", "Language")
+                        .IsUnique();
+
+                    b.ToTable("LegalDocumentFiles", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Legal.PlatformTenantTermsAcceptance", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("AcceptedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ActorName")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("ActorReference")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ActorRole")
+                        .HasMaxLength(40)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<string>("ClientIp")
+                        .HasMaxLength(45)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(45)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte[]>("Evidence")
+                        .HasMaxLength(5242880)
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("EvidenceContentType")
+                        .HasMaxLength(40)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(8)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("PlatformLegalDocumentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("PlatformTenantRegistrationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid?>("RecordedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Sha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("char(64)")
+                        .IsFixedLength();
+
+                    b.Property<int>("Source")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserAgent")
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
+
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlatformLegalDocumentId");
+
+                    b.HasIndex("PlatformTenantRegistrationId");
+
+                    b.HasIndex("RecordedByUserId");
+
+                    b.HasIndex("PlatformTenantId", "PlatformLegalDocumentId")
+                        .IsUnique();
+
+                    b.ToTable("TenantTermsAcceptances", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Legal.PlatformTermsReminder", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(8)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("PlatformLegalDocumentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid?>("SentByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Step")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlatformLegalDocumentId");
+
+                    b.HasIndex("SentByUserId");
+
+                    b.HasIndex("PlatformTenantId", "CreatedUtc");
+
+                    b.HasIndex(new[] { "PlatformTenantId", "PlatformLegalDocumentId", "Step" }, "IX_TermsReminders_OncePerStep")
+                        .IsUnique()
+                        .HasFilter("[Step] <> 20");
+
+                    b.ToTable("TermsReminders", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Licensing.PlatformDevice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("ApprovedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("EndedByTenant")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("EndedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("LastSeenUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(12)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(12)");
+
+                    b.Property<Guid>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PreviousSecretHash")
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<DateTimeOffset?>("PreviousSecretValidUntilUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Proof")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PublicKey")
+                        .HasMaxLength(200)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<int?>("Reason")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("ReleaseRequestedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("RequestedByName")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("RequestedByReference")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<bool>("SeatHeld")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecretHash")
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<DateTimeOffset?>("SecretIssuedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SecretHash")
+                        .HasFilter("[SecretHash] IS NOT NULL");
+
+                    b.HasIndex("PlatformTenantId", "Number")
+                        .IsUnique();
+
+                    b.HasIndex("PlatformTenantId", "Status");
+
+                    b.HasIndex("Status", "CreatedUtc");
+
+                    b.ToTable("Devices", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Licensing.PlatformDeviceChallenge", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ChallengeHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("ExpiresUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("PlatformDeviceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("UsedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChallengeHash")
+                        .IsUnique();
+
+                    b.HasIndex("PlatformDeviceId");
+
+                    b.ToTable("DeviceChallenges", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Licensing.PlatformDeviceEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ActorName")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("ActorReference")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid?>("ActorUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Arguments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("EventCode")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid?>("PlatformDeviceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("Reason")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActorUserId");
+
+                    b.HasIndex("PlatformDeviceId", "CreatedUtc");
+
+                    b.HasIndex("PlatformTenantId", "EventCode", "CreatedUtc");
+
+                    b.ToTable("DeviceEvents", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Licensing.PlatformDeviceLink", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("ExpiresUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("PlatformTenantRegistrationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<int>("Tries")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("UsedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("VoidedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlatformTenantRegistrationId");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("PlatformTenantId", "Kind");
+
+                    b.ToTable("DeviceLinks", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Licensing.PlatformTenantLicensing", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("LastDeviceNumber")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("SeatsInUse")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlatformTenantId")
+                        .IsUnique();
+
+                    b.ToTable("TenantLicensing", "platform");
+                });
+
             modelBuilder.Entity("Vixly.Platform.Domain.Messaging.PlatformOutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
@@ -623,6 +1873,643 @@ namespace Vixly.Platform.Infrastructure.Persistence.Migrations
                         .HasFilter("[ProcessedUtc] IS NULL");
 
                     b.ToTable("OutboxMessages", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Messaging.PlatformPublishedEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("OccurredUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("OutboxMessageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("Sequence")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Sequence"));
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedUtc");
+
+                    b.HasIndex("Sequence")
+                        .IsUnique();
+
+                    b.HasIndex("OutboxMessageId", "Type")
+                        .IsUnique();
+
+                    b.ToTable("PublishedEvents", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformCardTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid?>("ChargeTransactionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("CompletedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreditNoteId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CurrencyCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .IsUnicode(false)
+                        .HasColumnType("char(3)")
+                        .IsFixedLength();
+
+                    b.Property<int?>("Dispute")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FailureCode")
+                        .HasMaxLength(60)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(60)");
+
+                    b.Property<string>("IdempotencyKey")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(60)");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Origin")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("PlatformInvoiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("PlatformPaymentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Provider")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProviderCheckoutId")
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("ProviderPaymentId")
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("ProviderRefundId")
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid?>("SavedCardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChargeTransactionId");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("IdempotencyKey")
+                        .IsUnique();
+
+                    b.HasIndex("PlatformInvoiceId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_CardTransactions_OneOpenChargePerInvoice")
+                        .HasFilter("[Kind] = 1 AND [Status] IN (1, 2, 3)");
+
+                    b.HasIndex("ProviderCheckoutId")
+                        .HasFilter("[ProviderCheckoutId] IS NOT NULL");
+
+                    b.HasIndex("ProviderPaymentId")
+                        .HasFilter("[ProviderPaymentId] IS NOT NULL");
+
+                    b.HasIndex("ProviderRefundId")
+                        .HasFilter("[ProviderRefundId] IS NOT NULL");
+
+                    b.HasIndex("SavedCardId");
+
+                    b.HasIndex("PlatformInvoiceId", "CreatedUtc");
+
+                    b.HasIndex("PlatformTenantId", "CreatedUtc");
+
+                    b.HasIndex("Status", "LastModifiedUtc");
+
+                    b.ToTable("CardTransactions", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformMerchantAccount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AcceptedCurrencies")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<bool>("CardPaymentsEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("LastCheckCode")
+                        .HasMaxLength(60)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(60)");
+
+                    b.Property<bool>("LastCheckSucceeded")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LastCheckedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Mode")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Provider")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PublishableKey")
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.HasIndex("UpdatedByUserId");
+
+                    b.ToTable("MerchantAccounts", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformPaymentLink", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("ExpiresUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("PlatformInvoiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("char(64)")
+                        .IsFixedLength();
+
+                    b.Property<DateTimeOffset?>("UsedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByUserId");
+
+                    b.HasIndex("PlatformInvoiceId");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("PlatformTenantId", "Kind");
+
+                    b.ToTable("PaymentLinks", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformProviderEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ObjectId")
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Outcome")
+                        .HasMaxLength(40)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<DateTimeOffset?>("ProcessedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Provider")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProviderEventId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Provider", "ProviderEventId")
+                        .IsUnique();
+
+                    b.ToTable("ProviderEvents", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformSavedCard", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AddedVia")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("ExpiryMonth")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ExpiryYear")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Last4")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .IsUnicode(false)
+                        .HasColumnType("char(4)")
+                        .IsFixedLength();
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Provider")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProviderPaymentMethodId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<Guid?>("RemovedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("RemovedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProviderPaymentMethodId")
+                        .IsUnique();
+
+                    b.HasIndex("RemovedByUserId");
+
+                    b.HasIndex("PlatformTenantId", "Status");
+
+                    b.ToTable("SavedCards", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformTenantCardProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("AutoCharge")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid?>("AutoChargeOffByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("AutoChargeOffUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ConsentEmail")
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)");
+
+                    b.Property<string>("ConsentTextVersion")
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTimeOffset?>("ConsentUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Mode")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Provider")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProviderCustomerId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AutoCharge")
+                        .HasFilter("[AutoCharge] = 1");
+
+                    b.HasIndex("AutoChargeOffByUserId");
+
+                    b.HasIndex("PlatformTenantId")
+                        .IsUnique();
+
+                    b.ToTable("TenantCardProfiles", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformZelleAccount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(32)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(32)");
+
+                    b.Property<byte[]>("QrCode")
+                        .HasMaxLength(262144)
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("QrCodeContentType")
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<int>("QrCodeVersion")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RecipientName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Tag")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.HasIndex("UpdatedByUserId");
+
+                    b.ToTable("ZelleAccounts", "platform");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformZelleClaim", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CurrencyCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .IsUnicode(false)
+                        .HasColumnType("char(3)")
+                        .IsFixedLength();
+
+                    b.Property<Guid?>("DecidedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DecidedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("InvoiceNumber")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(32)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("PlatformInvoiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("PlatformPaymentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlatformTenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("ReceivedAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTimeOffset?>("ReceivedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<string>("RejectReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("SenderName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("SentOn")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Source")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StaffNote")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DecidedByUserId");
+
+                    b.HasIndex("PlatformTenantId", "Status");
+
+                    b.HasIndex("Status", "CreatedUtc");
+
+                    b.HasIndex(new[] { "PlatformInvoiceId" }, "IX_ZelleClaims_OneWaiting")
+                        .IsUnique()
+                        .HasFilter("[Status] = 1");
+
+                    b.ToTable("ZelleClaims", "platform");
                 });
 
             modelBuilder.Entity("Vixly.Platform.Domain.Sales.PlatformOffer", b =>
@@ -994,6 +2881,9 @@ namespace Vixly.Platform.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset?>("BlockedUtc")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<bool>("CancelAtPeriodEnd")
                         .HasColumnType("bit");
 
@@ -1043,6 +2933,9 @@ namespace Vixly.Platform.Infrastructure.Persistence.Migrations
                         .HasColumnType("decimal(19,4)");
 
                     b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("StatusBeforeBlock")
                         .HasColumnType("int");
 
                     b.Property<int?>("StatusBeforeSuspension")
@@ -1304,6 +3197,21 @@ namespace Vixly.Platform.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTimeOffset>("StatusChangedUtc")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("TaxExempt")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("TaxExemptionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("TaxExemptionReference")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TaxId")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
 
                     b.Property<string>("TenantCode")
                         .IsRequired()
@@ -1669,6 +3577,380 @@ namespace Vixly.Platform.Infrastructure.Persistence.Migrations
                     b.ToTable("TenantRegistrations", "platform");
                 });
 
+            modelBuilder.Entity("Vixly.Platform.Domain.Billing.PlatformBillingDocument", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Billing.PlatformInvoice", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformInvoiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Billing.PlatformBillingSettings", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.OwnsMany("Vixly.Platform.Domain.Billing.PlatformBillingText", "Texts", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<Guid>("BillingSettingsId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Footer")
+                                .HasMaxLength(1000)
+                                .HasColumnType("nvarchar(1000)");
+
+                            b1.Property<string>("Language")
+                                .IsRequired()
+                                .HasMaxLength(8)
+                                .IsUnicode(false)
+                                .HasColumnType("varchar(8)");
+
+                            b1.Property<string>("PaymentInstructions")
+                                .HasMaxLength(1000)
+                                .HasColumnType("nvarchar(1000)");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("BillingSettingsId");
+
+                            b1.ToTable("BillingTexts", "platform");
+
+                            b1.WithOwner()
+                                .HasForeignKey("BillingSettingsId");
+                        });
+
+                    b.Navigation("Texts");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Billing.PlatformCompanyProfile", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Billing.PlatformInvoice", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Subscriptions.PlatformSubscription", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformSubscriptionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenant", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsMany("Vixly.Platform.Domain.Billing.PlatformCreditNote", "Credits", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<decimal>("Amount")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<DateTimeOffset>("CreatedUtc")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<Guid?>("DecidedByUserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTimeOffset?>("DecidedUtc")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<string>("DecisionReason")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)");
+
+                            b1.Property<bool>("IsVoid")
+                                .HasColumnType("bit");
+
+                            b1.Property<DateTimeOffset?>("LastModifiedUtc")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<string>("Number")
+                                .HasMaxLength(32)
+                                .IsUnicode(false)
+                                .HasColumnType("varchar(32)");
+
+                            b1.Property<Guid>("PlatformInvoiceId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Reason")
+                                .IsRequired()
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)");
+
+                            b1.Property<Guid>("RequestedByUserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("Status")
+                                .HasColumnType("int");
+
+                            b1.Property<decimal>("TaxPart")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("DecidedByUserId");
+
+                            b1.HasIndex("Number")
+                                .IsUnique()
+                                .HasFilter("[Number] IS NOT NULL");
+
+                            b1.HasIndex("RequestedByUserId");
+
+                            b1.HasIndex(new[] { "PlatformInvoiceId" }, "IX_CreditNotes_OnePending")
+                                .IsUnique()
+                                .HasFilter("[Status] = 0");
+
+                            b1.ToTable("CreditNotes", "platform");
+
+                            b1.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                                .WithMany()
+                                .HasForeignKey("DecidedByUserId")
+                                .OnDelete(DeleteBehavior.Restrict);
+
+                            b1.WithOwner()
+                                .HasForeignKey("PlatformInvoiceId");
+
+                            b1.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                                .WithMany()
+                                .HasForeignKey("RequestedByUserId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+                        });
+
+                    b.OwnsMany("Vixly.Platform.Domain.Billing.PlatformInvoiceLine", "Lines", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Arguments")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<DateTimeOffset>("CreatedUtc")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<int>("Kind")
+                                .HasColumnType("int");
+
+                            b1.Property<DateTimeOffset?>("LastModifiedUtc")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<decimal>("Net")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<Guid>("PlatformInvoiceId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("Position")
+                                .HasColumnType("int");
+
+                            b1.Property<decimal>("Quantity")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<Guid?>("SourceId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<decimal>("Tax")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<string>("TaxLabel")
+                                .HasMaxLength(40)
+                                .HasColumnType("nvarchar(40)");
+
+                            b1.Property<decimal>("TaxRate")
+                                .HasPrecision(9, 4)
+                                .HasColumnType("decimal(9,4)");
+
+                            b1.Property<string>("TextKey")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .IsUnicode(false)
+                                .HasColumnType("varchar(100)");
+
+                            b1.Property<decimal>("UnitPrice")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("PlatformInvoiceId");
+
+                            b1.ToTable("InvoiceLines", "platform");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PlatformInvoiceId");
+                        });
+
+                    b.OwnsMany("Vixly.Platform.Domain.Billing.PlatformPayment", "Payments", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<decimal>("Amount")
+                                .HasPrecision(18, 2)
+                                .HasColumnType("decimal(18,2)");
+
+                            b1.Property<DateTimeOffset>("CreatedUtc")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<DateTimeOffset?>("LastModifiedUtc")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<int>("Method")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Note")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)");
+
+                            b1.Property<Guid>("PlatformInvoiceId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("ReceiptNumber")
+                                .IsRequired()
+                                .HasMaxLength(32)
+                                .IsUnicode(false)
+                                .HasColumnType("varchar(32)");
+
+                            b1.Property<DateTimeOffset>("ReceivedUtc")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<Guid?>("RecordedByUserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Reference")
+                                .HasMaxLength(100)
+                                .HasColumnType("nvarchar(100)");
+
+                            b1.Property<string>("ReversalReason")
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)");
+
+                            b1.Property<Guid?>("ReversedByUserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTimeOffset?>("ReversedUtc")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<int>("Status")
+                                .HasColumnType("int");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("PlatformInvoiceId");
+
+                            b1.HasIndex("ReceiptNumber")
+                                .IsUnique();
+
+                            b1.HasIndex("ReceivedUtc");
+
+                            b1.HasIndex("RecordedByUserId");
+
+                            b1.HasIndex("ReversedByUserId");
+
+                            b1.ToTable("Payments", "platform");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PlatformInvoiceId");
+
+                            b1.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                                .WithMany()
+                                .HasForeignKey("RecordedByUserId")
+                                .OnDelete(DeleteBehavior.Restrict);
+
+                            b1.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                                .WithMany()
+                                .HasForeignKey("ReversedByUserId")
+                                .OnDelete(DeleteBehavior.Restrict);
+                        });
+
+                    b.Navigation("Credits");
+
+                    b.Navigation("Lines");
+
+                    b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Billing.PlatformInvoiceEvent", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Billing.PlatformInvoice", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformInvoiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Billing.PlatformTaxRate", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Collections.PlatformCollectionCase", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Subscriptions.PlatformSubscription", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformSubscriptionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenant", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Collections.PlatformCollectionCaseEvent", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("ActorUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Platform.Domain.Collections.PlatformCollectionCase", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformCollectionCaseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenant", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Collections.PlatformCollectionsSettings", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
             modelBuilder.Entity("Vixly.Platform.Domain.Identity.PlatformAccountToken", b =>
                 {
                     b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
@@ -1927,6 +4209,289 @@ namespace Vixly.Platform.Infrastructure.Persistence.Migrations
                     b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
                         .WithMany()
                         .HasForeignKey("PlatformUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Legal.PlatformLegalDocument", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("PublishedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.OwnsMany("Vixly.Platform.Domain.Legal.PlatformLegalDocumentPart", "Parts", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<Guid>("IncludedDocumentId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("Kind")
+                                .HasColumnType("int");
+
+                            b1.Property<Guid>("PlatformLegalDocumentId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Version")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("nvarchar(20)");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("IncludedDocumentId");
+
+                            b1.HasIndex("PlatformLegalDocumentId");
+
+                            b1.ToTable("LegalDocumentParts", "platform");
+
+                            b1.HasOne("Vixly.Platform.Domain.Legal.PlatformLegalDocument", null)
+                                .WithMany()
+                                .HasForeignKey("IncludedDocumentId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+
+                            b1.WithOwner()
+                                .HasForeignKey("PlatformLegalDocumentId");
+                        });
+
+                    b.Navigation("Parts");
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Legal.PlatformLegalDocumentFile", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Legal.PlatformLegalDocument", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformLegalDocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Legal.PlatformTenantTermsAcceptance", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Legal.PlatformLegalDocument", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformLegalDocumentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenant", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenantRegistration", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantRegistrationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("RecordedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Legal.PlatformTermsReminder", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Legal.PlatformLegalDocument", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformLegalDocumentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenant", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("SentByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Licensing.PlatformDevice", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenant", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Licensing.PlatformDeviceChallenge", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Licensing.PlatformDevice", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformDeviceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Licensing.PlatformDeviceEvent", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("ActorUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Platform.Domain.Licensing.PlatformDevice", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformDeviceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenant", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Licensing.PlatformDeviceLink", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenant", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenantRegistration", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantRegistrationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Licensing.PlatformTenantLicensing", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenant", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformCardTransaction", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Payments.PlatformCardTransaction", null)
+                        .WithMany()
+                        .HasForeignKey("ChargeTransactionId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Platform.Domain.Billing.PlatformInvoice", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformInvoiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenant", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Platform.Domain.Payments.PlatformSavedCard", null)
+                        .WithMany()
+                        .HasForeignKey("SavedCardId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformMerchantAccount", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformPaymentLink", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Platform.Domain.Billing.PlatformInvoice", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformInvoiceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenant", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformSavedCard", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenant", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("RemovedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformTenantCardProfile", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("AutoChargeOffByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenant", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformZelleAccount", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Vixly.Platform.Domain.Payments.PlatformZelleClaim", b =>
+                {
+                    b.HasOne("Vixly.Platform.Domain.Identity.PlatformUser", null)
+                        .WithMany()
+                        .HasForeignKey("DecidedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Platform.Domain.Billing.PlatformInvoice", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformInvoiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Platform.Domain.Tenants.PlatformTenant", null)
+                        .WithMany()
+                        .HasForeignKey("PlatformTenantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

@@ -1,0 +1,91 @@
+﻿@*
+=========================================================
+FILE: TenantLicensing.razor
+
+PURPOSE:
+The Licensing section of the tenant page: seats bought and in
+use, devices waiting, releases under review, and the owner
+actions (first-device link, owner recovery) (Slice 7).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Hidden for staff without platform.licensing.view
+- Links go to the owner's email only; staff never see them
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantLicensingPresenter>
+@using Vixly.Platform.Application.Security
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (!PlatformSecurityErrors.AccessDenied.Equals(Presenter.State.Error))
+{
+    <div id="tenant-licensing"><VxCard Title="@T["ui.licensing.title"]">
+        @if (Presenter.State.DoneKey is { } done)
+        {
+            <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+        }
+        @if (Presenter.State.Error is not null)
+        {
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+        }
+        @if (!Presenter.State.Loaded)
+        {
+            <p role="status">@T["ui.common.loading"]</p>
+        }
+        else if (Presenter.State.Summary is { } summary)
+        {
+            <dl class="vx-facts">
+                <dt>@T["ui.licensing.seats"]</dt>
+                <dd>
+                    @VixlyText.Format(T, "ui.licensing.seats_used", new Dictionary<string, object> { ["inUse"] = summary.Counts.HoldingSeats, ["seats"] = summary.SeatsBought })
+                    @if (summary.SeatsScheduled is { } scheduled)
+                    {
+                        <span class="vx-hint">@VixlyText.Format(T, "ui.licensing.seats_scheduled", "seats", scheduled)</span>
+                    }
+                </dd>
+                <dt>@T["ui.licensing.pending"]</dt>
+                <dd><a href="/devices?tenant=@TenantId&status=Pending">@summary.Counts.Pending</a></dd>
+                <dt>@T["ui.licensing.awaiting_review"]</dt>
+                <dd><a href="/devices?tenant=@TenantId&review=true">@summary.Counts.AwaitingReview</a></dd>
+                <dt>@T["ui.licensing.allowance"]</dt>
+                <dd>@VixlyText.Format(T, "ui.licensing.allowance_value", "count", summary.ReleaseAllowance)</dd>
+            </dl>
+            <p><a href="/devices?tenant=@TenantId">@T["ui.licensing.all_devices"]</a></p>
+            @if (summary.Abilities.CanManage)
+            {
+                <div class="vx-actions">
+                    @if (summary.FirstDeviceLinkAllowed)
+                    {
+                        <VxButton OnClick="() => Presenter.RunAsync(TenantId, TenantLicensingPresenter.FirstDeviceAction)" IsBusy="@Presenter.IsBusy">@T["ui.licensing.send_first_link"]</VxButton>
+                    }
+                    <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => Presenter.RunAsync(TenantId, TenantLicensingPresenter.RecoveryAction)" IsBusy="@Presenter.IsBusy">@T["ui.licensing.start_recovery"]</VxButton>
+                </div>
+                <p class="vx-hint">@T["ui.licensing.recovery_help"]</p>
+            }
+        }
+    </VxCard></div>
+    @if (Presenter.State.StepUpAction is { } action)
+    {
+        <StepUpDialog OnConfirmed="() => Presenter.RunAsync(TenantId, action)" OnCancelled="Presenter.CancelStepUp" />
+    }
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid TenantId { get; set; }
+
+    private Guid _loaded;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_loaded != TenantId)
+        {
+            _loaded = TenantId;
+            await Presenter.LoadAsync(TenantId);
+        }
+    }
+}

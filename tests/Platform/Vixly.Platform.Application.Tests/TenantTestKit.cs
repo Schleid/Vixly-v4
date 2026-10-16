@@ -37,6 +37,12 @@ internal sealed class TenantTestKit
 
     public FixedTimeProvider Clock { get; } = new(Now);
 
+    private FakeLegalStore? _legal;
+
+    public FakeLegalStore Legal => _legal ??= new FakeLegalStore(Tenants);
+
+    public Vixly.Platform.Application.UseCases.Legal.PlatformLegalGate LegalGate() => new(Legal, Tenants, Clock);
+
     public PlatformAuthorizationGate Gate()
     {
         return new PlatformAuthorizationGate(new PlatformAuthorizationService(Store, Clock));

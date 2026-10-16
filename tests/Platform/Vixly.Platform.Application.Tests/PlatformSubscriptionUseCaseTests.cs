@@ -153,7 +153,7 @@ public sealed class PlatformSubscriptionUseCaseTests
         Assert.Equal(8, _kit.Store.Overrides.Single(item => item.IsOpen).Value);
         Assert.True((await StartAsync(context, tenant.Id, plan, false, licences: 8)).Succeeded);
 
-        GetPlatformTenantEntitlementsResponse entitlements = await new GetPlatformTenantEntitlementsUseCase(_kit.Subscriptions()).ExecuteAsync(
+        GetPlatformTenantEntitlementsResponse entitlements = await new GetPlatformTenantEntitlementsUseCase(_kit.Subscriptions(), _kit.Collections, _kit.Tenants.LegalGate()).ExecuteAsync(
             context, new GetPlatformTenantEntitlementsRequest { PlatformTenantId = tenant.Id }, CancellationToken.None);
 
         Assert.Equal(8, entitlements.Entitlements!.Limits[PlatformPlanLimitKind.MaxLicensedDevices]);
@@ -364,7 +364,7 @@ public sealed class PlatformSubscriptionUseCaseTests
     {
         TenantTestKit kit = _kit.Tenants;
         await new StartPlatformTenantRegistrationUseCase(
-            kit.Tenants, kit.Store, kit.Tenants, kit.Slugs(), kit.Tenants, kit.Tenants, kit.Links(), kit.Crypto, kit.Tenants, kit.Audit(), kit.Store, kit.Clock).ExecuteAsync(
+            kit.Tenants, kit.Store, kit.Tenants, kit.Slugs(), kit.Tenants, kit.Tenants, kit.Links(), kit.Crypto, kit.Tenants, kit.Audit(), kit.Store, kit.Clock, kit.Legal).ExecuteAsync(
                 PlatformAnonymousAuthorizationContext.Instance,
                 new StartPlatformTenantRegistrationRequest
                 {

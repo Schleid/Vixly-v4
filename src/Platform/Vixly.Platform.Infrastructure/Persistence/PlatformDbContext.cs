@@ -69,6 +69,8 @@ public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
 
     public DbSet<PlatformOutboxMessage> OutboxMessages => Set<PlatformOutboxMessage>();
 
+    public DbSet<PlatformPublishedEvent> PublishedEvents => Set<PlatformPublishedEvent>();
+
     public DbSet<PlatformPlan> Plans => Set<PlatformPlan>();
 
     public DbSet<PlatformSubscription> Subscriptions => Set<PlatformSubscription>();
@@ -82,6 +84,60 @@ public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<PlatformPromotion> Promotions => Set<PlatformPromotion>();
 
     public DbSet<PlatformOffer> Offers => Set<PlatformOffer>();
+
+    public DbSet<Vixly.Platform.Domain.Billing.PlatformInvoice> Invoices => Set<Vixly.Platform.Domain.Billing.PlatformInvoice>();
+
+    public DbSet<Vixly.Platform.Domain.Billing.PlatformInvoiceEvent> InvoiceEvents => Set<Vixly.Platform.Domain.Billing.PlatformInvoiceEvent>();
+
+    public DbSet<Vixly.Platform.Domain.Billing.PlatformNumberSequence> NumberSequences => Set<Vixly.Platform.Domain.Billing.PlatformNumberSequence>();
+
+    public DbSet<Vixly.Platform.Domain.Billing.PlatformTaxRate> TaxRates => Set<Vixly.Platform.Domain.Billing.PlatformTaxRate>();
+
+    public DbSet<Vixly.Platform.Domain.Billing.PlatformBillingSettings> BillingSettings => Set<Vixly.Platform.Domain.Billing.PlatformBillingSettings>();
+
+    public DbSet<Vixly.Platform.Domain.Billing.PlatformCompanyProfile> CompanyProfiles => Set<Vixly.Platform.Domain.Billing.PlatformCompanyProfile>();
+
+    public DbSet<Vixly.Platform.Domain.Billing.PlatformBillingDocument> BillingDocuments => Set<Vixly.Platform.Domain.Billing.PlatformBillingDocument>();
+
+    public DbSet<Vixly.Platform.Domain.Payments.PlatformMerchantAccount> MerchantAccounts => Set<Vixly.Platform.Domain.Payments.PlatformMerchantAccount>();
+
+    public DbSet<Vixly.Platform.Domain.Payments.PlatformTenantCardProfile> TenantCardProfiles => Set<Vixly.Platform.Domain.Payments.PlatformTenantCardProfile>();
+
+    public DbSet<Vixly.Platform.Domain.Payments.PlatformSavedCard> SavedCards => Set<Vixly.Platform.Domain.Payments.PlatformSavedCard>();
+
+    public DbSet<Vixly.Platform.Domain.Payments.PlatformCardTransaction> CardTransactions => Set<Vixly.Platform.Domain.Payments.PlatformCardTransaction>();
+
+    public DbSet<Vixly.Platform.Domain.Payments.PlatformPaymentLink> PaymentLinks => Set<Vixly.Platform.Domain.Payments.PlatformPaymentLink>();
+
+    public DbSet<Vixly.Platform.Domain.Payments.PlatformProviderEvent> ProviderEvents => Set<Vixly.Platform.Domain.Payments.PlatformProviderEvent>();
+
+    public DbSet<Vixly.Platform.Domain.Collections.PlatformCollectionsSettings> CollectionsSettings => Set<Vixly.Platform.Domain.Collections.PlatformCollectionsSettings>();
+
+    public DbSet<Vixly.Platform.Domain.Collections.PlatformCollectionCase> CollectionCases => Set<Vixly.Platform.Domain.Collections.PlatformCollectionCase>();
+
+    public DbSet<Vixly.Platform.Domain.Collections.PlatformCollectionCaseEvent> CollectionCaseEvents => Set<Vixly.Platform.Domain.Collections.PlatformCollectionCaseEvent>();
+
+    public DbSet<Vixly.Platform.Domain.Licensing.PlatformTenantLicensing> TenantLicensing => Set<Vixly.Platform.Domain.Licensing.PlatformTenantLicensing>();
+
+    public DbSet<Vixly.Platform.Domain.Licensing.PlatformDevice> Devices => Set<Vixly.Platform.Domain.Licensing.PlatformDevice>();
+
+    public DbSet<Vixly.Platform.Domain.Licensing.PlatformDeviceChallenge> DeviceChallenges => Set<Vixly.Platform.Domain.Licensing.PlatformDeviceChallenge>();
+
+    public DbSet<Vixly.Platform.Domain.Licensing.PlatformDeviceLink> DeviceLinks => Set<Vixly.Platform.Domain.Licensing.PlatformDeviceLink>();
+
+    public DbSet<Vixly.Platform.Domain.Licensing.PlatformDeviceEvent> DeviceEvents => Set<Vixly.Platform.Domain.Licensing.PlatformDeviceEvent>();
+
+    public DbSet<Vixly.Platform.Domain.Payments.PlatformZelleAccount> ZelleAccounts => Set<Vixly.Platform.Domain.Payments.PlatformZelleAccount>();
+
+    public DbSet<Vixly.Platform.Domain.Payments.PlatformZelleClaim> ZelleClaims => Set<Vixly.Platform.Domain.Payments.PlatformZelleClaim>();
+
+    public DbSet<Vixly.Platform.Domain.Legal.PlatformLegalDocument> LegalDocuments => Set<Vixly.Platform.Domain.Legal.PlatformLegalDocument>();
+
+    public DbSet<Vixly.Platform.Domain.Legal.PlatformLegalDocumentFile> LegalDocumentFiles => Set<Vixly.Platform.Domain.Legal.PlatformLegalDocumentFile>();
+
+    public DbSet<Vixly.Platform.Domain.Legal.PlatformTenantTermsAcceptance> TenantTermsAcceptances => Set<Vixly.Platform.Domain.Legal.PlatformTenantTermsAcceptance>();
+
+    public DbSet<Vixly.Platform.Domain.Legal.PlatformTermsReminder> TermsReminders => Set<Vixly.Platform.Domain.Legal.PlatformTermsReminder>();
 
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
 

@@ -87,6 +87,14 @@ public sealed class PlatformTenant : AuditableEntity
 
     public Guid? AccountManagerUserId { get; private set; }
 
+    public string? TaxId { get; private set; }
+
+    public bool TaxExempt { get; private set; }
+
+    public string? TaxExemptionReason { get; private set; }
+
+    public string? TaxExemptionReference { get; private set; }
+
     public IReadOnlyList<PlatformTenantContact> Contacts => _contacts;
 
     public IReadOnlyList<PlatformTenantTag> Tags => _tags;
@@ -187,6 +195,23 @@ public sealed class PlatformTenant : AuditableEntity
     // =====================================================
     // METHOD: LIFECYCLE (D-T1)
     // =====================================================
+    // Slice 7 (D-L7): the first device enrolled from the registration link activates the tenant;
+    // no staff member acts, so the event has no actor and says it came from registration.
+    public PlatformTenantLifecycleEvent? ActivateFromRegistration(DateTimeOffset utcNow)
+    {
+        if (Status is not (PlatformTenantStatus.Draft or PlatformTenantStatus.PendingActivation))
+        {
+            return null;
+        }
+
+        PlatformTenantStatus from = Status;
+        MoveTo(PlatformTenantStatus.Active, utcNow);
+        ActivatedUtc ??= utcNow;
+
+        return PlatformTenantLifecycleEvent.Record(this, PlatformTenantEventCodes.Activated, from, null, utcNow,
+            arguments: new Dictionary<string, string>(StringComparer.Ordinal) { ["by"] = "registration" });
+    }
+
     public PlatformTenantLifecycleEvent Activate(Guid actorUserId, DateTimeOffset utcNow)
     {
         PlatformTenantStatus from = Require(
@@ -307,6 +332,35 @@ public sealed class PlatformTenant : AuditableEntity
     // =====================================================
     // METHOD: PROFILE AND SETTINGS
     // =====================================================
+    // Billing (Slice 4, D-B16): tax ID printed on invoices, and an exemption that sets tax to 0 %.
+    public void SetTaxDetails(string? taxId, bool exempt, string? exemptionReason, string? exemptionReference, DateTimeOffset utcNow)
+    {
+        string? tax = string.IsNullOrWhiteSpace(taxId) ? null : taxId.Trim();
+        string? reason = string.IsNullOrWhiteSpace(exemptionReason) ? null : exemptionReason.Trim();
+        string? reference = string.IsNullOrWhiteSpace(exemptionReference) ? null : exemptionReference.Trim();
+
+        if (tax?.Length > Billing.PlatformBillingLimits.TaxIdMaxLength || reference?.Length > Billing.PlatformBillingLimits.ReferenceMaxLength)
+        {
+            throw new DomainException(Billing.PlatformBillingErrors.TaxIdTooLong);
+        }
+
+        if (exempt && reason is null)
+        {
+            throw new DomainException(Billing.PlatformBillingErrors.ReasonRequired);
+        }
+
+        if (reason?.Length > Billing.PlatformBillingLimits.ReasonMaxLength)
+        {
+            throw new DomainException(Billing.PlatformBillingErrors.ReasonTooLong);
+        }
+
+        TaxId = tax;
+        TaxExempt = exempt;
+        TaxExemptionReason = exempt ? reason : null;
+        TaxExemptionReference = exempt ? reference : null;
+        MarkAsModified(utcNow);
+    }
+
     public void UpdateCompany(PlatformCompanyDetails company, DateTimeOffset utcNow)
     {
         ArgumentNullException.ThrowIfNull(company);

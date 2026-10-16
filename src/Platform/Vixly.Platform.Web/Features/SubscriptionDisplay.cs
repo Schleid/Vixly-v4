@@ -37,6 +37,7 @@ public static class SubscriptionDisplay
             PlatformSubscriptionStatus.Trialing => VxBadgeStatus.Invited,
             PlatformSubscriptionStatus.PendingPayment or PlatformSubscriptionStatus.PastDue => VxBadgeStatus.Suspended,
             PlatformSubscriptionStatus.Suspended => VxBadgeStatus.Locked,
+            PlatformSubscriptionStatus.BlockedForNonPayment => VxBadgeStatus.Danger,
             _ => VxBadgeStatus.Deactivated
         };
     }

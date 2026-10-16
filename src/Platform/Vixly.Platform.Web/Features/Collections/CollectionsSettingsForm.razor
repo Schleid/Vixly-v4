@@ -1,0 +1,134 @@
+﻿@*
+=========================================================
+FILE: CollectionsSettingsForm.razor
+
+PURPOSE:
+Collections settings: the timeline, card retries, the block
+levels, extensions and the Pending payment period (D-C12).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Saving asks for step-up
+- Changes apply to future steps only
+=========================================================
+*@
+@inherits PlatformPresenterComponent<CollectionsSettingsPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="collections-settings">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (!Presenter.State.Loaded)
+    {
+        <p role="status">@T["ui.common.loading"]</p>
+    }
+    else if (Presenter.State.Settings is { } settings)
+    {
+        <form class="vx-form" @onsubmit="SaveAsync">
+            <fieldset class="vx-fieldset" disabled="@(!settings.CanEdit)">
+                <VxCard Title="@T["ui.collections_settings.timeline"]">
+                    <label><input id="collections-enabled" type="checkbox" @bind="_input.Enabled" /> @T["ui.collections_settings.enabled"]</label>
+                    <p class="vx-hint">@T["ui.collections_settings.timeline_help"]</p>
+                    <label for="collections-reminder1">@T["ui.collections_settings.reminder1"]</label>
+                    <input id="collections-reminder1" type="number" min="1" max="60" @bind="_input.Reminder1Day" />
+                    <label for="collections-reminder2">@T["ui.collections_settings.reminder2"]</label>
+                    <input id="collections-reminder2" type="number" min="1" max="60" @bind="_input.Reminder2Day" />
+                    <label for="collections-final">@T["ui.collections_settings.final_warning"]</label>
+                    <input id="collections-final" type="number" min="1" max="60" @bind="_input.FinalWarningDay" />
+                    <label for="collections-block">@T["ui.collections_settings.block_day"]</label>
+                    <input id="collections-block" type="number" min="1" max="60" @bind="_input.BlockDay" />
+                    <label for="collections-notice">@T["ui.collections_settings.minimum_notice"]</label>
+                    <input id="collections-notice" type="number" min="1" max="30" @bind="_input.MinimumNoticeDays" aria-describedby="collections-notice-help" />
+                    <p id="collections-notice-help" class="vx-hint">@T["ui.collections_settings.minimum_notice_help"]</p>
+                    <label for="collections-retries">@T["ui.collections_settings.retry_days"]</label>
+                    <input id="collections-retries" @bind="_input.RetryDays" maxlength="40" aria-describedby="collections-retries-help" />
+                    <p id="collections-retries-help" class="vx-hint">@T["ui.collections_settings.retry_days_help"]</p>
+                </VxCard>
+                <VxCard Title="@T["ui.collections_settings.blocking"]">
+                    <p class="vx-hint">@T["ui.collections_settings.blocking_help"]</p>
+                    <label for="collections-readonly">@T["ui.collections_settings.read_only_days"]</label>
+                    <input id="collections-readonly" type="number" min="0" max="90" @bind="_input.BlockedReadOnlyDays" aria-describedby="collections-readonly-help" />
+                    <p id="collections-readonly-help" class="vx-hint">@T["ui.collections_settings.read_only_days_help"]</p>
+                    <label><input id="collections-stay-read-only" type="checkbox" @bind="_input.StayReadOnly" /> @T["ui.collections_settings.stay_read_only"]</label>
+                    <label for="collections-pending">@T["ui.collections_settings.pending_days"]</label>
+                    <input id="collections-pending" type="number" min="0" max="60" @bind="_input.PendingPaymentReadOnlyDays" aria-describedby="collections-pending-help" />
+                    <p id="collections-pending-help" class="vx-hint">@T["ui.collections_settings.pending_days_help"]</p>
+                    <label for="collections-long">@T["ui.collections_settings.long_block_days"]</label>
+                    <input id="collections-long" type="number" min="7" max="365" @bind="_input.LongBlockDays" aria-describedby="collections-long-help" />
+                    <p id="collections-long-help" class="vx-hint">@T["ui.collections_settings.long_block_days_help"]</p>
+                </VxCard>
+                <VxCard Title="@T["ui.collections_settings.extensions"]">
+                    <label for="collections-ext-days">@T["ui.collections_settings.extension_days"]</label>
+                    <input id="collections-ext-days" type="number" min="1" max="60" @bind="_input.ExtensionMaxDays" />
+                    <label for="collections-ext-count">@T["ui.collections_settings.extensions_per_case"]</label>
+                    <input id="collections-ext-count" type="number" min="0" max="10" @bind="_input.ExtensionsPerCase" aria-describedby="collections-ext-count-help" />
+                    <p id="collections-ext-count-help" class="vx-hint">@T["ui.collections_settings.extensions_per_case_help"]</p>
+                </VxCard>
+            </fieldset>
+            @if (settings.CanEdit)
+            {
+                <div class="vx-actions">
+                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.collections_settings.save"]</VxButton>
+                </div>
+            }
+        </form>
+        @if (Presenter.State.StepUpPending)
+        {
+            <StepUpDialog OnConfirmed="SaveAsync" OnCancelled="Presenter.CancelStepUp" />
+        }
+    }
+</div>
+
+@code {
+    private readonly CollectionsSettingsInput _input = new();
+
+    private int _seen = -1;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!Presenter.State.Loaded)
+        {
+            await Presenter.LoadAsync();
+            Sync();
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        await Presenter.SaveAsync(_input);
+        Sync();
+    }
+
+    private void Sync()
+    {
+        if (Presenter.State.Settings is not { } settings || _seen == Presenter.State.Version)
+        {
+            return;
+        }
+
+        _seen = Presenter.State.Version;
+        _input.Enabled = settings.Enabled;
+        _input.Reminder1Day = settings.Reminder1Day;
+        _input.Reminder2Day = settings.Reminder2Day;
+        _input.FinalWarningDay = settings.FinalWarningDay;
+        _input.BlockDay = settings.BlockDay;
+        _input.RetryDays = string.Join(", ", settings.RetryDays);
+        _input.MinimumNoticeDays = settings.MinimumNoticeDays;
+        _input.StayReadOnly = settings.BlockedReadOnlyDays is null;
+        _input.BlockedReadOnlyDays = settings.BlockedReadOnlyDays ?? 7;
+        _input.ExtensionMaxDays = settings.ExtensionMaxDays;
+        _input.ExtensionsPerCase = settings.ExtensionsPerCase;
+        _input.PendingPaymentReadOnlyDays = settings.PendingPaymentReadOnlyDays;
+        _input.LongBlockDays = settings.LongBlockDays;
+    }
+}

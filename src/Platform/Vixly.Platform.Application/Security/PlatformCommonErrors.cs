@@ -29,6 +29,9 @@ public static class PlatformCommonErrors
     public static Error StepUpRequired { get; } =
         Error.Create("platform.common.step_up_required");
 
+    public static Error RoleNotAllowed { get; } =
+        Error.Create("platform.common.role_not_allowed");
+
     public static Error RequestInvalid { get; } =
         Error.Create("platform.common.request_invalid");
 

@@ -1,4 +1,4 @@
-@*
+﻿@*
 =========================================================
 FILE: Home.razor - Executive Overview Dashboard for Vixly Control Plane.
 =========================================================
@@ -55,6 +55,14 @@ FILE: Home.razor - Executive Overview Dashboard for Vixly Control Plane.
         <VxCard Title="@T["ui.subscriptions.title"]">
             <p>Manage subscription plans, recurring billing, trials, and promotional discount terms.</p>
             <div class="vx-actions"><a href="/subscriptions" class="vx-button vx-button--subtle">@T["ui.subscriptions.title"] →</a></div>
+        </VxCard>
+        <VxCard Title="@T["ui.invoices.title"]">
+            <p>Manage commercial invoices, tax lines, credit adjustments, and payment tracking.</p>
+            <div class="vx-actions"><a href="/invoices" class="vx-button vx-button--subtle">@T["ui.invoices.title"] →</a></div>
+        </VxCard>
+        <VxCard Title="@T["ui.collections.title"]">
+            <p>Oversee dunning timelines, overdue recovery, extensions, and automated access blocks.</p>
+            <div class="vx-actions"><a href="/collections" class="vx-button vx-button--subtle">@T["ui.collections.title"] →</a></div>
         </VxCard>
         <VxCard Title="@T["ui.users.title"]">
             <p>@T["ui.home.users_desc"]</p>

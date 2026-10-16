@@ -1,0 +1,151 @@
+﻿@*
+=========================================================
+FILE: ZelleClaimView.razor
+
+PURPOSE:
+One Zelle report: what the customer says they sent, the
+invoice balance now, and the staff decision (confirm or reject).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Confirm only after the money is seen in Vixly's bank account
+- The rejection reason is emailed to the customer; the note stays internal
+=========================================================
+*@
+@inherits PlatformPresenterComponent<ZelleClaimPresenter>
+@using Vixly.Platform.Application.Queries
+@using Vixly.Platform.Domain.Payments
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.DoneKey is { } done)
+{
+    <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+}
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+@if (!Presenter.State.Loaded)
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+else if (Presenter.State.Detail is { } detail)
+{
+    PlatformZelleClaimItem claim = detail.Claim;
+    <h1>@T["ui.zelle.claim"] · @claim.InvoiceNumber</h1>
+    <p><a href="/tenants/@claim.PlatformTenantId#tenant-billing">@claim.TenantName</a> · <a href="/invoices/@claim.PlatformInvoiceId">@claim.InvoiceNumber</a> · <a href="/payments/zelle">@T["ui.zelle.title"]</a></p>
+    <div id="zelle-claim"><VxCard Title="@T["ui.zelle.claim"]">
+        <dl class="vx-facts">
+            <dt>@T["ui.zelle.status"]</dt>
+            <dd><VxStatusBadge Status="@ZelleDisplay.Badge(claim.Status)" Text="@T[ZelleDisplay.StatusKey(claim.Status)]" /></dd>
+            <dt>@T["ui.zelle.amount"]</dt>
+            <dd>@Vixly.Platform.Web.Features.Billing.BillingDisplay.Money(claim.Amount, claim.CurrencyCode)</dd>
+            <dt>@T["ui.zelle.balance_now"]</dt>
+            <dd>@Vixly.Platform.Web.Features.Billing.BillingDisplay.Money(claim.InvoiceBalance, claim.CurrencyCode)</dd>
+            <dt>@T["ui.zelle.sent_on"]</dt>
+            <dd>@claim.SentOn.ToString("d", System.Globalization.CultureInfo.CurrentCulture)</dd>
+            <dt>@T["ui.zelle.sender"]</dt>
+            <dd>@claim.SenderName</dd>
+            <dt>@T["ui.zelle.reference"]</dt>
+            <dd>@claim.Reference</dd>
+            <dt>@T["ui.zelle.reported"]</dt>
+            <dd>@PlatformDisplay.Utc(T, claim.ReportedUtc) <span class="vx-hint">@T[ZelleDisplay.SourceKey(claim.Source)]</span></dd>
+            @if (claim.DecidedUtc is { } decided)
+            {
+                <dt>@T["ui.zelle.decided"]</dt>
+                <dd>@PlatformDisplay.Utc(T, decided) <span class="vx-hint">@claim.DecidedByName</span></dd>
+            }
+            @if (claim.ReceivedAmount is { } received)
+            {
+                <dt>@T["ui.zelle.received"]</dt>
+                <dd>@Vixly.Platform.Web.Features.Billing.BillingDisplay.Money(received, claim.CurrencyCode)</dd>
+            }
+            @if (claim.RejectReason is { } reason)
+            {
+                <dt>@T["ui.zelle.reject_reason"]</dt>
+                <dd>@reason</dd>
+            }
+            @if (claim.StaffNote is { } note)
+            {
+                <dt>@T["ui.zelle.note"]</dt>
+                <dd>@note</dd>
+            }
+        </dl>
+    </VxCard></div>
+
+    @if (detail.Abilities.CanDecide)
+    {
+        <div id="zelle-confirm"><VxCard Title="@T["ui.zelle.confirm_title"]">
+            <p class="vx-hint">@T["ui.zelle.confirm_help"]</p>
+            <form class="vx-form" @onsubmit="ConfirmAsync">
+                <label for="zelle-received">@T["ui.zelle.received_amount"]</label>
+                <input id="zelle-received" type="number" step="0.01" min="0.01" @bind="_amount" />
+                <label for="zelle-received-on">@T["ui.zelle.received_on"]</label>
+                <input id="zelle-received-on" type="date" @bind="_receivedOn" />
+                <label for="zelle-confirm-note">@T["ui.zelle.note"]</label>
+                <textarea id="zelle-confirm-note" @bind="_confirmNote" maxlength="@PlatformZelleLimits.NoteMaxLength" rows="2"></textarea>
+                <div class="vx-actions">
+                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.zelle.confirm"]</VxButton>
+                </div>
+            </form>
+        </VxCard></div>
+        <div id="zelle-reject"><VxCard Title="@T["ui.zelle.reject_title"]">
+            <form class="vx-form" @onsubmit="RejectAsync">
+                <label for="zelle-reason">@T["ui.zelle.reject_reason"]</label>
+                <textarea id="zelle-reason" @bind="_reason" maxlength="@PlatformZelleLimits.ReasonMaxLength" rows="2" required aria-describedby="zelle-reason-help"></textarea>
+                <p id="zelle-reason-help" class="vx-hint">@T["ui.zelle.reject_help"]</p>
+                <label for="zelle-reject-note">@T["ui.zelle.note"]</label>
+                <textarea id="zelle-reject-note" @bind="_rejectNote" maxlength="@PlatformZelleLimits.NoteMaxLength" rows="2"></textarea>
+                <div class="vx-actions">
+                    <VxButton Variant="VxButtonVariant.Danger" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.zelle.reject"]</VxButton>
+                </div>
+            </form>
+        </VxCard></div>
+    }
+    @if (Presenter.State.StepUpPending)
+    {
+        <StepUpDialog OnConfirmed="Presenter.ConfirmStepUpAsync" OnCancelled="Presenter.CancelStepUp" />
+    }
+}
+
+@code {
+    private decimal? _amount;
+
+    private DateTime? _receivedOn;
+
+    private string? _confirmNote;
+
+    private string? _reason;
+
+    private string? _rejectNote;
+
+    private Guid _loaded;
+
+    [Parameter, EditorRequired]
+    public Guid ClaimId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_loaded != ClaimId)
+        {
+            _loaded = ClaimId;
+            await Presenter.LoadAsync(ClaimId);
+            _amount = Presenter.State.Detail?.Claim.Amount;
+            _receivedOn = DateTime.UtcNow.Date;
+        }
+    }
+
+    private Task ConfirmAsync()
+    {
+        return Presenter.ConfirmAsync(ClaimId, _amount, _receivedOn, _confirmNote);
+    }
+
+    private Task RejectAsync()
+    {
+        return Presenter.RejectAsync(ClaimId, _reason, _rejectNote);
+    }
+}

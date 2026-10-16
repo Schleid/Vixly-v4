@@ -33,6 +33,8 @@ public static class PlatformSystemRoles
 
     public const string ChiefFinancialOfficer = "chief_financial_officer";
 
+    public const string BillingClerk = "billing_clerk";
+
     public static IReadOnlyDictionary<string, IReadOnlyCollection<string>> Definitions { get; } =
         new Dictionary<string, IReadOnlyCollection<string>>(StringComparer.Ordinal)
         {
@@ -60,7 +62,10 @@ public static class PlatformSystemRoles
                 PlatformPermissions.DepartmentsEdit,
                 PlatformPermissions.DepartmentsDeactivate,
                 PlatformPermissions.DepartmentsManageMembers,
-                PlatformPermissions.AuditView
+                PlatformPermissions.AuditView,
+                PlatformPermissions.LicensingView,
+                PlatformPermissions.LicensingManage,
+                PlatformPermissions.LegalView
             },
             [Administrator] = new[]
             {
@@ -89,7 +94,28 @@ public static class PlatformSystemRoles
                 PlatformPermissions.PromotionsManage,
                 PlatformPermissions.PromotionsApprove,
                 PlatformPermissions.SubscriptionsCharges,
-                PlatformPermissions.SalesConfigure
+                PlatformPermissions.SalesConfigure,
+                PlatformPermissions.BillingView,
+                PlatformPermissions.BillingRecordPayments,
+                PlatformPermissions.BillingRequestCredits,
+                PlatformPermissions.BillingApproveCredits,
+                PlatformPermissions.BillingConfigure,
+                PlatformPermissions.BillingChargeCards,
+                PlatformPermissions.BillingRefundCards,
+                PlatformPermissions.PaymentsConfigure,
+                PlatformPermissions.CollectionsView,
+                PlatformPermissions.CollectionsManage,
+                PlatformPermissions.CollectionsExtend,
+                PlatformPermissions.CollectionsExtendBeyondLimit,
+                PlatformPermissions.CollectionsConfigure,
+                PlatformPermissions.LicensingView,
+                PlatformPermissions.LicensingManage,
+                PlatformPermissions.LicensingApproveRelease,
+                PlatformPermissions.LegalView,
+                PlatformPermissions.LegalManage,
+                PlatformPermissions.LegalPublish,
+                PlatformPermissions.LegalRemind,
+                PlatformPermissions.LegalRecordAcceptance
             },
             [Salesperson] = new[]
             {
@@ -100,7 +126,9 @@ public static class PlatformSystemRoles
                 PlatformPermissions.DiscountsGrant,
                 PlatformPermissions.OffersManage,
                 PlatformPermissions.PromotionsManage,
-                PlatformPermissions.SubscriptionsCharges
+                PlatformPermissions.SubscriptionsCharges,
+                PlatformPermissions.LegalView,
+                PlatformPermissions.LegalRemind
             },
             [SalesManager] = new[]
             {
@@ -114,7 +142,13 @@ public static class PlatformSystemRoles
                 PlatformPermissions.OffersManage,
                 PlatformPermissions.PromotionsManage,
                 PlatformPermissions.SubscriptionsCharges,
-                PlatformPermissions.SalesConfigure
+                PlatformPermissions.SalesConfigure,
+                PlatformPermissions.BillingView,
+                PlatformPermissions.BillingApproveCredits,
+                PlatformPermissions.CollectionsView,
+                PlatformPermissions.CollectionsExtendBeyondLimit,
+                PlatformPermissions.LegalView,
+                PlatformPermissions.LegalRemind
             },
             [ChiefFinancialOfficer] = new[]
             {
@@ -122,7 +156,30 @@ public static class PlatformSystemRoles
                 PlatformPermissions.PlansView,
                 PlatformPermissions.PlansPublish,
                 PlatformPermissions.SubscriptionsView,
-                PlatformPermissions.PromotionsApprove
+                PlatformPermissions.PromotionsApprove,
+                PlatformPermissions.BillingView,
+                PlatformPermissions.BillingConfigure,
+                PlatformPermissions.BillingRefundCards,
+                PlatformPermissions.PaymentsConfigure,
+                PlatformPermissions.CollectionsView,
+                PlatformPermissions.CollectionsConfigure,
+                PlatformPermissions.LegalView
+            },
+            [BillingClerk] = new[]
+            {
+                PlatformPermissions.TenantsView,
+                PlatformPermissions.TenantsEdit,
+                PlatformPermissions.PlansView,
+                PlatformPermissions.SubscriptionsView,
+                PlatformPermissions.BillingView,
+                PlatformPermissions.BillingRecordPayments,
+                PlatformPermissions.BillingRequestCredits,
+                PlatformPermissions.BillingChargeCards,
+                PlatformPermissions.CollectionsView,
+                PlatformPermissions.CollectionsManage,
+                PlatformPermissions.CollectionsExtend,
+                PlatformPermissions.LicensingView,
+                PlatformPermissions.LegalView
             }
         };
 }

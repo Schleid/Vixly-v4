@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text;
+using Vixly.Contracts.Platform.Common;
 using Vixly.Contracts.Platform.Registration;
 
 namespace Vixly.Platform.Api.Tests;

@@ -1,0 +1,125 @@
+﻿@*
+=========================================================
+FILE: TenantCards.razor
+
+PURPOSE:
+Saved cards of a tenant and whether it agreed to automatic
+charging; send a save-card link, remove a card, turn automatic
+charging off (D-P3, D-P4).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Only the tenant adds a card or gives consent, on the
+  provider's page
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantCardsPresenter>
+@using Vixly.Platform.Application.UseCases.Payments
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="tenant-cards">
+    <h3>@T["ui.saved_cards.title"]</h3>
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (Presenter.State.Cards is { } cards)
+    {
+        <p>
+            @if (cards.AutoCharge)
+            {
+                <VxStatusBadge Status="VxBadgeStatus.Active" Text="@T["ui.saved_cards.auto_charge_on"]" />
+                <span class="vx-hint">@VixlyText.Format(T, "ui.saved_cards.consent", new Dictionary<string, object> { ["email"] = cards.ConsentEmail ?? "-", ["time"] = PlatformDisplay.Utc(T, cards.ConsentUtc) })</span>
+            }
+            else
+            {
+                <VxStatusBadge Status="VxBadgeStatus.Deactivated" Text="@T["ui.saved_cards.auto_charge_off"]" />
+            }
+        </p>
+        <VxDataTable Items="cards.Cards" IsLoading="false">
+            <HeaderContent>
+                <th scope="col">@T["ui.saved_cards.card"]</th>
+                <th scope="col">@T["ui.saved_cards.expires"]</th>
+                <th scope="col">@T["ui.saved_cards.added"]</th>
+                <th scope="col"><span class="vx-visually-hidden">@T["ui.subscriptions.actions"]</span></th>
+            </HeaderContent>
+            <RowTemplate Context="card">
+                <td>
+                    @PaymentsDisplay.Card(card.Brand, card.Last4)
+                    @if (card.IsDefault)
+                    {
+                        <VxStatusBadge Status="VxBadgeStatus.Info" Text="@T["ui.saved_cards.default"]" />
+                    }
+                </td>
+                <td>
+                    @card.ExpiryMonth.ToString("D2", System.Globalization.CultureInfo.InvariantCulture)/@card.ExpiryYear
+                    @if (card.IsExpired)
+                    {
+                        <VxStatusBadge Status="VxBadgeStatus.Danger" Text="@T["ui.saved_cards.expired"]" />
+                    }
+                </td>
+                <td>@PlatformDisplay.Utc(T, card.AddedUtc)</td>
+                <td>
+                    @if (cards.CanManage)
+                    {
+                        <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => RemoveAsync(card.SavedCardId)">@T["ui.saved_cards.remove"]</VxButton>
+                    }
+                </td>
+            </RowTemplate>
+            <EmptyContent>
+                <VxEmptyState Title="@T["ui.saved_cards.empty"]" />
+            </EmptyContent>
+        </VxDataTable>
+        @if (cards.CanManage)
+        {
+            <div class="vx-actions">
+                @if (cards.CardPaymentsReady)
+                {
+                    <VxButton OnClick="SendAsync" IsBusy="@Presenter.IsBusy">@T["ui.saved_cards.send_link"]</VxButton>
+                }
+                @if (cards.AutoCharge)
+                {
+                    <VxButton Variant="VxButtonVariant.Danger" OnClick="TurnOffAsync" IsBusy="@Presenter.IsBusy">@T["ui.saved_cards.turn_off"]</VxButton>
+                }
+            </div>
+        }
+    }
+    @if (Presenter.State.StepUpPending)
+    {
+        <StepUpDialog OnConfirmed="RetryAsync" OnCancelled="Presenter.CancelStepUp" />
+    }
+</div>
+
+@code {
+    private Func<Task>? _last;
+
+    [Parameter, EditorRequired]
+    public Guid TenantId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(TenantId);
+    }
+
+    private Task SendAsync() => Run(() => Presenter.SendLinkAsync(TenantId));
+
+    private Task RemoveAsync(Guid cardId) => Run(() => Presenter.RemoveAsync(TenantId, cardId));
+
+    private Task TurnOffAsync() => Run(() => Presenter.TurnOffAsync(TenantId));
+
+    private Task Run(Func<Task> work)
+    {
+        _last = work;
+        return work();
+    }
+
+    private Task RetryAsync() => _last is null ? Task.CompletedTask : _last();
+}

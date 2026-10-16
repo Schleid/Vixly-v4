@@ -23,7 +23,6 @@ internal sealed class FakeSubscriptionStore :
     IPlatformSubscriptionRepository,
     IPlatformLimitOverrideRepository,
     IPlatformLicenceCounter,
-    IPlatformSubscriptionPolicy,
     IPlatformSubscriptionMailer,
     IPlatformSubscriptionQueries
 {
@@ -39,7 +38,6 @@ internal sealed class FakeSubscriptionStore :
 
     public int ActiveLicences { get; set; }
 
-    public TimeSpan UnpaidReadOnlyPeriod => TimeSpan.FromDays(7);
 
     public Task<PlatformPlan?> GetAsync(Guid platformPlanId, CancellationToken cancellationToken)
     {

@@ -1,0 +1,21 @@
+﻿@*
+=========================================================
+FILE: PaymentsSettingsPage.razor
+
+PURPOSE:
+Card payment settings: provider, mode, currencies, on or off.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/payments/settings"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.payments_settings.title"]</PageTitle>
+<h1>@T["ui.payments_settings.title"]</h1>
+<p><a href="/payments/transactions">@T["ui.card_payments.list_title"]</a> · <a href="/billing/settings">@T["ui.billing_settings.title"]</a></p>
+<PaymentsSettingsForm />
+<ZelleSettingsForm />

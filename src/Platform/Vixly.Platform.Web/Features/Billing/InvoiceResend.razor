@@ -1,0 +1,44 @@
+﻿@*
+=========================================================
+FILE: InvoiceResend.razor
+
+PURPOSE:
+Sends the invoice email again to the billing contact (D-B13).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- The stored PDF is attached; nothing is regenerated
+=========================================================
+*@
+@inherits PlatformPresenterComponent<InvoiceCreditsPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<VxButton OnClick="ResendAsync" IsBusy="@Presenter.IsBusy">@T["ui.invoices.resend"]</VxButton>
+@if (Presenter.State.DoneKey is { } done)
+{
+    <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+}
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid InvoiceId { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private async Task ResendAsync()
+    {
+        if (await Presenter.ResendAsync(InvoiceId))
+        {
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

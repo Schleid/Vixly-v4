@@ -76,7 +76,7 @@ GO
 -- =========================================================
 -- 2. PLATFORM PLANE (schema [platform])
 -- Generated from the EF migrations of
--- Vixly.Platform.Infrastructure: InitialIdentity, SecondFactorsSessionsAudit, DataProtectionKeys, SignInChallenges, SessionStepUpFailures, PasskeyCeremonies, Tenants, Subscriptions, CommercialFlexibility
+-- Vixly.Platform.Infrastructure: InitialIdentity, SecondFactorsSessionsAudit, DataProtectionKeys, SignInChallenges, SessionStepUpFailures, PasskeyCeremonies, Tenants, Subscriptions, CommercialFlexibility, Billing, Payments, Collections, Licensing, Zelle, Legal, Contracts
 -- =========================================================
 IF OBJECT_ID(N'[platform].[__EFMigrationsHistory]') IS NULL
 BEGIN
@@ -2037,6 +2037,1772 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    ALTER TABLE [platform].[Tenants] ADD [TaxExempt] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    ALTER TABLE [platform].[Tenants] ADD [TaxExemptionReason] nvarchar(500) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    ALTER TABLE [platform].[Tenants] ADD [TaxExemptionReference] nvarchar(100) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    ALTER TABLE [platform].[Tenants] ADD [TaxId] nvarchar(40) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE TABLE [platform].[BillingSettings] (
+        [Id] uniqueidentifier NOT NULL,
+        [Key] varchar(16) NOT NULL,
+        [PaymentTermsDays] int NULL,
+        [InvoicePrefix] varchar(8) NOT NULL,
+        [CreditNotePrefix] varchar(8) NOT NULL,
+        [ReceiptPrefix] varchar(8) NOT NULL,
+        [PaperSize] int NOT NULL,
+        [EmailDocuments] bit NOT NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_BillingSettings] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_BillingSettings_Users_UpdatedByUserId] FOREIGN KEY ([UpdatedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE TABLE [platform].[CompanyProfile] (
+        [Id] uniqueidentifier NOT NULL,
+        [Key] varchar(16) NOT NULL,
+        [TaxId] nvarchar(40) NULL,
+        [Website] nvarchar(200) NULL,
+        [Logo] varbinary(max) NULL,
+        [LogoContentType] varchar(16) NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [RowVersion] rowversion NULL,
+        [Email] nvarchar(254) NOT NULL,
+        [LegalName] nvarchar(200) NOT NULL,
+        [Phone] varchar(16) NOT NULL,
+        [TradingName] nvarchar(200) NULL,
+        [City] nvarchar(100) NOT NULL,
+        [CountryCode] char(2) NOT NULL,
+        [AddressLine1] nvarchar(200) NOT NULL,
+        [AddressLine2] nvarchar(200) NULL,
+        [PostalCode] nvarchar(20) NULL,
+        [StateProvince] nvarchar(100) NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_CompanyProfile] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_CompanyProfile_Users_UpdatedByUserId] FOREIGN KEY ([UpdatedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE TABLE [platform].[Invoices] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [PlatformSubscriptionId] uniqueidentifier NULL,
+        [Kind] int NOT NULL,
+        [Number] varchar(32) NOT NULL,
+        [SourceKey] varchar(120) NOT NULL,
+        [Status] int NOT NULL,
+        [CurrencyCode] char(3) NOT NULL,
+        [Language] varchar(8) NOT NULL,
+        [IssuedUtc] datetimeoffset NOT NULL,
+        [DueUtc] datetimeoffset NOT NULL,
+        [PeriodStartUtc] datetimeoffset NULL,
+        [PeriodEndUtc] datetimeoffset NULL,
+        [NetTotal] decimal(18,2) NOT NULL,
+        [DiscountTotal] decimal(18,2) NOT NULL,
+        [TaxTotal] decimal(18,2) NOT NULL,
+        [Total] decimal(18,2) NOT NULL,
+        [PaidTotal] decimal(18,2) NOT NULL,
+        [CreditedTotal] decimal(18,2) NOT NULL,
+        [Balance] decimal(18,2) NOT NULL,
+        [PastDueUtc] datetimeoffset NULL,
+        [RowVersion] rowversion NULL,
+        [CustomerAddress] nvarchar(600) NOT NULL,
+        [CustomerEmail] nvarchar(254) NOT NULL,
+        [CustomerName] nvarchar(200) NOT NULL,
+        [CustomerTaxId] nvarchar(40) NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_Invoices] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Invoices_Subscriptions_PlatformSubscriptionId] FOREIGN KEY ([PlatformSubscriptionId]) REFERENCES [platform].[Subscriptions] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_Invoices_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE TABLE [platform].[NumberSequences] (
+        [Id] uniqueidentifier NOT NULL,
+        [Kind] int NOT NULL,
+        [Year] int NOT NULL,
+        [NextValue] int NOT NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_NumberSequences] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE TABLE [platform].[TaxRates] (
+        [Id] uniqueidentifier NOT NULL,
+        [CountryCode] char(2) NOT NULL,
+        [RegionCode] nvarchar(64) NULL,
+        [Rate] decimal(9,4) NOT NULL,
+        [Label] nvarchar(40) NOT NULL,
+        [ValidFromUtc] datetimeoffset NOT NULL,
+        [CreatedByUserId] uniqueidentifier NOT NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_TaxRates] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TaxRates_Users_CreatedByUserId] FOREIGN KEY ([CreatedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE TABLE [platform].[BillingTexts] (
+        [Id] int NOT NULL IDENTITY,
+        [Language] varchar(8) NOT NULL,
+        [PaymentInstructions] nvarchar(1000) NULL,
+        [Footer] nvarchar(1000) NULL,
+        [BillingSettingsId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_BillingTexts] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_BillingTexts_BillingSettings_BillingSettingsId] FOREIGN KEY ([BillingSettingsId]) REFERENCES [platform].[BillingSettings] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE TABLE [platform].[BillingDocuments] (
+        [Id] uniqueidentifier NOT NULL,
+        [Kind] int NOT NULL,
+        [PlatformInvoiceId] uniqueidentifier NOT NULL,
+        [OwnerId] uniqueidentifier NOT NULL,
+        [Number] varchar(32) NOT NULL,
+        [Language] varchar(8) NOT NULL,
+        [Content] varbinary(max) NOT NULL,
+        [Sha256] char(64) NOT NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_BillingDocuments] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_BillingDocuments_Invoices_PlatformInvoiceId] FOREIGN KEY ([PlatformInvoiceId]) REFERENCES [platform].[Invoices] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE TABLE [platform].[CreditNotes] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformInvoiceId] uniqueidentifier NOT NULL,
+        [Number] varchar(32) NULL,
+        [Amount] decimal(18,2) NOT NULL,
+        [TaxPart] decimal(18,2) NOT NULL,
+        [IsVoid] bit NOT NULL,
+        [Reason] nvarchar(500) NOT NULL,
+        [Status] int NOT NULL,
+        [RequestedByUserId] uniqueidentifier NOT NULL,
+        [DecidedByUserId] uniqueidentifier NULL,
+        [DecidedUtc] datetimeoffset NULL,
+        [DecisionReason] nvarchar(500) NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_CreditNotes] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_CreditNotes_Invoices_PlatformInvoiceId] FOREIGN KEY ([PlatformInvoiceId]) REFERENCES [platform].[Invoices] ([Id]) ON DELETE CASCADE,
+        CONSTRAINT [FK_CreditNotes_Users_DecidedByUserId] FOREIGN KEY ([DecidedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_CreditNotes_Users_RequestedByUserId] FOREIGN KEY ([RequestedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE TABLE [platform].[InvoiceEvents] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformInvoiceId] uniqueidentifier NOT NULL,
+        [EventCode] varchar(100) NOT NULL,
+        [ActorUserId] uniqueidentifier NULL,
+        [Reason] nvarchar(500) NULL,
+        [Arguments] nvarchar(max) NOT NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_InvoiceEvents] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_InvoiceEvents_Invoices_PlatformInvoiceId] FOREIGN KEY ([PlatformInvoiceId]) REFERENCES [platform].[Invoices] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE TABLE [platform].[InvoiceLines] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformInvoiceId] uniqueidentifier NOT NULL,
+        [Position] int NOT NULL,
+        [Kind] int NOT NULL,
+        [TextKey] varchar(100) NOT NULL,
+        [Arguments] nvarchar(max) NOT NULL,
+        [Quantity] decimal(18,2) NOT NULL,
+        [UnitPrice] decimal(18,2) NOT NULL,
+        [Net] decimal(18,2) NOT NULL,
+        [TaxRate] decimal(9,4) NOT NULL,
+        [TaxLabel] nvarchar(40) NULL,
+        [Tax] decimal(18,2) NOT NULL,
+        [SourceId] uniqueidentifier NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_InvoiceLines] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_InvoiceLines_Invoices_PlatformInvoiceId] FOREIGN KEY ([PlatformInvoiceId]) REFERENCES [platform].[Invoices] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE TABLE [platform].[Payments] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformInvoiceId] uniqueidentifier NOT NULL,
+        [ReceiptNumber] varchar(32) NOT NULL,
+        [Amount] decimal(18,2) NOT NULL,
+        [Method] int NOT NULL,
+        [ReceivedUtc] datetimeoffset NOT NULL,
+        [Reference] nvarchar(100) NULL,
+        [Note] nvarchar(500) NULL,
+        [RecordedByUserId] uniqueidentifier NULL,
+        [Status] int NOT NULL,
+        [ReversedByUserId] uniqueidentifier NULL,
+        [ReversedUtc] datetimeoffset NULL,
+        [ReversalReason] nvarchar(500) NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_Payments] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Payments_Invoices_PlatformInvoiceId] FOREIGN KEY ([PlatformInvoiceId]) REFERENCES [platform].[Invoices] ([Id]) ON DELETE CASCADE,
+        CONSTRAINT [FK_Payments_Users_RecordedByUserId] FOREIGN KEY ([RecordedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_Payments_Users_ReversedByUserId] FOREIGN KEY ([ReversedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_BillingDocuments_Kind_OwnerId] ON [platform].[BillingDocuments] ([Kind], [OwnerId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_BillingDocuments_PlatformInvoiceId] ON [platform].[BillingDocuments] ([PlatformInvoiceId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_BillingSettings_Key] ON [platform].[BillingSettings] ([Key]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_BillingSettings_UpdatedByUserId] ON [platform].[BillingSettings] ([UpdatedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_BillingTexts_BillingSettingsId] ON [platform].[BillingTexts] ([BillingSettingsId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_CompanyProfile_Key] ON [platform].[CompanyProfile] ([Key]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_CompanyProfile_UpdatedByUserId] ON [platform].[CompanyProfile] ([UpdatedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_CreditNotes_DecidedByUserId] ON [platform].[CreditNotes] ([DecidedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_CreditNotes_Number] ON [platform].[CreditNotes] ([Number]) WHERE [Number] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_CreditNotes_OnePending] ON [platform].[CreditNotes] ([PlatformInvoiceId]) WHERE [Status] = 0');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_CreditNotes_RequestedByUserId] ON [platform].[CreditNotes] ([RequestedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_InvoiceEvents_PlatformInvoiceId_CreatedUtc] ON [platform].[InvoiceEvents] ([PlatformInvoiceId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_InvoiceLines_PlatformInvoiceId] ON [platform].[InvoiceLines] ([PlatformInvoiceId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Invoices_Number] ON [platform].[Invoices] ([Number]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_Invoices_PlatformSubscriptionId_Status] ON [platform].[Invoices] ([PlatformSubscriptionId], [Status]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_Invoices_PlatformTenantId_IssuedUtc] ON [platform].[Invoices] ([PlatformTenantId], [IssuedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Invoices_SourceKey] ON [platform].[Invoices] ([SourceKey]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_Invoices_Status_DueUtc] ON [platform].[Invoices] ([Status], [DueUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_NumberSequences_Kind_Year] ON [platform].[NumberSequences] ([Kind], [Year]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_Payments_PlatformInvoiceId] ON [platform].[Payments] ([PlatformInvoiceId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Payments_ReceiptNumber] ON [platform].[Payments] ([ReceiptNumber]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_Payments_ReceivedUtc] ON [platform].[Payments] ([ReceivedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_Payments_RecordedByUserId] ON [platform].[Payments] ([RecordedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_Payments_ReversedByUserId] ON [platform].[Payments] ([ReversedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_TaxRates_CountryCode_RegionCode_ValidFromUtc] ON [platform].[TaxRates] ([CountryCode], [RegionCode], [ValidFromUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    CREATE INDEX [IX_TaxRates_CreatedByUserId] ON [platform].[TaxRates] ([CreatedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016013712_Billing'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261016013712_Billing', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    ALTER TABLE [platform].[Invoices] ADD [RefundedTotal] decimal(18,2) NOT NULL DEFAULT 0.0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE TABLE [platform].[MerchantAccounts] (
+        [Id] uniqueidentifier NOT NULL,
+        [Key] varchar(20) NOT NULL,
+        [Provider] int NOT NULL,
+        [Mode] int NOT NULL,
+        [PublishableKey] varchar(255) NULL,
+        [AcceptedCurrencies] varchar(40) NOT NULL,
+        [CardPaymentsEnabled] bit NOT NULL,
+        [LastCheckedUtc] datetimeoffset NULL,
+        [LastCheckSucceeded] bit NOT NULL,
+        [LastCheckCode] varchar(60) NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_MerchantAccounts] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_MerchantAccounts_Users_UpdatedByUserId] FOREIGN KEY ([UpdatedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE TABLE [platform].[PaymentLinks] (
+        [Id] uniqueidentifier NOT NULL,
+        [Kind] int NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [PlatformInvoiceId] uniqueidentifier NULL,
+        [TokenHash] char(64) NOT NULL,
+        [ExpiresUtc] datetimeoffset NOT NULL,
+        [UsedUtc] datetimeoffset NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_PaymentLinks] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_PaymentLinks_Invoices_PlatformInvoiceId] FOREIGN KEY ([PlatformInvoiceId]) REFERENCES [platform].[Invoices] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_PaymentLinks_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_PaymentLinks_Users_CreatedByUserId] FOREIGN KEY ([CreatedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE TABLE [platform].[ProviderEvents] (
+        [Id] uniqueidentifier NOT NULL,
+        [Provider] int NOT NULL,
+        [ProviderEventId] varchar(255) NOT NULL,
+        [EventType] varchar(100) NOT NULL,
+        [ObjectId] varchar(255) NULL,
+        [ProcessedUtc] datetimeoffset NULL,
+        [Outcome] varchar(40) NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_ProviderEvents] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE TABLE [platform].[SavedCards] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [Provider] int NOT NULL,
+        [ProviderPaymentMethodId] varchar(255) NOT NULL,
+        [Brand] varchar(20) NOT NULL,
+        [Last4] char(4) NOT NULL,
+        [ExpiryMonth] int NOT NULL,
+        [ExpiryYear] int NOT NULL,
+        [AddedVia] int NOT NULL,
+        [Status] int NOT NULL,
+        [IsDefault] bit NOT NULL,
+        [RemovedByUserId] uniqueidentifier NULL,
+        [RemovedUtc] datetimeoffset NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_SavedCards] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_SavedCards_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_SavedCards_Users_RemovedByUserId] FOREIGN KEY ([RemovedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE TABLE [platform].[TenantCardProfiles] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [Provider] int NOT NULL,
+        [Mode] int NOT NULL,
+        [ProviderCustomerId] varchar(255) NOT NULL,
+        [AutoCharge] bit NOT NULL,
+        [ConsentEmail] nvarchar(254) NULL,
+        [ConsentTextVersion] varchar(20) NULL,
+        [ConsentUtc] datetimeoffset NULL,
+        [AutoChargeOffByUserId] uniqueidentifier NULL,
+        [AutoChargeOffUtc] datetimeoffset NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_TenantCardProfiles] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TenantCardProfiles_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_TenantCardProfiles_Users_AutoChargeOffByUserId] FOREIGN KEY ([AutoChargeOffByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE TABLE [platform].[CardTransactions] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [PlatformInvoiceId] uniqueidentifier NOT NULL,
+        [Kind] int NOT NULL,
+        [Origin] int NOT NULL,
+        [Provider] int NOT NULL,
+        [Amount] decimal(18,2) NOT NULL,
+        [CurrencyCode] char(3) NOT NULL,
+        [Status] int NOT NULL,
+        [IdempotencyKey] varchar(60) NOT NULL,
+        [ProviderCheckoutId] varchar(255) NULL,
+        [ProviderPaymentId] varchar(255) NULL,
+        [ProviderRefundId] varchar(255) NULL,
+        [SavedCardId] uniqueidentifier NULL,
+        [CreditNoteId] uniqueidentifier NULL,
+        [ChargeTransactionId] uniqueidentifier NULL,
+        [PlatformPaymentId] uniqueidentifier NULL,
+        [FailureCode] varchar(60) NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [CompletedUtc] datetimeoffset NULL,
+        [Dispute] int NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_CardTransactions] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_CardTransactions_CardTransactions_ChargeTransactionId] FOREIGN KEY ([ChargeTransactionId]) REFERENCES [platform].[CardTransactions] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_CardTransactions_Invoices_PlatformInvoiceId] FOREIGN KEY ([PlatformInvoiceId]) REFERENCES [platform].[Invoices] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_CardTransactions_SavedCards_SavedCardId] FOREIGN KEY ([SavedCardId]) REFERENCES [platform].[SavedCards] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_CardTransactions_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_CardTransactions_Users_CreatedByUserId] FOREIGN KEY ([CreatedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE INDEX [IX_CardTransactions_ChargeTransactionId] ON [platform].[CardTransactions] ([ChargeTransactionId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE INDEX [IX_CardTransactions_CreatedByUserId] ON [platform].[CardTransactions] ([CreatedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_CardTransactions_IdempotencyKey] ON [platform].[CardTransactions] ([IdempotencyKey]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_CardTransactions_OneOpenChargePerInvoice] ON [platform].[CardTransactions] ([PlatformInvoiceId]) WHERE [Kind] = 1 AND [Status] IN (1, 2, 3)');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE INDEX [IX_CardTransactions_PlatformInvoiceId_CreatedUtc] ON [platform].[CardTransactions] ([PlatformInvoiceId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE INDEX [IX_CardTransactions_PlatformTenantId_CreatedUtc] ON [platform].[CardTransactions] ([PlatformTenantId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    EXEC(N'CREATE INDEX [IX_CardTransactions_ProviderCheckoutId] ON [platform].[CardTransactions] ([ProviderCheckoutId]) WHERE [ProviderCheckoutId] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    EXEC(N'CREATE INDEX [IX_CardTransactions_ProviderPaymentId] ON [platform].[CardTransactions] ([ProviderPaymentId]) WHERE [ProviderPaymentId] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    EXEC(N'CREATE INDEX [IX_CardTransactions_ProviderRefundId] ON [platform].[CardTransactions] ([ProviderRefundId]) WHERE [ProviderRefundId] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE INDEX [IX_CardTransactions_SavedCardId] ON [platform].[CardTransactions] ([SavedCardId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE INDEX [IX_CardTransactions_Status_LastModifiedUtc] ON [platform].[CardTransactions] ([Status], [LastModifiedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_MerchantAccounts_Key] ON [platform].[MerchantAccounts] ([Key]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE INDEX [IX_MerchantAccounts_UpdatedByUserId] ON [platform].[MerchantAccounts] ([UpdatedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE INDEX [IX_PaymentLinks_CreatedByUserId] ON [platform].[PaymentLinks] ([CreatedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE INDEX [IX_PaymentLinks_PlatformInvoiceId] ON [platform].[PaymentLinks] ([PlatformInvoiceId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE INDEX [IX_PaymentLinks_PlatformTenantId_Kind] ON [platform].[PaymentLinks] ([PlatformTenantId], [Kind]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_PaymentLinks_TokenHash] ON [platform].[PaymentLinks] ([TokenHash]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_ProviderEvents_Provider_ProviderEventId] ON [platform].[ProviderEvents] ([Provider], [ProviderEventId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE INDEX [IX_SavedCards_PlatformTenantId_Status] ON [platform].[SavedCards] ([PlatformTenantId], [Status]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_SavedCards_ProviderPaymentMethodId] ON [platform].[SavedCards] ([ProviderPaymentMethodId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE INDEX [IX_SavedCards_RemovedByUserId] ON [platform].[SavedCards] ([RemovedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    EXEC(N'CREATE INDEX [IX_TenantCardProfiles_AutoCharge] ON [platform].[TenantCardProfiles] ([AutoCharge]) WHERE [AutoCharge] = 1');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE INDEX [IX_TenantCardProfiles_AutoChargeOffByUserId] ON [platform].[TenantCardProfiles] ([AutoChargeOffByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_TenantCardProfiles_PlatformTenantId] ON [platform].[TenantCardProfiles] ([PlatformTenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016041409_Payments'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261016041409_Payments', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    ALTER TABLE [platform].[Subscriptions] ADD [BlockedUtc] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    ALTER TABLE [platform].[Subscriptions] ADD [StatusBeforeBlock] int NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    CREATE TABLE [platform].[CollectionCases] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [PlatformSubscriptionId] uniqueidentifier NULL,
+        [Status] int NOT NULL,
+        [Stage] int NOT NULL,
+        [OldestDueUtc] datetimeoffset NOT NULL,
+        [PlannedBlockUtc] datetimeoffset NULL,
+        [BlockedUtc] datetimeoffset NULL,
+        [NoAccessUtc] datetimeoffset NULL,
+        [ExtensionUntilUtc] datetimeoffset NULL,
+        [ExtensionsUsed] int NOT NULL,
+        [ExtensionEndingNoticeSent] bit NOT NULL,
+        [Held] bit NOT NULL,
+        [LastStepUtc] datetimeoffset NULL,
+        [LastCheckedUtc] datetimeoffset NULL,
+        [ClosedUtc] datetimeoffset NULL,
+        [CloseReason] int NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_CollectionCases] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_CollectionCases_Subscriptions_PlatformSubscriptionId] FOREIGN KEY ([PlatformSubscriptionId]) REFERENCES [platform].[Subscriptions] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_CollectionCases_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    CREATE TABLE [platform].[CollectionsSettings] (
+        [Id] uniqueidentifier NOT NULL,
+        [Key] varchar(20) NOT NULL,
+        [Enabled] bit NOT NULL,
+        [Reminder1Day] int NOT NULL,
+        [Reminder2Day] int NOT NULL,
+        [FinalWarningDay] int NOT NULL,
+        [BlockDay] int NOT NULL,
+        [RetryDays] varchar(40) NOT NULL,
+        [MinimumNoticeDays] int NOT NULL,
+        [BlockedReadOnlyDays] int NULL,
+        [ExtensionMaxDays] int NOT NULL,
+        [ExtensionsPerCase] int NOT NULL,
+        [PendingPaymentReadOnlyDays] int NOT NULL,
+        [LongBlockDays] int NOT NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_CollectionsSettings] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_CollectionsSettings_Users_UpdatedByUserId] FOREIGN KEY ([UpdatedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    CREATE TABLE [platform].[CollectionCaseEvents] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformCollectionCaseId] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [EventCode] varchar(100) NOT NULL,
+        [ActorUserId] uniqueidentifier NULL,
+        [Note] nvarchar(1000) NULL,
+        [RetryKey] varchar(80) NULL,
+        [Arguments] nvarchar(max) NOT NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_CollectionCaseEvents] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_CollectionCaseEvents_CollectionCases_PlatformCollectionCaseId] FOREIGN KEY ([PlatformCollectionCaseId]) REFERENCES [platform].[CollectionCases] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_CollectionCaseEvents_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_CollectionCaseEvents_Users_ActorUserId] FOREIGN KEY ([ActorUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    CREATE INDEX [IX_CollectionCaseEvents_ActorUserId] ON [platform].[CollectionCaseEvents] ([ActorUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    CREATE INDEX [IX_CollectionCaseEvents_PlatformCollectionCaseId_CreatedUtc] ON [platform].[CollectionCaseEvents] ([PlatformCollectionCaseId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    CREATE INDEX [IX_CollectionCaseEvents_PlatformTenantId] ON [platform].[CollectionCaseEvents] ([PlatformTenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_CollectionCaseEvents_RetryKey] ON [platform].[CollectionCaseEvents] ([RetryKey]) WHERE [RetryKey] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_CollectionCases_OneOpenCasePerTenant] ON [platform].[CollectionCases] ([PlatformTenantId]) WHERE [Status] = 1');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    CREATE INDEX [IX_CollectionCases_PlatformSubscriptionId] ON [platform].[CollectionCases] ([PlatformSubscriptionId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    CREATE INDEX [IX_CollectionCases_Status_Stage] ON [platform].[CollectionCases] ([Status], [Stage]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_CollectionsSettings_Key] ON [platform].[CollectionsSettings] ([Key]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    CREATE INDEX [IX_CollectionsSettings_UpdatedByUserId] ON [platform].[CollectionsSettings] ([UpdatedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016055942_Collections'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261016055942_Collections', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE TABLE [platform].[DeviceLinks] (
+        [Id] uniqueidentifier NOT NULL,
+        [Kind] int NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [PlatformTenantRegistrationId] uniqueidentifier NULL,
+        [TokenHash] varchar(64) NOT NULL,
+        [ExpiresUtc] datetimeoffset NOT NULL,
+        [UsedUtc] datetimeoffset NULL,
+        [VoidedUtc] datetimeoffset NULL,
+        [Tries] int NOT NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_DeviceLinks] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_DeviceLinks_TenantRegistrations_PlatformTenantRegistrationId] FOREIGN KEY ([PlatformTenantRegistrationId]) REFERENCES [platform].[TenantRegistrations] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_DeviceLinks_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE TABLE [platform].[Devices] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [Number] varchar(12) NOT NULL,
+        [Name] nvarchar(80) NOT NULL,
+        [Kind] int NOT NULL,
+        [Proof] int NOT NULL,
+        [PublicKey] varchar(200) NULL,
+        [SecretHash] varchar(64) NULL,
+        [SecretIssuedUtc] datetimeoffset NULL,
+        [PreviousSecretHash] varchar(64) NULL,
+        [PreviousSecretValidUntilUtc] datetimeoffset NULL,
+        [Status] int NOT NULL,
+        [SeatHeld] bit NOT NULL,
+        [Reason] int NULL,
+        [RequestedByReference] nvarchar(100) NULL,
+        [RequestedByName] nvarchar(120) NULL,
+        [ApprovedUtc] datetimeoffset NULL,
+        [ReleaseRequestedUtc] datetimeoffset NULL,
+        [EndedUtc] datetimeoffset NULL,
+        [EndedByTenant] bit NOT NULL,
+        [LastSeenUtc] datetimeoffset NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_Devices] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_Devices_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE TABLE [platform].[TenantLicensing] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [SeatsInUse] int NOT NULL,
+        [LastDeviceNumber] int NOT NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_TenantLicensing] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TenantLicensing_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE TABLE [platform].[DeviceChallenges] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformDeviceId] uniqueidentifier NOT NULL,
+        [ChallengeHash] varchar(64) NOT NULL,
+        [ExpiresUtc] datetimeoffset NOT NULL,
+        [UsedUtc] datetimeoffset NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_DeviceChallenges] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_DeviceChallenges_Devices_PlatformDeviceId] FOREIGN KEY ([PlatformDeviceId]) REFERENCES [platform].[Devices] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE TABLE [platform].[DeviceEvents] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [PlatformDeviceId] uniqueidentifier NULL,
+        [EventCode] varchar(100) NOT NULL,
+        [ActorReference] nvarchar(100) NULL,
+        [ActorName] nvarchar(120) NULL,
+        [ActorUserId] uniqueidentifier NULL,
+        [Reason] int NULL,
+        [Note] nvarchar(500) NULL,
+        [Arguments] nvarchar(max) NOT NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_DeviceEvents] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_DeviceEvents_Devices_PlatformDeviceId] FOREIGN KEY ([PlatformDeviceId]) REFERENCES [platform].[Devices] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_DeviceEvents_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_DeviceEvents_Users_ActorUserId] FOREIGN KEY ([ActorUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_DeviceChallenges_ChallengeHash] ON [platform].[DeviceChallenges] ([ChallengeHash]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE INDEX [IX_DeviceChallenges_PlatformDeviceId] ON [platform].[DeviceChallenges] ([PlatformDeviceId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE INDEX [IX_DeviceEvents_ActorUserId] ON [platform].[DeviceEvents] ([ActorUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE INDEX [IX_DeviceEvents_PlatformDeviceId_CreatedUtc] ON [platform].[DeviceEvents] ([PlatformDeviceId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE INDEX [IX_DeviceEvents_PlatformTenantId_EventCode_CreatedUtc] ON [platform].[DeviceEvents] ([PlatformTenantId], [EventCode], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE INDEX [IX_DeviceLinks_PlatformTenantId_Kind] ON [platform].[DeviceLinks] ([PlatformTenantId], [Kind]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE INDEX [IX_DeviceLinks_PlatformTenantRegistrationId] ON [platform].[DeviceLinks] ([PlatformTenantRegistrationId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_DeviceLinks_TokenHash] ON [platform].[DeviceLinks] ([TokenHash]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Devices_PlatformTenantId_Number] ON [platform].[Devices] ([PlatformTenantId], [Number]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE INDEX [IX_Devices_PlatformTenantId_Status] ON [platform].[Devices] ([PlatformTenantId], [Status]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    EXEC(N'CREATE INDEX [IX_Devices_SecretHash] ON [platform].[Devices] ([SecretHash]) WHERE [SecretHash] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE INDEX [IX_Devices_Status_CreatedUtc] ON [platform].[Devices] ([Status], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_TenantLicensing_PlatformTenantId] ON [platform].[TenantLicensing] ([PlatformTenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016074231_Licensing'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261016074231_Licensing', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016083010_Zelle'
+)
+BEGIN
+    CREATE TABLE [platform].[ZelleAccounts] (
+        [Id] uniqueidentifier NOT NULL,
+        [Key] varchar(20) NOT NULL,
+        [Enabled] bit NOT NULL,
+        [RecipientName] nvarchar(100) NOT NULL,
+        [Email] nvarchar(254) NULL,
+        [Tag] nvarchar(50) NULL,
+        [Phone] varchar(32) NULL,
+        [QrCode] varbinary(max) NULL,
+        [QrCodeContentType] varchar(20) NULL,
+        [QrCodeVersion] int NOT NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_ZelleAccounts] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_ZelleAccounts_Users_UpdatedByUserId] FOREIGN KEY ([UpdatedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016083010_Zelle'
+)
+BEGIN
+    CREATE TABLE [platform].[ZelleClaims] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [PlatformInvoiceId] uniqueidentifier NOT NULL,
+        [InvoiceNumber] varchar(32) NOT NULL,
+        [CurrencyCode] char(3) NOT NULL,
+        [Amount] decimal(18,2) NOT NULL,
+        [SentOn] date NOT NULL,
+        [SenderName] nvarchar(100) NOT NULL,
+        [Reference] nvarchar(60) NOT NULL,
+        [Source] int NOT NULL,
+        [Status] int NOT NULL,
+        [ReceivedAmount] decimal(18,2) NULL,
+        [ReceivedUtc] datetimeoffset NULL,
+        [PlatformPaymentId] uniqueidentifier NULL,
+        [RejectReason] nvarchar(500) NULL,
+        [StaffNote] nvarchar(1000) NULL,
+        [DecidedByUserId] uniqueidentifier NULL,
+        [DecidedUtc] datetimeoffset NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_ZelleClaims] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_ZelleClaims_Invoices_PlatformInvoiceId] FOREIGN KEY ([PlatformInvoiceId]) REFERENCES [platform].[Invoices] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_ZelleClaims_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_ZelleClaims_Users_DecidedByUserId] FOREIGN KEY ([DecidedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016083010_Zelle'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_ZelleAccounts_Key] ON [platform].[ZelleAccounts] ([Key]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016083010_Zelle'
+)
+BEGIN
+    CREATE INDEX [IX_ZelleAccounts_UpdatedByUserId] ON [platform].[ZelleAccounts] ([UpdatedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016083010_Zelle'
+)
+BEGIN
+    CREATE INDEX [IX_ZelleClaims_DecidedByUserId] ON [platform].[ZelleClaims] ([DecidedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016083010_Zelle'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_ZelleClaims_OneWaiting] ON [platform].[ZelleClaims] ([PlatformInvoiceId]) WHERE [Status] = 1');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016083010_Zelle'
+)
+BEGIN
+    CREATE INDEX [IX_ZelleClaims_PlatformTenantId_Status] ON [platform].[ZelleClaims] ([PlatformTenantId], [Status]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016083010_Zelle'
+)
+BEGIN
+    CREATE INDEX [IX_ZelleClaims_Status_CreatedUtc] ON [platform].[ZelleClaims] ([Status], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016083010_Zelle'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261016083010_Zelle', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    ALTER TABLE [platform].[CompanyProfile] ADD [SupportEmail] nvarchar(254) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    ALTER TABLE [platform].[CompanyProfile] ADD [SupportPhone] varchar(32) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE TABLE [platform].[LegalDocuments] (
+        [Id] uniqueidentifier NOT NULL,
+        [Kind] int NOT NULL,
+        [Version] nvarchar(20) NOT NULL,
+        [Status] int NOT NULL,
+        [AcceptanceRequired] bit NOT NULL,
+        [EffectiveUtc] datetimeoffset NULL,
+        [DeadlineUtc] datetimeoffset NULL,
+        [PublishedUtc] datetimeoffset NULL,
+        [PublishedByUserId] uniqueidentifier NULL,
+        [CreatedByUserId] uniqueidentifier NOT NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_LegalDocuments] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_LegalDocuments_Users_CreatedByUserId] FOREIGN KEY ([CreatedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_LegalDocuments_Users_PublishedByUserId] FOREIGN KEY ([PublishedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE TABLE [platform].[LegalDocumentFiles] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformLegalDocumentId] uniqueidentifier NOT NULL,
+        [Language] varchar(8) NOT NULL,
+        [Content] varbinary(max) NOT NULL,
+        [Sha256] char(64) NOT NULL,
+        [SizeBytes] int NOT NULL,
+        [Summary] nvarchar(2000) NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_LegalDocumentFiles] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_LegalDocumentFiles_LegalDocuments_PlatformLegalDocumentId] FOREIGN KEY ([PlatformLegalDocumentId]) REFERENCES [platform].[LegalDocuments] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE TABLE [platform].[LegalDocumentParts] (
+        [Id] int NOT NULL IDENTITY,
+        [IncludedDocumentId] uniqueidentifier NOT NULL,
+        [Kind] int NOT NULL,
+        [Version] nvarchar(20) NOT NULL,
+        [PlatformLegalDocumentId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_LegalDocumentParts] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_LegalDocumentParts_LegalDocuments_IncludedDocumentId] FOREIGN KEY ([IncludedDocumentId]) REFERENCES [platform].[LegalDocuments] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_LegalDocumentParts_LegalDocuments_PlatformLegalDocumentId] FOREIGN KEY ([PlatformLegalDocumentId]) REFERENCES [platform].[LegalDocuments] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE TABLE [platform].[TenantTermsAcceptances] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [PlatformLegalDocumentId] uniqueidentifier NOT NULL,
+        [Version] nvarchar(20) NOT NULL,
+        [Sha256] char(64) NOT NULL,
+        [Language] varchar(8) NOT NULL,
+        [Source] int NOT NULL,
+        [AcceptedUtc] datetimeoffset NOT NULL,
+        [ActorReference] nvarchar(100) NULL,
+        [ActorName] nvarchar(120) NULL,
+        [ActorRole] varchar(40) NULL,
+        [ClientIp] varchar(45) NULL,
+        [UserAgent] nvarchar(400) NULL,
+        [PlatformTenantRegistrationId] uniqueidentifier NULL,
+        [RecordedByUserId] uniqueidentifier NULL,
+        [Reason] nvarchar(500) NULL,
+        [Evidence] varbinary(max) NULL,
+        [EvidenceContentType] varchar(40) NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_TenantTermsAcceptances] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TenantTermsAcceptances_LegalDocuments_PlatformLegalDocumentId] FOREIGN KEY ([PlatformLegalDocumentId]) REFERENCES [platform].[LegalDocuments] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_TenantTermsAcceptances_TenantRegistrations_PlatformTenantRegistrationId] FOREIGN KEY ([PlatformTenantRegistrationId]) REFERENCES [platform].[TenantRegistrations] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_TenantTermsAcceptances_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_TenantTermsAcceptances_Users_RecordedByUserId] FOREIGN KEY ([RecordedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE TABLE [platform].[TermsReminders] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [PlatformLegalDocumentId] uniqueidentifier NOT NULL,
+        [Step] int NOT NULL,
+        [Language] varchar(8) NOT NULL,
+        [SentByUserId] uniqueidentifier NULL,
+        [Reason] nvarchar(500) NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_TermsReminders] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TermsReminders_LegalDocuments_PlatformLegalDocumentId] FOREIGN KEY ([PlatformLegalDocumentId]) REFERENCES [platform].[LegalDocuments] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_TermsReminders_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_TermsReminders_Users_SentByUserId] FOREIGN KEY ([SentByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_LegalDocumentFiles_PlatformLegalDocumentId_Language] ON [platform].[LegalDocumentFiles] ([PlatformLegalDocumentId], [Language]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE INDEX [IX_LegalDocumentParts_IncludedDocumentId] ON [platform].[LegalDocumentParts] ([IncludedDocumentId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE INDEX [IX_LegalDocumentParts_PlatformLegalDocumentId] ON [platform].[LegalDocumentParts] ([PlatformLegalDocumentId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE INDEX [IX_LegalDocuments_CreatedByUserId] ON [platform].[LegalDocuments] ([CreatedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE INDEX [IX_LegalDocuments_Kind_PublishedUtc] ON [platform].[LegalDocuments] ([Kind], [PublishedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_LegalDocuments_Kind_Version] ON [platform].[LegalDocuments] ([Kind], [Version]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_LegalDocuments_OnePublished] ON [platform].[LegalDocuments] ([Kind]) WHERE [Status] = 2');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE INDEX [IX_LegalDocuments_PublishedByUserId] ON [platform].[LegalDocuments] ([PublishedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE INDEX [IX_TenantTermsAcceptances_PlatformLegalDocumentId] ON [platform].[TenantTermsAcceptances] ([PlatformLegalDocumentId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_TenantTermsAcceptances_PlatformTenantId_PlatformLegalDocumentId] ON [platform].[TenantTermsAcceptances] ([PlatformTenantId], [PlatformLegalDocumentId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE INDEX [IX_TenantTermsAcceptances_PlatformTenantRegistrationId] ON [platform].[TenantTermsAcceptances] ([PlatformTenantRegistrationId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE INDEX [IX_TenantTermsAcceptances_RecordedByUserId] ON [platform].[TenantTermsAcceptances] ([RecordedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_TermsReminders_OncePerStep] ON [platform].[TermsReminders] ([PlatformTenantId], [PlatformLegalDocumentId], [Step]) WHERE [Step] <> 20');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE INDEX [IX_TermsReminders_PlatformLegalDocumentId] ON [platform].[TermsReminders] ([PlatformLegalDocumentId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE INDEX [IX_TermsReminders_PlatformTenantId_CreatedUtc] ON [platform].[TermsReminders] ([PlatformTenantId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    CREATE INDEX [IX_TermsReminders_SentByUserId] ON [platform].[TermsReminders] ([SentByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016091612_Legal'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261016091612_Legal', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016110140_Contracts'
+)
+BEGIN
+    CREATE TABLE [platform].[PublishedEvents] (
+        [Id] uniqueidentifier NOT NULL,
+        [Sequence] bigint NOT NULL IDENTITY,
+        [Type] varchar(100) NOT NULL,
+        [PlatformTenantId] uniqueidentifier NULL,
+        [OutboxMessageId] uniqueidentifier NOT NULL,
+        [Payload] nvarchar(max) NOT NULL,
+        [OccurredUtc] datetimeoffset NOT NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_PublishedEvents] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016110140_Contracts'
+)
+BEGIN
+    CREATE INDEX [IX_PublishedEvents_CreatedUtc] ON [platform].[PublishedEvents] ([CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016110140_Contracts'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_PublishedEvents_OutboxMessageId_Type] ON [platform].[PublishedEvents] ([OutboxMessageId], [Type]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016110140_Contracts'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_PublishedEvents_Sequence] ON [platform].[PublishedEvents] ([Sequence]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261016110140_Contracts'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261016110140_Contracts', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
 -- =========================================================
 -- 3. LOGINS AND GRANTS (D-1)
 -- Skipped when the passwords in section 0 are empty.
@@ -2079,6 +3845,17 @@ BEGIN
     DENY UPDATE, DELETE ON OBJECT::[platform].[TenantLifecycleEvents] TO [vixly_platform_app];
     DENY UPDATE, DELETE ON OBJECT::[platform].[TenantNotes] TO [vixly_platform_app];
     DENY UPDATE, DELETE ON OBJECT::[platform].[SubscriptionEvents] TO [vixly_platform_app];
+    -- Invoice history is append-only, and a stored PDF is never changed (Slice 4, D-B10).
+    DENY UPDATE, DELETE ON OBJECT::[platform].[InvoiceEvents] TO [vixly_platform_app];
+    DENY UPDATE, DELETE ON OBJECT::[platform].[BillingDocuments] TO [vixly_platform_app];
+    -- Collections history is append-only (Slice 6, D-C15).
+    DENY UPDATE, DELETE ON OBJECT::[platform].[CollectionCaseEvents] TO [vixly_platform_app];
+    -- Device and licensing history is append-only (Slice 7, D-L14).
+    DENY UPDATE, DELETE ON OBJECT::[platform].[DeviceEvents] TO [vixly_platform_app];
+    -- Terms acceptances are evidence: never changed or deleted (Slice 8).
+    DENY UPDATE, DELETE ON OBJECT::[platform].[TenantTermsAcceptances] TO [vixly_platform_app];
+    -- Slice 9: published events never change; old ones are removed by the event feed clock.
+    DENY UPDATE ON OBJECT::[platform].[PublishedEvents] TO [vixly_platform_app];
 
     -- The migrator changes the platform schema only.
     GRANT ALTER, CONTROL ON SCHEMA::[platform] TO [vixly_platform_migrator];

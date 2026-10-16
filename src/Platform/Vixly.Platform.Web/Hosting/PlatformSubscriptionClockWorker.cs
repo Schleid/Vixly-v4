@@ -13,7 +13,13 @@ namespace Vixly.Platform.Web.Hosting;
 //
 // RESPONSIBILITIES:
 // - At start and then every interval, process due subscriptions
+// - Then mark unpaid invoices past their due date (Billing, D-B8)
 //   in a fresh scope
+// - Then run the payments clock (Slice 5): automatic charges,
+//   waiting refunds, stale card transactions
+// - Then collections (Slice 6) and licensing (Slice 7): device
+//   requests left unapproved expire
+// - Then legal (Slice 8): Terms notices and reminders
 // - Log failures without stopping
 //
 // IMPORTANT NOTES:
@@ -60,6 +66,60 @@ public sealed class PlatformSubscriptionClockWorker : BackgroundService
                 if (processed > 0)
                 {
                     _logger.LogInformation("Subscription clock processed {Count} subscription(s).", processed);
+                }
+
+                // Billing (Slice 4, D-B8): unpaid invoices past their due date.
+                await using AsyncServiceScope billing = _scopes.CreateAsyncScope();
+                int overdue = await billing.ServiceProvider.GetRequiredService<PlatformBillingClock>().ProcessOverdueAsync(stoppingToken);
+
+                if (overdue > 0)
+                {
+                    _logger.LogInformation("Billing clock marked {Count} invoice(s) past due.", overdue);
+                }
+
+                // Card payments (Slice 5): automatic charges, waiting refunds, stale transactions.
+                await using AsyncServiceScope payments = _scopes.CreateAsyncScope();
+                int handled = await payments.ServiceProvider.GetRequiredService<PlatformPaymentsClock>().RunAsync(stoppingToken);
+
+                if (handled > 0)
+                {
+                    _logger.LogInformation("Payments clock handled {Count} card transaction(s).", handled);
+                }
+
+                // Collections (Slice 6): reminders, retries, blocks and clearing, one tenant per commit.
+                await using AsyncServiceScope collections = _scopes.CreateAsyncScope();
+                int checkedTenants = await collections.ServiceProvider.GetRequiredService<PlatformCollectionsClock>().RunAsync(stoppingToken);
+
+                if (checkedTenants > 0)
+                {
+                    _logger.LogInformation("Collections clock updated {Count} tenant(s).", checkedTenants);
+                }
+
+                // Licensing (Slice 7): device requests nobody approved within the limit expire.
+                await using AsyncServiceScope licensing = _scopes.CreateAsyncScope();
+                int expired = await licensing.ServiceProvider.GetRequiredService<PlatformLicensingClock>().RunAsync(stoppingToken);
+
+                if (expired > 0)
+                {
+                    _logger.LogInformation("Licensing clock expired {Count} device request(s).", expired);
+                }
+
+                // Legal (Slice 8): Terms notices and reminders, each step once per tenant.
+                await using AsyncServiceScope legal = _scopes.CreateAsyncScope();
+                int reminded = await legal.ServiceProvider.GetRequiredService<PlatformLegalClock>().RunAsync(stoppingToken);
+
+                if (reminded > 0)
+                {
+                    _logger.LogInformation("Legal clock queued {Count} Terms notice(s).", reminded);
+                }
+
+                // Event feed (Slice 9): remove public events past 30 days.
+                await using AsyncServiceScope feed = _scopes.CreateAsyncScope();
+                int pruned = await feed.ServiceProvider.GetRequiredService<PlatformEventFeedClock>().RunAsync(stoppingToken);
+
+                if (pruned > 0)
+                {
+                    _logger.LogInformation("Event feed clock removed {Count} old event(s).", pruned);
                 }
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)

@@ -38,6 +38,7 @@ internal sealed class PlatformSubscriptionConfiguration : IEntityTypeConfigurati
         builder.Ignore(subscription => subscription.IsCurrent);
         builder.Ignore(subscription => subscription.ActiveDiscount);
         builder.Ignore(subscription => subscription.PendingDiscount);
+        builder.Ignore(subscription => subscription.PendingCharges);
         builder.Property(subscription => subscription.SetupFeeOverride).HasPrecision(19, 4);
 
         builder.OwnsMany(subscription => subscription.Discounts, discount =>

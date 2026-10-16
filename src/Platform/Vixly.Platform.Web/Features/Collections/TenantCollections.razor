@@ -1,0 +1,53 @@
+﻿@*
+=========================================================
+FILE: TenantCollections.razor
+
+PURPOSE:
+The Collections part of a tenant's Billing section: the open
+case, if any, with its stage and a link to the case page.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Hidden for readers without platform.collections.view
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantCollectionsPresenter>
+@inject IStringLocalizer<PlatformText> T
+
+@if (Presenter.State.Loaded && Presenter.State.Summary is { } summary)
+{
+    <div id="tenant-collections">
+        <h3>@T["ui.collections.title"]</h3>
+        @if (summary.OpenCase is { } open)
+        {
+            <p>
+                <VxStatusBadge Status="@CollectionsDisplay.StageBadge(open.Stage)" Text="@T[CollectionsDisplay.StageKey(open.Stage)]" />
+                @VixlyText.Format(T, "ui.collections.tenant_summary", new Dictionary<string, object> { ["amount"] = CollectionsDisplay.Amounts(open.Overdue), ["date"] = CollectionsDisplay.Date(open.OldestDueUtc) })
+                <a href="/collections/@open.CaseId">@T["ui.collections.open_case"]</a>
+            </p>
+        }
+        else
+        {
+            <p class="vx-hint">@T["ui.collections.up_to_date"]</p>
+        }
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid TenantId { get; set; }
+
+    private Guid _loaded;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_loaded != TenantId)
+        {
+            _loaded = TenantId;
+            await Presenter.LoadAsync(TenantId);
+        }
+    }
+}

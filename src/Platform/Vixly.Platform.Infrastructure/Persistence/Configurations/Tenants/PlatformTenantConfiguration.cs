@@ -88,6 +88,10 @@ internal sealed class PlatformTenantConfiguration : IEntityTypeConfiguration<Pla
             });
         });
 
+        builder.Property(tenant => tenant.TaxId).HasMaxLength(Vixly.Platform.Domain.Billing.PlatformBillingLimits.TaxIdMaxLength);
+        builder.Property(tenant => tenant.TaxExemptionReason).HasMaxLength(Vixly.Platform.Domain.Billing.PlatformBillingLimits.ReasonMaxLength);
+        builder.Property(tenant => tenant.TaxExemptionReference).HasMaxLength(Vixly.Platform.Domain.Billing.PlatformBillingLimits.ReferenceMaxLength);
+
         builder.HasIndex(tenant => tenant.TenantCode).IsUnique();
         builder.HasIndex(tenant => tenant.CurrentSlug).IsUnique();
         builder.HasIndex(tenant => new { tenant.Status, tenant.CreatedUtc });

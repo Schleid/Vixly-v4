@@ -1,0 +1,153 @@
+﻿@*
+=========================================================
+FILE: DeviceView.razor
+
+PURPOSE:
+One tenant device: where it stands, who asked for it, the
+history, and the staff actions (decide a release under review,
+revoke) (Slice 7).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Device secrets and keys are never shown
+=========================================================
+*@
+@inherits PlatformPresenterComponent<DevicePresenter>
+@using Vixly.Platform.Application.Queries
+@using Vixly.Platform.Domain.Licensing
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.DoneKey is { } done)
+{
+    <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+}
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+@if (!Presenter.State.Loaded)
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+else if (Presenter.State.Detail is { } detail)
+{
+    PlatformDeviceItem device = detail.Device;
+    <h1>@device.Number · @device.Name</h1>
+    <p><a href="/tenants/@device.PlatformTenantId#tenant-licensing">@device.TenantName</a> · <a href="/devices">@T["ui.devices.title"]</a></p>
+    <div id="device-overview"><VxCard Title="@T["ui.device.title"]">
+        <dl class="vx-facts">
+            <dt>@T["ui.devices.status"]</dt>
+            <dd>
+                <VxStatusBadge Status="@LicensingDisplay.Badge(device.Status, device.SeatHeld)" Text="@T[LicensingDisplay.StatusKey(device.Status)]" />
+                @if (device.Reason is { } reason)
+                {
+                    <span class="vx-hint">@T[LicensingDisplay.ReasonKey(reason)]</span>
+                }
+                @if (device.Status == PlatformDeviceStatus.Revoked && device.SeatHeld)
+                {
+                    <div class="vx-hint">@T["ui.device.seat_held"]</div>
+                }
+            </dd>
+            <dt>@T["ui.device.kind"]</dt>
+            <dd>@T[LicensingDisplay.KindKey(device.Kind)]</dd>
+            <dt>@T["ui.device.proof"]</dt>
+            <dd>@T[LicensingDisplay.ProofKey(device.Proof)]</dd>
+            <dt>@T["ui.device.requested_by"]</dt>
+            <dd>@(device.RequestedByName ?? "-") <span class="vx-hint">@PlatformDisplay.Utc(T, device.RequestedUtc)</span></dd>
+            @if (device.ApprovedUtc is { } approved)
+            {
+                <dt>@T["ui.device.approved"]</dt>
+                <dd>@PlatformDisplay.Utc(T, approved)</dd>
+            }
+            @if (device.ReleaseRequestedUtc is { } release)
+            {
+                <dt>@T["ui.device.release_requested"]</dt>
+                <dd>@PlatformDisplay.Utc(T, release)</dd>
+            }
+            @if (device.EndedUtc is { } ended)
+            {
+                <dt>@T["ui.device.ended"]</dt>
+                <dd>@PlatformDisplay.Utc(T, ended)</dd>
+            }
+            <dt>@T["ui.devices.last_seen"]</dt>
+            <dd>@(device.LastSeenUtc is { } seen ? PlatformDisplay.Utc(T, seen) : "-")</dd>
+        </dl>
+    </VxCard></div>
+
+    @if ((detail.Abilities.CanDecideReleases && LicensingDisplay.AwaitsReview(device)) || (detail.Abilities.CanManage && device.Status is PlatformDeviceStatus.Active or PlatformDeviceStatus.ReleasePending or PlatformDeviceStatus.Pending))
+    {
+        <div id="device-actions"><VxCard Title="@T["ui.device.actions"]">
+            <form class="vx-form" @onsubmit="() => RunAsync(_choice)">
+                <label for="device-note">@T["ui.device.note"]</label>
+                <textarea id="device-note" @bind="_note" maxlength="1000" rows="3" required aria-describedby="device-note-help"></textarea>
+                <p id="device-note-help" class="vx-hint">@T["ui.device.note_help"]</p>
+                <div class="vx-actions">
+                    @if (detail.Abilities.CanDecideReleases && LicensingDisplay.AwaitsReview(device))
+                    {
+                        <VxButton Variant="VxButtonVariant.Primary" Type="submit" OnClick="() => _choice = DevicePresenter.ApproveAction" IsBusy="@Presenter.IsBusy">@T["ui.device.approve_release"]</VxButton>
+                        <VxButton Type="submit" OnClick="() => _choice = DevicePresenter.RefuseAction" IsBusy="@Presenter.IsBusy">@T["ui.device.refuse_release"]</VxButton>
+                    }
+                    @if (detail.Abilities.CanManage && device.Status is PlatformDeviceStatus.Active or PlatformDeviceStatus.ReleasePending or PlatformDeviceStatus.Pending)
+                    {
+                        <VxButton Variant="VxButtonVariant.Danger" Type="submit" OnClick="() => _choice = DevicePresenter.RevokeAction" IsBusy="@Presenter.IsBusy">@T["ui.device.revoke"]</VxButton>
+                    }
+                </div>
+            </form>
+        </VxCard></div>
+    }
+
+    <div id="device-history"><VxCard Title="@T["ui.device.history"]">
+        <VxDataTable Items="detail.History" IsLoading="false">
+            <HeaderContent>
+                <th scope="col">@T["ui.audit.when"]</th>
+                <th scope="col">@T["ui.device.what"]</th>
+                <th scope="col">@T["ui.audit.who"]</th>
+            </HeaderContent>
+            <RowTemplate Context="line">
+                <td>@PlatformDisplay.Utc(T, line.OccurredUtc)</td>
+                <td>
+                    @LicensingDisplay.History(T, line.EventCode)
+                    @if (line.Reason is { } why)
+                    {
+                        <span class="vx-hint"> · @T[LicensingDisplay.ReasonKey(why)]</span>
+                    }
+                    @if (line.Note is { } text)
+                    {
+                        <div class="vx-hint">@text</div>
+                    }
+                </td>
+                <td>@(line.ActorName ?? T["ui.audit.no_actor"].Value)</td>
+            </RowTemplate>
+        </VxDataTable>
+    </VxCard></div>
+    @if (Presenter.State.StepUpAction is { } action)
+    {
+        <StepUpDialog OnConfirmed="() => RunAsync(action)" OnCancelled="Presenter.CancelStepUp" />
+    }
+}
+
+@code {
+    private string? _note;
+
+    private string _choice = DevicePresenter.ApproveAction;
+
+    [Parameter, EditorRequired]
+    public Guid DeviceId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(DeviceId);
+    }
+
+    private async Task RunAsync(string action)
+    {
+        if (await Presenter.RunAsync(DeviceId, action, _note))
+        {
+            _note = null;
+        }
+    }
+}

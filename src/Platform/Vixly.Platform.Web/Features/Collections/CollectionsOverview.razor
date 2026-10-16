@@ -1,0 +1,149 @@
+﻿@*
+=========================================================
+FILE: CollectionsOverview.razor
+
+PURPOSE:
+The collections dashboard and the paged list of cases, with
+stage, status, currency, extension and tenant filters.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Filters live in the URL so a view can be bookmarked
+=========================================================
+*@
+@inherits PlatformPresenterComponent<CollectionsOverviewPresenter>
+@using Vixly.Platform.Application.Queries
+@using Vixly.Platform.Domain.Collections
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+@if (Presenter.State.Dashboard is { } dashboard)
+{
+    <div id="collections-dashboard"><VxCard Title="@T["ui.collections.dashboard"]">
+        <dl class="vx-facts">
+            @foreach (PlatformCollectionStage stage in Enum.GetValues<PlatformCollectionStage>())
+            {
+                <dt>@T[CollectionsDisplay.StageKey(stage)]</dt>
+                <dd><a href="@Url(1, stage.ToString(), "Open")">@(dashboard.OpenByStage.TryGetValue(stage, out int count) ? count : 0)</a></dd>
+            }
+            <dt>@T["ui.collections.blocked_subscriptions"]</dt>
+            <dd>@dashboard.Blocked</dd>
+            <dt>@T["ui.collections.overdue_total"]</dt>
+            <dd>@CollectionsDisplay.Amounts(dashboard.Overdue)</dd>
+            @foreach (IGrouping<int, PlatformAgeingItem> bucket in dashboard.Ageing.GroupBy(item => item.Bucket))
+            {
+                <dt>@T[CollectionsDisplay.AgeingKey(bucket.Key)]</dt>
+                <dd>@CollectionsDisplay.Amounts(bucket.Select(item => new PlatformMoneyItem(item.CurrencyCode, item.Amount)).ToArray())</dd>
+            }
+            <dt>@T["ui.collections.extensions_ending"]</dt>
+            <dd>@dashboard.ExtensionsEndingSoon</dd>
+            <dt>@T["ui.collections.long_blocks"]</dt>
+            <dd>@dashboard.LongBlocks</dd>
+            <dt>@T["ui.collections.failed_retries"]</dt>
+            <dd>@dashboard.FailedRetries</dd>
+            <dt>@T["ui.collections.recovered"]</dt>
+            <dd>@CollectionsDisplay.Amounts(dashboard.Recovered)</dd>
+        </dl>
+    </VxCard></div>
+}
+
+<form class="vx-toolbar" role="search" @onsubmit="Apply">
+    <label for="collections-search">@T["ui.collections.search"]</label>
+    <input id="collections-search" @bind="_search" maxlength="100" />
+    <label for="collections-status">@T["ui.collections.status"]</label>
+    <select id="collections-status" @bind="_status">
+        <option value="">@T["ui.invoices.status.all"]</option>
+        @foreach (PlatformCollectionCaseStatus status in Enum.GetValues<PlatformCollectionCaseStatus>())
+        {
+            <option value="@status">@T[CollectionsDisplay.StatusKey(status)]</option>
+        }
+    </select>
+    <label for="collections-stage">@T["ui.collections.stage"]</label>
+    <select id="collections-stage" @bind="_stage">
+        <option value="">@T["ui.collections.stage.all"]</option>
+        @foreach (PlatformCollectionStage stage in Enum.GetValues<PlatformCollectionStage>())
+        {
+            <option value="@stage">@T[CollectionsDisplay.StageKey(stage)]</option>
+        }
+    </select>
+    <label for="collections-currency">@T["ui.collections.currency"]</label>
+    <input id="collections-currency" @bind="_currency" maxlength="3" size="4" />
+    <label><input type="checkbox" @bind="_extension" /> @T["ui.collections.in_extension"]</label>
+    <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
+</form>
+<p class="vx-hint">@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.collections.count", "count", Presenter.State.TotalCount) : T["ui.common.loading"].Value)</p>
+<div id="collections-cases"><CollectionCaseTable Items="Presenter.State.Items" /></div>
+@if (Presenter.State.Loaded && Presenter.State.TotalPages > 1)
+{
+    <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="page => Navigation.NavigateTo(Url(page, _stage, _status))" />
+}
+
+@code {
+    private string _status = string.Empty;
+
+    private string _stage = string.Empty;
+
+    private string? _currency;
+
+    private string? _search;
+
+    private bool _extension;
+
+    [Parameter]
+    public string? Status { get; set; }
+
+    [Parameter]
+    public string? Stage { get; set; }
+
+    [Parameter]
+    public string? Currency { get; set; }
+
+    [Parameter]
+    public bool Extension { get; set; }
+
+    [Parameter]
+    public string? Search { get; set; }
+
+    [Parameter]
+    public int? Page { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        PlatformCollectionCaseStatus? status = Enum.TryParse(Status, true, out PlatformCollectionCaseStatus parsedStatus) ? parsedStatus : null;
+        PlatformCollectionStage? stage = Enum.TryParse(Stage, true, out PlatformCollectionStage parsedStage) ? parsedStage : null;
+        _status = status?.ToString() ?? string.Empty;
+        _stage = stage?.ToString() ?? string.Empty;
+        _currency = Currency;
+        _search = Search;
+        _extension = Extension;
+        return Presenter.LoadAsync(status, stage, Currency, Extension ? true : null, Search, Page ?? 1);
+    }
+
+    private void Apply()
+    {
+        Navigation.NavigateTo(Url(1, _stage, _status));
+    }
+
+    private string Url(int page, string? stage, string? status)
+    {
+        Dictionary<string, string?> query = new()
+        {
+            ["status"] = string.IsNullOrEmpty(status) ? null : status,
+            ["stage"] = string.IsNullOrEmpty(stage) ? null : stage,
+            ["currency"] = string.IsNullOrWhiteSpace(_currency) ? null : _currency.Trim().ToUpperInvariant(),
+            ["extension"] = _extension ? "true" : null,
+            ["search"] = string.IsNullOrWhiteSpace(_search) ? null : _search.Trim(),
+            ["page"] = page > 1 ? page.ToString(System.Globalization.CultureInfo.InvariantCulture) : null
+        };
+
+        return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString("/collections", query.Where(pair => pair.Value is not null));
+    }
+}

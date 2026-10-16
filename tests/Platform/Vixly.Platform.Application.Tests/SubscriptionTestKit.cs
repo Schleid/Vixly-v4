@@ -28,6 +28,8 @@ internal sealed class SubscriptionTestKit
 
     public FakeSalesStore Sales { get; } = new();
 
+    public FakeCollectionsStore Collections { get; } = new();
+
     public PlatformSalesAdministration SalesAdministration()
     {
         return new PlatformSalesAdministration(
@@ -69,7 +71,7 @@ internal sealed class SubscriptionTestKit
             Store,
             Tenants.Audit(),
             Tenants.Outbox(),
-            Store,
+            Collections,
             Tenants.Clock);
     }
 

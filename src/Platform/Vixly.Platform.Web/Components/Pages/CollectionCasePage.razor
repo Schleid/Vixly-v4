@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: CollectionCasePage.razor
+
+PURPOSE:
+One collections case.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/collections/{CaseId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.collections.case"]</PageTitle>
+<CollectionCaseView CaseId="CaseId" />
+
+@code {
+    [Parameter]
+    public Guid CaseId { get; set; }
+}

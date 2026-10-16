@@ -288,6 +288,56 @@ public sealed class PlatformTenantRegistration : AuditableEntity
     }
 
     // =====================================================
+    // METHOD: PAID (Slice 5)
+    // =====================================================
+    // The registration invoice was paid: the owner can now set up the account. Returns false when
+    // the registration is not waiting for payment, so a replayed "invoice paid" changes nothing.
+    public bool RecordPaid(DateTimeOffset utcNow)
+    {
+        if (Status != PlatformTenantRegistrationStatus.PendingPayment)
+        {
+            return false;
+        }
+
+        Status = PlatformTenantRegistrationStatus.PendingAccountSetup;
+        MarkAsModified(utcNow);
+        return true;
+    }
+
+    // =====================================================
+    // METHOD: FIRST DEVICE (Slice 7, D-L7)
+    // =====================================================
+    // Account setup is done: the owner gets a first-device link. False when the registration is not there yet.
+    public bool StartFirstDevice(DateTimeOffset utcNow)
+    {
+        if (Status == PlatformTenantRegistrationStatus.PendingFirstDeviceRegistration)
+        {
+            return true;
+        }
+
+        if (Status != PlatformTenantRegistrationStatus.PendingAccountSetup)
+        {
+            return false;
+        }
+
+        Status = PlatformTenantRegistrationStatus.PendingFirstDeviceRegistration;
+        MarkAsModified(utcNow);
+        return true;
+    }
+
+    // The first device enrolled from the link: the registration is complete.
+    public bool CompleteWithFirstDevice(DateTimeOffset utcNow)
+    {
+        if (Status != PlatformTenantRegistrationStatus.PendingFirstDeviceRegistration)
+        {
+            return false;
+        }
+
+        Close(PlatformTenantRegistrationStatus.Completed, utcNow);
+        return true;
+    }
+
+    // =====================================================
     // METHOD: CANCEL
     // =====================================================
     public void Cancel(Guid actorUserId, string? reason, DateTimeOffset utcNow)

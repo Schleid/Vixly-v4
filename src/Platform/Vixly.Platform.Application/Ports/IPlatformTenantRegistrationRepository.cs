@@ -22,6 +22,8 @@ public interface IPlatformTenantRegistrationRepository
 
     Task<PlatformTenantRegistration?> FindByAccessHashAsync(string accessTokenHash, CancellationToken cancellationToken);
 
+    Task<PlatformTenantRegistration?> FindByTenantAsync(Guid platformTenantId, CancellationToken cancellationToken);
+
     Task<PlatformRegistrationToken?> FindTokenByHashAsync(string tokenHash, CancellationToken cancellationToken);
 
     Task<IReadOnlyList<PlatformRegistrationToken>> ListUnusedTokensAsync(Guid registrationId, CancellationToken cancellationToken);

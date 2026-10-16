@@ -1,0 +1,34 @@
+﻿@*
+=========================================================
+FILE: CardTransactionsPage.razor
+
+PURPOSE:
+All card charges and refunds.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/payments/transactions"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.card_payments.list_title"]</PageTitle>
+<h1>@T["ui.card_payments.list_title"]</h1>
+<p><a href="/invoices">@T["ui.invoices.title"]</a> · <a href="/payments/settings">@T["ui.payments_settings.title"]</a></p>
+<CardTransactionList Status="@Status" Origin="@Origin" Disputed="@(Disputed ?? false)" Page="@Page" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Origin { get; set; }
+
+    [SupplyParameterFromQuery]
+    public bool? Disputed { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

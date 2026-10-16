@@ -129,6 +129,11 @@ internal sealed class FakeTenantStore :
         return Task.FromResult(Registrations.FirstOrDefault(registration => registration.AccessTokenHash == accessTokenHash));
     }
 
+    public Task<PlatformTenantRegistration?> FindByTenantAsync(Guid platformTenantId, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(Registrations.FirstOrDefault(registration => registration.PlatformTenantId == platformTenantId));
+    }
+
     public Task<PlatformRegistrationToken?> FindTokenByHashAsync(string tokenHash, CancellationToken cancellationToken)
     {
         return Task.FromResult(Tokens.FirstOrDefault(token => token.TokenHash == tokenHash));

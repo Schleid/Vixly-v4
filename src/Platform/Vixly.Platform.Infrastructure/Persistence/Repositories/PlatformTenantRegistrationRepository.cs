@@ -38,6 +38,14 @@ internal sealed class PlatformTenantRegistrationRepository : IPlatformTenantRegi
         return _context.TenantRegistrations.FirstOrDefaultAsync(item => item.AccessTokenHash == accessTokenHash, cancellationToken);
     }
 
+    public Task<PlatformTenantRegistration?> FindByTenantAsync(Guid platformTenantId, CancellationToken cancellationToken)
+    {
+        return _context.TenantRegistrations
+            .Where(item => item.PlatformTenantId == platformTenantId)
+            .OrderByDescending(item => item.CreatedUtc)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
     public Task<PlatformRegistrationToken?> FindTokenByHashAsync(string tokenHash, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(tokenHash);

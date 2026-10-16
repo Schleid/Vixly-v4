@@ -1,0 +1,37 @@
+﻿@*
+=========================================================
+FILE: DevicesPage.razor
+
+PURPOSE:
+Tenant devices, and the release review queue.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/devices"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.devices.title"]</PageTitle>
+<h1>@T["ui.devices.title"]</h1>
+<p><a href="/devices?review=true">@T["ui.devices.review_queue"]</a></p>
+<DevicesOverview Tenant="@Tenant" Status="@Status" Review="@(Review ?? false)" Search="@Search" Page="@Page" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public Guid? Tenant { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+
+    [SupplyParameterFromQuery]
+    public bool? Review { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Search { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

@@ -1,0 +1,182 @@
+﻿@*
+=========================================================
+FILE: InvoiceCredits.razor
+
+PURPOSE:
+Credit notes and voids of an invoice: request one, and approve
+or send back one requested by someone else (D-B6).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Void is offered only while nothing is paid; a credit can
+  never exceed what is left to credit
+- The person who asked never decides (four eyes)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<InvoiceCreditsPresenter>
+@using Vixly.Platform.Application.UseCases.Billing
+@using Vixly.Platform.Domain.Billing
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="invoice-credits"><VxCard Title="@T["ui.credit_notes.title"]">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    <VxDataTable Items="Invoice.Credits" IsLoading="false">
+        <HeaderContent>
+            <th scope="col">@T["ui.invoices.number"]</th>
+            <th scope="col">@T["ui.billing_document.amount"]</th>
+            <th scope="col">@T["ui.credit_notes.status"]</th>
+            <th scope="col">@T["ui.tenants.reason"]</th>
+            <th scope="col">@T["ui.approvals.requested_by"]</th>
+            <th scope="col">@T["ui.approvals.decision"]</th>
+            <th scope="col"><span class="vx-visually-hidden">@T["ui.subscriptions.actions"]</span></th>
+        </HeaderContent>
+        <RowTemplate Context="credit">
+            <td>
+                @if (credit.Number is { } number)
+                {
+                    <a href="@BillingDisplay.DocumentLink(PlatformBillingDocumentKind.CreditNote, credit.CreditId)" download>@number</a>
+                }
+                @if (credit.IsVoid)
+                {
+                    <VxStatusBadge Status="VxBadgeStatus.Deactivated" Text="@T["ui.billing_document.void"]" />
+                }
+            </td>
+            <td>@BillingDisplay.Money(credit.Amount, Invoice.CurrencyCode)</td>
+            <td>@T[BillingDisplay.CreditStatusKey(credit.Status)]</td>
+            <td>@credit.Reason</td>
+            <td>@credit.RequestedByName <span class="vx-hint">@PlatformDisplay.Utc(T, credit.RequestedUtc)</span></td>
+            <td>@credit.DecidedByName <span class="vx-hint">@credit.DecisionReason</span></td>
+            <td>
+                @if (credit.CanDecide && _mode == Mode.None)
+                {
+                    <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => Open(Mode.Decide, credit.CreditId)">@T["ui.approvals.decision"]</VxButton>
+                }
+            </td>
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.credit_notes.empty"]" />
+        </EmptyContent>
+    </VxDataTable>
+    @if (_mode is Mode.Credit or Mode.Void)
+    {
+        <form class="vx-form" @onsubmit="SubmitAsync">
+            <p>@T[_mode == Mode.Void ? "ui.credit_notes.void_help" : "ui.credit_notes.request_help"]</p>
+            @if (_mode == Mode.Credit)
+            {
+                <label for="credit-amount">@VixlyText.Format(T, "ui.discounts.amount_in", "currency", Invoice.CurrencyCode)</label>
+                <input id="credit-amount" type="number" min="0.01" step="0.01" max="@Remaining" @bind="_amount" required />
+            }
+            <label for="credit-reason">@T["ui.tenants.reason"]</label>
+            <textarea id="credit-reason" @bind="_reason" maxlength="500" required></textarea>
+            <div class="vx-actions">
+                <VxButton Variant="@(_mode == Mode.Void ? VxButtonVariant.Danger : VxButtonVariant.Primary)" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.credit_notes.submit"]</VxButton>
+                <VxButton OnClick="() => Open(Mode.None, null)">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else if (_mode == Mode.Decide)
+    {
+        <form class="vx-form" @onsubmit="() => DecideAsync(true)">
+            <p>@T["ui.credit_notes.decide_help"]</p>
+            <label for="credit-decision-reason">@T["ui.approvals.reason"]</label>
+            <textarea id="credit-decision-reason" @bind="_reason" maxlength="500" aria-describedby="credit-decision-help"></textarea>
+            <p id="credit-decision-help" class="vx-hint">@T["ui.approvals.reason_help"]</p>
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.approvals.approve"]</VxButton>
+                <VxButton Variant="VxButtonVariant.Danger" OnClick="() => DecideAsync(false)" IsBusy="@Presenter.IsBusy">@T["ui.approvals.reject"]</VxButton>
+                <VxButton OnClick="() => Open(Mode.None, null)">@T["ui.common.cancel"]</VxButton>
+            </div>
+        </form>
+    }
+    else if (CanRequest && Invoice.Status != PlatformInvoiceStatus.Void && !HasPending)
+    {
+        <div class="vx-actions">
+            @if (Remaining > 0m)
+            {
+                <VxButton OnClick="() => Open(Mode.Credit, null)">@T["ui.credit_notes.request"]</VxButton>
+            }
+            @if (Invoice.PaidTotal == 0m && Invoice.CreditedTotal == 0m)
+            {
+                <VxButton Variant="VxButtonVariant.Danger" OnClick="() => Open(Mode.Void, null)">@T["ui.credit_notes.request_void"]</VxButton>
+            }
+        </div>
+    }
+    @if (Presenter.State.StepUpPending)
+    {
+        <StepUpDialog OnConfirmed="() => DecideAsync(_approve)" OnCancelled="Presenter.CancelStepUp" />
+    }
+</VxCard></div>
+
+@code {
+    private enum Mode
+    {
+        None,
+        Credit,
+        Void,
+        Decide
+    }
+
+    private Mode _mode;
+
+    private Guid? _creditId;
+
+    private decimal? _amount;
+
+    private string? _reason;
+
+    private bool _approve;
+
+    [Parameter, EditorRequired]
+    public PlatformInvoiceDetail Invoice { get; set; } = null!;
+
+    [Parameter]
+    public bool CanRequest { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private decimal Remaining => Invoice.Total - Invoice.CreditedTotal;
+
+    private bool HasPending => Invoice.Credits.Any(credit => credit.Status == PlatformCreditNoteStatus.Requested);
+
+    private void Open(Mode mode, Guid? creditId)
+    {
+        _mode = mode;
+        _creditId = creditId;
+        _amount = null;
+        _reason = null;
+        Presenter.Clear();
+    }
+
+    private async Task SubmitAsync()
+    {
+        bool isVoid = _mode == Mode.Void;
+        await FinishAsync(await Presenter.RequestAsync(Invoice.PlatformInvoiceId, isVoid ? Remaining : _amount ?? 0m, isVoid, _reason));
+    }
+
+    private async Task DecideAsync(bool approve)
+    {
+        _approve = approve;
+        await FinishAsync(await Presenter.DecideAsync(Invoice.PlatformInvoiceId, _creditId!.Value, approve, _reason));
+    }
+
+    private async Task FinishAsync(bool done)
+    {
+        if (done)
+        {
+            _mode = Mode.None;
+            await OnChanged.InvokeAsync();
+        }
+    }
+}

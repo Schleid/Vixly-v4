@@ -1,0 +1,141 @@
+﻿@*
+=========================================================
+FILE: InvoiceCardPayments.razor
+
+PURPOSE:
+Card payments on an invoice: charges and refunds with the
+provider, charge the saved card, refund to the card against an
+approved credit note (D-P4, D-P6).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- A charge shows as Pending until the provider confirms it; the
+  payment and receipt then appear under Payments (D-P5)
+- The amount charged is the balance; it is never typed
+=========================================================
+*@
+@inherits PlatformPresenterComponent<InvoiceCardPaymentsPresenter>
+@using Vixly.Platform.Application.UseCases.Billing
+@using Vixly.Platform.Application.UseCases.Payments
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="invoice-card-payments"><VxCard Title="@T["ui.card_payments.title"]">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (Presenter.State.Payments is { } payments)
+    {
+        @if (!payments.CardPaymentsReady)
+        {
+            <p class="vx-hint">@T["ui.card_payments.not_ready"]</p>
+        }
+        <CardTransactionTable Items="payments.Transactions" ShowInvoice="false" />
+        <div class="vx-actions">
+            @if (payments.DefaultCard is { } card)
+            {
+                <span>@VixlyText.Format(T, "ui.card_payments.default_card", "card", PaymentsDisplay.Card(card.Brand, card.Last4))</span>
+                @if (payments.CanCharge)
+                {
+                    <VxButton Variant="VxButtonVariant.Primary" OnClick="ChargeAsync" IsBusy="@Presenter.IsBusy">@VixlyText.Format(T, "ui.card_payments.charge", "amount", BillingDisplay_Money())</VxButton>
+                }
+            }
+            else
+            {
+                <span class="vx-hint">@T["ui.card_payments.no_card"]</span>
+            }
+        </div>
+        @if (payments.CanRefund && payments.RefundableCredits.Count > 0)
+        {
+            <form class="vx-form" @onsubmit="RefundAsync">
+                <label for="card-refund-credit">@T["ui.card_payments.refund_credit"]</label>
+                <select id="card-refund-credit" @bind="_creditId">
+                    @foreach (PlatformRefundableCreditItem credit in payments.RefundableCredits)
+                    {
+                        <option value="@credit.CreditId">@credit.Number (@VixlyText.Format(T, "ui.card_payments.refundable", "amount", Vixly.Platform.Web.Features.Billing.BillingDisplay.Money(credit.Refundable, Invoice.CurrencyCode)))</option>
+                    }
+                </select>
+                <label for="card-refund-amount">@VixlyText.Format(T, "ui.discounts.amount_in", "currency", Invoice.CurrencyCode)</label>
+                <input id="card-refund-amount" type="number" min="0.01" step="0.01" @bind="_amount" required />
+                <div class="vx-actions">
+                    <VxButton Variant="VxButtonVariant.Danger" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.card_payments.refund"]</VxButton>
+                </div>
+            </form>
+        }
+    }
+    @if (Presenter.State.StepUpPending)
+    {
+        <StepUpDialog OnConfirmed="RetryAsync" OnCancelled="Presenter.CancelStepUp" />
+    }
+</VxCard></div>
+
+@code {
+    private Guid _creditId;
+
+    private decimal? _amount;
+
+    private bool _refunding;
+
+    // The parent re-renders often; reload only when the invoice really changed (one load at a time per circuit).
+    private string? _loadedKey;
+
+    [Parameter, EditorRequired]
+    public PlatformInvoiceDetail Invoice { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        string key = string.Join('|', Invoice.PlatformInvoiceId, Invoice.Status, Invoice.Balance, Invoice.PaidTotal, Invoice.CreditedTotal, Invoice.RefundOwed, Invoice.Payments.Count, Invoice.Credits.Count, Invoice.History.Count);
+
+        if (key == _loadedKey)
+        {
+            return;
+        }
+
+        _loadedKey = key;
+        await Presenter.LoadAsync(Invoice.PlatformInvoiceId);
+
+        if (Presenter.State.Payments?.RefundableCredits.FirstOrDefault() is { } first && _creditId == Guid.Empty)
+        {
+            _creditId = first.CreditId;
+        }
+    }
+
+    private string BillingDisplay_Money() => Vixly.Platform.Web.Features.Billing.BillingDisplay.Money(Invoice.Balance, Invoice.CurrencyCode);
+
+    private async Task ChargeAsync()
+    {
+        _refunding = false;
+
+        if (await Presenter.ChargeAsync(Invoice.PlatformInvoiceId))
+        {
+            await OnChanged.InvokeAsync();
+        }
+    }
+
+    private async Task RefundAsync()
+    {
+        _refunding = true;
+
+        if (await Presenter.RefundAsync(Invoice.PlatformInvoiceId, _creditId, _amount ?? 0m))
+        {
+            _amount = null;
+            await OnChanged.InvokeAsync();
+        }
+    }
+
+    private Task RetryAsync()
+    {
+        return _refunding ? RefundAsync() : ChargeAsync();
+    }
+}

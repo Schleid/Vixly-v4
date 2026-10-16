@@ -1,0 +1,31 @@
+﻿@*
+=========================================================
+FILE: ZelleClaimsPage.razor
+
+PURPOSE:
+Zelle payments customers reported, for staff to check.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/payments/zelle"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.zelle.title"]</PageTitle>
+<h1>@T["ui.zelle.title"]</h1>
+<p><a href="/payments/settings#zelle-settings">@T["ui.zelle_settings.title"]</a></p>
+<ZelleClaimsOverview Status="@Status" Search="@Search" Page="@Page" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Search { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

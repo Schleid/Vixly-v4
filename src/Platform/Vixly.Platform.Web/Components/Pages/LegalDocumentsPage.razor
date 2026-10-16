@@ -1,0 +1,28 @@
+﻿@*
+=========================================================
+FILE: LegalDocumentsPage.razor
+
+PURPOSE:
+Vixly's legal documents and their versions.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/legal"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.legal.title"]</PageTitle>
+<h1>@T["ui.legal.title"]</h1>
+<p><a href="/legal/register">@T["ui.legal.register"]</a></p>
+<LegalDocumentsOverview Kind="@Kind" Page="@Page" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Kind { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

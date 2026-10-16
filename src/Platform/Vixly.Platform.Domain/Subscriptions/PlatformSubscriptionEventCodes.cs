@@ -56,12 +56,17 @@ public static class PlatformSubscriptionEventCodes
     public const string ChargeAdded = "platform.subscription_history.charge_added";
     public const string ChargeCancelled = "platform.subscription_history.charge_cancelled";
     public const string SetupFeeChanged = "platform.subscription_history.setup_fee_changed";
+    public const string PastDue = "platform.subscription_history.past_due";
+    public const string InvoicePaid = "platform.subscription_history.invoice_paid";
+    public const string BlockedForNonPayment = "platform.subscription_history.blocked_for_non_payment";
+    public const string BlockLifted = "platform.subscription_history.block_lifted";
 
     public static IReadOnlyList<string> All { get; } = new[]
     {
         StartedTrial, StartedAwaitingPayment, Activated, OfflinePaymentRecorded, TrialExtended, TrialEnded, TrialExpired,
         Changed, ChangeScheduled, ScheduledChangeCancelled, Renewed, CancellationRequested, Resumed, Ended,
         SuspendedWithTenant, RestoredWithTenant, ActivatedNothingDue, DiscountRequested, DiscountApplied, DiscountApproved,
-        DiscountRejected, DiscountEnded, ChargeAdded, ChargeCancelled, SetupFeeChanged
+        DiscountRejected, DiscountEnded, ChargeAdded, ChargeCancelled, SetupFeeChanged, PastDue, InvoicePaid,
+        BlockedForNonPayment, BlockLifted
     };
 }

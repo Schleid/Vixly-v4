@@ -4846,4 +4846,2835 @@ Vixly</value>
   <data name="ui.offers.one_time_charges" xml:space="preserve">
     <value>One-time charges</value>
   </data>
+  <data name="platform.billing.invoice_not_found" xml:space="preserve">
+    <value>The invoice was not found.</value>
+  </data>
+  <data name="platform.billing.nothing_to_bill" xml:space="preserve">
+    <value>There is nothing to bill: the total is zero.</value>
+  </data>
+  <data name="platform.billing.line_invalid" xml:space="preserve">
+    <value>An invoice line is not valid.</value>
+  </data>
+  <data name="platform.billing.currency_invalid" xml:space="preserve">
+    <value>The currency is not valid.</value>
+  </data>
+  <data name="platform.billing.invoice_void" xml:space="preserve">
+    <value>This invoice is void.</value>
+  </data>
+  <data name="platform.billing.invoice_paid" xml:space="preserve">
+    <value>This invoice is already paid.</value>
+  </data>
+  <data name="platform.billing.amount_invalid" xml:space="preserve">
+    <value>Enter an amount greater than zero, to the cent.</value>
+  </data>
+  <data name="platform.billing.amount_above_balance" xml:space="preserve">
+    <value>The amount is more than the balance due.</value>
+  </data>
+  <data name="platform.billing.reference_required" xml:space="preserve">
+    <value>Enter the payment reference (not needed for cash).</value>
+  </data>
+  <data name="platform.billing.reference_too_long" xml:space="preserve">
+    <value>The reference is too long.</value>
+  </data>
+  <data name="platform.billing.note_too_long" xml:space="preserve">
+    <value>The note is too long.</value>
+  </data>
+  <data name="platform.billing.received_date_invalid" xml:space="preserve">
+    <value>The date received cannot be in the future or more than a year before the invoice.</value>
+  </data>
+  <data name="platform.billing.method_not_allowed" xml:space="preserve">
+    <value>Card payments come from the card provider; they cannot be recorded by hand.</value>
+  </data>
+  <data name="platform.billing.payment_not_found" xml:space="preserve">
+    <value>The payment was not found.</value>
+  </data>
+  <data name="platform.billing.payment_reversed" xml:space="preserve">
+    <value>This payment is already reversed.</value>
+  </data>
+  <data name="platform.billing.reason_required" xml:space="preserve">
+    <value>Enter a reason.</value>
+  </data>
+  <data name="platform.billing.reason_too_long" xml:space="preserve">
+    <value>The reason is too long.</value>
+  </data>
+  <data name="platform.billing.credit_above_remaining" xml:space="preserve">
+    <value>The credit is more than what is left to credit on this invoice.</value>
+  </data>
+  <data name="platform.billing.credit_pending" xml:space="preserve">
+    <value>A credit note for this invoice is already waiting for approval.</value>
+  </data>
+  <data name="platform.billing.credit_not_found" xml:space="preserve">
+    <value>The credit note was not found.</value>
+  </data>
+  <data name="platform.billing.credit_not_pending" xml:space="preserve">
+    <value>This credit note has already been decided.</value>
+  </data>
+  <data name="platform.billing.own_request" xml:space="preserve">
+    <value>You cannot decide on your own request.</value>
+  </data>
+  <data name="platform.billing.void_after_payment" xml:space="preserve">
+    <value>An invoice with payments cannot be voided; use a credit note.</value>
+  </data>
+  <data name="platform.billing.actor_required" xml:space="preserve">
+    <value>The person deciding is required.</value>
+  </data>
+  <data name="platform.billing.tax_rate_invalid" xml:space="preserve">
+    <value>Enter a tax rate between 0 and 100 %.</value>
+  </data>
+  <data name="platform.billing.tax_label_required" xml:space="preserve">
+    <value>Enter the tax label shown on invoices (for example VAT).</value>
+  </data>
+  <data name="platform.billing.country_invalid" xml:space="preserve">
+    <value>Choose a valid country.</value>
+  </data>
+  <data name="platform.billing.region_invalid" xml:space="preserve">
+    <value>The region is not valid.</value>
+  </data>
+  <data name="platform.billing.tax_rate_not_found" xml:space="preserve">
+    <value>The tax rate was not found.</value>
+  </data>
+  <data name="platform.billing.setting_invalid" xml:space="preserve">
+    <value>A billing setting is not valid.</value>
+  </data>
+  <data name="platform.billing.prefix_invalid" xml:space="preserve">
+    <value>Number prefixes are 1 to 8 capital letters or digits.</value>
+  </data>
+  <data name="platform.billing.text_too_long" xml:space="preserve">
+    <value>The text is too long.</value>
+  </data>
+  <data name="platform.billing.profile_invalid" xml:space="preserve">
+    <value>The company profile is not complete or not valid.</value>
+  </data>
+  <data name="platform.billing.logo_invalid" xml:space="preserve">
+    <value>The logo must be a PNG or JPEG of at most {maxKilobytes} KB.</value>
+  </data>
+  <data name="platform.billing.profile_missing" xml:space="preserve">
+    <value>Fill in the company profile in Billing settings before invoices can be issued.</value>
+  </data>
+  <data name="platform.billing.tax_id_too_long" xml:space="preserve">
+    <value>The tax ID is too long.</value>
+  </data>
+  <data name="platform.billing.document_not_found" xml:space="preserve">
+    <value>The document was not found.</value>
+  </data>
+  <data name="platform.billing.sequence_exhausted" xml:space="preserve">
+    <value>The number sequence for this year is used up.</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.invoice_issued" xml:space="preserve">
+    <value>Invoice issued</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.payment_recorded" xml:space="preserve">
+    <value>Payment recorded</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.payment_reversed" xml:space="preserve">
+    <value>Payment reversed</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.credit_requested" xml:space="preserve">
+    <value>Credit note requested</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.void_requested" xml:space="preserve">
+    <value>Void requested</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.credit_issued" xml:space="preserve">
+    <value>Credit note issued</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.credit_rejected" xml:space="preserve">
+    <value>Credit note sent back</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.invoice_voided" xml:space="preserve">
+    <value>Invoice voided</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.invoice_past_due" xml:space="preserve">
+    <value>Invoice past due</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.invoice_emailed" xml:space="preserve">
+    <value>Billing document emailed</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.settings_updated" xml:space="preserve">
+    <value>Billing settings changed</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.tax_rate_added" xml:space="preserve">
+    <value>Tax rate added</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.company_profile_updated" xml:space="preserve">
+    <value>Company profile changed</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.company_logo_updated" xml:space="preserve">
+    <value>Company logo changed</value>
+  </data>
+  <data name="ui.audit.action.platform.billing.tenant_tax_updated" xml:space="preserve">
+    <value>Tenant tax details changed</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.invoice_paid" xml:space="preserve">
+    <value>Subscription invoice paid</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.past_due" xml:space="preserve">
+    <value>Subscription past due</value>
+  </data>
+  <data name="ui.permission.platform.billing.view" xml:space="preserve">
+    <value>View invoices and payments</value>
+  </data>
+  <data name="ui.permission.platform.billing.record_payments" xml:space="preserve">
+    <value>Record and reverse payments</value>
+  </data>
+  <data name="ui.permission.platform.billing.request_credits" xml:space="preserve">
+    <value>Request credit notes and voids</value>
+  </data>
+  <data name="ui.permission.platform.billing.approve_credits" xml:space="preserve">
+    <value>Approve credit notes and voids</value>
+  </data>
+  <data name="ui.permission.platform.billing.configure" xml:space="preserve">
+    <value>Change billing settings, company profile and tax rates</value>
+  </data>
+  <data name="ui.permission_area.billing" xml:space="preserve">
+    <value>Billing</value>
+  </data>
+  <data name="ui.roles.system.billing_clerk" xml:space="preserve">
+    <value>Billing clerk</value>
+  </data>
+  <data name="ui.approvals.kind.credit_note" xml:space="preserve">
+    <value>Credit note</value>
+  </data>
+  <data name="ui.subscription_history.past_due" xml:space="preserve">
+    <value>Past due: invoice {invoice} is unpaid after its due date</value>
+  </data>
+  <data name="ui.subscription_history.invoice_paid" xml:space="preserve">
+    <value>Invoice {invoice} paid; period runs until {periodEnd}</value>
+  </data>
+  <data name="ui.invoice_history.issued" xml:space="preserve">
+    <value>Issued as {number}: {total} {currency}</value>
+  </data>
+  <data name="ui.invoice_history.emailed" xml:space="preserve">
+    <value>{number} emailed to the billing contact</value>
+  </data>
+  <data name="ui.invoice_history.payment_recorded" xml:space="preserve">
+    <value>Payment of {amount} {currency} recorded, receipt {receipt}</value>
+  </data>
+  <data name="ui.invoice_history.payment_reversed" xml:space="preserve">
+    <value>Payment of {amount} {currency} reversed (receipt {receipt})</value>
+  </data>
+  <data name="ui.invoice_history.credit_requested" xml:space="preserve">
+    <value>Credit note of {amount} {currency} requested</value>
+  </data>
+  <data name="ui.invoice_history.void_requested" xml:space="preserve">
+    <value>Void requested ({amount} {currency})</value>
+  </data>
+  <data name="ui.invoice_history.credit_issued" xml:space="preserve">
+    <value>Credit note {number} issued: {amount} {currency}</value>
+  </data>
+  <data name="ui.invoice_history.credit_rejected" xml:space="preserve">
+    <value>Credit note of {amount} {currency} sent back</value>
+  </data>
+  <data name="ui.invoice_history.voided" xml:space="preserve">
+    <value>Invoice voided by credit note {number}</value>
+  </data>
+  <data name="ui.invoice_history.past_due" xml:space="preserve">
+    <value>Past due: unpaid after the due date</value>
+  </data>
+  <data name="ui.invoice_line.plan_period" xml:space="preserve">
+    <value>{plan} plan, {term}, {licences} licences</value>
+  </data>
+  <data name="ui.invoice_line.plan_period_dates" xml:space="preserve">
+    <value>{plan} plan, {term}, {licences} licences, {from} to {to}</value>
+  </data>
+  <data name="ui.invoice_line.setup_fee" xml:space="preserve">
+    <value>Setup fee, {plan} plan</value>
+  </data>
+  <data name="ui.invoice_line.change" xml:space="preserve">
+    <value>{plan} plan, change to {licences} licences until {to}</value>
+  </data>
+  <data name="ui.invoice_line.charge" xml:space="preserve">
+    <value>{description}</value>
+  </data>
+  <data name="ui.invoice_line.discount" xml:space="preserve">
+    <value>Discount</value>
+  </data>
+  <data name="ui.billing_document.invoice" xml:space="preserve">
+    <value>Invoice</value>
+  </data>
+  <data name="ui.billing_document.credit_note" xml:space="preserve">
+    <value>Credit note</value>
+  </data>
+  <data name="ui.billing_document.void" xml:space="preserve">
+    <value>Void</value>
+  </data>
+  <data name="ui.billing_document.receipt" xml:space="preserve">
+    <value>Receipt</value>
+  </data>
+  <data name="ui.billing_document.issued" xml:space="preserve">
+    <value>Issued</value>
+  </data>
+  <data name="ui.billing_document.due" xml:space="preserve">
+    <value>Due</value>
+  </data>
+  <data name="ui.billing_document.period" xml:space="preserve">
+    <value>Period</value>
+  </data>
+  <data name="ui.billing_document.bill_to" xml:space="preserve">
+    <value>Bill to</value>
+  </data>
+  <data name="ui.billing_document.tax_id" xml:space="preserve">
+    <value>Tax ID: {taxId}</value>
+  </data>
+  <data name="ui.billing_document.how_to_pay" xml:space="preserve">
+    <value>How to pay</value>
+  </data>
+  <data name="ui.billing_document.description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="ui.billing_document.quantity" xml:space="preserve">
+    <value>Qty</value>
+  </data>
+  <data name="ui.billing_document.unit_price" xml:space="preserve">
+    <value>Unit price</value>
+  </data>
+  <data name="ui.billing_document.tax" xml:space="preserve">
+    <value>Tax</value>
+  </data>
+  <data name="ui.billing_document.amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="ui.billing_document.subtotal" xml:space="preserve">
+    <value>Subtotal</value>
+  </data>
+  <data name="ui.billing_document.discount" xml:space="preserve">
+    <value>Discount</value>
+  </data>
+  <data name="ui.billing_document.total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="ui.billing_document.no_tax" xml:space="preserve">
+    <value>No tax was charged on this invoice.</value>
+  </data>
+  <data name="ui.billing_document.for_invoice" xml:space="preserve">
+    <value>For invoice</value>
+  </data>
+  <data name="ui.billing_document.reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="ui.billing_document.invoice_total" xml:space="preserve">
+    <value>Invoice total</value>
+  </data>
+  <data name="ui.billing_document.of_which_tax" xml:space="preserve">
+    <value>of which tax</value>
+  </data>
+  <data name="ui.billing_document.credited" xml:space="preserve">
+    <value>Credited</value>
+  </data>
+  <data name="ui.billing_document.received" xml:space="preserve">
+    <value>Received</value>
+  </data>
+  <data name="ui.billing_document.method" xml:space="preserve">
+    <value>Method</value>
+  </data>
+  <data name="ui.billing_document.reference" xml:space="preserve">
+    <value>Reference</value>
+  </data>
+  <data name="ui.billing_document.amount_received" xml:space="preserve">
+    <value>Amount received</value>
+  </data>
+  <data name="ui.billing_document.balance" xml:space="preserve">
+    <value>Balance due</value>
+  </data>
+  <data name="ui.payments.method.bank_transfer" xml:space="preserve">
+    <value>Bank transfer</value>
+  </data>
+  <data name="ui.payments.method.cash" xml:space="preserve">
+    <value>Cash</value>
+  </data>
+  <data name="ui.payments.method.cheque" xml:space="preserve">
+    <value>Cheque</value>
+  </data>
+  <data name="ui.payments.method.zelle" xml:space="preserve">
+    <value>Zelle</value>
+  </data>
+  <data name="ui.payments.method.other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="ui.payments.method.card" xml:space="preserve">
+    <value>Card</value>
+  </data>
+  <data name="email.invoice.subject" xml:space="preserve">
+    <value>Invoice {number}</value>
+  </data>
+  <data name="email.invoice.body" xml:space="preserve">
+    <value>Hello {name},
+
+Invoice {number} for {company} is attached: {amount}, due on {due}.
+
+Payment instructions are on the invoice. Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.credit_note.subject" xml:space="preserve">
+    <value>Credit note {number}</value>
+  </data>
+  <data name="email.credit_note.body" xml:space="preserve">
+    <value>Hello {name},
+
+Credit note {number} for invoice {invoice} ({company}) is attached. The balance of the invoice is now {balance}.
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.receipt.subject" xml:space="preserve">
+    <value>Receipt {number}</value>
+  </data>
+  <data name="email.receipt.body" xml:space="preserve">
+    <value>Hello {name},
+
+Thank you for your payment on invoice {invoice} ({company}). Receipt {number} is attached. The balance of the invoice is now {balance}.
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="ui.invoices.title" xml:space="preserve">
+    <value>Invoices</value>
+  </data>
+  <data name="ui.invoices.back" xml:space="preserve">
+    <value>Back to invoices</value>
+  </data>
+  <data name="ui.invoices.page_title" xml:space="preserve">
+    <value>Invoice {number}</value>
+  </data>
+  <data name="ui.invoices.search" xml:space="preserve">
+    <value>Number or tenant</value>
+  </data>
+  <data name="ui.invoices.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.invoices.status.all" xml:space="preserve">
+    <value>All statuses</value>
+  </data>
+  <data name="ui.invoices.status.issued" xml:space="preserve">
+    <value>Issued</value>
+  </data>
+  <data name="ui.invoices.status.paid" xml:space="preserve">
+    <value>Paid</value>
+  </data>
+  <data name="ui.invoices.status.void" xml:space="preserve">
+    <value>Void</value>
+  </data>
+  <data name="ui.invoices.kind" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ui.invoices.kind.first_period" xml:space="preserve">
+    <value>First period</value>
+  </data>
+  <data name="ui.invoices.kind.change" xml:space="preserve">
+    <value>Change</value>
+  </data>
+  <data name="ui.invoices.kind.renewal" xml:space="preserve">
+    <value>Renewal</value>
+  </data>
+  <data name="ui.invoices.kind.charges" xml:space="preserve">
+    <value>One-time charges</value>
+  </data>
+  <data name="ui.invoices.issued_from" xml:space="preserve">
+    <value>Issued from</value>
+  </data>
+  <data name="ui.invoices.issued_to" xml:space="preserve">
+    <value>Issued until</value>
+  </data>
+  <data name="ui.invoices.overdue_only" xml:space="preserve">
+    <value>Overdue only</value>
+  </data>
+  <data name="ui.invoices.overdue" xml:space="preserve">
+    <value>Overdue</value>
+  </data>
+  <data name="ui.invoices.credit_pending" xml:space="preserve">
+    <value>Credit waiting for approval</value>
+  </data>
+  <data name="ui.invoices.count" xml:space="preserve">
+    <value>{count} invoices</value>
+  </data>
+  <data name="ui.invoices.empty" xml:space="preserve">
+    <value>No invoices match.</value>
+  </data>
+  <data name="ui.invoices.number" xml:space="preserve">
+    <value>Number</value>
+  </data>
+  <data name="ui.invoices.issued" xml:space="preserve">
+    <value>Issued</value>
+  </data>
+  <data name="ui.invoices.due" xml:space="preserve">
+    <value>Due</value>
+  </data>
+  <data name="ui.invoices.total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="ui.invoices.balance" xml:space="preserve">
+    <value>Balance</value>
+  </data>
+  <data name="ui.invoices.paid" xml:space="preserve">
+    <value>Paid</value>
+  </data>
+  <data name="ui.invoices.language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="ui.invoices.history" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="ui.invoices.no_lines" xml:space="preserve">
+    <value>No lines.</value>
+  </data>
+  <data name="ui.invoices.download" xml:space="preserve">
+    <value>Download PDF</value>
+  </data>
+  <data name="ui.invoices.resend" xml:space="preserve">
+    <value>Email again</value>
+  </data>
+  <data name="ui.invoices.resent" xml:space="preserve">
+    <value>The invoice will be emailed to the billing contact.</value>
+  </data>
+  <data name="ui.invoices.refund_owed" xml:space="preserve">
+    <value>Refund owed</value>
+  </data>
+  <data name="ui.invoices.refund_owed_help" xml:space="preserve">
+    <value>Credited after payment; pay it back by hand (card refunds come with Slice 5).</value>
+  </data>
+  <data name="ui.payments.title" xml:space="preserve">
+    <value>Payments</value>
+  </data>
+  <data name="ui.payments.receipt" xml:space="preserve">
+    <value>Receipt</value>
+  </data>
+  <data name="ui.payments.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.payments.status.recorded" xml:space="preserve">
+    <value>Recorded</value>
+  </data>
+  <data name="ui.payments.status.reversed" xml:space="preserve">
+    <value>Reversed</value>
+  </data>
+  <data name="ui.payments.empty" xml:space="preserve">
+    <value>No payments yet.</value>
+  </data>
+  <data name="ui.payments.record" xml:space="preserve">
+    <value>Record a payment</value>
+  </data>
+  <data name="ui.payments.recorded" xml:space="preserve">
+    <value>Payment recorded; a receipt was issued.</value>
+  </data>
+  <data name="ui.payments.reverse" xml:space="preserve">
+    <value>Reverse</value>
+  </data>
+  <data name="ui.payments.reversed" xml:space="preserve">
+    <value>Payment reversed; the balance is open again.</value>
+  </data>
+  <data name="ui.payments.reverse_help" xml:space="preserve">
+    <value>Reverse a payment that bounced or was entered by mistake. The receipt stays on record; the balance reopens.</value>
+  </data>
+  <data name="ui.payments.reference_help" xml:space="preserve">
+    <value>Bank, cheque or Zelle reference. Not needed for cash.</value>
+  </data>
+  <data name="ui.payments.note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="ui.credit_notes.title" xml:space="preserve">
+    <value>Credit notes</value>
+  </data>
+  <data name="ui.credit_notes.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.credit_notes.status.requested" xml:space="preserve">
+    <value>Waiting for approval</value>
+  </data>
+  <data name="ui.credit_notes.status.issued" xml:space="preserve">
+    <value>Issued</value>
+  </data>
+  <data name="ui.credit_notes.status.rejected" xml:space="preserve">
+    <value>Sent back</value>
+  </data>
+  <data name="ui.credit_notes.empty" xml:space="preserve">
+    <value>No credit notes.</value>
+  </data>
+  <data name="ui.credit_notes.request" xml:space="preserve">
+    <value>Request a credit note</value>
+  </data>
+  <data name="ui.credit_notes.request_void" xml:space="preserve">
+    <value>Request void</value>
+  </data>
+  <data name="ui.credit_notes.request_help" xml:space="preserve">
+    <value>A credit note lowers what the tenant owes. The sales manager approves it; you cannot approve your own request.</value>
+  </data>
+  <data name="ui.credit_notes.void_help" xml:space="preserve">
+    <value>Voiding cancels the whole invoice with a credit note for its total. Possible only while nothing is paid; the sales manager approves it.</value>
+  </data>
+  <data name="ui.credit_notes.decide_help" xml:space="preserve">
+    <value>Approving issues the credit note with the next number and emails it to the tenant.</value>
+  </data>
+  <data name="ui.credit_notes.submit" xml:space="preserve">
+    <value>Send for approval</value>
+  </data>
+  <data name="ui.credit_notes.requested" xml:space="preserve">
+    <value>Credit note sent for approval.</value>
+  </data>
+  <data name="ui.credit_notes.void_requested" xml:space="preserve">
+    <value>Void sent for approval.</value>
+  </data>
+  <data name="ui.credit_notes.approved" xml:space="preserve">
+    <value>Credit note issued.</value>
+  </data>
+  <data name="ui.credit_notes.rejected" xml:space="preserve">
+    <value>Request sent back.</value>
+  </data>
+  <data name="ui.billing_settings.title" xml:space="preserve">
+    <value>Billing settings</value>
+  </data>
+  <data name="ui.billing_settings.documents" xml:space="preserve">
+    <value>Invoices and documents</value>
+  </data>
+  <data name="ui.billing_settings.payment_terms" xml:space="preserve">
+    <value>Payment terms (days)</value>
+  </data>
+  <data name="ui.billing_settings.payment_terms_help" xml:space="preserve">
+    <value>Days between issue and due date. Leave empty: invoices are due when issued.</value>
+  </data>
+  <data name="ui.billing_settings.invoice_prefix" xml:space="preserve">
+    <value>Invoice prefix</value>
+  </data>
+  <data name="ui.billing_settings.credit_note_prefix" xml:space="preserve">
+    <value>Credit note prefix</value>
+  </data>
+  <data name="ui.billing_settings.receipt_prefix" xml:space="preserve">
+    <value>Receipt prefix</value>
+  </data>
+  <data name="ui.billing_settings.prefix_help" xml:space="preserve">
+    <value>Numbers read PREFIX-YEAR-000001 and restart each year. A new prefix applies to the next document.</value>
+  </data>
+  <data name="ui.billing_settings.paper_size" xml:space="preserve">
+    <value>Paper size</value>
+  </data>
+  <data name="ui.billing_settings.paper.a4" xml:space="preserve">
+    <value>A4</value>
+  </data>
+  <data name="ui.billing_settings.paper.letter" xml:space="preserve">
+    <value>Letter</value>
+  </data>
+  <data name="ui.billing_settings.email_documents" xml:space="preserve">
+    <value>Email invoices, credit notes and receipts to the billing contact</value>
+  </data>
+  <data name="ui.billing_settings.footer" xml:space="preserve">
+    <value>Footer</value>
+  </data>
+  <data name="ui.billing_settings.save" xml:space="preserve">
+    <value>Save settings</value>
+  </data>
+  <data name="ui.billing_settings.saved" xml:space="preserve">
+    <value>Billing settings saved.</value>
+  </data>
+  <data name="ui.billing_settings.company_profile" xml:space="preserve">
+    <value>Company profile</value>
+  </data>
+  <data name="ui.billing_settings.company_profile_help" xml:space="preserve">
+    <value>Printed as the issuer on every invoice, credit note and receipt. Documents already issued keep the details they were issued with.</value>
+  </data>
+  <data name="ui.billing_settings.email" xml:space="preserve">
+    <value>Billing email</value>
+  </data>
+  <data name="ui.billing_settings.phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="ui.billing_settings.tax_id" xml:space="preserve">
+    <value>Tax ID</value>
+  </data>
+  <data name="ui.billing_settings.website" xml:space="preserve">
+    <value>Website</value>
+  </data>
+  <data name="ui.billing_settings.save_profile" xml:space="preserve">
+    <value>Save profile</value>
+  </data>
+  <data name="ui.billing_settings.profile_saved" xml:space="preserve">
+    <value>Company profile saved.</value>
+  </data>
+  <data name="ui.billing_settings.logo" xml:space="preserve">
+    <value>Logo</value>
+  </data>
+  <data name="ui.billing_settings.logo_help" xml:space="preserve">
+    <value>PNG or JPEG, at most {maxKilobytes} KB.</value>
+  </data>
+  <data name="ui.billing_settings.logo_set" xml:space="preserve">
+    <value>A logo is printed on documents.</value>
+  </data>
+  <data name="ui.billing_settings.logo_none" xml:space="preserve">
+    <value>No logo yet; the company name is printed instead.</value>
+  </data>
+  <data name="ui.billing_settings.logo_saved" xml:space="preserve">
+    <value>Logo saved.</value>
+  </data>
+  <data name="ui.tax_rates.title" xml:space="preserve">
+    <value>Tax rates</value>
+  </data>
+  <data name="ui.tax_rates.help" xml:space="preserve">
+    <value>The rate in force on the day an invoice is issued is stored on its lines. A region rate wins over its country rate; with no rate, no tax is charged.</value>
+  </data>
+  <data name="ui.tax_rates.all_countries" xml:space="preserve">
+    <value>All countries</value>
+  </data>
+  <data name="ui.tax_rates.label" xml:space="preserve">
+    <value>Label</value>
+  </data>
+  <data name="ui.tax_rates.rate" xml:space="preserve">
+    <value>Rate (%)</value>
+  </data>
+  <data name="ui.tax_rates.valid_from" xml:space="preserve">
+    <value>Valid from</value>
+  </data>
+  <data name="ui.tax_rates.in_force" xml:space="preserve">
+    <value>In force</value>
+  </data>
+  <data name="ui.tax_rates.empty" xml:space="preserve">
+    <value>No tax rates yet.</value>
+  </data>
+  <data name="ui.tax_rates.add" xml:space="preserve">
+    <value>Add a rate</value>
+  </data>
+  <data name="ui.tax_rates.added" xml:space="preserve">
+    <value>Tax rate added.</value>
+  </data>
+  <data name="ui.tax_rates.region_help" xml:space="preserve">
+    <value>Optional region code, for example QC. Empty applies to the whole country.</value>
+  </data>
+  <data name="ui.tenant_billing.title" xml:space="preserve">
+    <value>Billing</value>
+  </data>
+  <data name="ui.tenant_billing.open_balance" xml:space="preserve">
+    <value>Open balance ({currency})</value>
+  </data>
+  <data name="ui.tenant_billing.open_invoices" xml:space="preserve">
+    <value>{count} open invoices</value>
+  </data>
+  <data name="ui.tenant_billing.overdue" xml:space="preserve">
+    <value>{amount} overdue</value>
+  </data>
+  <data name="ui.tenant_billing.tax" xml:space="preserve">
+    <value>Tax on new invoices</value>
+  </data>
+  <data name="ui.tenant_billing.no_tax" xml:space="preserve">
+    <value>No tax</value>
+  </data>
+  <data name="ui.tenant_billing.exempt" xml:space="preserve">
+    <value>Tax exempt</value>
+  </data>
+  <data name="ui.tenant_billing.exempt_reason" xml:space="preserve">
+    <value>Exemption reason</value>
+  </data>
+  <data name="ui.tenant_billing.exempt_reference" xml:space="preserve">
+    <value>Exemption reference</value>
+  </data>
+  <data name="ui.tenant_billing.edit_tax" xml:space="preserve">
+    <value>Change tax details</value>
+  </data>
+  <data name="ui.tenant_billing.save_tax" xml:space="preserve">
+    <value>Save tax details</value>
+  </data>
+  <data name="ui.tenant_billing.tax_saved" xml:space="preserve">
+    <value>Tax details saved; they apply to the next invoice.</value>
+  </data>
+  <data name="ui.tenant_billing.bill_charges" xml:space="preserve">
+    <value>Bill pending charges now</value>
+  </data>
+  <data name="ui.tenant_billing.charges_billed" xml:space="preserve">
+    <value>Pending charges invoiced.</value>
+  </data>
+  <data name="ui.tenant_billing.all_invoices" xml:space="preserve">
+    <value>Open in Invoices</value>
+  </data>
+  <data name="platform.payments.not_ready" xml:space="preserve">
+    <value>Card payments are not available right now.</value>
+  </data>
+  <data name="platform.payments.currency_not_accepted" xml:space="preserve">
+    <value>Card payments are not accepted in this currency.</value>
+  </data>
+  <data name="platform.payments.publishable_key_invalid" xml:space="preserve">
+    <value>The publishable key does not match the provider or the test/live mode of the configured secret key.</value>
+  </data>
+  <data name="platform.payments.currency_invalid" xml:space="preserve">
+    <value>Enter currencies as three-letter codes, for example USD, EUR.</value>
+  </data>
+  <data name="platform.payments.too_many_currencies" xml:space="preserve">
+    <value>At most {max} currencies.</value>
+  </data>
+  <data name="platform.payments.mode_mismatch" xml:space="preserve">
+    <value>The configured card keys do not match this environment: live keys only in production, test keys elsewhere.</value>
+  </data>
+  <data name="platform.payments.secret_missing" xml:space="preserve">
+    <value>The card provider keys are not configured on this server.</value>
+  </data>
+  <data name="platform.payments.provider_unavailable" xml:space="preserve">
+    <value>The card provider could not be reached. Nothing was charged twice; try again shortly.</value>
+  </data>
+  <data name="platform.payments.provider_refused" xml:space="preserve">
+    <value>The card provider refused the request.</value>
+  </data>
+  <data name="platform.payments.provider_reference_invalid" xml:space="preserve">
+    <value>The card provider sent a reference Vixly cannot use.</value>
+  </data>
+  <data name="platform.payments.card_not_found" xml:space="preserve">
+    <value>The saved card was not found.</value>
+  </data>
+  <data name="platform.payments.no_saved_card" xml:space="preserve">
+    <value>The tenant has no saved card.</value>
+  </data>
+  <data name="platform.payments.card_expired" xml:space="preserve">
+    <value>The saved card has expired.</value>
+  </data>
+  <data name="platform.payments.card_removed" xml:space="preserve">
+    <value>This card was already removed.</value>
+  </data>
+  <data name="platform.payments.card_invalid" xml:space="preserve">
+    <value>The card details from the provider are not valid.</value>
+  </data>
+  <data name="platform.payments.charge_open" xml:space="preserve">
+    <value>A card payment for this invoice is already in progress.</value>
+  </data>
+  <data name="platform.payments.nothing_to_charge" xml:space="preserve">
+    <value>There is nothing left to pay on this invoice.</value>
+  </data>
+  <data name="platform.payments.amount_invalid" xml:space="preserve">
+    <value>Enter an amount greater than zero, to the cent.</value>
+  </data>
+  <data name="platform.payments.link_invalid" xml:space="preserve">
+    <value>This link is not valid or has expired.</value>
+  </data>
+  <data name="platform.payments.refund_not_allowed" xml:space="preserve">
+    <value>A card refund needs an issued credit note on an invoice paid by card.</value>
+  </data>
+  <data name="platform.payments.refund_above_charged" xml:space="preserve">
+    <value>The refund is more than what can still be refunded to the card.</value>
+  </data>
+  <data name="platform.payments.transaction_not_found" xml:space="preserve">
+    <value>The card transaction was not found.</value>
+  </data>
+  <data name="platform.payments.transaction_closed" xml:space="preserve">
+    <value>This card transaction is already closed.</value>
+  </data>
+  <data name="platform.payments.consent_invalid" xml:space="preserve">
+    <value>Automatic charging needs the consent of a named contact.</value>
+  </data>
+  <data name="platform.payments.auto_charge_off" xml:space="preserve">
+    <value>Automatic charging is already off.</value>
+  </data>
+  <data name="platform.payments.event_invalid" xml:space="preserve">
+    <value>The provider message could not be verified.</value>
+  </data>
+  <data name="platform.payments.actor_required" xml:space="preserve">
+    <value>The person making the change is required.</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.merchant_updated" xml:space="preserve">
+    <value>Card payment settings changed</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.merchant_checked" xml:space="preserve">
+    <value>Card provider connection checked</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.checkout_started" xml:space="preserve">
+    <value>Card checkout opened</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_saved" xml:space="preserve">
+    <value>Card saved</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_removed" xml:space="preserve">
+    <value>Saved card removed</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.auto_charge_on" xml:space="preserve">
+    <value>Automatic charging agreed by the tenant</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.auto_charge_off" xml:space="preserve">
+    <value>Automatic charging turned off</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.save_card_link_sent" xml:space="preserve">
+    <value>Save-card link sent</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_charge_started" xml:space="preserve">
+    <value>Saved card charged</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_charge_succeeded" xml:space="preserve">
+    <value>Card payment confirmed</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_charge_failed" xml:space="preserve">
+    <value>Card payment failed</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_action_required" xml:space="preserve">
+    <value>Card payment needs the cardholder</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_refund_started" xml:space="preserve">
+    <value>Card refund sent</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_refunded" xml:space="preserve">
+    <value>Card refund confirmed</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.card_refund_failed" xml:space="preserve">
+    <value>Card refund failed</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.excess_refund_started" xml:space="preserve">
+    <value>Overpaid card amount refunded</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.dispute_open" xml:space="preserve">
+    <value>Card payment disputed by the bank</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.dispute_won" xml:space="preserve">
+    <value>Card dispute won</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.dispute_lost" xml:space="preserve">
+    <value>Card dispute lost</value>
+  </data>
+  <data name="ui.audit.action.platform.registrations.paid" xml:space="preserve">
+    <value>Registration invoice paid</value>
+  </data>
+  <data name="ui.permission.platform.billing.charge_cards" xml:space="preserve">
+    <value>Charge saved cards and manage them</value>
+  </data>
+  <data name="ui.permission.platform.billing.refund_cards" xml:space="preserve">
+    <value>Refund to cards</value>
+  </data>
+  <data name="ui.permission.platform.payments.configure" xml:space="preserve">
+    <value>Change card payment settings</value>
+  </data>
+  <data name="ui.permission_area.payments" xml:space="preserve">
+    <value>Payments</value>
+  </data>
+  <data name="ui.invoice_history.card_refunded" xml:space="preserve">
+    <value>{amount} {currency} refunded to the card ({reference})</value>
+  </data>
+  <data name="ui.invoice_history.card_failed" xml:space="preserve">
+    <value>Card payment of {amount} {currency} failed ({code})</value>
+  </data>
+  <data name="ui.invoice_history.card_action_required" xml:space="preserve">
+    <value>Card payment of {amount} {currency} needs the cardholder</value>
+  </data>
+  <data name="ui.invoice_history.disputed" xml:space="preserve">
+    <value>Bank dispute on card payment {receipt}</value>
+  </data>
+  <data name="ui.invoice_history.dispute_won" xml:space="preserve">
+    <value>Dispute won on card payment {receipt}</value>
+  </data>
+  <data name="ui.invoice_history.dispute_lost" xml:space="preserve">
+    <value>Dispute lost: card payment {receipt} of {amount} {currency} reversed</value>
+  </data>
+  <data name="ui.card_payments.title" xml:space="preserve">
+    <value>Card payments</value>
+  </data>
+  <data name="ui.card_payments.list_title" xml:space="preserve">
+    <value>Card payments</value>
+  </data>
+  <data name="ui.card_payments.count" xml:space="preserve">
+    <value>{count} card transactions</value>
+  </data>
+  <data name="ui.card_payments.empty" xml:space="preserve">
+    <value>No card transactions.</value>
+  </data>
+  <data name="ui.card_payments.kind" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ui.card_payments.kind.charge" xml:space="preserve">
+    <value>Charge</value>
+  </data>
+  <data name="ui.card_payments.kind.refund" xml:space="preserve">
+    <value>Refund</value>
+  </data>
+  <data name="ui.card_payments.origin" xml:space="preserve">
+    <value>Started by</value>
+  </data>
+  <data name="ui.card_payments.origin.all" xml:space="preserve">
+    <value>All origins</value>
+  </data>
+  <data name="ui.card_payments.origin.pay_link" xml:space="preserve">
+    <value>Pay link</value>
+  </data>
+  <data name="ui.card_payments.origin.registration" xml:space="preserve">
+    <value>Registration</value>
+  </data>
+  <data name="ui.card_payments.origin.staff_charge" xml:space="preserve">
+    <value>Staff charge</value>
+  </data>
+  <data name="ui.card_payments.origin.automatic" xml:space="preserve">
+    <value>Automatic</value>
+  </data>
+  <data name="ui.card_payments.origin.refund" xml:space="preserve">
+    <value>Refund</value>
+  </data>
+  <data name="ui.card_payments.origin.excess_refund" xml:space="preserve">
+    <value>Overpayment refund</value>
+  </data>
+  <data name="ui.card_payments.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.card_payments.status.created" xml:space="preserve">
+    <value>Opened</value>
+  </data>
+  <data name="ui.card_payments.status.pending" xml:space="preserve">
+    <value>Waiting for the provider</value>
+  </data>
+  <data name="ui.card_payments.status.requires_action" xml:space="preserve">
+    <value>Needs the cardholder</value>
+  </data>
+  <data name="ui.card_payments.status.succeeded" xml:space="preserve">
+    <value>Succeeded</value>
+  </data>
+  <data name="ui.card_payments.status.failed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="ui.card_payments.status.cancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="ui.card_payments.dispute.open" xml:space="preserve">
+    <value>Disputed</value>
+  </data>
+  <data name="ui.card_payments.dispute.won" xml:space="preserve">
+    <value>Dispute won</value>
+  </data>
+  <data name="ui.card_payments.dispute.lost" xml:space="preserve">
+    <value>Dispute lost</value>
+  </data>
+  <data name="ui.card_payments.disputed_only" xml:space="preserve">
+    <value>Disputed only</value>
+  </data>
+  <data name="ui.card_payments.not_ready" xml:space="preserve">
+    <value>Card payments are off or not configured for this currency.</value>
+  </data>
+  <data name="ui.card_payments.default_card" xml:space="preserve">
+    <value>Card on file: {card}</value>
+  </data>
+  <data name="ui.card_payments.no_card" xml:space="preserve">
+    <value>No saved card. Send the tenant a save-card link from its Billing section.</value>
+  </data>
+  <data name="ui.card_payments.charge" xml:space="preserve">
+    <value>Charge the card {amount}</value>
+  </data>
+  <data name="ui.card_payments.charge_sent" xml:space="preserve">
+    <value>Charge sent. The payment and receipt appear once the provider confirms it.</value>
+  </data>
+  <data name="ui.card_payments.charge_action_required" xml:space="preserve">
+    <value>The bank asks the cardholder to confirm; the tenant was emailed a link.</value>
+  </data>
+  <data name="ui.card_payments.charge_declined" xml:space="preserve">
+    <value>The card was declined ({code}). The tenant was emailed a link to pay another way.</value>
+  </data>
+  <data name="ui.card_payments.refund_credit" xml:space="preserve">
+    <value>Credit note</value>
+  </data>
+  <data name="ui.card_payments.refundable" xml:space="preserve">
+    <value>up to {amount}</value>
+  </data>
+  <data name="ui.card_payments.refund" xml:space="preserve">
+    <value>Refund to the card</value>
+  </data>
+  <data name="ui.card_payments.refund_sent" xml:space="preserve">
+    <value>Refund sent to the provider; it is recorded once confirmed.</value>
+  </data>
+  <data name="ui.payments_settings.title" xml:space="preserve">
+    <value>Payments settings</value>
+  </data>
+  <data name="ui.payments_settings.provider" xml:space="preserve">
+    <value>Card provider</value>
+  </data>
+  <data name="ui.payments_settings.provider.stripe" xml:space="preserve">
+    <value>Stripe</value>
+  </data>
+  <data name="ui.payments_settings.provider.simulated" xml:space="preserve">
+    <value>Simulated (development)</value>
+  </data>
+  <data name="ui.payments_settings.mode" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="ui.payments_settings.mode.test" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="ui.payments_settings.mode.live" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="ui.payments_settings.keys" xml:space="preserve">
+    <value>Secret keys</value>
+  </data>
+  <data name="ui.payments_settings.keys_configured" xml:space="preserve">
+    <value>Configured on this server</value>
+  </data>
+  <data name="ui.payments_settings.keys_help" xml:space="preserve">
+    <value>Set by the server administrator in environment variables; never entered here.</value>
+  </data>
+  <data name="ui.payments_settings.last_check" xml:space="preserve">
+    <value>Last connection check</value>
+  </data>
+  <data name="ui.payments_settings.check_ok" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+  <data name="ui.payments_settings.check_failed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="ui.payments_settings.check" xml:space="preserve">
+    <value>Check the connection</value>
+  </data>
+  <data name="ui.payments_settings.connected" xml:space="preserve">
+    <value>The card provider answered.</value>
+  </data>
+  <data name="ui.payments_settings.status" xml:space="preserve">
+    <value>Card payments</value>
+  </data>
+  <data name="ui.payments_settings.ready" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="ui.payments_settings.not_ready" xml:space="preserve">
+    <value>Not available</value>
+  </data>
+  <data name="ui.payments_settings.cards" xml:space="preserve">
+    <value>Card payments</value>
+  </data>
+  <data name="ui.payments_settings.publishable_key" xml:space="preserve">
+    <value>Publishable key</value>
+  </data>
+  <data name="ui.payments_settings.publishable_key_help" xml:space="preserve">
+    <value>The public key from the provider (pk_test_… or pk_live_…), matching the configured mode.</value>
+  </data>
+  <data name="ui.payments_settings.currencies" xml:space="preserve">
+    <value>Accepted currencies</value>
+  </data>
+  <data name="ui.payments_settings.currencies_help" xml:space="preserve">
+    <value>Three-letter codes separated by commas, for example USD, EUR. Invoices in other currencies are not offered card payment.</value>
+  </data>
+  <data name="ui.payments_settings.enabled" xml:space="preserve">
+    <value>Accept card payments</value>
+  </data>
+  <data name="ui.payments_settings.save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ui.payments_settings.saved" xml:space="preserve">
+    <value>Payments settings saved.</value>
+  </data>
+  <data name="ui.saved_cards.title" xml:space="preserve">
+    <value>Saved cards</value>
+  </data>
+  <data name="ui.saved_cards.card" xml:space="preserve">
+    <value>Card</value>
+  </data>
+  <data name="ui.saved_cards.expires" xml:space="preserve">
+    <value>Expires</value>
+  </data>
+  <data name="ui.saved_cards.added" xml:space="preserve">
+    <value>Added</value>
+  </data>
+  <data name="ui.saved_cards.default" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="ui.saved_cards.expired" xml:space="preserve">
+    <value>Expired</value>
+  </data>
+  <data name="ui.saved_cards.empty" xml:space="preserve">
+    <value>No saved cards.</value>
+  </data>
+  <data name="ui.saved_cards.remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ui.saved_cards.removed" xml:space="preserve">
+    <value>Card removed.</value>
+  </data>
+  <data name="ui.saved_cards.auto_charge_on" xml:space="preserve">
+    <value>Automatic charging on</value>
+  </data>
+  <data name="ui.saved_cards.auto_charge_off" xml:space="preserve">
+    <value>Automatic charging off</value>
+  </data>
+  <data name="ui.saved_cards.consent" xml:space="preserve">
+    <value>Agreed by {email} on {time}</value>
+  </data>
+  <data name="ui.saved_cards.send_link" xml:space="preserve">
+    <value>Email a save-card link</value>
+  </data>
+  <data name="ui.saved_cards.link_sent" xml:space="preserve">
+    <value>Save-card link emailed to the billing contact.</value>
+  </data>
+  <data name="ui.saved_cards.turn_off" xml:space="preserve">
+    <value>Turn automatic charging off</value>
+  </data>
+  <data name="ui.saved_cards.auto_charge_turned_off" xml:space="preserve">
+    <value>Automatic charging turned off. Only the tenant can turn it on again.</value>
+  </data>
+  <data name="email.invoice.pay_by_card" xml:space="preserve">
+    <value>Pay by card: {link}</value>
+  </data>
+  <data name="email.save_card.subject" xml:space="preserve">
+    <value>Save a card for your Vixly invoices</value>
+  </data>
+  <data name="email.save_card.body" xml:space="preserve">
+    <value>Hello {name},
+
+You can save a card for {company} on our payment provider's secure page:
+{link}
+
+The link works until {expires}. Your card number is entered only on that page; Vixly never sees it.
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.card_failed.subject" xml:space="preserve">
+    <value>Card payment failed for invoice {invoice}</value>
+  </data>
+  <data name="email.card_failed.body" xml:space="preserve">
+    <value>Hello {name},
+
+We could not charge the card on file for invoice {invoice} ({company}). {amount} is still due.
+
+You can pay or use another card here:
+{link}
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.card_failed.body_no_link" xml:space="preserve">
+    <value>Hello {name},
+
+We could not charge the card on file for invoice {invoice} ({company}). {amount} is still due. Please contact us at {support} to arrange payment.</value>
+  </data>
+  <data name="email.card_action_required.subject" xml:space="preserve">
+    <value>Please confirm the card payment for invoice {invoice}</value>
+  </data>
+  <data name="email.card_action_required.body" xml:space="preserve">
+    <value>Hello {name},
+
+Your bank asks you to confirm the payment of {amount} for invoice {invoice} ({company}). Please complete it here:
+{link}
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.card_action_required.body_no_link" xml:space="preserve">
+    <value>Hello {name},
+
+Your bank asks you to confirm the payment of {amount} for invoice {invoice} ({company}). Please contact us at {support} to complete it.</value>
+  </data>
+  <data name="platform.collections.settings_invalid" xml:space="preserve">
+    <value>The timeline is not valid: each step must come after the one before, the block day at most 60, and the final warning at least the minimum notice before the block.</value>
+  </data>
+  <data name="platform.collections.actor_required" xml:space="preserve">
+    <value>A signed-in staff member is required.</value>
+  </data>
+  <data name="platform.collections.case_not_found" xml:space="preserve">
+    <value>The collections case was not found.</value>
+  </data>
+  <data name="platform.collections.case_closed" xml:space="preserve">
+    <value>This collections case is closed.</value>
+  </data>
+  <data name="platform.collections.reason_required" xml:space="preserve">
+    <value>Give a reason.</value>
+  </data>
+  <data name="platform.collections.note_invalid" xml:space="preserve">
+    <value>Write a note of at most 1,000 characters (a reason: at most 500).</value>
+  </data>
+  <data name="platform.collections.extension_date_invalid" xml:space="preserve">
+    <value>Choose a date from today onwards.</value>
+  </data>
+  <data name="platform.collections.extension_too_long" xml:space="preserve">
+    <value>An extension can last at most {days} days.</value>
+  </data>
+  <data name="platform.collections.extension_limit" xml:space="preserve">
+    <value>This case already had {max} extensions; another needs a sales manager.</value>
+  </data>
+  <data name="ui.permission.platform.collections.view" xml:space="preserve">
+    <value>View collections</value>
+  </data>
+  <data name="ui.permission.platform.collections.manage" xml:space="preserve">
+    <value>Add collections notes and check a tenant again</value>
+  </data>
+  <data name="ui.permission.platform.collections.extend" xml:space="preserve">
+    <value>Give a tenant more time to pay</value>
+  </data>
+  <data name="ui.permission.platform.collections.extend_beyond_limit" xml:space="preserve">
+    <value>Give more time beyond the per-case limit</value>
+  </data>
+  <data name="ui.permission.platform.collections.configure" xml:space="preserve">
+    <value>Change collections settings</value>
+  </data>
+  <data name="ui.permission_area.collections" xml:space="preserve">
+    <value>Collections</value>
+  </data>
+  <data name="ui.audit.action.platform.collections.settings_updated" xml:space="preserve">
+    <value>Collections settings changed</value>
+  </data>
+  <data name="ui.audit.action.platform.collections.case_opened" xml:space="preserve">
+    <value>Collections case opened</value>
+  </data>
+  <data name="ui.audit.action.platform.collections.reminder_sent" xml:space="preserve">
+    <value>Payment reminder sent</value>
+  </data>
+  <data name="ui.audit.action.platform.collections.final_warning_sent" xml:space="preserve">
+    <value>Final warning sent</value>
+  </data>
+  <data name="ui.audit.action.platform.collections.blocked" xml:space="preserve">
+    <value>Subscription blocked for non-payment</value>
+  </data>
+  <data name="ui.audit.action.platform.collections.no_access" xml:space="preserve">
+    <value>Read-only period ended: payment required</value>
+  </data>
+  <data name="ui.audit.action.platform.collections.card_retry" xml:space="preserve">
+    <value>Card charge retried</value>
+  </data>
+  <data name="ui.audit.action.platform.collections.extension_granted" xml:space="preserve">
+    <value>Extension given</value>
+  </data>
+  <data name="ui.audit.action.platform.collections.extension_ended" xml:space="preserve">
+    <value>Extension ended</value>
+  </data>
+  <data name="ui.audit.action.platform.collections.note_added" xml:space="preserve">
+    <value>Collections note added</value>
+  </data>
+  <data name="ui.audit.action.platform.collections.checked" xml:space="preserve">
+    <value>Collections checked again</value>
+  </data>
+  <data name="ui.audit.action.platform.collections.case_closed" xml:space="preserve">
+    <value>Collections case closed</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.blocked_for_non_payment" xml:space="preserve">
+    <value>Subscription blocked for non-payment</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.block_lifted" xml:space="preserve">
+    <value>Non-payment block lifted for an extension</value>
+  </data>
+  <data name="ui.subscriptions.status.blocked_for_non_payment" xml:space="preserve">
+    <value>Blocked for non-payment</value>
+  </data>
+  <data name="ui.subscriptions.access.payment_required" xml:space="preserve">
+    <value>Payment required</value>
+  </data>
+  <data name="ui.subscription_history.blocked_for_non_payment" xml:space="preserve">
+    <value>Blocked for non-payment</value>
+  </data>
+  <data name="ui.subscription_history.block_lifted" xml:space="preserve">
+    <value>Block lifted until {through} (extension)</value>
+  </data>
+  <data name="ui.card_payments.origin.retry" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="ui.collection_history.opened" xml:space="preserve">
+    <value>Case opened; oldest unpaid due date {due}</value>
+  </data>
+  <data name="ui.collection_history.reminder_1" xml:space="preserve">
+    <value>First reminder sent (day {day})</value>
+  </data>
+  <data name="ui.collection_history.reminder_2" xml:space="preserve">
+    <value>Second reminder sent (day {day})</value>
+  </data>
+  <data name="ui.collection_history.final_warning" xml:space="preserve">
+    <value>Final warning sent (day {day}); block on {blockDate}</value>
+  </data>
+  <data name="ui.collection_history.blocked" xml:space="preserve">
+    <value>Blocked for non-payment (day {day})</value>
+  </data>
+  <data name="ui.collection_history.no_access" xml:space="preserve">
+    <value>Read-only period over: payment required</value>
+  </data>
+  <data name="ui.collection_history.card_retry" xml:space="preserve">
+    <value>Card charge retried for {invoice} (day {day})</value>
+  </data>
+  <data name="ui.collection_history.extension_granted" xml:space="preserve">
+    <value>Extension through {through} (number {count})</value>
+  </data>
+  <data name="ui.collection_history.extension_ended" xml:space="preserve">
+    <value>Extension through {through} ended</value>
+  </data>
+  <data name="ui.collection_history.note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="ui.collection_history.checked" xml:space="preserve">
+    <value>Checked again</value>
+  </data>
+  <data name="ui.collection_history.unblocked" xml:space="preserve">
+    <value>Paid: access restored</value>
+  </data>
+  <data name="ui.collection_history.closed" xml:space="preserve">
+    <value>Case closed</value>
+  </data>
+  <data name="ui.collections.title" xml:space="preserve">
+    <value>Collections</value>
+  </data>
+  <data name="ui.collections.dashboard" xml:space="preserve">
+    <value>Overview</value>
+  </data>
+  <data name="ui.collections.case" xml:space="preserve">
+    <value>Collections case</value>
+  </data>
+  <data name="ui.collections.actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ui.collections.history" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="ui.collections.what" xml:space="preserve">
+    <value>What happened</value>
+  </data>
+  <data name="ui.collections.stage" xml:space="preserve">
+    <value>Stage</value>
+  </data>
+  <data name="ui.collections.stage.all" xml:space="preserve">
+    <value>All stages</value>
+  </data>
+  <data name="ui.collections.stage.opened" xml:space="preserve">
+    <value>Opened</value>
+  </data>
+  <data name="ui.collections.stage.reminder1" xml:space="preserve">
+    <value>First reminder</value>
+  </data>
+  <data name="ui.collections.stage.reminder2" xml:space="preserve">
+    <value>Second reminder</value>
+  </data>
+  <data name="ui.collections.stage.final_warning" xml:space="preserve">
+    <value>Final warning</value>
+  </data>
+  <data name="ui.collections.stage.blocked" xml:space="preserve">
+    <value>Blocked</value>
+  </data>
+  <data name="ui.collections.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.collections.case_status.open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="ui.collections.case_status.closed" xml:space="preserve">
+    <value>Closed</value>
+  </data>
+  <data name="ui.collections.close_reason.settled" xml:space="preserve">
+    <value>Nothing overdue any more</value>
+  </data>
+  <data name="ui.collections.close_reason.subscription_ended" xml:space="preserve">
+    <value>Subscription ended</value>
+  </data>
+  <data name="ui.collections.close_reason.tenant_closed" xml:space="preserve">
+    <value>Account closed</value>
+  </data>
+  <data name="ui.collections.ageing.1" xml:space="preserve">
+    <value>Overdue 1–30 days</value>
+  </data>
+  <data name="ui.collections.ageing.2" xml:space="preserve">
+    <value>Overdue 31–60 days</value>
+  </data>
+  <data name="ui.collections.ageing.3" xml:space="preserve">
+    <value>Overdue 61–90 days</value>
+  </data>
+  <data name="ui.collections.ageing.4" xml:space="preserve">
+    <value>Overdue more than 90 days</value>
+  </data>
+  <data name="ui.collections.blocked_subscriptions" xml:space="preserve">
+    <value>Blocked subscriptions</value>
+  </data>
+  <data name="ui.collections.overdue_total" xml:space="preserve">
+    <value>Overdue in total</value>
+  </data>
+  <data name="ui.collections.extensions_ending" xml:space="preserve">
+    <value>Extensions ending within 7 days</value>
+  </data>
+  <data name="ui.collections.long_blocks" xml:space="preserve">
+    <value>Blocked for a long time</value>
+  </data>
+  <data name="ui.collections.failed_retries" xml:space="preserve">
+    <value>Failed card retries (7 days)</value>
+  </data>
+  <data name="ui.collections.recovered" xml:space="preserve">
+    <value>Recovered (30 days)</value>
+  </data>
+  <data name="ui.collections.search" xml:space="preserve">
+    <value>Tenant</value>
+  </data>
+  <data name="ui.collections.currency" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="ui.collections.in_extension" xml:space="preserve">
+    <value>In an extension</value>
+  </data>
+  <data name="ui.collections.count" xml:space="preserve">
+    <value>{count} cases</value>
+  </data>
+  <data name="ui.collections.empty" xml:space="preserve">
+    <value>No collections case.</value>
+  </data>
+  <data name="ui.collections.overdue" xml:space="preserve">
+    <value>Overdue</value>
+  </data>
+  <data name="ui.collections.oldest_due" xml:space="preserve">
+    <value>Oldest due date</value>
+  </data>
+  <data name="ui.collections.next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="ui.collections.subscription" xml:space="preserve">
+    <value>Subscription</value>
+  </data>
+  <data name="ui.collections.held" xml:space="preserve">
+    <value>On hold</value>
+  </data>
+  <data name="ui.collections.held_help" xml:space="preserve">
+    <value>A credit note request waits for a decision; the next step waits too.</value>
+  </data>
+  <data name="ui.collections.extended_through" xml:space="preserve">
+    <value>Extended through {date}</value>
+  </data>
+  <data name="ui.collections.blocked_since" xml:space="preserve">
+    <value>Blocked since {date}</value>
+  </data>
+  <data name="ui.collections.block_on" xml:space="preserve">
+    <value>Block on {date}</value>
+  </data>
+  <data name="ui.collections.closed_on" xml:space="preserve">
+    <value>Closed on {date}</value>
+  </data>
+  <data name="ui.collections.opened" xml:space="preserve">
+    <value>Opened</value>
+  </data>
+  <data name="ui.collections.block_date" xml:space="preserve">
+    <value>Block date</value>
+  </data>
+  <data name="ui.collections.blocked_at" xml:space="preserve">
+    <value>Blocked</value>
+  </data>
+  <data name="ui.collections.level.read_only" xml:space="preserve">
+    <value>Read-only for the tenant’s staff</value>
+  </data>
+  <data name="ui.collections.level.payment_required" xml:space="preserve">
+    <value>Payment required: only the owner and billing contact can sign in, to pay</value>
+  </data>
+  <data name="ui.collections.customers_unaffected" xml:space="preserve">
+    <value>The tenant’s customers are never affected: portal, tracking, booking and notifications keep working.</value>
+  </data>
+  <data name="ui.collections.extensions" xml:space="preserve">
+    <value>Extensions</value>
+  </data>
+  <data name="ui.collections.extensions_used" xml:space="preserve">
+    <value>{count} given</value>
+  </data>
+  <data name="ui.collections.overdue_invoices" xml:space="preserve">
+    <value>Overdue invoices</value>
+  </data>
+  <data name="ui.collections.credit_requested" xml:space="preserve">
+    <value>Credit note requested</value>
+  </data>
+  <data name="ui.collections.extend_through" xml:space="preserve">
+    <value>Give time until (included)</value>
+  </data>
+  <data name="ui.collections.extension_reason" xml:space="preserve">
+    <value>Reason (internal)</value>
+  </data>
+  <data name="ui.collections.extension_help" xml:space="preserve">
+    <value>Reminders pause and any block is lifted until that day. The tenant only sees the date.</value>
+  </data>
+  <data name="ui.collections.extension_beyond_help" xml:space="preserve">
+    <value>The per-case limit is reached: only a sales manager can give more time.</value>
+  </data>
+  <data name="ui.collections.extend" xml:space="preserve">
+    <value>Give time</value>
+  </data>
+  <data name="ui.collections.note" xml:space="preserve">
+    <value>Note (internal)</value>
+  </data>
+  <data name="ui.collections.add_note" xml:space="preserve">
+    <value>Add note</value>
+  </data>
+  <data name="ui.collections.check_now" xml:space="preserve">
+    <value>Check again now</value>
+  </data>
+  <data name="ui.collections.note_added" xml:space="preserve">
+    <value>Note added.</value>
+  </data>
+  <data name="ui.collections.checked" xml:space="preserve">
+    <value>Checked again.</value>
+  </data>
+  <data name="ui.collections.extension_granted" xml:space="preserve">
+    <value>Extension given. The tenant was emailed the date.</value>
+  </data>
+  <data name="ui.collections.tenant_page" xml:space="preserve">
+    <value>Tenant page</value>
+  </data>
+  <data name="ui.collections.tenant_summary" xml:space="preserve">
+    <value>{amount} overdue since {date}.</value>
+  </data>
+  <data name="ui.collections.open_case" xml:space="preserve">
+    <value>Open the case</value>
+  </data>
+  <data name="ui.collections.up_to_date" xml:space="preserve">
+    <value>Nothing overdue.</value>
+  </data>
+  <data name="ui.collections_settings.title" xml:space="preserve">
+    <value>Collections settings</value>
+  </data>
+  <data name="ui.collections_settings.timeline" xml:space="preserve">
+    <value>Timeline</value>
+  </data>
+  <data name="ui.collections_settings.timeline_help" xml:space="preserve">
+    <value>Days after the invoice due date. Day 1 is the first day it is overdue.</value>
+  </data>
+  <data name="ui.collections_settings.enabled" xml:space="preserve">
+    <value>Collections on</value>
+  </data>
+  <data name="ui.collections_settings.reminder1" xml:space="preserve">
+    <value>First reminder (day)</value>
+  </data>
+  <data name="ui.collections_settings.reminder2" xml:space="preserve">
+    <value>Second reminder (day)</value>
+  </data>
+  <data name="ui.collections_settings.final_warning" xml:space="preserve">
+    <value>Final warning (day)</value>
+  </data>
+  <data name="ui.collections_settings.block_day" xml:space="preserve">
+    <value>Block (day)</value>
+  </data>
+  <data name="ui.collections_settings.minimum_notice" xml:space="preserve">
+    <value>Minimum notice before a block (days)</value>
+  </data>
+  <data name="ui.collections_settings.minimum_notice_help" xml:space="preserve">
+    <value>The block always comes at least this long after the final warning.</value>
+  </data>
+  <data name="ui.collections_settings.retry_days" xml:space="preserve">
+    <value>Card retries (days)</value>
+  </data>
+  <data name="ui.collections_settings.retry_days_help" xml:space="preserve">
+    <value>For example 3, 7. Only for tenants who agreed to automatic charging.</value>
+  </data>
+  <data name="ui.collections_settings.blocking" xml:space="preserve">
+    <value>Blocking</value>
+  </data>
+  <data name="ui.collections_settings.blocking_help" xml:space="preserve">
+    <value>When blocked, the tenant’s staff first get read-only access, then no access except the payment page. The tenant’s customers are never affected.</value>
+  </data>
+  <data name="ui.collections_settings.read_only_days" xml:space="preserve">
+    <value>Read-only days after the block</value>
+  </data>
+  <data name="ui.collections_settings.read_only_days_help" xml:space="preserve">
+    <value>0 means no access at once.</value>
+  </data>
+  <data name="ui.collections_settings.stay_read_only" xml:space="preserve">
+    <value>Stay read-only until paid (never cut off)</value>
+  </data>
+  <data name="ui.collections_settings.pending_days" xml:space="preserve">
+    <value>Read-only days for an unpaid new subscription</value>
+  </data>
+  <data name="ui.collections_settings.pending_days_help" xml:space="preserve">
+    <value>After a trial or the first invoice; then it is blocked like any unpaid bill.</value>
+  </data>
+  <data name="ui.collections_settings.long_block_days" xml:space="preserve">
+    <value>Flag blocks longer than (days)</value>
+  </data>
+  <data name="ui.collections_settings.long_block_days_help" xml:space="preserve">
+    <value>Shown on the overview so staff can decide to end the subscription.</value>
+  </data>
+  <data name="ui.collections_settings.extensions" xml:space="preserve">
+    <value>Extensions</value>
+  </data>
+  <data name="ui.collections_settings.extension_days" xml:space="preserve">
+    <value>Longest extension (days)</value>
+  </data>
+  <data name="ui.collections_settings.extensions_per_case" xml:space="preserve">
+    <value>Extensions per case</value>
+  </data>
+  <data name="ui.collections_settings.extensions_per_case_help" xml:space="preserve">
+    <value>More needs a sales manager.</value>
+  </data>
+  <data name="ui.collections_settings.save" xml:space="preserve">
+    <value>Save settings</value>
+  </data>
+  <data name="ui.collections_settings.saved" xml:space="preserve">
+    <value>Collections settings saved.</value>
+  </data>
+  <data name="email.collections.invoice_line" xml:space="preserve">
+    <value>- {invoice}, due {due}: {amount} - pay by card: {link}</value>
+  </data>
+  <data name="email.collections.invoice_line_no_link" xml:space="preserve">
+    <value>- {invoice}, due {due}: {amount}</value>
+  </data>
+  <data name="email.collections.total" xml:space="preserve">
+    <value>Total due: {amounts}</value>
+  </data>
+  <data name="email.collections.instructions" xml:space="preserve">
+    <value>How to pay:</value>
+  </data>
+  <data name="email.collections.closing" xml:space="preserve">
+    <value>Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.collections.reminder_1.subject" xml:space="preserve">
+    <value>Payment reminder - {company}</value>
+  </data>
+  <data name="email.collections.reminder_1.body" xml:space="preserve">
+    <value>Hello {name},
+
+This is a friendly reminder that the following Vixly invoices for {company} are past their due date:</value>
+  </data>
+  <data name="email.collections.reminder_2.subject" xml:space="preserve">
+    <value>Second payment reminder - {company}</value>
+  </data>
+  <data name="email.collections.reminder_2.body" xml:space="preserve">
+    <value>Hello {name},
+
+We have not yet received payment for the following Vixly invoices for {company}. Please pay them as soon as possible:</value>
+  </data>
+  <data name="email.collections.final_warning.subject" xml:space="preserve">
+    <value>Final notice: access will be limited on {blockDate} - {company}</value>
+  </data>
+  <data name="email.collections.final_warning.body" xml:space="preserve">
+    <value>Hello {name},
+
+The following Vixly invoices for {company} are still unpaid. If they are not paid by {blockDate}, your team’s access to Vixly will be limited until payment. Your customers will not be affected.</value>
+  </data>
+  <data name="email.collections.blocked.subject" xml:space="preserve">
+    <value>Access limited for non-payment - {company}</value>
+  </data>
+  <data name="email.collections.blocked.body" xml:space="preserve">
+    <value>Hello {name},
+
+Because the following Vixly invoices for {company} are unpaid, your team’s access to Vixly is now limited. Your customers are not affected. Access is restored as soon as payment is received.</value>
+  </data>
+  <data name="email.collections.extension_granted.subject" xml:space="preserve">
+    <value>More time to pay until {through} - {company}</value>
+  </data>
+  <data name="email.collections.extension_granted.body" xml:space="preserve">
+    <value>Hello {name},
+
+As agreed, {company} has until {through} to pay the following Vixly invoices. Your team keeps full access until then.</value>
+  </data>
+  <data name="email.collections.extension_ending.subject" xml:space="preserve">
+    <value>Your extension ends on {through} - {company}</value>
+  </data>
+  <data name="email.collections.extension_ending.body" xml:space="preserve">
+    <value>Hello {name},
+
+The extra time given to {company} ends on {through}. Please pay the following Vixly invoices before then:</value>
+  </data>
+  <data name="email.collections.access_restored.subject" xml:space="preserve">
+    <value>Access restored - {company}</value>
+  </data>
+  <data name="email.collections.access_restored.body" xml:space="preserve">
+    <value>Hello {name},
+
+Thank you: we have received payment and full access to Vixly is restored for {company}.</value>
+  </data>
+  <data name="platform.licensing.no_free_seat" xml:space="preserve">
+    <value>No licence is free: {inUse} of {seats} are in use. Release a device or add licences first.</value>
+  </data>
+  <data name="platform.licensing.too_many_pending" xml:space="preserve">
+    <value>Too many devices are waiting for approval (at most {max}). Approve or deny some first.</value>
+  </data>
+  <data name="platform.licensing.device_not_found" xml:space="preserve">
+    <value>The device was not found.</value>
+  </data>
+  <data name="platform.licensing.not_allowed_in_status" xml:space="preserve">
+    <value>This cannot be done while the device is in its current state.</value>
+  </data>
+  <data name="platform.licensing.name_invalid" xml:space="preserve">
+    <value>Give the device a name of at most 80 characters.</value>
+  </data>
+  <data name="platform.licensing.kind_invalid" xml:space="preserve">
+    <value>Choose the kind of device.</value>
+  </data>
+  <data name="platform.licensing.public_key_invalid" xml:space="preserve">
+    <value>The device key is not valid.</value>
+  </data>
+  <data name="platform.licensing.link_invalid" xml:space="preserve">
+    <value>This link is not valid or has expired. Ask for a new one.</value>
+  </data>
+  <data name="platform.licensing.tenant_not_active" xml:space="preserve">
+    <value>The account is not active.</value>
+  </data>
+  <data name="platform.licensing.access_not_full" xml:space="preserve">
+    <value>New devices can be approved only while the subscription is fully active.</value>
+  </data>
+  <data name="platform.licensing.reason_required" xml:space="preserve">
+    <value>Give a reason.</value>
+  </data>
+  <data name="platform.licensing.actor_required" xml:space="preserve">
+    <value>A signed-in user is required.</value>
+  </data>
+  <data name="platform.licensing.proof_invalid" xml:space="preserve">
+    <value>The device could not prove who it is.</value>
+  </data>
+  <data name="platform.licensing.release_not_pending" xml:space="preserve">
+    <value>This device is not waiting for a release decision.</value>
+  </data>
+  <data name="platform.licensing.registration_not_ready" xml:space="preserve">
+    <value>The registration is not ready for its first device yet.</value>
+  </data>
+  <data name="platform.licensing.too_many_links" xml:space="preserve">
+    <value>Too many links were asked for. Try again in an hour.</value>
+  </data>
+  <data name="ui.permission.platform.licensing.view" xml:space="preserve">
+    <value>View tenant devices and licences</value>
+  </data>
+  <data name="ui.permission.platform.licensing.manage" xml:space="preserve">
+    <value>Revoke devices and send owner links</value>
+  </data>
+  <data name="ui.permission.platform.licensing.approve_release" xml:space="preserve">
+    <value>Decide releases over the allowance</value>
+  </data>
+  <data name="ui.permission_area.licensing" xml:space="preserve">
+    <value>Licensing</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.device_requested" xml:space="preserve">
+    <value>Device requested</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.device_approved" xml:space="preserve">
+    <value>Device approved</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.device_denied" xml:space="preserve">
+    <value>Device denied</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.device_released" xml:space="preserve">
+    <value>Device released</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.release_requested" xml:space="preserve">
+    <value>Release sent for review</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.release_decided" xml:space="preserve">
+    <value>Release decided</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.release_withdrawn" xml:space="preserve">
+    <value>Release withdrawn</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.device_revoked" xml:space="preserve">
+    <value>Device revoked</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.device_expired" xml:space="preserve">
+    <value>Device request expired</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.device_enrolled_by_link" xml:space="preserve">
+    <value>Device added by owner link</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.first_device_link_requested" xml:space="preserve">
+    <value>First-device link sent</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.owner_recovery_started" xml:space="preserve">
+    <value>Owner recovery started</value>
+  </data>
+  <data name="ui.audit.action.platform.tenants.activated_by_registration" xml:space="preserve">
+    <value>Tenant activated by registration</value>
+  </data>
+  <data name="ui.device_history.requested" xml:space="preserve">
+    <value>Requested</value>
+  </data>
+  <data name="ui.device_history.approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="ui.device_history.denied" xml:space="preserve">
+    <value>Denied</value>
+  </data>
+  <data name="ui.device_history.released" xml:space="preserve">
+    <value>Released</value>
+  </data>
+  <data name="ui.device_history.release_requested" xml:space="preserve">
+    <value>Release sent to Vixly for review</value>
+  </data>
+  <data name="ui.device_history.release_approved" xml:space="preserve">
+    <value>Release approved by Vixly</value>
+  </data>
+  <data name="ui.device_history.release_refused" xml:space="preserve">
+    <value>Release refused by Vixly</value>
+  </data>
+  <data name="ui.device_history.release_withdrawn" xml:space="preserve">
+    <value>Release withdrawn</value>
+  </data>
+  <data name="ui.device_history.revoked" xml:space="preserve">
+    <value>Revoked</value>
+  </data>
+  <data name="ui.device_history.expired" xml:space="preserve">
+    <value>Request expired</value>
+  </data>
+  <data name="ui.device_history.enrolled_by_link" xml:space="preserve">
+    <value>Added by the owner’s link</value>
+  </data>
+  <data name="ui.device_history.link_sent" xml:space="preserve">
+    <value>Owner link sent</value>
+  </data>
+  <data name="ui.device.status.pending" xml:space="preserve">
+    <value>Waiting for approval</value>
+  </data>
+  <data name="ui.device.status.active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="ui.device.status.release_pending" xml:space="preserve">
+    <value>Release under review</value>
+  </data>
+  <data name="ui.device.status.released" xml:space="preserve">
+    <value>Released</value>
+  </data>
+  <data name="ui.device.status.revoked" xml:space="preserve">
+    <value>Revoked</value>
+  </data>
+  <data name="ui.device.status.denied" xml:space="preserve">
+    <value>Denied</value>
+  </data>
+  <data name="ui.device.status.expired" xml:space="preserve">
+    <value>Expired</value>
+  </data>
+  <data name="ui.device.kind.pc" xml:space="preserve">
+    <value>Computer</value>
+  </data>
+  <data name="ui.device.kind.phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="ui.device.kind.scanner" xml:space="preserve">
+    <value>Scanner</value>
+  </data>
+  <data name="ui.device.kind.tablet" xml:space="preserve">
+    <value>Tablet</value>
+  </data>
+  <data name="ui.device.kind.other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="ui.device.proof.key_pair" xml:space="preserve">
+    <value>Device key</value>
+  </data>
+  <data name="ui.device.proof.secret" xml:space="preserve">
+    <value>Rotating secret</value>
+  </data>
+  <data name="ui.device.reason.replaced" xml:space="preserve">
+    <value>Replaced</value>
+  </data>
+  <data name="ui.device.reason.lost_or_stolen" xml:space="preserve">
+    <value>Lost or stolen</value>
+  </data>
+  <data name="ui.device.reason.broken" xml:space="preserve">
+    <value>Broken</value>
+  </data>
+  <data name="ui.device.reason.staff_left" xml:space="preserve">
+    <value>Staff member left</value>
+  </data>
+  <data name="ui.device.reason.other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="ui.device.reason.credential_reused" xml:space="preserve">
+    <value>Old secret used again</value>
+  </data>
+  <data name="ui.device.reason.subscription_ended" xml:space="preserve">
+    <value>Subscription ended</value>
+  </data>
+  <data name="ui.device.reason.tenant_closed" xml:space="preserve">
+    <value>Account closed</value>
+  </data>
+  <data name="ui.device.reason.security" xml:space="preserve">
+    <value>Security</value>
+  </data>
+  <data name="ui.device.reason.replaced_by_recovery" xml:space="preserve">
+    <value>Replaced during owner recovery</value>
+  </data>
+  <data name="ui.device.reason.not_recognized" xml:space="preserve">
+    <value>Not recognised</value>
+  </data>
+  <data name="ui.device.title" xml:space="preserve">
+    <value>Device</value>
+  </data>
+  <data name="ui.device.actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ui.device.approve_release" xml:space="preserve">
+    <value>Approve release</value>
+  </data>
+  <data name="ui.device.refuse_release" xml:space="preserve">
+    <value>Refuse release</value>
+  </data>
+  <data name="ui.device.revoke" xml:space="preserve">
+    <value>Revoke device</value>
+  </data>
+  <data name="ui.device.approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="ui.device.ended" xml:space="preserve">
+    <value>Ended</value>
+  </data>
+  <data name="ui.device.history" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="ui.device.kind" xml:space="preserve">
+    <value>Kind</value>
+  </data>
+  <data name="ui.device.proof" xml:space="preserve">
+    <value>Proof</value>
+  </data>
+  <data name="ui.device.note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="ui.device.note_help" xml:space="preserve">
+    <value>Required. The tenant sees a release decision; the note stays internal.</value>
+  </data>
+  <data name="ui.device.release_requested" xml:space="preserve">
+    <value>Release asked</value>
+  </data>
+  <data name="ui.device.requested_by" xml:space="preserve">
+    <value>Requested by</value>
+  </data>
+  <data name="ui.device.seat_held" xml:space="preserve">
+    <value>The licence stays taken until Vixly approves the release.</value>
+  </data>
+  <data name="ui.device.what" xml:space="preserve">
+    <value>What</value>
+  </data>
+  <data name="ui.device.done.approve" xml:space="preserve">
+    <value>Release approved. The licence is free again.</value>
+  </data>
+  <data name="ui.device.done.refuse" xml:space="preserve">
+    <value>Release refused.</value>
+  </data>
+  <data name="ui.device.done.revoke" xml:space="preserve">
+    <value>Device revoked.</value>
+  </data>
+  <data name="ui.devices.title" xml:space="preserve">
+    <value>Devices</value>
+  </data>
+  <data name="ui.devices.review_queue" xml:space="preserve">
+    <value>Releases to review</value>
+  </data>
+  <data name="ui.devices.awaiting_review" xml:space="preserve">
+    <value>Awaiting review</value>
+  </data>
+  <data name="ui.devices.clear_tenant" xml:space="preserve">
+    <value>All tenants</value>
+  </data>
+  <data name="ui.devices.tenant_filter" xml:space="preserve">
+    <value>Back to the tenant</value>
+  </data>
+  <data name="ui.devices.count" xml:space="preserve">
+    <value>{count} device(s)</value>
+  </data>
+  <data name="ui.devices.last_seen" xml:space="preserve">
+    <value>Last seen</value>
+  </data>
+  <data name="ui.devices.name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ui.devices.number" xml:space="preserve">
+    <value>Number</value>
+  </data>
+  <data name="ui.devices.requested" xml:space="preserve">
+    <value>Requested</value>
+  </data>
+  <data name="ui.devices.search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="ui.devices.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.devices.status.all" xml:space="preserve">
+    <value>All statuses</value>
+  </data>
+  <data name="ui.devices.tenant" xml:space="preserve">
+    <value>Tenant</value>
+  </data>
+  <data name="ui.licensing.title" xml:space="preserve">
+    <value>Licensing</value>
+  </data>
+  <data name="ui.licensing.seats" xml:space="preserve">
+    <value>Licences</value>
+  </data>
+  <data name="ui.licensing.seats_used" xml:space="preserve">
+    <value>{inUse} of {seats} in use</value>
+  </data>
+  <data name="ui.licensing.seats_scheduled" xml:space="preserve">
+    <value>{seats} from the next period</value>
+  </data>
+  <data name="ui.licensing.pending" xml:space="preserve">
+    <value>Waiting for approval</value>
+  </data>
+  <data name="ui.licensing.awaiting_review" xml:space="preserve">
+    <value>Releases under review</value>
+  </data>
+  <data name="ui.licensing.allowance" xml:space="preserve">
+    <value>Release allowance</value>
+  </data>
+  <data name="ui.licensing.allowance_value" xml:space="preserve">
+    <value>{count} per 30 days</value>
+  </data>
+  <data name="ui.licensing.all_devices" xml:space="preserve">
+    <value>All devices of this tenant</value>
+  </data>
+  <data name="ui.licensing.send_first_link" xml:space="preserve">
+    <value>Send the first-device link again</value>
+  </data>
+  <data name="ui.licensing.start_recovery" xml:space="preserve">
+    <value>Start owner recovery</value>
+  </data>
+  <data name="ui.licensing.recovery_help" xml:space="preserve">
+    <value>Both send a one-time link to the owner’s email. Staff never see the link.</value>
+  </data>
+  <data name="ui.licensing.first_link_sent" xml:space="preserve">
+    <value>The first-device link was sent to the owner.</value>
+  </data>
+  <data name="ui.licensing.recovery_sent" xml:space="preserve">
+    <value>The recovery link was sent to the owner.</value>
+  </data>
+  <data name="email.licensing.first_device.subject" xml:space="preserve">
+    <value>Set up the first device for {company}</value>
+  </data>
+  <data name="email.licensing.first_device.body" xml:space="preserve">
+    <value>Hello {name},
+
+Open this link on the device you will use first to finish setting up {company} on Vixly:
+{link}
+
+The link works once and expires on {expires} (UTC).
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.licensing.recovery.subject" xml:space="preserve">
+    <value>Recover access to {company}</value>
+  </data>
+  <data name="email.licensing.recovery.body" xml:space="preserve">
+    <value>Hello {name},
+
+Vixly support started an owner recovery for {company}. Open this link on the device you want to use:
+{link}
+
+The link works once and expires on {expires} (UTC). If you did not ask for this, contact us right away.
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.licensing.device_added.subject" xml:space="preserve">
+    <value>New device approved for {company}</value>
+  </data>
+  <data name="email.licensing.device_added.body" xml:space="preserve">
+    <value>Hello {name},
+
+The device {device} ({number}) was approved and now uses one of the licences of {company}.
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.licensing.device_replaced.subject" xml:space="preserve">
+    <value>A device of {company} was replaced</value>
+  </data>
+  <data name="email.licensing.device_replaced.body" xml:space="preserve">
+    <value>Hello {name},
+
+During owner recovery, the device {device} ({number}) was replaced by a new one. If this was not you, contact us right away.
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.licensing.release_approved.subject" xml:space="preserve">
+    <value>Device release approved for {company}</value>
+  </data>
+  <data name="email.licensing.release_approved.body" xml:space="preserve">
+    <value>Hello {name},
+
+Vixly approved the release of {device} ({number}). Its licence is free again.
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.licensing.release_refused.subject" xml:space="preserve">
+    <value>Device release refused for {company}</value>
+  </data>
+  <data name="email.licensing.release_refused.body" xml:space="preserve">
+    <value>Hello {name},
+
+Vixly did not approve the release of {device} ({number}). It keeps its licence.
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.licensing.devices_revoked.subject" xml:space="preserve">
+    <value>Devices of {company} were signed out</value>
+  </data>
+  <data name="email.licensing.devices_revoked.body" xml:space="preserve">
+    <value>Hello {name},
+
+{count} device(s) of {company} can no longer use Vixly because the account or subscription ended.
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.licensing.credential_reused.subject" xml:space="preserve">
+    <value>A device of {company} was blocked for safety</value>
+  </data>
+  <data name="email.licensing.credential_reused.body" xml:space="preserve">
+    <value>Hello {name},
+
+The device {device} ({number}) used an old secret again, which can mean it was copied. We revoked it to keep {company} safe. Approve it again from a trusted device if this was expected.
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="platform.payments.zelle_not_available" xml:space="preserve">
+    <value>Zelle is not available for this payment.</value>
+  </data>
+  <data name="platform.payments.zelle_settings_invalid" xml:space="preserve">
+    <value>To turn Zelle on, give the recipient name and at least an email, a Zelle tag or a phone number.</value>
+  </data>
+  <data name="platform.payments.zelle_recipient_invalid" xml:space="preserve">
+    <value>Give a recipient name of at most 100 characters.</value>
+  </data>
+  <data name="platform.payments.zelle_email_invalid" xml:space="preserve">
+    <value>The Zelle email is not valid.</value>
+  </data>
+  <data name="platform.payments.zelle_tag_invalid" xml:space="preserve">
+    <value>The Zelle tag must be at most 50 characters, without spaces.</value>
+  </data>
+  <data name="platform.payments.zelle_phone_invalid" xml:space="preserve">
+    <value>The Zelle phone number is not valid.</value>
+  </data>
+  <data name="platform.payments.zelle_qr_invalid" xml:space="preserve">
+    <value>The QR code must be a PNG or JPEG image of at most {max} KB.</value>
+  </data>
+  <data name="platform.payments.zelle_amount_invalid" xml:space="preserve">
+    <value>Enter the amount you sent, with at most two decimals, no more than the balance due.</value>
+  </data>
+  <data name="platform.payments.zelle_date_invalid" xml:space="preserve">
+    <value>Enter the day you sent the money: not in the future and at most {days} days ago.</value>
+  </data>
+  <data name="platform.payments.zelle_sender_invalid" xml:space="preserve">
+    <value>Enter the name the money was sent from (at most 100 characters).</value>
+  </data>
+  <data name="platform.payments.zelle_reference_invalid" xml:space="preserve">
+    <value>Enter the Zelle confirmation code from your bank (at most 60 characters).</value>
+  </data>
+  <data name="platform.payments.zelle_claim_waiting" xml:space="preserve">
+    <value>A Zelle payment for this invoice is already waiting to be checked.</value>
+  </data>
+  <data name="platform.payments.zelle_too_many_claims" xml:space="preserve">
+    <value>Too many Zelle payments were reported for this invoice. Please contact us.</value>
+  </data>
+  <data name="platform.payments.zelle_claim_not_found" xml:space="preserve">
+    <value>The Zelle payment report was not found.</value>
+  </data>
+  <data name="platform.payments.zelle_claim_decided" xml:space="preserve">
+    <value>This Zelle payment report was already decided.</value>
+  </data>
+  <data name="platform.payments.zelle_reason_required" xml:space="preserve">
+    <value>Give the reason the customer will read (at most 500 characters).</value>
+  </data>
+  <data name="platform.payments.zelle_actor_required" xml:space="preserve">
+    <value>A signed-in staff member is required.</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.zelle_updated" xml:space="preserve">
+    <value>Zelle settings updated</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.zelle_qr_updated" xml:space="preserve">
+    <value>Zelle QR code changed</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.zelle_claim_submitted" xml:space="preserve">
+    <value>Zelle payment reported by the customer</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.zelle_claim_confirmed" xml:space="preserve">
+    <value>Zelle payment confirmed</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.zelle_claim_rejected" xml:space="preserve">
+    <value>Zelle payment rejected</value>
+  </data>
+  <data name="ui.collections.held_help_any" xml:space="preserve">
+    <value>A credit note request or a Zelle payment report waits for a decision; the next step waits too.</value>
+  </data>
+  <data name="ui.zelle_settings.title" xml:space="preserve">
+    <value>Zelle</value>
+  </data>
+  <data name="ui.zelle_settings.help" xml:space="preserve">
+    <value>Customers paying a US-dollar invoice see these details at checkout, send the money with their bank, then report it. Nothing is paid until staff confirm the money arrived.</value>
+  </data>
+  <data name="ui.zelle_settings.enabled" xml:space="preserve">
+    <value>Offer Zelle at checkout</value>
+  </data>
+  <data name="ui.zelle_settings.recipient" xml:space="preserve">
+    <value>Recipient name (as customers see it in their bank)</value>
+  </data>
+  <data name="ui.zelle_settings.email" xml:space="preserve">
+    <value>Zelle email</value>
+  </data>
+  <data name="ui.zelle_settings.tag" xml:space="preserve">
+    <value>Zelle tag</value>
+  </data>
+  <data name="ui.zelle_settings.phone" xml:space="preserve">
+    <value>Zelle phone</value>
+  </data>
+  <data name="ui.zelle_settings.ways_help" xml:space="preserve">
+    <value>Give at least one: email, Zelle tag or phone.</value>
+  </data>
+  <data name="ui.zelle_settings.save" xml:space="preserve">
+    <value>Save Zelle settings</value>
+  </data>
+  <data name="ui.zelle_settings.saved" xml:space="preserve">
+    <value>Zelle settings saved.</value>
+  </data>
+  <data name="ui.zelle_settings.qr" xml:space="preserve">
+    <value>QR code</value>
+  </data>
+  <data name="ui.zelle_settings.qr_alt" xml:space="preserve">
+    <value>Zelle QR code</value>
+  </data>
+  <data name="ui.zelle_settings.qr_none" xml:space="preserve">
+    <value>No QR code yet.</value>
+  </data>
+  <data name="ui.zelle_settings.qr_upload" xml:space="preserve">
+    <value>Upload a QR code</value>
+  </data>
+  <data name="ui.zelle_settings.qr_help" xml:space="preserve">
+    <value>PNG or JPEG, at most {maxKilobytes} KB. Use the QR code your bank app shows for receiving Zelle payments.</value>
+  </data>
+  <data name="ui.zelle_settings.qr_remove" xml:space="preserve">
+    <value>Remove the QR code</value>
+  </data>
+  <data name="ui.zelle_settings.qr_saved" xml:space="preserve">
+    <value>QR code saved.</value>
+  </data>
+  <data name="ui.zelle_settings.qr_removed" xml:space="preserve">
+    <value>QR code removed.</value>
+  </data>
+  <data name="ui.zelle.title" xml:space="preserve">
+    <value>Zelle payments</value>
+  </data>
+  <data name="ui.zelle.claim" xml:space="preserve">
+    <value>Zelle payment report</value>
+  </data>
+  <data name="ui.zelle.search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="ui.zelle.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.zelle.status.all" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="ui.zelle.status.waiting" xml:space="preserve">
+    <value>Waiting to be checked</value>
+  </data>
+  <data name="ui.zelle.status.confirmed" xml:space="preserve">
+    <value>Confirmed</value>
+  </data>
+  <data name="ui.zelle.status.rejected" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="ui.zelle.source.payment_link" xml:space="preserve">
+    <value>From a pay link</value>
+  </data>
+  <data name="ui.zelle.source.registration" xml:space="preserve">
+    <value>From the registration</value>
+  </data>
+  <data name="ui.zelle.count" xml:space="preserve">
+    <value>{count} report(s)</value>
+  </data>
+  <data name="ui.zelle.reported" xml:space="preserve">
+    <value>Reported</value>
+  </data>
+  <data name="ui.zelle.tenant" xml:space="preserve">
+    <value>Tenant</value>
+  </data>
+  <data name="ui.zelle.amount" xml:space="preserve">
+    <value>Amount reported</value>
+  </data>
+  <data name="ui.zelle.sender" xml:space="preserve">
+    <value>Sent by</value>
+  </data>
+  <data name="ui.zelle.reference" xml:space="preserve">
+    <value>Zelle confirmation code</value>
+  </data>
+  <data name="ui.zelle.sent_on" xml:space="preserve">
+    <value>Sent on</value>
+  </data>
+  <data name="ui.zelle.balance_now" xml:space="preserve">
+    <value>Invoice balance now</value>
+  </data>
+  <data name="ui.zelle.decided" xml:space="preserve">
+    <value>Decided</value>
+  </data>
+  <data name="ui.zelle.received" xml:space="preserve">
+    <value>Amount received</value>
+  </data>
+  <data name="ui.zelle.note" xml:space="preserve">
+    <value>Internal note</value>
+  </data>
+  <data name="ui.zelle.confirm_title" xml:space="preserve">
+    <value>Confirm the payment</value>
+  </data>
+  <data name="ui.zelle.confirm_help" xml:space="preserve">
+    <value>Confirm only once the money is in Vixly’s bank account. A Zelle payment is recorded on the invoice and the receipt is emailed.</value>
+  </data>
+  <data name="ui.zelle.received_amount" xml:space="preserve">
+    <value>Amount received</value>
+  </data>
+  <data name="ui.zelle.received_on" xml:space="preserve">
+    <value>Received on</value>
+  </data>
+  <data name="ui.zelle.confirm" xml:space="preserve">
+    <value>Confirm payment</value>
+  </data>
+  <data name="ui.zelle.confirmed" xml:space="preserve">
+    <value>Payment confirmed and recorded.</value>
+  </data>
+  <data name="ui.zelle.reject_title" xml:space="preserve">
+    <value>Reject the report</value>
+  </data>
+  <data name="ui.zelle.reject_reason" xml:space="preserve">
+    <value>Reason for the customer</value>
+  </data>
+  <data name="ui.zelle.reject_help" xml:space="preserve">
+    <value>The customer receives this reason by email. Keep internal details in the note.</value>
+  </data>
+  <data name="ui.zelle.reject" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="ui.zelle.rejected" xml:space="preserve">
+    <value>Report rejected; the customer was told why.</value>
+  </data>
+  <data name="email.zelle.received.subject" xml:space="preserve">
+    <value>We received your Zelle payment notice for {invoice}</value>
+  </data>
+  <data name="email.zelle.received.body" xml:space="preserve">
+    <value>Hello {name},
+
+Thank you. We received your notice that {amount} was sent with Zelle on {date} for invoice {invoice} of {company}. We will check our bank and send the receipt once the payment is confirmed.
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.zelle.rejected.subject" xml:space="preserve">
+    <value>We could not confirm your Zelle payment for {invoice}</value>
+  </data>
+  <data name="email.zelle.rejected.body" xml:space="preserve">
+    <value>Hello {name},
+
+We could not confirm the Zelle payment of {amount} sent on {date} for invoice {invoice} of {company}.
+
+Reason: {reason}
+
+The invoice is still open. Please check with your bank, then report the payment again or contact us.
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.invoice.pay_online" xml:space="preserve">
+    <value>Pay online: {link}</value>
+  </data>
+  <data name="email.collections.invoice_line_online" xml:space="preserve">
+    <value>- {invoice}, due {due}: {amount} - pay online: {link}</value>
+  </data>
+  <data name="platform.legal.document_not_found" xml:space="preserve">
+    <value>The legal document was not found.</value>
+  </data>
+  <data name="platform.legal.not_draft" xml:space="preserve">
+    <value>Only a draft can be changed. Start a new version instead.</value>
+  </data>
+  <data name="platform.legal.version_invalid" xml:space="preserve">
+    <value>Give a version label of at most 20 characters, without spaces.</value>
+  </data>
+  <data name="platform.legal.version_taken" xml:space="preserve">
+    <value>This version label is already used for this document.</value>
+  </data>
+  <data name="platform.legal.kind_invalid" xml:space="preserve">
+    <value>Choose the kind of document.</value>
+  </data>
+  <data name="platform.legal.file_invalid" xml:space="preserve">
+    <value>The file must be a PDF of at most {max} MB.</value>
+  </data>
+  <data name="platform.legal.summary_invalid" xml:space="preserve">
+    <value>The summary must be plain text of at most 2,000 characters.</value>
+  </data>
+  <data name="platform.legal.languages_missing" xml:space="preserve">
+    <value>Upload the PDF in English, French and Spanish before publishing.</value>
+  </data>
+  <data name="platform.legal.parts_invalid" xml:space="preserve">
+    <value>The Terms must include the published Privacy Policy and Data Processing Agreement, and every other published document, once each.</value>
+  </data>
+  <data name="platform.legal.effective_date_invalid" xml:space="preserve">
+    <value>Terms that need acceptance take effect at least {days} days after publishing; dates cannot be in the past.</value>
+  </data>
+  <data name="platform.legal.nothing_to_accept" xml:space="preserve">
+    <value>There are no Terms to accept right now.</value>
+  </data>
+  <data name="platform.legal.version_changed" xml:space="preserve">
+    <value>The Terms changed since they were shown. Please read the new version.</value>
+  </data>
+  <data name="platform.legal.owner_only" xml:space="preserve">
+    <value>Only the account owner can accept the Terms.</value>
+  </data>
+  <data name="platform.legal.already_accepted" xml:space="preserve">
+    <value>This tenant already accepted this version.</value>
+  </data>
+  <data name="platform.legal.evidence_invalid" xml:space="preserve">
+    <value>Attach the signed paper as a PDF, PNG or JPEG of at most {max} MB.</value>
+  </data>
+  <data name="platform.legal.reason_required" xml:space="preserve">
+    <value>Give a reason (at most 500 characters).</value>
+  </data>
+  <data name="platform.legal.reminder_too_soon" xml:space="preserve">
+    <value>A reminder was sent in the last 24 hours. Try again later.</value>
+  </data>
+  <data name="platform.legal.actor_required" xml:space="preserve">
+    <value>A signed-in user is required.</value>
+  </data>
+  <data name="platform.legal.tenant_not_asked" xml:space="preserve">
+    <value>This tenant has nothing to accept.</value>
+  </data>
+  <data name="platform.billing.support_contact_invalid" xml:space="preserve">
+    <value>The support email or phone is not valid.</value>
+  </data>
+  <data name="ui.permission.platform.legal.view" xml:space="preserve">
+    <value>View legal documents and acceptances</value>
+  </data>
+  <data name="ui.permission.platform.legal.manage" xml:space="preserve">
+    <value>Prepare legal document drafts</value>
+  </data>
+  <data name="ui.permission.platform.legal.publish" xml:space="preserve">
+    <value>Publish legal documents</value>
+  </data>
+  <data name="ui.permission.platform.legal.remind" xml:space="preserve">
+    <value>Send Terms reminders</value>
+  </data>
+  <data name="ui.permission.platform.legal.record_acceptance" xml:space="preserve">
+    <value>Record an acceptance from a signed paper</value>
+  </data>
+  <data name="ui.permission_area.legal" xml:space="preserve">
+    <value>Legal</value>
+  </data>
+  <data name="ui.audit.action.platform.legal.draft_created" xml:space="preserve">
+    <value>Legal draft created</value>
+  </data>
+  <data name="ui.audit.action.platform.legal.draft_updated" xml:space="preserve">
+    <value>Legal draft changed</value>
+  </data>
+  <data name="ui.audit.action.platform.legal.file_set" xml:space="preserve">
+    <value>Legal file uploaded</value>
+  </data>
+  <data name="ui.audit.action.platform.legal.draft_deleted" xml:space="preserve">
+    <value>Legal draft deleted</value>
+  </data>
+  <data name="ui.audit.action.platform.legal.published" xml:space="preserve">
+    <value>Legal document published</value>
+  </data>
+  <data name="ui.audit.action.platform.legal.reminder_sent" xml:space="preserve">
+    <value>Terms reminder sent</value>
+  </data>
+  <data name="ui.audit.action.platform.legal.acceptance_recorded" xml:space="preserve">
+    <value>Offline acceptance recorded</value>
+  </data>
+  <data name="ui.audit.action.platform.legal.terms_accepted" xml:space="preserve">
+    <value>Terms accepted by the owner</value>
+  </data>
+  <data name="ui.audit.action.platform.legal.accepted_at_registration" xml:space="preserve">
+    <value>Terms accepted at registration</value>
+  </data>
+  <data name="ui.legal.kind.terms" xml:space="preserve">
+    <value>Terms of Service</value>
+  </data>
+  <data name="ui.legal.kind.privacy" xml:space="preserve">
+    <value>Privacy Policy</value>
+  </data>
+  <data name="ui.legal.kind.data_processing" xml:space="preserve">
+    <value>Data Processing Agreement</value>
+  </data>
+  <data name="ui.legal.kind.acceptable_use" xml:space="preserve">
+    <value>Acceptable Use Policy</value>
+  </data>
+  <data name="ui.legal.kind.service_level" xml:space="preserve">
+    <value>Service Level Agreement</value>
+  </data>
+  <data name="ui.legal.kind.all" xml:space="preserve">
+    <value>All documents</value>
+  </data>
+  <data name="ui.legal.document_status.draft" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="ui.legal.document_status.published" xml:space="preserve">
+    <value>Published</value>
+  </data>
+  <data name="ui.legal.document_status.superseded" xml:space="preserve">
+    <value>Superseded</value>
+  </data>
+  <data name="ui.legal.status.not_required" xml:space="preserve">
+    <value>Nothing to accept</value>
+  </data>
+  <data name="ui.legal.status.accepted" xml:space="preserve">
+    <value>Accepted</value>
+  </data>
+  <data name="ui.legal.status.due" xml:space="preserve">
+    <value>To accept</value>
+  </data>
+  <data name="ui.legal.status.overdue" xml:space="preserve">
+    <value>Overdue: read-only</value>
+  </data>
+  <data name="ui.legal.status.all" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="ui.legal.source.registration" xml:space="preserve">
+    <value>At registration</value>
+  </data>
+  <data name="ui.legal.source.operations" xml:space="preserve">
+    <value>By the owner in Vixly</value>
+  </data>
+  <data name="ui.legal.source.staff_record" xml:space="preserve">
+    <value>Recorded by staff (signed paper)</value>
+  </data>
+  <data name="ui.legal.step.published" xml:space="preserve">
+    <value>New version notice</value>
+  </data>
+  <data name="ui.legal.step.before14_days" xml:space="preserve">
+    <value>Reminder 14 days before</value>
+  </data>
+  <data name="ui.legal.step.before7_days" xml:space="preserve">
+    <value>Reminder 7 days before</value>
+  </data>
+  <data name="ui.legal.step.before1_day" xml:space="preserve">
+    <value>Reminder 1 day before</value>
+  </data>
+  <data name="ui.legal.step.after1_week" xml:space="preserve">
+    <value>Overdue: 1 week</value>
+  </data>
+  <data name="ui.legal.step.after2_weeks" xml:space="preserve">
+    <value>Overdue: 2 weeks</value>
+  </data>
+  <data name="ui.legal.step.after3_weeks" xml:space="preserve">
+    <value>Overdue: 3 weeks</value>
+  </data>
+  <data name="ui.legal.step.after4_weeks" xml:space="preserve">
+    <value>Overdue: 4 weeks</value>
+  </data>
+  <data name="ui.legal.step.manual" xml:space="preserve">
+    <value>Reminder sent by staff</value>
+  </data>
+  <data name="ui.legal.language.en" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="ui.legal.language.fr" xml:space="preserve">
+    <value>French</value>
+  </data>
+  <data name="ui.legal.language.es" xml:space="preserve">
+    <value>Spanish</value>
+  </data>
+  <data name="ui.legal.title" xml:space="preserve">
+    <value>Legal documents</value>
+  </data>
+  <data name="ui.legal.register" xml:space="preserve">
+    <value>Acceptance register</value>
+  </data>
+  <data name="ui.legal.document" xml:space="preserve">
+    <value>Legal document</value>
+  </data>
+  <data name="ui.legal.tenant_title" xml:space="preserve">
+    <value>Legal</value>
+  </data>
+  <data name="ui.legal.kind" xml:space="preserve">
+    <value>Document</value>
+  </data>
+  <data name="ui.legal.version" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="ui.legal.document_status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.legal.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.legal.effective" xml:space="preserve">
+    <value>Takes effect</value>
+  </data>
+  <data name="ui.legal.deadline" xml:space="preserve">
+    <value>Accept by</value>
+  </data>
+  <data name="ui.legal.published" xml:space="preserve">
+    <value>Published</value>
+  </data>
+  <data name="ui.legal.includes" xml:space="preserve">
+    <value>Includes</value>
+  </data>
+  <data name="ui.legal.acceptance" xml:space="preserve">
+    <value>Acceptance</value>
+  </data>
+  <data name="ui.legal.acceptance_required" xml:space="preserve">
+    <value>Tenants must accept this version</value>
+  </data>
+  <data name="ui.legal.notice_only" xml:space="preserve">
+    <value>Notice only (nothing to accept)</value>
+  </data>
+  <data name="ui.legal.acceptance_help" xml:space="preserve">
+    <value>Untick for corrections that change no rights, such as typos or contact details: tenants are told, nothing to accept.</value>
+  </data>
+  <data name="ui.legal.effective_help" xml:space="preserve">
+    <value>Empty: {days} days after publishing for Terms to accept, at once otherwise. Tenants have until this day to accept.</value>
+  </data>
+  <data name="ui.legal.new_draft" xml:space="preserve">
+    <value>New version</value>
+  </data>
+  <data name="ui.legal.new_draft_help" xml:space="preserve">
+    <value>A new Terms draft starts with the published versions of the other documents.</value>
+  </data>
+  <data name="ui.legal.create_draft" xml:space="preserve">
+    <value>Create draft</value>
+  </data>
+  <data name="ui.legal.draft" xml:space="preserve">
+    <value>Draft</value>
+  </data>
+  <data name="ui.legal.save_draft" xml:space="preserve">
+    <value>Save draft</value>
+  </data>
+  <data name="ui.legal.draft_saved" xml:space="preserve">
+    <value>Draft saved.</value>
+  </data>
+  <data name="ui.legal.files" xml:space="preserve">
+    <value>Files</value>
+  </data>
+  <data name="ui.legal.files_help" xml:space="preserve">
+    <value>One approved PDF per language, at most {max} MB. Customers download the file; it is never shown as a web page.</value>
+  </data>
+  <data name="ui.legal.no_file" xml:space="preserve">
+    <value>No file yet.</value>
+  </data>
+  <data name="ui.legal.download" xml:space="preserve">
+    <value>Download PDF</value>
+  </data>
+  <data name="ui.legal.summary" xml:space="preserve">
+    <value>What changed (plain text, shown in emails)</value>
+  </data>
+  <data name="ui.legal.upload" xml:space="preserve">
+    <value>Upload the PDF</value>
+  </data>
+  <data name="ui.legal.file_saved" xml:space="preserve">
+    <value>File saved.</value>
+  </data>
+  <data name="ui.legal.actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ui.legal.publish_help" xml:space="preserve">
+    <value>Publishing needs all three languages and cannot be undone. The version can never be changed afterwards; tenants are notified.</value>
+  </data>
+  <data name="ui.legal.publish" xml:space="preserve">
+    <value>Publish</value>
+  </data>
+  <data name="ui.legal.published_done" xml:space="preserve">
+    <value>Published. Tenants will be notified.</value>
+  </data>
+  <data name="ui.legal.delete_draft" xml:space="preserve">
+    <value>Delete draft</value>
+  </data>
+  <data name="ui.legal.nothing_required" xml:space="preserve">
+    <value>No Terms version needs acceptance yet.</value>
+  </data>
+  <data name="ui.legal.register_for" xml:space="preserve">
+    <value>Terms {version}, to accept by {deadline} (new tenants get 30 days).</value>
+  </data>
+  <data name="ui.legal.read_only_help" xml:space="preserve">
+    <value>After the deadline the tenant’s staff are read-only until the owner accepts. The tenant’s customers are never affected.</value>
+  </data>
+  <data name="ui.legal.search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="ui.legal.count" xml:space="preserve">
+    <value>{count} tenant(s)</value>
+  </data>
+  <data name="ui.legal.tenant" xml:space="preserve">
+    <value>Tenant</value>
+  </data>
+  <data name="ui.legal.accepted" xml:space="preserve">
+    <value>Accepted</value>
+  </data>
+  <data name="ui.legal.last_reminder" xml:space="preserve">
+    <value>Last reminder</value>
+  </data>
+  <data name="ui.legal.acceptances" xml:space="preserve">
+    <value>Acceptances</value>
+  </data>
+  <data name="ui.legal.by" xml:space="preserve">
+    <value>By</value>
+  </data>
+  <data name="ui.legal.evidence" xml:space="preserve">
+    <value>Evidence</value>
+  </data>
+  <data name="ui.legal.reminders" xml:space="preserve">
+    <value>Reminders</value>
+  </data>
+  <data name="ui.legal.what" xml:space="preserve">
+    <value>What</value>
+  </data>
+  <data name="ui.legal.remind_reason" xml:space="preserve">
+    <value>Reason for a reminder now</value>
+  </data>
+  <data name="ui.legal.send_reminder" xml:space="preserve">
+    <value>Send a reminder</value>
+  </data>
+  <data name="ui.legal.reminder_sent" xml:space="preserve">
+    <value>Reminder sent to the owner.</value>
+  </data>
+  <data name="ui.legal.record_title" xml:space="preserve">
+    <value>Record an acceptance from a signed paper</value>
+  </data>
+  <data name="ui.legal.record_help" xml:space="preserve">
+    <value>Only when the owner signed the current Terms on paper. Attach the signed copy.</value>
+  </data>
+  <data name="ui.legal.owner_name" xml:space="preserve">
+    <value>Owner name</value>
+  </data>
+  <data name="ui.legal.language" xml:space="preserve">
+    <value>Language of the version signed</value>
+  </data>
+  <data name="ui.legal.record_reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="ui.legal.record" xml:space="preserve">
+    <value>Record acceptance</value>
+  </data>
+  <data name="ui.legal.acceptance_recorded" xml:space="preserve">
+    <value>Acceptance recorded.</value>
+  </data>
+  <data name="ui.billing_settings.support_email" xml:space="preserve">
+    <value>Support email</value>
+  </data>
+  <data name="ui.billing_settings.support_phone" xml:space="preserve">
+    <value>Support phone</value>
+  </data>
+  <data name="ui.billing_settings.support_help" xml:space="preserve">
+    <value>Shown to tenants as the way to reach Vixly support.</value>
+  </data>
+  <data name="email.legal.published.subject" xml:space="preserve">
+    <value>New Vixly Terms to accept by {deadline}</value>
+  </data>
+  <data name="email.legal.published.body" xml:space="preserve">
+    <value>Hello {name},
+
+We have updated the Vixly Terms of Service (version {version}). As the owner of {company}, please read and accept them by {deadline}:
+{link}
+
+What changed:
+{summary}
+
+If they are not accepted by then, your team will have read-only access until you accept. Your customers are not affected.
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.legal.reminder.subject" xml:space="preserve">
+    <value>Reminder: accept the Vixly Terms by {deadline}</value>
+  </data>
+  <data name="email.legal.reminder.body" xml:space="preserve">
+    <value>Hello {name},
+
+The Vixly Terms of Service version {version} still need your acceptance for {company}. Please accept them by {deadline}:
+{link}
+
+After that day your team will have read-only access until you accept. Your customers are not affected.
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.legal.overdue.subject" xml:space="preserve">
+    <value>Action needed: your team is read-only until you accept the Vixly Terms</value>
+  </data>
+  <data name="email.legal.overdue.body" xml:space="preserve">
+    <value>Hello {name},
+
+The Vixly Terms of Service version {version} were due on {deadline}. Until you accept them, your team at {company} has read-only access. Your customers are not affected.
+
+Accept now:
+{link}
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="email.legal.notice.subject" xml:space="preserve">
+    <value>Vixly Terms updated (version {version})</value>
+  </data>
+  <data name="email.legal.notice.body" xml:space="preserve">
+    <value>Hello {name},
+
+We made small corrections to the Vixly Terms of Service (version {version}). Nothing to accept; your rights do not change. You can read them here:
+{link}
+
+What changed:
+{summary}
+
+Questions? Contact us at {support}.</value>
+  </data>
+  <data name="platform.common.role_not_allowed" xml:space="preserve">
+    <value>Your role in this account does not allow this.</value>
+  </data>
+  <data name="platform.tenant_account.owner_contact_locked" xml:space="preserve">
+    <value>The owner contact can only be changed by Vixly support.</value>
+  </data>
+  <data name="platform.tenant_account.plan_not_offered" xml:space="preserve">
+    <value>This plan is not offered for a change from your account. Contact Vixly sales.</value>
+  </data>
+  <data name="platform.tenant_account.too_many" xml:space="preserve">
+    <value>Ask for at most {max} tenants at once.</value>
+  </data>
+  <data name="platform.internal.token_invalid" xml:space="preserve">
+    <value>The service token is missing, expired or not valid.</value>
+  </data>
+  <data name="platform.internal.scope_not_allowed" xml:space="preserve">
+    <value>This caller may not use this call.</value>
+  </data>
+  <data name="platform.internal.tenant_required" xml:space="preserve">
+    <value>This call needs a tenant in the service token.</value>
+  </data>
+  <data name="platform.internal.too_many_items" xml:space="preserve">
+    <value>Send at most {max} items at once.</value>
+  </data>
 </root>

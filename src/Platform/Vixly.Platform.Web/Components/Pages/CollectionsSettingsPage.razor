@@ -1,0 +1,20 @@
+﻿@*
+=========================================================
+FILE: CollectionsSettingsPage.razor
+
+PURPOSE:
+Collections settings: timeline, block levels, extensions.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/collections/settings"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.collections_settings.title"]</PageTitle>
+<h1>@T["ui.collections_settings.title"]</h1>
+<p><a href="/collections">@T["ui.collections.title"]</a> · <a href="/billing/settings">@T["ui.billing_settings.title"]</a></p>
+<CollectionsSettingsForm />

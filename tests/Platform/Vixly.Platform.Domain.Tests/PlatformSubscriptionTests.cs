@@ -303,7 +303,7 @@ public sealed class PlatformSubscriptionTests
     [Fact]
     public void Access_FollowsTheStatus_WithAReadOnlyGraceWhenUnpaid()
     {
-        TimeSpan grace = TimeSpan.FromDays(7);
+        PlatformSubscriptionAccessRules grace = new(TimeSpan.FromDays(7), TimeSpan.FromDays(7));
         PlatformPlan basic = SubscriptionTestData.Published();
 
         Assert.Equal(PlatformSubscriptionAccess.Full, SubscriptionTestData.Started(basic, trial: true).AccessAt(Now, grace));
@@ -311,7 +311,7 @@ public sealed class PlatformSubscriptionTests
 
         PlatformSubscription unpaid = SubscriptionTestData.Started(basic);
         Assert.Equal(PlatformSubscriptionAccess.ReadOnly, unpaid.AccessAt(Now.AddDays(6), grace));
-        Assert.Equal(PlatformSubscriptionAccess.None, unpaid.AccessAt(Now.AddDays(7), grace));
+        Assert.Equal(PlatformSubscriptionAccess.PaymentRequired, unpaid.AccessAt(Now.AddDays(7), grace));
 
         PlatformSubscription suspended = SubscriptionTestData.Active(basic);
         suspended.SuspendWithTenant(Now);

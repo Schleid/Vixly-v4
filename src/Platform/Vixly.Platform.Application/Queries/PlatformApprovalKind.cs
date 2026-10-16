@@ -10,12 +10,13 @@
 // - Name each kind
 //
 // IMPORTANT NOTES:
-// - Discounts and offers go to the sales manager; plan versions and promotions to the CFO
+// - Discounts, offers and credit notes go to the sales manager; plan versions and promotions to the CFO
 // =========================================================
 public enum PlatformApprovalKind
 {
     Discount = 1,
     Offer = 2,
     Promotion = 3,
-    PlanVersion = 4
+    PlanVersion = 4,
+    CreditNote = 5
 }

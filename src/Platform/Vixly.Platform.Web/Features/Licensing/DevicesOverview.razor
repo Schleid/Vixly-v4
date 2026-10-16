@@ -1,0 +1,126 @@
+﻿@*
+=========================================================
+FILE: DevicesOverview.razor
+
+PURPOSE:
+Every tenant device with status, tenant and review filters;
+the release review queue is this list with "awaiting review".
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Filters live in the URL so a view can be bookmarked
+=========================================================
+*@
+@inherits PlatformPresenterComponent<DevicesOverviewPresenter>
+@using Vixly.Platform.Domain.Licensing
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+<form class="vx-toolbar" role="search" @onsubmit="Apply">
+    <label for="devices-search">@T["ui.devices.search"]</label>
+    <input id="devices-search" @bind="_search" maxlength="100" />
+    <label for="devices-status">@T["ui.devices.status"]</label>
+    <select id="devices-status" @bind="_status">
+        <option value="">@T["ui.devices.status.all"]</option>
+        @foreach (PlatformDeviceStatus status in Enum.GetValues<PlatformDeviceStatus>())
+        {
+            <option value="@status">@T[LicensingDisplay.StatusKey(status)]</option>
+        }
+    </select>
+    <label><input type="checkbox" @bind="_review" /> @T["ui.devices.awaiting_review"]</label>
+    <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
+</form>
+@if (Tenant is not null)
+{
+    <p class="vx-hint"><a href="/tenants/@Tenant#tenant-licensing">@T["ui.devices.tenant_filter"]</a> · <a href="/devices">@T["ui.devices.clear_tenant"]</a></p>
+}
+<p class="vx-hint">@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.devices.count", "count", Presenter.State.TotalCount) : T["ui.common.loading"].Value)</p>
+<div id="devices-list">
+    <VxDataTable Items="Presenter.State.Items" IsLoading="!Presenter.State.Loaded">
+        <HeaderContent>
+            <th scope="col">@T["ui.devices.number"]</th>
+            <th scope="col">@T["ui.devices.name"]</th>
+            <th scope="col">@T["ui.devices.tenant"]</th>
+            <th scope="col">@T["ui.devices.status"]</th>
+            <th scope="col">@T["ui.devices.requested"]</th>
+            <th scope="col">@T["ui.devices.last_seen"]</th>
+        </HeaderContent>
+        <RowTemplate Context="device">
+            <td><a href="/devices/@device.DeviceId">@device.Number</a></td>
+            <td>@device.Name <span class="vx-hint">@T[LicensingDisplay.KindKey(device.Kind)]</span></td>
+            <td><a href="/tenants/@device.PlatformTenantId#tenant-licensing">@device.TenantName</a></td>
+            <td>
+                <VxStatusBadge Status="@LicensingDisplay.Badge(device.Status, device.SeatHeld)" Text="@T[LicensingDisplay.StatusKey(device.Status)]" />
+                @if (device.Reason is { } reason)
+                {
+                    <span class="vx-hint">@T[LicensingDisplay.ReasonKey(reason)]</span>
+                }
+            </td>
+            <td>@PlatformDisplay.Utc(T, device.RequestedUtc)</td>
+            <td>@(device.LastSeenUtc is { } seen ? PlatformDisplay.Utc(T, seen) : "-")</td>
+        </RowTemplate>
+    </VxDataTable>
+</div>
+@if (Presenter.State.Loaded && Presenter.State.TotalPages > 1)
+{
+    <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="page => Navigation.NavigateTo(Url(page))" />
+}
+
+@code {
+    private string _status = string.Empty;
+
+    private string? _search;
+
+    private bool _review;
+
+    [Parameter]
+    public Guid? Tenant { get; set; }
+
+    [Parameter]
+    public string? Status { get; set; }
+
+    [Parameter]
+    public bool Review { get; set; }
+
+    [Parameter]
+    public string? Search { get; set; }
+
+    [Parameter]
+    public int? Page { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        PlatformDeviceStatus? status = Enum.TryParse(Status, true, out PlatformDeviceStatus parsed) ? parsed : null;
+        _status = status?.ToString() ?? string.Empty;
+        _search = Search;
+        _review = Review;
+        return Presenter.LoadAsync(Tenant, status, Review, Search, Page ?? 1);
+    }
+
+    private void Apply()
+    {
+        Navigation.NavigateTo(Url(1));
+    }
+
+    private string Url(int page)
+    {
+        Dictionary<string, string?> query = new()
+        {
+            ["tenant"] = Tenant?.ToString(),
+            ["status"] = string.IsNullOrEmpty(_status) ? null : _status,
+            ["review"] = _review ? "true" : null,
+            ["search"] = string.IsNullOrWhiteSpace(_search) ? null : _search.Trim(),
+            ["page"] = page > 1 ? page.ToString(System.Globalization.CultureInfo.InvariantCulture) : null
+        };
+
+        return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString("/devices", query.Where(pair => pair.Value is not null));
+    }
+}

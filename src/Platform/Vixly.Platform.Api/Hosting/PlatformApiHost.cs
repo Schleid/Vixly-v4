@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Localization;
 using Vixly.Platform.Api.Endpoints;
+using Vixly.Platform.Api.Endpoints.Internal;
+using Vixly.Platform.Api.Internal;
 using Vixly.Platform.Application.DependencyInjection;
 using Vixly.Platform.Application.Ports;
 using Vixly.Platform.Infrastructure.DependencyInjection;
@@ -19,7 +21,7 @@ namespace Vixly.Platform.Api.Hosting;
 // - Register Application and Infrastructure
 // - Apply forwarded headers, security headers, body limit, CORS,
 //   request localisation and rate limits
-// - Map health and the public registration endpoints
+// - Map health, the public registration endpoints and the card-payment endpoints (Slice 5)
 //
 // IMPORTANT NOTES:
 // - No cookies and no sessions: the API is stateless
@@ -48,6 +50,10 @@ public static class PlatformApiHost
         builder.Services.AddScoped<IPlatformRequestMetadata, PlatformApiRequestMetadata>();
         builder.Services.AddScoped<PlatformApiErrors>();
         builder.Services.AddPlatformApiRateLimits();
+        builder.Services.Configure<PlatformInternalOptions>(builder.Configuration.GetSection(PlatformInternalOptions.SectionName));
+        builder.Services.AddMemoryCache();
+        builder.Services.AddSingleton<PlatformServiceTokenValidator>();
+        builder.Services.AddPlatformInternalRateLimits();
         builder.Services.AddProblemDetails();
         builder.Services.AddCors(options => options.AddPolicy(CorsPolicy, policy => policy
             .WithOrigins(api.AllowedOrigins)
@@ -67,12 +73,15 @@ public static class PlatformApiHost
         }));
         app.Use((context, next) =>
         {
+            // Provider webhooks carry whole payment objects: 64 KB there, the API limit elsewhere (Slice 5).
+            long maxBody = context.Request.Path.StartsWithSegments("/payments/webhook") ? 64 * 1024 : api.MaxRequestBodyBytes;
+
             if (context.Features.Get<IHttpMaxRequestBodySizeFeature>() is { IsReadOnly: false } limit)
             {
-                limit.MaxRequestBodySize = api.MaxRequestBodyBytes;
+                limit.MaxRequestBodySize = maxBody;
             }
 
-            if (context.Request.ContentLength > api.MaxRequestBodyBytes)
+            if (context.Request.ContentLength > maxBody)
             {
                 context.Response.StatusCode = StatusCodes.Status413PayloadTooLarge;
                 return Task.CompletedTask;
@@ -89,10 +98,15 @@ public static class PlatformApiHost
             options.RequestCultureProviders = new List<IRequestCultureProvider> { new AcceptLanguageHeaderRequestCultureProvider() };
         });
         app.UseCors();
+        app.UsePlatformInternalAuthentication();
         app.UseRateLimiter();
 
         app.MapVixlyHealth();
         app.MapPlatformRegistrationEndpoints();
+        app.MapPlatformPaymentEndpoints();
+        app.MapPlatformLegalEndpoints();
+        app.MapPlatformSimulatedCheckout(app.Environment);
+        app.MapPlatformInternalEndpoints();
 
         return app;
     }

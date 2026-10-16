@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: DevicePage.razor
+
+PURPOSE:
+One tenant device.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/devices/{DeviceId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.device.title"]</PageTitle>
+<DeviceView DeviceId="DeviceId" />
+
+@code {
+    [Parameter]
+    public Guid DeviceId { get; set; }
+}

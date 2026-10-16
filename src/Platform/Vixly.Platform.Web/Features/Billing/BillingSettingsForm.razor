@@ -1,0 +1,141 @@
+﻿@*
+=========================================================
+FILE: BillingSettingsForm.razor
+
+PURPOSE:
+Billing settings: payment terms, number prefixes, paper size,
+emails, payment instructions and footer per language, and the
+company profile and logo printed on documents.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Numbers already issued keep their prefix; a new prefix
+  applies to the next document (D-B2)
+- Until payment terms are set, invoices are due when issued
+  (D-B4)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<BillingSettingsPresenter>
+@using Vixly.Platform.Domain.Billing
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="billing-settings">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (!Presenter.State.Loaded)
+    {
+        <p role="status">@T["ui.common.loading"]</p>
+    }
+    else if (Presenter.State.Settings is { } settings)
+    {
+        @if (settings.Profile is null)
+        {
+            <VxMessage Type="VxMessageType.Warning">@T["platform.billing.profile_missing"]</VxMessage>
+        }
+        <VxCard Title="@T["ui.billing_settings.documents"]">
+            <form class="vx-form" @onsubmit="SaveSettingsAsync">
+                <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)">
+                    <label for="billing-terms">@T["ui.billing_settings.payment_terms"]</label>
+                    <input id="billing-terms" type="number" min="0" max="365" @bind="_settings.PaymentTermsDays" aria-describedby="billing-terms-help" />
+                    <p id="billing-terms-help" class="vx-hint">@T["ui.billing_settings.payment_terms_help"]</p>
+                    <label for="billing-invoice-prefix">@T["ui.billing_settings.invoice_prefix"]</label>
+                    <input id="billing-invoice-prefix" @bind="_settings.InvoicePrefix" maxlength="8" required />
+                    <label for="billing-credit-prefix">@T["ui.billing_settings.credit_note_prefix"]</label>
+                    <input id="billing-credit-prefix" @bind="_settings.CreditNotePrefix" maxlength="8" required />
+                    <label for="billing-receipt-prefix">@T["ui.billing_settings.receipt_prefix"]</label>
+                    <input id="billing-receipt-prefix" @bind="_settings.ReceiptPrefix" maxlength="8" required aria-describedby="billing-prefix-help" />
+                    <p id="billing-prefix-help" class="vx-hint">@T["ui.billing_settings.prefix_help"]</p>
+                    <label for="billing-paper">@T["ui.billing_settings.paper_size"]</label>
+                    <select id="billing-paper" @bind="_settings.PaperSize">
+                        @foreach (PlatformPaperSize size in Enum.GetValues<PlatformPaperSize>())
+                        {
+                            <option value="@size">@T["ui.billing_settings.paper." + BillingDisplay.Snake(size.ToString())]</option>
+                        }
+                    </select>
+                    <label><input type="checkbox" @bind="_settings.EmailDocuments" /> @T["ui.billing_settings.email_documents"]</label>
+                    @foreach (BillingSettingsModel.TextRow row in _settings.Texts)
+                    {
+                        <fieldset class="vx-fieldset">
+                            <legend>@T["ui.language." + row.Language]</legend>
+                            <label for="billing-instructions-@row.Language">@T["ui.billing_document.how_to_pay"]</label>
+                            <textarea id="billing-instructions-@row.Language" @bind="row.PaymentInstructions" maxlength="1000"></textarea>
+                            <label for="billing-footer-@row.Language">@T["ui.billing_settings.footer"]</label>
+                            <textarea id="billing-footer-@row.Language" @bind="row.Footer" maxlength="500"></textarea>
+                        </fieldset>
+                    }
+                </fieldset>
+                @if (Presenter.State.CanEdit)
+                {
+                    <div class="vx-actions">
+                        <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.billing_settings.save"]</VxButton>
+                    </div>
+                }
+            </form>
+        </VxCard>
+        <CompanyProfileForm Profile="settings.Profile" CanEdit="Presenter.State.CanEdit" Version="Presenter.State.Version" IsBusy="Presenter.IsBusy" OnSave="SaveProfileAsync" OnLogo="SaveLogoAsync" OnRefused="Presenter.Fail" />
+        @if (Presenter.State.StepUpPending)
+        {
+            <StepUpDialog OnConfirmed="RetryAsync" OnCancelled="Presenter.CancelStepUp" />
+        }
+    }
+</div>
+
+@code {
+    private BillingSettingsModel _settings = new();
+
+    private Func<Task>? _last;
+
+    private int _seenVersion = -1;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Presenter.LoadAsync();
+        Sync();
+    }
+
+    private Task SaveSettingsAsync()
+    {
+        return RunAsync(() => Presenter.SaveSettingsAsync(_settings));
+    }
+
+    private Task SaveProfileAsync(CompanyProfileModel model)
+    {
+        return RunAsync(() => Presenter.SaveProfileAsync(model));
+    }
+
+    private Task SaveLogoAsync((byte[] Content, string ContentType) logo)
+    {
+        return RunAsync(() => Presenter.SaveLogoAsync(logo.Content, logo.ContentType));
+    }
+
+    private async Task RunAsync(Func<Task> work)
+    {
+        _last = work;
+        await work();
+        Sync();
+    }
+
+    private Task RetryAsync()
+    {
+        return _last is null ? Task.CompletedTask : RunAsync(_last);
+    }
+
+    private void Sync()
+    {
+        if (Presenter.State.Settings is { } settings && _seenVersion != Presenter.State.Version)
+        {
+            _seenVersion = Presenter.State.Version;
+            _settings = BillingSettingsModel.From(settings);
+        }
+    }
+}

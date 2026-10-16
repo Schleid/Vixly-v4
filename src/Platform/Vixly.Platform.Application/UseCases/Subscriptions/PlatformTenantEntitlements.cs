@@ -20,4 +20,6 @@ public sealed record PlatformTenantEntitlements(
     PlatformSubscriptionStatus? Status,
     PlatformSubscriptionAccess Access,
     IReadOnlyList<PlatformPlanFeature> Features,
-    IReadOnlyDictionary<PlatformPlanLimitKind, int> Limits);
+    IReadOnlyDictionary<PlatformPlanLimitKind, int> Limits,
+    PlatformNonPaymentInfo? NonPayment = null,
+    PlatformLegalInfo? Legal = null);

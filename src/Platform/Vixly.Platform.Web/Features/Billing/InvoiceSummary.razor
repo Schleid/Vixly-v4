@@ -1,0 +1,110 @@
+﻿@*
+=========================================================
+FILE: InvoiceSummary.razor
+
+PURPOSE:
+One invoice: facts, lines and totals, payments, credit notes,
+document download, resend and history.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- An issued invoice never changes; corrections are credit
+  notes (D-B6)
+=========================================================
+*@
+@inherits PlatformPresenterComponent<InvoicePresenter>
+@using Vixly.Platform.Domain.Billing
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else if (!Presenter.State.Loaded)
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+else if (Presenter.State.Invoice is { } invoice)
+{
+    <PageTitle>@VixlyText.Format(T, "ui.invoices.page_title", "number", invoice.Number)</PageTitle>
+    <h1>
+        @VixlyText.Format(T, "ui.invoices.page_title", "number", invoice.Number)
+        <VxStatusBadge Status="@BillingDisplay.Badge(invoice.Status, invoice.Overdue)" Text="@T[BillingDisplay.StatusKey(invoice.Status)]" />
+        @if (invoice.Overdue)
+        {
+            <VxStatusBadge Status="VxBadgeStatus.Danger" Text="@T["ui.invoices.overdue"]" />
+        }
+    </h1>
+    <nav class="vx-sections" aria-label="@T["ui.tenants.sections"]">
+        <a href="@Anchor("invoice-overview")">@T["ui.tenants.overview"]</a>
+        <a href="@Anchor("invoice-payments")">@T["ui.payments.title"]</a>
+        <a href="@Anchor("invoice-card-payments")">@T["ui.card_payments.title"]</a>
+        <a href="@Anchor("invoice-credits")">@T["ui.credit_notes.title"]</a>
+        <a href="@Anchor("invoice-history")">@T["ui.invoices.history"]</a>
+    </nav>
+    <div id="invoice-overview"><VxCard Title="@T["ui.tenants.overview"]">
+        <dl class="vx-facts">
+            <dt>@T["ui.subscriptions.tenant"]</dt>
+            <dd><a href="/tenants/@invoice.PlatformTenantId#tenant-billing">@invoice.TenantName</a></dd>
+            <dt>@T["ui.invoices.kind"]</dt>
+            <dd>@T[BillingDisplay.KindKey(invoice.Kind)]</dd>
+            <dt>@T["ui.invoices.issued"]</dt>
+            <dd>@PlatformDisplay.Utc(T, invoice.IssuedUtc)</dd>
+            <dt>@T["ui.invoices.due"]</dt>
+            <dd>@SubscriptionDisplay.Date(invoice.DueUtc)</dd>
+            @if (invoice.PeriodStartUtc is not null)
+            {
+                <dt>@T["ui.billing_document.period"]</dt>
+                <dd>@SubscriptionDisplay.Date(invoice.PeriodStartUtc) - @SubscriptionDisplay.Date(invoice.PeriodEndUtc)</dd>
+            }
+            <dt>@T["ui.billing_document.bill_to"]</dt>
+            <dd>
+                @invoice.CustomerName<br />
+                <span class="vx-hint">@invoice.CustomerAddress</span>
+                @if (invoice.CustomerTaxId is { } taxId)
+                {
+                    <br /><span class="vx-hint">@VixlyText.Format(T, "ui.billing_document.tax_id", "taxId", taxId)</span>
+                }
+                <br /><span class="vx-hint">@invoice.CustomerEmail</span>
+            </dd>
+            <dt>@T["ui.invoices.language"]</dt>
+            <dd>@invoice.Language.ToUpperInvariant()</dd>
+        </dl>
+        <InvoiceLines Invoice="invoice" />
+        <div class="vx-actions">
+            <a class="vx-button" href="@BillingDisplay.DocumentLink(PlatformBillingDocumentKind.Invoice, invoice.PlatformInvoiceId)" download>@T["ui.invoices.download"]</a>
+            @if (Presenter.State.Abilities.CanRecordPayments)
+            {
+                <InvoiceResend InvoiceId="invoice.PlatformInvoiceId" OnChanged="ReloadAsync" />
+            }
+        </div>
+    </VxCard></div>
+    <InvoicePayments Invoice="invoice" CanRecord="Presenter.State.Abilities.CanRecordPayments" OnChanged="ReloadAsync" />
+    <InvoiceCardPayments Invoice="invoice" OnChanged="ReloadAsync" />
+    <InvoiceCredits Invoice="invoice" CanRequest="Presenter.State.Abilities.CanRequestCredits" OnChanged="ReloadAsync" />
+    <InvoiceHistory Items="invoice.History" />
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid InvoiceId { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(InvoiceId);
+    }
+
+    private Task ReloadAsync()
+    {
+        return Presenter.LoadAsync(InvoiceId);
+    }
+
+    private string Anchor(string id)
+    {
+        return "/invoices/" + InvoiceId + "#" + id;
+    }
+}

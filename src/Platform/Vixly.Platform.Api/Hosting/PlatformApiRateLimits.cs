@@ -33,6 +33,12 @@ public static class PlatformApiRateLimits
 
     public const string Catalogue = "registration-catalogue";
 
+    public const string Webhook = "payments-webhook";
+
+    public const string PaymentLinkView = "payments-link-view";
+
+    public const string PaymentCheckout = "payments-checkout";
+
     public static IServiceCollection AddPlatformApiRateLimits(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
@@ -46,6 +52,9 @@ public static class PlatformApiRateLimits
             AddPerIp(options, Change, 10, TimeSpan.FromHours(1));
             AddPerIp(options, Status, 60, TimeSpan.FromHours(1));
             AddPerIp(options, Catalogue, 60, TimeSpan.FromMinutes(1));
+            AddPerIp(options, Webhook, 600, TimeSpan.FromMinutes(1));
+            AddPerIp(options, PaymentLinkView, 60, TimeSpan.FromHours(1));
+            AddPerIp(options, PaymentCheckout, 20, TimeSpan.FromHours(1));
         });
 
         return services;

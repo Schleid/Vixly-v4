@@ -1,4 +1,7 @@
-﻿using Vixly.Platform.Application.Security;
+﻿using Vixly.Platform.Application.Ports;
+using Vixly.Platform.Application.Queries;
+using Vixly.Platform.Application.Security;
+using Vixly.Platform.Application.UseCases.Legal;
 using Vixly.Platform.Application.UseCases.Subscriptions;
 using Vixly.Platform.Domain.Subscriptions;
 using Vixly.Shared.Kernel.Errors;
@@ -22,10 +25,18 @@ public sealed class GetPlatformTenantEntitlementsUseCase
 {
     private readonly PlatformSubscriptionAdministration _administration;
 
+    private readonly IPlatformCollectionsQueries _collections;
+
+    private readonly PlatformLegalGate _legal;
+
     public GetPlatformTenantEntitlementsUseCase(
-        PlatformSubscriptionAdministration administration)
+        PlatformSubscriptionAdministration administration,
+        IPlatformCollectionsQueries collections,
+        PlatformLegalGate legal)
     {
+        _legal = legal ?? throw new ArgumentNullException(nameof(legal));
         _administration = administration ?? throw new ArgumentNullException(nameof(administration));
+        _collections = collections ?? throw new ArgumentNullException(nameof(collections));
     }
 
     public async Task<GetPlatformTenantEntitlementsResponse> ExecuteAsync(
@@ -43,16 +54,6 @@ public sealed class GetPlatformTenantEntitlementsUseCase
             return GetPlatformTenantEntitlementsResponse.Failure(refused);
         }
 
-        PlatformSubscription? subscription = await _administration.Subscriptions.GetCurrentAsync(request.PlatformTenantId, cancellationToken);
-        PlatformPlan? plan = subscription is null ? null : await _administration.Plans.GetAsync(subscription.PlatformPlanId, cancellationToken);
-        PlatformPlanVersion? version = plan?.Versions.FirstOrDefault(item => item.Id == subscription!.PlanVersionId);
-        IReadOnlyList<PlatformLimitItem> limits = await _administration.LimitsAsync(request.PlatformTenantId, version, null, cancellationToken);
-
-        return GetPlatformTenantEntitlementsResponse.Success(new PlatformTenantEntitlements(
-            request.PlatformTenantId,
-            subscription?.Status,
-            subscription?.AccessAt(_administration.UtcNow, _administration.UnpaidReadOnlyPeriod) ?? PlatformSubscriptionAccess.None,
-            version?.Features.Select(item => item.Feature).OrderBy(feature => feature).ToArray() ?? Array.Empty<PlatformPlanFeature>(),
-            limits.ToDictionary(item => item.Kind, item => item.Effective)));
+        return GetPlatformTenantEntitlementsResponse.Success(await new PlatformEntitlementsReader(_administration, _collections, _legal).ReadAsync(request.PlatformTenantId, cancellationToken));
     }
 }

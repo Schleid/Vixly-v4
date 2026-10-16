@@ -1,0 +1,127 @@
+﻿@*
+=========================================================
+FILE: TaxRateList.razor
+
+PURPOSE:
+Tax rates by country and region, with the date each applies
+from, and a form to add one (D-B1).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- The rate in force on the day of issue is stored on each
+  invoice line; later rates never change issued invoices
+- A region rate wins over its country rate; no rate means 0 %
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TaxRateListPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<form class="vx-toolbar" role="search" @onsubmit="() => Presenter.LoadAsync(_filter)">
+    <label for="tax-filter">@T["ui.tenants.country"]</label>
+    <select id="tax-filter" @bind="_filter">
+        <option value="">@T["ui.tax_rates.all_countries"]</option>
+        @foreach ((string country, string name) in PlatformDisplay.Countries(T))
+        {
+            <option value="@country">@name</option>
+        }
+    </select>
+    <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
+</form>
+@if (Presenter.State.DoneKey is { } done)
+{
+    <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+}
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+<VxDataTable Items="Presenter.State.Rates" IsLoading="@(!Presenter.State.Loaded)">
+    <HeaderContent>
+        <th scope="col">@T["ui.tenants.country"]</th>
+        <th scope="col">@T["ui.tenants.state_province"]</th>
+        <th scope="col">@T["ui.tax_rates.label"]</th>
+        <th scope="col">@T["ui.tax_rates.rate"]</th>
+        <th scope="col">@T["ui.tax_rates.valid_from"]</th>
+        <th scope="col">@T["ui.tax_rates.in_force"]</th>
+    </HeaderContent>
+    <RowTemplate Context="rate">
+        <td>@PlatformDisplay.CountryName(T, rate.CountryCode)</td>
+        <td>@(rate.RegionCode ?? "-")</td>
+        <td>@rate.Label</td>
+        <td>@BillingDisplay.Rate(rate.Rate)</td>
+        <td>@SubscriptionDisplay.Date(rate.ValidFromUtc)</td>
+        <td>
+            @if (rate.InForce)
+            {
+                <VxStatusBadge Status="VxBadgeStatus.Active" Text="@T["ui.tax_rates.in_force"]" />
+            }
+        </td>
+    </RowTemplate>
+    <EmptyContent>
+        <VxEmptyState Title="@T["ui.tax_rates.empty"]" />
+    </EmptyContent>
+</VxDataTable>
+@if (Presenter.State.CanEdit)
+{
+    <VxCard Title="@T["ui.tax_rates.add"]">
+        <form class="vx-form" @onsubmit="AddAsync">
+            <label for="tax-country">@T["ui.tenants.country"]</label>
+            <select id="tax-country" @bind="_country" required>
+                <option value="">-</option>
+                @foreach ((string country, string name) in PlatformDisplay.Countries(T))
+                {
+                    <option value="@country">@name</option>
+                }
+            </select>
+            <label for="tax-region">@T["ui.tenants.state_province"]</label>
+            <input id="tax-region" @bind="_region" maxlength="10" aria-describedby="tax-region-help" />
+            <p id="tax-region-help" class="vx-hint">@T["ui.tax_rates.region_help"]</p>
+            <label for="tax-label">@T["ui.tax_rates.label"]</label>
+            <input id="tax-label" @bind="_label" maxlength="40" required />
+            <label for="tax-rate">@T["ui.tax_rates.rate"]</label>
+            <input id="tax-rate" type="number" min="0" max="100" step="0.0001" @bind="_rate" required />
+            <label for="tax-from">@T["ui.tax_rates.valid_from"]</label>
+            <input id="tax-from" type="date" @bind="_from" required />
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.tax_rates.add"]</VxButton>
+            </div>
+        </form>
+    </VxCard>
+}
+@if (Presenter.State.StepUpPending)
+{
+    <StepUpDialog OnConfirmed="AddAsync" OnCancelled="Presenter.CancelStepUp" />
+}
+
+@code {
+    private string? _filter;
+
+    private string? _country;
+
+    private string? _region;
+
+    private string? _label;
+
+    private decimal _rate;
+
+    private DateTime? _from = DateTime.Today;
+
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync(_filter);
+    }
+
+    private async Task AddAsync()
+    {
+        if (await Presenter.AddAsync(_country, _region, _rate, _label, _from, _filter))
+        {
+            _region = null;
+            _label = null;
+            _rate = 0m;
+        }
+    }
+}

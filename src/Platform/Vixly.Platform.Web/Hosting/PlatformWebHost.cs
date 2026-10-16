@@ -115,6 +115,8 @@ public static class PlatformWebHost
         app.MapStaticAssets();
         app.MapVixlyHealth();
         app.MapPlatformAuthEndpoints();
+        app.MapPlatformBillingEndpoints();
+        app.MapPlatformLegalEndpoints();
         app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
         return app;

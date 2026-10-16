@@ -1,4 +1,6 @@
-﻿namespace Vixly.Contracts.Platform.Registration;
+﻿using Vixly.Contracts.Platform.Common;
+
+namespace Vixly.Contracts.Platform.Registration;
 
 // =========================================================
 // FILE: PlatformSlugAvailability.cs

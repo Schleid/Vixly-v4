@@ -13,6 +13,8 @@
 // - Persisted as numbers; never renumber
 // - Cancellation is a flag on an Active subscription, not a status
 // - Past due is set by Billing (Slice 4)
+// - Blocked for non-payment is set and cleared only by Collections
+//   and payment (Slice 6, D-S17); Suspended is for the account only
 // =========================================================
 public enum PlatformSubscriptionStatus
 {
@@ -21,5 +23,6 @@ public enum PlatformSubscriptionStatus
     Active = 2,
     PastDue = 3,
     Suspended = 4,
-    Ended = 5
+    Ended = 5,
+    BlockedForNonPayment = 6
 }

@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: InvoicePage.razor
+
+PURPOSE:
+One invoice with its payments, credit notes and history.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/invoices/{InvoiceId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<p><a href="/invoices">@T["ui.invoices.back"]</a></p>
+<InvoiceSummary InvoiceId="@InvoiceId" />
+
+@code {
+    [Parameter]
+    public Guid InvoiceId { get; set; }
+}

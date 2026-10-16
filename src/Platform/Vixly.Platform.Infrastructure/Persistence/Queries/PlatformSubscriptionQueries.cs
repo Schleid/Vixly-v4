@@ -466,6 +466,26 @@ internal sealed class PlatformSubscriptionQueries : IPlatformSubscriptionQueries
                 null)));
         }
 
+        if (kinds.Contains(PlatformApprovalKind.CreditNote))
+        {
+            var credits = await (
+                    from invoice in _context.Invoices.AsNoTracking()
+                    from credit in invoice.Credits
+                    where credit.Status == Vixly.Platform.Domain.Billing.PlatformCreditNoteStatus.Requested
+                    select new { invoice.Id, invoice.PlatformTenantId, invoice.Number, credit.Amount, credit.IsVoid, invoice.CurrencyCode, credit.RequestedByUserId, credit.CreatedUtc, credit.Reason })
+                .ToListAsync(cancellationToken);
+            items.AddRange(credits.Select(row => new PlatformApprovalItem(
+                PlatformApprovalKind.CreditNote,
+                row.Id,
+                row.PlatformTenantId,
+                row.Number,
+                (row.IsVoid ? "void " : string.Empty) + row.Amount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) + " " + row.CurrencyCode,
+                row.RequestedByUserId,
+                null,
+                row.CreatedUtc,
+                row.Reason)));
+        }
+
         IReadOnlyDictionary<Guid, string> names = await StaffNamesAsync(
             items.Where(item => item.RequestedByUserId is not null).Select(item => item.RequestedByUserId!.Value),
             cancellationToken);

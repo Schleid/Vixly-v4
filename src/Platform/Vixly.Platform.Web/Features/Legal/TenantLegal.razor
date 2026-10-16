@@ -1,0 +1,198 @@
+﻿@*
+=========================================================
+FILE: TenantLegal.razor
+
+PURPOSE:
+The Legal section of the tenant page: where the tenant stands
+with the Terms, its acceptances with their evidence, the
+reminders sent, and the staff actions (Slice 8).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Hidden for staff without platform.legal.view
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantLegalPresenter>
+@using Vixly.Platform.Application.Security
+@using Vixly.Platform.Domain.Legal
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (!PlatformSecurityErrors.AccessDenied.Equals(Presenter.State.Error))
+{
+    <div id="tenant-legal"><VxCard Title="@T["ui.legal.tenant_title"]">
+        @if (Presenter.State.DoneKey is { } done)
+        {
+            <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+        }
+        @if (Presenter.State.Error is not null)
+        {
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+        }
+        @if (!Presenter.State.Loaded)
+        {
+            <p role="status">@T["ui.common.loading"]</p>
+        }
+        else if (Presenter.State.Detail is { } detail)
+        {
+            <dl class="vx-facts">
+                <dt>@T["ui.legal.status"]</dt>
+                <dd>
+                    <VxStatusBadge Status="@LegalDisplay.Badge(detail.State.Status)" Text="@T[LegalDisplay.StatusKey(detail.State.Status)]" />
+                    @if (detail.State.RequiredVersion is { } version)
+                    {
+                        <span class="vx-hint"> · @version</span>
+                    }
+                </dd>
+                @if (detail.State.DeadlineUtc is { } deadline && detail.State.Status != PlatformLegalStatus.Accepted)
+                {
+                    <dt>@T["ui.legal.deadline"]</dt>
+                    <dd>@LegalDisplay.Date(deadline)</dd>
+                }
+            </dl>
+            @if (detail.State.Status == PlatformLegalStatus.Overdue)
+            {
+                <p class="vx-hint">@T["ui.legal.read_only_help"]</p>
+            }
+            @if (detail.Acceptances.Count > 0)
+            {
+                <h3>@T["ui.legal.acceptances"]</h3>
+                <VxDataTable Items="detail.Acceptances" IsLoading="false">
+                    <HeaderContent>
+                        <th scope="col">@T["ui.legal.accepted"]</th>
+                        <th scope="col">@T["ui.legal.version"]</th>
+                        <th scope="col">@T["ui.legal.by"]</th>
+                        <th scope="col">@T["ui.legal.evidence"]</th>
+                    </HeaderContent>
+                    <RowTemplate Context="item">
+                        <td>@PlatformDisplay.Utc(T, item.AcceptedUtc)</td>
+                        <td>@item.Version <span class="vx-hint">@T[LegalDisplay.LanguageKey(item.Language)]</span></td>
+                        <td>@(item.ActorName ?? "-") <span class="vx-hint">@T[LegalDisplay.SourceKey(item.Source)]@(item.RecordedByName is { } staff ? " · " + staff : string.Empty)</span></td>
+                        <td class="vx-hint">@item.ClientIp @item.UserAgent · SHA-256 @item.Sha256[..12]…@(item.Reason is { } why ? " · " + why : string.Empty)</td>
+                    </RowTemplate>
+                </VxDataTable>
+            }
+            @if (detail.Reminders.Count > 0)
+            {
+                <h3>@T["ui.legal.reminders"]</h3>
+                <VxDataTable Items="detail.Reminders" IsLoading="false">
+                    <HeaderContent>
+                        <th scope="col">@T["ui.audit.when"]</th>
+                        <th scope="col">@T["ui.legal.what"]</th>
+                        <th scope="col">@T["ui.audit.who"]</th>
+                    </HeaderContent>
+                    <RowTemplate Context="item">
+                        <td>@PlatformDisplay.Utc(T, item.SentUtc)</td>
+                        <td>@T[LegalDisplay.StepKey(item.Step)] · @item.Version <span class="vx-hint">@item.Reason</span></td>
+                        <td>@(item.SentByName ?? T["ui.audit.no_actor"].Value)</td>
+                    </RowTemplate>
+                </VxDataTable>
+            }
+            @if (detail.State.Status is PlatformLegalStatus.Due or PlatformLegalStatus.Overdue)
+            {
+                @if (detail.Abilities.CanRemind)
+                {
+                    <form class="vx-form" @onsubmit="RemindAsync">
+                        <label for="legal-remind-reason">@T["ui.legal.remind_reason"]</label>
+                        <input id="legal-remind-reason" @bind="_reason" maxlength="@PlatformLegalLimits.ReasonMaxLength" required />
+                        <div class="vx-actions">
+                            <VxButton Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.legal.send_reminder"]</VxButton>
+                        </div>
+                    </form>
+                }
+                @if (detail.Abilities.CanRecord)
+                {
+                    <form class="vx-form" @onsubmit="RecordAsync">
+                        <h3>@T["ui.legal.record_title"]</h3>
+                        <p class="vx-hint">@T["ui.legal.record_help"]</p>
+                        <label for="legal-record-name">@T["ui.legal.owner_name"]</label>
+                        <input id="legal-record-name" @bind="_ownerName" maxlength="@PlatformLegalLimits.ActorNameMaxLength" />
+                        <label for="legal-record-language">@T["ui.legal.language"]</label>
+                        <select id="legal-record-language" @bind="_language">
+                            @foreach (string language in new[] { "en", "fr", "es" })
+                            {
+                                <option value="@language">@T[LegalDisplay.LanguageKey(language)]</option>
+                            }
+                        </select>
+                        <label for="legal-record-reason">@T["ui.legal.record_reason"]</label>
+                        <input id="legal-record-reason" @bind="_recordReason" maxlength="@PlatformLegalLimits.ReasonMaxLength" required />
+                        <label for="legal-record-file">@T["ui.legal.evidence"]</label>
+                        <InputFile id="legal-record-file" accept="application/pdf,image/png,image/jpeg" OnChange="PickAsync" />
+                        <div class="vx-actions">
+                            <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.legal.record"]</VxButton>
+                        </div>
+                    </form>
+                }
+            }
+        }
+    </VxCard></div>
+    @if (Presenter.State.StepUpPending)
+    {
+        <StepUpDialog OnConfirmed="Presenter.ConfirmStepUpAsync" OnCancelled="Presenter.CancelStepUp" />
+    }
+}
+
+@code {
+    private string? _reason;
+
+    private string? _ownerName;
+
+    private string _language = "en";
+
+    private string? _recordReason;
+
+    private byte[]? _evidence;
+
+    private string? _evidenceType;
+
+    private Guid _loaded;
+
+    [Parameter, EditorRequired]
+    public Guid TenantId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_loaded != TenantId)
+        {
+            _loaded = TenantId;
+            await Presenter.LoadAsync(TenantId);
+        }
+    }
+
+    private async Task RemindAsync()
+    {
+        if (await Presenter.RemindAsync(TenantId, _reason))
+        {
+            _reason = null;
+        }
+    }
+
+    private async Task PickAsync(InputFileChangeEventArgs args)
+    {
+        long limit = PlatformLegalLimits.MaxEvidenceMegabytes * 1024L * 1024L;
+
+        if (args.File.Size > limit)
+        {
+            Presenter.Fail(PlatformLegalErrors.EvidenceInvalid);
+            return;
+        }
+
+        using MemoryStream buffer = new();
+        await using Stream stream = args.File.OpenReadStream(limit);
+        await stream.CopyToAsync(buffer);
+        _evidence = buffer.ToArray();
+        _evidenceType = args.File.ContentType;
+    }
+
+    private async Task RecordAsync()
+    {
+        if (await Presenter.RecordAsync(TenantId, _language, _ownerName, _recordReason, _evidence, _evidenceType))
+        {
+            _recordReason = null;
+            _evidence = null;
+        }
+    }
+}

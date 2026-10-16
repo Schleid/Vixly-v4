@@ -2,8 +2,14 @@
 using Vixly.Platform.Application.Audit;
 using Vixly.Platform.Application.Identity;
 using Vixly.Platform.Application.Messaging;
+using Vixly.Platform.Application.Ports;
 using Vixly.Platform.Application.Security;
+using Vixly.Platform.Application.UseCases.Billing;
+using Vixly.Platform.Application.UseCases.Collections;
+using Vixly.Platform.Application.UseCases.Payments;
 using Vixly.Platform.Application.UseCases.Departments;
+using Vixly.Platform.Application.UseCases.Legal;
+using Vixly.Platform.Application.UseCases.Licensing;
 using Vixly.Platform.Application.UseCases.Plans;
 using Vixly.Platform.Application.UseCases.Sales;
 using Vixly.Platform.Application.UseCases.Registration;
@@ -65,6 +71,48 @@ public static class PlatformApplicationServiceCollectionExtensions
         services.AddScoped<PlatformSalesAdministration>();
         services.AddScoped<IPlatformOutboxHandler, PlatformApprovalRequestHandler>();
         services.AddScoped<IPlatformOutboxHandler, PlatformDiscountEndingHandler>();
+        services.AddScoped<PlatformBillingAdministration>();
+        services.AddScoped<PlatformInvoiceIssuer>();
+        services.AddScoped<PlatformBillingClock>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformSubscriptionStartedBillingHandler>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformSubscriptionStatusBillingHandler>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformSubscriptionChangedBillingHandler>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformSubscriptionRenewedBillingHandler>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformBillingDocumentMailHandler>();
+        services.AddScoped<PlatformPaymentApplier>();
+        services.AddScoped<PlatformPaymentsAdministration>();
+        services.AddScoped<PlatformCardSettlement>();
+        services.AddScoped<PlatformPaymentsClock>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformProviderEventHandler>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformRegistrationPaidHandler>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformCardProblemMailHandler>();
+        services.AddScoped<PlatformCollectionsAdministration>();
+        services.AddScoped<PlatformCollectionsClock>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformCollectionsNoticeHandler>();
+        services.AddScoped<PlatformLicensingAdministration>();
+        services.AddScoped<PlatformLicensingClock>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformLicensingNoticeHandler>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformLicensingEndHandler>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformLicensingSubscriptionEndHandler>();
+        services.AddScoped<PlatformZelleAdministration>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformZelleNoticeHandler>();
+        services.AddScoped<PlatformLegalGate>();
+        services.AddScoped<PlatformEntitlementsReader>();
+
+        // Public event feed (Slice 9, D-K3): one handler per source type.
+        services.AddScoped<PlatformEventFeedClock>();
+
+        foreach (string messageType in PlatformPublicEvents.SourceTypes)
+        {
+            services.AddScoped<IPlatformOutboxHandler>(provider => new PlatformPublicEventHandler(
+                messageType,
+                provider.GetRequiredService<IPlatformPublishedEventRepository>(),
+                provider.GetRequiredService<TimeProvider>()));
+        }
+        services.AddScoped<PlatformLegalAdministration>();
+        services.AddScoped<PlatformLegalClock>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformLegalNoticeHandler>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformLegalRegistrationHandler>();
 
         foreach (Type useCase in typeof(PlatformApplicationServiceCollectionExtensions).Assembly
             .GetExportedTypes()

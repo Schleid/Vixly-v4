@@ -43,6 +43,7 @@ public sealed class PlatformApprovalRequestHandler : IPlatformOutboxHandler
             PlatformApprovalKind.Discount => "discount",
             PlatformApprovalKind.Offer => "offer",
             PlatformApprovalKind.Promotion => "promotion",
+            PlatformApprovalKind.CreditNote => "credit_note",
             _ => "plan_version"
         };
 

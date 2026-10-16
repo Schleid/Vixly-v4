@@ -1,0 +1,40 @@
+﻿@*
+=========================================================
+FILE: CollectionsPage.razor
+
+PURPOSE:
+Collections: the dashboard and every case.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/collections"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.collections.title"]</PageTitle>
+<h1>@T["ui.collections.title"]</h1>
+<p><a href="/invoices">@T["ui.invoices.title"]</a> · <a href="/collections/settings">@T["ui.collections_settings.title"]</a></p>
+<CollectionsOverview Status="@Status" Stage="@Stage" Currency="@Currency" Extension="@(Extension ?? false)" Search="@Search" Page="@Page" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Stage { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Currency { get; set; }
+
+    [SupplyParameterFromQuery]
+    public bool? Extension { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Search { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

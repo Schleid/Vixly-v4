@@ -1,0 +1,71 @@
+﻿@*
+=========================================================
+FILE: InvoiceLines.razor
+
+PURPOSE:
+The lines and totals of an invoice, with tax per line.
+
+IMPORTANT NOTES:
+- Markup only; values come from the invoice detail
+- Text comes from PlatformText (UI-10); lines are translated
+  from their key and arguments, never stored as free text
+=========================================================
+*@
+@using Vixly.Platform.Application.UseCases.Billing
+@inject IStringLocalizer<PlatformText> T
+
+<VxDataTable Items="Invoice.Lines" IsLoading="false">
+    <HeaderContent>
+        <th scope="col">@T["ui.billing_document.description"]</th>
+        <th scope="col">@T["ui.billing_document.quantity"]</th>
+        <th scope="col">@T["ui.billing_document.unit_price"]</th>
+        <th scope="col">@T["ui.billing_document.tax"]</th>
+        <th scope="col">@T["ui.billing_document.amount"]</th>
+    </HeaderContent>
+    <RowTemplate Context="line">
+        <td>@BillingDisplay.Line(T, line)</td>
+        <td>@line.Quantity.ToString("0.##", System.Globalization.CultureInfo.CurrentCulture)</td>
+        <td>@BillingDisplay.Money(line.UnitPrice, Invoice.CurrencyCode)</td>
+        <td>@(line.TaxLabel is null ? "-" : line.TaxLabel + " " + BillingDisplay.Rate(line.TaxRate))</td>
+        <td>@BillingDisplay.Money(line.Net, Invoice.CurrencyCode)</td>
+    </RowTemplate>
+    <EmptyContent>
+        <VxEmptyState Title="@T["ui.invoices.no_lines"]" />
+    </EmptyContent>
+</VxDataTable>
+<dl class="vx-facts">
+    <dt>@T["ui.billing_document.subtotal"]</dt>
+    <dd>@BillingDisplay.Money(Invoice.NetTotal + Invoice.DiscountTotal, Invoice.CurrencyCode)</dd>
+    @if (Invoice.DiscountTotal != 0m)
+    {
+        <dt>@T["ui.billing_document.discount"]</dt>
+        <dd>@BillingDisplay.Money(-Invoice.DiscountTotal, Invoice.CurrencyCode)</dd>
+    }
+    <dt>@T["ui.billing_document.tax"]</dt>
+    <dd>@BillingDisplay.Money(Invoice.TaxTotal, Invoice.CurrencyCode)</dd>
+    <dt>@T["ui.billing_document.total"]</dt>
+    <dd><strong>@BillingDisplay.Money(Invoice.Total, Invoice.CurrencyCode)</strong></dd>
+    <dt>@T["ui.invoices.paid"]</dt>
+    <dd>@BillingDisplay.Money(Invoice.PaidTotal, Invoice.CurrencyCode)</dd>
+    @if (Invoice.CreditedTotal != 0m)
+    {
+        <dt>@T["ui.billing_document.credited"]</dt>
+        <dd>@BillingDisplay.Money(Invoice.CreditedTotal, Invoice.CurrencyCode)</dd>
+    }
+    <dt>@T["ui.billing_document.balance"]</dt>
+    <dd><strong>@BillingDisplay.Money(Invoice.Balance, Invoice.CurrencyCode)</strong></dd>
+    @if (Invoice.RefundOwed > 0m)
+    {
+        <dt>@T["ui.invoices.refund_owed"]</dt>
+        <dd>@BillingDisplay.Money(Invoice.RefundOwed, Invoice.CurrencyCode) <span class="vx-hint">@T["ui.invoices.refund_owed_help"]</span></dd>
+    }
+</dl>
+@if (Invoice.TaxTotal == 0m)
+{
+    <p class="vx-hint">@T["ui.billing_document.no_tax"]</p>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public PlatformInvoiceDetail Invoice { get; set; } = null!;
+}

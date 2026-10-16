@@ -132,7 +132,7 @@ public sealed class GetPlatformTenantSubscriptionUseCase
             subscription.PeriodEndUtc,
             subscription.CancelAtPeriodEnd,
             subscription.StatusChangedUtc,
-            subscription.AccessAt(_administration.UtcNow, _administration.UnpaidReadOnlyPeriod),
+            subscription.AccessAt(_administration.UtcNow, await _administration.AccessRulesAsync(cancellationToken)),
             scheduled,
             limits,
             version.Features.Select(item => item.Feature).OrderBy(feature => feature).ToArray(),

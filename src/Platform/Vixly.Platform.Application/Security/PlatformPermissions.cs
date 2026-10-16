@@ -118,6 +118,48 @@ public static class PlatformPermissions
 
     public const string SalesConfigure = "platform.sales.configure";
 
+    public const string BillingView = "platform.billing.view";
+
+    public const string BillingRecordPayments = "platform.billing.record_payments";
+
+    public const string BillingRequestCredits = "platform.billing.request_credits";
+
+    public const string BillingApproveCredits = "platform.billing.approve_credits";
+
+    public const string BillingConfigure = "platform.billing.configure";
+
+    public const string BillingChargeCards = "platform.billing.charge_cards";
+
+    public const string BillingRefundCards = "platform.billing.refund_cards";
+
+    public const string PaymentsConfigure = "platform.payments.configure";
+
+    public const string CollectionsView = "platform.collections.view";
+
+    public const string CollectionsManage = "platform.collections.manage";
+
+    public const string CollectionsExtend = "platform.collections.extend";
+
+    public const string CollectionsExtendBeyondLimit = "platform.collections.extend_beyond_limit";
+
+    public const string CollectionsConfigure = "platform.collections.configure";
+
+    public const string LicensingView = "platform.licensing.view";
+
+    public const string LicensingManage = "platform.licensing.manage";
+
+    public const string LicensingApproveRelease = "platform.licensing.approve_release";
+
+    public const string LegalView = "platform.legal.view";
+
+    public const string LegalManage = "platform.legal.manage";
+
+    public const string LegalPublish = "platform.legal.publish";
+
+    public const string LegalRemind = "platform.legal.remind";
+
+    public const string LegalRecordAcceptance = "platform.legal.record_acceptance";
+
     public static IReadOnlyList<string> Catalogue { get; } = new[]
     {
         UsersView,
@@ -165,7 +207,28 @@ public static class PlatformPermissions
         PromotionsManage,
         PromotionsApprove,
         SubscriptionsCharges,
-        SalesConfigure
+        SalesConfigure,
+        BillingView,
+        BillingRecordPayments,
+        BillingRequestCredits,
+        BillingApproveCredits,
+        BillingConfigure,
+        BillingChargeCards,
+        BillingRefundCards,
+        PaymentsConfigure,
+        CollectionsView,
+        CollectionsManage,
+        CollectionsExtend,
+        CollectionsExtendBeyondLimit,
+        CollectionsConfigure,
+        LicensingView,
+        LicensingManage,
+        LicensingApproveRelease,
+        LegalView,
+        LegalManage,
+        LegalPublish,
+        LegalRemind,
+        LegalRecordAcceptance
     };
 
     public static IReadOnlyCollection<string> All { get; } = new HashSet<string>(Catalogue, StringComparer.Ordinal);

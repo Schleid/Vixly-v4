@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Vixly.Platform.Application.Ports;
 using Vixly.Platform.Application.Queries;
 using Vixly.Platform.Application.Security;
@@ -12,7 +14,6 @@ using Vixly.Platform.Infrastructure.Persistence;
 using Vixly.Platform.Infrastructure.Persistence.Queries;
 using Vixly.Platform.Infrastructure.Persistence.Repositories;
 using Vixly.Platform.Infrastructure.Security;
-using Vixly.Platform.Infrastructure.Subscriptions;
 using Vixly.Platform.Infrastructure.Tenants;
 
 namespace Vixly.Platform.Infrastructure.DependencyInjection;
@@ -95,6 +96,7 @@ public static class PlatformInfrastructureServiceCollectionExtensions
         services.AddScoped<IPlatformPortalSlugRepository, PlatformPortalSlugRepository>();
         services.AddScoped<IPlatformTenantRegistrationRepository, PlatformTenantRegistrationRepository>();
         services.AddScoped<IPlatformOutboxRepository, PlatformOutboxRepository>();
+        services.AddScoped<IPlatformPublishedEventRepository, PlatformPublishedEventRepository>();
         services.AddScoped<IPlatformTenantQueries, PlatformTenantQueries>();
         services.AddScoped<IPlatformTenantPolicy, ConfiguredPlatformTenantPolicy>();
         services.AddScoped<IPlatformPlanRepository, PlatformPlanRepository>();
@@ -103,10 +105,24 @@ public static class PlatformInfrastructureServiceCollectionExtensions
         services.AddScoped<IPlatformSalesSettingsRepository, PlatformSalesSettingsRepository>();
         services.AddScoped<IPlatformPromotionRepository, PlatformPromotionRepository>();
         services.AddScoped<IPlatformOfferRepository, PlatformOfferRepository>();
+        services.AddScoped<PlatformInvoiceRepository>();
+        services.AddScoped<IPlatformInvoiceRepository>(provider => provider.GetRequiredService<PlatformInvoiceRepository>());
+        services.AddScoped<IPlatformInvoiceHistory>(provider => provider.GetRequiredService<PlatformInvoiceRepository>());
+        services.AddScoped<IPlatformBillingRepository, PlatformBillingRepository>();
+        services.AddScoped<IPlatformBillingQueries, PlatformBillingQueries>();
         services.AddScoped<IPlatformPublicLinks, PlatformPublicLinks>();
         services.AddScoped<IPlatformSubscriptionQueries, PlatformSubscriptionQueries>();
-        services.AddScoped<IPlatformSubscriptionPolicy, ConfiguredPlatformSubscriptionPolicy>();
-        services.AddScoped<IPlatformLicenceCounter, PendingPlatformLicenceCounter>();
+        services.AddScoped<IPlatformLicenceCounter, Vixly.Platform.Infrastructure.Licensing.PlatformDeviceLicenceCounter>();
+        services.AddScoped<IPlatformLicensingRepository, PlatformLicensingRepository>();
+        services.AddScoped<IPlatformLicensingQueries, PlatformLicensingQueries>();
+        services.AddScoped<IPlatformLicensingMailer, SmtpPlatformLicensingMailer>();
+        services.AddScoped<IPlatformZelleRepository, PlatformZelleRepository>();
+        services.AddScoped<IPlatformZelleQueries, PlatformZelleQueries>();
+        services.AddScoped<IPlatformZelleMailer, SmtpPlatformZelleMailer>();
+        services.AddScoped<IPlatformLegalRepository, PlatformLegalRepository>();
+        services.AddScoped<IPlatformLegalQueries, PlatformLegalQueries>();
+        services.AddScoped<IPlatformLegalMailer, SmtpPlatformLegalMailer>();
+        services.AddSingleton<IPlatformDeviceKeys, Vixly.Platform.Infrastructure.Licensing.PlatformDeviceKeys>();
         services.AddSingleton<IPlatformRandom, PlatformRandom>();
 
         services.AddSingleton<IPlatformPasswordHasher, BCryptPlatformPasswordHasher>();
@@ -117,15 +133,18 @@ public static class PlatformInfrastructureServiceCollectionExtensions
 
         services.AddLocalization();
         services.AddOptions<PlatformMailOptions>().Bind(configuration.GetSection(PlatformMailOptions.SectionName));
+        services.AddOptions<Vixly.Platform.Infrastructure.Documents.PlatformDocumentOptions>().Bind(configuration.GetSection(Vixly.Platform.Infrastructure.Documents.PlatformDocumentOptions.SectionName));
         services.AddOptions<PlatformHostingOptions>().Bind(configuration.GetSection(PlatformHostingOptions.SectionName));
         services.AddOptions<PlatformTenantOptions>().Bind(configuration.GetSection(PlatformTenantOptions.SectionName));
         services.AddOptions<PlatformBotCheckOptions>().Bind(configuration.GetSection(PlatformBotCheckOptions.SectionName));
-        services.AddOptions<PlatformSubscriptionOptions>().Bind(configuration.GetSection(PlatformSubscriptionOptions.SectionName));
         services.AddScoped<PlatformMailSender>();
         services.AddScoped<IPlatformIdentityMailer, SmtpPlatformIdentityMailer>();
         services.AddScoped<IPlatformTenantMailer, SmtpPlatformTenantMailer>();
         services.AddScoped<IPlatformSubscriptionMailer, SmtpPlatformSubscriptionMailer>();
         services.AddScoped<IPlatformSalesMailer, SmtpPlatformSalesMailer>();
+        services.AddScoped<IPlatformBillingMailer, SmtpPlatformBillingMailer>();
+        services.AddScoped<IPlatformBillingDocuments, Vixly.Platform.Infrastructure.Documents.QuestPdfPlatformBillingDocuments>();
+        AddPayments(services, configuration);
         services.AddHttpClient<IPlatformBotCheck, TurnstilePlatformBotCheck>(client => client.Timeout = TimeSpan.FromSeconds(10));
 
         services.AddHealthChecks()
@@ -133,5 +152,38 @@ public static class PlatformInfrastructureServiceCollectionExtensions
             .AddCheck<PlatformSchemaHealthCheck>("platform-schema", HealthStatus.Unhealthy, new[] { "ready" });
 
         return services;
+    }
+
+    // Slice 5: card payments. Unset provider means Simulated in Development and Stripe elsewhere.
+    private static void AddPayments(IServiceCollection services, IConfiguration configuration)
+    {
+        string environment = configuration["environment"] ?? configuration["ASPNETCORE_ENVIRONMENT"] ?? configuration["DOTNET_ENVIRONMENT"] ?? "Production";
+        bool development = string.Equals(environment, "Development", StringComparison.OrdinalIgnoreCase);
+
+        services.AddOptions<Vixly.Platform.Infrastructure.Payments.PlatformPaymentsOptions>().Bind(configuration.GetSection(Vixly.Platform.Infrastructure.Payments.PlatformPaymentsOptions.SectionName));
+        services.AddScoped<IPlatformPaymentsRepository, PlatformPaymentsRepository>();
+        services.AddScoped<IPlatformPaymentsQueries, PlatformPaymentsQueries>();
+        services.AddScoped<IPlatformPaymentsMailer, SmtpPlatformPaymentsMailer>();
+        services.AddScoped<IPlatformCollectionsRepository, PlatformCollectionsRepository>();
+        services.AddScoped<IPlatformCollectionsQueries, PlatformCollectionsQueries>();
+        services.AddScoped<IPlatformCollectionsMailer, SmtpPlatformCollectionsMailer>();
+
+        // The simulated provider posts its events to the local API; it trusts the local development certificate only.
+        services.AddHttpClient(Vixly.Platform.Infrastructure.Payments.SimulatedCardGateway.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(10))
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (request, _, _, errors) =>
+                    errors == System.Net.Security.SslPolicyErrors.None || (development && request.RequestUri is { IsLoopback: true })
+            });
+
+        services.AddSingleton<IPlatformCardGateway>(provider =>
+        {
+            IOptions<Vixly.Platform.Infrastructure.Payments.PlatformPaymentsOptions> options = provider.GetRequiredService<IOptions<Vixly.Platform.Infrastructure.Payments.PlatformPaymentsOptions>>();
+            string chosen = options.Value.Provider ?? (development ? "Simulated" : "Stripe");
+
+            return string.Equals(chosen, "Simulated", StringComparison.OrdinalIgnoreCase)
+                ? new Vixly.Platform.Infrastructure.Payments.SimulatedCardGateway(options, environment, provider.GetRequiredService<IHttpClientFactory>(), provider.GetRequiredService<ILogger<Vixly.Platform.Infrastructure.Payments.SimulatedCardGateway>>())
+                : new Vixly.Platform.Infrastructure.Payments.StripeCardGateway(options, environment, provider.GetRequiredService<ILogger<Vixly.Platform.Infrastructure.Payments.StripeCardGateway>>());
+        });
     }
 }

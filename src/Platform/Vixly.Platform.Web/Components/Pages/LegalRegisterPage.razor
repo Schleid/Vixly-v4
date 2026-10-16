@@ -1,0 +1,31 @@
+﻿@*
+=========================================================
+FILE: LegalRegisterPage.razor
+
+PURPOSE:
+Which tenants accepted the current Terms.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/legal/register"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.legal.register"]</PageTitle>
+<h1>@T["ui.legal.register"]</h1>
+<p><a href="/legal">@T["ui.legal.title"]</a></p>
+<LegalRegisterView Status="@Status" Search="@Search" Page="@Page" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Search { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

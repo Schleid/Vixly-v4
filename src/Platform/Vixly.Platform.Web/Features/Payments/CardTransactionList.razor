@@ -1,0 +1,103 @@
+﻿@*
+=========================================================
+FILE: CardTransactionList.razor
+
+PURPOSE:
+All card charges and refunds, filtered by status, origin and
+disputes, with pager.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Filters live in the URL so a view can be bookmarked
+=========================================================
+*@
+@inherits PlatformPresenterComponent<CardTransactionListPresenter>
+@using Vixly.Platform.Domain.Payments
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+<form class="vx-toolbar" role="search" @onsubmit="Apply">
+    <label for="card-status">@T["ui.card_payments.status"]</label>
+    <select id="card-status" @bind="_status">
+        <option value="">@T["ui.invoices.status.all"]</option>
+        @foreach (PlatformCardTransactionStatus status in Enum.GetValues<PlatformCardTransactionStatus>())
+        {
+            <option value="@status">@T[PaymentsDisplay.StatusKey(status)]</option>
+        }
+    </select>
+    <label for="card-origin">@T["ui.card_payments.origin"]</label>
+    <select id="card-origin" @bind="_origin">
+        <option value="">@T["ui.card_payments.origin.all"]</option>
+        @foreach (PlatformCardTransactionOrigin origin in Enum.GetValues<PlatformCardTransactionOrigin>())
+        {
+            <option value="@origin">@T[PaymentsDisplay.OriginKey(origin)]</option>
+        }
+    </select>
+    <label><input type="checkbox" @bind="_disputed" /> @T["ui.card_payments.disputed_only"]</label>
+    <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
+</form>
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else
+{
+    <p class="vx-hint">@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.card_payments.count", "count", Presenter.State.TotalCount) : T["ui.common.loading"].Value)</p>
+    <CardTransactionTable Items="Presenter.State.Items" />
+    @if (Presenter.State.Loaded && Presenter.State.TotalPages > 1)
+    {
+        <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="page => Navigation.NavigateTo(Url(page))" />
+    }
+}
+
+@code {
+    private string _status = string.Empty;
+
+    private string _origin = string.Empty;
+
+    private bool _disputed;
+
+    [Parameter]
+    public string? Status { get; set; }
+
+    [Parameter]
+    public string? Origin { get; set; }
+
+    [Parameter]
+    public bool Disputed { get; set; }
+
+    [Parameter]
+    public int? Page { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        PlatformCardTransactionStatus? status = Enum.TryParse(Status, true, out PlatformCardTransactionStatus parsedStatus) ? parsedStatus : null;
+        PlatformCardTransactionOrigin? origin = Enum.TryParse(Origin, true, out PlatformCardTransactionOrigin parsedOrigin) ? parsedOrigin : null;
+        _status = status?.ToString() ?? string.Empty;
+        _origin = origin?.ToString() ?? string.Empty;
+        _disputed = Disputed;
+        return Presenter.LoadAsync(status, origin, Disputed, Page ?? 1);
+    }
+
+    private void Apply()
+    {
+        Navigation.NavigateTo(Url(1));
+    }
+
+    private string Url(int page)
+    {
+        Dictionary<string, string?> query = new()
+        {
+            ["status"] = string.IsNullOrEmpty(_status) ? null : _status,
+            ["origin"] = string.IsNullOrEmpty(_origin) ? null : _origin,
+            ["disputed"] = _disputed ? "true" : null,
+            ["page"] = page > 1 ? page.ToString(System.Globalization.CultureInfo.InvariantCulture) : null
+        };
+
+        return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString("/payments/transactions", query.Where(pair => pair.Value is not null));
+    }
+}

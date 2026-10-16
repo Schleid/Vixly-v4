@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | v1.3, 2026-10-13 (adds ADR-0010: schema per plane, table naming, V4 hostnames, independence from V3, build order; and ADR-0007: Platform Worker). v1.2 approved by the owner 2026-10-06; v1.3 changes accepted by the owner 2026-10-13. Section 1 white-label paragraph amended 2026-10-14 (ADR-0012 Amendment 1). Binding for every team and every project in this repository. |
+| Status | v1.3, 2026-10-13 (adds ADR-0010: schema per plane, table naming, V4 hostnames, independence from V3, build order; and ADR-0007: Platform Worker). v1.2 approved by the owner 2026-10-06; v1.3 changes accepted by the owner 2026-10-13. Section 1 white-label paragraph amended 2026-10-14 (ADR-0012 Amendment 1). S-7, S-9, cross-plane rule 4 and the 4.1 wire-type rule amended 2026-10-16 (ADR-0014). Binding for every team and every project in this repository. |
 | Owner | Architecture. Changes only by ADR in `docs/decisions/`. |
 | Audience | Control, Operations, Customer and Frontend/UI teams. |
 
@@ -102,7 +102,7 @@ Cross-plane rules:
 1. **C-0** A plane never references another plane's Domain, Application, Infrastructure, Api or Web project. Planes talk over HTTP through `Vixly.Contracts.*`.
 2. Customer never touches the Operations database. Operations owns the data (it builds the invoice); Customer presents a customer-scoped view of it, read through the Operations internal API.
 3. `Operations.Api` is internal. Edge never routes to it publicly.
-4. Contracts hold no logic. Wire enums carry explicit numeric values. Changes are additive; a breaking change is a new version plus an ADR.
+4. Contracts hold no logic. Wire enums carry explicit numeric values; `Contracts.Platform` carries enum values as stable lowercase string codes instead (ADR-0014). Changes are additive; a breaking change is a new version plus an ADR.
 5. `Shared.UI` references no plane project and no `Contracts.*` and never reads `HttpContext`. Its **primitives** (buttons, inputs, grids, dialogs, badges) take parameters and `EventCallback`s only, which lets the Frontend/UI team build and test them without a backend. `Shared.UI` also holds the plane-agnostic `PresenterBase` and `PresenterComponent<TPresenter>` (see 5.3). Feature components are not primitives: they live in each plane's `*.Web` project (ADR-0001).
 6. `Shared.Kernel` holds no entities and no plane vocabulary. It grows only by ADR.
 
@@ -124,7 +124,7 @@ Applies to entities, aggregate roots, EF entity classes and repositories. Also:
 
 - `DbSet` names and table names are the plural noun without the prefix. Each entity's EF configuration sets the table name explicitly (`builder.ToTable("Invoices")`) so a class rename never renames a table silently.
 - Translation tables follow the same rule: `platform.SubscriptionPlanTranslations` for `PlatformSubscriptionPlanTranslation`.
-- Wire types in `Contracts.*` carry the owning plane plus `Dto`: `OperationsInvoiceDto`. The consumer maps it into its own entity or read model.
+- Wire types in `Contracts.*` carry the owning plane plus `Dto`: `OperationsInvoiceDto`. The consumer maps it into its own entity or read model. `Contracts.Platform` uses `...Body` for requests, `...Info` or a plain noun for answers and `...Event` for events (ADR-0014).
 - Value objects, enums and use cases live in a plane-named namespace and need no prefix, but must not reuse an entity's name.
 - Avoid stutter: name by role (`OperationsCustomer`, `OperationsCustomerInvoice`; not `CustomerCustomer`). Inside Operations, `Customer…` in a name describes the subject (the tenant's customer), never the Customer plane.
 - A bare `Invoice`, `Shipment`, `Tenant`, `Customer` as an entity class in any plane is a review blocker. A table name carrying a plane prefix is a review blocker.
@@ -282,9 +282,9 @@ Every item is mandatory. Findings from the legacy audit are cited so the reason 
 - **S-4** Cookies are host-only (no `Domain`) and carry V4 names: the `__Host-` prefix (`__Host-vx4-auth`, `__Host-vx4-device`), except the customer cookie, which is `__Secure-vx4-customer` because it is scoped to `Path=/customer`. Every cookie is `HttpOnly`, `Secure` always, `SameSite=Lax`, with a short `ExpireTimeSpan`, idle-deadline stamping and a bounded `MaxAge`. One cookie scheme per process. No policy-scheme router that guesses the scheme from path, referer or cookie. V4 never writes a domain-wide cookie and ignores any `vx-*` cookie it receives.
 - **S-5** Data Protection keys are persisted to the plane's own schema under a per-app name, never to local disk or memory. Each deployable has its own key ring and an application name that differs from V3's.
 - **S-6** Authentication, registration, device-registration and public endpoints carry named rate-limit policies. Every anonymous endpoint is listed in its plane document with its policy.
-- **S-7** Internal APIs authenticate every caller (internal API key header handler at minimum, with an allowed-caller list), are never routed publicly, and receive tenant context explicitly.
+- **S-7** Internal APIs authenticate every caller (internal API key header handler at minimum, with an allowed-caller list), are never routed publicly, and receive tenant context explicitly. Platform requires short-lived signed service tokens instead of a key (ADR-0014).
 - **S-8** CORS uses explicit per-environment origins, never a wildcard. `AllowedHosts` is restricted outside Development.
-- **S-9** Never echo raw HTTP responses, exception text or stack traces to a UI or API consumer (legacy SEC-02). Show a generic, localized error with a correlation id (5.5). APIs return an error code, its arguments and the correlation id, not display text.
+- **S-9** Never echo raw HTTP responses, exception text or stack traces to a UI or API consumer (legacy SEC-02). Show a generic, localized error with a correlation id (5.5). APIs return an error code, its arguments and the correlation id; Platform also returns its own text for the code in the caller’s language, which consumers never parse (ADR-0014).
 - **S-10** Every web host sends CSP, HSTS, `X-Content-Type-Options` and frame protection. Relaxations that Blazor Server needs (legacy allows `'unsafe-inline'` and `'unsafe-eval'`) are recorded as tracked exceptions, not silently copied.
 - **S-11** No secrets in the repository. Secrets come from host environment variables today; Google Secret Manager is the planned second source. Code reads them only through `IConfiguration`, so switching source is configuration, not code.
 - **S-12** Every host exposes `/health/live` and `/health/ready`, writes structured logs with no PII, tokens or secrets, and supports OpenTelemetry export by configuration.

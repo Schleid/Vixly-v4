@@ -39,4 +39,30 @@ public static class PlatformMessageTypes
     public const string SubscriptionChargeChanged = "platform.subscription.charge_changed.v1";
     public const string ApprovalRequested = "platform.sales.approval_requested.v1";
     public const string DiscountEnding = "platform.subscription.discount_ending.v1";
+    public const string BillingDocumentIssued = "platform.billing.document_issued.v1";
+    public const string InvoicePaid = "platform.billing.invoice_paid.v1";
+
+    public const string ProviderEvent = "platform.payments.provider_event.v1";
+
+    public const string CardPaymentFailed = "platform.payments.card_payment_failed.v1";
+
+    public const string CollectionsNotice = "platform.collections.notice.v1";
+
+    public const string LicensingNotice = "platform.licensing.notice.v1";
+
+    public const string ZelleNotice = "platform.payments.zelle_notice.v1";
+
+    public const string LegalNotice = "platform.legal.notice.v1";
+
+    // For Operations (contract, D-Lg11).
+    public const string LegalVersionPublished = "platform.legal.version_published.v1";
+
+    public const string TermsAccepted = "platform.legal.terms_accepted.v1";
+
+    // For Operations (contract, D-L14): drop cached device checks on these.
+    public const string DeviceApproved = "platform.device.approved.v1";
+
+    public const string DeviceReleased = "platform.device.released.v1";
+
+    public const string DeviceRevoked = "platform.device.revoked.v1";
 }
