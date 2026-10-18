@@ -20,3 +20,7 @@ Owner: Frontend/UI. Scope: the two supplied homepage screenshots and a creative 
 - Review screenshots: public-sketch-hero.png, public-sketch-modules.png and public-feature-journey.png in this chat's visualization artifacts.
 
 Delivered on the UI review branch through draft PR #1. Production requires review, merge and deployment. Only Frontend-owned marketing markup, styles, assets and this record are included; unrelated backend/application worktree changes remain excluded.
+
+## Customer portal illustration correction
+
+The Customer portal chapter now depicts a customer entering and reviewing records in a browser-based self-service portal. The former parcel handoff scene incorrectly suggested physical delivery. Only the image selection and asset change; localized copy and application behavior are unchanged.

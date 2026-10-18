@@ -65,3 +65,9 @@ Suffix: Style: refined architectural pencil and ink sketch on very pale warm ivo
 - `sketch-organization.webp`: Three separate miniature warehouse-office buildings connected to their own blue key-shaped access tokens, clearly separated private spaces; two staff figures at a doorway, subtle shield outline integrated behind the central building. Thoughtful architectural editorial metaphor for company isolation and role-based access. No giant padlock cliché. Landscape 4:3.
 - `sketch-customers.webp`: A courier handing a parcel to a business customer at a small shop entrance, customer checking shipment arrival on a phone with screen turned away. Human customer visibility and delivery theme. Landscape 4:3.
 - `sketch-hero.webp`: A sophisticated wide isometric cutaway of one connected logistics operation: warehouse shelving at center, worker scanning a carton at intake, consolidated parcels moving on a pallet toward a loading bay, delivery van leaving onto a curved cobalt route, a small office finance desk at upper right. One coherent airy architectural composition, no segmented panels, clear end-to-end operations. Landscape 3:2.
+
+## Customer portal correction
+
+`sketch-customer-web-portal.webp` replaces the delivery handoff metaphor with a customer entering and reviewing data in a browser portal. Generated with the built-in imagegen tool, generation mode, then resized and encoded as WebP.
+
+Prompt: Premium architectural pencil-and-ink editorial sketch on pale ivory paper with slate linework and restrained cobalt watercolor. A business customer seated at an office desk, using a desktop browser portal. Monitor is the focal point: blue navigation sidebar, shipment entry form with input rectangles and primary button, shipment/invoice table rows below. Hands on keyboard and mouse show data entry. Landscape 4:3, readable at 500px. No legible interface text, branding, courier, delivery person, parcel handoff, loading bay or van.
