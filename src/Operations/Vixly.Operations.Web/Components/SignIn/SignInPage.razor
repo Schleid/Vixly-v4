@@ -1,44 +1,93 @@
-﻿@*
-=========================================================
+﻿@inject IStringLocalizer<OperationsText> T
+@inject IStringLocalizer<OperationsLoginText> L
+@* =========================================================
 FILE: SignInPage.razor
 
 PURPOSE:
-The tenant landing: the staff sign-in form with the tenant name.
+The approved tenant staff entry, separate from Control.
 
 RESPONSIBILITIES:
-- Render the tenant landing: the staff sign-in form with the tenant name
+- Compose the tenant welcome panel and existing staff sign-in form
 
 IMPORTANT NOTES:
-- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
-- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
-- Operations entry is distinct from the platform administration console
-=========================================================
-*@
-@inject IStringLocalizer<OperationsText> T
-
-<AuthShell Title="@T["ui.signin.title"]" Subtitle="@(Setup ? T["ui.signin.setup_subtitle"] : T["ui.signin.subtitle"])" Company="@Company" ReturnHere="@ReturnUrl">
-    <figure class="ops-entry-photo" aria-hidden="true">
-        <img src="/images/staff-receiving.webp" alt="" width="960" height="1200" decoding="async" fetchpriority="high" />
-        <figcaption><span>@Company</span><svg viewBox="0 0 32 20" width="48" height="30" fill="currentColor"><path d="M0 0h2v20H0zm4 0h1v20H4zm3 0h3v20H7zm5 0h1v20h-1zm3 0h2v20h-2zm4 0h1v20h-1zm3 0h3v20h-3zm5 0h1v20h-1zm3 0h2v20h-2z" /></svg></figcaption>
-    </figure>
-    <div class="ops-entry-form">
-    <FormMessage Error="@Error" Info="@Info" />
-    <form method="post" action="/staff/sign-in" class="vx-form">
-        <AntiforgeryToken />
-        <input type="hidden" name="returnUrl" value="@ReturnUrl" />
-        <div class="vx-field">
-            <label for="email" class="vx-label">@T["ui.signin.email"]</label>
-            <input id="email" name="email" type="email" class="vx-input" autocomplete="username" required value="@Email" />
-        </div>
-        <div class="vx-field">
-            <label for="password" class="vx-label">@T["ui.signin.password"]</label>
-            <input id="password" name="password" type="password" class="vx-input" autocomplete="current-password" required />
-        </div>
-        <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.signin.submit"]</VxButton>
-    </form>
-    <p class="vx-auth__aside"><a href="/staff/forgot-password">@T["ui.signin.forgot"]</a></p>
-    </div>
-</AuthShell>
+- Tenant branding is published Operations data, never a platform logo
+- Preserve antiforgery, return URL, error handling and form guard
+========================================================= *@
+<!DOCTYPE html>
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex" />
+    <title>@L["heading"] · @Company</title>
+    <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-theme.css" />
+    <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-primitives.css" />
+    <link rel="stylesheet" href="/css/ops-login.css" />
+    <script src="/_content/Vixly.Shared.UI/vixly-forms.js" defer></script>
+    <script src="/js/ops-login.js" defer></script>
+</head>
+<body class="ops-login">
+    <main class="ops-login__card" aria-labelledby="login-heading">
+        <section class="ops-login__welcome" aria-labelledby="welcome-heading">
+            <span class="ops-login__badge">@L["badge"]</span>
+            <div class="ops-login__intro">
+                <p class="ops-login__eyebrow">@L["eyebrow"]</p>
+                <h2 id="welcome-heading">@(string.IsNullOrWhiteSpace(Company) ? L["welcome_fallback"] : L["welcome"])<span>@Company</span></h2>
+                <p class="ops-login__description">@L["body"]</p>
+            </div>
+            <div class="ops-login__tiles">
+                <div class="ops-login__tile">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v9l9 5 9-5V8M12 13v9" /></svg>
+                    <strong>@L["shipments"]</strong><span>@L["shipments_body"]</span>
+                </div>
+                <div class="ops-login__tile">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13M7 21V11h10v10M8 15h8M8 18h8" /></svg>
+                    <strong>@L["warehouses"]</strong><span>@L["warehouses_body"]</span>
+                </div>
+                <div class="ops-login__tile">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.87M15 3.13a4 4 0 0 1 0 7.75" /><circle cx="9" cy="7" r="4" /></svg>
+                    <strong>@L["team"]</strong><span>@L["team_body"]</span>
+                </div>
+            </div>
+        </section>
+        <section class="ops-login__form-panel">
+            <Vixly.Operations.Web.Features.SignIn.LoginBrand.OperationsLoginBrand Company="@Company" />
+            <header class="ops-login__header">
+                <h1 id="login-heading">@L["heading"]</h1>
+                <p>@(Setup ? T["ui.signin.setup_subtitle"] : L["subtitle"])</p>
+            </header>
+            <FormMessage Error="@Error" Info="@Info" />
+            <form method="post" action="/staff/sign-in" class="ops-login__form">
+                <AntiforgeryToken />
+                <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+                <div class="ops-login__field">
+                    <label for="email">@T["ui.signin.email"]</label>
+                    <input id="email" name="email" type="email" autocomplete="username" required value="@Email" placeholder="@L["email_placeholder"]" />
+                </div>
+                <div class="ops-login__field">
+                    <label for="password">@T["ui.signin.password"]</label>
+                    <div class="ops-login__password">
+                        <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="@L["password_placeholder"]" />
+                        <button type="button" hidden data-password-toggle aria-controls="password" aria-pressed="false" aria-label="@L["show_password"]" data-show-label="@L["show_password"]" data-hide-label="@L["hide_password"]">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /><path class="ops-login__eye-slash" d="m3 3 18 18" /></svg>
+                        </button>
+                    </div>
+                </div>
+                <a class="ops-login__forgot" href="/staff/forgot-password">@T["ui.signin.forgot"]</a>
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.signin.submit"]</VxButton>
+            </form>
+            <p class="ops-login__protected"><span aria-hidden="true"></span>@L["protected"]</p>
+            <nav class="ops-login__languages" aria-label="@T["ui.language"]">
+                @foreach (string language in new[] { "en", "fr", "es" })
+                {
+                    <a href="/culture/@language?returnUrl=@ReturnUrl" hreflang="@language" lang="@language" aria-current="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == language ? "true" : null)">@language.ToUpperInvariant()</a>
+                }
+            </nav>
+        </section>
+    </main>
+</body>
+</html>
 
 @code {
     [Parameter]

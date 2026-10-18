@@ -1,0 +1,58 @@
+﻿/* Approved tenant staff entry. All colors derive from shared semantic tokens. */
+.ops-login { box-sizing: border-box; margin: 0; min-height: 100dvh; display: grid; place-items: center; padding: clamp(1rem, 3vw, 3rem); background: radial-gradient(ellipse at 50% 0, var(--vx-color-primary-soft), var(--vx-color-app) 75%); color: var(--vx-color-text); font-family: var(--vx-font); -webkit-font-smoothing: antialiased; }
+.ops-login *, .ops-login *::before, .ops-login *::after { box-sizing: border-box; }
+.ops-login__card { width: min(100%, 74rem); display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); background: var(--vx-color-surface); border: 1px solid var(--vx-color-border); border-radius: 1.75rem; overflow: hidden; box-shadow: 0 2rem 4rem color-mix(in srgb, var(--vx-color-text) 14%, transparent); }
+.ops-login__welcome { position: relative; isolation: isolate; min-width: 0; padding: clamp(2rem, 3.6vw, 3.5rem); display: flex; flex-direction: column; justify-content: space-between; gap: 3.5rem; color: var(--vx-color-on-primary); background: radial-gradient(ellipse at 105% 0, color-mix(in srgb, var(--vx-color-primary) 90%, transparent), transparent 48%), linear-gradient(145deg, var(--vx-color-chrome-footer), color-mix(in srgb, var(--vx-color-primary-hover) 70%, var(--vx-color-chrome-footer))); }
+.ops-login__welcome::before { content: ''; position: absolute; z-index: -1; inset: 1.5rem; border: 1px solid color-mix(in srgb, var(--vx-color-on-primary) 14%, transparent); border-radius: 1.5rem; pointer-events: none; }
+.ops-login__badge { display: inline-flex; align-self: start; padding: .7rem 1.2rem; border: 1px solid color-mix(in srgb, var(--vx-color-on-primary) 25%, transparent); border-radius: 3rem; background: color-mix(in srgb, var(--vx-color-on-primary) 9%, transparent); font-size: .6875rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+.ops-login__intro { margin-top: 1.25rem; }
+.ops-login__eyebrow { margin: 0 0 1.5rem; color: var(--vx-color-chrome-accent); text-transform: uppercase; letter-spacing: .12em; font-size: .6875rem; line-height: 1.5; font-weight: 750; }
+.ops-login__intro h2 { margin: 0; font-size: clamp(2.7rem, 4.3vw, 4.15rem); font-weight: 750; line-height: 1.04; letter-spacing: -.055em; overflow-wrap: anywhere; }
+.ops-login__intro h2 span { display: block; margin-top: .1em; }
+.ops-login__description { margin: 1.5rem 0 0; max-width: 32rem; color: var(--vx-color-chrome-text); font-size: 1rem; line-height: 1.7; }
+.ops-login__tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
+.ops-login__tile { min-width: 0; padding: 1.2rem .85rem; display: flex; flex-direction: column; align-items: start; gap: .4rem; border: 1px solid color-mix(in srgb, var(--vx-color-on-primary) 22%, transparent); border-radius: 1rem; background: color-mix(in srgb, var(--vx-color-on-primary) 10%, transparent); }
+.ops-login__tile svg { width: 2rem; height: 2rem; fill: none; stroke: var(--vx-color-chrome-accent); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; margin-bottom: .5rem; }
+.ops-login__tile strong { font-size: .9rem; font-weight: 700; overflow-wrap: anywhere; }
+.ops-login__tile span { color: var(--vx-color-chrome-text); font-size: .6875rem; line-height: 1.55; }
+.ops-login__form-panel { min-width: 0; display: flex; flex-direction: column; justify-content: center; padding: clamp(2rem, 3.7vw, 3.5rem); }
+.ops-login__identity { display: flex; align-items: center; gap: 1rem; margin-bottom: 2.75rem; font-size: clamp(1.1rem, 1.8vw, 1.6rem); line-height: 1.2; font-weight: 750; letter-spacing: -.04em; }
+.ops-login__logo { flex: 0 0 3.75rem; width: 3.75rem; height: 3.75rem; display: grid; place-items: center; position: relative; border-radius: .9rem; background: var(--vx-color-primary-soft); color: var(--vx-color-primary); overflow: hidden; }
+.ops-login__initials { font-weight: 750; font-size: 1.5rem; letter-spacing: -.05em; }
+.ops-login__logo img { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: var(--vx-color-surface); }
+.ops-login__logo[data-logo-loaded] { background: transparent; border-radius: 0; }
+.ops-login__logo[data-logo-loaded] .ops-login__initials { visibility: hidden; }
+.ops-login__header { margin-bottom: 1.8rem; }
+.ops-login__header h1 { margin: 0 0 .6rem; font-size: clamp(1.8rem, 2.7vw, 2.4rem); letter-spacing: -.045em; line-height: 1.15; font-weight: 750; }
+.ops-login__header p { margin: 0; color: var(--vx-color-text-subtle); font-size: .875rem; line-height: 1.6; }
+.ops-login__form { display: grid; gap: 1.3rem; margin: 0; }
+.ops-login__field { display: grid; gap: .5rem; min-width: 0; }
+.ops-login__field label { font-size: .75rem; font-weight: 700; }
+.ops-login__field input { width: 100%; min-width: 0; min-height: 48px; padding: .8rem .9rem; font: inherit; font-size: .875rem; line-height: 1.4; color: var(--vx-color-text); background: var(--vx-color-surface); border: 1px solid var(--vx-color-border-control); border-radius: .7rem; transition: border-color 150ms ease, box-shadow 150ms ease; }
+.ops-login__field input::placeholder { color: var(--vx-color-text-subtle); opacity: 1; }
+.ops-login__field input:focus-visible { border-color: var(--vx-color-focus); outline: 2px solid var(--vx-color-focus); outline-offset: 3px; }
+.ops-login__field input:user-invalid { border-color: var(--vx-color-danger); }
+.ops-login__password { position: relative; min-width: 0; }
+.ops-login__password:has(button:not([hidden])) input { padding-right: 3.4rem; }
+.ops-login__password button { position: absolute; inset: 2px 3px 2px auto; width: 44px; border: 0; background: transparent; color: var(--vx-color-text-subtle); border-radius: .5rem; cursor: pointer; }
+.ops-login__password button[hidden] { display: none; }
+.ops-login__password svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+.ops-login__eye-slash { display: none; }
+.ops-login__password button[aria-pressed=true] .ops-login__eye-slash { display: block; }
+.ops-login__forgot { justify-self: end; margin-top: -.5rem; color: var(--vx-color-link); font-size: .75rem; font-weight: 650; text-underline-offset: .2em; }
+.ops-login__form .vx-button { width: 100%; min-height: 50px; border-radius: .75rem; font-size: .9375rem; font-weight: 700; box-shadow: 0 .7rem 1.5rem color-mix(in srgb, var(--vx-color-primary) 18%, transparent); transition: background-color 150ms ease, box-shadow 150ms ease; }
+.ops-login__form .vx-button--primary { background: var(--vx-color-primary); color: var(--vx-color-on-primary); border-color: var(--vx-color-primary); }
+.ops-login__form .vx-button--primary:hover { background: var(--vx-color-primary-hover); border-color: var(--vx-color-primary-hover); transform: none; }
+.ops-login :is(a, button):focus-visible { outline: 2px solid var(--vx-color-focus); outline-offset: 4px; }
+.ops-login__protected { display: flex; align-items: start; gap: .65rem; color: var(--vx-color-text-subtle); font-size: .6875rem; line-height: 1.6; margin: 1.5rem 0 0; }
+.ops-login__protected > span { width: .55rem; height: .55rem; flex-shrink: 0; border-radius: 50%; margin-top: .26rem; background: var(--vx-color-success); box-shadow: 0 0 0 4px var(--vx-color-success-bg); }
+.ops-login__languages { display: flex; gap: .3rem; margin: 1.2rem 0 -.5rem; }
+.ops-login__languages a { display: grid; place-items: center; min-width: 36px; min-height: 36px; border-radius: .35rem; font-size: .625rem; font-weight: 650; color: var(--vx-color-text-subtle); text-decoration: none; }
+.ops-login__languages a[aria-current=true] { background: var(--vx-color-primary-soft); color: var(--vx-color-link); }
+.ops-login .vx-auth__alert { padding: .8rem 1rem; border-inline-start: 3px solid var(--vx-color-danger); background: var(--vx-color-danger-bg); color: var(--vx-color-danger); font-size: .8125rem; margin-bottom: 1.25rem; }
+.ops-login .vx-auth__info { padding: .8rem 1rem; border-inline-start: 3px solid var(--vx-color-info); background: var(--vx-color-info-bg); color: var(--vx-color-info); font-size: .8125rem; margin-bottom: 1.25rem; }
+@media (max-width: 1000px) { .ops-login__welcome, .ops-login__form-panel { padding: 2.25rem; } .ops-login__welcome { gap: 2.5rem; } .ops-login__tile { padding: 1rem .6rem; } .ops-login__identity { gap: .75rem; } }
+@media (max-width: 760px) { .ops-login { padding: 1rem; } .ops-login__card { display: flex; flex-direction: column; max-width: 32rem; border-radius: 1.25rem; } .ops-login__form-panel { order: -1; padding: 2rem 1.5rem; } .ops-login__identity { margin-bottom: 2rem; font-size: 1.4rem; } .ops-login__welcome { padding: 2rem 1.5rem; gap: 2rem; } .ops-login__welcome::before { inset: .75rem; border-radius: 1rem; } .ops-login__intro { margin: 0; } .ops-login__intro h2 { font-size: clamp(2rem, 8vw, 2.8rem); } .ops-login__eyebrow { margin-bottom: 1rem; } .ops-login__description { font-size: .875rem; margin-top: 1rem; } .ops-login__tile { border-radius: .65rem; } .ops-login__tile strong { font-size: .75rem; } .ops-login__tile span { font-size: .625rem; } .ops-login__tiles { gap: .5rem; } }
+@media (prefers-reduced-motion: reduce) { .ops-login * { transition: none !important; } }
+
+.ops-login .vx-message { margin: 0 0 1.25rem; }

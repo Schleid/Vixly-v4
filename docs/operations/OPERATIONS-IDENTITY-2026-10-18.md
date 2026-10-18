@@ -1,5 +1,7 @@
 # Operations visual identity
 
+The staff-entry portion is superseded by the owner-approved [blue-panel staff login](APPROVED-STAFF-LOGIN-2026-10-18.md). The workbench and storefront refinements below remain applicable.
+
 Operations is a tenant logistics application with its own staff entry and workbench. This revision supersedes the security-themed staff entry described in STOREFRONT-STAFF-STYLING-2026-10-18.md. Control is unchanged.
 
 The staff entry uses an open white form beside original receiving photography, charcoal actions and an amber orientation marker. Mobile places the form before the photograph. Recovery and MFA inherit the same restrained visual language. Existing workspace links and setup checks receive a task-launcher layout; no shipment metrics or unfinished business features are fabricated.
