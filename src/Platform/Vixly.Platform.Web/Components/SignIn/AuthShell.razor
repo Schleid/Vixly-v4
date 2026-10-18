@@ -74,17 +74,26 @@ IMPORTANT NOTES:
         @if (Illustrated)
         {
             <figure class="vx-auth__illustration" aria-hidden="true">
-                <figcaption><span>@T["ui.app.name"]</span><span>@T["ui.auth.badge"]</span></figcaption>
-                <img src="/img/control-login-workspace.webp" alt="" width="960" height="720" decoding="async" fetchpriority="high" />
+                <figcaption>
+                    <span class="vx-auth__illustration-brand">
+                        <img src="/img/vixly-icon.png" alt="" width="40" height="40" />
+                        <span>@T["ui.app.name"]</span>
+                    </span>
+                    <span>@T["ui.auth.badge"]</span>
+                </figcaption>
+                <img src="/img/control-login-security.webp" alt="" width="960" height="720" decoding="async" fetchpriority="high" />
             </figure>
         }
         <div class="vx-auth__terminal">
             <div class="vx-auth__horizon-line" aria-hidden="true"></div>
             
             <header class="vx-auth__header">
-                <div class="vx-auth__portal-badge" aria-hidden="true">
-                    <img src="/img/vixly-icon.png" alt="Vixly" class="vx-auth__portal-badge-img" width="48" height="48" />
-                </div>
+                @if (!Illustrated)
+                {
+                    <div class="vx-auth__portal-badge" aria-hidden="true">
+                        <img src="/img/vixly-icon.png" alt="Vixly" class="vx-auth__portal-badge-img" width="48" height="48" />
+                    </div>
+                }
                 <h1 id="vx-page-title" class="vx-auth__title">@Title</h1>
                 @if (!string.IsNullOrWhiteSpace(Subtitle))
                 {
