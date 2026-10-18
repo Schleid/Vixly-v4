@@ -1,0 +1,91 @@
+﻿@*
+=========================================================
+FILE: SiteHomePage.razor
+
+PURPOSE:
+The tenant home page.
+
+RESPONSIBILITIES:
+- Render the tenant home page
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText and the tenant texts; values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); every value is HTML-encoded by Razor
+- Published tenant content and service visibility remain unchanged
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<SiteShell Page="@Page" Title="@(Page.Company + " | " + Page.Text(T, "headline", "site.default.headline"))" Description="@Page.Text(T, "meta_description", "site.default.meta_description")">
+    <section class="site-hero">
+        <div class="site-hero__text">
+            <h1>@Page.Text(T, "headline", "site.default.headline")</h1>
+            <p>@Page.Text(T, "intro", "site.default.intro")</p>
+            <div class="site-hero__actions">
+                <a class="site-button" href="/customer/sign-up">@T["site.hero.create_account"] <span aria-hidden="true">↗</span></a>
+                <a class="site-hero__locations" href="@(Page.Home)/locations">@T["site.nav.locations"] <span aria-hidden="true">→</span></a>
+            </div>
+        </div>
+        <figure class="site-hero__visual">
+            <img src="@(Page.Image(Settings.HeroImageId) ?? "/images/logistics-network.webp")" alt="" width="960" height="640" fetchpriority="high" decoding="async" />
+            <div class="site-hero__route" aria-hidden="true"><span></span><i></i><span></span><i></i><span></span></div>
+        </figure>
+    </section>
+    <div class="site-tracking-band"><SiteTrackForm Page="@Page" /></div>
+    @if (Settings.Services != OperationsSiteServices.None)
+    {
+        <section class="site-section" aria-labelledby="services-title">
+            <h2 id="services-title">@T["site.services.title"]</h2>
+            <ul class="site-cards">
+                @foreach ((OperationsSiteServices flag, string code) in Services)
+                {
+                    if (Settings.Services.HasFlag(flag))
+                    {
+                        <li class="site-card site-service"><SiteServiceIcon Code="@(code)" /><h3>@T["site.service." + code + ".title"]</h3><p>@Page.Text(T, "service." + code, "site.service." + code + ".text")</p></li>
+                    }
+                }
+            </ul>
+        </section>
+    }
+    @if (Settings.ShowSteps)
+    {
+        <section class="site-section" aria-labelledby="steps-title">
+            <h2 id="steps-title">@T["site.steps.title"]</h2>
+            <ol class="site-steps">
+                @for (int step = 1; step <= OperationsSiteTextKeys.Steps; step++)
+                {
+                    <li><h3>@Page.Text(T, "step." + step + ".title", "site.step." + step + ".title")</h3><p>@Page.Text(T, "step." + step + ".text", "site.step." + step + ".text")</p></li>
+                }
+            </ol>
+        </section>
+    }
+    <SiteLocations Page="@Page" />
+    @if (Settings.ShowFaq && Faq.Any())
+    {
+        <section class="site-section" aria-labelledby="faq-title">
+            <h2 id="faq-title">@T["site.faq.title"]</h2>
+            @foreach ((string question, string answer) in Faq)
+            {
+                <details class="site-faq"><summary>@question</summary><p>@answer</p></details>
+            }
+        </section>
+    }
+</SiteShell>
+
+@code {
+    private static readonly (OperationsSiteServices, string)[] Services =
+    {
+        (OperationsSiteServices.Mailbox, "mailbox"), (OperationsSiteServices.Consolidation, "consolidation"), (OperationsSiteServices.Air, "air"),
+        (OperationsSiteServices.Ocean, "ocean"), (OperationsSiteServices.DoorToDoor, "door_to_door"), (OperationsSiteServices.Pickup, "pickup")
+    };
+
+    private OperationsBrandSettings Settings => Page.Site.Settings;
+
+    private IEnumerable<(string, string)> Faq => Enumerable.Range(1, OperationsSiteTextKeys.FaqItems)
+        .Select(item => (Page.Site.Text("faq." + item + ".question"), Page.Site.Text("faq." + item + ".answer")))
+        .Where(pair => pair.Item1 is not null && pair.Item2 is not null)
+        .Select(pair => (pair.Item1!, pair.Item2!));
+
+    [Parameter, EditorRequired]
+    public OperationsSitePage Page { get; set; } = null!;
+}

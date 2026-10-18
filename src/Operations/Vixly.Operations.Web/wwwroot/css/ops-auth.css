@@ -1,0 +1,40 @@
+/* Staff access stays tenant-named; credential/session behavior belongs to Operations. */
+body.ops-auth { margin: 0; min-height: 100vh; font-family: var(--vx-font); color: var(--vx-color-text); background: radial-gradient(ellipse at 10% 10%, var(--vx-color-primary-soft), transparent 65%), var(--vx-color-app); }
+.ops-auth * { box-sizing: border-box; }
+.ops-auth .vx-auth__topbar { padding: 1rem max(1.25rem, calc((100vw - 70rem) / 2)); border-bottom: 1px solid var(--vx-color-border); background: var(--vx-color-surface); }
+.ops-auth .vx-auth__topbar-inner { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.ops-auth .vx-auth__brand-title { font-size: 1.15rem; font-weight: 750; letter-spacing: -.035em; overflow-wrap: anywhere; }
+.ops-auth .vx-auth__languages { display: flex; gap: .2rem; padding: .2rem; border: 1px solid var(--vx-color-border); border-radius: .7rem; }
+.ops-auth .vx-auth__languages a { display: grid; place-items: center; min-width: 40px; min-height: 40px; color: var(--vx-color-text-muted); font-size: .7rem; font-weight: 650; text-decoration: none; }
+.ops-auth .vx-auth__stage { padding: clamp(2rem, 7vh, 5rem) 1.25rem; }
+.ops-auth .vx-auth__terminal { max-width: 62rem; margin: auto; padding: 1.5rem; border: 1px solid var(--vx-color-border); border-radius: 1.15rem; background: var(--vx-color-surface); box-shadow: var(--vx-shadow-2); }
+.ops-auth .vx-auth__title { font-size: 1.85rem; line-height: 1.15; font-weight: 750; letter-spacing: -.045em; margin: 0 0 .75rem; }
+.ops-auth .vx-auth__subtitle { color: var(--vx-color-text-muted); line-height: 1.6; font-size: .875rem; margin: 0; }
+.ops-auth .vx-auth__header { margin-bottom: 1.5rem; }
+.ops-auth .vx-auth__terminal:has(.ops-signin-visual) { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); padding: 0; overflow: hidden; }
+.ops-auth .vx-auth__terminal:has(.ops-signin-visual) > .vx-auth__header { grid-column: 2; grid-row: 1; margin: 0; padding: 2rem 2rem 1.25rem; }
+.ops-auth .vx-auth__content:has(.ops-signin-visual) { display: contents; }
+.ops-signin-visual { grid-column: 1; grid-row: 1 / span 2; margin: 0; min-width: 0; padding: 2rem; display: flex; flex-direction: column; justify-content: space-between; gap: 1rem; background: radial-gradient(ellipse at 100% 90%, var(--vx-color-primary-hover), transparent 75%), var(--vx-color-chrome-surface); }
+.ops-signin-visual__brand { color: var(--vx-color-chrome-text-strong); font-size: 1.25rem; font-weight: 650; letter-spacing: -.03em; overflow-wrap: anywhere; }
+.ops-signin-visual img { display: block; width: 100%; height: 17rem; object-fit: contain; }
+.ops-signin-visual__line { display: block; width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--vx-color-chrome-accent), transparent); }
+.ops-signin-form { grid-column: 2; grid-row: 2; padding: 0 2rem 2rem; }
+.ops-auth .vx-form { display: grid; gap: 1.1rem; margin: 0; max-width: none; }
+.ops-auth .vx-field { display: grid; gap: .45rem; margin: 0; }
+.ops-auth .vx-label { font-size: .8125rem; font-weight: 600; }
+.ops-auth .vx-input { width: 100%; min-height: 46px; border: 1px solid var(--vx-color-border-control); border-radius: .55rem; background: var(--vx-color-surface); color: var(--vx-color-text); padding: .7rem .85rem; font: inherit; font-size: .875rem; }
+.ops-auth .vx-input:focus-visible { border-color: var(--vx-color-primary); outline: 3px solid color-mix(in srgb, var(--vx-color-primary) 22%, transparent); outline-offset: 2px; }
+.ops-signin-form .vx-button--primary { width: 100%; min-height: 46px; border-radius: .55rem; background: linear-gradient(110deg, var(--vx-color-primary), var(--vx-color-primary-hover)); color: var(--vx-color-on-primary); }
+.ops-auth .vx-auth__aside { text-align: center; margin: 1.25rem 0 0; font-size: .8125rem; }
+.ops-auth a { color: var(--vx-color-link); text-underline-offset: .25em; }
+.ops-auth :is(a, button, summary):focus-visible { outline: 3px solid var(--vx-color-focus); outline-offset: 3px; }
+.ops-auth .vx-auth__idle[hidden] { display: none !important; }
+.ops-auth .vx-auth__idle:not([hidden]) { position: fixed; inset: auto 1rem 1rem; z-index: 100; max-width: 36rem; margin: auto; padding: 1.5rem; background: var(--vx-color-surface); border: 1px solid var(--vx-color-warning); border-radius: 1rem; box-shadow: var(--vx-shadow-3); }
+@media (max-width: 720px) {
+    .ops-auth .vx-auth__stage { padding: 1.5rem 1rem; }
+    .ops-auth .vx-auth__terminal:has(.ops-signin-visual) { grid-template-columns: minmax(0, 1fr); max-width: 28rem; }
+    .ops-signin-visual { grid-column: 1; grid-row: 1; padding: 1.25rem; }
+    .ops-signin-visual img, .ops-signin-visual__line { display: none; }
+    .ops-auth .vx-auth__terminal:has(.ops-signin-visual) > .vx-auth__header { grid-column: 1; grid-row: 2; padding: 1.5rem 1.25rem 1rem; }
+    .ops-signin-form { grid-column: 1; grid-row: 3; padding: 0 1.25rem 1.5rem; }
+}
