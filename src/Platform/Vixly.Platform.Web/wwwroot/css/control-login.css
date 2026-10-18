@@ -29,7 +29,7 @@
 .vx-auth--illustrated .vx-auth__stage { padding: 1.5rem; }
 .vx-auth__workspace {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr);
     align-items: stretch;
     width: min(100%, 62rem);
     border: 1px solid var(--vx-color-border-control);
@@ -151,4 +151,14 @@
     .vx-auth--illustrated .vx-auth__header { padding-top: 1.25rem; }
     .vx-auth--illustrated .vx-auth__title { font-size: 1.65rem; }
     .vx-auth__illustration figcaption > span:last-child { padding: 0.3rem 0.5rem; }
+}
+
+/* More room for the security panel, within the established outer footprint. */
+@media (min-width: 961px) {
+    .vx-auth__workspace { min-height: 29.5rem; }
+    .vx-auth__illustration > img { height: 17.5rem; object-fit: contain; }
+    .vx-auth--illustrated .vx-auth__header { padding-top: 1.5rem; padding-bottom: 1rem; gap: 0.5rem; }
+    .vx-auth--illustrated .vx-auth__subtitle { line-height: 1.45; }
+    .vx-auth--illustrated .vx-auth__content { padding-bottom: 0.7rem; }
+    .vx-auth--illustrated .vx-auth__terminal .vx-form { gap: 0.75rem; }
 }
