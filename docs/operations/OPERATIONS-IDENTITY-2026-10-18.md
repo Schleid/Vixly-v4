@@ -1,5 +1,7 @@
 # Operations visual identity
 
+The signed-in shell is completed and superseded by the [Operations workbench coverage record](WORKBENCH-UI-COVERAGE-2026-10-18.md). Its grouped sidebar, responsive directory tables and shared form/access styling are the current implementation.
+
 The staff-entry portion is superseded by the owner-approved [blue-panel staff login](APPROVED-STAFF-LOGIN-2026-10-18.md). The workbench and storefront refinements below remain applicable.
 
 Operations is a tenant logistics application with its own staff entry and workbench. This revision supersedes the security-themed staff entry described in STOREFRONT-STAFF-STYLING-2026-10-18.md. Control is unchanged.

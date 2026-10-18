@@ -1,0 +1,66 @@
+﻿@*
+=========================================================
+FILE: WorkspacePage.razor
+
+PURPOSE:
+The signed-in Operations workspace and real setup tasks.
+
+RESPONSIBILITIES:
+- Render task shortcuts and the current setup checklist
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- No invented operational metrics or unfinished workflow links
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+@inject IStringLocalizer<OperationsWorkbenchText> L
+
+<EditorShell Title="@T["ui.editor.nav.workspace"]" Company="@Company" Section="workspace">
+    <section class="ops-workspace__welcome">
+        <div><p class="ops-editor__eyebrow">@L["workspace_intro"]</p><h2>@Company</h2><p>@L["workspace_body"]</p></div>
+        <p class="ops-workspace__user">@T["ui.signed_in_as"] <strong>@Name</strong></p>
+    </section>
+    @if (Checklist.Count > 0 && Checklist.Any(item => !item.Done))
+    {
+        <section class="ops-editor__panel" aria-labelledby="setup-checklist">
+            <h2 id="setup-checklist">@T["ui.checklist.title"]</h2>
+            <ul class="ops-workspace__checklist">
+                @foreach (Vixly.Operations.Application.Settings.OperationsSetupItem item in Checklist)
+                {
+                    <li data-done="@(item.Done ? "true" : "false")">
+                        @if (item.Done) { <span>✓ @T["ui.checklist." + item.Code]</span> } else { <a href="@item.Link">@T["ui.checklist." + item.Code]</a> }
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+    <h2 class="ops-workspace__section-title">@L["workspace_tasks"]</h2>
+    <nav class="ops-workspace__links" aria-label="@L["workspace_tasks"]">
+        <a href="/staff/site">@T["ui.editor.nav.site"]</a>
+        <a href="/staff/locations">@T["ui.editor.nav.locations"]</a>
+        <a href="/staff/devices">@T["ui.editor.nav.devices"]</a>
+        <a href="/staff/customers">@T["ui.editor.nav.customers"]</a>
+        <a href="/staff/people">@T["ui.editor.nav.staff"]</a>
+        <a href="/staff/roles">@T["ui.editor.nav.roles"]</a>
+        <a href="/staff/company">@T["ui.editor.nav.company"]</a>
+        <a href="/staff/billing">@T["ui.editor.nav.billing"]</a>
+        <a href="/staff/services">@T["ui.editor.nav.services"]</a>
+        <a href="/staff/settings">@T["ui.editor.nav.settings"]</a>
+        <a href="/staff/audit">@T["ui.editor.nav.audit"]</a>
+        <a href="/staff/legal">@T["ui.editor.nav.legal"]</a>
+        <a href="/staff/account">@T["ui.editor.nav.account"]</a>
+    </nav>
+</EditorShell>
+
+@code {
+    [Parameter]
+    public string? Company { get; set; }
+
+    [Parameter]
+    public string Name { get; set; } = string.Empty;
+
+    [Parameter]
+    public IReadOnlyList<Vixly.Operations.Application.Settings.OperationsSetupItem> Checklist { get; set; } = Array.Empty<Vixly.Operations.Application.Settings.OperationsSetupItem>();
+}

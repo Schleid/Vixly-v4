@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <data name="portal" xml:space="preserve">
+    <value>Espace des opérations</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="navigation" xml:space="preserve">
+    <value>Navigation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="close_menu" xml:space="preserve">
+    <value>Fermer la navigation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="workspace" xml:space="preserve">
+    <value>Espace de travail</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="business" xml:space="preserve">
+    <value>Configuration métier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="administration" xml:space="preserve">
+    <value>Administration</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="directory" xml:space="preserve">
+    <value>Annuaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="empty_staff" xml:space="preserve">
+    <value>Aucun membre à afficher</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="empty_staff_body" xml:space="preserve">
+    <value>Aucune personne ne correspond à cette vue. Modifiez votre recherche.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="open_invite" xml:space="preserve">
+    <value>Inviter une personne</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="workspace_intro" xml:space="preserve">
+    <value>L’espace de votre entreprise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="workspace_body" xml:space="preserve">
+    <value>Organisez vos clients, votre équipe et la configuration de votre entreprise au même endroit.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="workspace_tasks" xml:space="preserve">
+    <value>Raccourcis de travail</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="actions" xml:space="preserve">
+    <value>Actions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="results" xml:space="preserve">
+    <value>Résultats</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="staff_role" xml:space="preserve">
+    <value>Rôles et périmètre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="customers_intro" xml:space="preserve">
+    <value>Annuaire et gestion des comptes clients</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="staff_intro" xml:space="preserve">
+    <value>Personnel, accès et invitations</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="clear_search" xml:space="preserve">
+    <value>Effacer la recherche</value>
+    <comment>needs-review</comment>
+  </data>
+</root>

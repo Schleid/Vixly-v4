@@ -1,0 +1,111 @@
+﻿@*
+=========================================================
+FILE: CustomerListPage.razor
+
+PURPOSE:
+The tenant's customers: search, list, and create one at the counter (Slice 2).
+
+RESPONSIBILITIES:
+- Search by name, email, phone or code; 25 per page
+- The create form for staff with ops.customers.manage
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); the endpoint loads the data
+- Static forms with antiforgery and the form guard (ADR-0019)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+@inject IStringLocalizer<OperationsWorkbenchText> L
+
+<EditorShell Title="@T["ui.customers.title"]" Company="@Company" Section="customers" Error="@Error" Info="@Info">
+    <div class="ops-editor__page-intro"><p class="ops-editor__hint">@L["customers_intro"]</p>@if (CanManage) { <a href="#create-customer" class="vx-button vx-button--primary">@T["ui.customers.create"]</a> }</div>
+    <form method="get" action="/staff/customers" class="ops-editor__inline ops-editor__search">
+        <input name="search" value="@Search" placeholder="@T["ui.customers.search"]" aria-label="@T["ui.customers.search"]" maxlength="100" />
+        <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.search_submit"]</button>
+    </form>
+    <section class="ops-editor__panel">
+        @if (Customers.Count == 0)
+        {
+            <div class="ops-editor__empty">
+                <h2>@T["ui.customers.none"]</h2>
+                @if (!string.IsNullOrWhiteSpace(Search)) { <a href="/staff/customers">@L["clear_search"]</a> }
+                @if (CanManage) { <a class="vx-button vx-button--secondary" href="#create-customer">@T["ui.customers.create"]</a> }
+            </div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.customers.title"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.staff.name"]</th><th scope="col">@T["ui.customers.code"]</th><th scope="col">@T["ui.editor.email"]</th><th scope="col">@T["ui.customers.phone"]</th><th scope="col">@T["ui.customers.status"]</th><th scope="col">@T["ui.customers.credit"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsCustomerProfile customer in Customers)
+                        {
+                            <tr>
+                                <td class="ops-editor__identity-cell"><a href="/staff/customers/@customer.CustomerId">@customer.FullName</a>@if (!string.IsNullOrWhiteSpace(customer.CompanyName)) { <small>@customer.CompanyName</small> }</td>
+                                <td class="ops-editor__code">@(customer.Code ?? T["ui.customers.no_code"])</td>
+                                <td>@customer.Email</td><td class="ops-editor__code">@customer.Phone</td>
+                                <td><span class="ops-editor__status" data-status="@customer.Status.ToString().ToLowerInvariant()">@T["ui.customers.status." + customer.Status.ToString().ToLowerInvariant()]</span></td>
+                                <td>@(customer.CreditAllowed ? T["ui.customers.credit_on"] : T["ui.customers.credit_off"])</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+        <p class="ops-editor__list-footer">@VixlyText.Format(T, "ui.customers.count", "count", TotalCount)</p>
+        <nav class="ops-editor__inline" aria-label="@T["ui.customers.pages"]">
+            @if (Page > 1)
+            {
+                <a href="@PageLink(Page - 1)">@T["ui.customers.previous"]</a>
+            }
+            @if (Page * PageSize < TotalCount)
+            {
+                <a href="@PageLink(Page + 1)">@T["ui.customers.next"]</a>
+            }
+        </nav>
+    </section>
+    @if (CanManage)
+    {
+        <form id="create-customer" method="post" action="/staff/customers/create" class="ops-editor__panel">
+            <AntiforgeryToken />
+            <h2>@T["ui.customers.create"]</h2>
+            <p>@T["ui.customers.create_hint"]</p>
+            <label>@T["ui.customers.first_name"] <input name="firstName" maxlength="100" required /></label>
+            <label>@T["ui.customers.last_name"] <input name="lastName" maxlength="100" required /></label>
+            <label>@T["ui.customers.company"] <input name="companyName" maxlength="150" /></label>
+            <label>@T["ui.editor.email"] <input type="email" name="email" maxlength="254" required /></label>
+            <label>@T["ui.customers.phone"] <input type="tel" name="phone" maxlength="20" placeholder="+509…" required /></label>
+            <label>@T["ui.staff.language"]
+                <select name="language">
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                    <option value="es">Español</option>
+                </select>
+            </label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.customers.create_submit"]</button>
+        </form>
+    }
+</EditorShell>
+
+@code {
+    public const int PageSize = 25;
+
+    private string PageLink(int page) => "/staff/customers?page=" + page + (string.IsNullOrWhiteSpace(Search) ? null : "&search=" + Uri.EscapeDataString(Search));
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public string? Search { get; set; }
+
+    [Parameter] public int Page { get; set; } = 1;
+
+    [Parameter] public IReadOnlyList<OperationsCustomerProfile> Customers { get; set; } = Array.Empty<OperationsCustomerProfile>();
+
+    [Parameter] public int TotalCount { get; set; }
+
+    [Parameter] public bool CanManage { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

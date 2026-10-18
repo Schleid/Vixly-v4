@@ -10,11 +10,12 @@ RESPONSIBILITIES:
 
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10); values come from the endpoint
-- Tenant surface: never says "Vixly" (ADR-0012 W-1); owner only (the use cases refuse others)
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); endpoints enforce access
 - Static forms with antiforgery and the form guard (ADR-0019); Operations task navigation and responsive workbench styling
 =========================================================
 *@
 @inject IStringLocalizer<OperationsText> T
+@inject IStringLocalizer<OperationsWorkbenchText> L
 
 <!DOCTYPE html>
 <html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" data-theme="light">
@@ -29,31 +30,34 @@ IMPORTANT NOTES:
     <link rel="stylesheet" href="/css/ops-editor.css" />
     <script src="/_content/Vixly.Shared.UI/vixly-forms.js" defer></script>
     <script src="/js/ops-session.js" defer></script>
+    <script src="/js/ops-workbench.js" defer></script>
 </head>
 <body class="ops-editor" data-idle-warn="780" data-idle-end="900">
     <a class="ops-editor__skip" href="#main-content">@T["site.skip"]</a>
-    <header class="ops-editor__bar">
-        <strong>@Company</strong>
-        <nav aria-label="@T["ui.editor.nav"]">
-            <a href="/staff">@T["ui.editor.nav.workspace"]</a>
-            <a href="/staff/site" aria-current="@(Section == "site" ? "page" : null)">@T["ui.editor.nav.site"]</a>
-            <a href="/staff/locations" aria-current="@(Section == "locations" ? "page" : null)">@T["ui.editor.nav.locations"]</a>
-            <a href="/staff/devices" aria-current="@(Section == "devices" ? "page" : null)">@T["ui.editor.nav.devices"]</a>
-            <a href="/staff/people" aria-current="@(Section == "staff" ? "page" : null)">@T["ui.editor.nav.staff"]</a>
-            <a href="/staff/roles" aria-current="@(Section == "roles" ? "page" : null)">@T["ui.editor.nav.roles"]</a>
-            <a href="/staff/company" aria-current="@(Section == "company" ? "page" : null)">@T["ui.editor.nav.company"]</a>
-            <a href="/staff/billing" aria-current="@(Section == "billing" ? "page" : null)">@T["ui.editor.nav.billing"]</a>
-            <a href="/staff/settings" aria-current="@(Section == "settings" ? "page" : null)">@T["ui.editor.nav.settings"]</a>
-            <a href="/staff/audit" aria-current="@(Section == "audit" ? "page" : null)">@T["ui.editor.nav.audit"]</a>
-            <a href="/staff/legal" aria-current="@(Section == "legal" ? "page" : null)">@T["ui.editor.nav.legal"]</a>
+    <aside id="ops-navigation" class="ops-editor__sidebar" aria-label="@L["navigation"]" tabindex="-1">
+        <a href="/staff" class="ops-editor__brand">
+            <span class="ops-editor__mark" aria-hidden="true">@Initials</span>
+            <span>@Company<small>@L["portal"]</small></span>
+        </a>
+        <button type="button" hidden data-nav-close class="ops-editor__nav-close" aria-label="@L["close_menu"]"><span aria-hidden="true">×</span></button>
+        <OperationsNavigation Section="@Section" />
+        <footer class="ops-editor__sidebar-footer">
             <a href="/staff/account" aria-current="@(Section == "account" ? "page" : null)">@T["ui.editor.nav.account"]</a>
-        </nav>
-        <form method="post" action="/staff/sign-out">
-            <AntiforgeryToken />
-            <button type="submit" class="vx-button vx-button--secondary">@T["ui.signout"]</button>
-        </form>
+            <form method="post" action="/staff/sign-out">
+                <AntiforgeryToken />
+                <button type="submit">@T["ui.signout"]</button>
+            </form>
+        </footer>
+    </aside>
+    <button type="button" hidden data-nav-backdrop class="ops-editor__backdrop" aria-label="@L["close_menu"]" tabindex="-1"></button>
+    <header class="ops-editor__topbar">
+        <button type="button" hidden data-nav-toggle class="ops-editor__menu-button" aria-controls="ops-navigation" aria-expanded="false" aria-label="@L["navigation"]">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+        <div class="ops-editor__breadcrumb"><span>@L["portal"]</span><span aria-hidden="true">/</span><strong>@Title</strong></div>
+        <a href="/" class="ops-editor__site-link">@T["ui.editor.nav.site"] <span aria-hidden="true">↗</span></a>
     </header>
-    <main id="main-content" class="ops-editor__main">
+    <main id="main-content" class="ops-editor__main" tabindex="-1">
         <AccessBanner />
         <h1>@Title</h1>
         <FormMessage Error="@Error" Info="@Info" />
@@ -67,6 +71,8 @@ IMPORTANT NOTES:
 </html>
 
 @code {
+    private string Initials => string.IsNullOrWhiteSpace(Company) ? string.Empty : string.Concat(Company.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(word => System.Globalization.StringInfo.GetNextTextElement(word))).ToUpperInvariant();
+
     [Parameter, EditorRequired]
     public string Title { get; set; } = string.Empty;
 

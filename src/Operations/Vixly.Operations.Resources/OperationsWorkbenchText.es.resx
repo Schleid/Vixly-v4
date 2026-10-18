@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <data name="portal" xml:space="preserve">
+    <value>Espacio de operaciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="navigation" xml:space="preserve">
+    <value>Navegación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="close_menu" xml:space="preserve">
+    <value>Cerrar navegación</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="workspace" xml:space="preserve">
+    <value>Espacio de trabajo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="business" xml:space="preserve">
+    <value>Configuración del negocio</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="administration" xml:space="preserve">
+    <value>Administración</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="directory" xml:space="preserve">
+    <value>Directorio</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="empty_staff" xml:space="preserve">
+    <value>No hay personas para mostrar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="empty_staff_body" xml:space="preserve">
+    <value>No hay personas que coincidan con esta vista. Cambia la búsqueda.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="open_invite" xml:space="preserve">
+    <value>Invitar a una persona</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="workspace_intro" xml:space="preserve">
+    <value>El espacio de tu empresa</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="workspace_body" xml:space="preserve">
+    <value>Organiza tus clientes, equipo y configuración de empresa en un solo lugar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="workspace_tasks" xml:space="preserve">
+    <value>Accesos directos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="actions" xml:space="preserve">
+    <value>Acciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="results" xml:space="preserve">
+    <value>Resultados</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="staff_role" xml:space="preserve">
+    <value>Roles y alcance</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="customers_intro" xml:space="preserve">
+    <value>Directorio y gestión de cuentas de clientes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="staff_intro" xml:space="preserve">
+    <value>Personal, acceso e invitaciones</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="clear_search" xml:space="preserve">
+    <value>Borrar búsqueda</value>
+    <comment>needs-review</comment>
+  </data>
+</root>

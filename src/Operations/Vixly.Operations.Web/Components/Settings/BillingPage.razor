@@ -1,0 +1,93 @@
+﻿@*
+=========================================================
+FILE: BillingPage.razor
+
+PURPOSE:
+The company's plan at Vixly, its invoices and billing PDFs.
+
+RESPONSIBILITIES:
+- Render the company's plan at Vixly, its invoices and billing PDFs
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@using Vixly.Operations.Application.Company
+@using Vixly.Operations.Application.Ports
+@inject IStringLocalizer<OperationsText> T
+@inject IStringLocalizer<OperationsWorkbenchText> L
+
+<EditorShell Title="@T["ui.billing.title"]" Company="@Company" Section="billing" Error="@Error">
+    <section class="ops-editor__panel">
+        <h2>@T["ui.billing.plan"]</h2>
+        @if (View.Subscription is { } plan)
+        {
+            <p><strong>@plan.PlanName</strong> · @T["ui.billing.status." + plan.Status] · @T["ui.billing.term." + plan.Term]</p>
+            <p>@VixlyText.Format(T, "ui.billing.licences", new Dictionary<string, object> { ["used"] = plan.ActiveLicences, ["total"] = plan.Licences })</p>
+            <p>@Money(plan.PeriodAmount, plan.CurrencyCode)</p>
+            @if (plan.TrialEndsUtc is { } trial) { <p>@VixlyText.Format(T, "ui.billing.trial_ends", "date", Date(trial))</p> }
+            @if (plan.PeriodEndUtc is { } end) { <p>@VixlyText.Format(T, plan.CancelAtPeriodEnd ? "ui.billing.ends" : "ui.billing.renews", "date", Date(end))</p> }
+        }
+        else
+        {
+            <p class="ops-editor__empty-message">@T["ui.editor.none"]</p>
+        }
+    </section>
+    <section class="ops-editor__panel">
+        <h2>@T["ui.billing.invoices"]</h2>
+        @if (View.Invoices.Count == 0) { <p class="ops-editor__empty-message">@T["ui.editor.none"]</p> }
+        @if (View.Invoices.Count > 0)
+        {
+        <OperationsTableViewport Label="@T["ui.billing.invoices"]">
+        <table class="ops-editor__table">
+            <thead><tr><th scope="col">@T["ui.billing.number"]</th><th scope="col">@T["ui.billing.issued"]</th><th scope="col">@T["ui.billing.due"]</th><th scope="col">@T["ui.billing.total"]</th><th scope="col">@T["ui.billing.balance"]</th><th scope="col">@L["actions"]</th></tr></thead>
+            <tbody>
+                @foreach (OperationsInvoice invoice in View.Invoices)
+                {
+                    <tr>
+                        <td class="ops-editor__code">@invoice.Number</td>
+                        <td>@Date(invoice.IssuedUtc)</td>
+                        <td>@Date(invoice.DueUtc) @if (invoice.Overdue) { <span class="ops-editor__status" data-status="overdue">@T["ui.billing.overdue"]</span> }</td>
+                        <td class="ops-editor__numeric">@Money(invoice.Total, invoice.CurrencyCode)</td>
+                        <td class="ops-editor__numeric">@Money(invoice.Balance, invoice.CurrencyCode)</td>
+                        <td>
+                            @if (invoice.Balance > 0 && !invoice.CreditPending && invoice.Status is not ("paid" or "void"))
+                            {
+                                <form method="post" action="/staff/billing/invoices/@invoice.InvoiceId/pay" class="ops-editor__inline">
+                                    <AntiforgeryToken />
+                                    <button type="submit" class="vx-button vx-button--primary">@T["ui.billing.pay"]</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        </OperationsTableViewport>
+        }
+    </section>
+    <section class="ops-editor__panel">
+        <h2>@T["ui.billing.documents"]</h2>
+        @if (View.Documents.Count == 0) { <p class="ops-editor__empty-message">@T["ui.editor.none"]</p> }
+        <ul class="ops-editor__list">
+            @foreach (OperationsBillingDocument document in View.Documents)
+            {
+                <li><a href="/staff/billing/documents/@document.Kind/@document.DocumentId">@document.Number</a> <span>@document.InvoiceNumber</span> <span>@Date(document.CreatedUtc)</span></li>
+            }
+        </ul>
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsBillingView View { get; set; } = null!;
+
+    [Parameter] public string? Error { get; set; }
+
+    private static string Date(DateTimeOffset value) => value.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+
+    private static string Money(decimal amount, string currency) => amount.ToString("N2", System.Globalization.CultureInfo.CurrentCulture) + " " + currency;
+}

@@ -1,0 +1,117 @@
+﻿@*
+=========================================================
+FILE: CustomerPage.razor
+
+PURPOSE:
+One customer: details, mailbox addresses, status and credit (Slice 2).
+
+RESPONSIBILITIES:
+- Show the customer and the mailbox addresses
+- Edit name, company, phone and language; suspend, reactivate or close; allow or remove credit; resend the invitation
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); the endpoint loads the data
+- Static forms with antiforgery and the form guard (ADR-0019)
+- Credit needs ops.customers.credit and step-up; the use cases decide
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@Customer.FullName" Company="@Company" Section="customers" Error="@Error" Info="@Info">
+    <p><a href="/staff/customers">@T["ui.customers.back"]</a></p>
+    <section class="ops-editor__panel" aria-labelledby="customer-details">
+        <h2 id="customer-details">@T["ui.customers.details"]</h2>
+        <dl>
+            <dt>@T["ui.customers.code"]</dt><dd>@(Customer.Code ?? T["ui.customers.no_code"])</dd>
+            <dt>@T["ui.editor.email"]</dt><dd>@Customer.Email @(Customer.EmailVerified ? null : "· " + T["ui.customers.not_verified"])</dd>
+            <dt>@T["ui.customers.status"]</dt><dd><span class="ops-editor__status" data-status="@Customer.Status.ToString().ToLowerInvariant()">@T["ui.customers.status." + Customer.Status.ToString().ToLowerInvariant()]</span> @(Customer.StatusReason is null ? null : "· " + Customer.StatusReason)</dd>
+            <dt>@T["ui.customers.credit"]</dt><dd>@(Customer.CreditAllowed ? T["ui.customers.credit_on"] : T["ui.customers.credit_off"]) @(Customer.CreditReason is null ? null : "· " + Customer.CreditReason)</dd>
+            <dt>@T["ui.customers.created"]</dt><dd>@Customer.CreatedUtc.ToString("yyyy-MM-dd")</dd>
+            <dt>@T["ui.customers.last_sign_in"]</dt><dd>@(Customer.LastSignInUtc?.ToString("yyyy-MM-dd HH:mm") ?? T["ui.customers.never"])</dd>
+        </dl>
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="customer-mailboxes">
+        <h2 id="customer-mailboxes">@T["ui.customers.mailboxes"]</h2>
+        @if (Customer.Mailboxes.Count == 0)
+        {
+            <p>@T["ui.customers.mailboxes_none"]</p>
+        }
+        @foreach (OperationsMailboxAddress mailbox in Customer.Mailboxes)
+        {
+            <address>
+                <strong>@mailbox.WarehouseName</strong><br />
+                @mailbox.Addressee<br />
+                @mailbox.Line1<br />
+                @if (!string.IsNullOrWhiteSpace(mailbox.Line2)) { @mailbox.Line2<br /> }
+                @mailbox.City@(mailbox.Region is null ? null : ", " + mailbox.Region) @mailbox.PostalCode<br />
+                @mailbox.CountryCode
+            </address>
+        }
+    </section>
+    @if (CanManage)
+    {
+        <form method="post" action="/staff/customers/@Customer.CustomerId" class="ops-editor__panel">
+            <AntiforgeryToken />
+            <h2>@T["ui.customers.edit"]</h2>
+            <label>@T["ui.customers.first_name"] <input name="firstName" value="@Customer.FirstName" maxlength="100" required /></label>
+            <label>@T["ui.customers.last_name"] <input name="lastName" value="@Customer.LastName" maxlength="100" required /></label>
+            <label>@T["ui.customers.company"] <input name="companyName" value="@Customer.CompanyName" maxlength="150" /></label>
+            <label>@T["ui.customers.phone"] <input type="tel" name="phone" value="@Customer.Phone" maxlength="20" required /></label>
+            <label>@T["ui.staff.language"]
+                <select name="language">
+                    <option value="en" selected="@(Customer.Language == "en")">English</option>
+                    <option value="fr" selected="@(Customer.Language == "fr")">Français</option>
+                    <option value="es" selected="@(Customer.Language == "es")">Español</option>
+                </select>
+            </label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+        </form>
+        <form method="post" action="/staff/customers/@Customer.CustomerId/status" class="ops-editor__panel">
+            <AntiforgeryToken />
+            <h2>@T["ui.customers.status"]</h2>
+            <p>@T["ui.customers.status_hint"]</p>
+            <label>@T["ui.customers.new_status"]
+                <select name="status">
+                    @if (Customer.Status != OperationsCustomerStatus.Active) { <option value="active">@T["ui.customers.status.active"]</option> }
+                    @if (Customer.Status != OperationsCustomerStatus.Suspended) { <option value="suspended">@T["ui.customers.status.suspended"]</option> }
+                    @if (Customer.Status != OperationsCustomerStatus.Closed) { <option value="closed">@T["ui.customers.status.closed"]</option> }
+                </select>
+            </label>
+            <label>@T["ui.customers.reason"] <input name="reason" maxlength="300" required /></label>
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.customers.status_submit"]</button>
+        </form>
+        @if (Customer.Status == OperationsCustomerStatus.Active && !Customer.EmailVerified)
+        {
+            <form method="post" action="/staff/customers/@Customer.CustomerId/invitation" class="ops-editor__panel">
+                <AntiforgeryToken />
+                <p>@T["ui.customers.invitation_hint"]</p>
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.customers.invitation_submit"]</button>
+            </form>
+        }
+    }
+    @if (CanSetCredit)
+    {
+        <form method="post" action="/staff/customers/@Customer.CustomerId/credit" class="ops-editor__panel">
+            <AntiforgeryToken />
+            <h2>@T["ui.customers.credit"]</h2>
+            <p>@T["ui.customers.credit_hint"]</p>
+            <input type="hidden" name="allowed" value="@(Customer.CreditAllowed ? "false" : "true")" />
+            <label>@T["ui.customers.reason"] <input name="reason" maxlength="300" required /></label>
+            <button type="submit" class="vx-button vx-button--secondary">@(Customer.CreditAllowed ? T["ui.customers.credit_remove"] : T["ui.customers.credit_allow"])</button>
+        </form>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsCustomerProfile Customer { get; set; } = null!;
+
+    [Parameter] public bool CanManage { get; set; }
+
+    [Parameter] public bool CanSetCredit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

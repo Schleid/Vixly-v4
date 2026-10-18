@@ -1,0 +1,8 @@
+﻿/* Tenant-neutral unavailable/not-found states; request status and copy remain authoritative. */
+body { margin:0; min-height:100dvh; display:grid; place-items:center; padding:1.5rem; box-sizing:border-box; background:var(--vx-color-app); color:var(--vx-color-text); font-family:var(--vx-font); }
+.ops-status { width:min(100%,34rem); box-sizing:border-box; padding:2.5rem; border:1px solid var(--vx-color-border); border-top:3px solid var(--vx-color-primary); border-radius:1rem; background:var(--vx-color-surface); box-shadow:var(--vx-shadow-3); }
+.ops-status__symbol { display:grid; place-items:center; width:3rem; height:3rem; margin-bottom:1.5rem; border-radius:.75rem; color:var(--vx-color-primary); background:var(--vx-color-primary-soft); }
+.ops-status__symbol svg { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; }
+.ops-status h1 { font-size:1.8rem; line-height:1.2; letter-spacing:-.04em; margin:0 0 1rem; }
+.ops-status p { font-size:.875rem; line-height:1.7; color:var(--vx-color-text-muted); margin:0; }
+@media(max-width:480px) { .ops-status { padding:1.5rem; } }
