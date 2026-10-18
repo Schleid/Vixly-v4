@@ -1,10 +1,16 @@
 # Compact illustrated Control login
 
-The initial sign-in page uses a medium blue header and a two-column workspace: a security and multi-factor authentication sketch beside a compact credential form. Existing semantic chrome and primary tokens are mixed to lighten the blue surfaces. The logo sits on the blue panel instead of above the form. Field gaps remain compact while inputs and buttons retain 44px minimum height. At 720px and below only the blue logo strip remains above the form; the decorative sketch is hidden.
+The initial sign-in page uses a blue header and a two-column workspace: a transparent security and multi-factor authentication sketch on a navy-to-cobalt panel beside a compact credential form. Existing semantic chrome and primary tokens provide the gradient and brighter blue primary action. The logo sits on the blue panel instead of above the form. Field gaps remain compact while inputs and buttons retain 44px minimum height. At 720px and below only the blue logo strip remains above the form; the decorative sketch is hidden.
 
 The illustration is decorative (`alt=""`, hidden from assistive technology). All existing localized text, form endpoints, antiforgery fields, return URLs, password autocomplete, passkey support and submit protection remain intact. Recovery and MFA pages retain their existing presentation. No backend logic changes.
 
 ## Illustration provenance
+
+Latest asset: `src/Platform/Vixly.Platform.Web/wwwroot/img/control-login-security-cutout.webp`. The built-in imagegen tool edited the security sketch with `transparent_background=true`; WebP optimization preserves its alpha channel. Earlier assets below are retained as unused versions. The existing public login at `https://control.vixly.ltd` was viewed for navy/cobalt color inspiration; its content, layout and assets were not copied.
+
+Latest final edit prompt:
+
+undefined
 
 Current asset: `src/Platform/Vixly.Platform.Web/wwwroot/img/control-login-security.webp` (960Ã—720, optimized WebP). Built-in imagegen, generation mode, resized and encoded with Pillow. The earlier workstation sketch below is retained as an unused prior asset.
 
