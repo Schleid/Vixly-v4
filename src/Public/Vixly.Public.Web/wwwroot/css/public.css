@@ -217,3 +217,82 @@ p { margin: 0 0 var(--vx-space-4); }
     .pub-section--narrow:has(#contact-company)::after { aspect-ratio: 2 / 1; max-height: var(--vx-table-viewport); }
     .pub-form:has(#contact-company) { padding: var(--vx-space-5); }
 }
+
+/* Registration start: company setup, not the Contact sales form. */
+.pub-section--narrow:has(#reg-legal) {
+    max-width: var(--vx-content-wide);
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    grid-template-rows: min-content 1fr;
+    grid-template-areas: "heading registration" "sketch registration";
+    gap: var(--vx-space-6) var(--vx-space-12);
+    align-items: start;
+}
+.pub-section--narrow:has(#reg-legal) > h1 { grid-area: heading; margin: 0; font-size: var(--vx-font-size-heading); }
+.pub-section--narrow:has(#reg-legal)::after {
+    content: '';
+    grid-area: sketch;
+    position: sticky;
+    top: var(--vx-space-6);
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--vx-radius-lg);
+    background: url('../images/registration-workspace-sketch.webp') center / contain no-repeat;
+}
+.pub-form:has(#reg-legal) {
+    grid-area: registration;
+    counter-reset: registration-section;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    padding: var(--vx-space-6);
+    gap: var(--vx-space-6);
+    border-radius: var(--vx-radius-md);
+    box-shadow: var(--vx-shadow-1);
+}
+.pub-form:has(#reg-legal) fieldset {
+    counter-increment: registration-section;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--vx-space-4);
+    margin: 0;
+    padding: 0 0 var(--vx-space-6);
+    border: 0;
+    border-bottom: var(--vx-border-width) solid var(--vx-color-border);
+    border-radius: 0;
+}
+.pub-form:has(#reg-legal) legend { display: flex; align-items: center; gap: var(--vx-space-3); width: 100%; padding: 0; margin-bottom: var(--vx-space-4); font-size: var(--vx-font-size-lg); color: var(--vx-color-text); }
+.pub-form:has(#reg-legal) legend::before { content: counter(registration-section, decimal-leading-zero); display: inline-grid; place-items: center; min-width: var(--vx-space-8); min-height: var(--vx-space-8); border-radius: var(--vx-radius-sm); background: var(--vx-color-primary-soft); color: var(--vx-color-link); font-family: var(--vx-font-mono); font-size: var(--vx-font-size-sm); }
+.pub-form:has(#reg-legal) .vx-field { min-width: 0; margin: 0; }
+.pub-form:has(#reg-legal) .vx-input { width: 100%; min-width: 0; min-height: var(--vx-control-min); }
+.pub-form:has(#reg-legal) .vx-field:has(#reg-line1),
+.pub-form:has(#reg-legal) .vx-field:has(#reg-line2),
+.pub-form:has(#reg-legal) .vx-field:has(#reg-oname),
+.pub-form:has(#reg-legal) .vx-field:has(#reg-slug),
+.pub-form:has(#reg-legal) fieldset > label,
+.pub-form:has(#reg-legal) fieldset > .pub-hint { grid-column: 1 / -1; }
+.pub-form:has(#reg-legal) fieldset > label { padding: var(--vx-space-3); border-radius: var(--vx-radius-sm); background: var(--vx-color-primary-soft); }
+.pub-form:has(#reg-legal) label:has(input[type="checkbox"]) { font-size: var(--vx-font-size-md); line-height: var(--vx-leading-body); }
+.pub-form:has(#reg-legal) input[type="checkbox"] { margin-inline-end: var(--vx-space-2); accent-color: var(--vx-color-primary); }
+.pub-form:has(#reg-legal) .pub-hint { font-size: var(--vx-font-size-sm); margin: 0; }
+.pub-form:has(#reg-legal) > .vx-button { width: 100%; justify-content: center; }
+/* Offer and refusal details keep their natural reading order above the form. */
+.pub-section--narrow:has(#reg-legal):has(> .vx-message),
+.pub-section--narrow:has(#reg-legal):has(> .vx-card) { display: block; }
+.pub-section--narrow:has(#reg-legal):has(> .vx-message)::after,
+.pub-section--narrow:has(#reg-legal):has(> .vx-card)::after { display: none; }
+.pub-section--narrow:has(#reg-legal):has(> .vx-message) > h1,
+.pub-section--narrow:has(#reg-legal):has(> .vx-card) > h1 { margin-bottom: var(--vx-space-6); }
+@media (max-width: 1024px) {
+    .pub-section--narrow:has(#reg-legal) { gap: var(--vx-space-6); }
+}
+@media (max-width: 768px) {
+    .pub-section--narrow:has(#reg-legal) { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; grid-template-areas: "heading" "sketch" "registration"; }
+    .pub-section--narrow:has(#reg-legal)::after { position: static; aspect-ratio: 8 / 5; }
+    .pub-form:has(#reg-legal) { padding: var(--vx-space-5); }
+}
+@media (max-width: 640px) {
+    .pub-form:has(#reg-legal) fieldset { grid-template-columns: minmax(0, 1fr); }
+    .pub-form:has(#reg-legal) { padding: var(--vx-space-4); }
+    .pub-form:has(#reg-legal) .cf-turnstile { max-width: 100%; overflow-x: auto; }
+}
