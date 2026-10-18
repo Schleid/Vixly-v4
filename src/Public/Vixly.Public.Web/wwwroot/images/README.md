@@ -30,3 +30,11 @@ Corrected the broad adjacent-sibling selector: it selected every feature with a 
 - Organization: `feature-organization.webp`, branch supervisors coordinating operations.
 
 Four new images generated with built-in imagegen and visually inspected. Shared prompt: premium editorial logistics photography, natural daylight, navy/cobalt accents, authentic environment, landscape crop, no logos, readable text, watermark or interface overlays. Scene prompts are the descriptions above. Optimized WebP assets live in Public wwwroot/images; originals remain in Codex generated-images storage. No markup, backend or resource changes. CSS and asset-reference checks pass. Live browser verification remains pending.
+
+## Contact sales illustration — 2026-10-17
+
+`contact-logistics-sketch.webp` is original artwork generated with the built-in imagegen tool, then encoded as WebP (293,062 bytes). It decorates the Contact sales form only; no information depends on the image. The original PNG remains in Codex generated-images storage.
+
+Final generation prompt:
+
+> Use case: stylized-concept. Asset type: finished editorial illustration for the left column of Vixly logistics SaaS Contact Sales web form. Primary request: refined architect's isometric logistics sketch, warehouse shelving with cartons, a small handheld barcode scanner in foreground, two adult logistics colleagues discussing a clipboard, and a delivery van at loading bay, linked by a subtle cobalt dotted route. Style: sophisticated airy editorial ink and pencil line drawing, precise fine slate strokes, restrained enterprise cobalt blue wash accents, warm pale ivory paper, slight hand-drawn texture, premium B2B product illustration, inviting human scale, accurate readable silhouettes. Composition: landscape 4:3, one coherent scene with generous breathing room around edges, designed to sit beside a real HTML form at 450px wide, no surrounding UI or form. Palette: off-white, slate gray, deep cobalt, small muted amber carton accents. No text, no letters, no labels, no logos, no watermark, no gradients, no dark background, no stock-photo look, no childish cartoon, no dashboard mockup.

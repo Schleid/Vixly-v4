@@ -160,3 +160,60 @@ p { margin: 0 0 var(--vx-space-4); }
     .pub-feature { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
     .pub-feature::after { grid-column: 1; grid-row: auto; margin-top: var(--vx-space-4); }
 }
+
+/* Contact sales: an editorial illustration beside an accessible, compact form.
+   Target the existing contact field so registration and payment forms stay independent. */
+.pub-section--narrow:has(#contact-company) {
+    max-width: var(--vx-content-wide);
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    grid-template-areas: "title form" "lead form" "art form" "direct form";
+    column-gap: var(--vx-space-12);
+    row-gap: var(--vx-space-4);
+    align-items: start;
+}
+.pub-section--narrow:has(#contact-company) > h1 { grid-area: title; font-size: var(--vx-font-size-heading); margin: 0; }
+.pub-section--narrow:has(#contact-company) > .pub-lead { grid-area: lead; margin: 0; }
+.pub-section--narrow:has(#contact-company)::after {
+    content: '';
+    grid-area: art;
+    display: block;
+    aspect-ratio: 4 / 3;
+    width: 100%;
+    border-radius: var(--vx-radius-lg);
+    background: url('../images/contact-logistics-sketch.webp') center / contain no-repeat;
+}
+.pub-section--narrow:has(#contact-company) > .pub-hint { grid-area: direct; overflow-wrap: anywhere; }
+.pub-section--narrow:has(#contact-company) > [role="alert"] { grid-area: error; }
+.pub-section--narrow:has(#contact-company):has(> [role="alert"]) { grid-template-areas: "error error" "title form" "lead form" "art form" "direct form"; }
+.pub-form:has(#contact-company) {
+    grid-area: form;
+    max-width: none;
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--vx-space-5) var(--vx-space-4);
+    padding: var(--vx-space-6);
+    border-radius: var(--vx-radius-md);
+    box-shadow: var(--vx-shadow-1);
+}
+.pub-form:has(#contact-company) > .vx-field { min-width: 0; margin: 0; }
+.pub-form:has(#contact-company) > :not(.vx-field),
+.pub-form:has(#contact-company) > .vx-field:has(#contact-company),
+.pub-form:has(#contact-company) > .vx-field:has(#contact-message) { grid-column: 1 / -1; }
+.pub-form:has(#contact-company) .vx-input { width: 100%; min-width: 0; }
+.pub-form:has(#contact-company) textarea { resize: vertical; }
+.pub-form:has(#contact-company) .vx-button { width: 100%; justify-content: center; }
+@media (max-width: 1024px) {
+    .pub-section--narrow:has(#contact-company) { column-gap: var(--vx-space-6); }
+    .pub-form:has(#contact-company) { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 768px) {
+    .pub-section--narrow:has(#contact-company),
+    .pub-section--narrow:has(#contact-company):has(> [role="alert"]) {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "title" "lead" "art" "error" "form" "direct";
+    }
+    .pub-section--narrow:has(#contact-company)::after { aspect-ratio: 2 / 1; max-height: var(--vx-table-viewport); }
+    .pub-form:has(#contact-company) { padding: var(--vx-space-5); }
+}
