@@ -1,0 +1,98 @@
+﻿/* Control sign-in only. Reuses semantic chrome tokens; recovery/MFA stay unchanged. */
+.vx-auth--illustrated .vx-auth__backdrop { display: none; }
+.vx-auth--illustrated .vx-auth__topbar {
+    padding: 0.75rem 2rem;
+    background: var(--vx-color-chrome-surface);
+    border-bottom: 1px solid var(--vx-color-chrome-border);
+}
+.vx-auth--illustrated .vx-auth__brand-title { color: var(--vx-color-chrome-text-strong); }
+.vx-auth--illustrated .vx-auth__brand-badge,
+.vx-auth--illustrated .vx-auth__telemetry-pill,
+.vx-auth--illustrated .vx-auth__security-tag {
+    background: var(--vx-color-chrome-hover);
+    border-color: var(--vx-color-chrome-border);
+    color: var(--vx-color-chrome-text);
+}
+.vx-auth--illustrated .vx-auth__status-dot { background: var(--vx-color-chrome-accent); box-shadow: none; }
+.vx-auth--illustrated .vx-auth__languages { background: var(--vx-color-chrome-footer); border-color: var(--vx-color-chrome-border); }
+.vx-auth--illustrated .vx-auth__languages a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--vx-control-min);
+    min-width: var(--vx-control-min);
+    color: var(--vx-color-chrome-text);
+}
+.vx-auth--illustrated .vx-auth__languages a:hover,
+.vx-auth--illustrated .vx-auth__languages a.active { background: var(--vx-color-chrome-active); color: var(--vx-color-chrome-text-strong); border-color: var(--vx-color-chrome-active-border); }
+.vx-auth--illustrated .vx-auth__languages a:focus-visible { outline: var(--vx-focus-width) solid var(--vx-color-chrome-accent); outline-offset: 2px; }
+.vx-auth--illustrated .vx-auth__stage { padding: 1.5rem; }
+.vx-auth__workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    align-items: stretch;
+    width: min(100%, 62rem);
+    border: 1px solid var(--vx-color-border-control);
+    border-radius: var(--vx-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--vx-shadow-2);
+    background: var(--vx-color-surface);
+}
+.vx-auth__illustration {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+    min-width: 0;
+    margin: 0;
+    padding: 2rem;
+    background: var(--vx-color-chrome-surface);
+}
+.vx-auth__illustration figcaption { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem; color: var(--vx-color-chrome-text-strong); font-size: var(--vx-font-size-lg); font-weight: 700; }
+.vx-auth__illustration figcaption span:last-child { color: var(--vx-color-chrome-accent); font-size: var(--vx-font-size-xs); letter-spacing: 0.08em; }
+.vx-auth__illustration img { display: block; width: 100%; height: auto; border-radius: var(--vx-radius-sm); }
+.vx-auth--illustrated .vx-auth__terminal { max-width: none; min-width: 0; border: 0; border-radius: 0; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.vx-auth--illustrated .vx-auth__horizon-line { display: none; }
+.vx-auth--illustrated .vx-auth__header { padding: 1.5rem 2rem 1rem; gap: 0.5rem; text-align: start; align-items: start; }
+.vx-auth--illustrated .vx-auth__portal-badge { width: 2.5rem; height: 2.5rem; border-radius: var(--vx-radius-sm); margin: 0 0 0.25rem; box-shadow: none; }
+.vx-auth--illustrated .vx-auth__portal-badge-img { border-radius: var(--vx-radius-sm); }
+.vx-auth--illustrated .vx-auth__title { font-size: 1.5rem; }
+.vx-auth--illustrated .vx-auth__subtitle { white-space: normal; }
+.vx-auth--illustrated .vx-auth__content { padding: 0 2rem 1.25rem; }
+.vx-auth--illustrated .vx-auth__terminal .vx-form { gap: 0.85rem; }
+.vx-auth--illustrated .vx-auth__terminal .vx-field { gap: 0.3rem; }
+.vx-auth--illustrated .vx-auth__terminal .vx-label { text-transform: none; margin: 0; }
+.vx-auth--illustrated .vx-auth__terminal .vx-input { height: var(--vx-control-min); min-height: 2.75rem; border-radius: var(--vx-radius-sm); }
+.vx-auth--illustrated .vx-auth__terminal .vx-button--primary { min-height: 2.75rem; height: auto; margin-top: 0.15rem; border-radius: var(--vx-radius-sm); background: var(--vx-color-chrome-surface); color: var(--vx-color-chrome-text-strong); border-color: var(--vx-color-chrome-surface); box-shadow: none; }
+.vx-auth--illustrated .vx-auth__terminal .vx-button--primary:hover { background: var(--vx-color-chrome-active); border-color: var(--vx-color-chrome-active); transform: none; filter: none; }
+.vx-auth--illustrated .vx-auth__forgot { display: inline-flex; align-items: center; min-height: 1.5rem; }
+.vx-auth--illustrated .vx-passkey { background: none; border: 0; border-radius: 0; padding: 0; margin: 0.85rem 0 0; }
+.vx-auth--illustrated .vx-divider { margin: 0.65rem 0; font-size: var(--vx-font-size-xs); }
+.vx-auth--illustrated .vx-button--passkey { min-height: 2.75rem; padding: 0.4rem 0.75rem; border-radius: var(--vx-radius-sm); gap: 0.65rem; }
+.vx-auth--illustrated .vx-passkey__icon-box { width: 1.75rem; height: 1.75rem; border: 0; }
+.vx-auth--illustrated .vx-auth__terminal-footer { padding: 0.65rem 1rem; margin-top: auto; }
+.vx-auth--illustrated .vx-auth__footer { padding: 0.75rem 1rem; }
+.vx-auth--illustrated .vx-auth__terminal :is(a, button, input):focus-visible {
+    outline: var(--vx-focus-width) solid var(--vx-color-focus);
+    outline-offset: var(--vx-space-1);
+}
+@media (max-width: 960px) {
+    .vx-auth--illustrated .vx-auth__telemetry-pill { display: none; }
+    .vx-auth__illustration { padding: 1.25rem; }
+    .vx-auth--illustrated .vx-auth__header { padding-inline: 1.5rem; }
+    .vx-auth--illustrated .vx-auth__content { padding-inline: 1.5rem; }
+}
+@media (max-width: 720px) {
+    .vx-auth--illustrated .vx-auth__topbar { padding: 0.5rem 1rem; }
+    .vx-auth--illustrated .vx-auth__security-tag { display: none; }
+    .vx-auth--illustrated .vx-auth__stage { padding: 1rem; }
+    .vx-auth__workspace { max-width: 28rem; grid-template-columns: minmax(0, 1fr); }
+    .vx-auth__illustration { display: none; }
+}
+@media (max-width: 380px) {
+    .vx-auth--illustrated .vx-auth__brand-badge { display: none; }
+    .vx-auth--illustrated .vx-auth__header { padding-inline: 1.25rem; }
+    .vx-auth--illustrated .vx-auth__content { padding-inline: 1.25rem; }
+}
+
+.vx-auth__workspace--plain { width: 100%; max-width: 38.5rem; }
