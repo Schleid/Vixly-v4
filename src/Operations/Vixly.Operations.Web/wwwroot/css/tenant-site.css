@@ -27,9 +27,6 @@ a, button, input { -webkit-tap-highlight-color: transparent; }
 .site-hero__locations { display: inline-flex; gap: .75rem; align-items: center; min-height: 44px; font-size: .875rem; font-weight: 650; text-decoration: none; }
 .site-hero__visual { margin: 0; position: relative; }
 .site-hero__visual img { display: block; width: 100%; height: clamp(20rem, 30vw, 28rem); object-fit: cover; border-radius: 1.25rem 1.25rem 3.5rem 1.25rem; box-shadow: var(--vx-shadow-3); }
-.site-hero__route { position: absolute; inset: auto 1.5rem 1.5rem; display: flex; align-items: center; gap: .65rem; padding: .85rem 1rem; border: 1px solid color-mix(in srgb, var(--vx-color-surface) 40%, transparent); border-radius: 1rem; background: color-mix(in srgb, var(--site-primary) 80%, transparent); }
-.site-hero__route span { width: .55rem; height: .55rem; border: 2px solid var(--vx-color-on-primary); border-radius: 50%; }
-.site-hero__route i { flex: 1; border-top: 1px dashed color-mix(in srgb, var(--vx-color-on-primary) 60%, transparent); }
 .site-tracking-band { max-width: 64rem; padding-inline: 1.25rem; margin: -2.25rem auto 0; position: relative; z-index: 1; }
 .site-track { background: var(--vx-color-surface); padding: 1.5rem 1.75rem; border: 1px solid var(--site-line); border-radius: var(--site-radius); box-shadow: var(--vx-shadow-2); scroll-margin-top: 2rem; }
 .site-track label { display: block; font-weight: 700; font-size: 1.05rem; margin-bottom: .75rem; letter-spacing: -.02em; }
@@ -74,3 +71,27 @@ a, button, input { -webkit-tap-highlight-color: transparent; }
 @media (max-width: 720px) { .site-hero { grid-template-columns: minmax(0, 1fr); padding-top: 2.5rem; gap: 2rem; } .site-hero__visual img { height: 18rem; } .site-cards, .site-steps { grid-template-columns: minmax(0, 1fr); } .site-nav { gap: .65rem; font-size: .75rem; } .site-nav .site-button { padding-inline: .7rem; font-size: .75rem; } .site-footer { grid-template-columns: minmax(0, 1fr); } .site-track { padding: 1.25rem; } }
 @media (max-width: 380px) { .site-track__row { flex-direction: column; } .site-languages a { min-width: 2rem; } }
 @media (prefers-reduced-motion: reduce) { .site *, .site *::before, .site *::after { transition: none !important; animation: none !important; } }
+
+/* Tenant storefront: an editorial freight identity, separate from platform chrome. */
+.site-header { padding-block: .85rem; }
+.site-brand { letter-spacing: -.045em; font-size: 1.45rem; }
+.site-hero { background: var(--site-surface); border-bottom: 1px solid var(--site-line); }
+.site-hero__visual img { border-radius: .3rem; box-shadow: none; }
+.site-button { border-radius: .3rem; }
+.site-hero__locations { border-bottom: 1px solid var(--site-line); }
+.site-track { border-radius: .35rem; border: 0; border-top: 3px solid var(--site-accent); background: var(--vx-color-text); color: var(--vx-color-surface); padding: 1.5rem 1.75rem; }
+.site-track input, .site-track .site-button { border-radius: .3rem; }
+.site-section h2 { display: flex; align-items: center; gap: 1.5rem; }
+.site-section h2::after { content: ''; height: 1px; flex: 1; background: var(--site-line); }
+.site-card { border-radius: .35rem; box-shadow: none; }
+.site-service__icon { border-radius: .3rem; border: 1px solid color-mix(in srgb, var(--site-primary) 18%, transparent); background: transparent; }
+.site-service:hover { transform: translateY(-2px); }
+.site-steps li::before { font-size: 2rem; color: var(--site-accent); }
+.site-faq summary { min-height: 44px; }
+.site-country > h3 { display: inline-flex; padding: .5rem .75rem; border: 1px solid var(--site-line); border-radius: .3rem; background: var(--site-surface); }
+.site-milestones { list-style: none; padding: 0 0 0 .6rem; margin: 2rem 0; max-width: 48rem; }
+.site-milestones li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; position: relative; padding: .5rem 1rem 1.5rem 1.5rem; border-left: 1px solid var(--site-line); }
+.site-milestones li::before { content: ''; position: absolute; top: .8rem; left: -.3rem; width: .6rem; height: .6rem; border-radius: 50%; background: var(--site-primary); }
+.site-milestones time { font-size: .8rem; font-variant-numeric: tabular-nums; color: var(--site-muted); }
+.site-message { border-inline-start: 3px solid var(--site-accent); border-radius: .3rem; }
+@media (max-width: 720px) { .site-section h2 { gap: 1rem; } .site-hero__visual img { height: 13rem; } .site-track { padding: 1.25rem; } }

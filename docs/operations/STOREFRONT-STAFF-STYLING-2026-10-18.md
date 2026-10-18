@@ -1,5 +1,7 @@
 # Operations storefront and staff access styling
 
+The staff-entry design and copied security asset below are superseded by [Operations visual identity](OPERATIONS-IDENTITY-2026-10-18.md). The current Operations entry uses original receiving photography and a distinct light workbench.
+
 The tenant public site now has a freight-image hero, prominent tracking band, service-specific icons, four-step process, country-grouped locations and a clear footer with discreet staff access. Tenant-published image settings take precedence over the original fallback image. Existing company names, service visibility, translations, preview status, customer links, tracking action, locations, SEO and publishing behavior are retained. No quotes, rates, statistics, routes or operating capabilities are invented.
 
 The staff sign-in retains the existing form and endpoints in a responsive security-themed layout with the tenant's company name. Shared semantic palette tokens are used because the current authentication view receives the company name, not published brand settings; no new branding contract or backend read was introduced. Existing recovery, MFA, session-warning and double-submit behavior remain in place. The security illustration is an independent static copy of our original unbranded artwork, not a runtime dependency on another plane.

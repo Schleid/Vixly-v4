@@ -17,7 +17,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <!DOCTYPE html>
-<html lang="@Lang">
+<html lang="@Lang" data-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -35,11 +35,11 @@ IMPORTANT NOTES:
 <body class="vx-auth ops-auth" data-idle-warn="@(SignedIn ? "780" : null)" data-idle-end="@(SignedIn ? "900" : null)">
     <header class="vx-auth__topbar">
         <div class="vx-auth__topbar-inner">
-            <span class="vx-auth__brand-title">@CompanyName</span>
+            <a href="/" class="vx-auth__brand-title">@CompanyName</a>
             <nav class="vx-auth__languages" aria-label="@T["ui.language"]">
-                <a href="/culture/en?returnUrl=@ReturnHere" hreflang="en" lang="en">EN</a>
-                <a href="/culture/fr?returnUrl=@ReturnHere" hreflang="fr" lang="fr">FR</a>
-                <a href="/culture/es?returnUrl=@ReturnHere" hreflang="es" lang="es">ES</a>
+                <a href="/culture/en?returnUrl=@ReturnHere" hreflang="en" lang="en" aria-current="@(Lang == "en" ? "true" : null)">EN</a>
+                <a href="/culture/fr?returnUrl=@ReturnHere" hreflang="fr" lang="fr" aria-current="@(Lang == "fr" ? "true" : null)">FR</a>
+                <a href="/culture/es?returnUrl=@ReturnHere" hreflang="es" lang="es" aria-current="@(Lang == "es" ? "true" : null)">ES</a>
             </nav>
         </div>
     </header>
