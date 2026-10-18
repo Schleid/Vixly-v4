@@ -1,0 +1,52 @@
+﻿@*
+=========================================================
+FILE: SiteTrackPage.razor
+
+PURPOSE:
+Public tracking: milestones and dates only.
+
+RESPONSIBILITIES:
+- Render public tracking: milestones and dates only
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText and the tenant texts; values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); every value is HTML-encoded by Razor
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<SiteShell Page="@Page" Title="@(T["site.track.title"] + " | " + Page.Company)" Description="@Page.Text(T, "meta_description", "site.default.meta_description")">
+    <section class="site-section">
+        <h1>@T["site.track.title"]</h1>
+        <SiteTrackForm Page="@Page" Number="@Number" />
+        @if (NotFound)
+        {
+            <p class="site-message" role="status">@T["site.track.not_found"]</p>
+        }
+        @if (Milestones is { Count: > 0 })
+        {
+            <ol class="site-milestones">
+                @foreach (OperationsPublicMilestone milestone in Milestones)
+                {
+                    <li><strong>@T["ops.milestone." + milestone.Code]</strong> <time datetime="@milestone.ReachedUtc.ToString("O")">@milestone.ReachedUtc.ToString("d", System.Globalization.CultureInfo.CurrentCulture)</time></li>
+                }
+            </ol>
+        }
+        <p class="site-hint">@T["site.track.hint"]</p>
+    </section>
+</SiteShell>
+
+@code {
+    [Parameter, EditorRequired]
+    public OperationsSitePage Page { get; set; } = null!;
+
+    [Parameter]
+    public string? Number { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<OperationsPublicMilestone>? Milestones { get; set; }
+
+    [Parameter]
+    public bool NotFound { get; set; }
+}

@@ -28,6 +28,7 @@ IMPORTANT NOTES:
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-theme.css" />
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-primitives.css" />
     <link rel="stylesheet" href="/css/ops-editor.css" />
+    <link rel="stylesheet" href="/css/ops-experience.css" />
     <script src="/_content/Vixly.Shared.UI/vixly-forms.js" defer></script>
     <script src="/js/ops-session.js" defer></script>
     <script src="/js/ops-workbench.js" defer></script>
@@ -57,7 +58,7 @@ IMPORTANT NOTES:
         <div class="ops-editor__breadcrumb"><span>@L["portal"]</span><span aria-hidden="true">/</span><strong>@Title</strong></div>
         <a href="/" class="ops-editor__site-link">@T["ui.editor.nav.site"] <span aria-hidden="true">↗</span></a>
     </header>
-    <main id="main-content" class="ops-editor__main" tabindex="-1">
+    <main id="main-content" class="ops-editor__main" data-section="@Section" tabindex="-1">
         <AccessBanner />
         <h1>@Title</h1>
         <FormMessage Error="@Error" Info="@Info" />

@@ -63,4 +63,7 @@
   <data name="clear_search" xml:space="preserve">
     <value>Clear search</value>
   </data>
+  <data name="access" xml:space="preserve">
+    <value>Secure account access</value>
+  </data>
 </root>

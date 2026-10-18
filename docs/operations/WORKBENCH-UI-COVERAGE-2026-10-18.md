@@ -1,6 +1,6 @@
-# Operations UI coverage
+﻿# Operations UI coverage
 
-This completes the design/styling pass for Operations screens currently implemented in the shared workspace. The approved staff login remains intact. Operations now has one signed-in workbench, rather than a separate welcome shell and unrelated editor navigation.
+This was an initial styling pass with spot checks, not complete screen coverage. See FULL-SCREEN-UI-AUDIT-2026-10-18.md for the subsequent full component audit and the MFA correction. The approved staff login remains intact. Operations now has one signed-in workbench, rather than a separate welcome shell and unrelated editor navigation.
 
 ## Design and coverage
 

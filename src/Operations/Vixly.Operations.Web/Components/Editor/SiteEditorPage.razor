@@ -1,0 +1,171 @@
+﻿@*
+=========================================================
+FILE: SiteEditorPage.razor
+
+PURPOSE:
+The site and brand editor: settings, texts per language, images, preview and publish.
+
+RESPONSIBILITIES:
+- Render the site and brand editor: settings, texts per language, images, preview and publish
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); owner only (the use cases refuse others)
+- Static forms with antiforgery and the form guard (ADR-0019); placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.editor.site.title"]" Company="@Company" Section="site" Error="@Error" Info="@Info">
+    @if (!Features.ThemeCustomization)
+    {
+        <p class="ops-editor__notice" role="status">@T["ui.editor.site.plan_theme"]</p>
+    }
+    @if (!Features.ContentCustomization)
+    {
+        <p class="ops-editor__notice" role="status">@T["ui.editor.site.plan_content"]</p>
+    }
+    @if (Draft is not null)
+    {
+        <section class="ops-editor__panel ops-publication-bar" aria-labelledby="publish-title">
+            <h2 id="publish-title">@T["ui.editor.site.publish.title"]</h2>
+            <p>@(HasUnpublishedChanges ? T["ui.editor.site.publish.pending"] : T["ui.editor.site.publish.none"])</p>
+            <p class="ops-editor__actions">
+                @foreach (string language in OperationsSiteLanguages.All)
+                {
+                    <a class="vx-button vx-button--secondary" href="/@(language)?preview=true" target="_blank" rel="noopener">@T["ui.editor.site.preview"] @language.ToUpperInvariant()</a>
+                }
+            </p>
+            <form method="post" action="/staff/site/publish">
+                <AntiforgeryToken />
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.site.publish"]</button>
+            </form>
+        </section>
+
+        <form method="post" action="/staff/site?language=@Language" class="ops-editor__panel">
+            <AntiforgeryToken />
+            <h2>@T["ui.editor.site.brand"]</h2>
+            <label>@T["ui.editor.site.display_name"] <input name="displayName" value="@Draft.DisplayName" maxlength="@OperationsBrandSettings.DisplayNameMaxLength" required /></label>
+            <label>@T["ui.editor.site.preset"]
+                <select name="preset">
+                    @foreach (OperationsSitePreset preset in Enum.GetValues<OperationsSitePreset>())
+                    {
+                        <option value="@preset" selected="@(preset == Draft.Preset)">@T["ui.editor.preset." + preset.ToString().ToLowerInvariant()]</option>
+                    }
+                </select>
+            </label>
+            <label>@T["ui.editor.site.primary"] <input type="color" name="primaryColour" value="@Draft.PrimaryColour.ToLowerInvariant()" /></label>
+            <label>@T["ui.editor.site.accent"] <input type="color" name="accentColour" value="@Draft.AccentColour.ToLowerInvariant()" /></label>
+            <p class="ops-editor__hint">@T["ui.editor.site.contrast_hint"]</p>
+
+            <fieldset>
+                <legend>@T["ui.editor.site.sections"]</legend>
+                @foreach (string item in OperationsSiteTextKeys.ServiceCodes)
+                {
+                    OperationsSiteServices flag = OperationsEditorForms.Service(item);
+                    <label><input type="checkbox" name="services" value="@item" checked="@Draft.Services.HasFlag(flag)" /> @T["site.service." + item + ".title"]</label>
+                }
+                <label><input type="checkbox" name="showSteps" value="true" checked="@Draft.ShowSteps" /> @T["ui.editor.site.show_steps"]</label>
+                <label><input type="checkbox" name="showFaq" value="true" checked="@Draft.ShowFaq" /> @T["ui.editor.site.show_faq"]</label>
+            </fieldset>
+
+            <fieldset>
+                <legend>@T["ui.editor.site.social"]</legend>
+                @foreach ((string field, string? value) in Social)
+                {
+                    <label>@T["ui.editor.social." + field] <input type="url" name="@field" value="@value" maxlength="@OperationsBrandSettings.LinkMaxLength" placeholder="https://" /></label>
+                }
+            </fieldset>
+
+            <h2>@T["ui.editor.site.texts"]</h2>
+            <nav class="ops-editor__tabs" aria-label="@T["ui.language"]">
+                @foreach (string language in OperationsSiteLanguages.All)
+                {
+                    <a href="/staff/site?language=@language" aria-current="@(language == Language ? "page" : null)">@language.ToUpperInvariant()</a>
+                }
+            </nav>
+            <p class="ops-editor__hint">@T["ui.editor.site.texts_hint"]</p>
+            @foreach (var group in OperationsSiteTextKeys.All.GroupBy(item => item.Key.Contains('.') ? item.Key.Split('.')[0] : "intro"))
+            {
+                <details class="ops-content-group" open="@(group.Key == "intro")">
+                    <summary>@T[group.Key switch { "service" => "site.services.title", "step" => "site.steps.title", "faq" => "site.faq.title", _ => "ui.editor.site.texts" }] <span>@group.Count()</span></summary>
+                    <div class="ops-content-group__fields">
+                    @foreach ((string key, int max) in group)
+                    {
+                        <label>@T["ui.editor.text." + OperationsEditorForms.LabelKey(key)] @OperationsEditorForms.Number(key)
+                            @if (max > 120)
+                            {
+                                <textarea name="text.@key" maxlength="@max" rows="3">@Value(key)</textarea>
+                            }
+                            else
+                            {
+                                <input name="text.@key" value="@Value(key)" maxlength="@max" />
+                            }
+                        </label>
+                    }
+                    </div>
+                </details>
+            }            <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+        </form>
+
+        <section class="ops-editor__panel" aria-labelledby="images-title">
+            <h2 id="images-title">@T["ui.editor.site.images"]</h2>
+            <p class="ops-editor__hint">@T["ui.editor.site.images_hint"]</p>
+            @foreach (OperationsSiteImageKind kind in Enum.GetValues<OperationsSiteImageKind>())
+            {
+                string item = kind.ToString().ToLowerInvariant();
+                Guid? current = OperationsEditorForms.ImageId(Draft, kind);
+                <div class="ops-editor__image">
+                    <h3>@T["ui.editor.image." + item]</h3>
+                    @if (current is { } id)
+                    {
+                        <img src="/site/image/@id.ToString("N")" alt="" height="64" />
+                        <form method="post" action="/staff/site/image/@item/remove">
+                            <AntiforgeryToken />
+                            <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.remove"]</button>
+                        </form>
+                    }
+                    <form method="post" action="/staff/site/image/@item" enctype="multipart/form-data">
+                        <AntiforgeryToken />
+                        <input type="file" name="file" accept="image/png,image/jpeg,image/webp" required />
+                        <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.upload"]</button>
+                    </form>
+                </div>
+            }
+        </section>
+    }
+</EditorShell>
+
+@code {
+    private IEnumerable<(string, string?)> Social => Draft is null ? Array.Empty<(string, string?)>() : new[]
+    {
+        ("facebook", Draft.FacebookUrl), ("instagram", Draft.InstagramUrl), ("x", Draft.XUrl),
+        ("linkedin", Draft.LinkedInUrl), ("youtube", Draft.YouTubeUrl), ("tiktok", Draft.TikTokUrl)
+    };
+
+    private string? Value(string key) => Texts.TryGetValue(key, out string? value) ? value : null;
+
+    [Parameter]
+    public string? Company { get; set; }
+
+    [Parameter]
+    public string Language { get; set; } = "en";
+
+    [Parameter]
+    public OperationsBrandSettings? Draft { get; set; }
+
+    [Parameter]
+    public IReadOnlyDictionary<string, string> Texts { get; set; } = new Dictionary<string, string>();
+
+    [Parameter]
+    public bool HasUnpublishedChanges { get; set; }
+
+    [Parameter]
+    public string? Error { get; set; }
+
+    [Parameter]
+    public Vixly.Operations.Application.Ports.OperationsPlanFeatures Features { get; set; } = Vixly.Operations.Application.Ports.OperationsPlanFeatures.All;
+
+    [Parameter]
+    public string? Info { get; set; }
+}

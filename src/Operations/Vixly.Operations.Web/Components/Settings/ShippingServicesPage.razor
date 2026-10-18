@@ -1,0 +1,83 @@
+﻿@*
+=========================================================
+FILE: ShippingServicesPage.razor
+
+PURPOSE:
+The shipping services the tenant offers, and how.
+
+RESPONSIBILITIES:
+- Render one row per Vixly service: offered, label, business days and volumetric divisor
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Static form with antiforgery (ADR-0019)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@using Vixly.Operations.Application.Settings
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.services.title"]" Company="@Company" Section="services" Error="@Error" Info="@Info">
+    <form method="post" action="/staff/services" class="ops-editor__panel">
+        <AntiforgeryToken />
+        <p class="ops-editor__hint">@T["ui.services.hint"]</p>
+        <fieldset disabled="@(!CanEdit)">
+            <OperationsTableViewport Label="@T["ui.services.title"]">
+            <table class="ops-editor__table">
+                <thead>
+                    <tr>
+                        <th scope="col">@T["ui.services.offered"]</th>
+                        <th scope="col">@T["ui.services.service"]</th>
+                        <th scope="col">@T["ui.services.label"]</th>
+                        <th scope="col">@T["ui.services.days"]</th>
+                        <th scope="col">@VixlyText.Format(T, "ui.services.divisor", "unit", T["ui.services.unit." + DivisorUnit.Replace('/', '_')].Value)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (OperationsShippingServiceRow row in Services)
+                    {
+                        <tr>
+                            <td><input type="checkbox" name="offered" value="@row.Code" checked="@row.Offered" aria-label="@T["ui.services.offered"]" /></td>
+                            <td><strong>@T["ui.services.name." + row.Code]</strong> <span class="ops-editor__hint">@T["ui.services.mode." + row.Mode]</span></td>
+                            <td><input name="label_@row.Code" value="@row.Label" maxlength="60" placeholder="@T["ui.services.name." + row.Code]" aria-label="@T["ui.services.label"]" /></td>
+                            <td class="ops-editor__inline">
+                                <input type="number" name="min_@row.Code" value="@row.MinDays" min="1" max="365" required aria-label="@T["ui.services.min_days"]" />
+                                <span>–</span>
+                                <input type="number" name="max_@row.Code" value="@row.MaxDays" min="1" max="365" required aria-label="@T["ui.services.max_days"]" />
+                            </td>
+                            <td>
+                                @if (row.DivisorAllowed)
+                                {
+                                    <input type="number" name="divisor_@row.Code" value="@row.VolumetricDivisor" min="1" step="1" required aria-label="@T["ui.services.divisor_short"]" />
+                                }
+                                else
+                                {
+                                    <span class="ops-editor__hint">@T["ui.services.by_container"]</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            </OperationsTableViewport>
+        </fieldset>
+        @if (CanEdit)
+        {
+            <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></p>
+        }
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsShippingServiceRow> Services { get; set; } = Array.Empty<OperationsShippingServiceRow>();
+
+    [Parameter] public string DivisorUnit { get; set; } = "cm3/kg";
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

@@ -1,0 +1,123 @@
+﻿@*
+=========================================================
+FILE: CustomerShell.razor
+
+PURPOSE:
+The customer portal frame in the tenant's brand.
+
+RESPONSIBILITIES:
+- Render the customer portal frame in the tenant's brand
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019)
+- Placeholder look: Frontend/UI designs the final experience; never says "Vixly"
+=========================================================
+*@
+@inject IStringLocalizer<CustomerText> T
+
+<!DOCTYPE html>
+<html lang="@Lang" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex" />
+    <base href="/customer/" />
+    <title>@Title · @CompanyName</title>
+    @if (Brand?.FaviconImageId is { } favicon)
+    {
+        <link rel="icon" href="/site/image/@favicon" />
+    }
+    <link rel="stylesheet" href="_content/Vixly.Shared.UI/vixly-theme.css" />
+    <link rel="stylesheet" href="_content/Vixly.Shared.UI/vixly-primitives.css" />
+    <link rel="stylesheet" href="css/customer-portal.css" />
+    <script src="_content/Vixly.Shared.UI/vixly-forms.js" defer></script>
+    @if (BotSiteKey is { Length: > 0 })
+    {
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    }
+</head>
+<body class="customer-portal" data-signed-in="@(SignedIn ? "true" : "false")" data-page="@ReturnHere" style="--customer-primary: @Primary; --customer-accent: @Accent;">
+    <header class="customer-portal__topbar">
+        <a class="customer-portal__brand" href="/customer/">
+            @if (Brand?.LogoImageId is { } logo)
+            {
+                <img src="/site/image/@logo" alt="@CompanyName" height="40" />
+            }
+            else
+            {
+                <span>@CompanyName</span>
+            }
+        </a>
+        <nav class="customer-portal__languages" aria-label="@T["ui.language"]">
+            <a href="/customer/culture/en?returnUrl=@ReturnHere" hreflang="en" lang="en" aria-current="@(Lang == "en" ? "true" : null)">EN</a>
+            <a href="/customer/culture/fr?returnUrl=@ReturnHere" hreflang="fr" lang="fr" aria-current="@(Lang == "fr" ? "true" : null)">FR</a>
+            <a href="/customer/culture/es?returnUrl=@ReturnHere" hreflang="es" lang="es" aria-current="@(Lang == "es" ? "true" : null)">ES</a>
+        </nav>
+        @if (SignedIn)
+        {
+            <nav class="customer-portal__nav" aria-label="@T["ui.nav"]">
+                <a href="/customer/" aria-current="@(ReturnHere == "/customer/" ? "page" : null)">@T["ui.nav.home"]</a>
+                <a href="/customer/profile" aria-current="@(ReturnHere == "/customer/profile" ? "page" : null)">@T["ui.nav.profile"]</a>
+                <form method="post" action="/customer/sign-out" class="customer-portal__inline">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.sign_out"]</button>
+                </form>
+            </nav>
+        }
+    </header>
+    <main id="main-content" class="customer-portal__main" aria-labelledby="page-title">
+        <header class="customer-portal__heading"><div>
+        <h1 id="page-title">@Title</h1>
+        @if (!string.IsNullOrWhiteSpace(Subtitle))
+        {
+            <p class="customer-portal__subtitle">@Subtitle</p>
+        }
+        </div><AccountSketch /></header>
+        <div class="customer-portal__content">
+        @if (!string.IsNullOrWhiteSpace(Error))
+        {
+            <p class="customer-portal__error" role="alert">@Error</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(Info))
+        {
+            <p class="customer-portal__info" role="status">@Info</p>
+        }
+        @ChildContent
+        </div>
+    </main>
+</body>
+</html>
+
+@code {
+    private static string Lang => System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+    private string CompanyName => string.IsNullOrWhiteSpace(Brand?.DisplayName) ? T["ui.app.name"] : Brand.DisplayName;
+
+    private string Primary => Colour(Brand?.PrimaryColour) ?? "var(--vx-color-primary)";
+
+    private string Accent => Colour(Brand?.AccentColour) ?? "var(--vx-color-accent)";
+
+    // Only #RRGGBB reaches the style attribute.
+    private static string? Colour(string? value) =>
+        value is { Length: 7 } && value[0] == '#' && value[1..].All(Uri.IsHexDigit) ? value : null;
+
+    [Parameter] public Vixly.Contracts.Operations.Customers.CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+
+    [Parameter] public string? Subtitle { get; set; }
+
+    [Parameter] public bool SignedIn { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    [Parameter] public string ReturnHere { get; set; } = "/customer/";
+
+    [Parameter] public string? BotSiteKey { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

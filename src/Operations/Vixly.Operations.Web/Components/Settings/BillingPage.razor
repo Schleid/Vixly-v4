@@ -20,7 +20,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsWorkbenchText> L
 
 <EditorShell Title="@T["ui.billing.title"]" Company="@Company" Section="billing" Error="@Error">
-    <section class="ops-editor__panel">
+    <section class="ops-editor__panel ops-subscription">
         <h2>@T["ui.billing.plan"]</h2>
         @if (View.Subscription is { } plan)
         {

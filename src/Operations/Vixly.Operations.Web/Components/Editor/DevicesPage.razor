@@ -21,7 +21,7 @@ IMPORTANT NOTES:
     @foreach ((string title, IEnumerable<OperationsDevice> group) in Groups)
     {
         <section class="ops-editor__panel">
-            <h2>@title</h2>
+            <h2>@title <span class="ops-section-count">@group.Count()</span></h2>
             @if (!group.Any())
             {
                 <p class="ops-editor__empty-message">@T["ui.editor.none"]</p>
@@ -29,7 +29,7 @@ IMPORTANT NOTES:
             <ul class="ops-editor__list">
                 @foreach (OperationsDevice device in group)
                 {
-                    <li>
+                    <li class="ops-device-record">
                         <strong>@device.Number · @device.Name</strong>
                         <span class="ops-editor__status" data-status="@device.Status">@T["ui.devices.kind." + device.Kind]</span>
                         @if (device.RequestedByName is not null) { <span>@T["ui.devices.requested_by"] @device.RequestedByName</span> }

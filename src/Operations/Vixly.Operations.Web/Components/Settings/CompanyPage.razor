@@ -1,0 +1,124 @@
+﻿@*
+=========================================================
+FILE: CompanyPage.razor
+
+PURPOSE:
+The company's account at Vixly: legal details, contacts and change requests.
+
+RESPONSIBILITIES:
+- Render the company's account at Vixly: legal details, contacts and change requests
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@using Vixly.Operations.Application.Company
+@using Vixly.Operations.Application.Ports
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.company.title"]" Company="@Company" Section="company" Error="@Error" Info="@Info">
+    <section class="ops-editor__panel">
+        <h2>@T["ui.company.legal"]</h2>
+        <p><strong>@View.Company.Details.LegalName</strong> @(View.Company.Details.TradingName is { Length: > 0 } trading ? "· " + trading : null)</p>
+        <p>@View.Company.Details.Email · @View.Company.Details.Phone</p>
+        <p>@Address(View.Company.Details.Address)</p>
+        <p class="ops-editor__hint">@VixlyText.Format(T, "ui.company.code", "code", View.Company.TenantCode)</p>
+        <p class="ops-editor__hint">@T["ui.company.legal_hint"]</p>
+    </section>
+
+    <form method="post" action="/staff/company/contacts" class="ops-editor__panel">
+        <AntiforgeryToken />
+        <fieldset disabled="@(!View.CanEditContacts)">
+            <h2>@T["ui.company.contacts"]</h2>
+            @if (Contact("owner") is { } owner)
+            {
+                <p>@T["ui.company.role.owner"]: <strong>@owner.Name</strong> · @owner.Email @owner.Phone</p>
+            }
+            @foreach (string role in new[] { "billing", "technical" })
+            {
+                OperationsCompanyContact? contact = Contact(role);
+                <fieldset>
+                    <legend>@T["ui.company.role." + role]</legend>
+                    <label>@T["ui.staff.name"] <input name="@(role)Name" value="@contact?.Name" maxlength="200" /></label>
+                    <label>@T["ui.editor.email"] <input type="email" name="@(role)Email" value="@contact?.Email" maxlength="254" /></label>
+                    <label>@T["ui.company.phone"] <input name="@(role)Phone" value="@contact?.Phone" maxlength="40" /></label>
+                </fieldset>
+            }
+            <label>@T["ui.company.language"]
+                <select name="language">
+                    <option value="en" selected="@(View.Company.DefaultLanguage == "en")">English</option>
+                    <option value="fr" selected="@(View.Company.DefaultLanguage == "fr")">Français</option>
+                    <option value="es" selected="@(View.Company.DefaultLanguage == "es")">Español</option>
+                </select>
+            </label>
+            <label>@T["ui.company.time_zone"] <input name="timeZone" value="@View.Company.TimeZone" list="time-zones" maxlength="64" required /></label>
+            <datalist id="time-zones">
+                @foreach (string zone in Zones) { <option value="@zone"></option> }
+            </datalist>
+        </fieldset>
+        @if (View.CanEditContacts)
+        {
+            <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></p>
+        }
+    </form>
+
+    <section class="ops-editor__panel">
+        <h2>@T["ui.company.change"]</h2>
+        @if (View.Change is { } change)
+        {
+            <p>@T["ui.company.change_status." + change.Status] · @change.SubmittedUtc.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) · @change.SubmittedByName</p>
+            <p>@change.Proposed.LegalName · @Address(change.Proposed.Address)</p>
+            @if (change.DecisionNote is { Length: > 0 } note) { <p class="ops-editor__hint">@note</p> }
+            @if (change.Status == "pending" && View.CanRequestChange)
+            {
+                <form method="post" action="/staff/company/change/withdraw" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.company.withdraw"]</button>
+                </form>
+            }
+        }
+        @if (View.CanRequestChange && View.Change?.Status != "pending")
+        {
+            <form method="post" action="/staff/company/change" enctype="multipart/form-data" class="ops-form-grid">
+                <AntiforgeryToken />
+                <p class="ops-editor__hint">@T["ui.company.change_hint"]</p>
+                <label>@T["ui.company.legal_name"] <input name="legalName" value="@View.Company.Details.LegalName" maxlength="200" required /></label>
+                <label>@T["ui.company.trading_name"] <input name="tradingName" value="@View.Company.Details.TradingName" maxlength="200" /></label>
+                <label>@T["ui.editor.email"] <input type="email" name="email" value="@View.Company.Details.Email" maxlength="254" required /></label>
+                <label>@T["ui.company.phone"] <input name="phone" value="@View.Company.Details.Phone" maxlength="40" required /></label>
+                <label>@T["ui.editor.address.line1"] <input name="line1" value="@View.Company.Details.Address.Line1" maxlength="200" required /></label>
+                <label>@T["ui.editor.address.line2"] <input name="line2" value="@View.Company.Details.Address.Line2" maxlength="200" /></label>
+                <label>@T["ui.editor.address.city"] <input name="city" value="@View.Company.Details.Address.City" maxlength="100" required /></label>
+                <label>@T["ui.editor.address.region"] <input name="region" value="@View.Company.Details.Address.StateProvince" maxlength="100" /></label>
+                <label>@T["ui.editor.address.postal_code"] <input name="postalCode" value="@View.Company.Details.Address.PostalCode" maxlength="20" /></label>
+                <label>@T["ui.editor.country"] <input name="country" value="@View.Company.Details.Address.CountryCode" maxlength="2" required /></label>
+                <label>@T["ui.company.reason"] <textarea name="reason" maxlength="1000" required></textarea></label>
+                <label>@T["ui.company.proof"] <input type="file" name="proof" accept="application/pdf,image/png,image/jpeg" required /></label>
+                <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.company.send_change"]</button></p>
+            </form>
+        }
+    </section>
+</EditorShell>
+
+@code {
+    private static readonly string[] Zones =
+    {
+        "America/Port-au-Prince", "America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles", "America/Santo_Domingo",
+        "America/Puerto_Rico", "America/Toronto", "America/Mexico_City", "America/Bogota", "America/Panama", "Europe/Paris", "Europe/London", "Europe/Madrid", "UTC"
+    };
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsCompanyView View { get; set; } = null!;
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private OperationsCompanyContact? Contact(string role) => View.Company.Contacts.FirstOrDefault(contact => contact.Role == role);
+
+    private static string Address(OperationsCompanyAddress address) =>
+        string.Join(", ", new[] { address.Line1, address.Line2, address.City, address.StateProvince, address.PostalCode, address.CountryCode }.Where(part => !string.IsNullOrWhiteSpace(part)));
+}

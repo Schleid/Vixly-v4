@@ -1,0 +1,36 @@
+﻿@*
+=========================================================
+FILE: DeviceKindField.razor
+
+PURPOSE:
+The device name and kind fields.
+
+RESPONSIBILITIES:
+- Render the device name and kind fields
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<div class="vx-field">
+    <label for="device-name" class="vx-label">@T["ui.devices.name"]</label>
+    <input id="device-name" name="name" class="vx-input" maxlength="60" required value="@Name" placeholder="@T["ui.devices.name_placeholder"]" />
+</div>
+<div class="vx-field">
+    <label for="device-kind" class="vx-label">@T["ui.devices.kind"]</label>
+    <select id="device-kind" name="kind" class="vx-input">
+        @foreach (string kind in Vixly.Operations.Application.Devices.OperationsDeviceErrors.Kinds)
+        {
+            <option value="@kind">@T["ui.devices.kind." + kind]</option>
+        }
+    </select>
+</div>
+
+@code {
+    [Parameter]
+    public string? Name { get; set; }
+}

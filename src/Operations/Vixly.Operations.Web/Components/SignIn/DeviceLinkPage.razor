@@ -1,0 +1,40 @@
+﻿@*
+=========================================================
+FILE: DeviceLinkPage.razor
+
+PURPOSE:
+The page an emailed device link opens: it enrols this computer.
+
+RESPONSIBILITIES:
+- Render the page an emailed device link opens: it enrols this computer
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<AuthShell Title="@T[Recovery ? "ui.devices.recover.title" : "ui.devices.first.title"]" Subtitle="@T[Recovery ? "ui.devices.recover.subtitle" : "ui.devices.first.subtitle"]" Company="@Company" ReturnHere="@(Recovery ? "/devices/recover" : "/devices/first")">
+    <FormMessage Error="@Error" />
+    <form method="post" action="/devices/link" class="vx-form" data-device-link>
+        <AntiforgeryToken />
+        <input type="hidden" name="token" value="" data-device-token />
+        <DeviceKindField />
+        <p class="vx-hint" data-device-token-missing hidden>@T["ui.devices.link_missing"]</p>
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.devices.enrol_submit"]</VxButton>
+    </form>
+    <script src="/js/ops-device-link.js" defer></script>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string? Company { get; set; }
+
+    [Parameter]
+    public bool Recovery { get; set; }
+
+    [Parameter]
+    public string? Error { get; set; }
+}

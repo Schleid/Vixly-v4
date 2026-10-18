@@ -1,0 +1,71 @@
+﻿@*
+=========================================================
+FILE: SiteLocations.razor
+
+PURPOSE:
+Locations grouped by the country of their own address, then contacts per country.
+
+RESPONSIBILITIES:
+- Render locations grouped by the country of their own address, then contacts per country
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText and the tenant texts; values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); every value is HTML-encoded by Razor
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<section class="site-section" aria-labelledby="locations-title" id="locations">
+    <h2 id="locations-title">@T["site.locations.title"]</h2>
+    @if (Page.Site.Countries.Count == 0)
+    {
+        <p>@T["site.locations.none"]</p>
+    }
+    @foreach (string country in Page.Site.Countries)
+    {
+        <div class="site-country" id="country-@country.ToLowerInvariant()">
+            <h3><span aria-hidden="true">@OperationsCountries.Flag(country)</span> @OperationsCountries.Name(T, country)</h3>
+            <ul class="site-cards">
+                @foreach (OperationsPublicLocation location in Page.Site.Locations.Where(item => item.CountryCode == country))
+                {
+                    <li class="site-card" data-country="@location.CountryCode">
+                        <h4>@location.Name</h4>
+                        <p class="site-badges">
+                            @if (location.Receiving) { <span>@T["site.locations.receiving"]</span> }
+                            @if (location.PickupPoint) { <span>@T["site.locations.pickup"]</span> }
+                            @if (location.Kind == "branch") { <span>@T["site.locations.office"]</span> }
+                            @if (location.AcceptingDeliveries) { <span class="site-badge--ok">@T["site.locations.accepting"]</span> }
+                        </p>
+                        <address>@location.Line1@if (location.Line2 is not null) { <br />@location.Line2 }<br />@location.City@(location.Region is null ? null : ", " + location.Region) @location.PostalCode</address>
+                        @if (location.OpeningHours is not null) { <p>@location.OpeningHours</p> }
+                        <p><a href="https://www.google.com/maps/search/?api=1&query=@Uri.EscapeDataString(Query(location))" rel="noopener noreferrer" target="_blank">@T["site.locations.directions"]</a></p>
+                    </li>
+                }
+                @foreach (OperationsPublicContact contact in Page.Site.Contacts.Where(item => item.CountryCode == country))
+                {
+                    <li class="site-card site-card--contact">
+                        <h4>@(contact.Label ?? T["site.contacts.title"])</h4>
+                        <ul class="site-phones" aria-label="@T["site.contacts.call"]">
+                            @foreach (string phone in contact.Phones)
+                            {
+                                <li><a href="tel:@phone">@OperationsPhoneDisplay.Format(phone)</a></li>
+                            }
+                        </ul>
+                        @if (contact.WhatsApp is not null) { <p><a href="https://wa.me/@contact.WhatsApp.TrimStart('+')" rel="noopener noreferrer" target="_blank">@T["site.contacts.whatsapp"]</a></p> }
+                        @if (contact.Email is not null) { <p><a href="mailto:@contact.Email">@contact.Email</a></p> }
+                        @if (contact.Hours is not null) { <p>@contact.Hours</p> }
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public OperationsSitePage Page { get; set; } = null!;
+
+    private static string Query(OperationsPublicLocation location) =>
+        string.Join(", ", new[] { location.Line1, location.City, location.Region, location.PostalCode, location.CountryCode }.Where(part => !string.IsNullOrWhiteSpace(part)));
+}

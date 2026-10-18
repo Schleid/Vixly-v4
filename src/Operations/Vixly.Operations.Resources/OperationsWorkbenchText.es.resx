@@ -82,4 +82,8 @@
     <value>Borrar búsqueda</value>
     <comment>needs-review</comment>
   </data>
+  <data name="access" xml:space="preserve">
+    <value>Acceso seguro a la cuenta</value>
+    <comment>needs-review</comment>
+  </data>
 </root>

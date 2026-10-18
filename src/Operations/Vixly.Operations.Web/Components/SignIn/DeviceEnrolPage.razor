@@ -1,0 +1,41 @@
+﻿@*
+=========================================================
+FILE: DeviceEnrolPage.razor
+
+PURPOSE:
+The page that asks to add this computer for a signed-in staff member.
+
+RESPONSIBILITIES:
+- Render the page that asks to add this computer for a signed-in staff member
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<AuthShell Title="@T["ui.devices.enrol.title"]" Subtitle="@T["ui.devices.enrol.subtitle"]" Company="@Company" SignedIn="true" ReturnHere="/devices/enrol">
+    <FormMessage Error="@Error" Info="@Info" />
+    <form method="post" action="/devices/enrol" class="vx-form">
+        <AntiforgeryToken />
+        <DeviceKindField />
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.devices.enrol.submit"]</VxButton>
+    </form>
+    <form method="post" action="/staff/sign-out" class="vx-form">
+        <AntiforgeryToken />
+        <VxButton Variant="VxButtonVariant.Secondary" Type="submit">@T["ui.signout"]</VxButton>
+    </form>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string? Company { get; set; }
+
+    [Parameter]
+    public string? Error { get; set; }
+
+    [Parameter]
+    public string? Info { get; set; }
+}

@@ -1,0 +1,49 @@
+﻿@*
+=========================================================
+FILE: BranchFormPage.razor
+
+PURPOSE:
+The form for one branch.
+
+RESPONSIBILITIES:
+- Render the form for one branch
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); owner only (the use cases refuse others)
+- Static forms with antiforgery and the form guard (ADR-0019); placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T[Form.BranchId is null ? "ui.editor.branch.add" : "ui.editor.branch.edit"]" Company="@Company" Section="locations" Error="@Error">
+    <form method="post" action="/staff/locations/branch" class="ops-editor__panel">
+        <AntiforgeryToken />
+        <input type="hidden" name="branchId" value="@Form.BranchId" />
+        <label>@T["ui.editor.code"] <input name="code" value="@Form.Code" maxlength="@OperationsLocationLimits.CodeMaxLength" required /></label>
+        <label>@T["ui.editor.name"] <input name="name" value="@Form.Name" maxlength="@OperationsLocationLimits.NameMaxLength" required /></label>
+        <AddressFields Line1="@Form.Line1" Line2="@Form.Line2" City="@Form.City" Region="@Form.Region" PostalCode="@Form.PostalCode" CountryCode="@Form.CountryCode" />
+        <ContactFields Phone="@Form.Phone" Email="@Form.Email" OpeningHours="@Form.OpeningHours" />
+        <label>@T["ui.editor.branch.side"]
+            <select name="side">
+                @foreach (OperationsBranchSide side in Enum.GetValues<OperationsBranchSide>())
+                {
+                    <option value="@side" selected="@(side == Form.Side)">@T["ui.editor.side." + side.ToString().ToLowerInvariant()]</option>
+                }
+            </select>
+        </label>
+        <StatusFields Status="@Form.Status" ShowOnSite="@Form.ShowOnSite" />
+        <p class="ops-editor__actions">
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+            <a href="/staff/locations">@T["ui.editor.cancel"]</a>
+        </p>
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public SaveOperationsBranchRequest Form { get; set; } = null!;
+
+    [Parameter] public string? Error { get; set; }
+}

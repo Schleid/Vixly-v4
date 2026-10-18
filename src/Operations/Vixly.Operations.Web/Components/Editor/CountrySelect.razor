@@ -1,0 +1,33 @@
+﻿@*
+=========================================================
+FILE: CountrySelect.razor
+
+PURPOSE:
+A country select box.
+
+RESPONSIBILITIES:
+- Render a country select box
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); owner only (the use cases refuse others)
+- Static forms with antiforgery and the form guard (ADR-0019); placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<label>@T["ui.editor.country"]
+    <select name="@Name" required>
+        <option value="">@T["ui.editor.choose"]</option>
+        @foreach ((string country, string name) in OperationsCountries.Options(T))
+        {
+            <option value="@country" selected="@(country == Value)">@OperationsCountries.Flag(country) @name</option>
+        }
+    </select>
+</label>
+
+@code {
+    [Parameter, EditorRequired] public string Name { get; set; } = string.Empty;
+
+    [Parameter] public string? Value { get; set; }
+}

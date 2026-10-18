@@ -18,7 +18,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsWorkbenchText> L
 
 <EditorShell Title="@T["ui.staff.title"]" Company="@Company" Section="staff" Error="@Error" Info="@Info">
-    <div class="ops-editor__page-intro"><p class="ops-editor__hint">@L["staff_intro"]</p>@if (CanInvite) { <a href="#invite-person" class="vx-button vx-button--primary">@T["ui.staff.invite"]</a> }</div>
+    <div class="ops-editor__page-intro"><p class="ops-editor__hint">@L["staff_intro"]</p>@if (CanInvite) { <a href="#invite-person" data-open-panel class="vx-button vx-button--primary">@T["ui.staff.invite"]</a> }</div>
     <form method="get" action="/staff/people" class="ops-editor__inline ops-editor__search">
         <input name="search" value="@Search" placeholder="@T["ui.staff.search"]" aria-label="@T["ui.staff.search"]" />
         <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.search_submit"]</button>
@@ -29,7 +29,7 @@ IMPORTANT NOTES:
             <div class="ops-editor__empty">
                 <h2>@L["empty_staff"]</h2><p>@L["empty_staff_body"]</p>
                 @if (!string.IsNullOrWhiteSpace(Search)) { <a href="/staff/people">@L["clear_search"]</a> }
-                @if (CanInvite) { <a class="vx-button vx-button--secondary" href="#invite-person">@L["open_invite"]</a> }
+                @if (CanInvite) { <a class="vx-button vx-button--secondary" href="#invite-person" data-open-panel>@L["open_invite"]</a> }
             </div>
         }
         else
@@ -55,7 +55,9 @@ IMPORTANT NOTES:
     </section>
     @if (CanInvite)
     {
-        <form id="invite-person" method="post" action="/staff/people/invite" class="ops-editor__panel">
+        <details id="invite-person" class="ops-task-panel">
+        <summary>@T["ui.staff.invite"]<span aria-hidden="true">+</span></summary>
+        <form method="post" action="/staff/people/invite" class="ops-editor__panel">
             <AntiforgeryToken />
             <h2>@T["ui.staff.invite"]</h2>
             <label>@T["ui.staff.name"] <input name="fullName" maxlength="200" required /></label>
@@ -88,6 +90,7 @@ IMPORTANT NOTES:
             </select></label>
             <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.invite_submit"]</button>
         </form>
+        </details>
     }
 </EditorShell>
 

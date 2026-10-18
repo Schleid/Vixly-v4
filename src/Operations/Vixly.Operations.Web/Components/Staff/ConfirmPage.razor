@@ -1,0 +1,40 @@
+﻿@*
+=========================================================
+FILE: ConfirmPage.razor
+
+PURPOSE:
+The step-up page: confirm a code before a sensitive action.
+
+RESPONSIBILITIES:
+- Render the step-up page: confirm a code before a sensitive action
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019); sensitive actions ask for step-up first
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.confirm.title"]" Company="@Company" Section="account" Error="@Error">
+    <form method="post" action="/staff/confirm" class="ops-editor__panel">
+        <AntiforgeryToken />
+        <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+        <p>@T[HasSecondFactor ? "ui.confirm.body" : "ui.confirm.enrol_first"]</p>
+        @if (HasSecondFactor)
+        {
+            <label>@T["ui.devices.code"] <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required /></label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.confirm.submit"]</button>
+        }
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public string ReturnUrl { get; set; } = "/staff";
+
+    [Parameter] public bool HasSecondFactor { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+}

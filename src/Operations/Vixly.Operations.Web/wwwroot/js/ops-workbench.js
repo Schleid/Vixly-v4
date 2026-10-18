@@ -1,6 +1,15 @@
 ﻿/* Progressive mobile navigation only; no session, tenant or business data is stored. */
 (() => {
     'use strict';
+    document.addEventListener('click', event => {
+        const link = event.target.closest('[data-open-panel]');
+        if (!link) return;
+        const panel = document.getElementById(link.hash.slice(1));
+        if (panel instanceof HTMLDetailsElement) {
+            panel.open = true;
+            requestAnimationFrame(() => panel.querySelector('input:not([type=hidden]),select,textarea')?.focus());
+        }
+    });
     const sidebar = document.getElementById('ops-navigation');
     const toggle = document.querySelector('[data-nav-toggle]');
     const close = document.querySelector('[data-nav-close]');

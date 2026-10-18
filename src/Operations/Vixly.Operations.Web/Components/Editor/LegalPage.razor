@@ -1,0 +1,78 @@
+﻿@*
+=========================================================
+FILE: LegalPage.razor
+
+PURPOSE:
+The Terms the Owner reads and accepts.
+
+RESPONSIBILITIES:
+- Render the Terms the Owner reads and accepts
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.legal.title"]" Company="@Company" Section="legal" Error="@Error" Info="@Info">
+    @if (Status is null || Status.Terms is null || Status.Status is "accepted" or "not_required")
+    {
+        <section class="ops-editor__panel"><p>@T["ui.legal.nothing"]</p></section>
+    }
+    else
+    {
+        OperationsLegalTerms terms = Status.Terms;
+        <section class="ops-editor__panel">
+            <h2>@T["ui.legal.version"] @terms.Version</h2>
+            @if (Status.DeadlineUtc is { } deadline)
+            {
+                <p class="@(Status.Status == "overdue" ? "ops-editor__alert" : null)">@T[Status.Status == "overdue" ? "ui.legal.overdue" : "ui.legal.due"] <time datetime="@deadline.ToString("O")">@deadline.ToLocalTime().ToString("D", System.Globalization.CultureInfo.CurrentCulture)</time></p>
+            }
+            @if (terms.Summary is { Length: > 0 } summary)
+            {
+                <h3>@T["ui.legal.summary"]</h3>
+                <p class="ops-editor__pre">@summary</p>
+            }
+            <p><a href="/staff/legal/documents/@terms.DocumentId/@terms.Language" target="_blank" rel="noopener">@T["ui.legal.read"]</a></p>
+            @if (terms.Parts.Count > 0)
+            {
+                <h3>@T["ui.legal.includes"]</h3>
+                <ul>
+                    @foreach (OperationsLegalPart part in terms.Parts)
+                    {
+                        <li><a href="/staff/legal/documents/@part.DocumentId/@terms.Language" target="_blank" rel="noopener">@T["ui.legal.kind." + part.Kind]</a> @part.Version</li>
+                    }
+                </ul>
+            }
+            @if (IsOwner)
+            {
+                <form method="post" action="/staff/legal/accept" class="vx-form">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="documentId" value="@terms.DocumentId" />
+                    <input type="hidden" name="sha256" value="@terms.Sha256" />
+                    <input type="hidden" name="language" value="@terms.Language" />
+                    <label><input type="checkbox" name="agree" value="true" required /> @T["ui.legal.agree"]</label>
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.legal.accept"]</button>
+                </form>
+            }
+            else
+            {
+                <p>@T["ui.legal.owner_only"]</p>
+            }
+        </section>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsLegalStatus? Status { get; set; }
+
+    [Parameter] public bool IsOwner { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

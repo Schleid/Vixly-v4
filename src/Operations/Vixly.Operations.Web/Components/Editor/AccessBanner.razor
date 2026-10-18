@@ -1,0 +1,41 @@
+﻿@*
+=========================================================
+FILE: AccessBanner.razor
+
+PURPOSE:
+The notice of a read-only company or Terms to accept, shown on every staff page.
+
+RESPONSIBILITIES:
+- Render the notice of a read-only company or Terms to accept, shown on every staff page
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+@inject IHttpContextAccessor Http
+
+@if (Host is { } host)
+{
+    @if (host.Access is OperationsTenantAccess.ReadOnly or OperationsTenantAccess.PaymentRequired or OperationsTenantAccess.None)
+    {
+        <p class="ops-editor__alert" role="status">@T["ui.access." + Reason(host)] @if (host.Legal == "overdue") { <a href="/staff/legal">@T["ui.access.legal_link"]</a> } @if (Reason(host) == "payment_required") { <a href="/staff/billing">@T["ui.access.billing_link"]</a> }</p>
+    }
+    else if (host.Legal == "due")
+    {
+        <p class="ops-editor__notice" role="status">@T["ui.access.legal_due"] <a href="/staff/legal">@T["ui.access.legal_link"]</a></p>
+    }
+}
+
+@code {
+    private OperationsTenantHost? Host => Http.HttpContext is { } http ? Vixly.Operations.Web.Tenancy.OperationsTenantMiddleware.Host(http) : null;
+
+    public static string Reason(OperationsTenantHost host) => host.Legal == "overdue" ? "legal" : host.Access switch
+    {
+        OperationsTenantAccess.PaymentRequired => "payment_required",
+        OperationsTenantAccess.None => "none",
+        _ => "read_only"
+    };
+}

@@ -1,0 +1,35 @@
+﻿@*
+=========================================================
+FILE: UnavailablePage.razor
+
+PURPOSE:
+The page shown when Platform cannot be reached (503, try again).
+
+RESPONSIBILITIES:
+- Show the page shown when Platform cannot be reached (503, try again)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Tenant surface: never says "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@page "/unavailable"
+@inject IStringLocalizer<OperationsText> T
+
+<PageTitle>@T["ui.tenant.unavailable.title"]</PageTitle>
+<h1>@T["ui.tenant.unavailable.title"]</h1>
+<p>@T["ui.tenant.unavailable.body"]</p>
+
+@code {
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (HttpContext is { Response.HasStarted: false } http)
+        {
+            http.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+        }
+    }
+}

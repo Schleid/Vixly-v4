@@ -1,0 +1,30 @@
+﻿@*
+=========================================================
+FILE: DeviceWaitingPage.razor
+
+PURPOSE:
+The page shown while this computer waits for approval.
+
+RESPONSIBILITIES:
+- Render the page shown while this computer waits for approval
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<AuthShell Title="@T["ui.devices.waiting.title"]" Subtitle="@T["ui.devices.waiting.subtitle"]" Company="@Company" SignedIn="true" ReturnHere="/devices/waiting">
+    <p><a class="vx-button vx-button--primary" href="/staff">@T["ui.devices.waiting.check"]</a></p>
+    <form method="post" action="/staff/sign-out" class="vx-form">
+        <AntiforgeryToken />
+        <VxButton Variant="VxButtonVariant.Secondary" Type="submit">@T["ui.signout"]</VxButton>
+    </form>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string? Company { get; set; }
+}

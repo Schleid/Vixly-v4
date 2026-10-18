@@ -24,18 +24,6 @@ body.ops-auth { margin: 0; min-height: 100dvh; font-family: var(--vx-font); colo
 .ops-auth :is(a, button, summary):focus-visible { outline: 2px solid var(--vx-color-warning); outline-offset: 4px; }
 .ops-auth .vx-auth__idle[hidden] { display: none !important; }
 .ops-auth .vx-auth__idle:not([hidden]) { position: fixed; inset: auto 1rem 1rem; z-index: 100; max-width: 36rem; margin: auto; padding: 1.5rem; background: var(--vx-color-surface); border: 1px solid var(--vx-color-warning); border-radius: .3rem; box-shadow: var(--vx-shadow-3); }
-/* Existing setup/workspace screens use a compact task launcher, not an auth card. */
-.ops-auth .vx-auth__terminal:has(.vx-auth__links) { max-width: 80rem; padding: 0; border: 0; background: transparent; }
-.ops-auth .vx-auth__terminal:has(.vx-auth__links) .vx-auth__header { border-bottom: 1px solid var(--vx-color-border); padding-bottom: 1.25rem; }
-.ops-auth .vx-auth__links { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: .75rem; margin: 1.5rem 0; }
-.ops-auth .vx-auth__links a { display: flex; justify-content: space-between; align-items: center; min-height: 4rem; padding: 1rem; background: var(--vx-color-surface); border: 1px solid var(--vx-color-border); border-radius: .3rem; color: var(--vx-color-text); font-size: .875rem; font-weight: 600; text-decoration: none; }
-.ops-auth .vx-auth__links a::after { content: '↗'; color: var(--vx-color-text-muted); }
-.ops-auth .vx-auth__links a:hover { border-color: var(--vx-color-warning); }
-.ops-auth .vx-auth__checklist { padding: 0; margin: 1rem 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: .5rem; }
-.ops-auth .vx-auth__checklist li { padding: .75rem 1rem; border-inline-start: 3px solid var(--vx-color-warning); background: var(--vx-color-surface); font-size: .8125rem; }
-.ops-auth .vx-auth__checklist li[data-done=true] { border-inline-start-color: var(--vx-color-success); color: var(--vx-color-text-muted); }
-.ops-auth .vx-auth__content > .vx-form > .vx-button { justify-self: start; }
-
 @media (max-width: 720px) {
     .ops-auth .vx-auth__terminal { padding: 1.25rem; }
     .ops-auth .vx-auth__title { font-size: 2rem; }
@@ -70,4 +58,35 @@ body.ops-auth { background:radial-gradient(ellipse at top,var(--vx-color-primary
 .ops-auth .vx-auth__steps li::marker { color:var(--vx-color-primary); font-weight:700; }
 .ops-auth .vx-message { margin-bottom:1.25rem; }
 @media (max-width:640px) { .ops-auth .vx-auth__terminal { padding:1.5rem; } .ops-auth .vx-auth__codes { grid-template-columns:minmax(0,1fr); } }
-@media print { .ops-auth .vx-auth__topbar,.ops-auth .vx-auth__idle,.ops-auth .vx-button { display:none !important; } .ops-auth .vx-auth__terminal { border:0; box-shadow:none; } }
+@media print { .ops-auth .vx-auth__topbar,.ops-auth .vx-auth__idle,.ops-auth .vx-button { display:none !important; } .ops-auth .vx-auth__terminal { border:0; box-shadow:none; } }/* Account access is always bounded; recovery links never select a workspace layout. */
+.ops-auth .vx-auth__stage { padding:clamp(1.5rem,5vh,4rem) 1.25rem 3rem; }
+.ops-auth .vx-auth__terminal { width:100%; max-width:40rem; padding:0; border:1px solid var(--vx-color-border); border-radius:1.2rem; overflow:hidden; box-shadow:0 1.5rem 3rem color-mix(in srgb,var(--vx-color-text) 12%,transparent); }
+.ops-auth .vx-auth__header { padding:1.75rem 2rem; margin:0; border:0; background:linear-gradient(120deg,var(--vx-color-chrome-footer),var(--vx-color-primary-hover)); color:var(--vx-color-on-primary); }
+.ops-access-heading { display:flex; align-items:center; justify-content:space-between; gap:1.5rem; }
+.ops-access-heading > div { flex:1; min-width:0; }
+.ops-auth .vx-auth__title { color:var(--vx-color-on-primary); font-size:1.9rem; line-height:1.16; letter-spacing:-.035em; margin:0; }
+.ops-auth .vx-auth__subtitle { margin-top:.8rem; color:var(--vx-color-chrome-text); font-size:.8125rem; }
+.ops-access-kicker { color:var(--vx-color-chrome-accent); font-size:.625rem; letter-spacing:.11em; text-transform:uppercase; font-weight:750; margin:0 0 .8rem; }
+.ops-auth .vx-auth__content { padding:2rem; }
+.ops-access-art { width:128px; height:112px; flex-shrink:0; stroke-width:1.6; }
+.ops-access-art__orbit { stroke:var(--vx-color-chrome-active-border); opacity:.35; stroke-dasharray:3 6; }
+.ops-access-art__connector,.ops-access-art__line { stroke:var(--vx-color-chrome-accent); stroke-linecap:round; }
+.ops-access-art__device { fill:var(--vx-color-chrome-active); stroke:var(--vx-color-chrome-active-border); }
+.ops-access-art__screen { fill:var(--vx-color-chrome-footer); stroke:var(--vx-color-chrome-border); }
+.ops-access-art__keys { fill:var(--vx-color-chrome-accent); }
+.ops-access-art__shield { fill:var(--vx-color-chrome-surface); stroke:var(--vx-color-chrome-accent); }
+.ops-access-art__lock { fill:var(--vx-color-chrome-active); stroke:var(--vx-color-chrome-accent); }
+.ops-access-art__node { fill:var(--vx-color-chrome-accent); stroke:none; }
+.ops-auth .vx-input--code { min-height:68px; font-family:var(--vx-font-mono); font-size:1.9rem; text-align:center; letter-spacing:.45em; padding:.8rem .4rem .8rem .85rem; border-color:var(--vx-color-primary); background:var(--vx-color-primary-soft); font-variant-numeric:tabular-nums; }
+.ops-auth .vx-auth__links { display:flex; flex-direction:column; gap:0; margin:1.75rem 0 0; padding-top:1rem; border-top:1px solid var(--vx-color-border); }
+.ops-auth .vx-auth__links p { margin:0; }
+.ops-auth .vx-auth__links a { display:flex; align-items:center; justify-content:space-between; gap:1rem; min-height:44px; font-size:.75rem; font-weight:550; color:var(--vx-color-link); text-decoration:none; }
+.ops-auth .vx-auth__links a::after { content:'→'; }
+.ops-auth .vx-auth__links a:hover { text-decoration:underline; text-underline-offset:.25em; }
+.ops-auth .vx-auth__content .vx-form { width:100%; }
+.ops-auth .vx-auth__content .vx-form > .vx-button { width:100%; min-height:48px; }
+.ops-auth .vx-auth__steps { list-style:none; padding:0; counter-reset:access-step; }
+.ops-auth .vx-auth__steps li { counter-increment:access-step; display:flex; align-items:center; gap:.8rem; padding:.8rem; background:var(--vx-color-surface-sunken); border:1px solid var(--vx-color-border); border-radius:.5rem; }
+.ops-auth .vx-auth__steps li::before { content:counter(access-step,decimal-leading-zero); font-family:var(--vx-font-mono); color:var(--vx-color-primary); font-weight:650; }
+@media(max-width:560px) { .ops-auth .vx-auth__header { padding:1.5rem; } .ops-auth .vx-auth__content { padding:1.5rem; } .ops-access-art { width:84px; height:90px; } .ops-auth .vx-auth__title { font-size:1.55rem; } .ops-access-heading { gap:.75rem; } .ops-auth .vx-auth__terminal { border-radius:.9rem; } .ops-access-kicker { font-size:.5625rem; } }
+.ops-auth a.vx-button--primary { color:var(--vx-color-on-primary); }

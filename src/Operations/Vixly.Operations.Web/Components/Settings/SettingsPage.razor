@@ -1,0 +1,91 @@
+﻿@*
+=========================================================
+FILE: SettingsPage.razor
+
+PURPOSE:
+The tenant settings: currency, units, payment, delivery, security and numbering.
+
+RESPONSIBILITIES:
+- Render the tenant settings: currency, units, payment, delivery, security and numbering
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@using Vixly.Operations.Domain.Settings
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.settings.title"]" Company="@Company" Section="settings" Error="@Error" Info="@Info">
+    <form method="post" action="/staff/settings" class="ops-editor__panel">
+        <AntiforgeryToken />
+        <fieldset disabled="@(!CanEdit)">
+            <h2>@T["ui.settings.money"]</h2>
+            <label>@T["ui.settings.currency"]
+                <select name="currencyCode" disabled="@CurrencyLocked">
+                    @foreach (string currency in OperationsCurrencies.All)
+                    {
+                        <option value="@currency" selected="@(currency == Settings.CurrencyCode)">@currency</option>
+                    }
+                </select>
+            </label>
+            <p class="ops-editor__hint">@T[CurrencyLocked ? "ui.settings.currency_locked" : "ui.settings.currency_hint"]</p>
+            <label><input type="checkbox" name="allowCollect" value="true" checked="@Settings.AllowCollect" /> @T["ui.settings.allow_collect"]</label>
+            <label><input type="checkbox" name="allowCredit" value="true" checked="@Settings.AllowCredit" /> @T["ui.settings.allow_credit"]</label>
+            <p class="ops-editor__hint">@T["ui.settings.gate_hint"]</p>
+
+            <h2>@T["ui.settings.units"]</h2>
+            <label>@T["ui.settings.weight"]
+                <select name="weightUnit">
+                    <option value="Kilogram" selected="@(Settings.WeightUnit == OperationsWeightUnit.Kilogram)">@T["ui.settings.kg"]</option>
+                    <option value="Pound" selected="@(Settings.WeightUnit == OperationsWeightUnit.Pound)">@T["ui.settings.lb"]</option>
+                </select>
+            </label>
+            <label>@T["ui.settings.dimension"]
+                <select name="dimensionUnit">
+                    <option value="Centimetre" selected="@(Settings.DimensionUnit == OperationsDimensionUnit.Centimetre)">@T["ui.settings.cm"]</option>
+                    <option value="Inch" selected="@(Settings.DimensionUnit == OperationsDimensionUnit.Inch)">@T["ui.settings.in"]</option>
+                </select>
+            </label>
+
+            <h2>@T["ui.settings.delivery"]</h2>
+            <label><input type="checkbox" name="pickup" value="true" checked="@Settings.DeliveryModes.HasFlag(OperationsDeliveryModes.Pickup)" /> @T["ui.settings.pickup"]</label>
+            <label><input type="checkbox" name="homeDelivery" value="true" checked="@Settings.DeliveryModes.HasFlag(OperationsDeliveryModes.HomeDelivery)" /> @T["ui.settings.home_delivery"]</label>
+
+            <h2>@T["ui.settings.security"]</h2>
+            <label><input type="checkbox" name="requireSecondFactor" value="true" checked="@Settings.RequireSecondFactorForAllStaff" /> @T["ui.settings.require_second_factor"]</label>
+            <p class="ops-editor__hint">@T["ui.settings.second_factor_hint"]</p>
+
+            <h2>@T["ui.settings.numbering"]</h2>
+            <label>@T["ui.settings.prefix.shipment"] <input name="shipmentPrefix" value="@Settings.ShipmentPrefix" maxlength="6" required /></label>
+            <label>@T["ui.settings.prefix.receiving"] <input name="receivingPrefix" value="@Settings.ReceivingPrefix" maxlength="6" required /></label>
+            <label>@T["ui.settings.prefix.invoice"] <input name="invoicePrefix" value="@Settings.InvoicePrefix" maxlength="6" required /></label>
+            <label>@T["ui.settings.prefix.payment"] <input name="paymentPrefix" value="@Settings.PaymentPrefix" maxlength="6" required /></label>
+            <label>@T["ui.settings.prefix.customer"] <input name="customerPrefix" value="@Settings.CustomerPrefix" maxlength="6" required /></label>
+            <p class="ops-editor__hint">@VixlyText.Format(T, "ui.settings.prefix_hint", "example", Settings.ShipmentPrefix + DateTime.UtcNow.ToString("yy", System.Globalization.CultureInfo.InvariantCulture) + "000001")</p>
+        </fieldset>
+        @if (CurrencyLocked)
+        {
+            <input type="hidden" name="currencyCode" value="@Settings.CurrencyCode" />
+        }
+        @if (CanEdit)
+        {
+            <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></p>
+        }
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsTenantSettings Settings { get; set; } = null!;
+
+    [Parameter] public bool CurrencyLocked { get; set; }
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

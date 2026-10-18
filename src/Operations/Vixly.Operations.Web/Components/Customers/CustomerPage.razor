@@ -19,7 +19,10 @@ IMPORTANT NOTES:
 
 <EditorShell Title="@Customer.FullName" Company="@Company" Section="customers" Error="@Error" Info="@Info">
     <p><a href="/staff/customers">@T["ui.customers.back"]</a></p>
-    <section class="ops-editor__panel" aria-labelledby="customer-details">
+    <div class="ops-record-layout" data-editable="@((CanManage || CanSetCredit) ? "true" : "false")">
+    <aside class="ops-record-rail">
+    <section class="ops-editor__panel ops-record-summary" aria-labelledby="customer-details">
+        <div class="ops-record-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 22v-3a8 8 0 0 1 16 0v3" /></svg></div>
         <h2 id="customer-details">@T["ui.customers.details"]</h2>
         <dl>
             <dt>@T["ui.customers.code"]</dt><dd>@(Customer.Code ?? T["ui.customers.no_code"])</dd>
@@ -30,7 +33,7 @@ IMPORTANT NOTES:
             <dt>@T["ui.customers.last_sign_in"]</dt><dd>@(Customer.LastSignInUtc?.ToString("yyyy-MM-dd HH:mm") ?? T["ui.customers.never"])</dd>
         </dl>
     </section>
-    <section class="ops-editor__panel" aria-labelledby="customer-mailboxes">
+    <section class="ops-editor__panel ops-mailbox-panel" aria-labelledby="customer-mailboxes">
         <h2 id="customer-mailboxes">@T["ui.customers.mailboxes"]</h2>
         @if (Customer.Mailboxes.Count == 0)
         {
@@ -48,6 +51,8 @@ IMPORTANT NOTES:
             </address>
         }
     </section>
+    </aside>
+    <div class="ops-record-workflows">
     @if (CanManage)
     {
         <form method="post" action="/staff/customers/@Customer.CustomerId" class="ops-editor__panel">
@@ -66,7 +71,7 @@ IMPORTANT NOTES:
             </label>
             <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
         </form>
-        <form method="post" action="/staff/customers/@Customer.CustomerId/status" class="ops-editor__panel">
+        <form method="post" action="/staff/customers/@Customer.CustomerId/status" class="ops-editor__panel ops-panel--restricted">
             <AntiforgeryToken />
             <h2>@T["ui.customers.status"]</h2>
             <p>@T["ui.customers.status_hint"]</p>
@@ -91,7 +96,7 @@ IMPORTANT NOTES:
     }
     @if (CanSetCredit)
     {
-        <form method="post" action="/staff/customers/@Customer.CustomerId/credit" class="ops-editor__panel">
+        <form method="post" action="/staff/customers/@Customer.CustomerId/credit" class="ops-editor__panel ops-panel--restricted">
             <AntiforgeryToken />
             <h2>@T["ui.customers.credit"]</h2>
             <p>@T["ui.customers.credit_hint"]</p>
@@ -100,6 +105,8 @@ IMPORTANT NOTES:
             <button type="submit" class="vx-button vx-button--secondary">@(Customer.CreditAllowed ? T["ui.customers.credit_remove"] : T["ui.customers.credit_allow"])</button>
         </form>
     }
+    </div>
+    </div>
 </EditorShell>
 
 @code {

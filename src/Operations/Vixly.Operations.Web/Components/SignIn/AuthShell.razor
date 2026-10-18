@@ -15,6 +15,7 @@ IMPORTANT NOTES:
 =========================================================
 *@
 @inject IStringLocalizer<OperationsText> T
+@inject IStringLocalizer<OperationsWorkbenchText> L
 
 <!DOCTYPE html>
 <html lang="@Lang" data-theme="light">
@@ -47,11 +48,13 @@ IMPORTANT NOTES:
     <main id="main-content" class="vx-auth__stage" aria-labelledby="vx-page-title">
         <div class="vx-auth__terminal">
             <header class="vx-auth__header">
+                <div class="ops-access-heading"><div><p class="ops-access-kicker">@L["access"]</p>
                 <h1 id="vx-page-title" class="vx-auth__title">@Title</h1>
                 @if (!string.IsNullOrWhiteSpace(Subtitle))
                 {
                     <p class="vx-auth__subtitle">@Subtitle</p>
                 }
+                </div><AccessIllustration /></div>
             </header>
             <div class="vx-auth__content">
                 @ChildContent

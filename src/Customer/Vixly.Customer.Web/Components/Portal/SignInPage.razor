@@ -1,0 +1,48 @@
+﻿@*
+=========================================================
+FILE: SignInPage.razor
+
+PURPOSE:
+The customer sign-in page.
+
+RESPONSIBILITIES:
+- Render the customer sign-in page
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019)
+- Placeholder look: Frontend/UI designs the final experience; never says "Vixly"
+=========================================================
+*@
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.sign_in.title"]" Subtitle="@T["ui.home.title"]" Error="@Error" Info="@Info" ReturnHere="/customer/sign-in">
+    <form method="post" action="/customer/sign-in" class="customer-portal__form">
+        <AntiforgeryToken />
+        <label>@T["ui.field.email"] <input type="email" name="email" value="@Email" autocomplete="username" maxlength="254" required /></label>
+        <label>@T["ui.field.password"] <input type="password" name="password" autocomplete="current-password" maxlength="64" required /></label>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.sign_in.submit"]</button>
+    </form>
+    @if (ShowResend)
+    {
+        <form method="post" action="/customer/verify/resend" class="customer-portal__form">
+            <AntiforgeryToken />
+            <input type="hidden" name="email" value="@Email" />
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.verify.resend"]</button>
+        </form>
+    }
+    <p><a href="/customer/forgot-password">@T["ui.forgot.link"]</a></p>
+    <p>@T["ui.sign_in.no_account"] <a href="/customer/sign-up">@T["ui.sign_up.link"]</a></p>
+</CustomerShell>
+
+@code {
+    [Parameter] public Vixly.Contracts.Operations.Customers.CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public string? Email { get; set; }
+
+    [Parameter] public bool ShowResend { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

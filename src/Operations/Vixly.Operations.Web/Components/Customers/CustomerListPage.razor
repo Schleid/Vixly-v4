@@ -19,7 +19,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsWorkbenchText> L
 
 <EditorShell Title="@T["ui.customers.title"]" Company="@Company" Section="customers" Error="@Error" Info="@Info">
-    <div class="ops-editor__page-intro"><p class="ops-editor__hint">@L["customers_intro"]</p>@if (CanManage) { <a href="#create-customer" class="vx-button vx-button--primary">@T["ui.customers.create"]</a> }</div>
+    <div class="ops-editor__page-intro"><p class="ops-editor__hint">@L["customers_intro"]</p>@if (CanManage) { <a href="#create-customer" data-open-panel class="vx-button vx-button--primary">@T["ui.customers.create"]</a> }</div>
     <form method="get" action="/staff/customers" class="ops-editor__inline ops-editor__search">
         <input name="search" value="@Search" placeholder="@T["ui.customers.search"]" aria-label="@T["ui.customers.search"]" maxlength="100" />
         <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.search_submit"]</button>
@@ -30,7 +30,7 @@ IMPORTANT NOTES:
             <div class="ops-editor__empty">
                 <h2>@T["ui.customers.none"]</h2>
                 @if (!string.IsNullOrWhiteSpace(Search)) { <a href="/staff/customers">@L["clear_search"]</a> }
-                @if (CanManage) { <a class="vx-button vx-button--secondary" href="#create-customer">@T["ui.customers.create"]</a> }
+                @if (CanManage) { <a class="vx-button vx-button--secondary" href="#create-customer" data-open-panel>@T["ui.customers.create"]</a> }
             </div>
         }
         else
@@ -67,7 +67,9 @@ IMPORTANT NOTES:
     </section>
     @if (CanManage)
     {
-        <form id="create-customer" method="post" action="/staff/customers/create" class="ops-editor__panel">
+        <details id="create-customer" class="ops-task-panel">
+        <summary>@T["ui.customers.create"]<span aria-hidden="true">+</span></summary>
+        <form method="post" action="/staff/customers/create" class="ops-editor__panel">
             <AntiforgeryToken />
             <h2>@T["ui.customers.create"]</h2>
             <p>@T["ui.customers.create_hint"]</p>
@@ -85,6 +87,7 @@ IMPORTANT NOTES:
             </label>
             <button type="submit" class="vx-button vx-button--primary">@T["ui.customers.create_submit"]</button>
         </form>
+        </details>
     }
 </EditorShell>
 
