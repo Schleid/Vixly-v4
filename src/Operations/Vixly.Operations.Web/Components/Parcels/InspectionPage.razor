@@ -1,0 +1,53 @@
+﻿@*
+=========================================================
+FILE: InspectionPage.razor
+
+PURPOSE:
+The inspection station: scan a parcel's ID label, then record it (Slice 3B, owner 2026-10-18).
+
+RESPONSIBILITIES:
+- Take a scan (scanner or keyboard) and open the parcel; show the customer, the shipment and the check form
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); the use cases decide
+- Condition, weight, size and photos are recorded here, not at the dock; some parcels are picked for compliance inspection
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.inspection.title"]" Company="@Company" Section="inspection" Error="@Error" Info="@Info">
+    <InspectionStationFrame Loaded="@(Parcel is not null)">
+    <form method="get" action="/staff/inspection" class="ops-inspection-entry">
+        <label>@T["ui.inspection.scan"] <input name="code" autofocus autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="60" /></label>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.inspection.find"]</button>
+    </form>
+    </InspectionStationFrame>
+    @if (Parcel is { } parcel)
+    {
+        <InspectionCheckForm Parcel="parcel" CustomerPhone="@CustomerPhone" ShipmentParcels="ShipmentParcels" Shipment="Shipment" Condition="@Condition" WeightUnit="WeightUnit" DimensionUnit="DimensionUnit" CommandKey="@CommandKey" />
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsParcelSummary? Parcel { get; set; }
+
+    [Parameter] public string? CustomerPhone { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsParcelSummary> ShipmentParcels { get; set; } = Array.Empty<OperationsParcelSummary>();
+
+    [Parameter] public Vixly.Operations.Application.Shipments.OperationsCustomerShipment? Shipment { get; set; }
+
+    [Parameter] public string? Condition { get; set; }
+
+    [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
+
+    [Parameter] public OperationsDimensionUnit DimensionUnit { get; set; }
+
+    [Parameter] public string CommandKey { get; set; } = string.Empty;
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}
