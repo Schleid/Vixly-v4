@@ -81,3 +81,21 @@
 .ops-content-group__fields { padding:1rem; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
 .ops-content-group__fields label { min-width:0; margin:0; }
 @media(max-width:640px) { .ops-content-group__fields { grid-template-columns:1fr; } }
+/* Dock office and inspection: actual warehouse workflows, separate from account setup. */
+.ops-editor__main[data-section=parcels] > nav:first-of-type { padding:.3rem; border:1px solid var(--vx-color-border); background:var(--vx-color-surface); border-radius:.5rem; width:fit-content; margin-block:1rem; gap:.25rem; }
+.ops-editor__main[data-section=parcels] > nav:first-of-type a { min-height:38px; display:flex; align-items:center; padding:.5rem .9rem; border-radius:.3rem; text-decoration:none; font-size:.75rem; color:var(--vx-color-text-muted); }
+.ops-editor__main[data-section=parcels] > nav:first-of-type a[aria-current=page] { background:var(--vx-color-primary-soft); color:var(--vx-color-primary); font-weight:650; }
+.ops-editor__main[data-section=receiving] > section:first-of-type { border-top:3px solid var(--vx-color-primary); }
+.ops-editor__main[data-section=receiving] > section > ul { list-style:none; padding:0; margin:0; display:grid; gap:.5rem; }
+.ops-editor__main[data-section=receiving] > section > ul li { padding:.9rem 1rem; background:var(--vx-color-surface-sunken); border:1px solid var(--vx-color-border); border-inline-start:3px solid var(--vx-color-primary); border-radius:.4rem; font-size:.8125rem; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.ops-editor__main[data-section=inspection] > form:first-of-type { background:linear-gradient(110deg,var(--vx-color-primary-soft),var(--vx-color-surface)); border-color:var(--vx-color-status-info-border); padding:1.5rem; }
+.ops-editor__main[data-section=inspection] > form:first-of-type label { flex:1; max-width:32rem; }
+.ops-editor__main[data-section=inspection] input[name=code] { min-height:54px; font:500 1.1rem var(--vx-font-mono); letter-spacing:.06em; }
+.ops-inspection__customer { display:inline-flex; padding:.35rem .65rem; background:var(--vx-color-primary-soft); color:var(--vx-color-primary); border:1px solid var(--vx-color-status-info-border); border-radius:.3rem; font-family:var(--vx-font-mono); font-size:.8125rem; }
+.ops-parcel-photos { display:flex; flex-wrap:wrap; gap:.75rem; margin:0; padding:0; list-style:none; }.ops-parcel-photos img { max-width:100%; width:150px; height:120px; object-fit:cover; border:1px solid var(--vx-color-border); border-radius:.5rem; }
+.ops-parcel-history { list-style:none; padding:0; margin:0; }
+.ops-parcel-history li { display:grid; grid-template-columns:9rem minmax(0,1fr); gap:.5rem 1rem; position:relative; padding:0 0 1.5rem 1.3rem; margin-left:.3rem; border-inline-start:1px solid var(--vx-color-border); line-height:1.6; font-size:.8125rem; }
+.ops-parcel-history li::before { content:''; position:absolute; left:-4px; top:.25rem; width:7px; height:7px; border-radius:50%; background:var(--vx-color-primary); outline:3px solid var(--vx-color-surface); }
+.ops-parcel-history time { font:400 .6875rem var(--vx-font-mono); color:var(--vx-color-text-subtle); }.ops-parcel-history li small { grid-column:2; color:var(--vx-color-text-muted); }.ops-parcel-history li[data-voided=true] { opacity:.7; }.ops-parcel-history li[data-voided=true] > span { text-decoration:line-through; }
+.ops-parcel-history li:last-child { border-color:transparent; padding-bottom:0; }
+@media(max-width:640px) { .ops-parcel-history li { grid-template-columns:minmax(0,1fr); gap:.35rem; }.ops-parcel-history li small { grid-column:1; }.ops-editor__main[data-section=inspection] > form:first-of-type { align-items:stretch; }.ops-editor__main[data-section=inspection] > form:first-of-type > button { width:100%; } }

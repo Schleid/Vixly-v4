@@ -1,0 +1,82 @@
+﻿@*
+=========================================================
+FILE: PackagesPage.razor
+
+PURPOSE:
+The customer's pre-alerts and packages, newest first (Slice 3B).
+
+RESPONSIBILITIES:
+- List open pre-alerts with a way to withdraw them
+- List packages with their status and what is needed
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Customers
+@using Vixly.Contracts.Operations.Packages
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.packages.title"]" SignedIn="true" Error="@Error" Info="@Info" ReturnHere="/customer/packages">
+    <p><a class="vx-button vx-button--primary" href="/customer/packages/new">@T["ui.packages.new"]</a></p>
+    @if (Packages is { } packages)
+    {
+        <section aria-labelledby="packages-title">
+            <h2 id="packages-title">@T["ui.packages.received"]</h2>
+            @if (packages.Parcels.Count == 0)
+            {
+                <p>@T["ui.packages.none"]</p>
+            }
+            else
+            {
+                <ul class="customer-portal__list">
+                    @foreach (CustomerParcelDto parcel in packages.Parcels)
+                    {
+                        <li data-on-hold="@(parcel.Holds.Count > 0 ? "true" : "false")">
+                            <a href="/customer/packages/@parcel.ParcelId"><strong>@parcel.Number</strong> · @parcel.TrackingNumber</a>
+                            <span class="customer-package-status" data-status="@parcel.Milestone">@(parcel.Milestone is { } milestone ? T["ui.milestone." + milestone].Value : null)</span>
+                            @foreach (string hold in parcel.Holds)
+                            {
+                                <span class="customer-portal__notice">@T["ui.hold." + hold]</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(parcel.Contents)) { <small>@parcel.Contents</small> }
+                        </li>
+                    }
+                </ul>
+            }
+        </section>
+        <section aria-labelledby="prealerts-title">
+            <h2 id="prealerts-title">@T["ui.packages.expected"]</h2>
+            @if (packages.PreAlerts.Count == 0)
+            {
+                <p>@T["ui.packages.none_expected"]</p>
+            }
+            else
+            {
+                <ul class="customer-portal__list">
+                    @foreach (CustomerPreAlertDto preAlert in packages.PreAlerts)
+                    {
+                        <li>
+                            <div class="customer-package-identity"><strong>@preAlert.TrackingNumber</strong><span>@preAlert.Carrier</span></div>
+                            <small>@preAlert.Contents · @preAlert.DeclaredValue.ToString("0.00") @preAlert.CurrencyCode @(preAlert.ExpectedDate is { } date ? "· " + date.ToString("yyyy-MM-dd") : null)</small>
+                            <form method="post" action="/customer/packages/pre-alerts/@preAlert.PreAlertId/withdraw" class="customer-portal__inline">
+                                <AntiforgeryToken />
+                                <button type="submit" class="vx-button vx-button--secondary">@T["ui.packages.withdraw"]</button>
+                            </form>
+                        </li>
+                    }
+                </ul>
+            }
+        </section>
+    }
+</CustomerShell>
+
+@code {
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public CustomerPackagesDto? Packages { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

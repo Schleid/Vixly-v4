@@ -1,0 +1,76 @@
+﻿@*
+=========================================================
+FILE: PackagePage.razor
+
+PURPOSE:
+One of the customer's packages: details, photos and history (Slice 3B).
+
+RESPONSIBILITIES:
+- Show the package with its measurements, declaration and holds
+- Show its photos and its history in the customer's language
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10)
+- History is already reduced to what the customer may see (ADR-0021 decision 5)
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Customers
+@using Vixly.Contracts.Operations.Packages
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@(Detail.Parcel.Number ?? T["ui.packages.title"].Value)" SignedIn="true" Info="@Info" ReturnHere="/customer/packages">
+    <p><a href="/customer/packages">@T["ui.packages.back"]</a></p>
+    @foreach (string hold in Detail.Parcel.Holds)
+    {
+        <p class="customer-portal__notice" role="status">@T["ui.hold." + hold]</p>
+    }
+    <dl class="customer-portal__details customer-package-details">
+        <dt>@T["ui.prealert.tracking"]</dt><dd>@Detail.Parcel.TrackingNumber</dd>
+        @if (!string.IsNullOrWhiteSpace(Detail.Parcel.Carrier)) { <dt>@T["ui.prealert.carrier"]</dt><dd>@Detail.Parcel.Carrier</dd> }
+        <dt>@T["ui.packages.status"]</dt><dd>@(Detail.Parcel.Milestone is { } milestone ? T["ui.milestone." + milestone].Value : null)</dd>
+        @if (Detail.Parcel.Warehouse is not null) { <dt>@T["ui.packages.warehouse"]</dt><dd>@Detail.Parcel.Warehouse</dd> }
+        @if (Detail.ReceiptNumber is not null) { <dt>@T["ui.packages.receipt"]</dt><dd>@Detail.ReceiptNumber</dd> }
+        @if (Detail.Parcel.Weight is { } weight) { <dt>@T["ui.packages.weight"]</dt><dd>@weight.ToString("0.###") @Detail.WeightUnit</dd> }
+        @if (Detail.Parcel.Length is { } length && Detail.Parcel.Width is { } width && Detail.Parcel.Height is { } height) { <dt>@T["ui.packages.size"]</dt><dd>@length.ToString("0.#") × @width.ToString("0.#") × @height.ToString("0.#") @Detail.DimensionUnit</dd> }
+        @if (!string.IsNullOrWhiteSpace(Detail.Parcel.Contents)) { <dt>@T["ui.prealert.contents"]</dt><dd>@Detail.Parcel.Contents</dd> }
+        @if (Detail.Parcel.DeclaredValue is { } value) { <dt>@T["ui.prealert.value"]</dt><dd>@value.ToString("0.00") @Detail.Parcel.CurrencyCode</dd> }
+    </dl>
+    @if (Detail.Photos.Count > 0)
+    {
+        <section aria-labelledby="photos-title">
+            <h2 id="photos-title">@T["ui.packages.photos"]</h2>
+            <ul class="customer-portal__photos">
+                @foreach (CustomerParcelPhotoDto photo in Detail.Photos)
+                {
+                    <li><a href="/customer/packages/@Detail.Parcel.ParcelId/photos/@photo.PhotoId" target="_blank" rel="noopener"><img src="/customer/packages/@Detail.Parcel.ParcelId/photos/@photo.PhotoId" alt="@T["ui.packages.photo." + photo.Kind]" loading="lazy" width="160" /></a></li>
+                }
+            </ul>
+        </section>
+    }
+    <section aria-labelledby="history-title">
+        <h2 id="history-title">@T["ui.packages.history"]</h2>
+        <ol class="customer-portal__history">
+            @foreach (CustomerTrackingLineDto line in Detail.History.Reverse())
+            {
+                <li><time datetime="@line.OccurredUtc.ToString("O")">@line.OccurredUtc.ToString("yyyy-MM-dd HH:mm")</time> <span>@Describe(line)</span></li>
+            }
+        </ol>
+    </section>
+</CustomerShell>
+
+@code {
+    // Choices from fixed lists in the customer's words; anything else as it is.
+    private string Describe(CustomerTrackingLineDto line) =>
+        VixlyText.Format(T, "ui.tracking." + (line.Code.StartsWith("ops.tracking.", StringComparison.Ordinal) ? line.Code["ops.tracking.".Length..] : line.Code), line.Arguments.ToDictionary(pair => pair.Key, pair => (object)(pair.Key switch
+        {
+            "reason" when !T["ui.hold." + pair.Value].ResourceNotFound => T["ui.hold." + pair.Value].Value,
+            "result" when !T["ui.inspection." + pair.Value].ResourceNotFound => T["ui.inspection." + pair.Value].Value,
+            _ => pair.Value
+        }), StringComparer.Ordinal));
+
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter, EditorRequired] public CustomerParcelDetailDto Detail { get; set; } = null!;
+
+    [Parameter] public string? Info { get; set; }
+}

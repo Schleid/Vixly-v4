@@ -20,6 +20,9 @@
 :root[data-theme="light"] {
     --vx-color-status-received: #1D4ED8;
     --vx-color-status-received-bg: #EFF6FF;
+    --vx-color-status-transit: #7E22CE;
+    --vx-color-status-transit-bg: #FAF5FF;
+    --vx-color-status-transit-border: #E9D5FF;
     --vx-color-status-staged: #B45309;
     --vx-color-status-staged-bg: #FFFBEB;
     --vx-color-status-completed: #047857;
@@ -193,6 +196,9 @@
 :root[data-theme="dark"] {
     --vx-color-status-received: #93C5FD;
     --vx-color-status-received-bg: #16264A;
+    --vx-color-status-transit: #D8B4FE;
+    --vx-color-status-transit-bg: #281A3D;
+    --vx-color-status-transit-border: #63408C;
     --vx-color-status-staged: #FCD34D;
     --vx-color-status-staged-bg: #332711;
     --vx-color-status-completed: #6EE7B7;
@@ -254,6 +260,9 @@
     :root:not([data-theme="light"]) {
         --vx-color-status-received: #93C5FD;
         --vx-color-status-received-bg: #16264A;
+        --vx-color-status-transit: #D8B4FE;
+        --vx-color-status-transit-bg: #281A3D;
+        --vx-color-status-transit-border: #63408C;
         --vx-color-status-staged: #FCD34D;
         --vx-color-status-staged-bg: #332711;
         --vx-color-status-completed: #6EE7B7;
