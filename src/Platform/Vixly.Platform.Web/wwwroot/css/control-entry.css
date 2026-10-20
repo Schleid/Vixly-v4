@@ -5,7 +5,7 @@ body.control-entry { display:flex; flex-direction:column; margin:0; min-height:1
 .control-entry__brand img { border-radius:.5rem; }
 .control-entry__languages { display:flex; gap:.2rem; }
 .control-entry__languages a { display:grid; place-items:center; width:36px; min-height:36px; border-radius:.3rem; text-decoration:none; font-size:.6875rem; font-weight:600; color:var(--vx-color-text-muted); }
-.control-entry__languages a[aria-current=true] { color:var(--vx-color-primary); background:var(--vx-color-primary-soft); }
+.control-entry__languages a[aria-current=true] { color:var(--vx-color-link); background:var(--vx-color-primary-soft); }
 .control-entry__stage { flex:1; display:grid; place-items:center; padding:2rem 1.5rem; }
 .control-entry .control-entry__form { position:static; width:min(100%,26rem); max-width:none; padding:0; margin:0; border:0; border-radius:0; background:transparent; box-shadow:none; overflow:visible; animation:none; transform:none; }
 .control-entry__heading { margin-bottom:1.75rem; padding-top:1rem; border-top:2px solid var(--vx-color-primary); }
