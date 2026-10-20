@@ -33,6 +33,7 @@ IMPORTANT NOTES:
     <link rel="stylesheet" href="_content/Vixly.Shared.UI/vixly-primitives.css" />
     <link rel="stylesheet" href="css/customer-portal.css?v=20261018-customer3" />
     <link rel="stylesheet" href="css/customer-access.css?v=20261018-customer3" />
+    <link rel="stylesheet" href="css/customer-continuity.css?v=20261019-1" />
     <script src="_content/Vixly.Shared.UI/vixly-forms.js" defer></script>
     @if (BotSiteKey is { Length: > 0 })
     {
@@ -61,6 +62,8 @@ IMPORTANT NOTES:
             <nav class="customer-portal__nav" aria-label="@T["ui.nav"]">
                 <a href="/customer/" aria-current="@(ReturnHere == "/customer/" ? "page" : null)">@T["ui.nav.home"]</a>
                 <a href="/customer/packages" aria-current="@(ReturnHere.StartsWith("/customer/packages", StringComparison.Ordinal) ? "page" : null)">@T["ui.nav.packages"]</a>
+                <a href="/customer/tickets" aria-current="@(ReturnHere.StartsWith("/customer/tickets", StringComparison.Ordinal) ? "page" : null)">@T["ui.nav.tickets"]</a>
+                <a href="/customer/rates" aria-current="@(ReturnHere == "/customer/rates" ? "page" : null)">@T["ui.nav.rates"]</a>
                 <a href="/customer/profile" aria-current="@(ReturnHere == "/customer/profile" ? "page" : null)">@T["ui.nav.profile"]</a>
                 <form method="post" action="/customer/sign-out" class="customer-portal__inline">
                     <AntiforgeryToken />
@@ -76,7 +79,7 @@ IMPORTANT NOTES:
         {
             <p class="customer-portal__subtitle">@Subtitle</p>
         }
-        </div><AccountSketch /></header>
+        </div><Vixly.Shared.UI.Primitives.VxWorkspaceArt Kind="@Scene" /></header>
         <div class="customer-portal__content">
         @if (!string.IsNullOrWhiteSpace(Error))
         {
@@ -93,6 +96,8 @@ IMPORTANT NOTES:
 </html>
 
 @code {
+    private string Scene => !SignedIn ? "security" : ReturnHere.Contains("tickets", StringComparison.Ordinal) ? "support" : ReturnHere.Contains("rates", StringComparison.Ordinal) ? "document" : ReturnHere.Contains("packages", StringComparison.Ordinal) ? "parcel" : ReturnHere.Contains("profile", StringComparison.Ordinal) ? "people" : "network";
+
     private static string Lang => System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
 
     private string CompanyName => string.IsNullOrWhiteSpace(Brand?.DisplayName) ? T["ui.app.name"] : Brand.DisplayName;

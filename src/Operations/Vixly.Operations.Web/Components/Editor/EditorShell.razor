@@ -30,6 +30,7 @@ IMPORTANT NOTES:
     <link rel="stylesheet" href="/css/ops-editor.css" />
     <link rel="stylesheet" href="/css/ops-experience.css?v=20261018-customer3" />
     <link rel="stylesheet" href="/css/ops-inspection.css?v=20261019-1" />
+    <link rel="stylesheet" href="/css/ops-continuity.css?v=20261019-1" />
     <script src="/_content/Vixly.Shared.UI/vixly-forms.js" defer></script>
     <script src="/js/ops-session.js" defer></script>
     <script src="/js/ops-workbench.js" defer></script>
@@ -61,7 +62,7 @@ IMPORTANT NOTES:
     </header>
     <main id="main-content" class="ops-editor__main" data-section="@Section" tabindex="-1">
         <AccessBanner />
-        <h1>@Title</h1>
+        @if (Section == "inspection") { <h1>@Title</h1> } else { <OperationsPageHeading Title="@Title" Section="@Section" /> }
         <FormMessage Error="@Error" Info="@Info" />
         @ChildContent
     </main>

@@ -20,6 +20,7 @@ IMPORTANT NOTES:
 <EditorShell Title="@T["ui.editor.nav.workspace"]" Company="@Company" Section="workspace">
     <section class="ops-workspace__welcome">
         <div><p class="ops-editor__eyebrow">@L["workspace_intro"]</p><h2>@Company</h2><p>@L["workspace_body"]</p></div>
+        <VxWorkspaceArt Kind="network" />
         <p class="ops-workspace__user">@T["ui.signed_in_as"] <strong>@Name</strong></p>
     </section>
     @if (Checklist.Count > 0 && Checklist.Any(item => !item.Done))
@@ -37,21 +38,8 @@ IMPORTANT NOTES:
         </section>
     }
     <h2 class="ops-workspace__section-title">@L["workspace_tasks"]</h2>
-    <nav class="ops-workspace__links" aria-label="@L["workspace_tasks"]">
-        <a href="/staff/site">@T["ui.editor.nav.site"]</a>
-        <a href="/staff/locations">@T["ui.editor.nav.locations"]</a>
-        <a href="/staff/devices">@T["ui.editor.nav.devices"]</a>
-        <a href="/staff/customers">@T["ui.editor.nav.customers"]</a>
-        <a href="/staff/people">@T["ui.editor.nav.staff"]</a>
-        <a href="/staff/roles">@T["ui.editor.nav.roles"]</a>
-        <a href="/staff/company">@T["ui.editor.nav.company"]</a>
-        <a href="/staff/billing">@T["ui.editor.nav.billing"]</a>
-        <a href="/staff/services">@T["ui.editor.nav.services"]</a>
-        <a href="/staff/settings">@T["ui.editor.nav.settings"]</a>
-        <a href="/staff/audit">@T["ui.editor.nav.audit"]</a>
-        <a href="/staff/legal">@T["ui.editor.nav.legal"]</a>
-        <a href="/staff/account">@T["ui.editor.nav.account"]</a>
-    </nav>
+    @* Same items and order as the menu, and only what the person's role allows (OperationsNavigation). *@
+    <OperationsTaskLinks />
 </EditorShell>
 
 @code {

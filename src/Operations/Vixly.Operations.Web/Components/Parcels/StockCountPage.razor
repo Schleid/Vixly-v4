@@ -1,0 +1,98 @@
+﻿@*
+=========================================================
+FILE: StockCountPage.razor
+
+PURPOSE:
+One count of the undeclared parcels area: each parcel expected on its shelf, found or missing (Slice 4D step 3).
+
+RESPONSIBILITIES:
+- Scan a parcel's ID label to mark it found, or mark it from the list; mark missing with a note
+- Close the count once every parcel is marked (a parcel missing: the Owner or an administrator)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@using Vixly.Operations.Domain.Holds
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.counts.title"]" Company="@Company" Section="parcels" Error="@Error" Info="@Info">
+    <div class="ops-stock-workflow">
+    <p><a href="/staff/parcels/counts">@T["ui.counts.back"]</a></p>
+    <section class="ops-editor__panel" aria-labelledby="count-title">
+        <h2 id="count-title">@WarehouseCode · @Count.CreatedUtc.ToString("yyyy-MM-dd HH:mm") · @(Count.IsOpen ? T["ui.counts.open"].Value : T["ui.counts.closed"].Value)</h2>
+        <p>@VixlyText.Format(T, "ui.counts.summary", new Dictionary<string, object>
+            {
+                ["found"] = Count.Lines.Count(line => line.Result == OperationsCountResult.Found),
+                ["missing"] = Count.Lines.Count(line => line.Result == OperationsCountResult.Missing),
+                ["total"] = Count.Lines.Count
+            })</p>
+        @if (Count.IsOpen)
+        {
+            <form method="post" action="/staff/parcels/counts/@Count.Id/mark" class="ops-editor__inline ops-editor__search">
+                <AntiforgeryToken />
+                <input name="code" placeholder="@T["ui.counts.scan"]" aria-label="@T["ui.counts.scan"]" maxlength="40" autocomplete="off" autofocus />
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.counts.found"]</button>
+            </form>
+        }
+        @if (Count.Lines.Count == 0)
+        {
+            <div class="ops-editor__empty"><h2>@T["ui.counts.empty"]</h2></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.counts.title"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.parcels.number"]</th><th scope="col">@T["ui.counts.shelf"]</th><th scope="col">@T["ui.counts.result"]</th><th scope="col"></th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsCountLine line in Count.Lines)
+                        {
+                            <tr data-result="@line.Result">
+                                <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/parcels/@line.ParcelId">@line.ParcelNumber</a></td>
+                                <td class="ops-editor__code">@line.ShelfCode</td>
+                                <td>@T["ui.counts.result." + line.Result] @if (line.Note is { } note) { <small>@note</small> }</td>
+                                <td>
+                                    @if (Count.IsOpen)
+                                    {
+                                        <form method="post" action="/staff/parcels/counts/@Count.Id/mark" class="ops-editor__inline">
+                                            <AntiforgeryToken />
+                                            <input type="hidden" name="parcel" value="@line.ParcelId" />
+                                            <input name="note" maxlength="@OperationsStockCount.NoteMaxLength" placeholder="@T["ui.counts.note"]" aria-label="@T["ui.counts.note"]" />
+                                            <button type="submit" name="result" value="found" class="vx-button vx-button--secondary">@T["ui.counts.found"]</button>
+                                            <button type="submit" name="result" value="missing" class="vx-button vx-button--secondary">@T["ui.counts.missing"]</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+        @if (Count.IsOpen)
+        {
+            <form method="post" action="/staff/parcels/counts/@Count.Id/close" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <button type="submit" class="vx-button vx-button--primary" disabled="@(!CanClose)">@T["ui.counts.close"]</button>
+            </form>
+            <p class="ops-editor__hint">@(IsManager ? T["ui.counts.close_hint"] : T["ui.counts.close_hint_staff"])</p>
+        }
+    </section>
+    </div>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsStockCount Count { get; set; } = null!;
+
+    [Parameter] public string? WarehouseCode { get; set; }
+
+    [Parameter] public bool CanClose { get; set; }
+
+    [Parameter] public bool IsManager { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

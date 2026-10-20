@@ -18,6 +18,11 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<CustomerText> T
 
 <CustomerShell Brand="@Brand" Title="@VixlyText.Format(T, "ui.home.hello", "name", Customer.FirstName)" SignedIn="true" Info="@Info" ReturnHere="/customer/">
+    <nav class="customer-home-actions" aria-label="@T["ui.nav"]">
+        <a href="/customer/packages"><Vixly.Shared.UI.Primitives.VxWorkspaceArt Kind="parcel" /><span>@T["ui.nav.packages"]</span><span aria-hidden="true">↗</span></a>
+        <a href="/customer/rates"><Vixly.Shared.UI.Primitives.VxWorkspaceArt Kind="document" /><span>@T["ui.nav.rates"]</span><span aria-hidden="true">↗</span></a>
+        <a href="/customer/tickets"><Vixly.Shared.UI.Primitives.VxWorkspaceArt Kind="support" /><span>@T["ui.nav.tickets"]</span><span aria-hidden="true">↗</span></a>
+    </nav>
     <section class="customer-portal__panel" aria-labelledby="mailbox-title">
         <h2 id="mailbox-title">@T["ui.mailbox.title"]</h2>
         <p class="customer-portal__code">@VixlyText.Format(T, "ui.mailbox.code", "code", Customer.Code ?? string.Empty)</p>
