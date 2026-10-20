@@ -1,0 +1,58 @@
+﻿@*
+=========================================================
+FILE: ControlLoginShell.razor
+PURPOSE: Focused entry document for the Control console.
+RESPONSIBILITIES:
+- Present the sign-in form with branding and language navigation
+IMPORTANT NOTES:
+- Presentation only; existing endpoints, passkeys and form guard are preserved
+- Other authentication screens keep their own shell
+=========================================================
+*@
+@inject IStringLocalizer<PlatformText> T
+<!DOCTYPE html>
+<html lang="@CurrentLang">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex" />
+    <title>@Title · @T["ui.app.name"]</title>
+    <link rel="icon" type="image/png" href="/img/vixly-icon.png" />
+    <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-theme.css" />
+    <link rel="stylesheet" href="/css/vixly.css" />
+    <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-primitives.css" />
+    <link rel="stylesheet" href="/css/control-entry.css?v=20261020-1" />
+    <script src="/js/passkeys.js" defer></script>
+    <script src="/_content/Vixly.Shared.UI/vixly-forms.js" defer></script>
+</head>
+<body class="vx-auth control-entry">
+    <header class="control-entry__bar">
+        <div class="control-entry__brand"><img src="/img/vixly-icon.png" alt="" width="30" height="30" /><span>@T["ui.app.name"]</span></div>
+        <nav class="control-entry__languages" aria-label="@T["ui.language"]">
+            @foreach (string language in new[] { "en", "fr", "es" })
+            {
+                <a href="/culture/@language?returnUrl=@ReturnHere" lang="@language" hreflang="@language" aria-current="@(CurrentLang == language ? "true" : null)">@language.ToUpperInvariant()</a>
+            }
+        </nav>
+    </header>
+    <main id="main-content" class="control-entry__stage" aria-labelledby="vx-page-title">
+        <div class="vx-auth__terminal control-entry__form">
+            <header class="control-entry__heading">
+                <h1 id="vx-page-title">@Title</h1>
+                @if (!string.IsNullOrWhiteSpace(Subtitle)) { <p>@Subtitle</p> }
+            </header>
+            @ChildContent
+            <p class="control-entry__access"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m12 3 8 3v6c0 4-8 9-8 9s-8-5-8-9V6z" /><path d="m8 12 3 3 5-6" /></svg>@T["ui.auth.authorized_only"]</p>
+        </div>
+    </main>
+</body>
+</html>
+
+@code {
+    private string CurrentLang => System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public string ReturnHere { get; set; } = "/sign-in";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}
