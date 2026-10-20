@@ -60,3 +60,80 @@
 .ops-ticket-status { display:inline-flex; padding:.2rem .55rem; border:1px solid var(--vx-color-status-info-border); border-radius:999px; font-size:.7rem; font-weight:650; white-space:nowrap; color:var(--vx-color-status-received); background:var(--vx-color-status-received-bg); }
 .ops-ticket-status[data-status=Answered] { color:var(--vx-color-status-staged); background:var(--vx-color-status-staged-bg); border-color:var(--vx-color-status-warning-border); }
 .ops-ticket-status[data-status=Resolved] { color:var(--vx-color-status-completed); background:var(--vx-color-status-completed-bg); border-color:var(--vx-color-status-success-border); }
+/* Compact records: sections are peers, never independent columns of unequal height. */
+.ops-editor__main > .ops-page-heading { min-height:0; padding:0 0 .7rem; margin-bottom:1rem; }
+.ops-page-heading h1 { font-size:1.6rem; }
+.ops-page-heading > .vx-workspace-art { display:none; }
+.ops-editor__panel { padding:1rem; gap:.75rem; margin-bottom:1rem; }
+.ops-editor__panel :is(input:not([type=checkbox]):not([type=radio]),select) { min-height:38px; padding:.45rem .65rem; }
+.ops-editor__panel .vx-button { min-height:38px; min-width:0; margin-top:0; }
+.ops-editor__panel > .vx-button { grid-column:auto; }
+.ops-editor__main input[type=number] { width:7.5rem; max-width:100%; font-variant-numeric:tabular-nums; }
+.ops-editor__main input:is([name=code],[name=postalCode]) { width:12rem; max-width:100%; }
+.ops-editor__panel:has(>label) { grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr)); max-width:72rem; }
+.ops-editor__panel fieldset { padding:.75rem; }
+.ops-editor__panel fieldset label { margin-block:.25rem; }
+.ops-editor__panel.ops-editor__inline { display:flex; align-items:end; justify-content:flex-start; }
+.ops-editor__panel.ops-editor__inline > h2 { flex-basis:100%; }
+.ops-editor__inline > label { flex:0 1 auto; }
+.ops-editor__inline > label > input:not([type=checkbox]):not([type=radio]) { width:18rem; max-width:100%; }
+.ops-editor__inline > label > input[type=number] { width:7.5rem; }
+.ops-editor__inline > .vx-button { flex:0 0 auto; }
+.ops-editor__empty { min-height:0; padding:1rem; }
+.ops-editor__empty h2 { margin:0; }
+.ops-editor__status { width:max-content; max-width:100%; justify-self:start; flex:0 0 auto; }
+.ops-section-tabs { display:flex; gap:.25rem; flex-wrap:wrap; border-bottom:1px solid var(--vx-color-border); margin-bottom:1rem; }
+.ops-section-tabs > button { font:inherit; font-size:.8125rem; font-weight:550; border:0; border-bottom:2px solid transparent; color:var(--vx-color-text-muted); background:transparent; padding:.65rem 1rem; min-height:40px; cursor:pointer; }
+.ops-section-tabs > button[aria-selected=true] { color:var(--vx-color-primary); border-bottom-color:var(--vx-color-primary); background:var(--vx-color-primary-soft); }
+.ops-compact-tabs.ops-tabs-enhanced { display:block; }
+.ops-compact-tabs > [hidden] { display:none !important; }
+.ops-compact-tabs > [role=tabpanel] { margin:0; max-width:none; }
+.ops-compact-tabs > [role=tabpanel] > h2 { font-size:.875rem; }
+.ops-customer-tabs .ops-record-summary { padding-top:1rem; background:var(--vx-color-surface); border-top:1px solid var(--vx-color-border); }
+.ops-customer-tabs .ops-record-summary dl { display:grid; grid-template-columns:minmax(8rem,.5fr) minmax(0,1fr) minmax(8rem,.5fr) minmax(0,1fr); gap:.6rem 1rem; margin:0; }
+.ops-customer-tabs .ops-record-summary dt { margin:0; font-size:.75rem; letter-spacing:0; text-transform:none; align-self:start; }
+.ops-customer-tabs .ops-record-summary dd { margin:0; font-size:.8125rem; line-height:1.5; overflow-wrap:anywhere; }
+.ops-customer-tabs > form.ops-editor__panel { grid-template-columns:repeat(2,minmax(0,20rem)); justify-content:start; }
+.ops-customer-tabs > form > :is(h2,p) { grid-column:1/-1; }
+.ops-customer-tabs > form label { max-width:26rem; }
+.ops-customer-tabs > form button { justify-self:start; align-self:end; }
+.ops-customer-tabs .ops-incoming { list-style:none; padding:0; margin:0; }
+.ops-customer-tabs .ops-incoming > li { padding:.65rem 0; border-bottom:1px solid var(--vx-color-border); }
+.ops-location-layout .ops-editor__list li { display:flex; flex-wrap:wrap; align-items:center; gap:.35rem 1rem; padding:.7rem 0; }
+.ops-location-layout .ops-editor__list li > a { grid-column:auto; font-size:.8125rem; }
+.ops-location-layout .ops-editor__list li > a:first-child { flex:0 1 20rem; }
+.ops-location-layout .ops-editor__list li > span:nth-child(2) { flex:0 1 12rem; }
+.ops-location-layout .ops-editor__list li > .ops-editor__status { margin-inline-start:auto; }
+.ops-location-layout .ops-editor__panel > p:has(.vx-button) { margin:0; }
+.ops-editor__main[data-section=services] .ops-editor__panel:has(.ops-editor__table) { max-height:none; overflow:visible; }
+.ops-editor__main[data-section=services] fieldset { border:0; padding:0; background:transparent; }
+.ops-editor__main[data-section=services] .ops-editor__table-scroll { max-height:none; }
+.ops-editor__main[data-section=services] .ops-editor__table :is(td,th) { padding:.6rem .75rem; vertical-align:middle; }
+.ops-editor__main[data-section=services] .ops-editor__table input[name^=label_] { width:15rem; max-width:100%; }
+.ops-editor__main[data-section=services] .ops-editor__table input[type=number] { width:6rem; }
+.ops-service-days { display:flex; align-items:center; gap:.4rem; flex-wrap:nowrap; }
+.ops-service-days input[type=number] { width:4.25rem !important; }
+.ops-editor__main[data-section=holds] > .ops-compact-tabs > nav { display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:.8rem; }
+.ops-editor__main[data-section=holds] > .ops-compact-tabs > nav a { padding:.3rem .55rem; border:1px solid var(--vx-color-border); border-radius:.35rem; background:var(--vx-color-surface); text-decoration:none; font-size:.75rem; }
+.ops-editor__main[data-section=holds] > .ops-compact-tabs > nav a[aria-current=page] { border-color:var(--vx-color-primary); background:var(--vx-color-primary-soft); }
+.ops-editor__main[data-section=inspection_setup] .ops-editor__panel > ul:empty { display:none; }
+.ops-editor__main[data-section=shipments] .ops-editor__details { grid-template-columns:9rem minmax(0,1fr) 9rem minmax(0,1fr); gap:.6rem 1rem; }
+@media(max-width:800px) {
+ .ops-customer-tabs .ops-record-summary dl,.ops-editor__main[data-section=shipments] .ops-editor__details { grid-template-columns:8rem minmax(0,1fr); }
+ .ops-customer-tabs > form.ops-editor__panel { grid-template-columns:minmax(0,1fr); }
+ .ops-location-layout .ops-editor__list li > a:first-child { flex-basis:100%; }
+}
+@media(max-width:500px) {
+ .ops-editor__panel { padding:.85rem; }
+ .ops-section-tabs > button { padding:.6rem .7rem; }
+ .ops-customer-tabs .ops-record-summary dl { grid-template-columns:7rem minmax(0,1fr); gap:.65rem; }
+ .ops-editor__main[data-section=shipments] .ops-editor__details { grid-template-columns:minmax(0,1fr); gap:.25rem; }
+ .ops-editor__main[data-section=shipments] .ops-editor__details dd { margin-bottom:.65rem; }
+}
+.ops-editor__main[data-section=inspection] .ops-inspection-entry input { min-height:56px; }
+.ops-editor__main[data-section=inspection] .ops-inspection-entry .vx-button { min-height:56px; }
+@media(min-width:1000px) { .ops-editor__main[data-section=locations] .ops-editor__panel > fieldset:has(input[name=line1]) { grid-template-columns:repeat(3,minmax(0,1fr)); gap:.75rem; } }
+@media(pointer:coarse) { .ops-editor__panel :is(input:not([type=checkbox]):not([type=radio]),select),.ops-editor__panel .vx-button { min-height:44px; } }
+@media(max-width:600px) { .ops-editor__main[data-section=inspection] .ops-inspection-entry .vx-button { min-height:48px; } }
+.ops-tabs-enhanced > [role=tabpanel] > h2 { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.ops-customer-tabs > form.ops-editor__panel { width:fit-content; max-width:100%; }

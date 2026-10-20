@@ -40,11 +40,11 @@ IMPORTANT NOTES:
                             <td><input type="checkbox" name="offered" value="@row.Code" checked="@row.Offered" aria-label="@T["ui.services.offered"]" /></td>
                             <td><strong>@T["ui.services.name." + row.Code]</strong> <span class="ops-editor__hint">@T["ui.services.mode." + row.Mode]</span></td>
                             <td><input name="label_@row.Code" value="@row.Label" maxlength="60" placeholder="@T["ui.services.name." + row.Code]" aria-label="@T["ui.services.label"]" /></td>
-                            <td class="ops-editor__inline">
+                            <td><div class="ops-service-days">
                                 <input type="number" name="min_@row.Code" value="@row.MinDays" min="1" max="365" required aria-label="@T["ui.services.min_days"]" />
                                 <span>–</span>
                                 <input type="number" name="max_@row.Code" value="@row.MaxDays" min="1" max="365" required aria-label="@T["ui.services.max_days"]" />
-                            </td>
+                            </div></td>
                             <td>
                                 @if (row.DivisorAllowed)
                                 {

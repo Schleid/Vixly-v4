@@ -19,10 +19,9 @@ IMPORTANT NOTES:
 
 <EditorShell Title="@Customer.FullName" Company="@Company" Section="customers" Error="@Error" Info="@Info">
     <p><a href="/staff/customers">@T["ui.customers.back"]</a></p>
-    <div class="ops-record-layout" data-editable="@((CanManage || CanSetCredit) ? "true" : "false")">
-    <aside class="ops-record-rail">
+    <div class="ops-customer-tabs ops-compact-tabs" data-section-tabs="customer" data-tabs-label="@T["ui.customers.details"]">
+
     <section class="ops-editor__panel ops-record-summary" aria-labelledby="customer-details">
-        <div class="ops-record-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 22v-3a8 8 0 0 1 16 0v3" /></svg></div>
         <h2 id="customer-details">@T["ui.customers.details"]</h2>
         <dl>
             <dt>@T["ui.customers.code"]</dt><dd>@(Customer.Code ?? T["ui.customers.no_code"])</dd>
@@ -51,8 +50,8 @@ IMPORTANT NOTES:
             </address>
         }
     </section>
-    </aside>
-    <div class="ops-record-workflows">
+
+
     @if (CanManage)
     {
         <form method="post" action="/staff/customers/@Customer.CustomerId" class="ops-editor__panel">
@@ -105,7 +104,6 @@ IMPORTANT NOTES:
             <button type="submit" class="vx-button vx-button--secondary">@(Customer.CreditAllowed ? T["ui.customers.credit_remove"] : T["ui.customers.credit_allow"])</button>
         </form>
     }
-    </div>
     </div>
 </EditorShell>
 

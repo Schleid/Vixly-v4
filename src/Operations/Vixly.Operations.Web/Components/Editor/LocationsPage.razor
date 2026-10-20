@@ -17,7 +17,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.editor.locations.title"]" Company="@Company" Section="locations" Error="@Error" Info="@Info">
-    <div class="ops-location-layout">
+    <div class="ops-location-layout ops-compact-tabs" data-section-tabs="locations" data-tabs-label="@T["ui.editor.locations.title"]">
     <section class="ops-editor__panel" aria-labelledby="branches-title">
         <h2 id="branches-title">@T["ui.editor.branches"]</h2>
         <p><a class="vx-button vx-button--primary" href="/staff/locations/branch">@T["ui.editor.branch.add"]</a></p>
