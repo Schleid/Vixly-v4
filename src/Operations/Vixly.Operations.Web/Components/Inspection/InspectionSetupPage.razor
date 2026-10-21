@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: InspectionSetupPage.razor
 
@@ -20,13 +20,18 @@ IMPORTANT NOTES:
 <EditorShell Title="@T["ui.inspection.setup.title"]" Company="@Company" Section="inspection_setup" Error="@Error" Info="@Info">
     <div class="ops-compact-tabs" data-section-tabs="inspection-rules" data-tabs-label="@T["ui.inspection.setup.title"]">
     <p class="ops-editor__hint">@T["ui.inspection.setup.intro"]</p>
-    <form method="post" action="/staff/inspection/setup/share" class="ops-editor__panel ops-editor__inline">
+    <section class="ops-editor__panel" aria-labelledby="share-title">
+        <h2 id="share-title">@T["ui.inspection.share.title"]</h2>
+        <p class="ops-editor__hint">@T["ui.inspection.share.hint"]</p>
+
+        <form method="post" action="/staff/inspection/setup/share" class="ops-editor__inline-field">
         <AntiforgeryToken />
-        <h2>@T["ui.inspection.share.title"]</h2>
+
         <label>@T["ui.inspection.share.percent"] <input name="percent" type="number" min="0" max="100" step="1" value="@Percent" required /></label>
         <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
-        <p class="ops-editor__hint">@T["ui.inspection.share.hint"]</p>
+
     </form>
+    </section>
     <section class="ops-editor__panel" aria-labelledby="rules-title">
         <h2 id="rules-title">@T["ui.inspection.rules.title"]</h2>
         @if (Rules.Count == 0) { <p>@T["ui.inspection.rules.none"]</p> }
@@ -34,7 +39,7 @@ IMPORTANT NOTES:
             @foreach (OperationsInspectionRule rule in Rules)
             {
                 <li>
-                    <form method="post" action="/staff/inspection/setup/rules" class="ops-editor__inline">
+                    <form method="post" action="/staff/inspection/setup/rules" class="ops-editor__inline-field">
                         <AntiforgeryToken />
                         <input type="hidden" name="rule" value="@rule.Id" />
                         <span>@OperationsInspectionWords.Rule(T, rule, CurrencyCode)</span>
@@ -44,7 +49,7 @@ IMPORTANT NOTES:
                 </li>
             }
         </ul>
-        <form method="post" action="/staff/inspection/setup/rules" class="ops-editor__inline">
+        <form method="post" action="/staff/inspection/setup/rules" class="ops-editor__inline-field">
             <AntiforgeryToken />
             <input type="hidden" name="active" value="true" />
             <label>@T["ui.inspection.rules.kind"]

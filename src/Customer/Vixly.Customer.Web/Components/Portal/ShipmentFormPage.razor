@@ -45,7 +45,7 @@ IMPORTANT NOTES:
                 {
                     <label>@T["ui.shipments.origin"]
                         <select name="origin" required>
-                            @foreach (CustomerChoiceDto origin in choices.Origins) { <option value="@origin.Id">@origin.Name Â· @origin.Detail</option> }
+                            @foreach (CustomerChoiceDto origin in choices.Origins) { <option value="@origin.Id">@origin.Name &middot; @origin.Detail</option> }
                         </select>
                     </label>
                 }
@@ -97,11 +97,11 @@ IMPORTANT NOTES:
                     <legend>@T["ui.shipments.packages_to_add"]</legend>
                     @foreach (CustomerParcelDto parcel in UnplacedParcels)
                     {
-                        <label><input type="checkbox" name="parcels" value="@parcel.ParcelId" checked="@Chosen.Contains(parcel.ParcelId)" /> @parcel.Number Â· @parcel.TrackingNumber Â· @parcel.Warehouse</label>
+                        <label><input type="checkbox" name="parcels" value="@parcel.ParcelId" checked="@Chosen.Contains(parcel.ParcelId)" /> @parcel.Number &middot; @parcel.TrackingNumber &middot; @parcel.Warehouse</label>
                     }
                     @foreach (CustomerPreAlertDto preAlert in UnplacedPreAlerts)
                     {
-                        <label><input type="checkbox" name="preAlerts" value="@preAlert.PreAlertId" checked="@Chosen.Contains(preAlert.PreAlertId)" /> @preAlert.TrackingNumber Â· @preAlert.Carrier Â· @preAlert.Contents @(choices.Origins.Count > 1 ? "Â· " + choices.Origins.FirstOrDefault(origin => origin.Id == preAlert.WarehouseId)?.Name : null)</label>
+                        <label><input type="checkbox" name="preAlerts" value="@preAlert.PreAlertId" checked="@Chosen.Contains(preAlert.PreAlertId)" /> @preAlert.TrackingNumber &middot; @preAlert.Carrier &middot; @preAlert.Contents @(choices.Origins.Count > 1 ? "&middot; " + choices.Origins.FirstOrDefault(origin => origin.Id == preAlert.WarehouseId)?.Name : null)</label>
                     }
                 </fieldset>
             }

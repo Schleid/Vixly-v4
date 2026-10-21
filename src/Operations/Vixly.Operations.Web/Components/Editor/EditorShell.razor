@@ -25,7 +25,7 @@ IMPORTANT NOTES:
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="referrer" content="no-referrer" />
     <meta name="robots" content="noindex" />
-    <title>@Title Â· @Company</title>
+    <title>@Title &middot; @Company</title>
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-theme.css" />
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-primitives.css" />
     <link rel="stylesheet" href="/css/ops-editor.css?v=20261020-2" />
@@ -48,7 +48,7 @@ IMPORTANT NOTES:
             <span class="ops-editor__mark" aria-hidden="true">@Initials</span>
             <span>@Company<small>@L["portal"]</small></span>
         </a>
-        <button type="button" hidden data-nav-close class="ops-editor__nav-close" aria-label="@L["close_menu"]"><span aria-hidden="true">Ã—</span></button>
+        <button type="button" hidden data-nav-close class="ops-editor__nav-close" aria-label="@L["close_menu"]"><span aria-hidden="true">&times;</span></button>
         <OperationsNavigation Section="@Section" />
         <footer class="ops-editor__sidebar-footer">
             <a href="/staff/account" aria-current="@(Section == "account" ? "page" : null)">@T["ui.editor.nav.account"]</a>
@@ -71,14 +71,14 @@ IMPORTANT NOTES:
         <form class="ops-editor__quicksearch" method="get" action="/staff/counter" role="search" data-enhance="false">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input type="search" name="find" id="ops-quick-search" maxlength="100" placeholder="@T["ui.customers.search"]" class="ops-editor__quicksearch-input" aria-label="@T["ui.customers.search"]" />
-            <kbd class="ops-editor__kbd" aria-hidden="true">Ctrl / âŒ˜ K</kbd>
+            <kbd class="ops-editor__kbd" aria-hidden="true">Ctrl / &#x2318; K</kbd>
         </form>
         <div class="ops-editor__topbar-actions">
             <button type="button" class="ops-editor__theme-btn" id="ops-theme-toggle" title="Theme" aria-label="Theme" data-vx-theme-toggle aria-pressed="false">
                 <svg class="vx-theme-icon vx-theme-icon--dark" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 <svg class="vx-theme-icon vx-theme-icon--light" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
             </button>
-            <a href="/" class="ops-editor__site-link">@T["ui.editor.nav.site"] <span aria-hidden="true">â†—</span></a>
+            <a href="/" class="ops-editor__site-link">@T["ui.editor.nav.site"] <span aria-hidden="true">&nearr;</span></a>
         </div>
     </header>
     <main id="main-content" class="ops-editor__main" data-section="@Section" tabindex="-1">

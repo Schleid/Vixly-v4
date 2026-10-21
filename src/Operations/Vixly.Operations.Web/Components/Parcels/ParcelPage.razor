@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: ParcelPage.razor
 
@@ -18,7 +18,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@(Parcel.Number ?? string.Empty)" Company="@Company" Section="parcels" Error="@Error" Info="@Info">
-    <p class="ops-editor__inline"><a href="/staff/parcels">@T["ui.parcels.back"]</a> <a class="vx-button vx-button--secondary" href="/staff/parcels/@Parcel.ParcelId/label" target="_blank" rel="noopener">@T["ui.parcels.print_label"]</a></p>
+    <div class="ops-list-bar__actions" style="margin-bottom: 0.75rem;"><a href="/staff/parcels" class="vx-button vx-button--secondary">@T["ui.parcels.back"]</a> <a class="vx-button vx-button--secondary" href="/staff/parcels/@Parcel.ParcelId/label" target="_blank" rel="noopener">@T["ui.parcels.print_label"]</a></div>
     <div class="ops-record-layout" data-editable="@((CanAssign || CanPutAway) ? "true" : "false")">
     <aside class="ops-record-rail">
     <section class="ops-editor__panel ops-record-summary" aria-labelledby="parcel-details">
@@ -63,7 +63,7 @@ IMPORTANT NOTES:
         Printers="Printers.Where(printer => printer.Media == Vixly.Operations.Domain.Printing.OperationsLabelMedia.ShippingLabel).ToList()" />
     @if (Printers.Any(printer => printer.Media == Vixly.Operations.Domain.Printing.OperationsLabelMedia.IdLabel))
     {
-        <form method="post" action="/staff/parcels/@Parcel.ParcelId/print" class="ops-editor__panel ops-editor__inline">
+        <form method="post" action="/staff/parcels/@Parcel.ParcelId/print" class="ops-editor__panel ops-editor__inline-field">
             <AntiforgeryToken />
             <label>@T["ui.parcels.print_on"]
                 <select name="printer">

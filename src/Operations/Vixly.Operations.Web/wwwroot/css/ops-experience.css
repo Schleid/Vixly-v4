@@ -1,9 +1,9 @@
-﻿/* Screen-specific composition. Access screens never inherit workbench layout selectors. */
+/* Screen-specific composition. Access screens never inherit workbench layout selectors. */
 .ops-editor__main { padding-top:1.65rem; }
 .ops-editor__main > h1 { font-size:2rem; letter-spacing:-.045em; padding-bottom:1rem; border-bottom:1px solid var(--vx-color-border); }
 .ops-editor__panel { border-radius:.6rem; box-shadow:none; }
-.ops-editor__panel > h2 { display:flex; align-items:center; gap:.65rem; letter-spacing:-.015em; }
-.ops-editor__main[data-section] > .ops-editor__panel > h2::before { content:''; width:.25rem; height:1rem; border-radius:.2rem; background:var(--vx-color-primary); }
+.ops-editor__panel > h2 { font-size:.9375rem; font-weight:600; color:var(--vx-color-text); margin:0 0 .75rem 0; letter-spacing:-.01em; }
+
 .ops-record-layout { display:grid; grid-template-columns:minmax(17rem,.8fr) minmax(0,1.7fr); align-items:start; gap:1.25rem; }
 .ops-record-rail,.ops-record-workflows { min-width:0; }
 .ops-record-workflows .ops-editor__panel { max-width:none; }

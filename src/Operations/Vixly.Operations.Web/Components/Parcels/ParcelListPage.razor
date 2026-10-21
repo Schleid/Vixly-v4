@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: ParcelListPage.razor
 
@@ -16,29 +16,34 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@(Unidentified ? T["ui.parcels.unidentified_title"] : T["ui.parcels.title"])" Company="@Company" Section="parcels" Error="@Error">
-    <nav class="ops-editor__inline" aria-label="@T["ui.parcels.views"]">
-        <a href="/staff/parcels" aria-current="@(!Unidentified && !Held ? "page" : null)">@T["ui.parcels.view.all"]</a>
-        <a href="/staff/parcels?held=true" aria-current="@(Held ? "page" : null)">@T["ui.parcels.view.held"]</a>
-        <a href="/staff/parcels/unidentified" aria-current="@(Unidentified ? "page" : null)">@T["ui.parcels.view.unidentified"]</a>
-        <a href="/staff/parcels/incoming">@T["ui.incoming.title"]</a>
-        <a href="/staff/parcels/labels">@T["ui.shipping_label.list_title"]</a>
-        <a href="/staff/parcels/counts">@T["ui.counts.title"]</a>
-        <a href="/staff/tickets">@T["ui.tickets.title"]</a>
+    <nav class="ops-status-chips" aria-label="@T["ui.parcels.views"]">
+        <a href="/staff/parcels" class="ops-status-chip" aria-current="@(!Unidentified && !Held ? "page" : null)"><span>@T["ui.parcels.view.all"]</span></a>
+        <a href="/staff/parcels?held=true" class="ops-status-chip" aria-current="@(Held ? "page" : null)"><span>@T["ui.parcels.view.held"]</span></a>
+        <a href="/staff/parcels/unidentified" class="ops-status-chip" aria-current="@(Unidentified ? "page" : null)"><span>@T["ui.parcels.view.unidentified"]</span></a>
+        <a href="/staff/parcels/incoming" class="ops-status-chip"><span>@T["ui.incoming.title"]</span></a>
+        <a href="/staff/parcels/labels" class="ops-status-chip"><span>@T["ui.shipping_label.list_title"]</span></a>
+        <a href="/staff/parcels/counts" class="ops-status-chip"><span>@T["ui.counts.title"]</span></a>
+        <a href="/staff/tickets" class="ops-status-chip"><span>@T["ui.tickets.title"]</span></a>
     </nav>
-    <form method="get" action="@BasePath" class="ops-editor__inline ops-editor__search">
+    <form method="get" action="@BasePath" class="ops-list-bar">
         @if (Held) { <input type="hidden" name="held" value="true" /> }
-        <input name="search" value="@Search" placeholder="@T["ui.parcels.search"]" aria-label="@T["ui.parcels.search"]" maxlength="60" autocomplete="off" />
+        <div class="ops-list-bar__search">
+            <input name="search" value="@Search" placeholder="@T["ui.parcels.search"]" aria-label="@T["ui.parcels.search"]" maxlength="60" autocomplete="off" />
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.search_submit"]</button>
+        </div>
         @if (Warehouses.Count > 1)
         {
-            <select name="warehouse" aria-label="@T["ui.receiving.warehouse"]">
+            <div class="ops-list-bar__filters">
+                <select name="warehouse" aria-label="@T["ui.receiving.warehouse"]">
                 <option value="">@T["ui.parcels.all_warehouses"]</option>
                 @foreach (OperationsWarehouse warehouse in Warehouses)
                 {
                     <option value="@warehouse.Id" selected="@(warehouse.Id == WarehouseId)">@warehouse.Code</option>
                 }
-            </select>
+                </select>
+            </div>
         }
-        <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.search_submit"]</button>
+
     </form>
     <section class="ops-editor__panel">
         @if (Unidentified) { <p class="ops-editor__hint">@T["ui.parcels.unidentified_hint"]</p> }
@@ -70,9 +75,10 @@ IMPORTANT NOTES:
             </OperationsTableViewport>
         }
         <p class="ops-editor__list-footer">@VixlyText.Format(T, "ui.parcels.count", "count", TotalCount)</p>
-        <nav class="ops-editor__inline" aria-label="@T["ui.customers.pages"]">
-            @if (Page > 1) { <a href="@PageLink(Page - 1)">@T["ui.customers.previous"]</a> }
-            @if (Page * PageSize < TotalCount) { <a href="@PageLink(Page + 1)">@T["ui.customers.next"]</a> }
+        <nav class="ops-list-pager" aria-label="@T["ui.customers.pages"]">
+            @if (Page > 1) { <a href="@PageLink(Page - 1)" class="vx-button vx-button--secondary">@T["ui.customers.previous"]</a> }
+            <span>@Page</span>
+            @if (Page * PageSize < TotalCount) { <a href="@PageLink(Page + 1)" class="vx-button vx-button--secondary">@T["ui.customers.next"]</a> }
         </nav>
     </section>
 </EditorShell>

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: SupplyStockForms.razor
 
@@ -23,9 +23,11 @@ IMPORTANT NOTES:
         <input type="hidden" name="warehouse" value="@WarehouseId" />
         <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
         <SupplyLinesFields T="T" Supplies="Supplies" WithCost="true" />
-        <label>@T["ui.supplies.stock.supplier"] <input name="supplier" maxlength="@OperationsSupplyStockLimits.SupplierMaxLength" /></label>
-        <label>@T["ui.supplies.stock.reference"] <input name="reference" maxlength="@OperationsSupplyStockLimits.ReferenceMaxLength" /></label>
-        <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.stock.receive_save"]</button>
+        <label class="ops-editor__form-span-3">@T["ui.supplies.stock.supplier"] <input name="supplier" maxlength="@OperationsSupplyStockLimits.SupplierMaxLength" /></label>
+        <label class="ops-editor__form-span-3">@T["ui.supplies.stock.reference"] <input name="reference" maxlength="@OperationsSupplyStockLimits.ReferenceMaxLength" /></label>
+        <div class="ops-editor__form-actions">
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.stock.receive_save"]</button>
+        </div>
     </form>
 </section>
 <section class="ops-editor__panel" data-tab-label="@T["ui.supplies.stock.adjust"]" aria-labelledby="stock-adjust">
@@ -34,20 +36,22 @@ IMPORTANT NOTES:
         <AntiforgeryToken />
         <input type="hidden" name="warehouse" value="@WarehouseId" />
         <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
-        <label>@T["ui.supplies.stock.supply"]
+        <label class="ops-editor__form-span-3">@T["ui.supplies.stock.supply"]
             <select name="supply" required>
                 @foreach (OperationsSupply supply in Supplies) { <option value="@supply.Id">@supply.Code · @supply.Name(Language)</option> }
             </select>
         </label>
-        <label>@T["ui.supplies.stock.adjust_quantity"] <input name="quantity" inputmode="numeric" required autocomplete="off" /></label>
+        <label class="ops-editor__form-span-3">@T["ui.supplies.stock.adjust_quantity"] <input name="quantity" inputmode="numeric" required autocomplete="off" /></label>
         <p class="ops-editor__hint">@T["ui.supplies.stock.adjust_hint"]</p>
-        <label>@T["ui.supplies.stock.reason"]
+        <label class="ops-editor__form-span-3">@T["ui.supplies.stock.reason"]
             <select name="reason" required>
                 @foreach (OperationsSupplyAdjustReason reason in Enum.GetValues<OperationsSupplyAdjustReason>()) { <option value="@reason">@T["ui.supplies.reason." + reason]</option> }
             </select>
         </label>
-        <label>@T["ui.supplies.stock.note"] <input name="note" maxlength="@OperationsSupplyStockLimits.NoteMaxLength" /></label>
-        <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.stock.adjust_save"]</button>
+        <label class="ops-editor__form-span-3">@T["ui.supplies.stock.note"] <input name="note" maxlength="@OperationsSupplyStockLimits.NoteMaxLength" /></label>
+        <div class="ops-editor__form-actions">
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.stock.adjust_save"]</button>
+        </div>
     </form>
 </section>
 @if (AllWarehouses.Count(item => item.Id != WarehouseId && item.Status == OperationsLocationStatus.Active) > 0)
@@ -58,14 +62,16 @@ IMPORTANT NOTES:
             <AntiforgeryToken />
             <input type="hidden" name="warehouse" value="@WarehouseId" />
             <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
-            <label>@T["ui.supplies.stock.send_to"]
+            <label class="ops-editor__form-span-3">@T["ui.supplies.stock.send_to"]
                 <select name="to" required>
                     @foreach (OperationsWarehouse other in AllWarehouses.Where(item => item.Id != WarehouseId && item.Status == OperationsLocationStatus.Active)) { <option value="@other.Id">@other.Code · @other.Name</option> }
                 </select>
             </label>
+            <label class="ops-editor__form-span-3">@T["ui.supplies.stock.note"] <input name="note" maxlength="@OperationsSupplyStockLimits.NoteMaxLength" /></label>
             <SupplyLinesFields T="T" Supplies="Supplies" />
-            <label>@T["ui.supplies.stock.note"] <input name="note" maxlength="@OperationsSupplyStockLimits.NoteMaxLength" /></label>
-            <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.stock.send_save"]</button>
+            <div class="ops-editor__form-actions">
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.stock.send_save"]</button>
+            </div>
         </form>
     </section>
 }

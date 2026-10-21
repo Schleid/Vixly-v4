@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: CompanyPage.razor
 
@@ -20,12 +20,34 @@ IMPORTANT NOTES:
 
 <EditorShell Title="@T["ui.company.title"]" Company="@Company" Section="company" Error="@Error" Info="@Info">
     <CompanyTabs Current="profile" />
-    <section class="ops-editor__panel">
-        <h2>@T["ui.company.legal"]</h2>
-        <p><strong>@View.Company.Details.LegalName</strong> @(View.Company.Details.TradingName is { Length: > 0 } trading ? "· " + trading : null)</p>
-        <p>@View.Company.Details.Email · @View.Company.Details.Phone</p>
-        <p>@Address(View.Company.Details.Address)</p>
-        <p class="ops-editor__hint">@VixlyText.Format(T, "ui.company.code", "code", View.Company.TenantCode)</p>
+    <section class="ops-editor__panel" aria-labelledby="company-legal-title">
+        <h2 id="company-legal-title">@T["ui.company.legal"]</h2>
+        <dl class="ops-facts-grid">
+            <div class="ops-facts-grid__item ops-facts-grid__item--span2">
+                <dt>@T["ui.company.legal_name"]</dt>
+                <dd><strong>@View.Company.Details.LegalName</strong> @(View.Company.Details.TradingName is { Length: > 0 } trading ? "(" + trading + ")" : null)</dd>
+            </div>
+            <div class="ops-facts-grid__item">
+                <dt>@T["ui.editor.email"]</dt>
+                <dd>@View.Company.Details.Email</dd>
+            </div>
+            <div class="ops-facts-grid__item">
+                <dt>@T["ui.company.phone"]</dt>
+                <dd>@View.Company.Details.Phone</dd>
+            </div>
+            <div class="ops-facts-grid__item ops-facts-grid__item--span2">
+                <dt>@T["ui.editor.address.line1"]</dt>
+                <dd>@Address(View.Company.Details.Address)</dd>
+            </div>
+            <div class="ops-facts-grid__item">
+                <dt>@T["ui.company.code"]</dt>
+                <dd><code>@View.Company.TenantCode</code></dd>
+            </div>
+        </dl>
+         
+
+
+
         <p class="ops-editor__hint">@T["ui.company.legal_hint"]</p>
     </section>
 
@@ -65,7 +87,7 @@ IMPORTANT NOTES:
         }
     </form>
 
-    <section class="ops-editor__panel">
+    <section class="ops-editor__panel" aria-labelledby="company-legal-title">
         <h2>@T["ui.company.change"]</h2>
         @if (View.Change is { } change)
         {

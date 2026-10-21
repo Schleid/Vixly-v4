@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: LegalPage.razor
 
@@ -20,7 +20,10 @@ IMPORTANT NOTES:
     <CompanyTabs Current="legal" />
     @if (Status is null || Status.Terms is null || Status.Status is "accepted" or "not_required")
     {
-        <section class="ops-editor__panel"><p>@T["ui.legal.nothing"]</p></section>
+        <section class="ops-editor__panel" aria-labelledby="legal-status-title">
+            <h2 id="legal-status-title">@T["ui.legal.title"]</h2>
+            <p class="ops-editor__hint">@T["ui.legal.nothing"]</p>
+        </section>
     }
     else
     {

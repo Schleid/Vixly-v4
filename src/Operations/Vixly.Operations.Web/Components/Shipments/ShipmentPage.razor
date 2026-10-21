@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: ShipmentPage.razor
 
@@ -60,7 +60,7 @@ IMPORTANT NOTES:
     </section>
     @if (CanChangeService && Services.Count > 0)
     {
-        <form method="post" action="/staff/shipments/@Shipment.Id/service" class="ops-editor__panel ops-editor__inline ops-panel--restricted">
+        <form method="post" action="/staff/shipments/@Shipment.Id/service" class="ops-editor__panel ops-editor__inline-field ops-panel--restricted">
             <AntiforgeryToken />
             <label>@T["ui.shipments_desk.change_service"]
                 <select name="service" required>

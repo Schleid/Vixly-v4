@@ -135,8 +135,8 @@
  .ops-editor__main[data-section=shipments] .ops-editor__details { grid-template-columns:minmax(0,1fr); gap:.25rem; }
  .ops-editor__main[data-section=shipments] .ops-editor__details dd { margin-bottom:.65rem; }
 }
-.ops-editor__main[data-section=inspection] .ops-inspection-entry input { min-height:56px; }
-.ops-editor__main[data-section=inspection] .ops-inspection-entry .vx-button { min-height:56px; }
+.ops-editor__main[data-section=inspection] .ops-inspection-entry input { min-height:48px; height:48px; box-sizing:border-box; }
+.ops-editor__main[data-section=inspection] .ops-inspection-entry .vx-button { min-height:48px; height:48px; box-sizing:border-box; }
 @media(min-width:1000px) { .ops-editor__main[data-section=locations] .ops-editor__panel > fieldset:has(input[name=line1]) { grid-template-columns:repeat(3,minmax(0,1fr)); gap:.75rem; } }
 @media(pointer:coarse) { .ops-editor__panel :is(input:not([type=checkbox]):not([type=radio]),select),.ops-editor__panel .vx-button { min-height:44px; } }
 @media(max-width:600px) { .ops-editor__main[data-section=inspection] .ops-inspection-entry .vx-button { min-height:48px; } }
