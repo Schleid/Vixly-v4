@@ -1,0 +1,206 @@
+@*
+=========================================================
+FILE: CounterShipmentPage.razor
+
+PURPOSE:
+A shipment at the counter: its parcels against the count, the amount, and the next parcel (Slice 5C, C-2, C-7 and C-8).
+
+RESPONSIBILITIES:
+- One line about the shipment and its customer; the parcels entered with their labels
+- The next parcel on one row: weight, length, width, height, contents, value
+- The amount so far while parcels are entered; the amount fixed once it is final
+- Correct the count of a shipment made at the counter before its first parcel
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Weight and size in the company's units, the value in its currency; parcels are added only where the clerk serves
+- The last parcel makes the shipment final: nothing changes after that (owner, 2026-10-20)
+- Styling: listed in docs/operations/UI-STYLING-INVENTORY.md
+=========================================================
+*@
+@using Vixly.Operations.Web.Components.Charges
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@(Shipment.Number ?? T["ui.counter.no_number"].Value)" Company="@Company" Section="counter" Error="@Error" Info="@Info">
+    @* The whole page in the main column, so the shipment estimate beside it stays in view and centred from the top of the page (owner, 2026-10-20). *@
+    <div class="ops-counter__layout">
+        <div class="ops-counter__main">
+    <CounterFindBar />
+    <CounterCustomerCard Customer="Customer" Standing="Standing" Link="true" />
+    <dl class="ops-counter__shipment" data-status="@(Shipment.Status == OperationsShipmentStatus.Booked ? "booked" : "open")">
+        <div><dt>@T["ui.counter.route"]</dt><dd>@Shipment.Origin → @(Shipment.Destination ?? "—")@(Shipment.HomeDelivery ? " · " + T["ui.counter.home"].Value : null)</dd></div>
+        <div><dt>@T["ui.counter.service"]</dt><dd>@(Shipment.ServiceCode is { } service ? T["ui.services.name." + service].Value : "—")</dd></div>
+        <div><dt>@T["ui.counter.recipient"]</dt><dd>@Shipment.RecipientName</dd></div>
+        <div><dt>@T["ui.counter.parcels"]</dt><dd><strong>@VixlyText.Format(T, "ui.counter.parcels_of", new Dictionary<string, object> { ["entered"] = Parcels.Count, ["count"] = Shipment.ParcelCount?.ToString(CultureInfo.CurrentCulture) ?? "—" })</strong></dd></div>
+        <div><dt>@T["ui.counter.status"]</dt><dd><strong>@(Shipment.Status == OperationsShipmentStatus.Booked ? T["ui.counter.status.booked"].Value : T["ui.counter.status.open"].Value)</strong></dd></div>
+        @* Owner, 2026-10-20: close the shipment and go back to the customer's shipments. *@
+        <a class="vx-button vx-button--secondary ops-counter__close" href="/staff/counter/customers/@Customer.Id" accesskey="x">@T["ui.counter.close_shipment"]</a>
+    </dl>
+            <section class="ops-editor__panel" aria-labelledby="counter-parcels">
+                <h2 id="counter-parcels">@T["ui.counter.parcels"]</h2>
+                @if (CanAdd)
+                {
+                    <form method="post" action="/staff/counter/shipments/@Shipment.Id/parcels" class="ops-editor__inline ops-counter__parcel">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="key" value="@Key" />
+                        <label>@VixlyText.Format(T, "ui.counter.weight", "unit", Weight) <input name="weight" inputmode="decimal" required size="6" autofocus value="@Shown(Entered?.Weight)" /></label>
+                        <label>@VixlyText.Format(T, "ui.counter.length", "unit", Length) <input name="length" inputmode="decimal" required size="5" value="@Shown(Entered?.Length)" /></label>
+                        <label>@VixlyText.Format(T, "ui.counter.width", "unit", Length) <input name="width" inputmode="decimal" required size="5" value="@Shown(Entered?.Width)" /></label>
+                        <label>@VixlyText.Format(T, "ui.counter.height", "unit", Length) <input name="height" inputmode="decimal" required size="5" value="@Shown(Entered?.Height)" /></label>
+                        <label>@T["ui.counter.contents"] <input name="contents" maxlength="200" required size="28" value="@Entered?.Contents" /></label>
+                        <label>@VixlyText.Format(T, "ui.counter.value", "currency", CurrencyCode) <input name="value" inputmode="decimal" required size="8" value="@Shown(Entered?.Value)" /></label>
+                        <button type="submit" class="vx-button vx-button--primary">@T["ui.counter.add_parcel"]</button>
+                    </form>
+                }
+                else if (Shipment.Status == OperationsShipmentStatus.Booked)
+                {
+                    <p class="ops-editor__hint">@T["ui.counter.booked_hint"]</p>
+                    <CounterInvoiceNote T="T" Invoice="Invoice" />
+                }
+                @if (Parcels.Count > 0)
+                {
+                    <OperationsTableViewport Label="@T["ui.counter.parcels"]">
+                        <table class="ops-editor__table">
+                            <thead><tr><th scope="col">@T["ui.counter.parcel"]</th><th scope="col" class="ops-editor__number">@VixlyText.Format(T, "ui.counter.weight", "unit", Weight)</th><th scope="col">@VixlyText.Format(T, "ui.counter.size", "unit", Length)</th><th scope="col">@T["ui.counter.contents"]</th><th scope="col" class="ops-editor__number">@VixlyText.Format(T, "ui.counter.value", "currency", CurrencyCode)</th><th scope="col">@T["ui.counter.label"]</th></tr></thead>
+                            <tbody>
+                                @foreach (OperationsParcel parcel in Parcels)
+                                {
+                                    <tr>
+                                        <td>@parcel.Number</td>
+                                        <td class="ops-editor__number">@(parcel.WeightKg is { } kg ? OperationsUnits.ToShownWeight(kg, WeightUnit).ToString("0.##", CultureInfo.CurrentCulture) : "—")</td>
+                                        <td>@Size(parcel)</td>
+                                        <td>@parcel.DeclaredContents</td>
+                                        <td class="ops-editor__number">@(parcel.DeclaredValue?.ToString("N2", CultureInfo.CurrentCulture))</td>
+                                        <td><a href="/staff/parcels/@parcel.Id/label" download>@T["ui.counter.print_label"]</a></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </OperationsTableViewport>
+                }
+                @if ((Shipment.ParcelCount is null || (Shipment.CreatedAtCounter && Parcels.Count == 0)) && Shipment.Status == OperationsShipmentStatus.Open && Shipment.CanServe)
+                {
+                    <form method="post" action="/staff/counter/shipments/@Shipment.Id/count" class="ops-editor__inline ops-counter__count-form">
+                        <AntiforgeryToken />
+                        <label>@T["ui.counter.parcel_count"] <input name="parcelCount" type="number" inputmode="numeric" min="1" max="99" step="1" required size="3" value="@Shipment.ParcelCount" /></label>
+                        <button type="submit" class="vx-button">@T["ui.counter.change_count"]</button>
+                    </form>
+                }
+            </section>
+        @* Slice 5E (S-11 to S-13): supplies while the shipment is processed; none once it is final. *@
+        @if (Supplies is not null || (Shipment.CanServe && Shipment.Status == OperationsShipmentStatus.Open))
+        {
+            <CounterSuppliesPanel T="T" Sale="Supplies" AddAction="@("/staff/counter/shipments/" + Shipment.Id + "/supplies")" ShipmentId="Shipment.Id"
+                Changeable="@(Shipment.CanServe && Shipment.Status == OperationsShipmentStatus.Open)" Hint="@T["ui.counter.supplies.before_last"].Value" />
+        }
+        @* Slice 5D: the insurance the customer chose, and another one at the counter when the company allows it. *@
+        <section class="ops-editor__panel ops-counter__insurance-panel" aria-labelledby="counter-insurance">
+            <h2 id="counter-insurance">@T["ui.counter.insurance"]</h2>
+            <p>
+                @if (Chosen is { } chosen) { <strong>@chosen.Name</strong> } else if (Shipment.Insured) { <strong>@T["ui.counter.insured"]</strong> } else { <strong>@T["ui.counter.insurance_none"]</strong> }
+            </p>
+            @* Slice 5D (D-8): the customer signs the printed page, or on screen. *@
+            <div class="ops-counter__sign">
+                <p>
+                    <a class="vx-button vx-button--secondary" href="/staff/counter/shipments/@Shipment.Id/declaration" target="_blank" rel="noopener">@T["ui.counter.print_to_sign"]</a>
+                    @if (Shipment.CustomerSignedUtc is { } signed) { <span class="ops-counter__signed">@VixlyText.Format(T, "ui.counter.signed_on", "date", signed.ToLocalTime().ToString("g", CultureInfo.CurrentCulture))</span> }
+                </p>
+                @* Only while open (review of 5D): once booked, the signed page is the one the shipment left with. *@
+                @if (Shipment.CanServe && Shipment.Status == OperationsShipmentStatus.Open)
+                {
+                    <form method="post" action="/staff/counter/shipments/@Shipment.Id/signature" class="ops-counter__pad" data-signature-pad>
+                        <AntiforgeryToken />
+                        <input type="hidden" name="signature" />
+                        <p class="ops-editor__hint">@T["ui.counter.sign_here"]</p>
+                        <canvas width="600" height="160" aria-label="@T["ui.counter.sign_here"]"></canvas>
+                        <p>
+                            <button type="button" class="vx-button vx-button--secondary" data-signature-clear>@T["ui.counter.sign_clear"]</button>
+                            <button type="submit" class="vx-button vx-button--primary">@T["ui.counter.sign_save"]</button>
+                        </p>
+                    </form>
+                    <script src="/js/ops-signature.js?v=20261020-1" defer></script>
+                }
+            </div>
+            @if (CanChangeInsurance)
+            {
+                <form method="post" action="/staff/counter/shipments/@Shipment.Id/insurance" class="ops-editor__form">
+                    <AntiforgeryToken />
+                    <InsuranceChoice Legend="ui.counter.insurance_other" Products="Insurance" Selected="@Shipment.InsurancePlanId" Currency="@CurrencyCode" UtcNow="UtcNow" Premiums="Premiums" BaseTotal="BaseTotal" />
+                    <p><button type="submit" class="vx-button vx-button--primary">@T["ui.counter.insurance_change"]</button></p>
+                </form>
+            }
+        </section>
+        </div>
+        <div class="ops-counter__side">
+            <EstimatePanel Estimate="Panel" WeightUnit="WeightUnit" DimensionUnit="DimensionUnit" Final="@Shipment.BookedTotal" />
+            <script src="/js/ops-counter-side.js?v=20261020-1" defer></script>
+        </div>
+    </div>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsCounterCustomer Customer { get; set; } = null!;
+
+    [Parameter] public OperationsCounterShipment Shipment { get; set; } = null!;
+
+    // Slice 5E: the supplies added to it.
+    [Parameter] public OperationsSupplySale? Supplies { get; set; }
+
+    [Parameter] public OperationsCounterStanding Standing { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Charges.OperationsInsurancePlan> Insurance { get; set; } = Array.Empty<Vixly.Operations.Domain.Charges.OperationsInsurancePlan>();
+
+    [Parameter] public IReadOnlyDictionary<Guid, decimal?>? Premiums { get; set; }
+
+    [Parameter] public decimal? BaseTotal { get; set; }
+
+    [Parameter] public bool StaffMayChangeInsurance { get; set; }
+
+    // Slice 5D: the shipment estimate beside the page.
+    [Parameter] public Vixly.Operations.Application.Charges.OperationsEstimate? Panel { get; set; }
+
+    [Parameter] public DateTimeOffset UtcNow { get; set; }
+
+    // Slice 5F: its invoice once final.
+    [Parameter] public Vixly.Operations.Domain.Billing.OperationsInvoice? Invoice { get; set; }
+
+    private Vixly.Operations.Domain.Charges.OperationsInsurancePlan? Chosen => Shipment.InsurancePlanId is { } id ? Insurance.FirstOrDefault(product => product.Id == id) : null;
+
+    private bool CanChangeInsurance => StaffMayChangeInsurance && Insurance.Count > 0 && Standing.Good && Shipment.CanServe && Shipment.HasInstructions
+        && Shipment.Status == OperationsShipmentStatus.Open;
+
+    [Parameter] public IReadOnlyList<OperationsParcel> Parcels { get; set; } = Array.Empty<OperationsParcel>();
+
+    [Parameter] public Vixly.Operations.Application.Charges.OperationsRating? Estimate { get; set; }
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
+
+    [Parameter] public OperationsDimensionUnit DimensionUnit { get; set; }
+
+    [Parameter] public Vixly.Operations.Application.UseCases.Counter.AddOperationsCounterParcel.AddOperationsCounterParcelRequest? Entered { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    // The form's reference: the same parcel sent twice is entered once (ADR-0019).
+    private readonly string Key = Guid.NewGuid().ToString("N");
+
+    private bool CanAdd => Standing.Good && Shipment.CanServe && Shipment.Status == OperationsShipmentStatus.Open && Shipment.HasInstructions
+        && Shipment.ParcelCount is { } count && Parcels.Count < count;
+
+    private string Weight => WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg";
+
+    private string Length => DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm";
+
+    private static string? Shown(decimal? value) => value?.ToString(CultureInfo.InvariantCulture);
+
+    private string Size(OperationsParcel parcel) =>
+        parcel.LengthCm is { } length && parcel.WidthCm is { } width && parcel.HeightCm is { } height
+            ? string.Join(" × ", new[] { length, width, height }.Select(side => OperationsUnits.ToShownLength(side, DimensionUnit).ToString("0.#", CultureInfo.CurrentCulture)))
+            : "—";
+}

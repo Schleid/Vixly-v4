@@ -1,0 +1,50 @@
+﻿@*
+=========================================================
+FILE: SupplyStockSettingsPanel.razor
+
+PURPOSE:
+The company's supplies stock settings (Slice 5E, S-9), on the supplies page.
+
+RESPONSIBILITIES:
+- Count the stock or not
+- Selling at the counter with no stock left: allow with a warning, or refuse
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- ops.charges.configure
+=========================================================
+*@
+<section class="ops-editor__panel" aria-labelledby="supplies-settings">
+    <h2 id="supplies-settings">@T["ui.supplies.settings.title"]</h2>
+    <form method="post" action="/staff/supplies/settings" class="ops-editor__form">
+        <AntiforgeryToken />
+        <label><input type="checkbox" name="count" value="true" checked="@CountsStock" /> @T["ui.supplies.settings.count"]</label>
+        <p class="ops-editor__hint">@T["ui.supplies.settings.count_hint"]</p>
+        <fieldset>
+            <legend>@T["ui.supplies.settings.stock_out"]</legend>
+            @foreach (OperationsSupplyStockOut choice in Enum.GetValues<OperationsSupplyStockOut>())
+            {
+                <label><input type="radio" name="stock_out" value="@choice" checked="@(StockOut == choice)" /> @T["ui.supplies.settings.stock_out." + choice]</label>
+            }
+        </fieldset>
+        <fieldset>
+            <legend>@T["ui.supplies.settings.discounts"]</legend>
+            <label><input type="checkbox" name="discounts" value="true" checked="@(Settings?.SupplyDiscountsAllowed ?? true)" /> @T["ui.supplies.settings.discounts_allowed"]</label>
+            <label>@T["ui.supplies.settings.discount_line"] <input name="discount_line" inputmode="decimal" size="6" value="@((Settings?.SupplyDiscountLinePercent ?? 10m).ToString("0.##", CultureInfo.InvariantCulture))" />%</label>
+            <label>@T["ui.supplies.settings.discount_order"] <input name="discount_order" inputmode="decimal" size="6" value="@((Settings?.SupplyDiscountOrderPercent ?? 10m).ToString("0.##", CultureInfo.InvariantCulture))" />%</label>
+            <label><input type="checkbox" name="discount_reason" value="true" checked="@(Settings?.SupplyDiscountReasonRequired ?? true)" /> @T["ui.supplies.settings.discount_reason"]</label>
+            <p class="ops-editor__hint">@T["ui.supplies.settings.discounts_hint"]</p>
+        </fieldset>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+    </form>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public bool CountsStock { get; set; } = true;
+
+    [Parameter] public OperationsSupplyStockOut StockOut { get; set; } = OperationsSupplyStockOut.AllowWithWarning;
+
+    [Parameter] public Vixly.Operations.Domain.Settings.OperationsTenantSettings? Settings { get; set; }
+}

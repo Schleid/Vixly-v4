@@ -39,6 +39,8 @@ public static class PlatformApiRateLimits
 
     public const string PaymentCheckout = "payments-checkout";
 
+    public const string Leads = "public-leads";
+
     public static IServiceCollection AddPlatformApiRateLimits(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
@@ -55,6 +57,7 @@ public static class PlatformApiRateLimits
             AddPerIp(options, Webhook, 600, TimeSpan.FromMinutes(1));
             AddPerIp(options, PaymentLinkView, 60, TimeSpan.FromHours(1));
             AddPerIp(options, PaymentCheckout, 20, TimeSpan.FromHours(1));
+            AddPerIp(options, Leads, 5, TimeSpan.FromHours(1));
         });
 
         return services;
@@ -63,7 +66,7 @@ public static class PlatformApiRateLimits
     private static void AddPerIp(RateLimiterOptions options, string name, int permits, TimeSpan window)
     {
         options.AddPolicy(name, context => RateLimitPartition.GetFixedWindowLimiter(
-            context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            Vixly.Platform.Api.Internal.PlatformClientAddress.Of(context) ?? "unknown",
             _ => new FixedWindowRateLimiterOptions
             {
                 PermitLimit = permits,

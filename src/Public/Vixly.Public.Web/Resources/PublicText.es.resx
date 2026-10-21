@@ -1084,4 +1084,8 @@
     <value>Demasiados intentos. Espere un momento y vuelva a intentarlo.</value>
     <comment>needs-review</comment>
   </data>
+  <data name="public.bot_check.required" xml:space="preserve">
+    <value>Complete la verificación de seguridad antes de enviar.</value>
+    <comment>needs-review</comment>
+  </data>
 </root>

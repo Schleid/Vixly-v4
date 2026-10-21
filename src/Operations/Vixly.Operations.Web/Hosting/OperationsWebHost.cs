@@ -43,12 +43,15 @@ public static class OperationsWebHost
         builder.Services.AddOptions<OperationsHostingOptions>().Bind(builder.Configuration.GetSection(OperationsHostingOptions.SectionName));
         builder.Services.AddHostedService<OperationsOutboxWorker>();
         builder.Services.AddHostedService<OperationsPlatformFeedWorker>();
+        builder.Services.AddSingleton<OperationsUnclaimedWorker>();
+        builder.Services.AddHostedService(provider => provider.GetRequiredService<OperationsUnclaimedWorker>());
 
         if (builder.Environment.IsDevelopment())
         {
             builder.Services.AddOptions<OperationsDemoDataOptions>().Bind(builder.Configuration.GetSection(OperationsDemoDataOptions.SectionName));
             builder.Services.AddHostedService<OperationsDemoDataWorker>();
             builder.Services.AddScoped<OperationsDemoStaffSeeder>();
+            builder.Services.AddTransient<OperationsDemoScenario>();
             builder.Services.AddOperationsDevelopmentCustomerProxy(builder.Configuration);
         }
         builder.Services.AddOperationsRateLimits();
@@ -56,6 +59,7 @@ public static class OperationsWebHost
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<IOperationsRequestMetadata, OperationsHttpRequestMetadata>();
         builder.Services.AddScoped<OperationsErrorText>();
+        builder.Services.AddScoped<Vixly.Operations.Web.Security.OperationsAllowed>();
         builder.Services.AddScoped<StaffPages>();
         builder.Services.AddAuthentication(OperationsSessionAuthenticationHandler.SchemeName)
             .AddScheme<AuthenticationSchemeOptions, OperationsSessionAuthenticationHandler>(OperationsSessionAuthenticationHandler.SchemeName, null);
@@ -115,6 +119,33 @@ public static class OperationsWebHost
         app.MapOperationsSettingsEndpoints();
         app.MapOperationsCompanyEndpoints();
         app.MapOperationsCustomerEndpoints();
+        app.MapOperationsParcelEndpoints();
+        app.MapOperationsIncomingEndpoints();
+        app.MapOperationsShippingLabelEndpoints();
+        app.MapOperationsStockCountEndpoints();
+        app.MapOperationsTicketEndpoints();
+        app.MapOperationsCounterEndpoints();
+        app.MapOperationsCounterSupplyEndpoints();
+        app.MapOperationsShipmentEndpoints();
+        app.MapOperationsInsuranceEndpoints();
+        app.MapOperationsReceivingEndpoints();
+        app.MapOperationsInspectionEndpoints();
+        app.MapOperationsInspectionWorkEndpoints();
+        app.MapOperationsChargesEndpoints();
+        app.MapOperationsQuotesEndpoints();
+        app.MapOperationsSupplyEndpoints();
+        app.MapOperationsInvoiceEndpoints();
+        app.MapOperationsSupplyStockEndpoints();
+        app.MapOperationsPrinterEndpoints();
+        app.MapOperationsPrintAgentEndpoints();
+        // Any method: a failed form post comes back here as a post (2026-10-18).
+        app.MapVixlyErrorPage(
+            http =>
+            {
+                Microsoft.Extensions.Localization.IStringLocalizer<Vixly.Operations.Resources.OperationsText> text = http.RequestServices.GetRequiredService<Microsoft.Extensions.Localization.IStringLocalizer<Vixly.Operations.Resources.OperationsText>>();
+                return new VixlyErrorPageText(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, text["ui.error.title"], text["ui.error.body"], text["ui.error.back"], http.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerPathFeature>()?.Path.StartsWith("/staff", StringComparison.Ordinal) == true ? "/staff" : "/");
+            },
+            "/css/ops-status.css");
         app.MapRazorComponents<App>();
 
         return app;

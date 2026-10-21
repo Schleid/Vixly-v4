@@ -50,7 +50,7 @@ public sealed class PlatformOutboxWorker : BackgroundService
             try
             {
                 await using AsyncServiceScope scope = _scopes.CreateAsyncScope();
-                int handled = await scope.ServiceProvider.GetRequiredService<PlatformOutboxDispatcher>().DispatchAsync(stoppingToken);
+                int handled = await scope.ServiceProvider.GetRequiredService<PlatformOutboxDispatcher>().DispatchAsync(LogFailure, stoppingToken);
 
                 if (handled > 0)
                 {
@@ -67,6 +67,18 @@ public sealed class PlatformOutboxWorker : BackgroundService
             }
         }
         while (await NextTickAsync(timer, stoppingToken));
+    }
+
+    // The id and type find the message in the outbox table; the payload is never logged.
+    private void LogFailure(PlatformOutboxFailure failure)
+    {
+        _logger.LogError(
+            failure.Exception,
+            "Outbox handler failed for message {MessageId} ({MessageType}): {ErrorCode}, attempt {Attempts}.",
+            failure.MessageId,
+            failure.Type,
+            failure.ErrorCode,
+            failure.Attempts);
     }
 
     // Stopping the host cancels the wait: a normal end, not an error.

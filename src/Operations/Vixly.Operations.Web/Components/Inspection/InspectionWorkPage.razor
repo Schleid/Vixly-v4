@@ -1,0 +1,104 @@
+﻿@*
+=========================================================
+FILE: InspectionWorkPage.razor
+
+PURPOSE:
+One compliance inspection: the parcel, why it was chosen, what the list says, and the outcome (Slice 3C design section 5).
+
+RESPONSIBILITIES:
+- Show the parcel, its declaration and its shipment's instructions
+- Start the inspection, then record its outcome
+- Show the outcome once recorded
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The items listed are those that apply to this destination and carrier; "named" marks those the declaration names
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@VixlyText.Format(T, "ui.inspection.work.title", "number", Parcel.Number ?? string.Empty)" Company="@Company" Section="inspection_queue" Error="@Error" Info="@Info">
+    <p><a href="/staff/inspection/queue">@T["ui.inspection.queue.back"]</a></p>
+    <div class="ops-record-layout" data-editable="@(CanPerform ? "true" : "false")">
+        <aside class="ops-record-rail">
+            <section class="ops-editor__panel ops-record-summary" aria-labelledby="work-parcel">
+                <h2 id="work-parcel">@Parcel.Number</h2>
+                <p class="ops-inspection__customer">@(Parcel.CustomerCode ?? T["ui.hold.Unidentified"].Value)</p>
+                <dl>
+                    <dt>@T["ui.inspection.queue.why"]</dt><dd>@OperationsInspectionWords.Why(T, Inspection.Why, Inspection.Reason)</dd>
+                    <dt>@T["ui.inspection.queue.status"]</dt><dd>@T["ui.inspection.status." + Inspection.Status]</dd>
+                    <dt>@T["ui.parcels.tracking"]</dt><dd class="ops-editor__code">@Parcel.CarrierTrackingNumber @Parcel.Carrier</dd>
+                    <dt>@T["ui.parcels.contents"]</dt><dd>@(Parcel.DeclaredContents ?? T["ui.parcels.not_declared"].Value)</dd>
+                    @if (Parcel.DeclaredValue is { } value) { <dt>@T["ui.inspection.value"]</dt><dd>@value.ToString("0.00") @Parcel.CurrencyCode</dd> }
+                </dl>
+                <p><a href="/staff/parcels/@Parcel.ParcelId">@T["ui.parcels.open"]</a></p>
+            </section>
+            <ShipmentInstructionsPanel T="T" Shipment="Shipment" />
+            <section class="ops-editor__panel" aria-labelledby="work-list">
+                <h2 id="work-list">@T["ui.inspection.work.list"]</h2>
+                @if (Applicable.Count == 0) { <p>@T["ui.inspection.work.list_none"]</p> }
+                <ul>
+                    @foreach (OperationsRestrictedItem item in Applicable)
+                    {
+                        <li><strong>@item.Name</strong> · @T["ui.inspection.kind." + item.Kind] @(Named.Contains(item.Id) ? "· " + T["ui.inspection.named"].Value : null)
+                            @if (item.Requirement is { } need) { <br /><small>@need</small> }</li>
+                    }
+                </ul>
+            </section>
+        </aside>
+        <div class="ops-record-workflows">
+            @if (Inspection.Status == OperationsInspectionStatus.Waiting && CanPerform)
+            {
+                <form method="post" action="/staff/inspection/queue/@Inspection.Id/start" class="ops-editor__panel">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="key" value="@CommandKey" />
+                    <p>@T["ui.inspection.work.start_hint"]</p>
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.inspection.work.start"]</button>
+                </form>
+            }
+            else if (Inspection.Status == OperationsInspectionStatus.InProgress && CanPerform)
+            {
+                <InspectionOutcomeForm T="T" InspectionId="Inspection.Id" Applicable="Applicable" Named="Named" CurrencyCode="@CurrencyCode" CommandKey="@CommandKey" />
+            }
+            else
+            {
+                <section class="ops-editor__panel" aria-labelledby="work-outcome">
+                    <h2 id="work-outcome">@T["ui.inspection.outcome.title"]</h2>
+                    @if (Inspection.Status == OperationsInspectionStatus.AwaitingApproval) { <p class="ops-editor__hint">@T["ui.inspection.work.awaiting_approval"]</p> }
+                    <dl>
+                        @if (Inspection.Result is { } result) { <dt>@T["ui.inspection.outcome.result"]</dt><dd>@T["ui.inspection.result." + result]</dd> }
+                        @if (Inspection.ItemsFound is { } found) { <dt>@T["ui.inspection.outcome.found"]</dt><dd>@found</dd> }
+                        @if (Inspection.Notes is { } notes) { <dt>@T["ui.inspection.outcome.notes"]</dt><dd>@notes</dd> }
+                        @if (Inspection.CustomerAction is { } action) { <dt>@T["ui.inspection.outcome.action"]</dt><dd>@action</dd> }
+                        @if (Inspection.Fee is { } fee) { <dt>@VixlyText.Format(T, "ui.inspection.outcome.fee", "currency", Inspection.FeeCurrency ?? CurrencyCode)</dt><dd>@fee.ToString("0.00")</dd> }
+                        @if (Inspection.CalledCustomerUtc is { } called) { <dt>@T["ui.inspection.outcome.called_on"]</dt><dd>@called.ToString("yyyy-MM-dd") · @Inspection.CallNotes</dd> }
+                    </dl>
+                </section>
+            }
+        </div>
+    </div>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsInspection Inspection { get; set; } = null!;
+
+    [Parameter] public OperationsParcelSummary Parcel { get; set; } = null!;
+
+    [Parameter] public Vixly.Operations.Application.Shipments.OperationsCustomerShipment? Shipment { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsRestrictedItem> Applicable { get; set; } = Array.Empty<OperationsRestrictedItem>();
+
+    [Parameter] public IReadOnlyList<Guid> Named { get; set; } = Array.Empty<Guid>();
+
+    [Parameter] public bool CanPerform { get; set; }
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public string CommandKey { get; set; } = string.Empty;
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

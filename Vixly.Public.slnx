@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Contracts/">
+    <Project Path="src/Contracts/Vixly.Contracts.Platform/Vixly.Contracts.Platform.csproj" />
+  </Folder>
+  <Folder Name="/src/Public/">
+    <Project Path="src/Public/Vixly.Public.Web/Vixly.Public.Web.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/Vixly.Shared.Hosting/Vixly.Shared.Hosting.csproj" />
+    <Project Path="src/Shared/Vixly.Shared.Kernel/Vixly.Shared.Kernel.csproj" />
+    <Project Path="src/Shared/Vixly.Shared.Localization/Vixly.Shared.Localization.csproj" />
+    <Project Path="src/Shared/Vixly.Shared.UI/Vixly.Shared.UI.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/Public/">
+    <Project Path="tests/Public/Vixly.Public.Web.Tests/Vixly.Public.Web.Tests.csproj" />
+  </Folder>
+</Solution>

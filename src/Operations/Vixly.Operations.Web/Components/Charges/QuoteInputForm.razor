@@ -1,0 +1,99 @@
+﻿@*
+=========================================================
+FILE: QuoteInputForm.razor
+
+PURPOSE:
+What staff type to price a shipment: customer, route, service, delivery, options, pieces and extras (Slice 4, 4B and 4C).
+
+RESPONSIBILITIES:
+- Show the form again with what was typed
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Five piece rows; sizes, value and item type are optional
+=========================================================
+*@
+<form method="post" action="/staff/quotes/price" class="ops-editor__panel ops-editor__form" aria-labelledby="price-title">
+    <AntiforgeryToken />
+    <h2 id="price-title">@T["ui.quotes.price.title"]</h2>
+    <label>@T["ui.quotes.customer"] <input name="customer" value="@Form.Customer" maxlength="20" placeholder="C00042" autocapitalize="characters" /></label>
+    <p class="ops-editor__hint">@T["ui.quotes.customer_hint"]</p>
+    <RouteFields T="T" Origins="Origins" Destinations="Destinations" Origin="Form.Origin" Destination="Form.Destination" RequireDestination="true" />
+    <label>@T["ui.quotes.delivery"]
+        <select name="delivery">
+            <option value="">@T["ui.charges.extra.delivery.None"]</option>
+            <option value="Pickup" selected="@(Form.Delivery == "Pickup")">@T["ui.charges.extra.delivery.Pickup"]</option>
+            <option value="HomeDelivery" selected="@(Form.Delivery == "HomeDelivery")">@T["ui.charges.extra.delivery.HomeDelivery"]</option>
+        </select>
+    </label>
+    <label>@T["ui.quotes.service"]
+        <select name="service">
+            <option value="">@T["ui.quotes.every_service"]</option>
+            @foreach (OperationsServiceOption service in Services)
+            {
+                <option value="@service.Code" selected="@(Form.Service == service.Code)">@OperationsChargeWords.Service(T, service.Code, service.Label)</option>
+            }
+        </select>
+    </label>
+    <label><input type="checkbox" name="consolidated" value="true" checked="@Form.Consolidated" /> @T["ui.quotes.consolidated"]</label>
+    <label><input type="checkbox" name="insured" value="true" checked="@Form.Insured" /> @T["ui.quotes.insured"]</label>
+    <table class="ops-editor__table">
+        <caption>@OperationsChargeWords.Text(T, "ui.quotes.pieces", ("weight", Weight), ("length", Length), ("currency", Currency))</caption>
+        <thead><tr><th>#</th><th>@T["ui.quotes.weight"]</th><th>@T["ui.quotes.length"]</th><th>@T["ui.quotes.width"]</th><th>@T["ui.quotes.height"]</th><th>@T["ui.quotes.value"]</th><th>@T["ui.quotes.item"]</th><th>@T["ui.quotes.contents"]</th></tr></thead>
+        <tbody>
+            @for (int row = 0; row < OperationsQuoteForm.Rows; row++)
+            {
+                int number = row + 1;
+                <tr>
+                    <td>@number</td>
+                    <td><input name="weight_@number" value="@Form.Weights[row]" inputmode="decimal" size="6" aria-label="@T["ui.quotes.weight"] @number" required="@(row == 0)" /></td>
+                    <td><input name="length_@number" value="@Form.Lengths[row]" inputmode="decimal" size="5" aria-label="@T["ui.quotes.length"] @number" /></td>
+                    <td><input name="width_@number" value="@Form.Widths[row]" inputmode="decimal" size="5" aria-label="@T["ui.quotes.width"] @number" /></td>
+                    <td><input name="height_@number" value="@Form.Heights[row]" inputmode="decimal" size="5" aria-label="@T["ui.quotes.height"] @number" /></td>
+                    <td><input name="value_@number" value="@Form.Values[row]" inputmode="decimal" size="7" aria-label="@T["ui.quotes.value"] @number" /></td>
+                    <td>
+                        <select name="item_@number" aria-label="@T["ui.quotes.item"] @number">
+                            <option value="">-</option>
+                            @foreach (OperationsItemType type in ItemTypes) { <option value="@type.Id" selected="@(Form.Items[row] == type.Id.ToString())">@type.Name</option> }
+                        </select>
+                    </td>
+                    <td><input name="contents_@number" value="@Form.Contents[row]" maxlength="300" aria-label="@T["ui.quotes.contents"] @number" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <p class="ops-editor__hint">@T["ui.quotes.pieces_hint"]</p>
+    @if (ManualExtras.Count > 0)
+    {
+        <fieldset>
+            <legend>@T["ui.quotes.extras"]</legend>
+            @foreach (OperationsChargeExtra extra in ManualExtras)
+            {
+                <label>@extra.Name <input name="extra_@extra.Id" value="@(Form.Quantities.TryGetValue(extra.Id, out int quantity) ? quantity : null)" inputmode="numeric" size="3" /></label>
+            }
+        </fieldset>
+    }
+    <button type="submit" class="vx-button vx-button--primary">@T["ui.quotes.price"]</button>
+</form>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsQuoteForm Form { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Origins { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Destinations { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<OperationsItemType> ItemTypes { get; set; } = Array.Empty<OperationsItemType>();
+
+    [Parameter] public IReadOnlyList<OperationsServiceOption> Services { get; set; } = Array.Empty<OperationsServiceOption>();
+
+    [Parameter] public IReadOnlyList<OperationsChargeExtra> ManualExtras { get; set; } = Array.Empty<OperationsChargeExtra>();
+
+    [Parameter] public string Weight { get; set; } = string.Empty;
+
+    [Parameter] public string Length { get; set; } = string.Empty;
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+}

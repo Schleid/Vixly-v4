@@ -1,0 +1,71 @@
+﻿@*
+=========================================================
+FILE: StorageLocationsPage.razor
+
+PURPOSE:
+The shelves of one warehouse (Slice 3B).
+
+RESPONSIBILITIES:
+- List the shelves with their zone and whether they are in use
+- Add a shelf; change its zone or take it out of use
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); needs ops.warehouses.manage for this warehouse
+- A shelf code never changes once given: labels and scans refer to it
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@VixlyText.Format(T, "ui.storage.title", "warehouse", Warehouse.Code)" Company="@Company" Section="locations" Error="@Error" Info="@Info">
+    <p><a href="/staff/locations">@T["ui.storage.back"]</a></p>
+    <form method="post" action="/staff/locations/warehouse/@Warehouse.Id/storage" class="ops-editor__panel ops-editor__inline">
+        <AntiforgeryToken />
+        <h2>@T["ui.storage.add"]</h2>
+        <label>@T["ui.storage.code"] <input name="code" required maxlength="@OperationsReceivingLimits.LocationCodeMaxLength" pattern="[A-Za-z0-9][A-Za-z0-9\-]*" autocapitalize="characters" placeholder="A-03-2" /></label>
+        <label>@T["ui.storage.zone"] <ZoneSelect T="T" Selected="OperationsStorageZone.Storage" /></label>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.storage.add_submit"]</button>
+    </form>
+    <section class="ops-editor__panel">
+        @if (Locations.Count == 0)
+        {
+            <div class="ops-editor__empty"><h2>@T["ui.storage.none"]</h2></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.storage.list"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.storage.code"]</th><th scope="col">@T["ui.storage.zone"]</th><th scope="col">@T["ui.storage.in_use"]</th><th scope="col"><span class="vx-visually-hidden">@T["ui.storage.change"]</span></th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsStorageLocation location in Locations)
+                        {
+                            <tr>
+                                <td class="ops-editor__code">@location.Code</td>
+                                <td colspan="3">
+                                    <form method="post" action="/staff/locations/warehouse/@Warehouse.Id/storage" class="ops-editor__inline">
+                                        <AntiforgeryToken />
+                                        <input type="hidden" name="location" value="@location.Id" />
+                                        <ZoneSelect T="T" Selected="location.Zone" />
+                                        <label><input type="checkbox" name="active" value="true" checked="@location.IsActive" /> @T["ui.storage.in_use"]</label>
+                                        <button type="submit" class="vx-button vx-button--secondary">@T["ui.storage.change"]</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsWarehouse Warehouse { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsStorageLocation> Locations { get; set; } = Array.Empty<OperationsStorageLocation>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

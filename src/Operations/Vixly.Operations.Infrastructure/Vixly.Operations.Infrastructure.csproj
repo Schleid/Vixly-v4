@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vixly.Operations.Application\Vixly.Operations.Application.csproj" />
+    <ProjectReference Include="..\Vixly.Operations.Domain\Vixly.Operations.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\Vixly.Shared.Kernel\Vixly.Shared.Kernel.csproj" />
+    <ProjectReference Include="..\..\Shared\Vixly.Shared.Localization\Vixly.Shared.Localization.csproj" />
+    <ProjectReference Include="..\..\Contracts\Vixly.Contracts.Platform\Vixly.Contracts.Platform.csproj" />
+    <ProjectReference Include="..\Vixly.Operations.Resources\Vixly.Operations.Resources.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    <PackageReference Include="BCrypt.Net-Next" />
+    <PackageReference Include="Otp.NET" />
+    <PackageReference Include="QuestPDF" />
+    <PackageReference Include="Microsoft.Extensions.Localization" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Vixly.Operations.Infrastructure.Tests" />
+  </ItemGroup>
+
+</Project>

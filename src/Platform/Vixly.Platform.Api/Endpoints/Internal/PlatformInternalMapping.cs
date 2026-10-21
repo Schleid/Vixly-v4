@@ -85,6 +85,34 @@ public static class PlatformInternalMapping
             account.Support is { } support ? new PlatformSupportInfo(support.CompanyName, support.Email, support.Phone, support.Website) : null);
     }
 
+    public static PlatformCompanyChangeInfo CompanyChange(PlatformTenantChangeItem change)
+    {
+        ArgumentNullException.ThrowIfNull(change);
+
+        return new PlatformCompanyChangeInfo(
+            change.RequestId,
+            PlatformWireCodes.Of(change.Status),
+            Company(change.Previous),
+            Company(change.Proposed),
+            change.Reason,
+            change.SubmittedByName,
+            change.SubmittedUtc,
+            change.DecidedUtc,
+            change.DecisionNote);
+    }
+
+    public static PlatformCompanyDetailsInfo Company(PlatformTenantCompanyItem company)
+    {
+        ArgumentNullException.ThrowIfNull(company);
+
+        return new PlatformCompanyDetailsInfo(
+            company.LegalName,
+            company.TradingName,
+            company.Email,
+            company.Phone,
+            new PlatformPostalAddressInfo(company.AddressLine1, company.AddressLine2, company.City, company.StateProvince, company.PostalCode, company.CountryCode));
+    }
+
     public static PlatformSubscriptionInfo Subscription(PlatformTenantSubscriptionView view)
     {
         ArgumentNullException.ThrowIfNull(view);

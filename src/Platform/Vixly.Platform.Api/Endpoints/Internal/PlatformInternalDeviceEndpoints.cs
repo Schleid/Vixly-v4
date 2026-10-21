@@ -7,12 +7,12 @@ using Vixly.Platform.Application.Messaging;
 using Vixly.Platform.Application.Security;
 using Vixly.Platform.Application.UseCases.Licensing.ApprovePlatformDevice;
 using Vixly.Platform.Application.UseCases.Licensing.CompletePlatformDeviceLink;
+using Vixly.Platform.Application.UseCases.Licensing.CompletePlatformSecondFactorReset;
 using Vixly.Platform.Application.UseCases.Licensing.CreatePlatformDeviceChallenge;
 using Vixly.Platform.Application.UseCases.Licensing.DenyPlatformDevice;
 using Vixly.Platform.Application.UseCases.Licensing.EnrolPlatformDevice;
 using Vixly.Platform.Application.UseCases.Licensing.ReleasePlatformDevice;
 using Vixly.Platform.Application.UseCases.Licensing.RequestPlatformFirstDeviceLink;
-using Vixly.Platform.Application.UseCases.Licensing.StartPlatformOwnerRecoveryForOwner;
 using Vixly.Platform.Application.UseCases.Licensing.VerifyPlatformDevice;
 using Vixly.Platform.Application.UseCases.Licensing.WithdrawPlatformDeviceRelease;
 using Vixly.Platform.Application.UseCases.TenantAccount.ListTenantDevices;
@@ -103,11 +103,6 @@ public static class PlatformInternalDeviceEndpoints
             return response.Succeeded ? Results.Accepted() : errors.InternalProblem(response.Error!);
         });
 
-        devices.MapPost("/owner-recovery", async (StartPlatformOwnerRecoveryForOwnerUseCase useCase, HttpContext http, PlatformApiErrors errors, CancellationToken cancellationToken) =>
-        {
-            StartPlatformOwnerRecoveryForOwnerResponse response = await useCase.ExecuteAsync(PlatformInternalRequest.Tenant(http), new StartPlatformOwnerRecoveryForOwnerRequest(), cancellationToken);
-            return response.Succeeded ? Results.Accepted() : errors.InternalProblem(response.Error!);
-        });
     }
 
     public static void MapChecks(RouteGroupBuilder device)
@@ -150,8 +145,16 @@ public static class PlatformInternalDeviceEndpoints
             }
 
             CompletePlatformDeviceLinkResponse response = await useCase.ExecuteAsync(PlatformAnonymousAuthorizationContext.Instance,
-                new CompletePlatformDeviceLinkRequest { Token = body.Token, Name = body.Name, Kind = kind, PublicKey = body.PublicKey, ReplaceDeviceId = body.ReplaceDeviceId }, cancellationToken);
+                new CompletePlatformDeviceLinkRequest { Token = body.Token, Name = body.Name, Kind = kind, PublicKey = body.PublicKey, ReplaceDeviceId = body.ReplaceDeviceId, ExpectedTenantId = PlatformInternalRequest.Find(http)?.TenantId }, cancellationToken);
             return response.Succeeded ? Results.Ok(PlatformInternalMapping.Enrolment(response.Enrolment!)) : errors.InternalProblem(response.Error!);
+        });
+
+        // Owner second-factor reset started by Vixly support (D-O13); Operations then enrols a new second factor.
+        links.MapPost("/second-factor-reset/complete", async (CompletePlatformSecondFactorResetBody body, CompletePlatformSecondFactorResetUseCase useCase, HttpContext http, PlatformApiErrors errors, CancellationToken cancellationToken) =>
+        {
+            CompletePlatformSecondFactorResetResponse response = await useCase.ExecuteAsync(PlatformAnonymousAuthorizationContext.Instance,
+                new CompletePlatformSecondFactorResetRequest { Token = body.Token, ExpectedTenantId = PlatformInternalRequest.Find(http)?.TenantId }, cancellationToken);
+            return response.Succeeded ? Results.NoContent() : errors.InternalProblem(response.Error!);
         });
     }
 }

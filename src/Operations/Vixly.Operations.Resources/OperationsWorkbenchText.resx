@@ -66,4 +66,10 @@
   <data name="access" xml:space="preserve">
     <value>Secure account access</value>
   </data>
+  <data name="team" xml:space="preserve">
+    <value>Team and access</value>
+  </data>
+  <data name="company" xml:space="preserve">
+    <value>Company</value>
+  </data>
 </root>

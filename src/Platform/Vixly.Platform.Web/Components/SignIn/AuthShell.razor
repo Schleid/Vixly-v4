@@ -3,8 +3,9 @@
 FILE: AuthShell.razor
 
 PURPOSE:
-The full HTML document around every sign-in page. Static; the only script is
-passkeys.js, which adds the passkey button when the browser supports it.
+The full HTML document around every sign-in page. Static; the scripts are
+passkeys.js, which adds the passkey button when the browser supports it, and
+vixly-forms.js, which blocks repeated submits (ADR-0019).
 
 RESPONSIBILITIES:
 - Compose the localized authentication shell and optional login illustration
@@ -30,6 +31,7 @@ IMPORTANT NOTES:
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-primitives.css" />
     <link rel="stylesheet" href="/css/control-login.css" />
     <script src="/js/passkeys.js" defer></script>
+    <script src="/_content/Vixly.Shared.UI/vixly-forms.js" defer></script>
 </head>
 <body class="vx-auth @(Illustrated ? "vx-auth--illustrated" : null)">
     <!-- Atmospheric backdrop & micro-mesh -->

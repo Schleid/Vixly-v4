@@ -272,9 +272,10 @@ public sealed class PlatformLicensingAdministration
         _audit.Record(staffUserId, actionCode, permissionCode, targetType, targetId, after: after, reason: reason);
     }
 
-    public void Notice(Guid tenantId, PlatformLicensingNoticeKind kind, Guid? deviceId = null, Guid? registrationId = null, bool? approved = null, int count = 0)
+    public void Notice(Guid tenantId, PlatformLicensingNoticeKind kind, Guid? deviceId = null, Guid? registrationId = null, bool? approved = null, int count = 0,
+        Guid? supportRequestId = null, PlatformOwnerSupportKind? supportKind = null)
     {
-        _outbox.Write(PlatformMessageTypes.LicensingNotice, tenantId, new PlatformLicensingNotice(tenantId, kind, deviceId, registrationId, approved, count, UtcNow));
+        _outbox.Write(PlatformMessageTypes.LicensingNotice, tenantId, new PlatformLicensingNotice(tenantId, kind, deviceId, registrationId, approved, count, UtcNow, supportRequestId, supportKind));
     }
 
     public void RecordTenantActivated(PlatformTenant tenant, PlatformTenantLifecycleEvent change)

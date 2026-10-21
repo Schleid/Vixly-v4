@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: TenantChangePage.razor
+
+PURPOSE:
+One company change request (B12).
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/tenants/changes/{RequestId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.tenant_changes.request"]</PageTitle>
+<TenantChangeView RequestId="RequestId" />
+
+@code {
+    [Parameter]
+    public Guid RequestId { get; set; }
+}

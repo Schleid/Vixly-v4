@@ -40,6 +40,19 @@ IMPORTANT NOTES:
     <h2 class="ops-workspace__section-title">@L["workspace_tasks"]</h2>
     @* Same items and order as the menu, and only what the person's role allows (OperationsNavigation). *@
     <OperationsTaskLinks />
+    @* Slice 5E (S-8): supplies at or below their reorder level in the warehouses this person keeps the stock of. *@
+    @if (LowSupplies.Count > 0)
+    {
+        <section class="ops-editor__panel" aria-labelledby="low-supplies" data-low-supplies>
+            <h2 id="low-supplies">@T["ui.supplies.stock.low_title"]</h2>
+            <ul class="ops-editor__list">
+                @foreach (Vixly.Operations.Application.Supplies.OperationsLowSupply item in LowSupplies)
+                {
+                    <li><a href="/staff/supplies/stock?warehouse=@item.WarehouseId">@item.WarehouseCode</a> · @item.SupplyCode · @item.SupplyName: @VixlyText.Format(T, "ui.supplies.stock.low_line", new Dictionary<string, object> { ["count"] = item.OnHand, ["level"] = item.ReorderLevel })</li>
+                }
+            </ul>
+        </section>
+    }
 </EditorShell>
 
 @code {
@@ -51,4 +64,7 @@ IMPORTANT NOTES:
 
     [Parameter]
     public IReadOnlyList<Vixly.Operations.Application.Settings.OperationsSetupItem> Checklist { get; set; } = Array.Empty<Vixly.Operations.Application.Settings.OperationsSetupItem>();
+
+    [Parameter]
+    public IReadOnlyList<Vixly.Operations.Application.Supplies.OperationsLowSupply> LowSupplies { get; set; } = Array.Empty<Vixly.Operations.Application.Supplies.OperationsLowSupply>();
 }

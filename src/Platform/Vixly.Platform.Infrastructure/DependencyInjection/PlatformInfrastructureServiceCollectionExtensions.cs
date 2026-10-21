@@ -97,6 +97,9 @@ public static class PlatformInfrastructureServiceCollectionExtensions
         services.AddScoped<IPlatformTenantRegistrationRepository, PlatformTenantRegistrationRepository>();
         services.AddScoped<IPlatformOutboxRepository, PlatformOutboxRepository>();
         services.AddScoped<IPlatformPublishedEventRepository, PlatformPublishedEventRepository>();
+        services.AddScoped<IPlatformSalesLeadRepository, PlatformSalesLeadRepository>();
+        services.AddScoped<IPlatformTenantChangeRepository, PlatformTenantChangeRepository>();
+        services.AddScoped<IPlatformLeadMailer, SmtpPlatformLeadMailer>();
         services.AddScoped<IPlatformTenantQueries, PlatformTenantQueries>();
         services.AddScoped<IPlatformTenantPolicy, ConfiguredPlatformTenantPolicy>();
         services.AddScoped<IPlatformPlanRepository, PlatformPlanRepository>();

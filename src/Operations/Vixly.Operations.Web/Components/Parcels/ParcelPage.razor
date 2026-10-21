@@ -1,0 +1,199 @@
+﻿@*
+=========================================================
+FILE: ParcelPage.razor
+
+PURPOSE:
+One parcel for staff: details, photos, history and actions (Slice 3B).
+
+RESPONSIBILITIES:
+- Show the parcel, its receipt, photos and full history
+- Assign an unidentified parcel after the customer proved it; put it away; print its label
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); the use cases decide
+- Staff history shows every event, voided ones marked (ADR-0021 decision 5)
+- Photos load through a checked address, never from the file store directly
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@(Parcel.Number ?? string.Empty)" Company="@Company" Section="parcels" Error="@Error" Info="@Info">
+    <p class="ops-editor__inline"><a href="/staff/parcels">@T["ui.parcels.back"]</a> <a class="vx-button vx-button--secondary" href="/staff/parcels/@Parcel.ParcelId/label" target="_blank" rel="noopener">@T["ui.parcels.print_label"]</a></p>
+    <div class="ops-record-layout" data-editable="@((CanAssign || CanPutAway) ? "true" : "false")">
+    <aside class="ops-record-rail">
+    <section class="ops-editor__panel ops-record-summary" aria-labelledby="parcel-details">
+        <h2 id="parcel-details">@T["ui.parcels.details"]</h2>
+        <dl>
+            <dt>@T["ui.parcels.tracking"]</dt><dd class="ops-editor__code">@Parcel.CarrierTrackingNumber</dd>
+            @if (!string.IsNullOrWhiteSpace(Parcel.Carrier)) { <dt>@T["ui.receiving.carrier"]</dt><dd>@Parcel.Carrier</dd> }
+            <dt>@T["ui.customers.code"]</dt><dd>@if (Parcel.CustomerId is { } customerId) { <a href="/staff/customers/@customerId">@Parcel.CustomerCode · @Parcel.CustomerName</a> } else { @T["ui.hold.Unidentified"] }</dd>
+            @if (CustomerPhone is not null) { <dt>@T["ui.customers.phone"]</dt><dd>@CustomerPhone</dd> }
+            <dt>@T["ui.parcels.warehouse"]</dt><dd>@Parcel.WarehouseCode @(Parcel.StorageLocationCode is { } shelf ? "· " + shelf : null)</dd>
+            <dt>@T["ui.parcels.milestone"]</dt><dd>@(Parcel.Milestone is { } milestone ? T["ui.milestone." + milestone].Value : null)</dd>
+            @if (Parcel.HoldReasons != OperationsHoldReasons.None) { <dt>@T["ui.parcels.holds"]</dt><dd>@string.Join(", ", Enum.GetValues<OperationsHoldReasons>().Where(reason => reason != OperationsHoldReasons.None && Parcel.HoldReasons.HasFlag(reason)).Select(reason => T["ui.hold." + reason].Value))</dd> }
+            <dt>@T["ui.parcels.weight"]</dt><dd>@Shown(Parcel.WeightKg, true)</dd>
+            <dt>@T["ui.parcels.size"]</dt><dd>@Shown(Parcel.LengthCm, false) × @Shown(Parcel.WidthCm, false) × @Shown(Parcel.HeightCm, false)</dd>
+            <dt>@T["ui.parcels.contents"]</dt><dd>@(Parcel.DeclaredContents ?? T["ui.parcels.not_declared"])</dd>
+            @if (Parcel.DeclaredValue is { } value) { <dt>@T["ui.parcels.value"]</dt><dd>@value.ToString("0.00") @Parcel.CurrencyCode</dd> }
+            @if (ReceiptNumber is not null) { <dt>@T["ui.parcels.receipt"]</dt><dd class="ops-editor__code">@ReceiptNumber</dd> }
+            @if (Condition is not null) { <dt>@T["ui.receiving.condition"]</dt><dd>@T["ui.receiving.condition." + Condition]</dd> }
+            <dt>@T["ui.parcels.received"]</dt><dd>@Parcel.ReceivedUtc.ToString("yyyy-MM-dd HH:mm")</dd>
+            @if (StorageFee > 0) { <dt>@T["ui.undeclared.storage_fee"]</dt><dd>@VixlyText.Format(T, "ui.undeclared.storage_fee_value", new Dictionary<string, object> { ["amount"] = StorageFee.ToString("0.00"), ["currency"] = CurrencyCode, ["days"] = StorageDays })</dd> }
+        </dl>
+    </section>
+    @if (Photos.Count > 0)
+    {
+        <section class="ops-editor__panel" aria-labelledby="parcel-photos">
+            <h2 id="parcel-photos">@T["ui.receiving.photos"]</h2>
+            <ul class="ops-parcel-photos">
+                @foreach (OperationsParcelPhotoInfo photo in Photos)
+                {
+                    <li><a href="/staff/parcels/@Parcel.ParcelId/photos/@photo.PhotoId" target="_blank" rel="noopener"><img src="/staff/parcels/@Parcel.ParcelId/photos/@photo.PhotoId" alt="@T["ui.receiving.photo." + photo.Kind]" loading="lazy" width="160" /></a><small>@T["ui.receiving.photo." + photo.Kind]</small></li>
+                }
+            </ul>
+        </section>
+    }
+    </aside>
+    <div class="ops-record-workflows">
+    @if (CanCheck)
+    {
+        <p><a class="vx-button vx-button--primary" href="/staff/inspection/@Parcel.ParcelId">@T["ui.inspection.title"]</a></p>
+    }
+    <ShippingLabelPanel ParcelId="Parcel.ParcelId" Cleared="ShippingCleared" PrintedUtc="Parcel.ShippingLabelUtc"
+        Printers="Printers.Where(printer => printer.Media == Vixly.Operations.Domain.Printing.OperationsLabelMedia.ShippingLabel).ToList()" />
+    @if (Printers.Any(printer => printer.Media == Vixly.Operations.Domain.Printing.OperationsLabelMedia.IdLabel))
+    {
+        <form method="post" action="/staff/parcels/@Parcel.ParcelId/print" class="ops-editor__panel ops-editor__inline">
+            <AntiforgeryToken />
+            <label>@T["ui.parcels.print_on"]
+                <select name="printer">
+                    @foreach (Vixly.Operations.Domain.Printing.OperationsLabelPrinter printer in Printers.Where(printer => printer.Media == Vixly.Operations.Domain.Printing.OperationsLabelMedia.IdLabel))
+                    {
+                        <option value="@printer.Id">@printer.Name</option>
+                    }
+                </select>
+            </label>
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.parcels.print_label"]</button>
+        </form>
+    }
+    @if (CanAssign)
+    {
+        @if (Parcel.Milestone is null or Vixly.Operations.Domain.Tracking.OperationsMilestone.ReceivedAtOrigin)
+        {
+            <UndeclaredLabelPanel Parcel="Parcel" Customer="LabelCustomer" Named="LabelCustomerNamed" />
+        }
+        <form method="post" action="/staff/parcels/@Parcel.ParcelId/assign" class="ops-editor__panel ops-panel--restricted">
+            <AntiforgeryToken />
+            <input type="hidden" name="key" value="@CommandKey" />
+            <h2>@T["ui.parcels.assign"]</h2>
+            <p>@T["ui.parcels.assign_hint"]</p>
+            <label>@T["ui.customers.code"] <input name="customer" required maxlength="20" autocomplete="off" autocapitalize="characters" value="@LabelCustomer?.Code" /></label>
+            <fieldset>
+                <legend>@T["ui.parcels.verified_by"]</legend>
+                @foreach (string method in OperationsTrackingCodes.VerificationMethods)
+                {
+                    <label><input type="radio" name="verifiedBy" value="@method" required /> @T["ui.parcels.verified." + method]</label>
+                }
+            </fieldset>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.parcels.assign_submit"]</button>
+        </form>
+    }
+    @if (CanPutAway && Locations.Count > 0)
+    {
+        <form method="post" action="/staff/parcels/@Parcel.ParcelId/put-away" class="ops-editor__panel">
+            <AntiforgeryToken />
+            <input type="hidden" name="key" value="@CommandKey" />
+            <h2>@T["ui.parcels.put_away"]</h2>
+            <label>@T["ui.receiving.location"]
+                <select name="location" required>
+                    @foreach (OperationsStorageLocation location in Locations)
+                    {
+                        <option value="@location.Id">@location.Code · @T["ui.storage.zone." + location.Zone.ToString().ToLowerInvariant()]</option>
+                    }
+                </select>
+            </label>
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.parcels.put_away_submit"]</button>
+        </form>
+    }
+    <ShipmentInstructionsPanel T="T" Shipment="Shipment" />
+    <InspectionSummaryPanel T="T" Inspection="Inspection" />
+    <section class="ops-editor__panel" aria-labelledby="parcel-history">
+        <h2 id="parcel-history">@T["ui.parcels.history"]</h2>
+        <ol class="ops-parcel-history">
+            @foreach (OperationsTrackingLine line in History.Reverse())
+            {
+                <li data-voided="@(line.Voided ? "true" : "false")">
+                    <time datetime="@line.OccurredUtc.ToString("O")">@line.OccurredUtc.ToString("yyyy-MM-dd HH:mm")</time>
+                    <span>@OperationsTrackingText.Describe(T, line)</span>
+                    @if (line.LocationCode is not null) { <small>@line.LocationCode</small> }
+                    @if (line.Voided) { <small>@T["ui.tracking.voided"]</small> }
+                    @if (line.Note is not null) { <small>@line.Note</small> }
+                </li>
+            }
+        </ol>
+    </section>
+    </div>
+    </div>
+</EditorShell>
+
+@code {
+    private string? Shown(decimal? value, bool weight) => value switch
+    {
+        null => null,
+        { } kg when weight => OperationsUnits.ToShownWeight(kg, WeightUnit).ToString("0.###") + " " + (WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg"),
+        { } cm => OperationsUnits.ToShownLength(cm, DimensionUnit).ToString("0.#") + " " + (DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm")
+    };
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsParcelSummary Parcel { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsTrackingLine> History { get; set; } = Array.Empty<OperationsTrackingLine>();
+
+    [Parameter] public IReadOnlyList<OperationsParcelPhotoInfo> Photos { get; set; } = Array.Empty<OperationsParcelPhotoInfo>();
+
+    [Parameter] public string? ReceiptNumber { get; set; }
+
+    [Parameter] public string? Condition { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsStorageLocation> Locations { get; set; } = Array.Empty<OperationsStorageLocation>();
+
+    [Parameter] public bool CanAssign { get; set; }
+
+    [Parameter] public bool CanPutAway { get; set; }
+
+    [Parameter] public bool CanCheck { get; set; }
+
+    [Parameter] public string? CustomerPhone { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsParcelSummary> ShipmentParcels { get; set; } = Array.Empty<OperationsParcelSummary>();
+
+    [Parameter] public Vixly.Operations.Application.Shipments.OperationsCustomerShipment? Shipment { get; set; }
+
+    [Parameter] public Vixly.Operations.Domain.Inspection.OperationsInspection? Inspection { get; set; }
+
+    [Parameter] public bool ShippingCleared { get; set; }
+
+    // Slice 4D step 3: the customer the label's mailbox code points to; the storage fee so far.
+    [Parameter] public Vixly.Operations.Domain.Customers.OperationsCustomer? LabelCustomer { get; set; }
+
+    [Parameter] public bool LabelCustomerNamed { get; set; }
+
+    [Parameter] public decimal StorageFee { get; set; }
+
+    [Parameter] public int StorageDays { get; set; }
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Printing.OperationsLabelPrinter> Printers { get; set; } = Array.Empty<Vixly.Operations.Domain.Printing.OperationsLabelPrinter>();
+
+    [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
+
+    [Parameter] public OperationsDimensionUnit DimensionUnit { get; set; }
+
+    [Parameter] public string CommandKey { get; set; } = string.Empty;
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

@@ -1,0 +1,50 @@
+﻿@*
+=========================================================
+FILE: InsuranceProductsPanel.razor
+
+PURPOSE:
+The insurance products a company sells for one transport mode (Slice 5D: "insurance A for 10 dollars, insurance B for 15, which one do you want?").
+
+RESPONSIBILITIES:
+- List the mode's products in their order, each with its price rule and whether it is in use, opened to change it
+- Add a product
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Each product's form is InsurancePlanForm
+=========================================================
+*@
+<section class="ops-editor__panel" aria-labelledby="insurance-title">
+    <h2 id="insurance-title">@T["ui.charges.insurance.title." + Mode]</h2>
+    <p class="ops-editor__hint">@T["ui.charges.insurance.intro"]</p>
+    @foreach (OperationsInsurancePlan product in Products)
+    {
+        OperationsInsuranceVersion? terms = product.TermsAt(UtcNow) ?? product.Versions.FirstOrDefault();
+        <details class="ops-editor__panel">
+            <summary>
+                <strong>@product.Name</strong>
+                · @(terms is null ? "—" : OperationsInsuranceWords.Rule(T, terms, Currency))
+                · @(product.IsActive ? T["ui.charges.in_use"] : T["ui.charges.not_in_use"])
+            </summary>
+            <InsurancePlanForm T="T" Mode="Mode" Plan="product" UtcNow="UtcNow" Currency="@Currency" Unit="@Unit" />
+        </details>
+    }
+    <details class="ops-editor__panel" open="@(Products.Count == 0)">
+        <summary>@T["ui.charges.insurance.add"]</summary>
+        <InsurancePlanForm T="T" Mode="Mode" Plan="null" UtcNow="UtcNow" Currency="@Currency" Unit="@Unit" />
+    </details>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public OperationsTransportMode Mode { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsInsurancePlan> Products { get; set; } = Array.Empty<OperationsInsurancePlan>();
+
+    [Parameter] public DateTimeOffset UtcNow { get; set; }
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+
+    [Parameter] public string Unit { get; set; } = string.Empty;
+}

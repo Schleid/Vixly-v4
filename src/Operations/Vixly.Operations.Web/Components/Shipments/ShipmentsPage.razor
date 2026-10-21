@@ -1,0 +1,121 @@
+﻿@*
+=========================================================
+FILE: ShipmentsPage.razor
+
+PURPOSE:
+The shipments desk: every shipment of the user's warehouses by origin (Slice 5A).
+
+RESPONSIBILITIES:
+- Views with their counts, filters, the list and its pages, the CSV export
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The use case limits the list to covered warehouses
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.shipments_desk.title"]" Company="@Company" Section="shipments" Error="@Error">
+    <nav class="ops-editor__inline" aria-label="@T["ui.shipments_desk.views"]">
+        @foreach ((OperationsShipmentView view, string key, int? count) in new[]
+        {
+            (OperationsShipmentView.ToSend, "to_send", (int?)Counts.ToSend), (OperationsShipmentView.Waiting, "waiting", Counts.Waiting),
+            (OperationsShipmentView.Cancelled, "cancelled", Counts.Cancelled), (OperationsShipmentView.All, "all", (int?)null)
+        })
+        {
+            <a href="@Link(key, 1)" aria-current="@(View == view ? "page" : null)">@T["ui.shipments_desk.view." + key]@(count is { } shown ? " (" + shown + ")" : null)</a>
+        }
+    </nav>
+    <form method="get" action="/staff/shipments" class="ops-editor__inline ops-editor__search">
+        <input type="hidden" name="view" value="@Key" />
+        <input name="search" value="@Search" placeholder="@T["ui.shipments_desk.search"]" aria-label="@T["ui.shipments_desk.search"]" maxlength="60" autocomplete="off" />
+        @if (Warehouses.Count > 1)
+        {
+            <select name="warehouse" aria-label="@T["ui.receiving.warehouse"]">
+                <option value="">@T["ui.shipments_desk.all_warehouses"]</option>
+                @foreach (OperationsWarehouse warehouse in Warehouses) { <option value="@warehouse.Id" selected="@(warehouse.Id == Warehouse)">@warehouse.Code · @warehouse.Name</option> }
+            </select>
+        }
+        <select name="service" aria-label="@T["ui.shipments_desk.service"]">
+            <option value="">@T["ui.shipments_desk.any_service"]</option>
+            @foreach (Vixly.Contracts.Platform.Catalog.PlatformShippingServiceInfo item in Vixly.Contracts.Platform.Catalog.PlatformShippingServices.All)
+            {
+                <option value="@item.Code" selected="@(item.Code == Service)">@T["ui.services.name." + item.Code]</option>
+            }
+        </select>
+        <input name="country" value="@Country" placeholder="@T["ui.shipments_desk.country"]" aria-label="@T["ui.shipments_desk.country"]" maxlength="2" size="3" autocomplete="off" />
+        <button type="submit" class="vx-button">@T["ui.shipments_desk.filter"]</button>
+        <a href="@("/staff/shipments/export" + Query(Key, 1))">@T["ui.shipments_desk.export"]</a>
+    </form>
+    <section class="ops-editor__panel">
+        @if (Rows.Count == 0)
+        {
+            <div class="ops-editor__empty"><h2>@T["ui.shipments_desk.none"]</h2></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.shipments_desk.title"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.shipments_desk.number"]</th><th scope="col">@T["ui.receiving.warehouse"]</th><th scope="col">@T["ui.customers.code"]</th><th scope="col">@T["ui.shipments_desk.destination"]</th><th scope="col">@T["ui.shipments_desk.service"]</th><th scope="col">@T["ui.shipments_desk.contents"]</th><th scope="col">@T["ui.shipments_desk.created"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsShipmentRow row in Rows)
+                        {
+                            <tr>
+                                <td><a href="/staff/shipments/@row.ShipmentId">@(row.Number ?? T["ui.shipments_desk.not_numbered"].Value)</a>@(row.Status == OperationsShipmentStatus.Cancelled ? " · " + T["ui.shipments_desk.view.cancelled"].Value : null)</td>
+                                <td>@(Warehouses.FirstOrDefault(warehouse => warehouse.Id == row.OriginWarehouseId)?.Code)</td>
+                                <td>@row.CustomerCode</td>
+                                <td>@(row.CountryCode is null ? T["ui.shipments_desk.waiting_short"].Value : string.Join(", ", new[] { row.City, row.CountryCode }.Where(part => part is not null)) + " · " + row.RecipientName)</td>
+                                <td>@(row.ServiceCode is { } code ? T["ui.services.name." + code].Value : "—")</td>
+                                <td>@VixlyText.Format(T, "ui.shipments_desk.counts", new Dictionary<string, object> { ["announced"] = row.Announced, ["parcels"] = row.Parcels, ["labelled"] = row.Labelled })</td>
+                                <td>@row.CreatedUtc.ToString("yyyy-MM-dd")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+            <p class="ops-editor__inline">
+                @if (PageNumber > 1) { <a href="@Link(Key, PageNumber - 1)">@T["ui.shipments_desk.previous"]</a> }
+                @if (TotalCount > PageNumber * Vixly.Operations.Application.UseCases.Shipments.ListOperationsShipments.ListOperationsShipmentsUseCase.PageSize) { <a href="@Link(Key, PageNumber + 1)">@T["ui.shipments_desk.next"]</a> }
+            </p>
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsShipmentRow> Rows { get; set; } = Array.Empty<OperationsShipmentRow>();
+
+    [Parameter] public int TotalCount { get; set; }
+
+    [Parameter] public OperationsShipmentCounts Counts { get; set; } = new(0, 0, 0);
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public Guid? Warehouse { get; set; }
+
+    [Parameter] public OperationsShipmentView View { get; set; } = OperationsShipmentView.ToSend;
+
+    [Parameter] public string? Service { get; set; }
+
+    [Parameter] public string? Country { get; set; }
+
+    [Parameter] public string? Search { get; set; }
+
+    [Parameter] public int PageNumber { get; set; } = 1;
+
+    [Parameter] public string? Error { get; set; }
+
+    private string Key => View switch { OperationsShipmentView.Waiting => "waiting", OperationsShipmentView.Cancelled => "cancelled", OperationsShipmentView.All => "all", _ => "to_send" };
+
+    private string Link(string view, int page) => "/staff/shipments" + Query(view, page);
+
+    // The filters kept from page to page and view to view.
+    private string Query(string view, int page) =>
+        "?view=" + Uri.EscapeDataString(view)
+        + (Warehouse is { } warehouse ? "&warehouse=" + warehouse : string.Empty)
+        + (string.IsNullOrWhiteSpace(Service) ? string.Empty : "&service=" + Uri.EscapeDataString(Service))
+        + (string.IsNullOrWhiteSpace(Country) ? string.Empty : "&country=" + Uri.EscapeDataString(Country))
+        + (string.IsNullOrWhiteSpace(Search) ? string.Empty : "&search=" + Uri.EscapeDataString(Search))
+        + (page > 1 ? "&page=" + page : string.Empty);
+}

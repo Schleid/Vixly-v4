@@ -1,19 +1,4 @@
-﻿@*
-=========================================================
-FILE: ShipmentPage.razor
-
-PURPOSE:
-One of the customer's shipments: where it goes, its packages announced and arrived (owner, 2026-10-18).
-
-RESPONSIBILITIES:
-- Show the instructions, with a link to change them while the shipment is open
-- List the packages still expected (withdraw one) and those that arrived
-- Announce another package in it, or put in one announced before; take one out (Slice 4D); cancel it while nothing has arrived
-
-IMPORTANT NOTES:
-- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
-=========================================================
-*@
+@* ShipmentPage.razor: Customer shipment - destination, packages and actions (Slice 5C, ADR-0012). *@
 @using Vixly.Contracts.Operations.Customers
 @using Vixly.Contracts.Operations.Packages
 @using Vixly.Customer.Web.Portal
@@ -21,134 +6,146 @@ IMPORTANT NOTES:
 
 <CustomerShell Brand="@Brand" Title="@T["ui.shipments.title"]" SignedIn="true" Error="@Error" Info="@Info" ReturnHere="@("/customer/packages/shipments/" + Detail.Shipment.ShipmentId)">
     <div class="customer-shipment-record">
-    <p><a href="/customer/packages">@T["ui.packages.back"]</a> · <a href="@("/customer/rates?shipment=" + Detail.Shipment.ShipmentId)">@T["ui.rates.estimate_shipment"]</a></p>
-    <section aria-labelledby="shipment-where">
-        <h2 id="shipment-where">@T["ui.shipments.where"]</h2>
-        @if (!Detail.Shipment.HasInstructions)
+        <div class="customer-portal__actions customer-portal__actions--top">
+            <a href="/customer/packages" class="vx-button vx-button--secondary">← @T["ui.packages.back"]</a>
+            <a href="@("/customer/rates?shipment=" + Detail.Shipment.ShipmentId)" class="vx-button vx-button--secondary">@T["ui.rates.estimate_shipment"]</a>
+        </div>
+        <section aria-labelledby="shipment-where">
+            <h2 id="shipment-where">@T["ui.shipments.where"]</h2>
+            @if (!Detail.Shipment.HasInstructions)
+            {
+                <p class="customer-portal__notice">@T["ui.shipments.needs_instructions"]</p>
+            }
+            else
+            {
+                <dl class="customer-portal__details customer-package-details">
+                    <dt>@T["ui.shipments.origin"]</dt><dd>@Detail.Shipment.Origin</dd>
+                    <dt>@T["ui.shipments.destination"]</dt>
+                    <dd>
+                        @if (Detail.Shipment.Delivery == "pickup")
+                        {
+                            <span>@T["ui.shipments.pickup_at"] @Detail.Shipment.BranchName</span>
+                        }
+                        else if (Detail.Shipment.Address is { } address)
+                        {
+                            <span>@string.Join(", ", new[] { address.Line1, address.Line2, address.City, address.PostalCode, address.CountryCode }.Where(part => !string.IsNullOrWhiteSpace(part)))</span>
+                        }
+                    </dd>
+                    <dt>@T["ui.shipments.recipient"]</dt><dd>@Detail.Shipment.RecipientName · @Detail.Shipment.RecipientPhone</dd>
+                    <dt>@T["ui.shipments.options"]</dt>
+                    <dd>@string.Join(", ", Options())</dd>
+                    @if (Detail.Shipment.ParcelCount is { } count)
+                    {
+                        <dt>@T["ui.shipments.parcel_count"]</dt><dd>@VixlyText.Format(T, "ui.shipments.parcels_of", new Dictionary<string, object> { ["entered"] = Detail.Parcels.Count, ["count"] = count })</dd>
+                    }
+                    @if (Detail.Shipment.Booked)
+                    {
+                        <dt>@T["ui.shipments.amount"]</dt><dd>@((Detail.Shipment.BookedTotal ?? 0m).ToString("N2")) @Detail.Shipment.BookedCurrency</dd>
+                    }
+                </dl>
+                @if (Detail.Shipment.Booked) { <p class="customer-portal__notice">@T["ui.shipments.booked_notice"]</p> }
+            }
+            @if (Detail.Shipment.IsOpen && Detail.Shipment.HasInstructions)
+            {
+                <div class="customer-portal__actions">
+                    <a class="vx-button vx-button--secondary" href="/customer/packages/shipments/@Detail.Shipment.ShipmentId/edit">@T["ui.shipments.edit"]</a>
+                </div>
+            }
+            else if (Detail.Shipment.IsOpen)
+            {
+                <div class="customer-portal__actions">
+                    <a class="vx-button vx-button--secondary" href="/customer/packages/shipments/new">@T["ui.shipments.new"]</a>
+                </div>
+            }
+        </section>
+        @if (Detail.Shipment.HasInstructions && (Detail.Parcels.Count > 0 || Detail.Shipment.Insured))
         {
-            <p class="customer-portal__notice">@T["ui.shipments.needs_instructions"]</p>
+            <div class="customer-portal__actions">
+                @if (Detail.Parcels.Count > 0)
+                {
+                    <a class="vx-button vx-button--secondary" href="/customer/packages/shipments/@Detail.Shipment.ShipmentId/documents/packing-list">@T["ui.shipments.packing_list"]</a>
+                    <a class="vx-button vx-button--secondary" href="/customer/packages/shipments/@Detail.Shipment.ShipmentId/documents/commercial-invoice">@T["ui.shipments.commercial_invoice"]</a>
+                }
+                @if (Detail.Shipment.Insured)
+                {
+                    <a class="vx-button vx-button--secondary" href="/customer/packages/shipments/@Detail.Shipment.ShipmentId/certificate">@T["ui.shipments.certificate"]</a>
+                }
+            </div>
         }
-        else
+        <section aria-labelledby="shipment-arrived">
+            <h2 id="shipment-arrived">@T["ui.packages.received"]</h2>
+            @if (Detail.Parcels.Count == 0) { <p>@T["ui.packages.none"]</p> }
+            <ul class="customer-portal__list">
+                @foreach (CustomerParcelDto parcel in Detail.Parcels)
+                {
+                    <li data-on-hold="@(parcel.Holds.Count > 0 ? "true" : "false")">
+                        <a href="/customer/packages/@parcel.ParcelId"><strong>@parcel.Number</strong> · @parcel.TrackingNumber</a>
+                        <span class="customer-package-status" data-status="@parcel.Milestone">@(parcel.Milestone is { } milestone ? T["ui.milestone." + milestone].Value : null)</span>
+                        @foreach (string hold in parcel.Holds) { <span class="customer-portal__notice">@T["ui.hold." + hold]</span> }
+                        @if (Detail.Shipment.IsOpen && Detail.Shipment.HasInstructions && CustomerPackagePlaces.Movable(parcel)) { <TakeOutForm ParcelId="parcel.ParcelId" Back="@Here" /> }
+                        @if (Detail.Shipment.IsOpen && !Detail.Shipment.HasInstructions && CustomerPackagePlaces.Movable(parcel)) { <PackageMoveForm ParcelId="parcel.ParcelId" Choices="Choices" Back="@Here" /> }
+                    </li>
+                }
+            </ul>
+        </section>
+        <section aria-labelledby="shipment-expected">
+            <h2 id="shipment-expected">@T["ui.packages.expected"]</h2>
+            @if (Detail.PreAlerts.Count == 0) { <p>@T["ui.packages.none_expected"]</p> }
+            <ul class="customer-portal__list">
+                @foreach (CustomerPreAlertDto preAlert in Detail.PreAlerts)
+                {
+                    <li>
+                        <div class="customer-package-identity"><strong>@preAlert.TrackingNumber</strong><span>@preAlert.Carrier</span></div>
+                        <small>@preAlert.Contents · @preAlert.DeclaredValue.ToString("0.00") @preAlert.CurrencyCode</small>
+                        @if (Detail.Shipment.IsOpen) { <TakeOutForm PreAlertId="preAlert.PreAlertId" Back="@Here" /> }
+                        <form method="post" action="/customer/packages/pre-alerts/@preAlert.PreAlertId/withdraw" class="customer-portal__inline">
+                            <AntiforgeryToken />
+                            <button type="submit" class="vx-button vx-button--secondary">@T["ui.packages.withdraw"]</button>
+                        </form>
+                    </li>
+                }
+            </ul>
+        </section>
+        @if (Detail.Shipment.IsOpen && Detail.Shipment.HasInstructions && (UnplacedPreAlerts.Count > 0 || UnplacedParcels.Count > 0))
         {
-            <dl class="customer-portal__details customer-package-details">
-                <dt>@T["ui.shipments.origin"]</dt><dd>@Detail.Shipment.Origin</dd>
-                <dt>@T["ui.shipments.destination"]</dt>
-                <dd>
-                    @if (Detail.Shipment.Delivery == "pickup")
-                    {
-                        <span>@T["ui.shipments.pickup_at"] @Detail.Shipment.BranchName</span>
-                    }
-                    else if (Detail.Shipment.Address is { } address)
-                    {
-                        <span>@string.Join(", ", new[] { address.Line1, address.Line2, address.City, address.PostalCode, address.CountryCode }.Where(part => !string.IsNullOrWhiteSpace(part)))</span>
-                    }
-                </dd>
-                <dt>@T["ui.shipments.recipient"]</dt><dd>@Detail.Shipment.RecipientName · @Detail.Shipment.RecipientPhone</dd>
-                <dt>@T["ui.shipments.options"]</dt>
-                <dd>@string.Join(", ", Options()) </dd>
-            </dl>
+            <section aria-labelledby="shipment-put">
+                <h2 id="shipment-put">@T["ui.shipments.put_in"]</h2>
+                <ul class="customer-portal__list">
+                    @foreach (CustomerParcelDto parcel in UnplacedParcels) { <li>@parcel.Number · @parcel.TrackingNumber <PutInForm ParcelId="parcel.ParcelId" ShipmentId="Detail.Shipment.ShipmentId" Back="@Here" /></li> }
+                    @foreach (CustomerPreAlertDto preAlert in UnplacedPreAlerts) { <li>@preAlert.TrackingNumber · @preAlert.Contents <PutInForm PreAlertId="preAlert.PreAlertId" ShipmentId="Detail.Shipment.ShipmentId" Back="@Here" /></li> }
+                </ul>
+            </section>
         }
         @if (Detail.Shipment.IsOpen && Detail.Shipment.HasInstructions)
         {
-            <p><a class="vx-button vx-button--secondary" href="/customer/packages/shipments/@Detail.Shipment.ShipmentId/edit">@T["ui.shipments.edit"]</a></p>
+            <section aria-labelledby="shipment-add">
+                <h2 id="shipment-add">@T["ui.shipments.add_package"]</h2>
+                <form method="post" action="/customer/packages/shipments/@Detail.Shipment.ShipmentId/packages" class="customer-portal__form customer-prealert-form">
+                    <AntiforgeryToken />
+                    <PackageFields T="T" Entered="Package" />
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.prealert.submit"]</button>
+                </form>
+            </section>
         }
-        else if (Detail.Shipment.IsOpen)
+        @if (Detail.CanCancel)
         {
-            <p><a class="vx-button vx-button--secondary" href="/customer/packages/shipments/new">@T["ui.shipments.new"]</a></p>
-        }
-    </section>
-    @* Slice 5A: the shipment's documents once something is in it. *@
-    @if (Detail.Shipment.HasInstructions && Detail.Parcels.Count > 0)
-    {
-        <p class="customer-portal__actions">
-            <a href="/customer/packages/shipments/@Detail.Shipment.ShipmentId/documents/packing-list">@T["ui.shipments.packing_list"]</a>
-            · <a href="/customer/packages/shipments/@Detail.Shipment.ShipmentId/documents/commercial-invoice">@T["ui.shipments.commercial_invoice"]</a>
-        </p>
-    }
-    <section aria-labelledby="shipment-arrived">
-        <h2 id="shipment-arrived">@T["ui.packages.received"]</h2>
-        @if (Detail.Parcels.Count == 0) { <p>@T["ui.packages.none"]</p> }
-        <ul class="customer-portal__list">
-            @foreach (CustomerParcelDto parcel in Detail.Parcels)
-            {
-                <li data-on-hold="@(parcel.Holds.Count > 0 ? "true" : "false")">
-                    <a href="/customer/packages/@parcel.ParcelId"><strong>@parcel.Number</strong> · @parcel.TrackingNumber</a>
-                    <span class="customer-package-status" data-status="@parcel.Milestone">@(parcel.Milestone is { } milestone ? T["ui.milestone." + milestone].Value : null)</span>
-                    @foreach (string hold in parcel.Holds) { <span class="customer-portal__notice">@T["ui.hold." + hold]</span> }
-                    @if (Detail.Shipment.IsOpen && Detail.Shipment.HasInstructions && CustomerPackagePlaces.Movable(parcel)) { <TakeOutForm ParcelId="parcel.ParcelId" Back="@Here" /> }
-                    @if (Detail.Shipment.IsOpen && !Detail.Shipment.HasInstructions && CustomerPackagePlaces.Movable(parcel)) { <PackageMoveForm ParcelId="parcel.ParcelId" Choices="Choices" Back="@Here" /> }
-                </li>
-            }
-        </ul>
-    </section>
-    <section aria-labelledby="shipment-expected">
-        <h2 id="shipment-expected">@T["ui.packages.expected"]</h2>
-        @if (Detail.PreAlerts.Count == 0) { <p>@T["ui.packages.none_expected"]</p> }
-        <ul class="customer-portal__list">
-            @foreach (CustomerPreAlertDto preAlert in Detail.PreAlerts)
-            {
-                <li>
-                    <div class="customer-package-identity"><strong>@preAlert.TrackingNumber</strong><span>@preAlert.Carrier</span></div>
-                    <small>@preAlert.Contents · @preAlert.DeclaredValue.ToString("0.00") @preAlert.CurrencyCode</small>
-                    @if (Detail.Shipment.IsOpen) { <TakeOutForm PreAlertId="preAlert.PreAlertId" Back="@Here" /> }
-                    <form method="post" action="/customer/packages/pre-alerts/@preAlert.PreAlertId/withdraw" class="customer-portal__inline">
-                        <AntiforgeryToken />
-                        <button type="submit" class="vx-button vx-button--secondary">@T["ui.packages.withdraw"]</button>
-                    </form>
-                </li>
-            }
-        </ul>
-    </section>
-    @if (Detail.Shipment.IsOpen && Detail.Shipment.HasInstructions && (UnplacedPreAlerts.Count > 0 || UnplacedParcels.Count > 0))
-    {
-        <section aria-labelledby="shipment-put">
-            <h2 id="shipment-put">@T["ui.shipments.put_in"]</h2>
-            <ul class="customer-portal__list">
-                @foreach (CustomerParcelDto parcel in UnplacedParcels) { <li>@parcel.Number · @parcel.TrackingNumber <PutInForm ParcelId="parcel.ParcelId" ShipmentId="Detail.Shipment.ShipmentId" Back="@Here" /></li> }
-                @foreach (CustomerPreAlertDto preAlert in UnplacedPreAlerts) { <li>@preAlert.TrackingNumber · @preAlert.Contents <PutInForm PreAlertId="preAlert.PreAlertId" ShipmentId="Detail.Shipment.ShipmentId" Back="@Here" /></li> }
-            </ul>
-        </section>
-    }
-    @if (Detail.Shipment.IsOpen && Detail.Shipment.HasInstructions)
-    {
-        <section aria-labelledby="shipment-add">
-            <h2 id="shipment-add">@T["ui.shipments.add_package"]</h2>
-            <form method="post" action="/customer/packages/shipments/@Detail.Shipment.ShipmentId/packages" class="customer-portal__form customer-prealert-form">
+            <form method="post" action="/customer/packages/shipments/@Detail.Shipment.ShipmentId/cancel" class="customer-portal__inline">
                 <AntiforgeryToken />
-                <PackageFields T="T" Entered="Package" />
-                <button type="submit" class="vx-button vx-button--primary">@T["ui.prealert.submit"]</button>
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.shipments.cancel"]</button>
             </form>
-        </section>
-    }
-    @if (Detail.CanCancel)
-    {
-        <form method="post" action="/customer/packages/shipments/@Detail.Shipment.ShipmentId/cancel" class="customer-portal__inline">
-            <AntiforgeryToken />
-            <button type="submit" class="vx-button vx-button--secondary">@T["ui.shipments.cancel"]</button>
-        </form>
-    }
+        }
     </div>
 </CustomerShell>
 
 @code {
     [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
-
     [Parameter] public CustomerShipmentDetailDto Detail { get; set; } = null!;
-
     [Parameter] public CustomerPreAlertBody? Package { get; set; }
-
-    // Slice 4D: the customer's packages from this shipment's warehouse that are in no shipment yet.
     [Parameter] public IReadOnlyList<CustomerPreAlertDto> UnplacedPreAlerts { get; set; } = Array.Empty<CustomerPreAlertDto>();
-
     [Parameter] public IReadOnlyList<CustomerParcelDto> UnplacedParcels { get; set; } = Array.Empty<CustomerParcelDto>();
-
-    // Slice 4D: the customer's open shipments from this warehouse, for the packages of the waiting shipment.
     [Parameter] public IReadOnlyList<CustomerShipmentDto> Choices { get; set; } = Array.Empty<CustomerShipmentDto>();
-
     private string Here => "/customer/packages/shipments/" + Detail.Shipment.ShipmentId;
-
     [Parameter] public string? Error { get; set; }
-
     [Parameter] public string? Info { get; set; }
 
     private IEnumerable<string> Options()

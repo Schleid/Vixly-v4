@@ -201,6 +201,10 @@ public static class PlatformAuditActions
         "platform.licensing.device_enrolled_by_link",
         "platform.licensing.first_device_link_requested",
         "platform.licensing.owner_recovery_started",
+        "platform.licensing.second_factor_reset_requested",
+        "platform.licensing.second_factor_reset_approved",
+        "platform.licensing.second_factor_reset_refused",
+        "platform.licensing.second_factor_reset_completed",
         "platform.tenants.activated_by_registration",
         "platform.payments.zelle_updated",
         "platform.payments.zelle_qr_updated",
@@ -215,7 +219,13 @@ public static class PlatformAuditActions
         "platform.legal.reminder_sent",
         "platform.legal.acceptance_recorded",
         "platform.legal.terms_accepted",
-        "platform.legal.accepted_at_registration"
+        "platform.legal.accepted_at_registration",
+        "platform.leads.received",
+        "platform.leads.status_changed",
+        "platform.tenants.company_change_submitted",
+        "platform.tenants.company_change_withdrawn",
+        "platform.tenants.company_change_approved",
+        "platform.tenants.company_change_rejected"
     };
 
     private static readonly HashSet<string> Known = new(Catalogue, StringComparer.Ordinal);

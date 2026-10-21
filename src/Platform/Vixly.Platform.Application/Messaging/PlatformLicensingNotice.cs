@@ -21,4 +21,6 @@ public sealed record PlatformLicensingNotice(
     Guid? RegistrationId,
     bool? Approved,
     int Count,
-    DateTimeOffset OccurredUtc);
+    DateTimeOffset OccurredUtc,
+    Guid? SupportRequestId = null,
+    Vixly.Platform.Domain.Licensing.PlatformOwnerSupportKind? SupportKind = null);

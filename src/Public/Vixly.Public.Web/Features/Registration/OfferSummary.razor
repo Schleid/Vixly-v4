@@ -1,0 +1,62 @@
+﻿@*
+=========================================================
+FILE: OfferSummary.razor
+
+PURPOSE:
+The terms of a sales offer link, shown before the prospect registers or chooses (D-S21).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Sign-up is switched off until Stage 3 (owner decision D-U4); RegistrationGate shows the closed page
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+
+<VxCard Title="@VixlyText.Format(T, "public.register.offer_title", "company", Offer.CompanyName)">
+    <dl class="vx-facts">
+        <div>
+            <dt>@T["public.register.offer_plan"]</dt>
+            <dd>@Offer.PlanName</dd>
+        </div>
+        <div>
+            <dt>@T["public.register.offer_term"]</dt>
+            <dd>@T["public.register.term." + Offer.Term]</dd>
+        </div>
+        <div>
+            <dt>@T["public.register.licences"]</dt>
+            <dd>@Offer.Licences</dd>
+        </div>
+        <div>
+            <dt>@T["public.register.offer_amount"]</dt>
+            <dd>@Vixly.Public.Web.Features.Plans.PlanDisplay.Money(Offer.PeriodAmount, Offer.CurrencyCode)</dd>
+        </div>
+        @if (Offer.SetupFee > 0m)
+        {
+            <div>
+                <dt>@T["public.register.offer_setup"]</dt>
+                <dd>@Vixly.Public.Web.Features.Plans.PlanDisplay.Money(Offer.SetupFee, Offer.CurrencyCode)</dd>
+            </div>
+        }
+        @if (Offer.StartTrial && Offer.TrialDays is int days)
+        {
+            <div>
+                <dt>@T["public.register.offer_trial"]</dt>
+                <dd>@VixlyText.Format(T, "public.plans.trial", "days", days)</dd>
+            </div>
+        }
+        <div>
+            <dt>@T["public.register.offer_expires"]</dt>
+            <dd>@Offer.ExpiresUtc.UtcDateTime.ToString("D", CultureInfo.CurrentCulture)</dd>
+        </div>
+    </dl>
+    @if (Offer.MaskedEmail is { } email)
+    {
+        <p class="pub-hint">@VixlyText.Format(T, "public.register.offer_email", "email", email)</p>
+    }
+</VxCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public Vixly.Contracts.Platform.Registration.PlatformRegistrationOffer Offer { get; set; } = default!;
+}

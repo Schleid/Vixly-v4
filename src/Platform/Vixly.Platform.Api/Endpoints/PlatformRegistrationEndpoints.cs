@@ -96,7 +96,8 @@ public static class PlatformRegistrationEndpoints
                     AcceptedTerms = body.AcceptedTerms,
                     TermsVersion = body.TermsVersion,
                     PrivacyVersion = body.PrivacyVersion,
-                    BotToken = body.BotToken
+                    BotToken = body.BotToken,
+                    OfferToken = body.OfferToken
                 },
                 cancellationToken);
 

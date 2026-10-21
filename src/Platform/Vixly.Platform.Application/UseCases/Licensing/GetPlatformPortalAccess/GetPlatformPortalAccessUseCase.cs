@@ -46,6 +46,20 @@ public sealed class GetPlatformPortalAccessUseCase
         // Only a tenant's own addresses resolve; a slug still held by a registration does not (D-T11).
         PlatformTenant? tenant = row is { State: PlatformPortalSlugState.Permanent, PlatformTenantId: Guid tenantId } ? await _licensing.Tenants.GetAsync(tenantId, cancellationToken) : null;
 
+        // Operations serves the owner's setup pages while the tenant is still being set up (Stage 3, Slice 0):
+        // a registration's tenant stays Draft until its first device activates it.
+        if (tenant is { Status: PlatformTenantStatus.Draft or PlatformTenantStatus.PendingActivation } && request.IncludeSettingUp)
+        {
+            return GetPlatformPortalAccessResponse.Success(new PlatformPortalAccess(
+                true,
+                tenant.Id,
+                tenant.Status,
+                PlatformSubscriptionAccess.None,
+                tenant.CurrentSlug,
+                tenant.DefaultLanguage.Value,
+                (await _licensing.LegalAsync(tenant.Id, cancellationToken)).Status));
+        }
+
         // Unknown, never-active and closed tenants all look the same from outside.
         if (tenant is null || tenant.Status is PlatformTenantStatus.Draft or PlatformTenantStatus.PendingActivation or PlatformTenantStatus.Deactivated or PlatformTenantStatus.Banned)
         {

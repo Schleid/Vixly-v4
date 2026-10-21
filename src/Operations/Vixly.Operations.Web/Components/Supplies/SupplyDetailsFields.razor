@@ -1,0 +1,38 @@
+﻿@*
+=========================================================
+FILE: SupplyDetailsFields.razor
+
+PURPOSE:
+The fields describing a supply (Slice 5E, S-1): item code, names, unit, category, taxed, barcodes.
+
+RESPONSIBILITIES:
+- Show the fields with the values typed or saved
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Inside the caller's form
+=========================================================
+*@
+<label>@T["ui.supplies.code"] <input name="code" value="@Form.Code" maxlength="@OperationsSupplyLimits.CodeMaxLength" required autocomplete="off" class="ops-editor__code" /></label>
+<p class="ops-editor__hint">@T["ui.supplies.code_hint"]</p>
+<label>@T["ui.supplies.name_en"] <input name="name_en" value="@Form.NameEn" maxlength="@OperationsSupplyLimits.NameMaxLength" required /></label>
+<label>@T["ui.supplies.name_fr"] <input name="name_fr" value="@Form.NameFr" maxlength="@OperationsSupplyLimits.NameMaxLength" /></label>
+<label>@T["ui.supplies.name_es"] <input name="name_es" value="@Form.NameEs" maxlength="@OperationsSupplyLimits.NameMaxLength" /></label>
+<label>@T["ui.supplies.unit"] <input name="unit" value="@Form.Unit" maxlength="@OperationsSupplyLimits.UnitMaxLength" placeholder="@T["ui.supplies.unit_each"]" /></label>
+<label>@T["ui.supplies.category"]
+    <select name="category" required>
+        @foreach (OperationsSupplyCategory category in Enum.GetValues<OperationsSupplyCategory>())
+        {
+            <option value="@category" selected="@(Form.CategoryValue == category)">@T["ui.supplies.category." + category]</option>
+        }
+    </select>
+</label>
+<label><input type="checkbox" name="taxed" value="true" checked="@Form.Taxed" /> @T["ui.supplies.taxed"]</label>
+<label>@T["ui.supplies.barcodes"] <textarea name="barcodes" rows="3" maxlength="300" autocomplete="off">@Form.Barcodes</textarea></label>
+<p class="ops-editor__hint">@T["ui.supplies.barcodes_hint"]</p>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsSupplyForm Form { get; set; } = null!;
+}

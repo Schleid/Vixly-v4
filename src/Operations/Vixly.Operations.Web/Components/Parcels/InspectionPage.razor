@@ -24,7 +24,7 @@ IMPORTANT NOTES:
     </InspectionStationFrame>
     @if (Parcel is { } parcel)
     {
-        <InspectionCheckForm Parcel="parcel" CustomerPhone="@CustomerPhone" ShipmentParcels="ShipmentParcels" Shipment="Shipment" Condition="@Condition" WeightUnit="WeightUnit" DimensionUnit="DimensionUnit" CommandKey="@CommandKey" />
+        <InspectionCheckForm Parcel="parcel" CustomerPhone="@CustomerPhone" ShipmentParcels="ShipmentParcels" Shipment="Shipment" Condition="@Condition" WeightUnit="WeightUnit" DimensionUnit="DimensionUnit" CommandKey="@CommandKey" ShippingPrinters="ShippingPrinters" />
     }
 </EditorShell>
 
@@ -46,6 +46,8 @@ IMPORTANT NOTES:
     [Parameter] public OperationsDimensionUnit DimensionUnit { get; set; }
 
     [Parameter] public string CommandKey { get; set; } = string.Empty;
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Printing.OperationsLabelPrinter> ShippingPrinters { get; set; } = Array.Empty<Vixly.Operations.Domain.Printing.OperationsLabelPrinter>();
 
     [Parameter] public string? Error { get; set; }
 

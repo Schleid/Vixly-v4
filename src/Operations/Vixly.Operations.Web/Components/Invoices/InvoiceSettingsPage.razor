@@ -1,0 +1,72 @@
+﻿@*
+=========================================================
+FILE: InvoiceSettingsPage.razor
+
+PURPOSE:
+Settings → Invoices (Slice 5F, F-5, I-4 and I-10): the tax name and number, a rate per kind, one tax line or one per kind, and the note at the foot of every invoice.
+
+RESPONSIBILITIES:
+- Show the settings; the form for people who may change them
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- A rate of 0 means no tax on that kind; supplies marked not taxed and government fees are never taxed
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.invoice_settings.title"]" Company="@Company" Section="invoice_settings" Error="@Error" Info="@Info">
+    @if (Settings is { } settings)
+    {
+    <form method="post" action="/staff/settings/invoices" class="ops-editor__form">
+        <AntiforgeryToken />
+        <fieldset disabled="@(!CanEdit)">
+            <legend>@T["ui.invoice_settings.tax"]</legend>
+            <label>@T["ui.invoice_settings.tax_name"] <input name="taxName" value="@settings.TaxName" maxlength="40" placeholder="@T["ui.invoices.tax"]" /></label>
+            <label>@T["ui.invoice_settings.tax_number"] <input name="taxNumber" value="@settings.TaxNumber" maxlength="40" /></label>
+            @foreach ((string field, OperationsTaxKind kind, decimal rate) in Rates(settings))
+            {
+                <label>@VixlyText.Format(T, "ui.invoice_settings.rate", "kind", T["ui.invoice.tax_kind." + kind].Value) <input name="@field" value="@rate.ToString("0.###", CultureInfo.InvariantCulture)" inputmode="decimal" size="7" /> %</label>
+            }
+            <p class="ops-editor__hint">@T["ui.invoice_settings.rate_hint"]</p>
+            <fieldset>
+                <legend>@T["ui.invoice_settings.show"]</legend>
+                <label><input type="radio" name="perKind" value="false" checked="@(!settings.TaxPerKind)" /> @T["ui.invoice_settings.single"]</label>
+                <label><input type="radio" name="perKind" value="true" checked="@settings.TaxPerKind" /> @T["ui.invoice_settings.per_kind"]</label>
+            </fieldset>
+        </fieldset>
+        <fieldset disabled="@(!CanEdit)">
+            <legend>@T["ui.invoice_settings.note"]</legend>
+            <p class="ops-editor__hint">@T["ui.invoice_settings.note_hint"]</p>
+            <label>@T["ui.invoice_settings.note_en"] <textarea name="noteEn" rows="3" maxlength="1000">@settings.InvoiceNoteEn</textarea></label>
+            <label>@T["ui.invoice_settings.note_fr"] <textarea name="noteFr" rows="3" maxlength="1000">@settings.InvoiceNoteFr</textarea></label>
+            <label>@T["ui.invoice_settings.note_es"] <textarea name="noteEs" rows="3" maxlength="1000">@settings.InvoiceNoteEs</textarea></label>
+        </fieldset>
+        @if (CanEdit)
+        {
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.invoice_settings.save"]</button>
+        }
+        <p class="ops-editor__hint">@T["ui.invoice_settings.numbering_hint"]</p>
+    </form>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsTenantSettings? Settings { get; set; }
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private static IEnumerable<(string Field, OperationsTaxKind Kind, decimal Rate)> Rates(OperationsTenantSettings settings) => new[]
+    {
+        ("freightRate", OperationsTaxKind.Freight, settings.FreightTaxPercent),
+        ("insuranceRate", OperationsTaxKind.Insurance, settings.InsuranceTaxPercent),
+        ("suppliesRate", OperationsTaxKind.Supplies, settings.SuppliesTaxPercent),
+        ("chargesRate", OperationsTaxKind.Charges, settings.ChargesTaxPercent)
+    };
+}

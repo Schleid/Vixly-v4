@@ -1,0 +1,142 @@
+﻿@*
+=========================================================
+FILE: InsurancePage.razor
+
+PURPOSE:
+The insurance module: the company's policies, the cover it sells and the policy behind it, and its liability when a customer does not insure (Slice 5B step 1).
+
+RESPONSIBILITIES:
+- Flag policies ending within 30 days; list every policy
+- Per transport mode: the cover sold and its policy; the liability terms
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Forms only for staff who may manage insurance; the use cases check again
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.insurance_module.title"]" Company="@Company" Section="insurance" Error="@Error" Info="@Info">
+    @foreach (OperationsInsurancePolicy ending in Policies.Where(policy => policy.EndsSoon(Today)))
+    {
+        <p class="ops-editor__notice" role="status">@VixlyText.Format(T, "ui.insurance_module.ending_soon", new Dictionary<string, object> { ["policy"] = Name(ending), ["date"] = ending.EndsOn!.Value.ToString("yyyy-MM-dd") })</p>
+    }
+    <section class="ops-editor__panel" aria-labelledby="policies-title">
+        <h2 id="policies-title">@T["ui.insurance_module.policies"]</h2>
+        <p class="ops-editor__hint">@T["ui.insurance_module.policies_hint"]</p>
+        @if (CanManage) { <p><a class="vx-button vx-button--primary" href="/staff/insurance/policies/new">@T["ui.insurance_module.add_policy"]</a></p> }
+        @if (Policies.Count == 0)
+        {
+            <div class="ops-editor__empty"><h2>@T["ui.insurance_module.no_policies"]</h2></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.insurance_module.policies"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.insurance_module.policy"]</th><th scope="col">@T["ui.insurance_module.scope"]</th><th scope="col">@T["ui.insurance_module.kind"]</th><th scope="col">@T["ui.insurance_module.period"]</th><th scope="col">@T["ui.insurance_module.state"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsInsurancePolicy policy in Policies)
+                        {
+                            <tr>
+                                <td><a href="/staff/insurance/policies/@policy.Id">@Name(policy)</a></td>
+                                <td>@T["ui.insurance_module.scope." + policy.Scope]</td>
+                                <td>@T["ui.insurance_module.kind." + policy.Kind]</td>
+                                <td>@(policy.StartsOn?.ToString("yyyy-MM-dd") ?? "…") – @(policy.EndsOn?.ToString("yyyy-MM-dd") ?? "…")</td>
+                                <td>@T["ui.insurance_module.state." + State(policy)]</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="covers-title">
+        <h2 id="covers-title">@T["ui.insurance_module.covers"]</h2>
+        <p class="ops-editor__hint">@T["ui.insurance_module.covers_hint"] <a href="/staff/charges">@T["ui.insurance_module.covers_prices"]</a></p>
+        @if (Covers.Count == 0)
+        {
+            <p>@T["ui.insurance_module.no_covers"]</p>
+        }
+        @foreach (OperationsInsurancePlan cover in Covers)
+        {
+            <form method="post" action="/staff/insurance/covers/@cover.Mode" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <input type="hidden" name="plan" value="@cover.Id" />
+                <strong>@T["ui.insurance_module.mode." + cover.Mode] · @cover.Name</strong>
+                @if (!cover.IsActive) { <span> (@T["ui.insurance_module.not_in_use"])</span> }
+                <label>@T["ui.insurance_module.sits_under"]
+                    <select name="policy" disabled="@(!CanManage)">
+                        <option value="">@T["ui.insurance_module.self_insured"]</option>
+                        @foreach (OperationsInsurancePolicy policy in Policies.Where(policy => policy.Scope == OperationsPolicyScope.CustomerShipments && (!policy.IsArchived || policy.Id == cover.PolicyId)))
+                        {
+                            <option value="@policy.Id" selected="@(policy.Id == cover.PolicyId)">@Name(policy)</option>
+                        }
+                    </select>
+                </label>
+                @if (CanManage) { <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button> }
+            </form>
+        }
+    </section>
+    @* Slice 5D (D-6): the company decides whether staff may change a customer's insurance choice. *@
+    <section class="ops-editor__panel" aria-labelledby="insurance-settings-title">
+        <h2 id="insurance-settings-title">@T["ui.insurance_module.settings"]</h2>
+        <form method="post" action="/staff/insurance/settings" class="ops-editor__form">
+            <AntiforgeryToken />
+            <input type="hidden" name="staff_may_change" value="false" />
+            <label><input type="checkbox" name="staff_may_change" value="true" checked="@(Settings?.StaffMayChangeInsurance ?? true)" disabled="@(!CanManage)" /> @T["ui.insurance_module.staff_may_change"]</label>
+            <p class="ops-editor__hint">@T["ui.insurance_module.staff_may_change_hint"]</p>
+            @if (CanManage) { <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button> }
+        </form>
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="liability-title">
+        <h2 id="liability-title">@T["ui.insurance_module.liability"]</h2>
+        <p class="ops-editor__hint">@T["ui.insurance_module.liability_hint"]</p>
+        @foreach (OperationsLiabilityView terms in Liability)
+        {
+            <form method="post" action="/staff/insurance/liability/@terms.Mode" class="ops-editor__form ops-panel--restricted">
+                <AntiforgeryToken />
+                <h3>@T["ui.insurance_module.mode." + terms.Mode]</h3>
+                @if (terms.FromCover) { <p class="ops-editor__hint">@T["ui.insurance_module.liability_from_cover"]</p> }
+                <label>@T["ui.insurance_module.basis"]
+                    <select name="basis" disabled="@(!CanManage)">
+                        @foreach (OperationsLiabilityBasis basis in Enum.GetValues<OperationsLiabilityBasis>()) { <option value="@basis" selected="@(basis == terms.Basis)">@T["ui.insurance_module.basis." + basis]</option> }
+                    </select>
+                </label>
+                <label>@VixlyText.Format(T, "ui.insurance_module.amount", "unit", Unit) <input name="amount" inputmode="decimal" value="@terms.Amount?.ToString("0.####", CultureInfo.InvariantCulture)" disabled="@(!CanManage)" /></label>
+                <label>@T["ui.insurance_module.cap"] (@Currency) <input name="cap" inputmode="decimal" value="@terms.Cap?.ToString("0.##", CultureInfo.InvariantCulture)" disabled="@(!CanManage)" /></label>
+                <label>@T["ui.insurance_module.customer_text"] <textarea name="customer_text" rows="2" maxlength="@OperationsLiabilityTerms.TextMaxLength" disabled="@(!CanManage)">@terms.CustomerText</textarea></label>
+                @if (CanManage) { <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button> }
+            </form>
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsInsurancePolicy> Policies { get; set; } = Array.Empty<OperationsInsurancePolicy>();
+
+    [Parameter] public IReadOnlyList<OperationsInsurancePlan> Covers { get; set; } = Array.Empty<OperationsInsurancePlan>();
+
+    [Parameter] public IReadOnlyList<OperationsLiabilityView> Liability { get; set; } = Array.Empty<OperationsLiabilityView>();
+
+    [Parameter] public DateOnly Today { get; set; }
+
+    [Parameter] public bool CanManage { get; set; }
+
+    [Parameter] public OperationsTenantSettings? Settings { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private string Currency => Settings?.CurrencyCode ?? OperationsTenantSettings.DefaultCurrency;
+
+    private string Unit => Settings?.WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg";
+
+    private string Name(OperationsInsurancePolicy policy) =>
+        policy.Kind == OperationsPolicyKind.SelfInsured ? T["ui.insurance_module.kind.SelfInsured"].Value + (policy.PolicyNumber is { } number ? " " + number : string.Empty) : policy.Name;
+
+    private string State(OperationsInsurancePolicy policy) =>
+        policy.IsArchived ? "archived" : policy.EndsSoon(Today) ? "ending" : policy.IsInForce(Today) ? "in_force" : policy.StartsOn > Today ? "future" : "ended";
+}

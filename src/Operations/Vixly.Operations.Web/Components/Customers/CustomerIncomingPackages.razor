@@ -1,0 +1,59 @@
+﻿@*
+=========================================================
+FILE: CustomerIncomingPackages.razor
+
+PURPOSE:
+The packages coming to a customer, on the staff customer page (owner, 2026-10-18).
+
+RESPONSIBILITIES:
+- Announced packages and parcels at an origin warehouse, newest first, each parcel linked to its page
+- A link to all the customer's parcels
+
+IMPORTANT NOTES:
+- Markup only; the caller passes its localizer
+- No mailbox street address: staff see what is coming, not where the mailbox is
+=========================================================
+*@
+<section class="ops-editor__panel ops-incoming-panel" aria-labelledby="customer-incoming">
+    <h2 id="customer-incoming">@T["ui.customers.incoming"]</h2>
+    @if (Packages.Count == 0)
+    {
+        <p>@T["ui.customers.incoming_none"]</p>
+    }
+    else
+    {
+        <ul class="ops-incoming">
+            @foreach (OperationsIncomingPackage package in Packages)
+            {
+                <li data-state="@(package.ParcelId is null ? "announced" : package.OnHold ? "hold" : "arrived")">
+                    @if (package.ParcelId is { } parcel)
+                    {
+                        <a href="/staff/parcels/@parcel"><strong>@package.ParcelNumber</strong></a>
+                        <span>@VixlyText.Format(T, "ui.customers.incoming.at", "warehouse", package.WarehouseCode ?? string.Empty)</span>
+                        @if (package.OnHold) { <span class="ops-editor__status" data-status="hold">@T["ui.customers.incoming.on_hold"]</span> }
+                    }
+                    else
+                    {
+                        <strong>@T["ui.customers.incoming.announced"]</strong>
+                    }
+                    <br />
+                    <span>@package.Carrier @package.TrackingNumber</span>
+                    @if (!string.IsNullOrWhiteSpace(package.Contents)) { <span> · @package.Contents</span> }
+                    <small> · @package.Since.ToString("yyyy-MM-dd")</small>
+                </li>
+            }
+        </ul>
+    }
+    @if (!string.IsNullOrWhiteSpace(CustomerCode))
+    {
+        <p><a href="/staff/parcels?search=@Uri.EscapeDataString(CustomerCode)">@T["ui.customers.incoming.all"]</a></p>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public string? CustomerCode { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsIncomingPackage> Packages { get; set; } = Array.Empty<OperationsIncomingPackage>();
+}

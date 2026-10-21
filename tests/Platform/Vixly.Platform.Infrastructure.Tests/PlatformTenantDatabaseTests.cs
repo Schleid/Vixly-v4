@@ -75,14 +75,23 @@ public sealed class PlatformTenantDatabaseTests : IClassFixture<PlatformDatabase
         await using (PlatformDbContext context = _database.NewContext())
         {
             PlatformTenant tenant = await context.Tenants.SingleAsync(item => item.Id == tenantId);
-            tenant.UpdateCompany(
+            // B12: legal details change only through an approved request.
+            PlatformTenantChangeRequest change = PlatformTenantChangeRequest.Submit(
+                tenant,
                 PlatformCompanyDetails.Create(
                     "Northwind Logistics Ltd.",
                     null,
                     EmailAddress.Create("hello@northwind.example"),
                     PhoneNumber.Create("+1 514 555 0199"),
                     PlatformPostalAddress.Create("2 Dock Street", "Unit 4", "Laval", null, null, "CA")),
+                "Merger.",
+                "proof.pdf",
+                "%PDF-1.7"u8.ToArray(),
+                "ops-1",
+                "Grace Hopper",
                 Now);
+            context.TenantChangeRequests.Add(change);
+            context.TenantLifecycleEvents.Add(change.Approve(tenant, null, _database.ActorUserId, Now.AddSeconds(30)));
             PlatformTenantLifecycleEvent activated = tenant.Activate(Guid.NewGuid(), Now.AddMinutes(1));
             context.TenantLifecycleEvents.Add(activated);
             await context.SaveChangesAsync();
@@ -99,7 +108,7 @@ public sealed class PlatformTenantDatabaseTests : IClassFixture<PlatformDatabase
             PagedResult<PlatformTenantEventItem> history = await new PlatformTenantQueries(context)
                 .ListEventsAsync(tenantId, PagedRequest.First, CancellationToken.None);
             Assert.Equal(
-                new[] { PlatformTenantEventCodes.Activated, PlatformTenantEventCodes.CreatedByStaff },
+                new[] { PlatformTenantEventCodes.Activated, PlatformTenantEventCodes.CompanyChanged, PlatformTenantEventCodes.CreatedByStaff },
                 history.Items.Select(item => item.EventCode));
         }
     }

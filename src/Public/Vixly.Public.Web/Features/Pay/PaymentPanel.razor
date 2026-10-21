@@ -1,0 +1,135 @@
+﻿@*
+=========================================================
+FILE: PaymentPanel.razor
+
+PURPOSE:
+Pay an invoice by card (the provider’s page) or report a Zelle payment, or save a card (Slice 5 and the Zelle update).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Amounts always come from Platform; the card form sends choices only (D-P7)
+- Card checkout leaves for the provider’s hosted page; Vixly never sees a card number
+- Automatic charging is offered only with consent text for Platform’s consent version
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+@inject PlatformApi Api
+@inject NavigationManager Navigation
+
+<ErrorBox Error="_error" />
+@if (Status == "done")
+{
+    <VxMessage Type="VxMessageType.Success">@T[_info?.Kind == "save_card" ? "public.pay.card_saved" : "public.pay.done"]</VxMessage>
+}
+else if (Status == "cancelled")
+{
+    <VxMessage Type="VxMessageType.Warning">@T["public.pay.cancelled"]</VxMessage>
+}
+else if (Status == "zelle")
+{
+    <VxMessage Type="VxMessageType.Success">@T["public.pay.zelle_reported"]</VxMessage>
+}
+@if (_info is { } info)
+{
+    <VxCard Title="@info.TenantName">
+        @if (info.InvoiceNumber is { } number)
+        {
+            <dl class="vx-facts">
+                <div>
+                    <dt>@T["public.pay.invoice"]</dt>
+                    <dd>@number</dd>
+                </div>
+                <div>
+                    <dt>@T["public.pay.balance"]</dt>
+                    <dd>@Vixly.Public.Web.Features.Plans.PlanDisplay.Money(info.Balance ?? 0m, info.CurrencyCode ?? string.Empty)</dd>
+                </div>
+                @if (info.DueUtc is { } due)
+                {
+                    <div>
+                        <dt>@T["public.pay.due"]</dt>
+                        <dd>@due.UtcDateTime.ToString("D", CultureInfo.CurrentCulture)</dd>
+                    </div>
+                }
+            </dl>
+        }
+    </VxCard>
+    @if (info.Settled)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[info.Kind == "save_card" ? "public.pay.card_link_used" : "public.pay.settled"]</VxMessage>
+    }
+    else
+    {
+        @if (info.CardPaymentsAvailable)
+        {
+            <section class="pub-section" aria-labelledby="pay-card">
+                <h2 id="pay-card">@T[info.Kind == "save_card" ? "public.pay.save_title" : "public.pay.card_title"]</h2>
+                <p>@T[info.Kind == "save_card" ? "public.pay.save_text" : "public.pay.card_text"]</p>
+                <EditForm Model="Card" FormName="pay-card" OnSubmit="CheckoutAsync" class="pub-form">
+                    @if (info.Kind != "save_card")
+                    {
+                        <label><InputCheckbox @bind-Value="Card!.SaveCard" /> @T["public.pay.save_card"]</label>
+                    }
+                    @if (Consent(info.ConsentTextVersion) is { } consent)
+                    {
+                        <label><InputCheckbox @bind-Value="Card!.AutoCharge" /> @consent</label>
+                    }
+                    <div class="pub-form__actions">
+                        <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T[info.Kind == "save_card" ? "public.pay.save_go" : "public.pay.card_go"]</VxButton>
+                    </div>
+                </EditForm>
+            </section>
+        }
+        @if (info.Zelle is { } zelle)
+        {
+            <ZellePanel Zelle="zelle" Balance="info.Balance ?? 0m" Currency="@(info.CurrencyCode ?? string.Empty)" Target="Target" />
+        }
+        @if (!info.CardPaymentsAvailable && info.Zelle is null)
+        {
+            <VxMessage Type="VxMessageType.Warning">@T["public.pay.none"]</VxMessage>
+        }
+    }
+}
+
+@code {
+    private PlatformPaymentLinkInfo? _info;
+
+    private PlatformApiError? _error;
+
+    [Parameter, EditorRequired]
+    public PaymentTarget Target { get; set; } = default!;
+
+    [Parameter]
+    public string? Status { get; set; }
+
+    [SupplyParameterFromForm(FormName = "pay-card")]
+    public CardFormModel? Card { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Card ??= new CardFormModel();
+        PlatformApiResult<PlatformPaymentLinkInfo> result = await Target.LoadAsync(Api, CancellationToken.None);
+        _info = result.Value;
+        _error ??= result.Error;
+    }
+
+    private string? Consent(string version)
+    {
+        LocalizedString text = T["public.pay.consent." + version.Replace('-', '_')];
+        return text.ResourceNotFound ? null : text.Value;
+    }
+
+    private async Task CheckoutAsync()
+    {
+        bool saveCard = _info?.Kind == "save_card" || Card!.SaveCard;
+        PlatformApiResult<PlatformCheckoutStarted> result = await Target.CheckoutAsync(Api, new PlatformCheckoutBody(saveCard, saveCard && Card!.AutoCharge), CancellationToken.None);
+
+        if (result.Value is { } started)
+        {
+            Navigation.NavigateTo(started.CheckoutUrl);
+            return;
+        }
+
+        _error = result.Error;
+    }
+}

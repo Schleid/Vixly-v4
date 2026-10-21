@@ -14,6 +14,8 @@ IMPORTANT NOTES:
 - Static forms with antiforgery and the form guard (ADR-0019); placeholder look: Frontend/UI designs the final experience
 =========================================================
 *@
+@inherits OperationsAllowedComponent
+@using Vixly.Operations.Domain.Access
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.editor.site.title"]" Company="@Company" Section="site" Error="@Error" Info="@Info">
@@ -36,10 +38,13 @@ IMPORTANT NOTES:
                     <a class="vx-button vx-button--secondary" href="/@(language)?preview=true" target="_blank" rel="noopener">@T["ui.editor.site.preview"] @language.ToUpperInvariant()</a>
                 }
             </p>
-            <form method="post" action="/staff/site/publish">
-                <AntiforgeryToken />
-                <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.site.publish"]</button>
-            </form>
+            @if (Can(OperationsPermissions.BrandPublish))
+            {
+                <form method="post" action="/staff/site/publish">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.site.publish"]</button>
+                </form>
+            }
         </section>
 
         <form method="post" action="/staff/site?language=@Language" class="ops-editor__panel">
@@ -105,7 +110,8 @@ IMPORTANT NOTES:
                     }
                     </div>
                 </details>
-            }            <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+            }
+            @if (Can(OperationsPermissions.BrandEdit)) { <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button> }
         </form>
 
         <section class="ops-editor__panel" aria-labelledby="images-title">
@@ -117,7 +123,7 @@ IMPORTANT NOTES:
                 Guid? current = OperationsEditorForms.ImageId(Draft, kind);
                 <div class="ops-editor__image">
                     <h3>@T["ui.editor.image." + item]</h3>
-                    @if (current is { } id)
+                    @if (current is { } id && Can(OperationsPermissions.BrandEdit))
                     {
                         <img src="/site/image/@id.ToString("N")" alt="" height="64" />
                         <form method="post" action="/staff/site/image/@item/remove">
@@ -125,11 +131,18 @@ IMPORTANT NOTES:
                             <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.remove"]</button>
                         </form>
                     }
-                    <form method="post" action="/staff/site/image/@item" enctype="multipart/form-data">
-                        <AntiforgeryToken />
-                        <input type="file" name="file" accept="image/png,image/jpeg,image/webp" required />
-                        <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.upload"]</button>
-                    </form>
+                    else if (current is { } shown)
+                    {
+                        <img src="/site/image/@shown.ToString("N")" alt="" height="64" />
+                    }
+                    @if (Can(OperationsPermissions.BrandEdit))
+                    {
+                        <form method="post" action="/staff/site/image/@item" enctype="multipart/form-data">
+                            <AntiforgeryToken />
+                            <input type="file" name="file" accept="image/png,image/jpeg,image/webp" required />
+                            <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.upload"]</button>
+                        </form>
+                    }
                 </div>
             }
         </section>

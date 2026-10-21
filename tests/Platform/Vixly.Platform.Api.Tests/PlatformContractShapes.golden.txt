@@ -3,9 +3,10 @@ Common.PlatformPageInfo`1: items:IReadOnlyList<T>, page:int, pageSize:int, total
 Events.PlatformDeviceChangedEvent: tenantId:Guid, deviceId:Guid, number:string, status:string, reason:string?, occurredUtc:DateTimeOffset
 Events.PlatformEventInfo: sequence:long, type:string, tenantId:Guid?, occurredUtc:DateTimeOffset, data:JsonElement
 Events.PlatformEventPageInfo: items:IReadOnlyList<PlatformEventInfo>, next:long, more:bool
-Events.PlatformEventTypes: TenantStatusChanged=platform.tenant.status_changed.v1, TenantSlugCorrected=platform.tenant.slug_corrected.v1, SubscriptionStatusChanged=platform.subscription.status_changed.v1, PlanVersionPublished=platform.plan.version_published.v1, DeviceApproved=platform.device.approved.v1, DeviceReleased=platform.device.released.v1, DeviceRevoked=platform.device.revoked.v1, SeatsChanged=platform.licensing.seats_changed.v1, LegalVersionPublished=platform.legal.version_published.v1, TermsAccepted=platform.legal.terms_accepted.v1
+Events.PlatformEventTypes: TenantStatusChanged=platform.tenant.status_changed.v1, TenantSlugCorrected=platform.tenant.slug_corrected.v1, SubscriptionStatusChanged=platform.subscription.status_changed.v1, PlanVersionPublished=platform.plan.version_published.v1, DeviceApproved=platform.device.approved.v1, DeviceReleased=platform.device.released.v1, DeviceRevoked=platform.device.revoked.v1, SeatsChanged=platform.licensing.seats_changed.v1, LegalVersionPublished=platform.legal.version_published.v1, TermsAccepted=platform.legal.terms_accepted.v1, RegistrationAccountSetupReady=platform.registration.account_setup_ready.v1
 Events.PlatformLegalVersionPublishedEvent: documentId:Guid, kind:string, version:string, acceptanceRequired:bool, effectiveUtc:DateTimeOffset?, deadlineUtc:DateTimeOffset?, occurredUtc:DateTimeOffset
 Events.PlatformPlanVersionPublishedEvent: planId:Guid, planCode:string, versionId:Guid, versionNumber:int, occurredUtc:DateTimeOffset
+Events.PlatformRegistrationAccountSetupReadyEvent: tenantId:Guid, registrationId:Guid, occurredUtc:DateTimeOffset
 Events.PlatformSeatsChangedEvent: tenantId:Guid, cause:string, occurredUtc:DateTimeOffset
 Events.PlatformSubscriptionStatusChangedEvent: tenantId:Guid, subscriptionId:Guid, status:string, change:string, planId:Guid, term:string, licences:int, periodEndUtc:DateTimeOffset?, occurredUtc:DateTimeOffset
 Events.PlatformTenantSlugCorrectedEvent: tenantId:Guid, fromSlug:string, toSlug:string, occurredUtc:DateTimeOffset
@@ -15,6 +16,7 @@ Internal.Billing.PlatformBillingDocumentInfo: kind:string, documentId:Guid, numb
 Internal.Billing.PlatformInvoiceInfo: invoiceId:Guid, number:string, kind:string, status:string, currencyCode:string, total:decimal, balance:decimal, paidTotal:decimal, issuedUtc:DateTimeOffset, dueUtc:DateTimeOffset, overdue:bool, creditPending:bool
 Internal.Billing.PlatformPayLinkInfo: url:string, expiresUtc:DateTimeOffset
 Internal.Devices.CompletePlatformDeviceLinkBody: token:string, name:string?, kind:string, publicKey:string?, replaceDeviceId:Guid?
+Internal.Devices.CompletePlatformSecondFactorResetBody: token:string
 Internal.Devices.EnrolPlatformDeviceBody: name:string?, kind:string, publicKey:string?
 Internal.Devices.PlatformDeviceChallengeInfo: challenge:string
 Internal.Devices.PlatformDeviceCheckInfo: allowed:bool, code:string?, access:string, newSecret:string?
@@ -40,6 +42,10 @@ Internal.Subscription.PlatformScheduledChangeInfo: planCode:string, planName:str
 Internal.Subscription.PlatformSubscriptionChangeBody: planId:Guid, term:string, licences:int
 Internal.Subscription.PlatformSubscriptionInfo: planCode:string, planName:string, versionNumber:int, status:string, term:string, licences:int, activeLicences:int, pricePerLicence:decimal, periodAmount:decimal, nextPeriodNetAmount:decimal, currencyCode:string, trialEndsUtc:DateTimeOffset?, periodStartUtc:DateTimeOffset?, periodEndUtc:DateTimeOffset?, cancelAtPeriodEnd:bool, access:string, scheduledChange:PlatformScheduledChangeInfo?, limits:IReadOnlyDictionary<string,int>, features:IReadOnlyList<string>
 Internal.Subscription.PlatformSubscriptionQuoteInfo: timing:string, planCode:string, term:string, licences:int, chargeNow:decimal, nextPeriodAmount:decimal, nextPeriodNetAmount:decimal, currencyCode:string, effectiveUtc:DateTimeOffset, endsTrial:bool
+Internal.Tenant.PlatformCompanyChangeBody: legalName:string, tradingName:string?, email:string, phone:string, addressLine1:string, addressLine2:string?, city:string, stateProvince:string?, postalCode:string?, countryCode:string, reason:string?, proofFileName:string?, proofBase64:string?
+Internal.Tenant.PlatformCompanyChangeInfo: requestId:Guid, status:string, previous:PlatformCompanyDetailsInfo, proposed:PlatformCompanyDetailsInfo, reason:string, submittedByName:string, submittedUtc:DateTimeOffset, decidedUtc:DateTimeOffset?, decisionNote:string?
+Internal.Tenant.PlatformCompanyChangeReceipt: requestId:Guid
+Internal.Tenant.PlatformCompanyDetailsInfo: legalName:string, tradingName:string?, email:string, phone:string, address:PlatformPostalAddressInfo
 Internal.Tenant.PlatformPostalAddressInfo: line1:string, line2:string?, city:string, stateProvince:string?, postalCode:string?, countryCode:string
 Internal.Tenant.PlatformSupportInfo: companyName:string, email:string?, phone:string?, website:string?
 Internal.Tenant.PlatformTenantAccountInfo: tenantId:Guid, tenantCode:string, slug:string, legalName:string, tradingName:string?, email:string, phone:string, address:PlatformPostalAddressInfo, defaultLanguage:string, timeZone:string, status:string, contacts:IReadOnlyList<PlatformTenantContactInfo>, support:PlatformSupportInfo?

@@ -20,4 +20,6 @@ public sealed record PlatformTenantLicensingSummary(
     PlatformLicensingCounts Counts,
     int ReleaseAllowance,
     bool FirstDeviceLinkAllowed,
-    PlatformLicensingAbilities Abilities);
+    PlatformLicensingAbilities Abilities,
+    IReadOnlyList<PlatformOwnerSupportItem> Support,
+    IReadOnlyList<PlatformDeviceOption> ActiveDevices);

@@ -113,8 +113,8 @@ public sealed class PlatformDemoBilling
                     new[] { Period(plan, tenant, subscription, version.PricePerLicence(subscription.Term)) },
                     cancellationToken);
 
-                // Most demo invoices are settled; the third is part-paid and the rest stay open.
-                if (issued != 2 && issued < 4)
+                // Most demo invoices are settled; the third is part-paid and the rest stay open. The Operations demo companies always pay in full.
+                if (PlatformDemoTenants.OperationsSlugs.Contains(item.Slug) || (issued != 2 && issued < 4))
                 {
                     await PayAsync(invoice, invoice.Balance, actor, now, cancellationToken);
                     paid++;

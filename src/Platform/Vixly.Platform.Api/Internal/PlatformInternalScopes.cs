@@ -21,4 +21,7 @@ public static class PlatformInternalScopes
     public const string Events = "events";
 
     public const string Jobs = "jobs";
+
+    // Public.Web: carries the visitor IP for limits and the bot check (Stage 2).
+    public const string Public = "public";
 }

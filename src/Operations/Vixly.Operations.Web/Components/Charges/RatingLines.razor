@@ -1,0 +1,40 @@
+﻿@*
+=========================================================
+FILE: RatingLines.razor
+
+PURPOSE:
+The lines and total of one rating (Slice 4).
+
+RESPONSIBILITIES:
+- Name each line, its amount, and the total
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Government fees are marked as passed through
+=========================================================
+*@
+<table class="ops-editor__table">
+    <caption>@Caption</caption>
+    <tbody>
+        @foreach (OperationsChargeLine line in Rating.Lines)
+        {
+            <tr>
+                <td>@OperationsChargeWords.Line(T, line) @(line.IsGovernmentFee ? "(" + T["ui.charges.extra.government_short"].Value + ")" : null)</td>
+                <td class="ops-editor__number">@OperationsChargeWords.Money(line.Amount, Currency)</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot><tr><th scope="row">@T["ui.charges.total"]</th><td class="ops-editor__number"><strong>@OperationsChargeWords.Money(Rating.Total, Currency)</strong></td></tr></tfoot>
+</table>
+@if (Rating.InsuranceRefused) { <p class="ops-editor__hint">@T["ui.charges.insurance_refused"]</p> }
+@if (Rating.CustomerCard) { <p class="ops-editor__hint">@T["ui.charges.customer_card"]</p> }
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsRating Rating { get; set; } = null!;
+
+    [Parameter] public string Caption { get; set; } = string.Empty;
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+}

@@ -1,0 +1,56 @@
+﻿@*
+=========================================================
+FILE: ShippingLabelPanel.razor
+
+PURPOSE:
+A parcel's shipping label: print it on a shipping label printer, or download it to print (Slice 4D step 2, A-5).
+
+RESPONSIBILITIES:
+- Only for a cleared parcel (checked, no hold, no inspection waiting, in one of the customer's shipments); otherwise say why not yet
+- Show when it was last printed
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The download is a form post: it marks the label printed
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<section class="ops-editor__panel" aria-labelledby="shipping-label">
+    <h2 id="shipping-label">@T["ui.shipping_label.title"]</h2>
+    @if (!Cleared)
+    {
+        <p class="ops-editor__hint">@T["ui.shipping_label.not_cleared"]</p>
+    }
+    else
+    {
+        <p>@(PrintedUtc is { } printed ? VixlyText.Format(T, "ui.shipping_label.printed", "date", printed.ToString("yyyy-MM-dd HH:mm")) : T["ui.shipping_label.never"].Value)</p>
+        @if (Printers.Count > 0)
+        {
+            <form method="post" action="/staff/parcels/@ParcelId/shipping-label" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <label>@T["ui.parcels.print_on"]
+                    <select name="printer">
+                        @foreach (Vixly.Operations.Domain.Printing.OperationsLabelPrinter printer in Printers) { <option value="@printer.Id">@printer.Name</option> }
+                    </select>
+                </label>
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.shipping_label.print"]</button>
+            </form>
+        }
+        <form method="post" action="/staff/parcels/@ParcelId/shipping-label/pdf" class="ops-editor__inline">
+            <AntiforgeryToken />
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.shipping_label.download"]</button>
+        </form>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public Guid ParcelId { get; set; }
+
+    [Parameter] public bool Cleared { get; set; }
+
+    [Parameter] public DateTimeOffset? PrintedUtc { get; set; }
+
+    // The warehouse's printers holding shipping labels.
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Printing.OperationsLabelPrinter> Printers { get; set; } = Array.Empty<Vixly.Operations.Domain.Printing.OperationsLabelPrinter>();
+}

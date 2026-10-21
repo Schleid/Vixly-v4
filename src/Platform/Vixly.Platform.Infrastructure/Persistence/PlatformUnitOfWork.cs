@@ -20,6 +20,10 @@ namespace Vixly.Platform.Infrastructure.Persistence;
 //   tracked changes
 // - Other database errors propagate; the host logs them with
 //   the correlation id and shows a generic error (S-9)
+// - A commit that has started always finishes: a closed tab, a
+//   double click or a lost connection must never cancel it
+//   half-way (ADR-0019); the token only stops the work before
+//   the commit starts
 // =========================================================
 internal sealed class PlatformUnitOfWork : IPlatformUnitOfWork
 {
@@ -34,7 +38,8 @@ internal sealed class PlatformUnitOfWork : IPlatformUnitOfWork
     {
         try
         {
-            await _context.SaveChangesAsync(cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            await _context.SaveChangesAsync(CancellationToken.None);
 
             return true;
         }

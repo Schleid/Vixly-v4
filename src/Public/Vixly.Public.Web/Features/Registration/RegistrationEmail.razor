@@ -1,0 +1,114 @@
+﻿@*
+=========================================================
+FILE: RegistrationEmail.razor
+
+PURPOSE:
+Step 2 of sign-up: check your email; send the link again or correct the address (Slice 2).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Sign-up is switched off until Stage 3 (owner decision D-U4); RegistrationGate shows the closed page
+- Only the masked address is shown; Platform never returns the stored details
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+@inject PlatformApi Api
+@inject NavigationManager Navigation
+
+<ErrorBox Error="_error" />
+@if (_done is { } done)
+{
+    <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+}
+@if (_status is { } status)
+{
+    <div class="pub-form pub-form--grid">
+        <p class="pub-lead pub-field--full">@VixlyText.Format(T, "public.register.email_sent", "email", status.MaskedEmail)</p>
+        <p class="pub-hint pub-field--full">@VixlyText.Format(T, "public.register.email_deadline", "date", status.VerificationDeadlineUtc.UtcDateTime.ToString("f", CultureInfo.CurrentCulture) + " UTC")</p>
+        <div class="pub-field--full pub-form-actions-row">
+            <form method="post" @formname="register-resend" @onsubmit="ResendAsync">
+                <AntiforgeryToken />
+                <div class="pub-form__actions">
+                    <VxButton Type="submit">@T["public.register.resend"]</VxButton>
+                </div>
+            </form>
+        </div>
+        <fieldset class="pub-field--full">
+            <legend>@T["public.register.correct_email"]</legend>
+            <EditForm Model="Correction" FormName="register-email" OnSubmit="CorrectAsync" class="pub-form-inline">
+                <div class="vx-field pub-field--address">
+                    <label class="vx-label" for="reg-new-email">@T["public.register.correct_email"]</label>
+                    <InputText id="reg-new-email" type="email" class="vx-input" @bind-Value="Correction!.Email" required maxlength="254" />
+                </div>
+                <div class="pub-form__actions">
+                    <VxButton Type="submit">@T["public.register.correct"]</VxButton>
+                </div>
+            </EditForm>
+        </fieldset>
+    </div>
+}
+
+@code {
+    private Vixly.Contracts.Platform.Registration.PlatformRegistrationStatus? _status;
+
+    private PlatformApiError? _error;
+
+    private string? _done;
+
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    [SupplyParameterFromForm(FormName = "register-email")]
+    public EmailCorrection? Correction { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Correction ??= new EmailCorrection();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        if (RegistrationCookies.Read(HttpContext, RegistrationCookies.Access) is not { } access)
+        {
+            Navigation.NavigateTo(PublicLanguage.Page(PublicLanguage.Current, "register"));
+            return;
+        }
+
+        PlatformApiResult<Vixly.Contracts.Platform.Registration.PlatformRegistrationStatus> result = await Api.StatusAsync(access, CancellationToken.None);
+
+        if (result.Value is { Step: not "pending_email_verification" } moved)
+        {
+            Navigation.NavigateTo(RegistrationSteps.PageFor(moved.Step));
+            return;
+        }
+
+        _status = result.Value;
+        _error ??= result.Error;
+    }
+
+    private async Task ResendAsync()
+    {
+        PlatformApiResult<bool> result = await Api.ResendAsync(RegistrationCookies.Read(HttpContext, RegistrationCookies.Access) ?? string.Empty, CancellationToken.None);
+        _done = result.Succeeded ? "public.register.resent" : null;
+        _error = result.Error;
+    }
+
+    private async Task CorrectAsync()
+    {
+        PlatformApiResult<bool> result = await Api.CorrectEmailAsync(RegistrationCookies.Read(HttpContext, RegistrationCookies.Access) ?? string.Empty, Correction!.Email ?? string.Empty, CancellationToken.None);
+        _done = result.Succeeded ? "public.register.corrected" : null;
+        _error = result.Error;
+
+        if (result.Succeeded)
+        {
+            await LoadAsync();
+        }
+    }
+
+    public sealed class EmailCorrection
+    {
+        public string? Email { get; set; }
+    }
+}

@@ -1,0 +1,26 @@
+﻿@*
+=========================================================
+FILE: CompanyTabs.razor
+
+PURPOSE:
+The tabs of the Company area: profile, billing and Terms (owner, 2026-10-18).
+
+RESPONSIBILITIES:
+- Link the three company pages and mark the current one
+
+IMPORTANT NOTES:
+- Billing is the company's own subscription bill from the platform, not customer invoicing
+- Navigation never grants access; each page checks its own permission
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<nav class="ops-editor__tabs" aria-label="@T["ui.editor.nav.company"]">
+    <a href="/staff/company" aria-current="@(Current == "profile" ? "page" : null)">@T["ui.company.tab.profile"]</a>
+    <a href="/staff/billing" aria-current="@(Current == "billing" ? "page" : null)">@T["ui.editor.nav.billing"]</a>
+    <a href="/staff/legal" aria-current="@(Current == "legal" ? "page" : null)">@T["ui.editor.nav.legal"]</a>
+</nav>
+
+@code {
+    [Parameter, EditorRequired] public string Current { get; set; } = string.Empty;
+}

@@ -14,6 +14,8 @@ IMPORTANT NOTES:
 - Placeholder look: Frontend/UI designs the final experience
 =========================================================
 *@
+@inherits OperationsAllowedComponent
+@using Vixly.Operations.Domain.Access
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@Member.FullName" Company="@Company" Section="staff" Error="@Error" Info="@Info">
@@ -37,7 +39,7 @@ IMPORTANT NOTES:
                 <li>
                     <strong>@(grant.IsAdministratorRole ? T["ui.roles.administrator"] : grant.RoleName)</strong>
                     <span>@(grant.ScopeName ?? T["ui.staff.scope.tenant"])</span>
-                    @if (!Member.IsOwner)
+                    @if (!Member.IsOwner && Can(OperationsPermissions.RolesGrant))
                     {
                         <form method="post" action="/staff/people/@Member.UserId/revoke/@grant.GrantId" class="ops-editor__inline">
                             <AntiforgeryToken />
@@ -47,7 +49,7 @@ IMPORTANT NOTES:
                 </li>
             }
         </ul>
-        @if (!Member.IsOwner)
+        @if (!Member.IsOwner && Can(OperationsPermissions.RolesGrant))
         {
             <form method="post" action="/staff/people/@Member.UserId/grant" class="ops-editor__inline">
                 <AntiforgeryToken />
@@ -72,29 +74,38 @@ IMPORTANT NOTES:
             </form>
         }
     </section>
-    @if (!Member.IsOwner && !IsMe)
+    @if (!Member.IsOwner && !IsMe && (StatusChoices.Any() || CanAny(OperationsPermissions.StaffResetSecondFactor, OperationsPermissions.StaffEndSessions) || ViewerIsOwner))
     {
         <section class="ops-editor__panel ops-panel--restricted">
             <h2>@T["ui.staff.actions"]</h2>
-            <form method="post" action="/staff/people/@Member.UserId/status" class="ops-editor__inline">
-                <AntiforgeryToken />
-                <select name="status" aria-label="@T["ui.staff.change_status"]">
-                    @foreach (string status in new[] { "Suspended", "Locked", "Deactivated", "Active" })
-                    {
-                        <option value="@status">@T["ui.staff.to." + status.ToLowerInvariant()]</option>
-                    }
-                </select>
-                <input name="reason" maxlength="300" required placeholder="@T["ui.staff.reason"]" aria-label="@T["ui.staff.reason"]" />
-                <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.change_status"]</button>
-            </form>
-            <form method="post" action="/staff/people/@Member.UserId/reset-second-factor" class="ops-editor__inline">
-                <AntiforgeryToken />
-                <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.reset_second_factor"]</button>
-            </form>
-            <form method="post" action="/staff/people/@Member.UserId/end-sessions" class="ops-editor__inline">
-                <AntiforgeryToken />
-                <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.end_sessions"]</button>
-            </form>
+            @if (StatusChoices.Any())
+            {
+                <form method="post" action="/staff/people/@Member.UserId/status" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <select name="status" aria-label="@T["ui.staff.change_status"]">
+                        @foreach (string status in StatusChoices)
+                        {
+                            <option value="@status">@T["ui.staff.to." + status.ToLowerInvariant()]</option>
+                        }
+                    </select>
+                    <input name="reason" maxlength="300" required placeholder="@T["ui.staff.reason"]" aria-label="@T["ui.staff.reason"]" />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.change_status"]</button>
+                </form>
+            }
+            @if (Can(OperationsPermissions.StaffResetSecondFactor))
+            {
+                <form method="post" action="/staff/people/@Member.UserId/reset-second-factor" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.reset_second_factor"]</button>
+                </form>
+            }
+            @if (Can(OperationsPermissions.StaffEndSessions))
+            {
+                <form method="post" action="/staff/people/@Member.UserId/end-sessions" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.end_sessions"]</button>
+                </form>
+            }
             @if (ViewerIsOwner && Member.IsAdministrator && Member.HasSecondFactor)
             {
                 <form method="post" action="/staff/people/@Member.UserId/transfer" class="ops-editor__inline">
@@ -110,6 +121,13 @@ IMPORTANT NOTES:
 </EditorShell>
 
 @code {
+    // Each status change needs its own permission (the use case checks the same).
+    private IEnumerable<string> StatusChoices => new[]
+    {
+        ("Suspended", OperationsPermissions.StaffSuspend), ("Locked", OperationsPermissions.StaffLock),
+        ("Deactivated", OperationsPermissions.StaffDeactivate), ("Active", OperationsPermissions.StaffReactivate)
+    }.Where(choice => Can(choice.Item2)).Select(choice => choice.Item1);
+
     [Parameter] public string? Company { get; set; }
 
     [Parameter, EditorRequired] public OperationsStaffMember Member { get; set; } = null!;

@@ -1,0 +1,65 @@
+﻿@*
+=========================================================
+FILE: InvoicesPage.razor
+
+PURPOSE:
+The customer's invoices and credit notes (Slice 5F, I-8).
+
+RESPONSIBILITIES:
+- List each invoice with its date, what it is for, its total and what is owed; its PDF and its credit notes' PDFs
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- Paying comes with the company's payment options later
+=========================================================
+*@
+@using System.Globalization
+@using Vixly.Contracts.Operations.Billing
+@using Vixly.Contracts.Operations.Customers
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.invoices.title"]" SignedIn="true" Error="@Error" ReturnHere="/customer/invoices">
+    @if (Invoices is { } invoices)
+    {
+        @if (invoices.Invoices.Count == 0)
+        {
+            <p class="customer-portal__hint">@T["ui.invoices.none"]</p>
+        }
+        else
+        {
+            <CustomerTableViewport Label="@T["ui.invoices.title"]">
+<table class="customer-portal__table">
+                <thead><tr><th scope="col">@T["ui.invoices.number"]</th><th scope="col">@T["ui.invoices.date"]</th><th scope="col">@T["ui.invoices.for"]</th><th scope="col">@T["ui.invoices.total"]</th><th scope="col">@T["ui.invoices.owed"]</th><th scope="col">@T["ui.invoices.credit_notes"]</th></tr></thead>
+                <tbody>
+                    @foreach (CustomerInvoiceDto invoice in invoices.Invoices)
+                    {
+                        <tr data-voided="@invoice.Voided">
+                            <td><a href="/customer/invoices/@invoice.InvoiceId/pdf" target="_blank" rel="noopener">@invoice.Number</a>@if (invoice.Voided) { <span> · @T["ui.invoices.voided"]</span> }</td>
+                            <td>@invoice.IssuedOn.ToString("d", CultureInfo.CurrentCulture)</td>
+                            <td>@T["ui.invoices.kind." + invoice.Kind] @invoice.Reference</td>
+                            <td>@Money(invoice.Total, invoice.CurrencyCode)</td>
+                            <td>@Money(invoice.Owed, invoice.CurrencyCode)</td>
+                            <td>
+                                @foreach (CustomerCreditNoteDto note in invoice.CreditNotes)
+                                {
+                                    <a href="/customer/invoices/@invoice.InvoiceId/pdf?credit=@note.CreditNoteId" target="_blank" rel="noopener">@note.Number</a> <span>(-@Money(note.Total, invoice.CurrencyCode))</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+</CustomerTableViewport>
+        }
+    }
+</CustomerShell>
+
+@code {
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public CustomerInvoicesDto? Invoices { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    private static string Money(decimal amount, string currency) => amount.ToString("N2", CultureInfo.CurrentCulture) + " " + currency;
+}

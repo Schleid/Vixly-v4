@@ -1,0 +1,82 @@
+﻿@*
+=========================================================
+FILE: InsurancePlanForm.razor
+
+PURPOSE:
+One insurance product: its name and pitch, its price and its terms, from now or from a later day (Slice 4 and 4B; full terms, Slice 4C section 8;
+several products per mode, Slice 5D).
+
+RESPONSIBILITIES:
+- The name, the order among the mode's products and the pitch in each language (Slice 5D)
+- The premium: a percentage of the declared value with a minimum, or value bands; the most insured per shipment
+- The terms (InsuranceCoverageFields); a version scheduled for later and its removal
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+<form method="post" action="/staff/charges/insurance" class="ops-editor__form" aria-label="@(Plan?.Name ?? T["ui.charges.insurance.add"].Value)">
+    <AntiforgeryToken />
+    <input type="hidden" name="mode" value="@Mode" />
+    @if (Plan is not null) { <input type="hidden" name="plan" value="@Plan.Id" /> }
+    <fieldset>
+        <legend>@T["ui.charges.insurance.product"]</legend>
+        <label>@T["ui.charges.insurance.name"] <input name="name" value="@(Plan?.Name)" maxlength="@OperationsInsurancePlan.NameMaxLength" required placeholder="@T["ui.charges.insurance.name_hint"]" /></label>
+        <label>@T["ui.charges.insurance.position"] <input name="position" type="number" min="0" max="99" step="1" size="3" value="@(Plan?.Position ?? 0)" /></label>
+        <label>@T["ui.charges.insurance.pitch_en"] <textarea name="pitch_en" rows="2" maxlength="@OperationsInsurancePlan.PitchMaxLength">@Plan?.PitchEn</textarea></label>
+        <label>@T["ui.charges.insurance.pitch_fr"] <textarea name="pitch_fr" rows="2" maxlength="@OperationsInsurancePlan.PitchMaxLength">@Plan?.PitchFr</textarea></label>
+        <label>@T["ui.charges.insurance.pitch_es"] <textarea name="pitch_es" rows="2" maxlength="@OperationsInsurancePlan.PitchMaxLength">@Plan?.PitchEs</textarea></label>
+        <p class="ops-editor__hint">@T["ui.charges.insurance.pitch_hint"]</p>
+    </fieldset>
+    <fieldset>
+        <legend>@T["ui.charges.insurance.price"]</legend>
+        <label>@T["ui.charges.insurance.method"]
+            <select name="method">
+                <option value="Percent" selected="@(Current?.Method != OperationsInsuranceMethod.Bands)">@T["ui.charges.insurance.method.Percent"]</option>
+                <option value="Bands" selected="@(Current?.Method == OperationsInsuranceMethod.Bands)">@T["ui.charges.insurance.method.Bands"]</option>
+            </select>
+        </label>
+        <label>@T["ui.charges.insurance.percent"] <input name="percent" inputmode="decimal" value="@OperationsChargeWords.Number(Current?.Percent)" /></label>
+        <label>@T["ui.charges.insurance.minimum"] (@Currency) <input name="minimum" inputmode="decimal" value="@OperationsChargeWords.Number(Current?.MinimumPremium)" /></label>
+        <label>@T["ui.charges.insurance.bands"]
+            <textarea name="bands" rows="3" placeholder="100 = 3.00">@(Current is null ? null : OperationsPriceText.Write(Current.Bands.Select(band => (OperationsPriceText.Write(band.UpToValue), band.Premium))))</textarea>
+        </label>
+        <p class="ops-editor__hint">@T["ui.charges.insurance.bands_hint"]</p>
+        <label>@T["ui.charges.insurance.max_value"] (@Currency) <input name="max_value" inputmode="decimal" value="@OperationsChargeWords.Number(Current?.MaxValue)" /></label>
+    </fieldset>
+    <InsuranceCoverageFields T="T" Coverage="@(Current?.Coverage.ToTerms() ?? OperationsInsuranceCoverage.Defaults)" Currency="@Currency" Unit="@Unit" />
+    <label>@T["ui.charges.effective"] <input name="effective" type="date" /></label>
+    <label><input type="checkbox" name="active" value="true" checked="@(Plan?.IsActive != false)" /> @T["ui.charges.in_use"]</label>
+    <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+</form>
+@if (Plan is not null)
+{
+    @foreach (OperationsInsuranceVersion later in Plan.Versions.Where(version => version.EffectiveFromUtc > UtcNow))
+    {
+        <form method="post" action="/staff/charges/versions/remove" class="ops-editor__inline">
+            <AntiforgeryToken />
+            <input type="hidden" name="tab" value="@Mode" />
+            <input type="hidden" name="owner" value="Insurance" />
+            <input type="hidden" name="owner_id" value="@Plan.Id" />
+            <input type="hidden" name="version" value="@later.Id" />
+            <span>@VixlyText.Format(T, "ui.charges.version.scheduled_insurance", "date", later.EffectiveFromUtc.ToString("d", CultureInfo.CurrentCulture))</span>
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.charges.version.remove"]</button>
+        </form>
+    }
+}
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public OperationsTransportMode Mode { get; set; }
+
+    [Parameter] public OperationsInsurancePlan? Plan { get; set; }
+
+    [Parameter] public DateTimeOffset UtcNow { get; set; }
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+
+    [Parameter] public string Unit { get; set; } = string.Empty;
+
+    private OperationsInsuranceVersion? Current => Plan is null ? null : Plan.TermsAt(UtcNow) ?? Plan.Versions.FirstOrDefault();
+}

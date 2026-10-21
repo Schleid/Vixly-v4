@@ -1,0 +1,212 @@
+﻿@*
+=========================================================
+FILE: CounterCustomerPage.razor
+
+PURPOSE:
+The customer at the counter: who they are, all their shipments, and a new shipment (Slice 5C, C-5 and C-6).
+
+RESPONSIBILITIES:
+- The search bar for the next customer, then the customer's card with their standing (CounterCustomerCard)
+- Their shipments: destination, service, recipient, parcels in against the count, status, amount once final
+- A new shipment: origin, destination and delivery, address, recipient, service, parcel count, options, insurance terms
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Contact details and shipments only (C-9); the clerk never registers customers
+- No script: pickup and home fields are both shown and the chosen one is used, as on the portal
+- Styling: listed in docs/operations/UI-STYLING-INVENTORY.md
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.counter.title"]" Company="@Company" Section="counter" Error="@Error">
+    @* The whole page in the main column, so the shipment estimate beside it stays in view and centred from the top of the page (owner, 2026-10-20). *@
+    <div class="ops-counter__layout">
+    <div class="ops-counter__main">
+    <CounterFindBar />
+    <CounterCustomerCard Customer="Customer" Standing="Standing" />
+    <section class="ops-editor__panel" aria-labelledby="counter-shipments">
+        <h2 id="counter-shipments">@T["ui.counter.shipments"]</h2>
+        @if (Shipments.Count == 0)
+        {
+            <p>@T["ui.counter.no_shipments"]</p>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.counter.shipments"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.counter.number"]</th><th scope="col">@T["ui.counter.created"]</th><th scope="col">@T["ui.counter.route"]</th><th scope="col">@T["ui.counter.service"]</th><th scope="col">@T["ui.counter.recipient"]</th><th scope="col">@T["ui.counter.parcels"]</th><th scope="col">@T["ui.counter.status"]</th><th scope="col">@T["ui.counter.amount"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsCounterShipment shipment in Shipments)
+                        {
+                            <tr>
+                                <td>@if (shipment.HasInstructions) { <a href="/staff/counter/shipments/@shipment.Id">@(shipment.Number ?? T["ui.counter.no_number"].Value)</a> } else { @(shipment.Number ?? "—") }</td>
+                                <td>@shipment.CreatedUtc.ToString("yyyy-MM-dd")</td>
+                                <td>@shipment.Origin → @(shipment.Destination ?? "—")@(shipment.HomeDelivery ? " · " + T["ui.counter.home"].Value : null)</td>
+                                <td>@(shipment.ServiceCode is { } service ? T["ui.services.name." + service].Value : "—")</td>
+                                <td>@shipment.RecipientName</td>
+                                <td>@shipment.Entered / @(shipment.ParcelCount?.ToString(CultureInfo.CurrentCulture) ?? "—")</td>
+                                <td>@Status(shipment)</td>
+                                <td>@(shipment.BookedTotal is { } total ? total.ToString("N2", CultureInfo.CurrentCulture) + " " + shipment.CurrencyCode : "—")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+    </section>
+    @* Slice 5E (S-14): supplies ordered on their own, next to the shipments. *@
+    <section class="ops-editor__panel" aria-labelledby="counter-orders">
+        <h2 id="counter-orders">@T["ui.counter.supplies.orders"]</h2>
+        @if (Standing.Good)
+        {
+            <form method="post" action="/staff/counter/customers/@Customer.Id/orders" class="ops-editor__inline">
+                <AntiforgeryToken />
+                @* At the counter's warehouse: the clerk picks it when they serve at several (review of 5E). *@
+                @if (Origins.Count > 1)
+                {
+                    <select name="warehouse" aria-label="@T["ui.counter.origin"]">
+                        @foreach (OperationsChoice origin in Origins) { <option value="@origin.Id">@origin.Name</option> }
+                    </select>
+                }
+                else if (Origins.Count == 1)
+                {
+                    <input type="hidden" name="warehouse" value="@Origins[0].Id" />
+                }
+                <button type="submit" class="vx-button vx-button--secondary" accesskey="o">@T["ui.counter.supplies.order_new"]</button>
+            </form>
+        }
+        @if (Orders.Count > 0)
+        {
+            <ul class="ops-editor__list">
+                @foreach (OperationsSupplySale order in Orders)
+                {
+                    <li><a href="/staff/counter/orders/@order.Id">@(order.Number ?? T["ui.counter.supplies.order"].Value)</a> · @order.CreatedUtc.ToString("yyyy-MM-dd")
+                        · @T["ui.counter.supplies.status." + order.Status] · @order.Total.ToString("N2", CultureInfo.CurrentCulture) @order.CurrencyCode</li>
+                }
+            </ul>
+        }
+    </section>
+    @if (Origins.Count > 0 && Standing.Good)
+    {
+        <details class="ops-editor__panel" open="@(Entered is not null || Shipments.Count == 0)">
+            <summary><h2>@T["ui.counter.new_shipment"]</h2></summary>
+            <form method="post" action="/staff/counter/customers/@Customer.Id/shipments" class="ops-editor__form ops-counter__grid" data-estimate="/staff/counter/customers/@Customer.Id/estimate">
+                <AntiforgeryToken />
+                <input type="hidden" name="key" value="@Key" />
+                @if (Origins.Count == 1)
+                {
+                    <input type="hidden" name="origin" value="@Origins[0].Id" />
+                }
+                else
+                {
+                    <label>@T["ui.counter.origin"]
+                        <select name="origin" required>
+                            @foreach (OperationsChoice origin in Origins) { <option value="@origin.Id">@origin.Name</option> }
+                        </select>
+                    </label>
+                }
+                <label>@T["ui.counter.destination"]
+                    <select name="destination" required>
+                        <option value=""></option>
+                        @foreach (OperationsWarehouse destination in Destinations) { <option value="@destination.Id" selected="@(destination.Id == Entered?.DestinationId)">@destination.Name · @destination.Address.City</option> }
+                    </select>
+                </label>
+                <fieldset>
+                    <legend>@T["ui.counter.delivery"]</legend>
+                    @if (DeliveryModes.HasFlag(OperationsDeliveryModes.Pickup)) { <label><input type="radio" name="delivery" value="pickup" checked="@(Entered?.Delivery != "home")" /> @T["ui.counter.pickup"]</label> }
+                    @if (DeliveryModes.HasFlag(OperationsDeliveryModes.HomeDelivery)) { <label><input type="radio" name="delivery" value="home" checked="@(Entered?.Delivery == "home")" /> @T["ui.counter.home"]</label> }
+                </fieldset>
+                <label>@T["ui.counter.service"]
+                    <select name="service" required>
+                        <option value=""></option>
+                        @foreach (string service in Services) { <option value="@service" selected="@(service == Entered?.Service)">@T["ui.services.name." + service]</option> }
+                    </select>
+                </label>
+                <label>@T["ui.estimate.expected_value"] (@CurrencyCode) <input name="expectedValue" inputmode="decimal" size="8" autocomplete="off" /></label>
+                <label>@T["ui.counter.parcel_count"] <input name="parcelCount" type="number" inputmode="numeric" min="1" max="99" step="1" required size="3" value="@EnteredCount" /></label>
+                <label>@T["ui.counter.recipient"] <input name="recipient" value="@Entered?.RecipientName" maxlength="100" required autocomplete="off" /></label>
+                <label>@T["ui.counter.recipient_phone"] <input name="recipientPhone" type="tel" value="@Entered?.RecipientPhone" maxlength="20" required size="16" autocomplete="off" /></label>
+                @if (DeliveryModes.HasFlag(OperationsDeliveryModes.HomeDelivery))
+                {
+                    <fieldset class="ops-counter__address">
+                        <legend>@T["ui.counter.address"]</legend>
+                        <label>@T["ui.counter.line1"] <input name="line1" value="@Entered?.Line1" maxlength="100" /></label>
+                        <label>@T["ui.counter.line2"] <input name="line2" value="@Entered?.Line2" maxlength="100" /></label>
+                        <label>@T["ui.counter.city"] <input name="city" value="@Entered?.City" maxlength="60" size="20" /></label>
+                        <label>@T["ui.counter.region"] <input name="region" value="@Entered?.Region" maxlength="60" size="16" /></label>
+                        <label>@T["ui.counter.postal"] <input name="postalCode" value="@Entered?.PostalCode" maxlength="20" size="10" /></label>
+                        <label>@T["ui.counter.country"] <input name="country" value="@Entered?.CountryCode" maxlength="2" size="3" /></label>
+                    </fieldset>
+                }
+                <fieldset>
+                    <legend>@T["ui.counter.options"]</legend>
+                    <label><input type="checkbox" name="consolidate" value="true" checked="@(Entered?.Consolidate ?? false)" /> @T["ui.counter.consolidate"]</label>
+                    <label><input type="checkbox" name="refrigerated" value="true" checked="@(Entered?.Refrigerated ?? false)" /> @T["ui.counter.refrigerated"]</label>
+                </fieldset>
+                @if (Insurance.Count > 0)
+                {
+                    <InsuranceChoice Products="Insurance" Selected="@Entered?.InsurancePlanId" Currency="@CurrencyCode" UtcNow="UtcNow" />
+                }
+                <p><button type="submit" class="vx-button vx-button--primary">@T["ui.counter.create"]</button></p>
+            </form>
+        </details>
+        <script src="/js/ops-estimate.js?v=20261020-1" defer></script>
+    }
+    </div>
+    @if (Origins.Count > 0 && Standing.Good)
+    {
+        <div class="ops-counter__side">
+            <EstimatePanel Estimate="null" WeightUnit="WeightUnit" DimensionUnit="DimensionUnit" />
+            <script src="/js/ops-counter-side.js?v=20261020-1" defer></script>
+        </div>
+    }
+    </div>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsCounterCustomer Customer { get; set; } = null!;
+
+    [Parameter] public OperationsCounterStanding Standing { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsCounterShipment> Shipments { get; set; } = Array.Empty<OperationsCounterShipment>();
+
+    [Parameter] public IReadOnlyList<OperationsChoice> Origins { get; set; } = Array.Empty<OperationsChoice>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Destinations { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<string> Services { get; set; } = Array.Empty<string>();
+
+    // Slice 5D: the company's insurance products.
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Charges.OperationsInsurancePlan> Insurance { get; set; } = Array.Empty<Vixly.Operations.Domain.Charges.OperationsInsurancePlan>();
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
+
+    [Parameter] public OperationsDimensionUnit DimensionUnit { get; set; }
+
+    [Parameter] public DateTimeOffset UtcNow { get; set; }
+
+    [Parameter] public OperationsDeliveryModes DeliveryModes { get; set; }
+
+    [Parameter] public OperationsShipmentDraft? Entered { get; set; }
+
+    [Parameter] public int? EnteredCount { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    // Slice 5E: the customer's latest orders of supplies.
+    [Parameter] public IReadOnlyList<OperationsSupplySale> Orders { get; set; } = Array.Empty<OperationsSupplySale>();
+
+    // The form's reference: the same form sent twice creates one shipment (ADR-0019).
+    private readonly string Key = Guid.NewGuid().ToString("N");
+
+    private string Status(OperationsCounterShipment shipment) =>
+        !shipment.HasInstructions ? T["ui.counter.status.waiting"].Value
+        : shipment.Status == OperationsShipmentStatus.Booked ? T["ui.counter.status.booked"].Value
+        : shipment.ParcelCount is { } count && shipment.Entered > count ? T["ui.counter.status.more"].Value
+        : T["ui.counter.status.open"].Value;
+}

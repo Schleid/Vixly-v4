@@ -1,0 +1,81 @@
+﻿@*
+=========================================================
+FILE: UnclaimedPanel.razor
+
+PURPOSE:
+Packages waiting for their customer past the company's days: return to sender or dispose of (Slice 3E, Q-R6).
+
+RESPONSIBILITIES:
+- List them, oldest first, with the reminders sent
+- The Owner or an administrator decides each one and sets the number of days
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Shown to everyone with the holds page; decided only by the Owner or an administrator
+=========================================================
+*@
+<section class="ops-editor__panel" aria-labelledby="unclaimed-title">
+    <h2 id="unclaimed-title">@VixlyText.Format(T, "ui.holds.unclaimed", "days", Days)</h2>
+    @if (Items.Count == 0)
+    {
+        <p>@T["ui.holds.unclaimed_none"]</p>
+    }
+    else
+    {
+        <p class="ops-editor__hint">@(CanApprove ? T["ui.holds.unclaimed_hint"] : T["ui.holds.approvals_hint"])</p>
+        <ul>
+            @foreach (OperationsHeldParcel held in Items)
+            {
+                <li>
+                    <a href="/staff/parcels/@held.Parcel.ParcelId"><strong>@held.Parcel.Number</strong></a> · @(held.Parcel.CustomerCode ?? T["ui.hold.Unidentified"].Value) · @held.Parcel.ReceivedUtc.ToString("yyyy-MM-dd")
+                    @if (CanApprove)
+                    {
+                        <form method="post" action="/staff/holds/unclaimed/@held.Parcel.ParcelId" class="ops-editor__inline">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+                            <input name="note" maxlength="@OperationsHoldLimits.NoteMaxLength" placeholder="@T["ui.holds.note"]" aria-label="@T["ui.holds.note"]" />
+                            <button type="submit" name="decision" value="return" class="vx-button vx-button--secondary">@T["ui.holds.returned"]</button>
+                            <button type="submit" name="decision" value="dispose" class="vx-button vx-button--secondary">@T["ui.holds.dispose"]</button>
+                            <button type="submit" name="decision" value="auction" class="vx-button vx-button--secondary">@T["ui.holds.auction"]</button>
+                        </form>
+                    }
+                </li>
+            }
+        </ul>
+        @if (Count > Items.Count) { <p class="ops-editor__list-footer">@VixlyText.Format(T, "ui.holds.unclaimed_more", "count", Count - Items.Count)</p> }
+    }
+    @if (CanApprove)
+    {
+        <form method="post" action="/staff/holds/unclaimed-days" class="ops-editor__inline">
+            <AntiforgeryToken />
+            <label>@T["ui.holds.unclaimed_days"] <input name="days" type="number" min="@OperationsHoldLimits.MinUnclaimedDays" max="@OperationsHoldLimits.MaxUnclaimedDays" step="1" value="@Days" required /></label>
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
+        </form>
+        <form method="post" action="/staff/holds/storage-fee" class="ops-editor__inline">
+            <AntiforgeryToken />
+            <label>@T["ui.holds.free_days"] <input name="freeDays" type="number" min="0" max="@OperationsHoldLimits.MaxUnclaimedDays" step="1" value="@FreeDays" required /></label>
+            <label>@VixlyText.Format(T, "ui.holds.storage_fee", "currency", Currency) <input name="fee" inputmode="decimal" value="@FeePerDay?.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)" placeholder="0.00" /></label>
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
+        </form>
+        <p class="ops-editor__hint">@T["ui.holds.storage_fee_hint"]</p>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsHeldParcel> Items { get; set; } = Array.Empty<OperationsHeldParcel>();
+
+    [Parameter] public int Count { get; set; }
+
+    [Parameter] public int Days { get; set; }
+
+    [Parameter] public bool CanApprove { get; set; }
+
+    // Slice 4D step 3: free days, the storage fee per day (none when empty) and the company's currency.
+    [Parameter] public int FreeDays { get; set; }
+
+    [Parameter] public decimal? FeePerDay { get; set; }
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+}

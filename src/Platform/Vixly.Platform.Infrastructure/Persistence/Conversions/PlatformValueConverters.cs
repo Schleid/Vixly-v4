@@ -25,7 +25,7 @@ internal static class PlatformValueConverters
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     public static readonly ValueConverter<EmailAddress, string> Email =
-        new(value => value.Value, value => EmailAddress.Create(value));
+        new(value => value.Value, value => EmailAddress.FromStored(value));
 
     public static readonly ValueConverter<PhoneNumber?, string?> Phone =
         new(

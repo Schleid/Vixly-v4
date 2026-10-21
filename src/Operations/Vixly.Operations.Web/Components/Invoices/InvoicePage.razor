@@ -1,0 +1,60 @@
+﻿@*
+=========================================================
+FILE: InvoicePage.razor
+
+PURPOSE:
+One invoice (Slice 5F, I-2 and I-6 to I-8): who it is for, its lines, taxes and totals, its credit notes, and the forms to correct it.
+
+RESPONSIBILITIES:
+- Show the header and the PDF link, then the lines and totals, the credit notes, and the request form
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The forms show only to the people with the right; the use cases check it again
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@(Invoice?.Number ?? T["ui.invoices.title"].Value)" Company="@Company" Section="invoices" Error="@Error" Info="@Info">
+    <p><a href="/staff/invoices">@T["ui.invoices.back"]</a></p>
+    @if (Invoice is { } invoice)
+    {
+    <section class="ops-editor__panel ops-invoice" aria-labelledby="invoice-title">
+        <h2 id="invoice-title">@invoice.Number · <span class="ops-editor__status" data-status="@OperationsInvoiceWords.State(invoice)">@T["ui.invoices.status." + OperationsInvoiceWords.State(invoice)]</span></h2>
+        <dl class="ops-invoice__facts">
+            <div><dt>@T["ui.invoices.date"]</dt><dd>@OperationsInvoiceWords.Day(invoice.IssuedOn)</dd></div>
+            <div><dt>@T["ui.invoices.customer"]</dt><dd>@OperationsBillingRows.Customer(invoice) · @invoice.Party.CustomerPhone</dd></div>
+            <div><dt>@T[invoice.Kind == OperationsInvoiceKind.Shipment ? "ui.invoices.shipment" : "ui.invoices.order"]</dt><dd>@invoice.Reference@(invoice.Route is { } route ? " · " + route : string.Empty)</dd></div>
+            <div><dt>@T["ui.invoices.warehouse"]</dt><dd>@invoice.Party.WarehouseName</dd></div>
+            <div><dt>@T["ui.invoices.language"]</dt><dd>@invoice.Language.ToUpperInvariant()</dd></div>
+        </dl>
+        <p><a class="vx-button vx-button--secondary" href="/staff/invoices/@invoice.Id/pdf" target="_blank" rel="noopener">@T["ui.invoices.pdf"]</a></p>
+        <InvoiceLines T="T" Invoice="invoice" />
+    </section>
+    <InvoiceCredits T="T" Invoice="invoice" CreditNotes="CreditNotes" People="People" CanApprove="CanApprove" UserId="UserId" />
+    @if (CanRequest && invoice.Status == OperationsInvoiceStatus.Issued && CreditNotes.All(note => note.Status != OperationsCreditNoteStatus.Requested))
+    {
+        <InvoiceRequestForm T="T" Invoice="invoice" />
+    }
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsInvoice? Invoice { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsCreditNote> CreditNotes { get; set; } = Array.Empty<OperationsCreditNote>();
+
+    [Parameter] public IReadOnlyDictionary<Guid, string> People { get; set; } = new Dictionary<Guid, string>();
+
+    [Parameter] public bool CanRequest { get; set; }
+
+    [Parameter] public bool CanApprove { get; set; }
+
+    [Parameter] public Guid UserId { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

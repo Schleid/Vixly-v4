@@ -1,0 +1,48 @@
+﻿@*
+=========================================================
+FILE: SupplyLinesFields.razor
+
+PURPOSE:
+Rows of supplies and quantities in a stock form (Slice 5E step 2): receiving, transfers.
+
+RESPONSIBILITIES:
+- Show a supply list and a quantity on each row; a unit cost when receiving
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Inside the caller's form; empty rows are skipped
+=========================================================
+*@
+<table class="ops-editor__table">
+    <thead><tr><th scope="col">@T["ui.supplies.stock.supply"]</th><th scope="col">@T["ui.supplies.stock.quantity"]</th>@if (WithCost) { <th scope="col">@T["ui.supplies.stock.unit_cost"]</th> }</tr></thead>
+    <tbody>
+        @for (int row = 1; row <= Rows; row++)
+        {
+            <tr>
+                <td>
+                    <select name="@("line_supply_" + row)" aria-label="@T["ui.supplies.stock.supply"]">
+                        <option value=""></option>
+                        @foreach (OperationsSupply supply in Supplies.Where(item => item.IsActive))
+                        {
+                            <option value="@supply.Id">@supply.Code · @supply.Name(Language)</option>
+                        }
+                    </select>
+                </td>
+                <td><input name="@("line_qty_" + row)" inputmode="numeric" size="6" autocomplete="off" aria-label="@T["ui.supplies.stock.quantity"]" /></td>
+                @if (WithCost) { <td><input name="@("line_cost_" + row)" inputmode="decimal" size="8" autocomplete="off" aria-label="@T["ui.supplies.stock.unit_cost"]" /></td> }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsSupply> Supplies { get; set; } = Array.Empty<OperationsSupply>();
+
+    [Parameter] public int Rows { get; set; } = 6;
+
+    [Parameter] public bool WithCost { get; set; }
+
+    private static string Language => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+}

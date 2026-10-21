@@ -1,13 +1,14 @@
-﻿@*
+@*
 =========================================================
 FILE: PackagesPage.razor
 
 PURPOSE:
-The customer's pre-alerts and packages, newest first (Slice 3B).
+The customer's shipments, pre-alerts and packages, newest first (Slice 3B; Slice 4D, owner, 2026-10-19).
 
 RESPONSIBILITIES:
-- List open pre-alerts with a way to withdraw them
-- List packages with their status and what is needed
+- List the customer's shipments, with a way to create one; announce a package on its own
+- List open pre-alerts with their shipment (put in, move, take out) and a way to withdraw them
+- List packages with their status, what is needed and their shipment while they are at the warehouse
 
 IMPORTANT NOTES:
 - Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
@@ -15,12 +16,33 @@ IMPORTANT NOTES:
 *@
 @using Vixly.Contracts.Operations.Customers
 @using Vixly.Contracts.Operations.Packages
+@using Vixly.Customer.Web.Portal
 @inject IStringLocalizer<CustomerText> T
 
 <CustomerShell Brand="@Brand" Title="@T["ui.packages.title"]" SignedIn="true" Error="@Error" Info="@Info" ReturnHere="/customer/packages">
-    <p><a class="vx-button vx-button--primary" href="/customer/packages/new">@T["ui.packages.new"]</a></p>
+    <div class="customer-portal__actions customer-portal__actions--top"><a class="vx-button vx-button--primary" href="/customer/packages/new">@T["ui.prealert.new"]</a><a class="vx-button vx-button--secondary" href="/customer/packages/shipments/new">@T["ui.shipments.new"]</a></div>
     @if (Packages is { } packages)
     {
+        <section aria-labelledby="shipments-title">
+            <h2 id="shipments-title">@T["ui.shipments.list"]</h2>
+            @if ((packages.Shipments?.Count ?? 0) == 0)
+            {
+                <p>@T["ui.shipments.none"]</p>
+            }
+            else
+            {
+                <ul class="customer-portal__list">
+                    @foreach (CustomerShipmentDto shipment in packages.Shipments!.Where(shipment => shipment.HasInstructions || shipment.Arrived > 0))
+                    {
+                        <li data-needs-instructions="@(shipment.HasInstructions ? "false" : "true")">
+                            <a href="/customer/packages/shipments/@shipment.ShipmentId"><strong>@(shipment.HasInstructions ? (shipment.Delivery == "pickup" ? shipment.BranchName : shipment.Address?.City + ", " + shipment.CountryCode) : T["ui.shipments.needs_instructions_short"].Value)</strong></a>
+                            @if (shipment.HasInstructions) { <span>@shipment.RecipientName</span> }
+                            <small>@VixlyText.Format(T, "ui.shipments.counts", new Dictionary<string, object> { ["expected"] = shipment.Announced, ["arrived"] = shipment.Arrived })</small>
+                        </li>
+                    }
+                </ul>
+            }
+        </section>
         <section aria-labelledby="packages-title">
             <h2 id="packages-title">@T["ui.packages.received"]</h2>
             @if (packages.Parcels.Count == 0)
@@ -40,6 +62,10 @@ IMPORTANT NOTES:
                                 <span class="customer-portal__notice">@T["ui.hold." + hold]</span>
                             }
                             @if (!string.IsNullOrWhiteSpace(parcel.Contents)) { <small>@parcel.Contents</small> }
+                            @if (CustomerPackagePlaces.Movable(parcel) && CustomerPackagePlaces.WarehouseOf(packages, parcel) is { } warehouse)
+                            {
+                                <PackageMoveForm ParcelId="parcel.ParcelId" Current="CustomerPackagePlaces.ShipmentOf(packages, parcel)" Choices="CustomerPackagePlaces.Open(packages, warehouse)" />
+                            }
                         </li>
                     }
                 </ul>
@@ -59,6 +85,8 @@ IMPORTANT NOTES:
                         <li>
                             <div class="customer-package-identity"><strong>@preAlert.TrackingNumber</strong><span>@preAlert.Carrier</span></div>
                             <small>@preAlert.Contents · @preAlert.DeclaredValue.ToString("0.00") @preAlert.CurrencyCode @(preAlert.ExpectedDate is { } date ? "· " + date.ToString("yyyy-MM-dd") : null)</small>
+                            @if (preAlert.ShipmentId is null) { <span class="customer-portal__notice">@T["ui.packages.not_in_shipment"]</span> }
+                            <PackageMoveForm PreAlertId="preAlert.PreAlertId" Current="preAlert.ShipmentId" Choices="CustomerPackagePlaces.Open(packages, preAlert.WarehouseId)" />
                             <form method="post" action="/customer/packages/pre-alerts/@preAlert.PreAlertId/withdraw" class="customer-portal__inline">
                                 <AntiforgeryToken />
                                 <button type="submit" class="vx-button vx-button--secondary">@T["ui.packages.withdraw"]</button>

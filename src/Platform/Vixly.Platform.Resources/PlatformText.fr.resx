@@ -10168,6 +10168,429 @@ Des questions ? Écrivez-nous à {support}.</value>
     <value>Envoyez au plus {max} éléments à la fois.</value>
     <comment>needs-review</comment>
   </data>
+  <data name="platform.leads.company_required" xml:space="preserve">
+    <value>Indiquez le nom de l’entreprise (200 caractères au plus).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.name_required" xml:space="preserve">
+    <value>Indiquez votre nom (120 caractères au plus).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.email_invalid" xml:space="preserve">
+    <value>Indiquez une adresse e-mail professionnelle valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.phone_invalid" xml:space="preserve">
+    <value>Indiquez un numéro de téléphone valide, ou laissez le champ vide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.country_invalid" xml:space="preserve">
+    <value>Choisissez un pays dans la liste.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.kind_invalid" xml:space="preserve">
+    <value>Choisissez le type d’activité que vous exercez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.message_too_long" xml:space="preserve">
+    <value>Le message peut compter au plus {max} caractères.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.note_too_long" xml:space="preserve">
+    <value>La note peut compter au plus {max} caractères.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.status_invalid" xml:space="preserve">
+    <value>Choisissez un statut.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.lead_not_found" xml:space="preserve">
+    <value>La demande est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.bot_check_failed" xml:space="preserve">
+    <value>Nous n’avons pas pu confirmer que vous êtes une personne. Veuillez réessayer.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.leads.view" xml:space="preserve">
+    <value>Voir les demandes de contact</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.leads.manage" xml:space="preserve">
+    <value>Suivre les demandes de contact</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.leads" xml:space="preserve">
+    <value>Demandes de contact</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.leads.received" xml:space="preserve">
+    <value>Demande de contact reçue</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.leads.status_changed" xml:space="preserve">
+    <value>Demande de contact mise à jour</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.title" xml:space="preserve">
+    <value>Demandes de contact</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.request" xml:space="preserve">
+    <value>Demande de contact</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.search" xml:space="preserve">
+    <value>Rechercher</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.status.all" xml:space="preserve">
+    <value>Toutes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.status.new" xml:space="preserve">
+    <value>Nouvelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.status.contacted" xml:space="preserve">
+    <value>Contactée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.status.closed" xml:space="preserve">
+    <value>Fermée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.count" xml:space="preserve">
+    <value>{count} demandes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.received" xml:space="preserve">
+    <value>Reçue</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.company" xml:space="preserve">
+    <value>Entreprise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.contact" xml:space="preserve">
+    <value>Contact</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.email" xml:space="preserve">
+    <value>E-mail</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.phone" xml:space="preserve">
+    <value>Téléphone</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.country" xml:space="preserve">
+    <value>Pays</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.kind" xml:space="preserve">
+    <value>Activité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.kind.courier" xml:space="preserve">
+    <value>Entreprise de messagerie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.kind.freight" xml:space="preserve">
+    <value>Transport de fret</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.kind.warehouse" xml:space="preserve">
+    <value>Entreposage</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.kind.multi_branch" xml:space="preserve">
+    <value>Logistique multi-sites</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.kind.other" xml:space="preserve">
+    <value>Autre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.language" xml:space="preserve">
+    <value>Langue</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.message" xml:space="preserve">
+    <value>Message</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.handled" xml:space="preserve">
+    <value>Dernière mise à jour par</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.follow_up" xml:space="preserve">
+    <value>Suivi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.note" xml:space="preserve">
+    <value>Note interne</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.save" xml:space="preserve">
+    <value>Enregistrer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.saved" xml:space="preserve">
+    <value>Demande mise à jour.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.lead.subject" xml:space="preserve">
+    <value>Nouvelle demande de contact : {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.lead.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Une demande de contact est arrivée depuis le site public.
+
+Entreprise : {company}
+Contact : {contact}
+E-mail : {email}
+Téléphone : {phone}
+Pays : {country}
+Activité : {kind}
+Langue : {language}
+
+Message :
+{message}
+
+Ouvrez-la dans la console : {link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.invitation_required" xml:space="preserve">
+    <value>Les inscriptions se font sur invitation pour le moment. Utilisez le lien envoyé par Vixly ou contactez notre équipe commerciale.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.reason_required" xml:space="preserve">
+    <value>Indiquez pourquoi les informations de l’entreprise changent.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.reason_too_long" xml:space="preserve">
+    <value>Le motif est trop long.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.no_difference" xml:space="preserve">
+    <value>Les nouvelles informations sont identiques aux actuelles.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.proof_required" xml:space="preserve">
+    <value>Joignez un document qui prouve le changement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.proof_type_invalid" xml:space="preserve">
+    <value>La preuve doit être un fichier PDF, JPEG ou PNG.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.proof_too_large" xml:space="preserve">
+    <value>Le fichier de preuve dépasse 10 Mo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.not_pending" xml:space="preserve">
+    <value>Cette demande a déjà été traitée ou retirée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.note_required" xml:space="preserve">
+    <value>Ajoutez une note expliquant pourquoi au client.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.note_too_long" xml:space="preserve">
+    <value>La note est trop longue.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.already_pending" xml:space="preserve">
+    <value>Une demande de modification est déjà en attente.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.not_found" xml:space="preserve">
+    <value>La demande de modification est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.title" xml:space="preserve">
+    <value>Changements d’entreprise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.lead" xml:space="preserve">
+    <value>Les clients demandent ici à modifier leurs informations légales. Vérifiez la preuve, puis approuvez ou refusez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.request" xml:space="preserve">
+    <value>Demande de modification</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.count" xml:space="preserve">
+    <value>{count} demandes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.status.all" xml:space="preserve">
+    <value>Tous les statuts</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.status.pending" xml:space="preserve">
+    <value>En attente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.status.approved" xml:space="preserve">
+    <value>Approuvée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.status.rejected" xml:space="preserve">
+    <value>Refusée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.status.withdrawn" xml:space="preserve">
+    <value>Retirée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.submitted" xml:space="preserve">
+    <value>Envoyée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.tenant" xml:space="preserve">
+    <value>Client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.from" xml:space="preserve">
+    <value>Informations actuelles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.to" xml:space="preserve">
+    <value>Informations demandées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.reason" xml:space="preserve">
+    <value>Motif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.proof" xml:space="preserve">
+    <value>Preuve</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.decided" xml:space="preserve">
+    <value>Traitée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.note" xml:space="preserve">
+    <value>Note</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.decide" xml:space="preserve">
+    <value>Décision</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.decide_help" xml:space="preserve">
+    <value>L’approbation remplace les informations légales du client. Les factures déjà émises gardent les anciennes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.note_optional" xml:space="preserve">
+    <value>Note (facultative)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.reject_note" xml:space="preserve">
+    <value>Motif du refus (envoyé au client)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.approve" xml:space="preserve">
+    <value>Approuver</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.reject" xml:space="preserve">
+    <value>Refuser</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.approved" xml:space="preserve">
+    <value>La modification est approuvée et les nouvelles informations sont en place.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.rejected" xml:space="preserve">
+    <value>La modification est refusée. Le client a été informé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.company_locked" xml:space="preserve">
+    <value>Les informations légales ne changent que sur demande du client, avec preuve.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.edit_settings" xml:space="preserve">
+    <value>Modifier les paramètres</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_history.company_changed" xml:space="preserve">
+    <value>Informations de l’entreprise modifiées (demande approuvée)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.company_change_submitted" xml:space="preserve">
+    <value>Changement d’entreprise demandé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.company_change_withdrawn" xml:space="preserve">
+    <value>Changement d’entreprise retiré</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.company_change_approved" xml:space="preserve">
+    <value>Changement d’entreprise approuvé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.company_change_rejected" xml:space="preserve">
+    <value>Changement d’entreprise refusé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.tenants.review_changes" xml:space="preserve">
+    <value>Approuver les changements d’entreprise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.company_change.submitted_subject" xml:space="preserve">
+    <value>Changement d’entreprise à examiner : {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.company_change.submitted_body" xml:space="preserve">
+    <value>Bonjour {name},
+
+{company} ({code}) demande à modifier ses informations légales et a joint une preuve.
+
+Examinez la demande ici : {link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.company_change.approved_subject" xml:space="preserve">
+    <value>Vos informations d’entreprise sont à jour : {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.company_change.approved_body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Nous avons approuvé votre demande. Votre entreprise apparaît désormais comme {company} sur les nouvelles factures. Les factures déjà émises gardent les anciennes informations.
+
+{note}
+
+Des questions ? Écrivez à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.company_change.rejected_subject" xml:space="preserve">
+    <value>Votre changement d’entreprise n’a pas été approuvé : {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.company_change.rejected_body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Nous n’avons pas pu approuver le changement vers {company}. Notre motif :
+
+{note}
+
+Vous pouvez envoyer une nouvelle demande avec une preuve à jour. Des questions ? Écrivez à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
   <data name="ui.control.workspace" xml:space="preserve"><value>Administration de la plateforme</value><comment>needs-review</comment></data>
   <data name="ui.control.shortcuts" xml:space="preserve"><value>Raccourcis d’administration</value><comment>needs-review</comment></data>
   <data name="ui.control.view_all" xml:space="preserve"><value>Tout afficher</value><comment>needs-review</comment></data>
@@ -10184,4 +10607,162 @@ Des questions ? Écrivez-nous à {support}.</value>
   <data name="ui.control.system" xml:space="preserve"><value>Paramètres</value><comment>needs-review</comment></data>
   <data name="ui.control.theme" xml:space="preserve"><value>Changer le thème clair ou sombre</value><comment>needs-review</comment></data>
   <data name="ui.control.skip" xml:space="preserve"><value>Aller à l’espace de travail</value><comment>needs-review</comment></data>
+  <data name="email.licensing.welcome.subject" xml:space="preserve">
+    <value>{company} est prêt</value>
+  </data>
+  <data name="email.licensing.welcome.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Bienvenue ! La configuration de {company} est terminée : votre premier ordinateur est enregistré et votre entreprise est maintenant active sur Vixly.
+
+Votre personnel se connecte ici :
+{staff}
+
+Vos clients vous trouvent ici :
+{site}
+
+Prochaines étapes : ajoutez vos agences et entrepôts, vos numéros de téléphone par pays, ainsi que votre logo et vos couleurs, depuis Site web et Adresses une fois connecté.
+
+Des questions ? Écrivez à {support}.</value>
+  </data>
+  <data name="platform.licensing.support_reason_required" xml:space="preserve">
+    <value>Indiquez le motif de cette action du support.</value>
+  </data>
+  <data name="platform.licensing.identity_check_required" xml:space="preserve">
+    <value>Indiquez comment vous avez vérifié que l’appelant est le propriétaire (par exemple, un rappel au téléphone du propriétaire enregistré).</value>
+  </data>
+  <data name="platform.licensing.approver_must_differ" xml:space="preserve">
+    <value>Un autre membre du personnel doit approuver cette réinitialisation, pas celui qui l’a demandée.</value>
+  </data>
+  <data name="platform.licensing.support_not_pending" xml:space="preserve">
+    <value>Cette demande a déjà été traitée.</value>
+  </data>
+  <data name="email.licensing.support_started.device.subject" xml:space="preserve">
+    <value>{company} : le support Vixly a lancé une récupération d’appareil</value>
+  </data>
+  <data name="email.licensing.support_started.device.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Le support Vixly a lancé une récupération d’appareil pour le propriétaire de {company}, à sa demande. Le propriétaire reçoit un lien à usage unique pour enregistrer un nouvel appareil.
+
+Si personne chez {company} ne l’a demandé, contactez-nous immédiatement à {support}.</value>
+  </data>
+  <data name="email.licensing.support_started.second_factor.subject" xml:space="preserve">
+    <value>{company} : le support Vixly réinitialise le second facteur du propriétaire</value>
+  </data>
+  <data name="email.licensing.support_started.second_factor.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Le support Vixly a approuvé la réinitialisation du second facteur (application d’authentification) du propriétaire de {company}, à sa demande. Le propriétaire reçoit un lien à usage unique pour en enregistrer un nouveau.
+
+Si personne chez {company} ne l’a demandé, contactez-nous immédiatement à {support}.</value>
+  </data>
+  <data name="email.licensing.second_factor_link.subject" xml:space="preserve">
+    <value>Configurez une nouvelle application d’authentification pour {company}</value>
+  </data>
+  <data name="email.licensing.second_factor_link.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Le support Vixly a approuvé la réinitialisation de votre second facteur pour {company}. Ouvrez ce lien, confirmez votre e-mail et votre mot de passe, puis scannez le nouveau code avec votre application d’authentification :
+{link}
+
+Le lien ne fonctionne qu’une fois et expire le {expires} (UTC). Si vous ne l’avez pas demandé, contactez-nous immédiatement à {support}.</value>
+  </data>
+  <data name="email.licensing.second_factor_done.subject" xml:space="preserve">
+    <value>{company} : le second facteur du propriétaire a été remplacé</value>
+  </data>
+  <data name="email.licensing.second_factor_done.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Le propriétaire de {company} a enregistré un nouveau second facteur grâce à un lien du support Vixly. Toutes les sessions précédentes du propriétaire ont été fermées.
+
+Si personne chez {company} ne l’a demandé, contactez-nous immédiatement à {support}.</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.second_factor_reset_requested" xml:space="preserve">
+    <value>Réinitialisation du second facteur du propriétaire demandée</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.second_factor_reset_approved" xml:space="preserve">
+    <value>Réinitialisation du second facteur du propriétaire approuvée</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.second_factor_reset_refused" xml:space="preserve">
+    <value>Réinitialisation du second facteur du propriétaire refusée</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.second_factor_reset_completed" xml:space="preserve">
+    <value>Réinitialisation du second facteur du propriétaire terminée</value>
+  </data>
+  <data name="ui.licensing.support_title" xml:space="preserve">
+    <value>Support au propriétaire</value>
+  </data>
+  <data name="ui.licensing.support_help" xml:space="preserve">
+    <value>Uniquement quand le propriétaire a appelé et que vous avez vérifié que c’est lui : rappelez le téléphone du propriétaire enregistré, jamais un numéro donné pendant l’appel.</value>
+  </data>
+  <data name="ui.licensing.identity_check" xml:space="preserve">
+    <value>Comment vous avez vérifié l’appelant</value>
+  </data>
+  <data name="ui.licensing.identity_check_hint" xml:space="preserve">
+    <value>Rappel au téléphone du propriétaire enregistré ; détails de l’entreprise confirmés</value>
+  </data>
+  <data name="ui.licensing.support_reason" xml:space="preserve">
+    <value>Motif</value>
+  </data>
+  <data name="ui.licensing.replace_device" xml:space="preserve">
+    <value>Appareil perdu à remplacer (quand toutes les licences sont utilisées)</value>
+  </data>
+  <data name="ui.licensing.replace_none" xml:space="preserve">
+    <value>Aucun</value>
+  </data>
+  <data name="ui.licensing.request_reset" xml:space="preserve">
+    <value>Demander la réinitialisation du second facteur du propriétaire</value>
+  </data>
+  <data name="ui.licensing.support_open" xml:space="preserve">
+    <value>Demandes de support ouvertes</value>
+  </data>
+  <data name="ui.licensing.support_kind.devicerecovery" xml:space="preserve">
+    <value>Récupération d’appareil</value>
+  </data>
+  <data name="ui.licensing.support_kind.secondfactorreset" xml:space="preserve">
+    <value>Réinitialisation du second facteur</value>
+  </data>
+  <data name="ui.licensing.support_status.pending" xml:space="preserve">
+    <value>En attente d’un second membre du personnel</value>
+  </data>
+  <data name="ui.licensing.support_status.approved" xml:space="preserve">
+    <value>Lien envoyé, pas encore utilisé</value>
+  </data>
+  <data name="ui.licensing.support_status.refused" xml:space="preserve">
+    <value>Refusée</value>
+  </data>
+  <data name="ui.licensing.support_status.completed" xml:space="preserve">
+    <value>Terminée</value>
+  </data>
+  <data name="ui.licensing.unknown_staff" xml:space="preserve">
+    <value>Membre du personnel inconnu</value>
+  </data>
+  <data name="ui.licensing.decision_note" xml:space="preserve">
+    <value>Note (facultative)</value>
+  </data>
+  <data name="ui.licensing.approve_reset" xml:space="preserve">
+    <value>Approuver et envoyer le lien</value>
+  </data>
+  <data name="ui.licensing.refuse_reset" xml:space="preserve">
+    <value>Refuser</value>
+  </data>
+  <data name="ui.licensing.reset_requested" xml:space="preserve">
+    <value>Demande enregistrée. Un autre membre du personnel doit l’approuver.</value>
+  </data>
+  <data name="ui.licensing.reset_approved" xml:space="preserve">
+    <value>Approuvée. Le lien a été envoyé au propriétaire ; les contacts propriétaire et facturation ont été prévenus.</value>
+  </data>
+  <data name="ui.licensing.reset_refused" xml:space="preserve">
+    <value>Refusée. Rien n’a été envoyé.</value>
+  </data>
+  <data name="ui.error.title" xml:space="preserve">
+    <value>Un problème est survenu</value>
+  </data>
+  <data name="ui.error.body" xml:space="preserve">
+    <value>Cela n'a pas fonctionné. Revenez en arrière et réessayez ; si cela se reproduit, prévenez l'équipe technique.</value>
+  </data>
+  <data name="ui.error.back" xml:space="preserve">
+    <value>Retour à la console</value>
+  </data>
 </root>

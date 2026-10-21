@@ -19,7 +19,8 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 @inject IStringLocalizer<OperationsWorkbenchText> L
 
-<EditorShell Title="@T["ui.billing.title"]" Company="@Company" Section="billing" Error="@Error">
+<EditorShell Title="@T["ui.billing.title"]" Company="@Company" Section="company" Error="@Error">
+    <CompanyTabs Current="billing" />
     <section class="ops-editor__panel ops-subscription">
         <h2>@T["ui.billing.plan"]</h2>
         @if (View.Subscription is { } plan)

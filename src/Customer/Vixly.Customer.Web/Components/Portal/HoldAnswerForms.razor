@@ -1,0 +1,68 @@
+﻿@*
+=========================================================
+FILE: HoldAnswerForms.razor
+
+PURPOSE:
+The customer answers a hold on their package (Slice 3E, Q-R7).
+
+RESPONSIBILITIES:
+- A document or invoice for documents or a permit; contents and value for a value check; a choice for a damaged package
+- Show the latest answer: waiting, accepted, or declined with why
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10)
+- Staff review every answer; a fee is paid with the invoice (Slice 9)
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Packages
+@foreach (string reason in Detail.Answerable ?? Array.Empty<string>())
+{
+    CustomerHoldAnswerDto? latest = Detail.Answers?.FirstOrDefault(answer => answer.Reason == reason);
+    <section class="customer-portal__form" aria-labelledby="answer-@reason">
+        <h2 id="answer-@reason">@T["ui.hold." + reason]</h2>
+        @if (latest is { Status: "Open" })
+        {
+            <p class="customer-portal__info" role="status">@T["ui.answers.waiting"]</p>
+        }
+        else if (latest is { Status: "Declined" } declined)
+        {
+            <p class="customer-portal__notice" role="status"><strong>@T["ui.answers.declined"]</strong> @declined.DeclinedBecause</p>
+        }
+        <form method="post" action="/customer/packages/@Detail.Parcel.ParcelId/answers" enctype="multipart/form-data" class="customer-portal__form">
+            <AntiforgeryToken />
+            <input type="hidden" name="reason" value="@reason" />
+            @if (reason == "Damaged")
+            {
+                <fieldset>
+                    <legend>@T["ui.answers.damaged"]</legend>
+                    <label><input type="radio" name="choice" value="ship_as_is" required /> @T["ui.answers.choice.ship_as_is"]</label>
+                    <label><input type="radio" name="choice" value="return" /> @T["ui.answers.choice.return"]</label>
+                    <label><input type="radio" name="choice" value="dispose" /> @T["ui.answers.choice.dispose"]</label>
+                </fieldset>
+            }
+            else if (reason == "InspectionValue")
+            {
+                <label>@T["ui.prealert.contents"] <textarea name="contents" rows="2" maxlength="300" required>@Detail.Parcel.Contents</textarea></label>
+                <label>@T["ui.prealert.value"] <input name="value" type="number" inputmode="decimal" min="0" step="0.01" required value="@Detail.Parcel.DeclaredValue?.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)" /></label>
+                <label>@T["ui.answers.invoice"] <input name="document" type="file" accept="application/pdf,image/png,image/jpeg" /></label>
+            }
+            else
+            {
+                <label>@T["ui.answers.document"] <input name="document" type="file" accept="application/pdf,image/png,image/jpeg" required /></label>
+            }
+            <p class="customer-portal__hint">@T["ui.answers.file_hint"]</p>
+            <label>@T["ui.answers.note"] <textarea name="note" rows="2" maxlength="500"></textarea></label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.answers.send"]</button>
+        </form>
+    </section>
+}
+@if ((Detail.Parcel.Holds?.Contains("InspectionFee") ?? false))
+{
+    <p class="customer-portal__notice" role="status">@T["ui.answers.fee_later"]</p>
+}
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<CustomerText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public CustomerParcelDetailDto Detail { get; set; } = null!;
+}

@@ -1,0 +1,90 @@
+﻿@*
+=========================================================
+FILE: InsuranceCoverageFields.razor
+
+PURPOSE:
+The terms of an insurance: who covers, the risks and exclusions, the liability without insurance, the payout and the claim rules, and the text shown to the customer (Slice 4C section 8).
+
+RESPONSIBILITIES:
+- One fieldset per part, filled with the terms in force or the standard ones
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Read back by OperationsInsuranceForm
+=========================================================
+*@
+<fieldset>
+    <legend>@T["ui.insurance.cover"]</legend>
+    <label>@T["ui.insurance.cover.who"]
+        <select name="cover">
+            @foreach (OperationsInsuranceCover cover in Enum.GetValues<OperationsInsuranceCover>()) { <option value="@cover" selected="@(cover == Coverage.Cover)">@T["ui.insurance.cover." + cover]</option> }
+        </select>
+    </label>
+    <label>@T["ui.insurance.insurer_name"] <input name="insurer_name" value="@Coverage.InsurerName" maxlength="@OperationsInsuranceCoverage.NameMaxLength" /></label>
+    <label>@T["ui.insurance.policy_number"] <input name="policy_number" value="@Coverage.PolicyNumber" maxlength="@OperationsInsuranceCoverage.NameMaxLength" /></label>
+    <label>@T["ui.insurance.insurer_contact"] <input name="insurer_contact" value="@Coverage.InsurerContact" maxlength="@OperationsInsuranceCoverage.NameMaxLength" /></label>
+    <p class="ops-editor__hint">@T["ui.insurance.insurer_hint"]</p>
+</fieldset>
+<fieldset>
+    <legend>@T["ui.insurance.risks"]</legend>
+    @foreach (OperationsInsuredRisks risk in new[] { OperationsInsuredRisks.Loss, OperationsInsuredRisks.Damage, OperationsInsuredRisks.Theft })
+    {
+        <label><input type="checkbox" name="risks" value="@risk" checked="@Coverage.Risks.HasFlag(risk)" /> @T["ui.insurance.risk." + risk]</label>
+    }
+</fieldset>
+<fieldset>
+    <legend>@T["ui.insurance.exclusions"]</legend>
+    @foreach (OperationsInsuranceExclusions exclusion in Enum.GetValues<OperationsInsuranceExclusions>().Where(value => value is not (OperationsInsuranceExclusions.None or OperationsInsuranceExclusions.Standard)))
+    {
+        <label><input type="checkbox" name="exclusions" value="@exclusion" checked="@Coverage.Exclusions.HasFlag(exclusion)" /> @T["ui.insurance.exclusion." + exclusion]</label>
+    }
+    <label>@T["ui.insurance.other_exclusions"] <textarea name="other_exclusions" rows="2" maxlength="@OperationsInsuranceCoverage.TermsMaxLength">@Coverage.OtherExclusions</textarea></label>
+</fieldset>
+<fieldset>
+    <legend>@T["ui.insurance.liability"]</legend>
+    <label>@VixlyText.Format(T, "ui.insurance.liability_per_unit", "unit", Unit) (@Currency) <input name="liability_per_unit" inputmode="decimal" value="@OperationsChargeWords.Number(Coverage.LiabilityPerUnit)" /></label>
+    <label>@T["ui.insurance.liability_per_shipment"] (@Currency) <input name="liability_per_shipment" inputmode="decimal" value="@OperationsChargeWords.Number(Coverage.LiabilityPerShipment)" /></label>
+    <p class="ops-editor__hint">@T["ui.insurance.liability_hint"]</p>
+</fieldset>
+<fieldset>
+    <legend>@T["ui.insurance.payout"]</legend>
+    <label>@T["ui.insurance.payout.basis"]
+        <select name="payout">
+            @foreach (OperationsInsurancePayout payout in Enum.GetValues<OperationsInsurancePayout>()) { <option value="@payout" selected="@(payout == Coverage.Payout)">@T["ui.insurance.payout." + payout]</option> }
+        </select>
+    </label>
+    <label>@T["ui.insurance.deductible_amount"] (@Currency) <input name="deductible_amount" inputmode="decimal" value="@OperationsChargeWords.Number(Coverage.DeductibleAmount)" /></label>
+    <label>@T["ui.insurance.deductible_percent"] <input name="deductible_percent" inputmode="decimal" value="@OperationsChargeWords.Number(Coverage.DeductiblePercent)" /></label>
+    <label>@T["ui.insurance.max_per_item"] (@Currency) <input name="max_per_item" inputmode="decimal" value="@OperationsChargeWords.Number(Coverage.MaxPerItem)" /></label>
+</fieldset>
+<fieldset>
+    <legend>@T["ui.insurance.claims"]</legend>
+    <label>@T["ui.insurance.damage_days"] <input name="damage_days" type="number" min="1" max="@OperationsInsuranceCoverage.MaxClaimDays" value="@Coverage.DamageClaimDays" required /></label>
+    <label>@T["ui.insurance.loss_days"] <input name="loss_days" type="number" min="1" max="@OperationsInsuranceCoverage.MaxClaimDays" value="@Coverage.LossClaimDays" required /></label>
+    @foreach (OperationsClaimProof proof in new[] { OperationsClaimProof.Invoice, OperationsClaimProof.Photos, OperationsClaimProof.NotedAtRelease })
+    {
+        <label><input type="checkbox" name="proof" value="@proof" checked="@Coverage.Proof.HasFlag(proof)" /> @T["ui.insurance.proof." + proof]</label>
+    }
+    <label>@T["ui.insurance.filed_by"]
+        <select name="filed_by">
+            @foreach (OperationsClaimFiler filer in Enum.GetValues<OperationsClaimFiler>()) { <option value="@filer" selected="@(filer == Coverage.FiledBy)">@T["ui.insurance.filed_by." + filer]</option> }
+        </select>
+    </label>
+</fieldset>
+<fieldset>
+    <legend>@T["ui.insurance.terms"]</legend>
+    <p class="ops-editor__hint">@T["ui.insurance.terms_hint"]</p>
+    <label>English <textarea name="terms_en" rows="3" maxlength="@OperationsInsuranceCoverage.TermsMaxLength">@Coverage.TermsEn</textarea></label>
+    <label>Français <textarea name="terms_fr" rows="3" maxlength="@OperationsInsuranceCoverage.TermsMaxLength">@Coverage.TermsFr</textarea></label>
+    <label>Español <textarea name="terms_es" rows="3" maxlength="@OperationsInsuranceCoverage.TermsMaxLength">@Coverage.TermsEs</textarea></label>
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsInsuranceCoverageTerms Coverage { get; set; } = null!;
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+
+    [Parameter] public string Unit { get; set; } = string.Empty;
+}

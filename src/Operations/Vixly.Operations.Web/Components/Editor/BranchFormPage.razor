@@ -14,6 +14,8 @@ IMPORTANT NOTES:
 - Static forms with antiforgery and the form guard (ADR-0019); placeholder look: Frontend/UI designs the final experience
 =========================================================
 *@
+@inherits OperationsAllowedComponent
+@using Vixly.Operations.Domain.Access
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T[Form.BranchId is null ? "ui.editor.branch.add" : "ui.editor.branch.edit"]" Company="@Company" Section="locations" Error="@Error">
@@ -34,7 +36,7 @@ IMPORTANT NOTES:
         </label>
         <StatusFields Status="@Form.Status" ShowOnSite="@Form.ShowOnSite" />
         <p class="ops-editor__actions">
-            <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+            @if (Can(OperationsPermissions.BranchesManage)) { <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button> }
             <a href="/staff/locations">@T["ui.editor.cancel"]</a>
         </p>
     </form>

@@ -19,6 +19,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.company.title"]" Company="@Company" Section="company" Error="@Error" Info="@Info">
+    <CompanyTabs Current="profile" />
     <section class="ops-editor__panel">
         <h2>@T["ui.company.legal"]</h2>
         <p><strong>@View.Company.Details.LegalName</strong> @(View.Company.Details.TradingName is { Length: > 0 } trading ? "· " + trading : null)</p>

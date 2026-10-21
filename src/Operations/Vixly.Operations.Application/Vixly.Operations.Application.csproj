@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vixly.Operations.Domain\Vixly.Operations.Domain.csproj" />
+    <ProjectReference Include="..\..\Shared\Vixly.Shared.Kernel\Vixly.Shared.Kernel.csproj" />
+    <ProjectReference Include="..\..\Contracts\Vixly.Contracts.Platform\Vixly.Contracts.Platform.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Vixly.Operations.Application.Tests" />
+  </ItemGroup>
+
+</Project>

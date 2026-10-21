@@ -1,0 +1,51 @@
+﻿@*
+=========================================================
+FILE: SupplyPriceFields.razor
+
+PURPOSE:
+The fields of a supply price (Slice 5E, S-2): the unit price, the day it starts, quantity breaks and other prices per warehouse.
+
+RESPONSIBILITIES:
+- Show the fields with the values typed
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Inside the caller's form; prices before tax
+=========================================================
+*@
+<label>@VixlyText.Format(T, "ui.supplies.price", "currency", Currency) <input name="price" value="@Form.Price" inputmode="decimal" required autocomplete="off" /></label>
+<label>@T["ui.charges.effective"] <input name="effective" type="date" value="@Form.Effective" /></label>
+<p class="ops-editor__hint">@T["ui.charges.effective_hint"]</p>
+<fieldset>
+    <legend>@T["ui.supplies.breaks"]</legend>
+    <p class="ops-editor__hint">@T["ui.supplies.breaks_hint"]</p>
+    @for (int row = 1; row <= OperationsSupplyForm.BreakRows; row++)
+    {
+        (string? quantity, string? price) = row <= Form.Breaks.Count ? Form.Breaks[row - 1] : (null, null);
+        <p class="ops-editor__inline">
+            <label>@T["ui.supplies.break_from"] <input name="@("break_qty_" + row)" value="@quantity" inputmode="numeric" size="5" autocomplete="off" /></label>
+            <label>@T["ui.supplies.break_price"] <input name="@("break_price_" + row)" value="@price" inputmode="decimal" size="8" autocomplete="off" /></label>
+        </p>
+    }
+</fieldset>
+@if (Warehouses.Count > 1)
+{
+    <fieldset>
+        <legend>@T["ui.supplies.warehouse_prices"]</legend>
+        <p class="ops-editor__hint">@T["ui.supplies.warehouse_prices_hint"]</p>
+        @foreach (OperationsWarehouse warehouse in Warehouses)
+        {
+            <label>@warehouse.Code · @warehouse.Name <input name="@("wh_" + warehouse.Id)" value="@(Form.WarehousePrices.TryGetValue(warehouse.Id, out string? typed) ? typed : null)" inputmode="decimal" size="8" autocomplete="off" /></label>
+        }
+    </fieldset>
+}
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsSupplyForm Form { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+}

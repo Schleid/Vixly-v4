@@ -1,0 +1,128 @@
+@*
+=========================================================
+FILE: QuotesPage.razor
+
+PURPOSE:
+Quotes: price a shipment for a customer, offer a preferred price and save it (Slice 4 design section 7).
+
+RESPONSIBILITIES:
+- Price on one service or every offered one
+- Save a quote with an optional preferred price and reason
+- List the latest quotes and withdraw one; the full list with statuses is QuoteListPage
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- ops.quotes.create; the customer sees the saved quote on the portal
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.quotes.title"]" Company="@Company" Section="quotes" Error="@Error" Info="@Info">
+    @if (!Denied)
+    {
+    <div class="ops-quotes__workspace">
+        <QuoteInputForm T="T" Form="Form" Origins="Origins" Destinations="Destinations" ItemTypes="ItemTypes" Services="Services" ManualExtras="ManualExtras" Weight="@Weight" Length="@Length" Currency="@Currency" />
+        @if (Ratings.Count > 0)
+        {
+            <div class="ops-quotes__ratings">
+                @foreach (OperationsRating rating in Ratings)
+                {
+                    string name = OperationsChargeWords.Service(T, rating.ServiceCode, Services.FirstOrDefault(service => service.Code == rating.ServiceCode)?.Label);
+                    <section class="ops-editor__panel ops-quotes__rating" aria-label="@name">
+                        <RatingLines T="T" Rating="rating" Caption="@name" Currency="@Currency" />
+                        @if (CustomerName is not null)
+                        {
+                            <form method="post" action="/staff/quotes" class="ops-editor__form ops-quotes__save-form">
+                                <AntiforgeryToken />
+                                <QuoteHiddenFields Form="Form" Service="@rating.ServiceCode" />
+                                <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+                                <label>@T["ui.quotes.preferred"] (@Currency) <input name="preferred" inputmode="decimal" value="@Form.Preferred" /></label>
+                                <label>@T["ui.quotes.reason"] <input name="reason" value="@Form.Reason" maxlength="@OperationsChargeLimits.ReasonMaxLength" /></label>
+                                <label>@T["ui.quotes.days"] <input name="days" type="number" min="1" max="@OperationsQuote.MaxValidDays" value="@(Form.Days ?? OperationsQuote.DefaultValidDays.ToString(CultureInfo.InvariantCulture))" /></label>
+                                <p class="ops-editor__hint">@VixlyText.Format(T, "ui.quotes.save_hint", "customer", CustomerName)</p>
+                                <button type="submit" class="vx-button vx-button--primary">@T["ui.quotes.save"]</button>
+                            </form>
+                        }
+                    </section>
+                }
+            </div>
+        }
+    </div>
+    <section class="ops-editor__panel ops-quotes__recent" aria-labelledby="quotes-title">
+        <div class="ops-quotes__list-header">
+            <h2 id="quotes-title">@T["ui.quotes.list.title"]</h2>
+            <a class="vx-button vx-button--secondary" href="/staff/quotes/list">@T["ui.quotes.list.all"]</a>
+        </div>
+        @if (Quotes.Count == 0)
+        {
+            <p>@T["ui.quotes.list.none"]</p>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.quotes.list.title"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.quotes.list.number"]</th><th scope="col">@T["ui.quotes.list.customer"]</th><th scope="col">@T["ui.quotes.service"]</th><th scope="col">@T["ui.quotes.list.destination"]</th><th scope="col" class="ops-editor__number">@T["ui.quotes.list.amount"]</th><th scope="col">@T["ui.quotes.list.valid"]</th><th scope="col">@T["ui.quotes.list.status"]</th><th scope="col"><span class="vx-visually-hidden">@T["ui.quotes.withdraw"]</span></th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsQuoteRow row in Quotes)
+                        {
+                            <tr>
+                                <td class="ops-editor__code">@row.Quote.Number</td>
+                                <td>@row.CustomerCode @row.CustomerName</td>
+                                <td>@T["ui.services.name." + row.Quote.ServiceCode]</td>
+                                <td>@row.Quote.CountryCode</td>
+                                <td class="ops-editor__number">@OperationsChargeWords.Money(row.Quote.Total, row.Quote.CurrencyCode)@if (row.Quote.IsPreferred) { <small> @VixlyText.Format(T, "ui.quotes.list.standard", "amount", OperationsChargeWords.Money(row.Quote.StandardTotal, row.Quote.CurrencyCode))</small> }</td>
+                                <td>@(row.Quote.Status == OperationsQuoteStatus.Withdrawn ? T["ui.quotes.list.withdrawn"].Value : VixlyText.Format(T, "ui.quotes.list.valid_until", "date", row.Quote.ValidUntilUtc.ToString("d", CultureInfo.CurrentCulture)))</td>
+                                <td><span class="ops-editor__status" data-status="@(row.Quote.Status == OperationsQuoteStatus.Withdrawn ? "withdrawn" : "open")">@(row.Quote.Status == OperationsQuoteStatus.Withdrawn ? T["ui.quotes.list.withdrawn"].Value : T["ui.quotes.state.open"].Value)</span></td>
+                                <td>
+                                    @if (row.Quote.Status == OperationsQuoteStatus.Open)
+                                    {
+                                        <form method="post" action="/staff/quotes/@row.Quote.Id/withdraw" class="ops-editor__inline">
+                                            <AntiforgeryToken />
+                                            <button type="submit" class="vx-button vx-button--secondary">@T["ui.quotes.withdraw"]</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+    </section>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsQuoteForm Form { get; set; } = new();
+
+    [Parameter] public IReadOnlyList<OperationsRating> Ratings { get; set; } = Array.Empty<OperationsRating>();
+
+    [Parameter] public IReadOnlyList<OperationsQuoteRow> Quotes { get; set; } = Array.Empty<OperationsQuoteRow>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Origins { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Destinations { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<OperationsItemType> ItemTypes { get; set; } = Array.Empty<OperationsItemType>();
+
+    [Parameter] public IReadOnlyList<OperationsServiceOption> Services { get; set; } = Array.Empty<OperationsServiceOption>();
+
+    [Parameter] public IReadOnlyList<OperationsChargeExtra> ManualExtras { get; set; } = Array.Empty<OperationsChargeExtra>();
+
+    [Parameter] public string? CustomerName { get; set; }
+
+    [Parameter] public string Weight { get; set; } = string.Empty;
+
+    [Parameter] public string Length { get; set; } = string.Empty;
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+
+    // Without the permission: only the refusal, nothing of the page (owner: "what I am not allowed, I do not need to see").
+    [Parameter] public bool Denied { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

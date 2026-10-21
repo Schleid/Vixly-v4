@@ -1,0 +1,175 @@
+﻿@*
+=========================================================
+FILE: PolicyPage.razor
+
+PURPOSE:
+Record or change one of the company's insurance policies, and keep its documents (Slice 5B, design section 3).
+
+RESPONSIBILITIES:
+- What it covers and its kind; insurer and broker; number and period; limits and deductible; risks, modes, territory, exclusions; duties to the insurer
+- Documents: upload, open, remove; archive or bring back
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Shown again with what was typed when refused
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@(Policy is null ? T["ui.insurance_module.add_policy"].Value : Title)" Company="@Company" Section="insurance" Error="@Error" Info="@Info">
+    <p><a href="/staff/insurance">@T["ui.insurance_module.back"]</a></p>
+    <form method="post" action="@(Policy is null ? "/staff/insurance/policies/new" : "/staff/insurance/policies/" + Policy.Id)" class="ops-editor__panel ops-editor__form">
+        <AntiforgeryToken />
+        <fieldset disabled="@(!CanManage)">
+            <legend>@T["ui.insurance_module.what"]</legend>
+            @foreach (OperationsPolicyScope scope in Enum.GetValues<OperationsPolicyScope>())
+            {
+                <label><input type="radio" name="scope" value="@scope" checked="@(Terms.Scope == scope)" required /> @T["ui.insurance_module.scope." + scope] <small>@T["ui.insurance_module.scope_hint." + scope]</small></label>
+            }
+            <label>@T["ui.insurance_module.kind"]
+                <select name="kind" required>
+                    @foreach (OperationsPolicyKind kind in Enum.GetValues<OperationsPolicyKind>()) { <option value="@kind" selected="@(Terms.Kind == kind)">@T["ui.insurance_module.kind." + kind]</option> }
+                </select>
+            </label>
+            <p class="ops-editor__hint">@T["ui.insurance_module.kind_hint"]</p>
+        </fieldset>
+        <fieldset disabled="@(!CanManage)">
+            <legend>@T["ui.insurance_module.insurer"]</legend>
+            <label>@T["ui.insurance_module.insurer_name"] <input name="insurer" value="@Terms.InsurerName" maxlength="@OperationsInsurancePolicy.NameMaxLength" /></label>
+            <label>@T["ui.insurance_module.number"] <input name="number" value="@Terms.PolicyNumber" maxlength="@OperationsInsurancePolicy.NumberMaxLength" /></label>
+            <label>@T["ui.insurance_module.email"] <input name="insurer_email" value="@Terms.InsurerEmail" maxlength="@OperationsInsurancePolicy.ContactMaxLength" /></label>
+            <label>@T["ui.insurance_module.phone"] <input name="insurer_phone" value="@Terms.InsurerPhone" maxlength="@OperationsInsurancePolicy.ContactMaxLength" /></label>
+            <label>@T["ui.insurance_module.claims_email"] <input name="claims_email" value="@Terms.ClaimsEmail" maxlength="@OperationsInsurancePolicy.ContactMaxLength" /></label>
+            <label>@T["ui.insurance_module.claims_phone"] <input name="claims_phone" value="@Terms.ClaimsPhone" maxlength="@OperationsInsurancePolicy.ContactMaxLength" /></label>
+            <label>@T["ui.insurance_module.broker"] <input name="broker" value="@Terms.BrokerName" maxlength="@OperationsInsurancePolicy.NameMaxLength" /></label>
+            <label>@T["ui.insurance_module.broker_email"] <input name="broker_email" value="@Terms.BrokerEmail" maxlength="@OperationsInsurancePolicy.ContactMaxLength" /></label>
+            <label>@T["ui.insurance_module.broker_phone"] <input name="broker_phone" value="@Terms.BrokerPhone" maxlength="@OperationsInsurancePolicy.ContactMaxLength" /></label>
+            <p class="ops-editor__hint">@T["ui.insurance_module.insurer_hint"]</p>
+        </fieldset>
+        <fieldset disabled="@(!CanManage)">
+            <legend>@T["ui.insurance_module.period_limits"]</legend>
+            <label>@T["ui.insurance_module.starts"] <input name="starts" type="date" value="@Terms.StartsOn?.ToString("yyyy-MM-dd")" /></label>
+            <label>@T["ui.insurance_module.ends"] <input name="ends" type="date" value="@Terms.EndsOn?.ToString("yyyy-MM-dd")" /></label>
+            <label>@T["ui.insurance_module.currency"] <input name="currency" value="@(Terms.CurrencyCode ?? Currency ?? "USD")" maxlength="3" size="4" required /></label>
+            <label>@T["ui.insurance_module.limit_shipment"] <input name="limit_shipment" inputmode="decimal" value="@Number(Terms.LimitPerShipment)" /></label>
+            <label>@T["ui.insurance_module.limit_conveyance"] <input name="limit_conveyance" inputmode="decimal" value="@Number(Terms.LimitPerConveyance)" /></label>
+            <label>@T["ui.insurance_module.limit_location"] <input name="limit_location" inputmode="decimal" value="@Number(Terms.LimitPerLocation)" /></label>
+            <label>@T["ui.insurance_module.limit_year"] <input name="limit_year" inputmode="decimal" value="@Number(Terms.LimitPerYear)" /></label>
+            <label>@T["ui.insurance_module.deductible_amount"] <input name="deductible_amount" inputmode="decimal" value="@Number(Terms.DeductibleAmount)" /></label>
+            <label>@T["ui.insurance_module.deductible_percent"] <input name="deductible_percent" inputmode="decimal" value="@Number(Terms.DeductiblePercent)" /></label>
+            <label>@T["ui.insurance_module.deductible_minimum"] <input name="deductible_minimum" inputmode="decimal" value="@Number(Terms.DeductibleMinimum)" /></label>
+        </fieldset>
+        <fieldset disabled="@(!CanManage)">
+            <legend>@T["ui.insurance_module.scope_of_cover"]</legend>
+            @foreach (OperationsPolicyRisks risk in Enum.GetValues<OperationsPolicyRisks>().Where(value => value != OperationsPolicyRisks.None))
+            {
+                <label><input type="checkbox" name="risks" value="@risk" checked="@Terms.Risks.HasFlag(risk)" /> @T["ui.insurance_module.risk." + risk]</label>
+            }
+            @foreach (OperationsPolicyModes mode in Enum.GetValues<OperationsPolicyModes>().Where(value => value != OperationsPolicyModes.None))
+            {
+                <label><input type="checkbox" name="modes" value="@mode" checked="@Terms.Modes.HasFlag(mode)" /> @T["ui.insurance_module.mode." + mode]</label>
+            }
+            <p class="ops-editor__hint">@T["ui.insurance_module.modes_hint"]</p>
+            <label>@T["ui.insurance_module.territory"] <input name="territory" value="@Terms.Territory" maxlength="@OperationsInsurancePolicy.TerritoryMaxLength" /></label>
+        </fieldset>
+        <fieldset disabled="@(!CanManage)">
+            <legend>@T["ui.insurance.exclusions"]</legend>
+            @foreach (OperationsInsuranceExclusions exclusion in Enum.GetValues<OperationsInsuranceExclusions>().Where(value => value is not (OperationsInsuranceExclusions.None or OperationsInsuranceExclusions.Standard)))
+            {
+                <label><input type="checkbox" name="exclusions" value="@exclusion" checked="@Terms.Exclusions.HasFlag(exclusion)" /> @T["ui.insurance.exclusion." + exclusion]</label>
+            }
+            <label>@T["ui.insurance_module.other_exclusions"] <textarea name="other_exclusions" rows="3" maxlength="@OperationsInsurancePolicy.TextMaxLength">@Terms.OtherExclusions</textarea></label>
+        </fieldset>
+        <fieldset disabled="@(!CanManage)">
+            <legend>@T["ui.insurance_module.duties"]</legend>
+            <label>@T["ui.insurance_module.notice_days"] <input name="notice_days" inputmode="numeric" value="@Terms.NoticeDays" /></label>
+            <label>@T["ui.insurance_module.declarations"]
+                <select name="declarations">
+                    @foreach (OperationsDeclarationFrequency frequency in Enum.GetValues<OperationsDeclarationFrequency>()) { <option value="@frequency" selected="@(Terms.Declarations == frequency)">@T["ui.insurance_module.declarations." + frequency]</option> }
+                </select>
+            </label>
+            <label>@T["ui.insurance_module.notes"] <textarea name="notes" rows="3" maxlength="@OperationsInsurancePolicy.TextMaxLength">@Terms.Notes</textarea></label>
+        </fieldset>
+        @if (CanManage) { <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button> }
+    </form>
+    @if (Policy is not null)
+    {
+        <section class="ops-editor__panel" aria-labelledby="documents-title">
+            <h2 id="documents-title">@T["ui.insurance_module.documents"]</h2>
+            @if (Policy.Documents.Count == 0) { <p>@T["ui.insurance_module.no_documents"]</p> }
+            <ul>
+                @foreach (OperationsPolicyDocument document in Policy.Documents)
+                {
+                    <li>
+                        <a href="/staff/insurance/policies/@Policy.Id/documents/@document.Id">@document.FileName</a> · @T["ui.insurance_module.document." + document.Kind] · @document.UploadedUtc.ToString("yyyy-MM-dd")
+                        @if (CanManage)
+                        {
+                            <form method="post" action="/staff/insurance/policies/@Policy.Id/documents/@document.Id/remove" class="ops-editor__inline">
+                                <AntiforgeryToken />
+                                <button type="submit" class="vx-button vx-button--secondary">@T["ui.insurance_module.remove"]</button>
+                            </form>
+                        }
+                    </li>
+                }
+            </ul>
+            @if (CanManage)
+            {
+                <form method="post" action="/staff/insurance/policies/@Policy.Id/documents" enctype="multipart/form-data" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <select name="kind" aria-label="@T["ui.insurance_module.document_kind"]">
+                        @foreach (string kind in OperationsPolicyDocument.Kinds) { <option value="@kind">@T["ui.insurance_module.document." + kind]</option> }
+                    </select>
+                    <input type="file" name="document" accept="application/pdf,image/png,image/jpeg" required />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.insurance_module.upload"]</button>
+                </form>
+                <p class="ops-editor__hint">@T["ui.insurance_module.upload_hint"]</p>
+            }
+        </section>
+        @if (Covers.Count > 0)
+        {
+            <p>@VixlyText.Format(T, "ui.insurance_module.behind_covers", "modes", string.Join(", ", Covers.Select(cover => T["ui.insurance_module.mode." + cover.Mode].Value)))</p>
+        }
+        @if (CanManage)
+        {
+            <form method="post" action="/staff/insurance/policies/@Policy.Id/archive" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <input type="hidden" name="archived" value="@(Policy.IsArchived ? "false" : "true")" />
+                <button type="submit" class="vx-button vx-button--secondary">@(Policy.IsArchived ? T["ui.insurance_module.restore"] : T["ui.insurance_module.archive"])</button>
+            </form>
+        }
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsInsurancePolicy? Policy { get; set; }
+
+    [Parameter] public OperationsPolicyTerms? Entered { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsInsurancePlan> Covers { get; set; } = Array.Empty<OperationsInsurancePlan>();
+
+    [Parameter] public DateOnly Today { get; set; }
+
+    [Parameter] public bool CanManage { get; set; }
+
+    [Parameter] public string? Currency { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private string Title => Policy!.Kind == OperationsPolicyKind.SelfInsured ? T["ui.insurance_module.kind.SelfInsured"].Value : Policy.Name;
+
+    // What was typed, else the policy, else a new cargo policy with the usual risks and exclusions.
+    private OperationsPolicyTerms Terms => Entered ?? (Policy is { } policy
+        ? new OperationsPolicyTerms(policy.Scope, policy.Kind, policy.InsurerName, policy.InsurerEmail, policy.InsurerPhone, policy.ClaimsEmail, policy.ClaimsPhone, policy.BrokerName,
+            policy.BrokerEmail, policy.BrokerPhone, policy.PolicyNumber, policy.StartsOn, policy.EndsOn, policy.CurrencyCode, policy.LimitPerShipment, policy.LimitPerConveyance,
+            policy.LimitPerLocation, policy.LimitPerYear, policy.DeductibleAmount, policy.DeductiblePercent, policy.DeductibleMinimum, policy.Risks, policy.Modes, policy.Territory,
+            policy.Exclusions, policy.OtherExclusions, policy.NoticeDays, policy.Declarations, policy.Notes)
+        : new OperationsPolicyTerms(OperationsPolicyScope.CustomerShipments, OperationsPolicyKind.OpenCargo, null, null, null, null, null, null, null, null, null, null, null, null,
+            null, null, null, null, null, null, null, OperationsPolicyRisks.Loss | OperationsPolicyRisks.Damage | OperationsPolicyRisks.Theft, OperationsPolicyModes.None, null,
+            OperationsInsuranceExclusions.Standard, null, null, OperationsDeclarationFrequency.None, null));
+
+    private static string? Number(decimal? value) => value?.ToString("0.###", CultureInfo.InvariantCulture);
+}

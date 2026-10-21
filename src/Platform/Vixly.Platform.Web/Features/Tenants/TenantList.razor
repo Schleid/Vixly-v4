@@ -33,10 +33,6 @@ IMPORTANT NOTES:
     <div class="vx-control-filter"><label for="tenant-tag">@T["ui.tenants.tag"]</label>
     <input id="tenant-tag" @bind="_tag" maxlength="32" autocomplete="off" /></div>
     <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
-    @if (Presenter.State.CanCreate)
-    {
-        <a class="vx-button vx-button--primary" href="/tenants/new">@T["ui.tenants.new"]</a>
-    }
 </form>
 
 <div class="vx-control-list-summary" aria-live="polite">

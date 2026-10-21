@@ -60,13 +60,36 @@ public sealed class PlatformPublicLinks : IPlatformPublicLinks
         ArgumentException.ThrowIfNullOrWhiteSpace(token);
 
         string page = kind == Vixly.Platform.Domain.Licensing.PlatformDeviceLinkKind.FirstDevice ? "devices/first" : "devices/recover";
-        return "https://" + portalSlug + "." + _tenants.TenantBaseDomain.Trim().TrimEnd('/') + "/" + page + "#" + Uri.EscapeDataString(token);
+        return Portal(portalSlug) + "/" + page + "#" + Uri.EscapeDataString(token);
     }
 
     // Slice 8: the owner reads and accepts the Terms in Operations on the tenant host.
     public string LegalLink(string portalSlug)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(portalSlug);
-        return "https://" + portalSlug + "." + _tenants.TenantBaseDomain.Trim().TrimEnd('/') + "/legal";
+        return Portal(portalSlug) + "/legal";
+    }
+
+    public string PortalLink(string portalSlug, string path)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(portalSlug);
+        ArgumentNullException.ThrowIfNull(path);
+        return Portal(portalSlug) + "/" + path.TrimStart('/');
+    }
+
+    public string SecondFactorResetLink(string portalSlug, string token)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(portalSlug);
+        ArgumentException.ThrowIfNullOrWhiteSpace(token);
+        return Portal(portalSlug) + "/account/second-factor-reset#" + Uri.EscapeDataString(token);
+    }
+
+    private string Portal(string portalSlug)
+    {
+        string template = _tenants.PortalUrlTemplate?.Trim() ?? string.Empty;
+
+        return template.Length > 0
+            ? template.Replace("{slug}", portalSlug, StringComparison.Ordinal).TrimEnd('/')
+            : "https://" + portalSlug + "." + _tenants.TenantBaseDomain.Trim().TrimEnd('/');
     }
 }

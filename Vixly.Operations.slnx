@@ -1,0 +1,42 @@
+﻿<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Contracts/">
+    <Project Path="src/Contracts/Vixly.Contracts.Operations/Vixly.Contracts.Operations.csproj" />
+    <Project Path="src/Contracts/Vixly.Contracts.Platform/Vixly.Contracts.Platform.csproj" />
+  </Folder>
+  <Folder Name="/src/Customer/">
+    <Project Path="src/Customer/Vixly.Customer.Infrastructure/Vixly.Customer.Infrastructure.csproj" />
+    <Project Path="src/Customer/Vixly.Customer.Resources/Vixly.Customer.Resources.csproj" />
+    <Project Path="src/Customer/Vixly.Customer.Web/Vixly.Customer.Web.csproj" />
+  </Folder>
+  <Folder Name="/src/Operations/">
+    <Project Path="src/Operations/Vixly.Operations.Api/Vixly.Operations.Api.csproj" />
+    <Project Path="src/Operations/Vixly.Operations.Application/Vixly.Operations.Application.csproj" />
+    <Project Path="src/Operations/Vixly.Operations.Domain/Vixly.Operations.Domain.csproj" />
+    <Project Path="src/Operations/Vixly.Operations.Infrastructure/Vixly.Operations.Infrastructure.csproj" />
+    <Project Path="src/Operations/Vixly.Operations.Resources/Vixly.Operations.Resources.csproj" />
+    <Project Path="src/Operations/Vixly.Operations.Web/Vixly.Operations.Web.csproj" />
+    <Project Path="src/Operations/Vixly.PrintAgent/Vixly.PrintAgent.csproj" />
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/Vixly.Shared.Hosting/Vixly.Shared.Hosting.csproj" />
+    <Project Path="src/Shared/Vixly.Shared.Kernel/Vixly.Shared.Kernel.csproj" />
+    <Project Path="src/Shared/Vixly.Shared.Localization/Vixly.Shared.Localization.csproj" />
+    <Project Path="src/Shared/Vixly.Shared.UI/Vixly.Shared.UI.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/Architecture/">
+    <Project Path="tests/Architecture/Vixly.Architecture.Tests/Vixly.Architecture.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Customer/">
+    <Project Path="tests/Customer/Vixly.Customer.Infrastructure.Tests/Vixly.Customer.Infrastructure.Tests.csproj" />
+    <Project Path="tests/Customer/Vixly.Customer.Web.Tests/Vixly.Customer.Web.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Operations/">
+    <Project Path="tests/Operations/Vixly.Operations.Api.Tests/Vixly.Operations.Api.Tests.csproj" />
+    <Project Path="tests/Operations/Vixly.Operations.Application.Tests/Vixly.Operations.Application.Tests.csproj" />
+    <Project Path="tests/Operations/Vixly.Operations.Domain.Tests/Vixly.Operations.Domain.Tests.csproj" />
+    <Project Path="tests/Operations/Vixly.Operations.Infrastructure.Tests/Vixly.Operations.Infrastructure.Tests.csproj" />
+    <Project Path="tests/Operations/Vixly.Operations.Web.Tests/Vixly.Operations.Web.Tests.csproj" />
+  </Folder>
+</Solution>

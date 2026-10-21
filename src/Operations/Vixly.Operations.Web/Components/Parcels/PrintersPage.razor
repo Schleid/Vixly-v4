@@ -1,0 +1,78 @@
+﻿@*
+=========================================================
+FILE: PrintersPage.razor
+
+PURPOSE:
+The label printers and dock print programs of a warehouse (Slice 3B).
+
+RESPONSIBILITIES:
+- Add or change a printer; print a test label
+- Register a print program (its key is shown once) or stop one
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); needs ops.printers.manage for this warehouse
+=========================================================
+*@
+@using Vixly.Operations.Domain.Printing
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@VixlyText.Format(T, "ui.printers.title", "warehouse", Warehouse.Code)" Company="@Company" Section="locations" Error="@Error" Info="@Info">
+    <p><a href="/staff/locations">@T["ui.storage.back"]</a></p>
+    @if (NewKey is not null)
+    {
+        <section class="ops-editor__panel ops-panel--restricted" aria-labelledby="key-title">
+            <h2 id="key-title">@T["ui.printers.key_title"]</h2>
+            <p>@T["ui.printers.key_hint"]</p>
+            <p><code>@NewKey</code></p>
+        </section>
+    }
+    <section class="ops-editor__panel" aria-labelledby="printers-title">
+        <h2 id="printers-title">@T["ui.printers.printers"]</h2>
+        <p class="ops-editor__hint">@T["ui.printers.hint"]</p>
+        @foreach (OperationsLabelPrinter printer in Printers)
+        {
+            <PrinterForm T="T" WarehouseId="Warehouse.Id" Printer="printer" />
+        }
+        <PrinterForm T="T" WarehouseId="Warehouse.Id" Printer="null" />
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="agents-title">
+        <h2 id="agents-title">@T["ui.printers.agents"]</h2>
+        <p class="ops-editor__hint">@T["ui.printers.agents_hint"]</p>
+        <ul>
+            @foreach (OperationsPrintAgent agent in Agents)
+            {
+                <li>
+                    <strong>@agent.Name</strong> · @(agent.IsActive ? (agent.LastSeenUtc is { } seen ? VixlyText.Format(T, "ui.printers.seen", "time", seen.ToString("yyyy-MM-dd HH:mm")) : T["ui.printers.never_seen"].Value) : T["ui.printers.stopped"].Value)
+                    @if (agent.IsActive)
+                    {
+                        <form method="post" action="/staff/locations/warehouse/@Warehouse.Id/printers/agents/@agent.Id/stop" class="ops-editor__inline">
+                            <AntiforgeryToken />
+                            <button type="submit" class="vx-button vx-button--secondary">@T["ui.printers.stop"]</button>
+                        </form>
+                    }
+                </li>
+            }
+        </ul>
+        <form method="post" action="/staff/locations/warehouse/@Warehouse.Id/printers/agents" class="ops-editor__inline">
+            <AntiforgeryToken />
+            <label>@T["ui.printers.agent_name"] <input name="name" required maxlength="60" placeholder="Dock PC 1" /></label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.printers.register"]</button>
+        </form>
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsWarehouse Warehouse { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsLabelPrinter> Printers { get; set; } = Array.Empty<OperationsLabelPrinter>();
+
+    [Parameter] public IReadOnlyList<OperationsPrintAgent> Agents { get; set; } = Array.Empty<OperationsPrintAgent>();
+
+    [Parameter] public string? NewKey { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

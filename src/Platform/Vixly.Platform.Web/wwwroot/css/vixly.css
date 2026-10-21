@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    FILE: vixly.css
    PURPOSE: Platform console presentation; shared-style extraction pending.
    NOTES:
@@ -525,7 +525,7 @@ p {
 .vx-shell__main {
     flex: 1;
     padding: 2rem 2.5rem 3rem;
-    max-width: 86rem;
+    max-width: 100%;
     width: 100%;
     margin: 0;
     box-sizing: border-box;
@@ -2373,27 +2373,96 @@ body.vx-auth {
     box-shadow: var(--vx-shadow-2);
 }
 
-.vx-fieldset .vx-toolbar {
+/* Sales Settings & Limits (Revamped) */
+.vx-settings-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--vx-color-border);
+}
+
+.vx-settings-header .vx-hint {
+    margin: 0;
+}
+
+.vx-settings-meta {
+    font-size: 0.75rem;
+    color: var(--vx-color-text-muted);
+    font-weight: 500;
+}
+
+.vx-fieldset {
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-md);
+    padding: 1.25rem 1.5rem;
+    margin: 0 0 1.5rem;
+    background: var(--vx-color-surface);
+}
+
+.vx-fieldset__legend {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--vx-color-text);
+    padding: 0 0.5rem;
+    letter-spacing: -0.01em;
+}
+
+.vx-limit-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0.5rem 0 0.75rem;
+}
+
+.vx-limit-row {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin: 0.35rem 0;
-    padding: 0.5rem 0.75rem;
-    box-shadow: none;
-    border: 1px solid var(--vx-color-border);
-    border-radius: var(--vx-radius-sm);
-    background: var(--vx-color-surface);
     width: fit-content;
     max-width: 100%;
 }
 
-.vx-fieldset .vx-toolbar input {
-    background: var(--vx-color-surface-sunken);
-    width: 6rem;
+.vx-limit-currency {
+    width: 5.5rem !important;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-family: var(--vx-font-mono);
 }
 
-.vx-fieldset .vx-toolbar input[type="number"] {
-    width: 9rem;
+.vx-limit-amount {
+    width: 9rem !important;
+    font-variant-numeric: tabular-nums;
+}
+
+.vx-field--checkbox {
+    margin-top: 0.75rem;
+}
+
+.vx-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: var(--vx-color-text);
+    cursor: pointer;
+}
+
+.vx-checkbox {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: var(--vx-color-primary);
+    cursor: pointer;
+}
+
+.vx-limit-override-form {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--vx-color-border);
 }
 
 .vx-hint {
@@ -2522,6 +2591,7 @@ details.vx-nav-group .vx-nav-item { margin-block: var(--vx-space-1); }
         height: 100dvh; overflow: hidden;
         background: radial-gradient(ellipse at 0 0, var(--vx-color-chrome-active), transparent 65%), var(--vx-color-chrome-surface);
         border-inline-end: 1px solid var(--vx-color-chrome-border);
+        box-shadow: 4px 0 24px rgba(15, 23, 42, 0.12);
     }
     .vx-sidebar__brand { flex-shrink: 0; padding: 1.15rem 1.15rem 1rem; background: linear-gradient(115deg, transparent, color-mix(in srgb, var(--vx-color-primary) 15%, transparent)); }
     .vx-sidebar__brand-link { min-height: var(--vx-control-min); gap: 0.65rem; border-radius: var(--vx-radius-sm); }
@@ -2560,4 +2630,11 @@ details.vx-nav-group .vx-nav-item { margin-block: var(--vx-space-1); }
 }
 @media (prefers-reduced-motion: reduce) {
     .vx-sidebar *, .vx-sidebar *::before, .vx-sidebar *::after { transition: none !important; }
+}
+
+/* Plan draft editor: term preview spacing */
+.vx-plan-term-bar {
+    margin-top: 2.25rem !important;
+    padding-top: 1.75rem !important;
+    border-top: 1px dashed var(--vx-color-border) !important;
 }

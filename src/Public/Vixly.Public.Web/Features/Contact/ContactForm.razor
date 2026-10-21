@@ -1,0 +1,111 @@
+﻿@*
+=========================================================
+FILE: ContactForm.razor
+
+PURPOSE:
+The contact sales form: Platform stores the request and emails sales (D-U3).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Plain post with antiforgery; the bot check answer travels with it
+- After sending, the page shows a thank-you (post, redirect, get)
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+@inject PlatformApi Api
+@inject NavigationManager Navigation
+@inject IOptions<PublicSiteOptions> Site
+
+@if (Sent)
+{
+    <VxMessage Type="VxMessageType.Success">@T["public.contact.sent"]</VxMessage>
+    <p><a href="@PublicLanguage.Page(PublicLanguage.Current)">@T["public.not_found.home"]</a></p>
+}
+else
+{
+    <ErrorBox Error="_error" />
+    <EditForm Model="Form" FormName="contact" OnSubmit="SendAsync" class="pub-form pub-form--grid">
+        <div class="vx-field pub-field--name">
+            <label class="vx-label" for="contact-company">@T["public.contact.company"]</label>
+            <InputText id="contact-company" class="vx-input" @bind-Value="Form!.CompanyName" required maxlength="200" autocomplete="organization" />
+        </div>
+        <div class="vx-field pub-field--name">
+            <label class="vx-label" for="contact-name">@T["public.contact.name"]</label>
+            <InputText id="contact-name" class="vx-input" @bind-Value="Form!.ContactName" required maxlength="120" autocomplete="name" />
+        </div>
+        <div class="vx-field pub-field--address">
+            <label class="vx-label" for="contact-email">@T["public.contact.email"]</label>
+            <InputText id="contact-email" type="email" class="vx-input" @bind-Value="Form!.Email" required maxlength="254" autocomplete="email" />
+        </div>
+        <div class="vx-field pub-field--phone">
+            <label class="vx-label" for="contact-phone">@T["public.contact.phone"]</label>
+            <InputText id="contact-phone" type="tel" class="vx-input" @bind-Value="Form!.Phone" maxlength="40" autocomplete="tel" />
+        </div>
+        <div class="vx-field pub-field--name">
+            <label class="vx-label" for="contact-kind">@T["public.contact.kind"]</label>
+            <InputSelect id="contact-kind" class="vx-input" @bind-Value="Form!.Kind">
+                @foreach (string kind in Kinds)
+                {
+                    <option value="@kind">@T["public.contact.kind." + kind]</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="vx-field pub-field--full">
+            <label class="vx-label" for="contact-message">@T["public.contact.message"]</label>
+            <InputTextArea id="contact-message" class="vx-input" @bind-Value="Form!.Message" rows="5" maxlength="2000" />
+        </div>
+        <div class="pub-field--full">
+            <BotCheck />
+        </div>
+        <p class="pub-hint pub-field--full">@T["public.contact.privacy"]</p>
+        <div class="pub-form__actions pub-field--full">
+            <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["public.contact.send"]</VxButton>
+        </div>
+    </EditForm>
+    <p class="pub-hint">@VixlyText.Format(T, "public.contact.direct", "email", Site.Value.SalesEmail)</p>
+}
+
+@code {
+    public static readonly string[] Kinds = { "courier", "freight", "warehouse", "multi_branch", "other" };
+
+    private PlatformApiError? _error;
+
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    [SupplyParameterFromForm(FormName = "contact")]
+    public ContactFormModel? Form { get; set; }
+
+    [Parameter]
+    public bool Sent { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Form ??= new ContactFormModel();
+    }
+
+    private async Task SendAsync()
+    {
+        PlatformApiResult<bool> result = await Api.SubmitLeadAsync(new Vixly.Contracts.Platform.Leads.PlatformSalesLeadBody
+        {
+            CompanyName = Form!.CompanyName ?? string.Empty,
+            ContactName = Form.ContactName ?? string.Empty,
+            Email = Form.Email ?? string.Empty,
+            Phone = Form.Phone,
+            Kind = Kinds.Contains(Form.Kind, StringComparer.Ordinal) ? Form.Kind : "other",
+            Message = Form.Message,
+            Language = PublicLanguage.Current,
+            SourcePage = "contact",
+            BotToken = HttpContext?.Request.HasFormContentType == true ? HttpContext.Request.Form[BotCheck.FieldName].ToString() : null
+        }, CancellationToken.None);
+
+        if (result.Succeeded)
+        {
+            Navigation.NavigateTo(PublicLanguage.Page(PublicLanguage.Current, "contact") + "?sent=1");
+            return;
+        }
+
+        _error = result.Error;
+    }
+}

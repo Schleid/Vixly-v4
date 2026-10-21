@@ -54,10 +54,19 @@ public static class PlatformMessageTypes
 
     public const string LegalNotice = "platform.legal.notice.v1";
 
+    public const string SalesLeadReceived = "platform.sales.lead_received.v1";
+
+    public const string TenantCompanyChangeSubmitted = "platform.tenant.company_change_submitted.v1";
+
+    public const string TenantCompanyChangeDecided = "platform.tenant.company_change_decided.v1";
+
     // For Operations (contract, D-Lg11).
     public const string LegalVersionPublished = "platform.legal.version_published.v1";
 
     public const string TermsAccepted = "platform.legal.terms_accepted.v1";
+
+    // Operations Slice 1: a registration is ready for the owner to set up the account (ids only).
+    public const string RegistrationAccountSetupReady = "platform.registration.account_setup_ready.v1";
 
     // For Operations (contract, D-L14): drop cached device checks on these.
     public const string DeviceApproved = "platform.device.approved.v1";

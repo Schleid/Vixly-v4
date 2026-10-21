@@ -36,6 +36,15 @@ IMPORTANT NOTES:
                 <dt>@T["ui.shipments_desk.options"]</dt><dd>@string.Join(", ", Options())</dd>
             }
             <dt>@T["ui.shipments_desk.status"]</dt><dd>@T["ui.shipments_desk.status." + Shipment.Status]</dd>
+            @if (Shipment.ParcelCount is { } declared)
+            {
+                <dt>@T["ui.shipments_desk.parcel_count"]</dt>
+                <dd>@VixlyText.Format(T, "ui.shipments_desk.parcels_of", new Dictionary<string, object> { ["entered"] = Parcels.Count, ["count"] = declared })</dd>
+            }
+            @if (Shipment.BookedTotal is { } total)
+            {
+                <dt>@T["ui.shipments_desk.amount_final"]</dt><dd>@total.ToString("N2", System.Globalization.CultureInfo.CurrentCulture) @Shipment.BookedCurrencyCode</dd>
+            }
         </dl>
         @if (!Shipment.IsWaiting && Shipment.Status != OperationsShipmentStatus.Cancelled && (Parcels.Count > 0 || Shipment.Options.HasFlag(OperationsShipmentOptions.Insured)))
         {

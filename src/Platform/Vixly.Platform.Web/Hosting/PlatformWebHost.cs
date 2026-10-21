@@ -97,6 +97,8 @@ public static class PlatformWebHost
             app.UseExceptionHandler("/error", createScopeForErrors: true);
         }
 
+        app.UseVixlyClientDisconnects();
+
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseRequestLocalization(options =>
@@ -117,6 +119,15 @@ public static class PlatformWebHost
         app.MapPlatformAuthEndpoints();
         app.MapPlatformBillingEndpoints();
         app.MapPlatformLegalEndpoints();
+        app.MapPlatformTenantChangeEndpoints();
+        // Any method: a failed form post comes back here as a post (2026-10-18).
+        app.MapVixlyErrorPage(
+            http =>
+            {
+                Microsoft.Extensions.Localization.IStringLocalizer<Vixly.Platform.Resources.PlatformText> text = http.RequestServices.GetRequiredService<Microsoft.Extensions.Localization.IStringLocalizer<Vixly.Platform.Resources.PlatformText>>();
+                return new VixlyErrorPageText(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, text["ui.error.title"], text["ui.error.body"], text["ui.error.back"], "/");
+            },
+            "/css/vixly.css");
         app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
         return app;

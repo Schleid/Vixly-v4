@@ -3,11 +3,11 @@
 FILE: CustomerListPage.razor
 
 PURPOSE:
-The tenant's customers: search, list, and create one at the counter (Slice 2).
+The tenant's customers: search and list (Slice 2).
 
 RESPONSIBILITIES:
 - Search by name, email, phone or code; 25 per page
-- The create form for staff with ops.customers.manage
+- Customers register themselves on the portal; staff never enter their details (owner, 2026-10-18)
 
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10); the endpoint loads the data
@@ -19,7 +19,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsWorkbenchText> L
 
 <EditorShell Title="@T["ui.customers.title"]" Company="@Company" Section="customers" Error="@Error" Info="@Info">
-    <div class="ops-editor__page-intro"><p class="ops-editor__hint">@L["customers_intro"]</p>@if (CanManage) { <a href="#create-customer" data-open-panel class="vx-button vx-button--primary">@T["ui.customers.create"]</a> }</div>
+    <div class="ops-editor__page-intro"><p class="ops-editor__hint">@T["ui.customers.self_service"]</p></div>
     <form method="get" action="/staff/customers" class="ops-editor__inline ops-editor__search">
         <input name="search" value="@Search" placeholder="@T["ui.customers.search"]" aria-label="@T["ui.customers.search"]" maxlength="100" />
         <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.search_submit"]</button>
@@ -30,7 +30,6 @@ IMPORTANT NOTES:
             <div class="ops-editor__empty">
                 <h2>@T["ui.customers.none"]</h2>
                 @if (!string.IsNullOrWhiteSpace(Search)) { <a href="/staff/customers">@L["clear_search"]</a> }
-                @if (CanManage) { <a class="vx-button vx-button--secondary" href="#create-customer" data-open-panel>@T["ui.customers.create"]</a> }
             </div>
         }
         else
@@ -65,30 +64,6 @@ IMPORTANT NOTES:
             }
         </nav>
     </section>
-    @if (CanManage)
-    {
-        <details id="create-customer" class="ops-task-panel">
-        <summary>@T["ui.customers.create"]<span aria-hidden="true">+</span></summary>
-        <form method="post" action="/staff/customers/create" class="ops-editor__panel">
-            <AntiforgeryToken />
-            <h2>@T["ui.customers.create"]</h2>
-            <p>@T["ui.customers.create_hint"]</p>
-            <label>@T["ui.customers.first_name"] <input name="firstName" maxlength="100" required /></label>
-            <label>@T["ui.customers.last_name"] <input name="lastName" maxlength="100" required /></label>
-            <label>@T["ui.customers.company"] <input name="companyName" maxlength="150" /></label>
-            <label>@T["ui.editor.email"] <input type="email" name="email" maxlength="254" required /></label>
-            <label>@T["ui.customers.phone"] <input type="tel" name="phone" maxlength="20" placeholder="+509…" required /></label>
-            <label>@T["ui.staff.language"]
-                <select name="language">
-                    <option value="en">English</option>
-                    <option value="fr">Français</option>
-                    <option value="es">Español</option>
-                </select>
-            </label>
-            <button type="submit" class="vx-button vx-button--primary">@T["ui.customers.create_submit"]</button>
-        </form>
-        </details>
-    }
 </EditorShell>
 
 @code {
@@ -105,8 +80,6 @@ IMPORTANT NOTES:
     [Parameter] public IReadOnlyList<OperationsCustomerProfile> Customers { get; set; } = Array.Empty<OperationsCustomerProfile>();
 
     [Parameter] public int TotalCount { get; set; }
-
-    [Parameter] public bool CanManage { get; set; }
 
     [Parameter] public string? Error { get; set; }
 

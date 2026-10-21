@@ -1,0 +1,120 @@
+﻿@*
+=========================================================
+FILE: LeadView.razor
+
+PURPOSE:
+One contact request from the public site and its follow-up
+(status and internal note).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- The visitor's text is shown as plain text, never as markup
+=========================================================
+*@
+@inherits PlatformPresenterComponent<LeadPresenter>
+@using Vixly.Platform.Domain.Sales
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.Saved)
+{
+    <VxMessage Type="VxMessageType.Success">@T["ui.leads.saved"]</VxMessage>
+}
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+@if (!Presenter.State.Loaded)
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+else if (Presenter.State.Lead is { } lead)
+{
+    <h1>@lead.CompanyName</h1>
+    <p><a href="/leads">@T["ui.leads.title"]</a></p>
+    <div id="lead-overview"><VxCard Title="@T["ui.leads.request"]">
+        <dl class="vx-facts">
+            <dt>@T["ui.leads.status"]</dt>
+            <dd><VxStatusBadge Status="@LeadDisplay.Badge(lead.Status)" Text="@T[LeadDisplay.StatusKey(lead.Status)]" /></dd>
+            <dt>@T["ui.leads.contact"]</dt>
+            <dd>@lead.ContactName</dd>
+            <dt>@T["ui.leads.email"]</dt>
+            <dd><a href="mailto:@lead.Email">@lead.Email</a></dd>
+            @if (lead.Phone is { } phone)
+            {
+                <dt>@T["ui.leads.phone"]</dt>
+                <dd>@phone</dd>
+            }
+            @if (lead.CountryCode is { } country)
+            {
+                <dt>@T["ui.leads.country"]</dt>
+                <dd>@country</dd>
+            }
+            <dt>@T["ui.leads.kind"]</dt>
+            <dd>@T[LeadDisplay.KindKey(lead.Kind)]</dd>
+            <dt>@T["ui.leads.language"]</dt>
+            <dd>@lead.Language</dd>
+            <dt>@T["ui.leads.received"]</dt>
+            <dd>@PlatformDisplay.Utc(T, lead.ReceivedUtc) <span class="vx-hint">@lead.SourcePage</span></dd>
+            @if (lead.Message is { } message)
+            {
+                <dt>@T["ui.leads.message"]</dt>
+                <dd class="vx-pre">@message</dd>
+            }
+            @if (lead.HandledByName is { } handled)
+            {
+                <dt>@T["ui.leads.handled"]</dt>
+                <dd>@handled · @PlatformDisplay.Utc(T, lead.StatusChangedUtc)</dd>
+            }
+        </dl>
+    </VxCard></div>
+    @if (Presenter.State.CanManage)
+    {
+        <div id="lead-follow-up"><VxCard Title="@T["ui.leads.follow_up"]">
+            <form class="vx-form" @onsubmit="SaveAsync">
+                <label for="lead-status">@T["ui.leads.status"]</label>
+                <select id="lead-status" @bind="_status">
+                    @foreach (PlatformSalesLeadStatus status in Enum.GetValues<PlatformSalesLeadStatus>())
+                    {
+                        <option value="@status">@T[LeadDisplay.StatusKey(status)]</option>
+                    }
+                </select>
+                <label for="lead-note">@T["ui.leads.note"]</label>
+                <textarea id="lead-note" @bind="_note" maxlength="@PlatformSalesLeadLimits.NoteMaxLength" rows="3"></textarea>
+                <div class="vx-actions">
+                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.leads.save"]</VxButton>
+                </div>
+            </form>
+        </VxCard></div>
+    }
+}
+
+@code {
+    private PlatformSalesLeadStatus _status;
+
+    private string? _note;
+
+    private Guid _loaded;
+
+    [Parameter, EditorRequired]
+    public Guid LeadId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_loaded != LeadId)
+        {
+            _loaded = LeadId;
+            await Presenter.LoadAsync(LeadId);
+            _status = Presenter.State.Lead?.Status ?? PlatformSalesLeadStatus.New;
+            _note = Presenter.State.Lead?.StaffNote;
+        }
+    }
+
+    private Task SaveAsync()
+    {
+        return Presenter.SaveAsync(LeadId, _status, _note);
+    }
+}

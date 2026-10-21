@@ -1,0 +1,36 @@
+﻿@*
+=========================================================
+FILE: TenantCompanyFacts.razor
+
+PURPOSE:
+A company’s legal details as a fact list (B12).
+
+IMPORTANT NOTES:
+- Display only; used on the change request screen
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@using Vixly.Platform.Application.Queries
+@inject IStringLocalizer<PlatformText> T
+
+<dl class="vx-facts">
+    <dt>@T["ui.tenants.legal_name"]</dt><dd>@Company.LegalName</dd>
+    <dt>@T["ui.tenants.trading_name"]</dt><dd>@(Company.TradingName ?? T["ui.common.none"].Value)</dd>
+    <dt>@T["ui.tenants.company_email"]</dt><dd>@Company.Email</dd>
+    <dt>@T["ui.tenants.company_phone"]</dt><dd>@Company.Phone</dd>
+    <dt>@T["ui.tenants.postal_address"]</dt>
+    <dd>
+        @Company.AddressLine1<br />
+        @if (Company.AddressLine2 is not null)
+        {
+            @Company.AddressLine2<br />
+        }
+        @Company.City @Company.StateProvince @Company.PostalCode<br />
+        @PlatformDisplay.CountryName(T, Company.CountryCode)
+    </dd>
+</dl>
+
+@code {
+    [Parameter, EditorRequired]
+    public PlatformTenantCompanyItem Company { get; set; } = null!;
+}

@@ -1,14 +1,13 @@
-﻿@*
+@*
 =========================================================
 FILE: OperationsPageHeading.razor
 PURPOSE: Compact section identity for operational screens.
-RESPONSIBILITIES: Pair the real page title with a contextual drawing.
+RESPONSIBILITIES: Render semantic page heading without decorative illustration.
 IMPORTANT NOTES: No workflow behavior or synthetic operational data.
 =========================================================
 *@
 <header class="ops-page-heading">
     <h1>@Title</h1>
-    <VxWorkspaceArt Kind="@Scene(Section)" />
 </header>
 
 @code {
@@ -20,9 +19,9 @@ IMPORTANT NOTES: No workflow behavior or synthetic operational data.
         "receiving" or "locations" or "inspection_queue" => "warehouse",
         "parcels" or "shipments" => "parcel",
         "customers" or "staff" or "account" or "company" => "people",
-        "charges" or "quotes" or "billing" or "audit" => "document",
+        "charges" or "quotes" or "billing" or "audit" or "invoices" => "document",
         "roles" or "holds" or "devices" or "legal" => "security",
-        "settings" or "services" or "site" or "inspection_setup" => "settings",
+        "settings" or "services" or "site" or "inspection_setup" or "invoice_settings" => "settings",
         _ => "network"
     };
 }

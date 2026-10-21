@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Operations\Vixly.Operations.Api\Vixly.Operations.Api.csproj" />
+    <!-- Slice 2: the end-to-end test runs the real customer portal against this API. -->
+    <ProjectReference Include="..\..\..\src\Customer\Vixly.Customer.Web\Vixly.Customer.Web.csproj" />
+  </ItemGroup>
+
+</Project>

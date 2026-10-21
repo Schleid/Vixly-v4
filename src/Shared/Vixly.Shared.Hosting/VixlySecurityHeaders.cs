@@ -24,6 +24,7 @@ namespace Vixly.Shared.Hosting;
 //   only: no inline script, no eval
 // - img-src allows data: for generated QR codes
 // - frame-ancestors 'none': no V4 page may be framed
+// - Permissions-Policy denies the camera everywhere except a page that sets its own (the Operations scan station)
 // =========================================================
 public static class VixlySecurityHeaders
 {
@@ -39,9 +40,21 @@ public static class VixlySecurityHeaders
         "form-action 'self'; " +
         "object-src 'none'";
 
+    public const string PermissionsPolicy = "camera=(), microphone=(), geolocation=(), payment=()";
+
+    // A page that needs the camera (a barcode scan page) sets its own policy in HttpContext.Items under this key.
+    public const string PermissionsPolicyItem = "vx.permissions-policy";
+
     public static WebApplication UseVixlySecurityHeaders(this WebApplication app)
     {
+        return UseVixlySecurityHeaders(app, ContentSecurityPolicy);
+    }
+
+    // A host that needs a wider policy (the public site: bot check and card checkout) passes its own.
+    public static WebApplication UseVixlySecurityHeaders(this WebApplication app, string contentSecurityPolicy)
+    {
         ArgumentNullException.ThrowIfNull(app);
+        ArgumentException.ThrowIfNullOrWhiteSpace(contentSecurityPolicy);
 
         if (!app.Environment.IsDevelopment())
         {
@@ -53,11 +66,16 @@ public static class VixlySecurityHeaders
             context.Response.OnStarting(() =>
             {
                 IHeaderDictionary headers = context.Response.Headers;
-                headers["Content-Security-Policy"] = ContentSecurityPolicy;
+                // A response that set its own policy keeps it (a file download in a sandbox); every other gets the site's.
+                if (string.IsNullOrEmpty(headers.ContentSecurityPolicy))
+                {
+                    headers["Content-Security-Policy"] = contentSecurityPolicy;
+                }
+
                 headers["X-Content-Type-Options"] = "nosniff";
                 headers["X-Frame-Options"] = "DENY";
                 headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
-                headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=()";
+                headers["Permissions-Policy"] = context.Items.TryGetValue(PermissionsPolicyItem, out object? policy) && policy is string own ? own : PermissionsPolicy;
                 headers["Cross-Origin-Opener-Policy"] = "same-origin";
                 return Task.CompletedTask;
             });

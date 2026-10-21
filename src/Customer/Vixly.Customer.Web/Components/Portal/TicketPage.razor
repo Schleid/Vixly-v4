@@ -1,0 +1,62 @@
+﻿@*
+=========================================================
+FILE: TicketPage.razor
+
+PURPOSE:
+One of the customer's tickets: what it said, the messages and the answer form (Slice 4D step 4).
+
+RESPONSIBILITIES:
+- Show the ticket, its status and the package staff found
+- Let the customer write back (it opens the ticket again)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- Staff are never named; nothing in the warehouse shows before staff link the package
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Customers
+@using Vixly.Contracts.Operations.Tickets
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.tickets.ticket"]" SignedIn="true" Error="@Error" Info="@Info" ReturnHere="/customer/tickets">
+    <p><a href="/customer/tickets">@T["ui.tickets.back"]</a></p>
+    <dl class="customer-portal__details">
+        <dt>@T["ui.tickets.status"]</dt><dd>@T["ui.tickets.status." + Ticket.Status]</dd>
+        <dt>@T["ui.prealert.carrier"]</dt><dd>@Ticket.Carrier</dd>
+        <dt>@T["ui.prealert.tracking"]</dt><dd>@Ticket.TrackingNumber</dd>
+        @if (!string.IsNullOrWhiteSpace(Ticket.Store)) { <dt>@T["ui.prealert.store"]</dt><dd>@Ticket.Store</dd> }
+        @if (!string.IsNullOrWhiteSpace(Ticket.OrderNumber)) { <dt>@T["ui.tickets.order"]</dt><dd>@Ticket.OrderNumber</dd> }
+        @if (Ticket.DeliveredOn is { } day) { <dt>@T["ui.tickets.delivered"]</dt><dd>@day.ToString("yyyy-MM-dd")</dd> }
+        <dt>@T["ui.prealert.contents"]</dt><dd>@Ticket.Contents</dd>
+        <dt>@T["ui.tickets.proof"]</dt><dd>@(Ticket.HasProof ? T["ui.tickets.proof_sent"] : T["ui.tickets.proof_none"])</dd>
+    </dl>
+    @if (Ticket.ParcelId is { } parcel)
+    {
+        <p class="customer-portal__notice" role="status">@T["ui.tickets.found"] <a href="/customer/packages/@parcel">@T["ui.tickets.open_package"]</a></p>
+    }
+    <section aria-labelledby="messages-title">
+        <h2 id="messages-title">@T["ui.tickets.messages"]</h2>
+        <ol class="customer-portal__history">
+            @foreach (CustomerTicketMessageDto message in Ticket.Messages)
+            {
+                <li><time datetime="@message.SentUtc.ToString("O")">@message.SentUtc.ToString("yyyy-MM-dd HH:mm")</time> <strong>@(message.FromStaff ? T["ui.tickets.from_staff"] : T["ui.tickets.from_you"])</strong> <span>@message.Text</span></li>
+            }
+        </ol>
+    </section>
+    <form method="post" action="/customer/tickets/@Ticket.TicketId/messages" class="customer-portal__form">
+        <AntiforgeryToken />
+        <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+        <label>@T["ui.tickets.reply"] <textarea name="message" required maxlength="1000" rows="3"></textarea></label>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.tickets.send"]</button>
+    </form>
+</CustomerShell>
+
+@code {
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter, EditorRequired] public CustomerTicketDto Ticket { get; set; } = null!;
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

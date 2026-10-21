@@ -45,7 +45,7 @@ public sealed class CompletePlatformDeviceLinkUseCase
         DateTimeOffset utcNow = _licensing.UtcNow;
         PlatformDeviceLink? link = string.IsNullOrEmpty(request.Token) ? null : await _licensing.Store.GetLinkAsync(_licensing.Hash(request.Token), cancellationToken);
 
-        if (link is null || !link.Try(utcNow))
+        if (link is null || link.Kind == PlatformDeviceLinkKind.SecondFactorReset || (request.ExpectedTenantId is { } expected && link.PlatformTenantId != expected) || !link.Try(utcNow))
         {
             if (link is not null)
             {
@@ -66,6 +66,10 @@ public sealed class CompletePlatformDeviceLinkUseCase
         }
 
         PlatformTenantLicensing seats = await _licensing.SeatsAsync(tenant.Id, cancellationToken);
+        PlatformOwnerSupportRequest? support = link.SupportRequestId is Guid supportId ? await _licensing.Store.GetSupportRequestAsync(supportId, cancellationToken) : null;
+
+        // The device support named when it started the recovery gives its seat, unless the page names another (D-O13).
+        Guid? replaceDeviceId = request.ReplaceDeviceId ?? support?.ReplaceDeviceId;
         PlatformSecret? secret = keyed ? null : _licensing.NewSecret();
         PlatformDevice device;
         PlatformDeviceEvent requested;
@@ -80,7 +84,7 @@ public sealed class CompletePlatformDeviceLinkUseCase
             if (link.Kind == PlatformDeviceLinkKind.OwnerRecovery && seats.SeatsInUse >= limit)
             {
                 // No free seat: the device the owner names gives its seat to the new one, in this commit.
-                PlatformDevice? replaced = request.ReplaceDeviceId is Guid replaceId ? await _licensing.Store.GetDeviceAsync(replaceId, cancellationToken) : null;
+                PlatformDevice? replaced = replaceDeviceId is Guid replaceId ? await _licensing.Store.GetDeviceAsync(replaceId, cancellationToken) : null;
 
                 if (replaced is null || replaced.PlatformTenantId != tenant.Id)
                 {
@@ -101,6 +105,11 @@ public sealed class CompletePlatformDeviceLinkUseCase
 
         link.MarkUsed(utcNow);
 
+        if (support is { Status: PlatformOwnerSupportStatus.Approved })
+        {
+            support.Complete(utcNow);
+        }
+
         if (link.Kind == PlatformDeviceLinkKind.FirstDevice)
         {
             // One commit: registration complete, tenant active, first device in use (D-L7).
@@ -112,6 +121,9 @@ public sealed class CompletePlatformDeviceLinkUseCase
             if (tenant.ActivateFromRegistration(utcNow) is { } activated)
             {
                 _licensing.RecordTenantActivated(tenant, activated);
+
+                // The onboarding is complete: the welcome email is the last one (owner, 2026-10-18).
+                _licensing.Notice(tenant.Id, PlatformLicensingNoticeKind.Welcome);
             }
         }
         else

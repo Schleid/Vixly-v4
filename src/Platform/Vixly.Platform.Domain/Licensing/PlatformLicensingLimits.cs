@@ -27,6 +27,9 @@ public static class PlatformLicensingLimits
 
     public const int HashLength = 64;
 
+    // Owner support requests (D-O13): reason, identity check and decision note.
+    public const int SupportTextMaxLength = 500;
+
     public const int NumberMaxLength = 12;
 
     public const int LinkMaxTries = 5;

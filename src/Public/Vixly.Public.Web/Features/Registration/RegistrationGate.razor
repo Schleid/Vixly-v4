@@ -1,0 +1,47 @@
+﻿@*
+=========================================================
+FILE: RegistrationGate.razor
+
+PURPOSE:
+Shows a sign-up page only while sign-up is open; otherwise the "opens soon" page (D-U4).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Sign-up is switched off until Stage 3 (owner decision D-U4); RegistrationGate shows the closed page
+- Invite-only (Slice 2 correction): a visitor with an offer link, an email link or a sign-up in progress passes; Platform checks the link
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+@inject IOptions<PublicSiteOptions> Site
+
+@if (Site.Value.RegistrationOpen || Invited)
+{
+    @ChildContent
+}
+else
+{
+    <section class="pub-section pub-section--narrow">
+        <h1>@T["public.register.closed_title"]</h1>
+        <p class="pub-lead">@T["public.register.closed_text"]</p>
+        <p class="pub-actions">
+            <a class="vx-button vx-button--primary" href="@PublicLanguage.Page(PublicLanguage.Current, "contact")">@T["public.cta.talk"]</a>
+            <a class="vx-button" href="@PublicLanguage.Page(PublicLanguage.Current, "plans")">@T["public.cta.plans"]</a>
+        </p>
+    </section>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; } = default!;
+
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    // Only lets the page show: Platform refuses a start without a valid offer link for that email.
+    private bool Invited => HttpContext is { } http
+        && (!string.IsNullOrWhiteSpace(http.Request.Query["offer"])
+            || !string.IsNullOrWhiteSpace(http.Request.Query["token"])
+            || RegistrationCookies.Read(http, RegistrationCookies.Access) is not null
+            || RegistrationCookies.Read(http, RegistrationCookies.Offer) is not null);
+}

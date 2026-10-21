@@ -1,0 +1,186 @@
+﻿using Vixly.Operations.Domain.Common;
+using Vixly.Shared.Kernel.Domain;
+
+namespace Vixly.Operations.Domain.Billing;
+
+// =========================================================
+// FILE: OperationsInvoice.cs
+//
+// PURPOSE:
+// An invoice (Slice 5F step 1, F-1 to F-6 and I-1 to I-7): issued once for a final shipment or a confirmed order of supplies, then never edited.
+//
+// RESPONSIBILITIES:
+// - Issue it from a draft: number, parties, lines, taxes per kind and totals
+// - Take back an approved credit note or void it
+// - Say what is still owed
+//
+// IMPORTANT NOTES:
+// - One per shipment and one per order (unique indexes)
+// - Taxes: each kind on the total of its taxed lines, rounded to the cent (I-4)
+// - Payments come with the cashier (step 2); PaidTotal stays 0 until then
+// =========================================================
+public sealed class OperationsInvoice : OperationsEntity
+{
+    private readonly List<OperationsInvoiceLine> _lines = new();
+
+    private readonly List<OperationsInvoiceTax> _taxes = new();
+
+    private OperationsInvoice()
+    {
+        Number = string.Empty;
+        Reference = string.Empty;
+        CurrencyCode = string.Empty;
+        Language = string.Empty;
+        Party = null!;
+    }
+
+    private OperationsInvoice(Guid tenantId, string number, OperationsInvoiceDraft draft, DateOnly issuedOn, DateTimeOffset utcNow)
+        : base(tenantId, utcNow)
+    {
+        Number = number;
+        (Kind, CustomerId, WarehouseId, ShipmentId, SupplySaleId) = (draft.Kind, draft.CustomerId, draft.WarehouseId, draft.ShipmentId, draft.SupplySaleId);
+        (Reference, Route, ServiceCode, CurrencyCode, Language, Party) = (draft.Reference, draft.Route, draft.ServiceCode, draft.CurrencyCode, draft.Language, draft.Party);
+        (TaxName, TaxPerKind, Note) = (draft.TaxName, draft.TaxPerKind, draft.Note);
+        (IssuedOn, IssuedUtc, Status) = (issuedOn, utcNow, OperationsInvoiceStatus.Issued);
+        _lines.AddRange(draft.Lines);
+
+        foreach (OperationsTaxKind kind in Enum.GetValues<OperationsTaxKind>())
+        {
+            decimal rate = draft.Rates.Of(kind);
+            decimal basis = _lines.Where(line => line.Taxed && line.TaxKind == kind).Sum(line => line.Amount);
+
+            if (rate > 0m && basis > 0m)
+            {
+                _taxes.Add(new OperationsInvoiceTax(kind, rate, basis, OperationsBillingLimits.Money(basis * rate / 100m)));
+            }
+        }
+
+        (Gross, DiscountTotal, Subtotal) = (_lines.Sum(line => line.Gross), _lines.Sum(line => line.Discount), _lines.Sum(line => line.Amount));
+        TaxTotal = _taxes.Sum(tax => tax.Amount);
+        Total = Subtotal + TaxTotal;
+    }
+
+    public string Number { get; private set; }
+
+    public OperationsInvoiceKind Kind { get; private set; }
+
+    public Guid CustomerId { get; private set; }
+
+    // The warehouse that issued it: the shipment's origin or the order's counter.
+    public Guid WarehouseId { get; private set; }
+
+    public Guid? ShipmentId { get; private set; }
+
+    public Guid? SupplySaleId { get; private set; }
+
+    // The shipment's or the order's number.
+    public string Reference { get; private set; }
+
+    public string? Route { get; private set; }
+
+    public string? ServiceCode { get; private set; }
+
+    public string CurrencyCode { get; private set; }
+
+    // The customer's language at issue: the invoice is read and printed in it.
+    public string Language { get; private set; }
+
+    public OperationsInvoiceParty Party { get; private set; }
+
+    public string? TaxName { get; private set; }
+
+    public bool TaxPerKind { get; private set; }
+
+    public string? Note { get; private set; }
+
+    public DateOnly IssuedOn { get; private set; }
+
+    public DateTimeOffset IssuedUtc { get; private set; }
+
+    public OperationsInvoiceStatus Status { get; private set; }
+
+    public DateTimeOffset? VoidedUtc { get; private set; }
+
+    public IReadOnlyList<OperationsInvoiceLine> Lines => _lines;
+
+    public IReadOnlyList<OperationsInvoiceTax> Taxes => _taxes;
+
+    // Fixed at issue (kept as columns so lists can filter on them).
+    public decimal Gross { get; private set; }
+
+    public decimal DiscountTotal { get; private set; }
+
+    public decimal Subtotal { get; private set; }
+
+    public decimal TaxTotal { get; private set; }
+
+    public decimal Total { get; private set; }
+
+    // Approved credit notes, tax included.
+    public decimal CreditedTotal { get; private set; }
+
+    // Slice 5F step 2: payments.
+    public decimal PaidTotal { get; private set; }
+
+    public decimal Owed => Status == OperationsInvoiceStatus.Voided ? 0m : Total - CreditedTotal - PaidTotal;
+
+    public bool CanVoid => Status == OperationsInvoiceStatus.Issued && CreditedTotal == 0m && PaidTotal == 0m;
+
+    public static OperationsInvoice Issue(Guid tenantId, string number, OperationsInvoiceDraft draft, DateOnly issuedOn, DateTimeOffset utcNow)
+    {
+        ArgumentNullException.ThrowIfNull(draft);
+        ArgumentException.ThrowIfNullOrWhiteSpace(number);
+
+        return draft.Lines.Count is 0 or > OperationsBillingLimits.MaxLines
+            ? throw new DomainException(OperationsBillingErrors.NothingToInvoice)
+            : new OperationsInvoice(tenantId, number, draft, issuedOn, utcNow);
+    }
+
+    public OperationsInvoiceLine Line(Guid lineId) => _lines.FirstOrDefault(line => line.Id == lineId) ?? throw new DomainException(OperationsBillingErrors.AmountInvalid);
+
+    public void EnsureIssued()
+    {
+        if (Status != OperationsInvoiceStatus.Issued)
+        {
+            throw new DomainException(OperationsBillingErrors.Voided);
+        }
+    }
+
+    // An approved credit note takes back its lines and its taxes.
+    internal void Credit(IReadOnlyList<OperationsCreditNoteLine> lines, IReadOnlyList<OperationsCreditNoteTax> taxes, decimal total, DateTimeOffset utcNow)
+    {
+        EnsureIssued();
+
+        foreach (OperationsCreditNoteLine line in lines)
+        {
+            Line(line.InvoiceLineId).Credit(line.Amount);
+        }
+
+        foreach (OperationsCreditNoteTax tax in taxes)
+        {
+            OperationsInvoiceTax held = _taxes.First(item => item.Kind == tax.Kind);
+
+            // Never more than the tax still holds.
+            if (tax.Amount < 0m || tax.Amount > held.Amount - held.Credited)
+            {
+                throw new DomainException(OperationsBillingErrors.AmountInvalid);
+            }
+
+            held.Credit(tax.Amount);
+        }
+
+        CreditedTotal += total;
+        MarkAsModified(utcNow);
+    }
+
+    internal void Void(DateTimeOffset utcNow)
+    {
+        if (!CanVoid)
+        {
+            throw new DomainException(OperationsBillingErrors.VoidNotPossible);
+        }
+
+        (Status, VoidedUtc) = (OperationsInvoiceStatus.Voided, utcNow);
+        MarkAsModified(utcNow);
+    }
+}

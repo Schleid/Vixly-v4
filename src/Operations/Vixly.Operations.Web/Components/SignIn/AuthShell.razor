@@ -67,6 +67,8 @@ IMPORTANT NOTES:
             <p>@T["ui.session.idle_warning"]</p>
             <button type="button" class="vx-button vx-button--primary" data-idle-stay>@T["ui.session.stay"]</button>
         </div>
+        @* The idle timer signs out through this form (ops-session.js). *@
+        <form method="post" action="/staff/sign-out" data-sign-out hidden><AntiforgeryToken /></form>
     }
 </body>
 </html>

@@ -1,0 +1,43 @@
+﻿@*
+=========================================================
+FILE: ItemTypesPanel.razor
+
+PURPOSE:
+The company's item types: a barrel, a car, a TV (Slice 4B design section 7).
+
+RESPONSIBILITIES:
+- List the item types and change them; add one
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Never deleted, taken out of use
+=========================================================
+*@
+<section class="ops-editor__panel" aria-labelledby="types-title">
+    <h2 id="types-title">@T["ui.charges.types.title"]</h2>
+    <p class="ops-editor__hint">@T["ui.charges.types.intro"]</p>
+    @foreach (OperationsItemType type in ItemTypes)
+    {
+        <form method="post" action="/staff/charges/item-types" class="ops-editor__inline">
+            <AntiforgeryToken />
+            <input type="hidden" name="type" value="@type.Id" />
+            <input name="name" value="@type.Name" maxlength="@OperationsChargeLimits.NameMaxLength" aria-label="@T["ui.charges.types.name"]" required />
+            <input name="words" value="@type.Words" maxlength="@OperationsChargeLimits.WordsMaxLength" aria-label="@T["ui.charges.types.words"]" placeholder="@T["ui.charges.types.words"]" />
+            <label><input type="checkbox" name="active" value="true" checked="@type.IsActive" /> @T["ui.charges.in_use"]</label>
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
+        </form>
+    }
+    <form method="post" action="/staff/charges/item-types" class="ops-editor__inline">
+        <AntiforgeryToken />
+        <input type="hidden" name="active" value="true" />
+        <input name="name" maxlength="@OperationsChargeLimits.NameMaxLength" aria-label="@T["ui.charges.types.name"]" placeholder="@T["ui.charges.types.name"]" required />
+        <input name="words" maxlength="@OperationsChargeLimits.WordsMaxLength" aria-label="@T["ui.charges.types.words"]" placeholder="@T["ui.charges.types.words"]" />
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.charges.types.add"]</button>
+    </form>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsItemType> ItemTypes { get; set; } = Array.Empty<OperationsItemType>();
+}

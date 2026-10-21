@@ -29,7 +29,10 @@ public static class PlatformPortalSlugFormat
 
     public static IReadOnlyList<string> ReservedFloor { get; } = new[]
     {
-        "www", "mail", "vixly", "vixly-control", "vixly-api", "control", "api", "admin", "edge", "status", "staging"
+        "www", "mail", "vixly", "vixly-control", "vixly-api", "control", "api", "admin", "edge", "status", "staging",
+
+        // The Operations internal host shares the tenant wildcard: vixly-ops-internal in production, ops-internal on staging.
+        "vixly-ops-internal", "ops-internal"
     };
 
     public static string Normalize(string? value)

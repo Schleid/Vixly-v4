@@ -30,4 +30,17 @@ public interface IPlatformTenantMailer
         PlatformTenantStatus status,
         PlatformSuspensionCategory? category,
         CancellationToken cancellationToken);
+
+    // B12: staff who review changes hear of a new request; the tenant owner hears the decision.
+    Task SendCompanyChangeSubmittedAsync(
+        Vixly.Platform.Application.Queries.PlatformPermissionHolderItem recipient,
+        PlatformTenant tenant,
+        PlatformTenantChangeRequest request,
+        CancellationToken cancellationToken);
+
+    Task SendCompanyChangeDecidedAsync(
+        PlatformTenant tenant,
+        PlatformTenantContact recipient,
+        PlatformTenantChangeRequest request,
+        CancellationToken cancellationToken);
 }

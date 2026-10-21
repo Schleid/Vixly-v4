@@ -1,0 +1,17 @@
+﻿@*
+=========================================================
+FILE: Routes.razor
+
+PURPOSE:
+Routing for the public site; unknown addresses show the not-found page.
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+=========================================================
+*@
+<Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFoundPage)">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(PublicLayout)" />
+    </Found>
+</Router>

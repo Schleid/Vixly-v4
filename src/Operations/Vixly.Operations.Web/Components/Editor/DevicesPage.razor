@@ -14,6 +14,8 @@ IMPORTANT NOTES:
 - Placeholder look: Frontend/UI designs the final experience
 =========================================================
 *@
+@inherits OperationsAllowedComponent
+@using Vixly.Operations.Domain.Access
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.devices.title"]" Company="@Company" Section="devices" Error="@Error" Info="@Info">
@@ -34,7 +36,7 @@ IMPORTANT NOTES:
                         <span class="ops-editor__status" data-status="@device.Status">@T["ui.devices.kind." + device.Kind]</span>
                         @if (device.RequestedByName is not null) { <span>@T["ui.devices.requested_by"] @device.RequestedByName</span> }
                         @if (device.LastSeenUtc is { } seen) { <span>@T["ui.devices.last_seen"] <time datetime="@seen.ToString("O")">@seen.ToLocalTime().ToString("g", System.Globalization.CultureInfo.CurrentCulture)</time></span> }
-                        @if (device.Status == "pending")
+                        @if (device.Status == "pending" && Can(OperationsPermissions.DevicesApprove))
                         {
                             <form method="post" action="/staff/devices/@device.DeviceId/decide" class="ops-editor__inline">
                                 <AntiforgeryToken />
@@ -43,7 +45,7 @@ IMPORTANT NOTES:
                                 <button type="submit" name="approve" value="false" class="vx-button vx-button--secondary">@T["ui.devices.deny"]</button>
                             </form>
                         }
-                        else if (device.Status == "active")
+                        else if (device.Status == "active" && Can(OperationsPermissions.DevicesRelease))
                         {
                             <form method="post" action="/staff/devices/@device.DeviceId/release" class="ops-editor__inline">
                                 <AntiforgeryToken />

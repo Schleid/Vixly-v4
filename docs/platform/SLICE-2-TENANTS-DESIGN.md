@@ -255,7 +255,25 @@ The same patterns as Slice 1 apply (see the FE report). Subscriptions, invoices 
 - **Company legal data is immutable** once the tenant exists. The console's company profile editor (`UpdatePlatformTenantProfile`) becomes read-only.
 - **The portal slug is fixed once the tenant has been active (D-T11, unchanged).** Staff may still correct it while the tenant has never been activated, with `platform.tenants.edit`, a reason and step-up. After first activation it never changes.
 - **Still staff-owned:** lifecycle moves, account manager, tags and internal notes (D-T16).
-- **To settle in that slice:** how a legal change (merger, legal name change) is handled. It is not editable data. The proposal is a staff-reviewed change request with evidence, audited, which ties in with KYB on the backlog.
+- **Built 2026-10-16 (invite step):** `CreatePlatformTenant` and the "New tenant" form are removed. The invitation is a Sales offer link (`/register?offer=…`): the company registers itself on the public site. Platform.Api refuses a registration start without a valid offer link for that owner email while `PlatformTenants:RegistrationInviteOnly` is true (the default until public sign-up opens, D-U4); the public site shows the sign-up form only to a visitor who has such a link. The read-only company profile in the console is still to do.
+- **Built 2026-10-16 (B12, owner chose "Legal data now" and "Request and approve"):** see "Company change requests" below.
+
+### Company change requests (B12, built 2026-10-16)
+
+Company legal data (legal name, trading name, company email and phone, postal address) is read-only in the console. Contacts, language and time zone stay editable by staff until Operations ships its company profile screen.
+
+| Step | Who | What happens |
+|---|---|---|
+| Ask | Tenant owner, in Operations, with a fresh second factor | `POST /internal/v1/tenant/company-change` with the new details, a reason and one proof file (PDF, JPEG or PNG, found by its first bytes, up to 10 MB). The tenant keeps its current details. One pending request per tenant, enforced by a filtered unique index. Audited `platform.tenants.company_change_submitted`; staff holding `platform.tenants.review_changes` get an email with a link to the request |
+| Withdraw | Tenant owner | `DELETE /internal/v1/tenant/company-change` closes a pending request. Audited |
+| Follow | Tenant owner or admin | `GET /internal/v1/tenant/company-change` returns the latest request, or 204 when there is none |
+| Review | Staff with `platform.tenants.view` | Console, Company changes (`/tenants/changes`, pending first, filter by status or tenant). The request page shows current and requested details side by side, the reason and the proof download (`no-store`, `nosniff`) |
+| Decide | Staff with `platform.tenants.review_changes` (new; Administrator role) and step-up | Approve (optional note) replaces the tenant's legal details and writes tenant history `company_changed`; reject needs a note. Both are audited with before and after, and the tenant owner contact gets an email |
+
+- **Invoices keep the details they were issued with.** Only new invoices show the approved details.
+- **No other path changes legal data.** `UpdatePlatformTenantProfile` and the domain's `UpdateCompany` are removed; the only writer is an approved request.
+- **Tables:** `TenantChangeRequests` (previous and proposed details as columns, status, reason, decider, note, row version) and `TenantChangeProofs` (file bytes and SHA-256), migration `TenantChanges`.
+- **Later:** KYB checks on the proof, from the backlog.
 
 ### Tenant page: sections the owner asked for (2026-10-14)
 

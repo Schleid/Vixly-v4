@@ -86,4 +86,10 @@
     <value>Acceso seguro a la cuenta</value>
     <comment>needs-review</comment>
   </data>
+  <data name="team" xml:space="preserve">
+    <value>Equipo y acceso</value>
+  </data>
+  <data name="company" xml:space="preserve">
+    <value>Empresa</value>
+  </data>
 </root>

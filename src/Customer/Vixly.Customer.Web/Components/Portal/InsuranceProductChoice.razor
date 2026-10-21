@@ -1,0 +1,61 @@
+﻿@*
+=========================================================
+FILE: InsuranceProductChoice.razor
+
+PURPOSE:
+The customer chooses their insurance: none, or one of the company's products, each with its price rule, the company's few words and its full terms (Slice 5D).
+
+RESPONSIBILITIES:
+- No insurance, then each product in the company's order
+- The product's pitch in the customer's language; the full terms under it (InsuranceTermsView)
+- The acceptance of the chosen product's terms
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- Operations checks the product fits the service and records when the terms were accepted
+=========================================================
+*@
+@using System.Globalization
+@using Vixly.Contracts.Operations.Packages
+@inject IStringLocalizer<CustomerText> T
+
+<fieldset class="customer-portal__insurance">
+    <legend>@T["ui.shipments.insurance_choose"]</legend>
+    @* Review of 5D: a product the company no longer offers is never dropped silently; the customer must choose again (no radio is checked, one is required). *@
+    @if (Withdrawn) { <p class="customer-portal__notice" role="alert">@T["ui.shipments.insurance_withdrawn"]</p> }
+    <label><input type="radio" name="insurance" value="" checked="@(Selected is null)" required="@Withdrawn" /> @T["ui.shipments.insurance_none"]</label>
+    @foreach (CustomerInsuranceTermsDto terms in Products.Where(product => product.PlanId is not null))
+    {
+        <div class="customer-portal__insurance-product">
+            <label>
+                <input type="radio" name="insurance" value="@terms.PlanId" checked="@(Selected == terms.PlanId)" required="@Withdrawn" />
+                <strong>@(terms.Name ?? T["ui.insurance.title." + terms.Mode].Value)</strong>@(Modes > 1 ? " · " + T["ui.shipments.mode." + terms.Mode].Value : null)
+                · @(terms.Method == "Percent"
+                    ? VixlyText.Format(T, "ui.insurance.price_percent", new Dictionary<string, object> { ["percent"] = (terms.Percent ?? 0m).ToString("0.###", CultureInfo.CurrentCulture), ["minimum"] = (terms.MinimumPremium ?? 0m).ToString("N2", CultureInfo.CurrentCulture) + " " + terms.Currency })
+                    : T["ui.insurance.price_bands"].Value)
+            </label>
+            @if (Pitch(terms) is { } pitch) { <p class="customer-portal__hint">@pitch</p> }
+            <InsuranceTermsView Terms="new[] { terms }" />
+        </div>
+    }
+    <label><input type="checkbox" name="insuranceAccepted" value="true" checked="@Accepted" /> @T["ui.shipments.insurance_accept"]</label>
+</fieldset>
+
+@code {
+    [Parameter] public IReadOnlyList<CustomerInsuranceTermsDto> Products { get; set; } = Array.Empty<CustomerInsuranceTermsDto>();
+
+    [Parameter] public Guid? Selected { get; set; }
+
+    [Parameter] public bool Accepted { get; set; }
+
+    private bool Withdrawn => Selected is { } selected && Products.All(product => product.PlanId != selected);
+
+    private int Modes => Products.Select(product => product.Mode).Distinct().Count();
+
+    private static string? Pitch(CustomerInsuranceTermsDto terms) => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName switch
+    {
+        "fr" => terms.PitchFr ?? terms.PitchEn,
+        "es" => terms.PitchEs ?? terms.PitchEn,
+        _ => terms.PitchEn
+    };
+}

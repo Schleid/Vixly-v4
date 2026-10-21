@@ -1,0 +1,77 @@
+﻿@*
+=========================================================
+FILE: SupplyPage.razor
+
+PURPOSE:
+One shipping supply (Slice 5E, S-1 to S-3): its details and barcodes, its prices, and its shelf labels.
+
+RESPONSIBILITIES:
+- Change the details, barcodes and whether it is in use
+- Show the prices and schedule a new one
+- Print a sheet of shelf labels
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- ops.charges.configure
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@(Supply is null ? T["ui.supplies.page_title"].Value : Supply.Code + " · " + Supply.Name(Language))" Company="@Company" Section="supplies" Error="@Error" Info="@Info">
+    <p><a href="/staff/supplies">@T["ui.supplies.back"]</a></p>
+    @if (Supply is { } supply)
+    {
+    <section class="ops-editor__panel" aria-labelledby="supply-details">
+        <h2 id="supply-details">@T["ui.supplies.details"]</h2>
+        <form method="post" action="/staff/supplies/@supply.Id" class="ops-editor__form">
+            <AntiforgeryToken />
+            <SupplyDetailsFields T="T" Form="Details" />
+            <label><input type="checkbox" name="active" value="true" checked="@Details.Active" /> @T["ui.charges.in_use"]</label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+        </form>
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="supply-prices">
+        <h2 id="supply-prices">@T["ui.supplies.prices"]</h2>
+        <SupplyPriceHistory T="T" Supply="supply" Warehouses="Warehouses" UtcNow="UtcNow" Currency="@Currency" />
+        <h3>@T["ui.supplies.new_price"]</h3>
+        <form method="post" action="/staff/supplies/@supply.Id/prices" class="ops-editor__form">
+            <AntiforgeryToken />
+            <SupplyPriceFields T="T" Form="PriceEntered" Warehouses="Warehouses" Currency="@Currency" />
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.schedule_price"]</button>
+        </form>
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="supply-labels">
+        <h2 id="supply-labels">@T["ui.supplies.labels"]</h2>
+        <p class="ops-editor__hint">@T["ui.supplies.labels_hint"]</p>
+        <form method="get" action="/staff/supplies/@supply.Id/labels" target="_blank" class="ops-editor__inline">
+            <label>@T["ui.supplies.labels_count"] <input name="count" type="number" min="1" max="30" value="30" /></label>
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.supplies.labels_print"]</button>
+        </form>
+    </section>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsSupply? Supply { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+
+    [Parameter] public DateTimeOffset UtcNow { get; set; }
+
+    // The details as typed after a refusal, else as saved.
+    [Parameter] public OperationsSupplyForm? DetailsEntered { get; set; }
+
+    [Parameter] public OperationsSupplyForm PriceEntered { get; set; } = new();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private OperationsSupplyForm Details => DetailsEntered ?? (Supply is { } supply ? OperationsSupplyForm.From(supply) : new OperationsSupplyForm());
+
+    private static string Language => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+}

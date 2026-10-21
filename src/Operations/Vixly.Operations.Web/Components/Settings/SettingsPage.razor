@@ -49,6 +49,17 @@ IMPORTANT NOTES:
                 </select>
             </label>
 
+            <label>@T["ui.settings.time_zone"]
+                <input name="timeZone" value="@Settings.TimeZone" maxlength="64" list="time-zones" placeholder="America/Port-au-Prince" />
+                <datalist id="time-zones">
+                    @foreach (string zone in new[] { "America/Port-au-Prince", "America/New_York", "America/Chicago", "America/Los_Angeles", "America/Santo_Domingo", "America/Jamaica", "America/Puerto_Rico", "America/Panama", "America/Bogota", "Europe/Paris", "Europe/London", "Africa/Lagos", "UTC" })
+                    {
+                        <option value="@zone"></option>
+                    }
+                </datalist>
+            </label>
+            <p class="ops-editor__hint">@T["ui.settings.time_zone_hint"]</p>
+
             <h2>@T["ui.settings.delivery"]</h2>
             <label><input type="checkbox" name="pickup" value="true" checked="@Settings.DeliveryModes.HasFlag(OperationsDeliveryModes.Pickup)" /> @T["ui.settings.pickup"]</label>
             <label><input type="checkbox" name="homeDelivery" value="true" checked="@Settings.DeliveryModes.HasFlag(OperationsDeliveryModes.HomeDelivery)" /> @T["ui.settings.home_delivery"]</label>
@@ -63,6 +74,9 @@ IMPORTANT NOTES:
             <label>@T["ui.settings.prefix.invoice"] <input name="invoicePrefix" value="@Settings.InvoicePrefix" maxlength="6" required /></label>
             <label>@T["ui.settings.prefix.payment"] <input name="paymentPrefix" value="@Settings.PaymentPrefix" maxlength="6" required /></label>
             <label>@T["ui.settings.prefix.customer"] <input name="customerPrefix" value="@Settings.CustomerPrefix" maxlength="6" required /></label>
+            <label>@T["ui.settings.prefix.parcel"] <input name="parcelPrefix" value="@Settings.ParcelPrefix" maxlength="6" required /></label>
+            <label>@T["ui.settings.prefix.supply_order"] <input name="supplyOrderPrefix" value="@Settings.SupplyOrderPrefix" maxlength="6" required /></label>
+            <label>@T["ui.settings.prefix.credit_note"] <input name="creditNotePrefix" value="@Settings.CreditNotePrefix" maxlength="6" required /></label>
             <p class="ops-editor__hint">@VixlyText.Format(T, "ui.settings.prefix_hint", "example", Settings.ShipmentPrefix + DateTime.UtcNow.ToString("yy", System.Globalization.CultureInfo.InvariantCulture) + "000001")</p>
         </fieldset>
         @if (CurrencyLocked)

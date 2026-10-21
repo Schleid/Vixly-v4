@@ -1,0 +1,63 @@
+﻿@*
+=========================================================
+FILE: CounterPage.razor
+
+PURPOSE:
+The front-desk counter: find the customer in front of the clerk (Slice 5C, C-5).
+
+RESPONSIBILITIES:
+- One search box: phone, email or customer code
+- The customers found, each opening their counter page
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- One match opens the customer directly (the endpoint redirects); a name alone finds nobody (owner: phone or email)
+- Styling: listed in docs/operations/UI-STYLING-INVENTORY.md
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.counter.title"]" Company="@Company" Section="counter" Error="@Error">
+    <CounterFindBar Find="@Find" Focus="true" />
+    @if (Searched)
+    {
+        <section class="ops-editor__panel">
+            @if (Customers.Count == 0)
+            {
+                <p>@T["ui.counter.none"]</p>
+            }
+            else
+            {
+                <OperationsTableViewport Label="@T["ui.counter.found"]">
+                    <table class="ops-editor__table">
+                        <thead><tr><th scope="col">@T["ui.counter.customer"]</th><th scope="col">@T["ui.counter.code"]</th><th scope="col">@T["ui.counter.phone"]</th><th scope="col">@T["ui.counter.email"]</th><th scope="col">@T["ui.counter.status"]</th></tr></thead>
+                        <tbody>
+                            @foreach (OperationsCounterCustomer customer in Customers)
+                            {
+                                <tr>
+                                    <td><a href="/staff/counter/customers/@customer.Id">@customer.Name</a>@(customer.CompanyName is { } company ? " · " + company : null)</td>
+                                    <td>@customer.Code</td>
+                                    <td>@customer.Phone</td>
+                                    <td>@customer.Email</td>
+                                    <td>@T["ui.customers.status." + customer.Status.ToString().ToLowerInvariant()]</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </OperationsTableViewport>
+            }
+        </section>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public string? Find { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsCounterCustomer> Customers { get; set; } = Array.Empty<OperationsCounterCustomer>();
+
+    [Parameter] public bool Searched { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+}

@@ -1,0 +1,75 @@
+﻿@*
+=========================================================
+FILE: ExtrasPanel.razor
+
+PURPOSE:
+The company's extra charges of a mode (and those for every mode), with their scheduled amounts (Slice 4, 4B and 4C).
+
+RESPONSIBILITIES:
+- List the extras and change them; add one
+- Show an amount scheduled for later and remove it
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Never deleted, taken out of use
+=========================================================
+*@
+<section class="ops-editor__panel" aria-labelledby="extras-title">
+    <h2 id="extras-title">@T["ui.charges.extras.title"]</h2>
+    @if (Extras.Count == 0) { <p>@T["ui.charges.extras.none"]</p> }
+    @foreach (OperationsChargeExtra extra in Extras)
+    {
+        <details>
+            <summary><strong>@extra.Name</strong> · @(extra.Mode is null ? T["ui.charges.extra.mode.all"].Value : T["ui.charges.mode." + extra.Mode].Value) · @T["ui.charges.extra.trigger." + extra.Trigger] @(extra.IsGovernmentFee ? "· " + T["ui.charges.extra.government_short"].Value : null) @(extra.IsActive ? null : "· " + T["ui.charges.not_in_use"].Value)</summary>
+            @foreach (OperationsExtraVersion later in extra.Versions.Where(version => version.EffectiveFromUtc > UtcNow))
+            {
+                <form method="post" action="/staff/charges/versions/remove" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="owner" value="Extra" />
+                    <input type="hidden" name="tab" value="@Mode" />
+                    <input type="hidden" name="owner_id" value="@extra.Id" />
+                    <input type="hidden" name="version" value="@later.Id" />
+                    <span>@VixlyText.Format(T, "ui.charges.version.scheduled_amount", "date", later.EffectiveFromUtc.ToString("d", CultureInfo.CurrentCulture)) @OperationsChargeWords.Number(later.Amount)</span>
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.charges.version.remove"]</button>
+                </form>
+            }
+            <form method="post" action="/staff/charges/extras" class="ops-editor__form">
+                <AntiforgeryToken />
+                <input type="hidden" name="extra" value="@extra.Id" />
+                <input type="hidden" name="tab" value="@Mode" />
+                <ChargeExtraFields T="T" Mode="Mode" Extra="extra" Current="@(extra.VersionAt(UtcNow) ?? extra.Versions.FirstOrDefault())" Services="Services" Origins="Origins"
+                    Destinations="Destinations" Currency="@Currency" />
+                <label><input type="checkbox" name="active" value="true" checked="@extra.IsActive" /> @T["ui.charges.in_use"]</label>
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
+            </form>
+        </details>
+    }
+    <details>
+        <summary>@T["ui.charges.extras.add"]</summary>
+        <form method="post" action="/staff/charges/extras" class="ops-editor__form">
+            <AntiforgeryToken />
+            <input type="hidden" name="active" value="true" />
+            <input type="hidden" name="tab" value="@Mode" />
+            <ChargeExtraFields T="T" Mode="Mode" Services="Services" Origins="Origins" Destinations="Destinations" Currency="@Currency" />
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.charges.extras.add"]</button>
+        </form>
+    </details>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsChargeExtra> Extras { get; set; } = Array.Empty<OperationsChargeExtra>();
+
+    [Parameter] public IReadOnlyList<string> Services { get; set; } = Array.Empty<string>();
+
+    [Parameter] public OperationsTransportMode Mode { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Origins { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Destinations { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public DateTimeOffset UtcNow { get; set; }
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+}

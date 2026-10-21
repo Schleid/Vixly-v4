@@ -1,7 +1,7 @@
 ﻿/* =========================================================
    FILE: public.css
    PURPOSE: Public marketing layout on Shared.UI foundations.
-   NOTES: Theme -> primitives -> plane. No shared class ownership here.
+   NOTES: Theme -> primitives -> plane. Comfortable density for public & sign-in forms.
    ========================================================= */
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-padding-top: var(--vx-space-6); }
@@ -20,7 +20,7 @@ p { margin: 0 0 var(--vx-space-4); }
 .pub-brand { display: inline-flex; align-items: center; gap: var(--vx-space-3); font-weight: 700; font-size: var(--vx-font-size-2xl); letter-spacing: var(--vx-tracking-heading); color: var(--vx-color-text); text-decoration: none; }
 .pub-brand img { display: block; }
 .pub-nav, .pub-languages { display: flex; flex-wrap: wrap; align-items: center; gap: var(--vx-space-2); }
-.pub-nav a, .pub-languages a, .pub-languages span { display: inline-flex; align-items: center; min-height: var(--vx-control-min); padding: var(--vx-space-2) var(--vx-space-3); font-size: var(--vx-font-size-md); font-weight: 500; text-decoration: none; border-radius: var(--vx-radius-sm); }
+.pub-nav a, .pub-languages a, .pub-languages span { display: inline-flex; align-items: center; min-height: var(--vx-form-control-height, 40px); padding: var(--vx-space-2) var(--vx-space-3); font-size: var(--vx-font-size-md); font-weight: 500; text-decoration: none; border-radius: var(--vx-radius-sm); }
 .pub-nav a { color: var(--vx-color-text-muted); }
 .pub-nav a:hover, .pub-languages a:hover { color: var(--vx-color-link); background: var(--vx-color-primary-soft); }
 .pub-languages { margin-inline-start: auto; gap: 0; }
@@ -30,7 +30,6 @@ p { margin: 0 0 var(--vx-space-4); }
 .pub-hero h1 { max-width: var(--vx-content-reading); font-size: var(--vx-font-size-display); }
 .pub-eyebrow { display: inline-flex; padding: var(--vx-space-2) var(--vx-space-3); margin-bottom: var(--vx-space-6); border: var(--vx-border-width) solid var(--vx-color-border); border-radius: var(--vx-radius-full); color: var(--vx-color-link); background: var(--vx-color-surface); font-weight: 700; letter-spacing: var(--vx-tracking-label); text-transform: uppercase; font-size: var(--vx-font-size-xs); }
 .pub-lead { font-size: var(--vx-font-size-xl); color: var(--vx-color-text-muted); max-width: var(--vx-content-reading); text-wrap: pretty; }
-.pub-hint { color: var(--vx-color-text-subtle); font-size: var(--vx-font-size-md); }
 .pub-actions { display: flex; flex-wrap: wrap; gap: var(--vx-space-3); margin-block: var(--vx-space-8); }
 .pub-section { padding-block: var(--vx-space-16); }
 .pub-section + .pub-section { border-top: var(--vx-border-width) solid var(--vx-color-border); }
@@ -42,7 +41,7 @@ p { margin: 0 0 var(--vx-space-4); }
 .pub-tile h3::before { content: ''; display: block; width: var(--vx-space-8); height: var(--vx-space-1); margin-bottom: var(--vx-space-6); border-radius: var(--vx-radius-full); background: var(--vx-color-link); }
 .pub-steps { counter-reset: flow; display: grid; gap: var(--vx-space-6); grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--vx-grid-step-min)), 1fr)); padding: 0; margin-top: var(--vx-space-8); list-style: none; }
 .pub-steps li { counter-increment: flow; color: var(--vx-color-text-muted); }
-.pub-steps li::before { content: counter(flow, decimal-leading-zero); display: inline-grid; place-items: center; min-width: var(--vx-control-min); min-height: var(--vx-control-min); margin-bottom: var(--vx-space-5); border-radius: var(--vx-radius-full); background: var(--vx-color-primary-soft); color: var(--vx-color-link); font-weight: 700; font-variant-numeric: tabular-nums; }
+.pub-steps li::before { content: counter(flow, decimal-leading-zero); display: inline-grid; place-items: center; min-width: var(--vx-form-control-height, 40px); min-height: var(--vx-form-control-height, 40px); margin-bottom: var(--vx-space-5); border-radius: var(--vx-radius-full); background: var(--vx-color-primary-soft); color: var(--vx-color-link); font-weight: 700; font-variant-numeric: tabular-nums; }
 .pub-steps h3 { color: var(--vx-color-text); }
 .pub-plan { display: flex; flex-direction: column; align-items: flex-start; gap: var(--vx-space-3); }
 .pub-plan > p { margin: 0; }
@@ -51,13 +50,386 @@ p { margin: 0 0 var(--vx-space-4); }
 .pub-plan__facts { padding-inline-start: var(--vx-space-5); margin-block: var(--vx-space-5) var(--vx-space-8); color: var(--vx-color-text-muted); }
 .pub-plan__facts li { padding-block: var(--vx-space-2); }
 .pub-plan__facts li::marker, .pub-feature li::marker { color: var(--vx-color-link); }
-.pub-form { display: grid; gap: var(--vx-space-5); max-width: var(--vx-content-form); padding: var(--vx-space-8); background: var(--vx-color-surface); border: var(--vx-border-width) solid var(--vx-color-border); border-radius: var(--vx-radius-lg); box-shadow: var(--vx-shadow-2); }
-.pub-form fieldset { min-width: 0; border: var(--vx-border-width) solid var(--vx-color-border); border-radius: var(--vx-radius-md); padding: var(--vx-space-5); display: grid; gap: var(--vx-space-3); }
-.pub-form legend { padding-inline: var(--vx-space-2); font-weight: 600; }
+
+/* =========================================================
+   COMFORTABLE FORM SYSTEM (UX Brief 2026-10-20 & ADR-0013)
+   - Height: 40px inputs, selects, and buttons
+   - Card padding: 20px - 24px
+   - Gap between fields: 16px horizontal, 12px vertical
+   - Multi-column content-sized grid (4 to 6 columns desktop)
+   - Labels above fields, primary action bottom-left
+   ========================================================= */
+:root {
+    --vx-form-control-height: 40px;
+    --vx-form-gap-x: 16px;
+    --vx-form-gap-y: 12px;
+    --vx-form-card-padding: 24px;
+}
+
+.pub-form {
+    display: grid;
+    column-gap: var(--vx-form-gap-x);
+    row-gap: var(--vx-form-gap-y);
+    max-width: var(--vx-content-form);
+    padding: var(--vx-form-card-padding);
+    background: var(--vx-color-surface);
+    border: var(--vx-border-width) solid var(--vx-color-border);
+    border-radius: var(--vx-radius-lg);
+    box-shadow: var(--vx-shadow-1);
+    box-sizing: border-box;
+}
+
+.pub-form--grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.pub-form fieldset {
+    min-width: 0;
+    border: var(--vx-border-width) solid var(--vx-color-border);
+    border-radius: var(--vx-radius-md);
+    padding: var(--vx-space-5);
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    column-gap: var(--vx-form-gap-x);
+    row-gap: var(--vx-form-gap-y);
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.pub-form legend {
+    padding-inline: var(--vx-space-2);
+    font-size: var(--vx-font-size-md);
+    font-weight: 600;
+    color: var(--vx-color-text);
+}
+
 .pub-form > p { margin: 0; }
+
+/* Input and Select Controls */
+.pub-form .vx-input,
+.pub-form input[type="text"],
+.pub-form input[type="email"],
+.pub-form input[type="tel"],
+.pub-form input[type="number"],
+.pub-form input[type="date"],
+.pub-form select.vx-input {
+    width: 100%;
+    min-width: 0;
+    height: var(--vx-form-control-height);
+    min-height: var(--vx-form-control-height);
+    box-sizing: border-box;
+    padding: 0 12px;
+    font: inherit;
+    font-size: 15px;
+    border: 1px solid var(--vx-color-border-control);
+    border-radius: var(--vx-radius-sm);
+    background: var(--vx-color-surface);
+    color: var(--vx-color-text);
+    transition: border-color var(--vx-transition-fast), box-shadow var(--vx-transition-fast);
+}
+
+.pub-form textarea.vx-input {
+    width: 100%;
+    min-width: 0;
+    min-height: 96px;
+    padding: 10px 12px;
+    font: inherit;
+    font-size: 15px;
+    line-height: 1.5;
+    box-sizing: border-box;
+    border: 1px solid var(--vx-color-border-control);
+    border-radius: var(--vx-radius-sm);
+    background: var(--vx-color-surface);
+    color: var(--vx-color-text);
+    resize: vertical;
+}
+
+.pub-form .vx-input:focus-visible,
+.pub-form textarea.vx-input:focus-visible {
+    outline: 2px solid var(--vx-color-focus);
+    outline-offset: 1px;
+    border-color: var(--vx-color-focus);
+}
+
+/* Field Container & Labels */
+.vx-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    margin: 0;
+}
+
+.vx-label {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--vx-color-text);
+}
+
+.vx-required {
+    color: var(--vx-color-danger);
+    margin-left: 2px;
+}
+
+.pub-hint,
+.vx-hint {
+    color: var(--vx-color-text-subtle);
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 2px 0 0;
+}
+
+/* Multi-Column Grid Utilities (Section 2 Content Sizing) */
+.pub-field--name     { grid-column: span 3; }
+.pub-field--address  { grid-column: span 4; }
+.pub-field--full     { grid-column: 1 / -1; }
+.pub-field--phone    { grid-column: span 2; }
+.pub-field--postal   { grid-column: span 2; }
+.pub-field--city     { grid-column: span 2; }
+.pub-field--state    { grid-column: span 2; }
+.pub-field--country  { grid-column: span 2; }
+.pub-field--slug     { grid-column: span 3; }
+.pub-field--short    { grid-column: span 2; }
+.pub-field--half     { grid-column: span 3; }
+.pub-field--email    { grid-column: span 4; }
+
+@media (max-width: 1024px) {
+    .pub-form--grid,
+    .pub-form fieldset {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .pub-field--name,
+    .pub-field--address,
+    .pub-field--slug,
+    .pub-field--half,
+    .pub-field--email {
+        grid-column: span 2;
+    }
+    .pub-field--phone,
+    .pub-field--postal,
+    .pub-field--city,
+    .pub-field--state,
+    .pub-field--country,
+    .pub-field--short {
+        grid-column: span 1;
+    }
+    .pub-field--full {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 640px) {
+    .pub-form--grid,
+    .pub-form fieldset {
+        grid-template-columns: 1fr;
+    }
+    .pub-field--name,
+    .pub-field--address,
+    .pub-field--full,
+    .pub-field--phone,
+    .pub-field--postal,
+    .pub-field--city,
+    .pub-field--state,
+    .pub-field--country,
+    .pub-field--slug,
+    .pub-field--short,
+    .pub-field--half,
+    .pub-field--email {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Buttons and Actions */
+.vx-button,
+a.vx-button,
+button.vx-button {
+    height: var(--vx-form-control-height);
+    min-height: var(--vx-form-control-height);
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--vx-space-2);
+    border: 1px solid var(--vx-color-border-control);
+    border-radius: var(--vx-radius-sm);
+    background: var(--vx-color-surface);
+    color: var(--vx-color-text);
+    text-decoration: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    white-space: nowrap;
+    transition: background-color var(--vx-transition-fast), border-color var(--vx-transition-fast), color var(--vx-transition-fast);
+}
+
+.vx-button:hover:not(:disabled) {
+    background-color: var(--vx-color-surface-sunken);
+    border-color: var(--vx-color-border-control);
+}
+
+.vx-button--primary {
+    background-color: var(--vx-color-link);
+    border: 1px solid var(--vx-color-link);
+    color: #ffffff;
+}
+
+.vx-button--primary:hover:not(:disabled) {
+    background-color: var(--vx-color-primary-hover);
+    border-color: var(--vx-color-primary-hover);
+    color: #ffffff;
+}
+
+.vx-button--subtle {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--vx-color-text-muted);
+}
+
+.vx-button--subtle:hover:not(:disabled) {
+    background: var(--vx-color-primary-soft);
+    color: var(--vx-color-link);
+}
+
+.vx-button:focus-visible {
+    outline: 2px solid var(--vx-color-focus);
+    outline-offset: 2px;
+}
+
+.vx-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Primary Action Bottom-Left */
+.pub-form__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    margin-top: 8px;
+    grid-column: 1 / -1;
+    width: 100%;
+}
+
+.pub-form .vx-button,
+.pub-form button[type="submit"] {
+    width: auto;
+    align-self: flex-start;
+}
+
+/* Read-Only Facts Grid (.vx-facts, Section 3) */
+.vx-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px 20px;
+    margin: 0;
+    padding: 0;
+}
+
+.vx-facts > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vx-facts dt {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--vx-color-text-muted);
+    margin: 0;
+}
+
+.vx-facts dd {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--vx-color-text);
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Plan Radio Selection */
+.pub-plan-radio-group {
+    display: grid;
+    gap: 10px;
+    width: 100%;
+}
+
+.pub-plan-radio-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-sm);
+    background: var(--vx-color-surface);
+    cursor: pointer;
+    transition: border-color var(--vx-transition-fast), background var(--vx-transition-fast);
+}
+
+.pub-plan-radio-option:hover {
+    border-color: var(--vx-color-link);
+    background: var(--vx-color-primary-soft);
+}
+
+.pub-plan-radio-option:has(input[type="radio"]:checked) {
+    border-color: var(--vx-color-link);
+    background: var(--vx-color-primary-soft);
+}
+
+.pub-plan-radio-option input[type="radio"] {
+    accent-color: var(--vx-color-link);
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+.pub-plan-radio-label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    color: var(--vx-color-text);
+}
+
+/* Inline Email Forms */
+.pub-form-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pub-form-inline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    width: 100%;
+}
+
+.pub-form-inline .vx-field {
+    flex: 1 1 240px;
+}
+
+.pub-form-inline .pub-form__actions {
+    width: auto;
+    margin-top: 0;
+    padding-bottom: 0;
+}
+
+/* Step Navigation */
 .pub-steps-nav { display: flex; flex-wrap: wrap; gap: var(--vx-space-3); list-style: none; padding: 0; margin-block: var(--vx-space-6); font-size: var(--vx-font-size-md); color: var(--vx-color-text-muted); }
 .pub-steps-nav li { padding: var(--vx-space-2) var(--vx-space-3); border-bottom: var(--vx-border-width) solid var(--vx-color-border); }
 .pub-steps-nav [aria-current] { font-weight: 700; color: var(--vx-color-link); border-color: var(--vx-color-link); }
+
+/* Editorial & Marketing Sections */
 .pub-feature { display: grid; grid-template-columns: 1fr 1fr; gap: var(--vx-space-5) var(--vx-space-12); }
 .pub-feature h2 { grid-column: 1 / -1; }
 .pub-feature p, .pub-feature ul { margin: 0; color: var(--vx-color-text-muted); }
@@ -67,15 +439,17 @@ p { margin: 0 0 var(--vx-space-4); }
 .pub-footer { padding: var(--vx-space-12) max(var(--vx-space-6), calc((100% - var(--vx-content-wide)) / 2)); border-top: var(--vx-border-width) solid var(--vx-color-border); background: var(--vx-color-surface); display: grid; grid-template-columns: 1fr auto; gap: var(--vx-space-6); font-size: var(--vx-font-size-md); color: var(--vx-color-text-muted); }
 .pub-footer p { margin: 0; max-width: var(--vx-content-reading); }
 .pub-footer nav { display: flex; flex-wrap: wrap; align-items: start; gap: var(--vx-space-5); }
-.pub-footer a { display: inline-flex; align-items: center; min-height: var(--vx-control-min); }
+.pub-footer a { display: inline-flex; align-items: center; min-height: var(--vx-form-control-height, 40px); }
 .pub-footer__copy { grid-column: 1 / -1; padding-top: var(--vx-space-6); border-top: var(--vx-border-width) solid var(--vx-color-border); color: var(--vx-color-text-subtle); }
 .pub-pre { white-space: pre-line; overflow-wrap: anywhere; }
+
 @media (max-width: 1024px) {
     .pub-header { gap: var(--vx-space-3); }
     .pub-nav { order: 3; width: 100%; }
     .pub-cta { margin-inline-start: auto; }
     .pub-languages { margin-inline-start: 0; }
 }
+
 @media (max-width: 640px) {
     .pub-header { padding: var(--vx-space-4); }
     .pub-main { padding-inline: var(--vx-space-4); }
@@ -93,7 +467,7 @@ p { margin: 0 0 var(--vx-space-4); }
     .pub-footer { padding-inline: var(--vx-space-4); }
 }
 
-/* Decorative logistics photography; content and actions remain localized HTML. */
+/* Decorative logistics photography */
 .pub-hero {
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
@@ -129,8 +503,7 @@ p { margin: 0 0 var(--vx-space-4); }
     .pub-section:has(> #home-flow)::before { aspect-ratio: 4 / 3; }
 }
 
-/* Each feature owns a distinct, subject-specific decorative image.
-   Match the heading inside this section, never an adjacent section. */
+/* Feature specific photography */
 .pub-feature {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-rows: auto auto 1fr;
@@ -161,8 +534,7 @@ p { margin: 0 0 var(--vx-space-4); }
     .pub-feature::after { grid-column: 1; grid-row: auto; margin-top: var(--vx-space-4); }
 }
 
-/* Contact sales: an editorial illustration beside an accessible, compact form.
-   Target the existing contact field so registration and payment forms stay independent. */
+/* Contact sales editorial layout */
 .pub-section--narrow:has(#contact-company) {
     max-width: var(--vx-content-wide);
     display: grid;
@@ -191,22 +563,12 @@ p { margin: 0 0 var(--vx-space-4); }
     max-width: none;
     width: 100%;
     min-width: 0;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--vx-space-5) var(--vx-space-4);
-    padding: var(--vx-space-6);
+    padding: var(--vx-form-card-padding);
     border-radius: var(--vx-radius-md);
     box-shadow: var(--vx-shadow-1);
 }
-.pub-form:has(#contact-company) > .vx-field { min-width: 0; margin: 0; }
-.pub-form:has(#contact-company) > :not(.vx-field),
-.pub-form:has(#contact-company) > .vx-field:has(#contact-company),
-.pub-form:has(#contact-company) > .vx-field:has(#contact-message) { grid-column: 1 / -1; }
-.pub-form:has(#contact-company) .vx-input { width: 100%; min-width: 0; }
-.pub-form:has(#contact-company) textarea { resize: vertical; }
-.pub-form:has(#contact-company) .vx-button { width: 100%; justify-content: center; }
 @media (max-width: 1024px) {
     .pub-section--narrow:has(#contact-company) { column-gap: var(--vx-space-6); }
-    .pub-form:has(#contact-company) { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 768px) {
     .pub-section--narrow:has(#contact-company),
@@ -218,7 +580,7 @@ p { margin: 0 0 var(--vx-space-4); }
     .pub-form:has(#contact-company) { padding: var(--vx-space-5); }
 }
 
-/* Registration start: company setup, not the Contact sales form. */
+/* Registration start layout */
 .pub-section--narrow:has(#reg-legal) {
     max-width: var(--vx-content-wide);
     display: grid;
@@ -246,15 +608,13 @@ p { margin: 0 0 var(--vx-space-4); }
     width: 100%;
     max-width: none;
     min-width: 0;
-    padding: var(--vx-space-6);
+    padding: var(--vx-form-card-padding);
     gap: var(--vx-space-6);
     border-radius: var(--vx-radius-md);
     box-shadow: var(--vx-shadow-1);
 }
 .pub-form:has(#reg-legal) fieldset {
     counter-increment: registration-section;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--vx-space-4);
     margin: 0;
     padding: 0 0 var(--vx-space-6);
     border: 0;
@@ -263,20 +623,12 @@ p { margin: 0 0 var(--vx-space-4); }
 }
 .pub-form:has(#reg-legal) legend { display: flex; align-items: center; gap: var(--vx-space-3); width: 100%; padding: 0; margin-bottom: var(--vx-space-4); font-size: var(--vx-font-size-lg); color: var(--vx-color-text); }
 .pub-form:has(#reg-legal) legend::before { content: counter(registration-section, decimal-leading-zero); display: inline-grid; place-items: center; min-width: var(--vx-space-8); min-height: var(--vx-space-8); border-radius: var(--vx-radius-sm); background: var(--vx-color-primary-soft); color: var(--vx-color-link); font-family: var(--vx-font-mono); font-size: var(--vx-font-size-sm); }
-.pub-form:has(#reg-legal) .vx-field { min-width: 0; margin: 0; }
-.pub-form:has(#reg-legal) .vx-input { width: 100%; min-width: 0; min-height: var(--vx-control-min); }
-.pub-form:has(#reg-legal) .vx-field:has(#reg-line1),
-.pub-form:has(#reg-legal) .vx-field:has(#reg-line2),
-.pub-form:has(#reg-legal) .vx-field:has(#reg-oname),
-.pub-form:has(#reg-legal) .vx-field:has(#reg-slug),
-.pub-form:has(#reg-legal) fieldset > label,
-.pub-form:has(#reg-legal) fieldset > .pub-hint { grid-column: 1 / -1; }
 .pub-form:has(#reg-legal) fieldset > label { padding: var(--vx-space-3); border-radius: var(--vx-radius-sm); background: var(--vx-color-primary-soft); }
 .pub-form:has(#reg-legal) label:has(input[type="checkbox"]) { font-size: var(--vx-font-size-md); line-height: var(--vx-leading-body); }
 .pub-form:has(#reg-legal) input[type="checkbox"] { margin-inline-end: var(--vx-space-2); accent-color: var(--vx-color-primary); }
 .pub-form:has(#reg-legal) .pub-hint { font-size: var(--vx-font-size-sm); margin: 0; }
-.pub-form:has(#reg-legal) > .vx-button { width: 100%; justify-content: center; }
-/* Offer and refusal details keep their natural reading order above the form. */
+
+/* Offer and refusal details keep their natural reading order above the form */
 .pub-section--narrow:has(#reg-legal):has(> .vx-message),
 .pub-section--narrow:has(#reg-legal):has(> .vx-card) { display: block; }
 .pub-section--narrow:has(#reg-legal):has(> .vx-message)::after,
@@ -292,12 +644,11 @@ p { margin: 0 0 var(--vx-space-4); }
     .pub-form:has(#reg-legal) { padding: var(--vx-space-5); }
 }
 @media (max-width: 640px) {
-    .pub-form:has(#reg-legal) fieldset { grid-template-columns: minmax(0, 1fr); }
     .pub-form:has(#reg-legal) { padding: var(--vx-space-4); }
     .pub-form:has(#reg-legal) .cf-turnstile { max-width: 100%; overflow-x: auto; }
 }
 
-/* Illustrated public story: homepage modules and the feature journey. */
+/* Illustrated public story: homepage modules and the feature journey */
 .pub-hero { background: none; padding-block: var(--vx-space-16); }
 .pub-hero > .pub-eyebrow { justify-self: start; }
 .pub-hero::after { background-image: url('../images/sketch-hero.webp'); background-size: contain; aspect-ratio: 3 / 2; align-self: center; box-shadow: none; }
@@ -321,13 +672,13 @@ p { margin: 0 0 var(--vx-space-4); }
 .pub-feature-index a:hover, .pub-feature-index a:focus-visible { color: var(--vx-color-link); background: var(--vx-color-primary-soft); }
 .pub-feature-journey { position: relative; display: grid; gap: var(--vx-space-8); padding-block: var(--vx-space-12); }
 .pub-feature-journey::before { content: ''; position: absolute; inset-block: 0; inset-inline-start: 50%; border-inline-start: var(--vx-border-width) dashed var(--vx-color-link); opacity: 0.25; }
-.pub-feature-chapter { scroll-margin-top: calc(3 * var(--vx-control-min) + var(--vx-space-6)); position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: var(--vx-space-8); align-items: center; padding: var(--vx-space-8); border: var(--vx-border-width) solid var(--vx-color-border); border-radius: var(--vx-radius-lg); background: var(--vx-color-surface); box-shadow: var(--vx-shadow-1); }
+.pub-feature-chapter { scroll-margin-top: calc(3 * var(--vx-form-control-height, 40px) + var(--vx-space-6)); position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: var(--vx-space-8); align-items: center; padding: var(--vx-space-8); border: var(--vx-border-width) solid var(--vx-color-border); border-radius: var(--vx-radius-lg); background: var(--vx-color-surface); box-shadow: var(--vx-shadow-1); }
 .pub-feature-chapter:nth-child(even) { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
 .pub-feature-chapter:nth-child(even) .pub-feature-chapter__copy { grid-column: 2; grid-row: 1; }
 .pub-feature-chapter:nth-child(even) .pub-feature-chapter__art { grid-column: 1; grid-row: 1; }
 .pub-feature-chapter__copy { min-width: 0; }
 .pub-feature-chapter__number { display: inline-flex; align-items: center; margin-bottom: var(--vx-space-4); padding: var(--vx-space-2) var(--vx-space-3); color: var(--vx-color-link); background: var(--vx-color-primary-soft); border-radius: var(--vx-radius-full); font-family: var(--vx-font-mono); font-size: var(--vx-font-size-sm); }
-.pub-feature-chapter h2 { font-size: var(--vx-font-size-2xl); scroll-margin-top: calc(3 * var(--vx-control-min) + var(--vx-space-6)); }
+.pub-feature-chapter h2 { font-size: var(--vx-font-size-2xl); scroll-margin-top: calc(3 * var(--vx-form-control-height, 40px) + var(--vx-space-6)); }
 .pub-feature-chapter__copy > p { color: var(--vx-color-text-muted); }
 .pub-feature-chapter ul { display: grid; gap: var(--vx-space-3); list-style: none; padding: 0; margin: var(--vx-space-5) 0 0; font-size: var(--vx-font-size-md); color: var(--vx-color-text-muted); }
 .pub-feature-chapter li { position: relative; padding-inline-start: var(--vx-space-5); }
@@ -354,7 +705,7 @@ p { margin: 0 0 var(--vx-space-4); }
     .pub-section[aria-labelledby="home-modules"] .pub-tile { flex-basis: calc((100% - var(--vx-space-5)) / 2); }
     .pub-feature-intro { gap: var(--vx-space-6); }
     .pub-feature-index { display: flex; overflow-x: auto; overscroll-behavior-inline: contain; }
-    .pub-feature-index a { flex: 0 0 auto; max-width: var(--vx-grid-card-min); min-width: var(--vx-control-min); }
+    .pub-feature-index a { flex: 0 0 auto; max-width: var(--vx-grid-card-min); min-width: var(--vx-form-control-height, 40px); }
 }
 @media (max-width: 768px) {
     .pub-feature-intro, .pub-feature-chapter, .pub-feature-chapter:nth-child(even) { grid-template-columns: minmax(0, 1fr); }

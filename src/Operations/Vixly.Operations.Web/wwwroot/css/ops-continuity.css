@@ -1,4 +1,4 @@
-﻿/* Operational continuity: compact identities, deliberate workspace shortcuts and usable form groups. */
+/* Operational continuity: compact identities, deliberate workspace shortcuts and usable form groups. */
 .ops-page-heading { display:flex; align-items:center; justify-content:space-between; gap:1.5rem; min-height:7rem; margin-bottom:1.4rem; padding:0 1.25rem 1rem 0; border-bottom:1px solid var(--vx-color-border); }
 .ops-page-heading h1 { margin:0; max-width:48rem; font-size:clamp(1.6rem,2.5vw,2rem); line-height:1.18; letter-spacing:-.045em; overflow-wrap:anywhere; }
 .ops-page-heading .vx-workspace-art { width:150px; height:88px; flex-shrink:0; color:var(--vx-color-primary); }
@@ -61,15 +61,20 @@
 .ops-ticket-status[data-status=Answered] { color:var(--vx-color-status-staged); background:var(--vx-color-status-staged-bg); border-color:var(--vx-color-status-warning-border); }
 .ops-ticket-status[data-status=Resolved] { color:var(--vx-color-status-completed); background:var(--vx-color-status-completed-bg); border-color:var(--vx-color-status-success-border); }
 /* Compact records: sections are peers, never independent columns of unequal height. */
-.ops-editor__main > .ops-page-heading { min-height:0; padding:0 0 .7rem; margin-bottom:1rem; }
+.ops-editor__main > .ops-page-heading { display:none; }
 .ops-page-heading h1 { font-size:1.6rem; }
 .ops-page-heading > .vx-workspace-art { display:none; }
-.ops-editor__panel { padding:1rem; gap:.75rem; margin-bottom:1rem; }
-.ops-editor__panel :is(input:not([type=checkbox]):not([type=radio]),select) { min-height:38px; padding:.45rem .65rem; }
-.ops-editor__panel .vx-button { min-height:38px; min-width:0; margin-top:0; }
+.ops-editor__panel { padding:0.875rem 1rem; column-gap:12px; row-gap:8px; margin-bottom:0.875rem; }
+.ops-editor__panel :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not(.ops-editor__quicksearch-input),select) { min-height:32px; height:32px; padding:0.25rem 0.625rem; font-size:0.8125rem; }
+.ops-editor__panel .vx-button { min-height:32px; height:32px; padding:0.25rem 0.75rem; min-width:0; margin-top:0; font-size:0.8125rem; }
 .ops-editor__panel > .vx-button { grid-column:auto; }
 .ops-editor__main input[type=number] { width:7.5rem; max-width:100%; font-variant-numeric:tabular-nums; }
 .ops-editor__main input:is([name=code],[name=postalCode]) { width:12rem; max-width:100%; }
+.ops-editor__main input:is([name*="phone" i], [name*="telephone" i]) { width: 14rem; max-width: 100%; }
+.ops-editor__main input:is([name*="postal" i], [name*="zip" i]) { width: 9rem; max-width: 100%; }
+.ops-editor__main input:is([name*="weight" i], [name*="length" i], [name*="width" i], [name*="height" i]) { width: 7.5rem; max-width: 100%; }
+.ops-editor__main input:is([name*="name" i]) { width: 22rem; max-width: 100%; }
+.ops-editor__main input:is([name*="line1" i], [name*="line2" i], [name*="address" i]) { width: 28rem; max-width: 100%; }
 .ops-editor__panel:has(>label) { grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr)); max-width:72rem; }
 .ops-editor__panel fieldset { padding:.75rem; }
 .ops-editor__panel fieldset label { margin-block:.25rem; }
@@ -83,7 +88,7 @@
 .ops-editor__empty h2 { margin:0; }
 .ops-editor__status { width:max-content; max-width:100%; justify-self:start; flex:0 0 auto; }
 .ops-section-tabs { display:flex; gap:.25rem; flex-wrap:wrap; border-bottom:1px solid var(--vx-color-border); margin-bottom:1rem; }
-.ops-section-tabs > button { font:inherit; font-size:.8125rem; font-weight:550; border:0; border-bottom:2px solid transparent; color:var(--vx-color-text-muted); background:transparent; padding:.65rem 1rem; min-height:40px; cursor:pointer; }
+.ops-section-tabs > button { font:inherit; font-size:.8125rem; font-weight:550; border:0; border-bottom:2px solid transparent; color:var(--vx-color-text-muted); background:transparent; padding:.35rem .75rem; min-height:32px; cursor:pointer; }
 .ops-section-tabs > button[aria-selected=true] { color:var(--vx-color-primary); border-bottom-color:var(--vx-color-primary); background:var(--vx-color-primary-soft); }
 .ops-compact-tabs.ops-tabs-enhanced { display:block; }
 .ops-compact-tabs > [hidden] { display:none !important; }

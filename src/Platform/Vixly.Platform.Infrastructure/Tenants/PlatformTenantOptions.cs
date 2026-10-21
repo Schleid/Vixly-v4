@@ -25,4 +25,11 @@ public sealed class PlatformTenantOptions
     public string PrivacyVersion { get; set; } = string.Empty;
 
     public string TenantBaseDomain { get; set; } = "techcrafters.ltd";
+
+    // Optional address of a tenant host, with {slug}; Development uses https://{slug}.localhost:7404.
+    // Empty: https://{slug}.{TenantBaseDomain}.
+    public string PortalUrlTemplate { get; set; } = string.Empty;
+
+    // Until public sign-up opens (Stage 3, D-U4), a company can register only through an offer link.
+    public bool RegistrationInviteOnly { get; set; } = true;
 }

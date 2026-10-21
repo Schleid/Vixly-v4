@@ -1,29 +1,25 @@
-﻿@*
-=========================================================
-FILE: PackagePage.razor
-
-PURPOSE:
-One of the customer's packages: details, photos and history (Slice 3B).
-
-RESPONSIBILITIES:
-- Show the package with its measurements, declaration and holds
-- Show its photos and its history in the customer's language
-
-IMPORTANT NOTES:
-- Markup only. Text comes from CustomerText (L-10)
-- History is already reduced to what the customer may see (ADR-0021 decision 5)
-=========================================================
-*@
+@* PackagePage.razor: One customer package - details, photos and history (Slice 3B, ADR-0021). *@
 @using Vixly.Contracts.Operations.Customers
 @using Vixly.Contracts.Operations.Packages
 @inject IStringLocalizer<CustomerText> T
 
-<CustomerShell Brand="@Brand" Title="@(Detail.Parcel.Number ?? T["ui.packages.title"].Value)" SignedIn="true" Info="@Info" ReturnHere="/customer/packages">
-    <p><a href="/customer/packages">@T["ui.packages.back"]</a></p>
+<CustomerShell Brand="@Brand" Title="@(Detail.Parcel.Number ?? T["ui.packages.title"].Value)" SignedIn="true" Error="@Error" Info="@Info" ReturnHere="/customer/packages">
+    <div class="customer-portal__actions customer-portal__actions--top">
+        <a href="/customer/packages" class="vx-button vx-button--secondary">← @T["ui.packages.back"]</a>
+    </div>
     @foreach (string hold in Detail.Parcel.Holds)
     {
         <p class="customer-portal__notice" role="status">@T["ui.hold." + hold]</p>
     }
+    @if (Detail.StorageFee > 0)
+    {
+        <p class="customer-portal__notice">@VixlyText.Format(T, "ui.packages.storage_fee", new Dictionary<string, object> { ["amount"] = Detail.StorageFee.ToString("0.00"), ["currency"] = Detail.Currency ?? string.Empty })</p>
+    }
+    @if (Detail.ActionNeeded is { } action)
+    {
+        <p class="customer-portal__notice" role="status"><strong>@T["ui.packages.action_needed"]</strong> @action @(Detail.Fee is { } fee ? VixlyText.Format(T, "ui.packages.fee", new Dictionary<string, object> { ["amount"] = fee.ToString("0.00"), ["currency"] = Detail.FeeCurrency ?? string.Empty }) : null)</p>
+    }
+    <HoldAnswerForms T="T" Detail="Detail" />
     <dl class="customer-portal__details customer-package-details">
         <dt>@T["ui.prealert.tracking"]</dt><dd>@Detail.Parcel.TrackingNumber</dd>
         @if (!string.IsNullOrWhiteSpace(Detail.Parcel.Carrier)) { <dt>@T["ui.prealert.carrier"]</dt><dd>@Detail.Parcel.Carrier</dd> }
@@ -59,7 +55,6 @@ IMPORTANT NOTES:
 </CustomerShell>
 
 @code {
-    // Choices from fixed lists in the customer's words; anything else as it is.
     private string Describe(CustomerTrackingLineDto line) =>
         VixlyText.Format(T, "ui.tracking." + (line.Code.StartsWith("ops.tracking.", StringComparison.Ordinal) ? line.Code["ops.tracking.".Length..] : line.Code), line.Arguments.ToDictionary(pair => pair.Key, pair => (object)(pair.Key switch
         {
@@ -69,8 +64,7 @@ IMPORTANT NOTES:
         }), StringComparer.Ordinal));
 
     [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
-
     [Parameter, EditorRequired] public CustomerParcelDetailDto Detail { get; set; } = null!;
-
     [Parameter] public string? Info { get; set; }
+    [Parameter] public string? Error { get; set; }
 }

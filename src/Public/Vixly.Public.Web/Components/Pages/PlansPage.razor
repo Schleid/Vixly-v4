@@ -1,0 +1,17 @@
+﻿@*
+=========================================================
+FILE: PlansPage.razor
+
+PURPOSE:
+The plans page in each language.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+=========================================================
+*@
+@page "/en/plans"
+@page "/fr/plans"
+@page "/es/plans"
+@attribute [OutputCache(Duration = 300)]
+<PageHead TitleKey="public.plans.page_title" DescriptionKey="public.plans.description" Page="plans" />
+<PlanCatalogue />

@@ -1,0 +1,109 @@
+﻿@*
+=========================================================
+FILE: CounterSuppliesPanel.razor
+
+PURPOSE:
+Supplies at the counter (Slice 5E, S-11 to S-19): scan or search to add, change quantities and discounts, on a shipment being processed or an order.
+
+RESPONSIBILITIES:
+- A scan box: a barcode or item code adds one at once; a name lists the supplies to choose from
+- The lines with quantity, unit price, discount and amount; the totals
+- A discount above the clerk's limit takes the email and authenticator code of a person who may approve it
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Each form carries a key: sent twice, applied once (ADR-0019)
+- Read only once the shipment is final or the order confirmed
+=========================================================
+*@
+<section class="ops-editor__panel ops-counter__supplies" aria-labelledby="counter-supplies" data-supplies>
+    <h2 id="counter-supplies">@T["ui.counter.supplies.title"]</h2>
+    @if (Changeable)
+    {
+        <form method="post" action="@AddAction" class="ops-editor__inline ops-counter__scan">
+            <AntiforgeryToken />
+            <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+            <label>@T["ui.counter.supplies.scan"] <input name="scan" required maxlength="80" autocomplete="off" autofocus="@Focus" data-scan /></label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.counter.supplies.add"]</button>
+        </form>
+        @if (Hint is { } hint) { <p class="ops-editor__hint">@hint</p> }
+    }
+    @if (Sale is { Lines.Count: > 0 } sale)
+    {
+        <OperationsTableViewport Label="@T["ui.counter.supplies.title"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col">@T["ui.supplies.code"]</th><th scope="col">@T["ui.supplies.name"]</th><th scope="col">@T["ui.supplies.stock.quantity"]</th><th scope="col" class="ops-editor__number">@T["ui.supplies.stock.unit_price"]</th><th scope="col">@T["ui.counter.supplies.discount"]</th><th scope="col" class="ops-editor__number">@T["ui.counter.supplies.amount"]</th></tr></thead>
+                <tbody>
+                    @foreach (OperationsSupplySaleLine line in sale.Lines)
+                    {
+                        string form = "line-" + line.Id.ToString("N");
+                        <tr>
+                            <td class="ops-editor__code">@line.Code</td>
+                            <td>@line.Name</td>
+                            <td>
+                                @if (Changeable) { <input form="@form" name="quantity" value="@line.Quantity" inputmode="numeric" size="4" autocomplete="off" aria-label="@T["ui.supplies.stock.quantity"]" /> } else { @line.Quantity }
+                            </td>
+                            <td class="ops-editor__number">@OperationsChargeWords.Money(line.UnitPrice, sale.CurrencyCode)</td>
+                            <td>
+                                @if (Changeable)
+                                {
+                                    <input form="@form" name="discount" value="@(line.DiscountPercent == 0m ? null : line.DiscountPercent.ToString("0.##", CultureInfo.InvariantCulture))" inputmode="decimal" size="4" autocomplete="off" aria-label="@T["ui.counter.supplies.discount"]" /><span>%</span>
+                                    <input form="@form" name="reason" value="@line.DiscountReason" maxlength="300" size="14" placeholder="@T["ui.counter.supplies.reason"]" aria-label="@T["ui.counter.supplies.reason"]" />
+                                }
+                                else if (line.DiscountPercent > 0m)
+                                {
+                                    @(line.DiscountPercent.ToString("0.##", CultureInfo.CurrentCulture) + "%")@if (line.DiscountReason is { } why) { <small> · @why</small> }
+                                }
+                            </td>
+                            <td class="ops-editor__number">@OperationsChargeWords.Money(line.Amount, sale.CurrencyCode)</td>
+                        </tr>
+                        @if (Changeable)
+                        {
+                            <tr>
+                                <td colspan="6">
+                                    <form id="@form" method="post" action="/staff/counter/sales/@sale.Id/lines/@line.Id" class="ops-editor__inline">
+                                        <AntiforgeryToken />
+                                        <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+                                        @if (ShipmentId is { } shipmentId) { <input type="hidden" name="shipment" value="@shipmentId" /> }
+                                        <details>
+                                            <summary>@T["ui.counter.supplies.approval"]</summary>
+                                            <p class="ops-editor__hint">@T["ui.counter.supplies.approval_hint"]</p>
+                                            <label>@T["ui.counter.supplies.approver_email"] <input name="approver_email" type="email" autocomplete="off" /></label>
+                                            <label>@T["ui.counter.supplies.approver_code"] <input name="approver_code" inputmode="numeric" autocomplete="one-time-code" size="8" /></label>
+                                        </details>
+                                        <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
+                                        <button type="submit" name="remove" value="true" class="vx-button vx-button--secondary">@T["ui.counter.supplies.remove"]</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+                <tfoot>
+                    @if (sale.DiscountTotal > 0m) { <tr><th scope="row" colspan="5">@T["ui.counter.supplies.discounts"]</th><td class="ops-editor__number">−@OperationsChargeWords.Money(sale.DiscountTotal, sale.CurrencyCode)</td></tr> }
+                    <tr><th scope="row" colspan="5">@T["ui.counter.supplies.total"]</th><td class="ops-editor__number"><strong>@OperationsChargeWords.Money(sale.Total, sale.CurrencyCode)</strong></td></tr>
+                </tfoot>
+            </table>
+        </OperationsTableViewport>
+    }
+    else if (!Changeable)
+    {
+        <p>@T["ui.counter.supplies.none"]</p>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public OperationsSupplySale? Sale { get; set; }
+
+    [Parameter] public string AddAction { get; set; } = string.Empty;
+
+    [Parameter] public Guid? ShipmentId { get; set; }
+
+    [Parameter] public bool Changeable { get; set; }
+
+    [Parameter] public bool Focus { get; set; }
+
+    [Parameter] public string? Hint { get; set; }
+}

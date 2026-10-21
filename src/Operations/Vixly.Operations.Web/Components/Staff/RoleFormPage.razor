@@ -14,6 +14,8 @@ IMPORTANT NOTES:
 - Placeholder look: Frontend/UI designs the final experience
 =========================================================
 *@
+@inherits OperationsAllowedComponent
+@using Vixly.Operations.Domain.Access
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T[RoleId is null ? "ui.roles.add" : "ui.roles.edit"]" Company="@Company" Section="roles" Error="@Error">
@@ -35,7 +37,7 @@ IMPORTANT NOTES:
         }
         <p class="ops-editor__hint">@T["ui.roles.reserved_hint"]</p>
         <p class="ops-editor__actions">
-            <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+            @if (CanAny(OperationsPermissions.RolesCreate, OperationsPermissions.RolesEdit, OperationsPermissions.RolesEditPermissions)) { <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button> }
             <a href="/staff/roles">@T["ui.editor.cancel"]</a>
         </p>
     </form>

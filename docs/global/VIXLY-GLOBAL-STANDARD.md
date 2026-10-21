@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | v1.3, 2026-10-13 (adds ADR-0010: schema per plane, table naming, V4 hostnames, independence from V3, build order; and ADR-0007: Platform Worker). v1.2 approved by the owner 2026-10-06; v1.3 changes accepted by the owner 2026-10-13. Section 1 white-label paragraph amended 2026-10-14 (ADR-0012 Amendment 1). S-7, S-9, cross-plane rule 4 and the 4.1 wire-type rule amended 2026-10-16 (ADR-0014). Binding for every team and every project in this repository. |
+| Status | v1.3, 2026-10-13 (adds ADR-0010: schema per plane, table naming, V4 hostnames, independence from V3, build order; and ADR-0007: Platform Worker). v1.2 approved by the owner 2026-10-06; v1.3 changes accepted by the owner 2026-10-13. Section 1 white-label paragraph amended 2026-10-14 (ADR-0012 Amendment 1). S-7, S-9, cross-plane rule 4 and the 4.1 wire-type rule amended 2026-10-16 (ADR-0014). Section 1 Public row, section 3 Public.Web row, S-5 and S-7 amended 2026-10-16 (ADR-0015). Section 12 amended 2026-10-16 (ADR-0017: Operations and Customer built together). UI-12 added 2026-10-17 (ADR-0019: double-click protection). Binding for every team and every project in this repository. |
 | Owner | Architecture. Changes only by ADR in `docs/decisions/`. |
 | Audience | Control, Operations, Customer and Frontend/UI teams. |
 
@@ -20,9 +20,9 @@ V4 is built from scratch. It is not built on top of the legacy system. Where leg
 |---|---|---|---|---|
 | Platform (Control plane) | Tenants, subscriptions, plans, entitlements, platform billing, Vixly's shipping-service catalogue, tenant activity | `Platform.Web` (staff console), `Platform.Api`, `Platform.Worker` (Windows Service, ADR-0007) | Control team | 1 |
 | Operations | Shipments, parcels, bundles, dispatch, invoices, credit, tracking, tenant staff accounts (ADR-0003) | `Operations.Web` (staff / warehouse), `Operations.Api` (internal) | Operations team | 3 |
-| Customer | A customer's own view of their invoices, shipments and tracking | `Customer.Web` | Customer team | 4 |
+| Customer | A customer's own view of their invoices, shipments and tracking | `Customer.Web` | Customer team | 3, with Operations (ADR-0017) |
 | Edge | Reverse proxy: tenant resolution and path routing | `Vixly.Edge` | Control team | 5 |
-| Public | Plans catalog and tenant self-onboarding | `Public.Web` | Control team | 2 |
+| Public | Marketing site (home, features, plans, contact, legal), invoice pay pages and tenant self-sign-up (ADR-0015) | `Public.Web` | Control team | 2 |
 | Shared | `Kernel`, `Localization`, `UI` + `UI.Gallery`, `PlatformServices` (reserved) | Libraries | Architecture / Frontend/UI | 1 / parallel |
 
 **One hostname per tenant.** A tenant is served from one hostname, `{slug}.<base domain>` and a custom domain later (hostnames below). Customers never get a different domain: a customer reaches the portal at `{tenant-host}/customer`. Edge resolves the hostname to a tenant (through the Platform API) and routes `/customer/**` to `Customer.Web` and everything else to `Operations.Web`. The Platform console and the Public site are not tenant-hostname surfaces and Edge does not front them. Custom-domain resolution is designed in the legacy repo (`ControlPlane/docs/custom-domains/002-custom-domain-technical-design.md`) but not built; Edge ships with slug resolution and is structured so custom-domain resolution slots in without a rewrite.
@@ -35,10 +35,10 @@ V4 is built from scratch. It is not built on top of the legacy system. Where leg
 | Platform console (behind Cloudflare Access) | `vixly-control.techcrafters.ltd` | `control.vixly.ltd` |
 | Platform API | `vixly-api.techcrafters.ltd` | `api.vixly.ltd` or internal only |
 | Tenant host (Edge → Operations, Customer at `/customer`) | `{slug}.techcrafters.ltd` | `{slug}.vixly.ltd` |
-| Staging | same names with `-staging` (`vixly-control-staging.techcrafters.ltd`, `{slug}-staging.techcrafters.ltd`) | unchanged |
+| Staging (owner, 2026-10-18) | `vixly.freedns.org` (public site), `control.vixly.freedns.org` (console), `api.vixly.freedns.org` (API), `ops-internal.vixly.freedns.org` (Operations internal API), `{slug}.vixly.freedns.org` (tenants, wildcard DNS); `ASPNETCORE_ENVIRONMENT=Staging` loads `appsettings.Staging.json` | unchanged |
 
 - **H-1** Base domains are configuration, never code: `TenantHosting:BaseDomains` and `PlatformHosting`. No hostname literal in source. Links in emails and PDFs are built from this configuration.
-- **H-2** Registration rejects reserved slugs: `www`, `mail`, `vixly`, `vixly-control`, `vixly-api`, `control`, `api`, `admin`, `edge`, `status`, `staging`, anything ending `-staging`, and any name TechCrafters already uses in DNS. The list is configuration with this set as its floor.
+- **H-2** Registration rejects reserved slugs: `www`, `mail`, `vixly`, `vixly-control`, `vixly-api`, `control`, `api`, `admin`, `edge`, `status`, `staging`, `vixly-ops-internal`, `ops-internal`, anything ending `-staging`, and any name TechCrafters already uses in DNS. The list is configuration with this set as its floor.
 
 **White label (ADR-0012, amended 2026-10-14).** White label belongs to the Operations plane: tenant-facing surfaces (Operations, Customer, the tenant landing page, tenant emails and documents) show the tenant's brand, never "Vixly". Tenant text uses `{brandName}`, the brand is Operations data exposed through `Contracts.Operations`, theming is presets plus allowlisted tokens through one `ThemeProvider`, and a plan entitlement from `Contracts.Platform` decides what a tenant may change. The Platform plane (Control) is proprietary to TechCrafters: never white-labelled, never offered to anyone; it runs plans, billing and collections. The Public site is always Vixly.
 
@@ -87,7 +87,7 @@ Enforced by `tests/Architecture/Vixly.Architecture.Tests`. A violation fails the
 | `*.Application` | its own `Domain`, `Shared.Kernel`, and other planes' `Contracts` (behind ports) |
 | `*.Infrastructure` | its own `Application` and `Domain`, `Contracts`, its own `Resources` and `Shared.Localization` (to render emails and documents) |
 | `*.Api`, `*.Web`, `*.Worker` | its own `Application`; `Infrastructure` for the composition root only (`Program.cs` / DI registration, never in pages or controllers); its own `Contracts`; its own `Resources` and `Shared.Localization`; `Shared.UI` (Web only) |
-| `Vixly.Public.Web` | `Contracts.Platform`, `Shared.UI` |
+| `Vixly.Public.Web` | `Contracts.Platform`, `Shared.UI`, `Shared.Hosting`, `Shared.Localization` (ADR-0015) |
 | `Vixly.Edge` | `Contracts.Platform`, `Shared.Kernel` |
 | `*.Resources` | `Shared.Kernel` only |
 | `Shared.Localization` | `Shared.Kernel` and ASP.NET Core localization only |
@@ -250,6 +250,7 @@ Features/<Area>/<Feature>/
 - **UI-9** Presenters are unit-tested with plain xUnit, no Blazor host. A bUnit smoke test per feature component is recommended.
 - **UI-10** Markup contains no literal user-facing text. Text, labels, placeholders, tooltips and accessibility text come from the localizer (5.5). A deliberate exception is marked `@* i18n-ignore *@`.
 - **UI-11** Layouts tolerate text 40 percent longer than English: no fixed-width labels or buttons, and truncation always has a tooltip. Check with the `en-XA` pseudo-locale.
+- **UI-12** Every click and submit is protected against repeats (ADR-0019): interactive components inherit `PresenterComponent` or `GuardedComponent`; static page shells load `vixly-forms.js`; `VxButton` ignores clicks while its handler runs.
 
 Styling uses Shared.UI components and CSS custom properties, never hard-coded colors, so theming can be added later without rework. Business rules still live in Domain and Application; a presenter orchestrates one screen's workflow and holds UI state, it does not decide business outcomes.
 
@@ -280,9 +281,9 @@ Every item is mandatory. Findings from the legacy audit are cited so the reason 
 - **S-2** Identity comes from trusted context only. Tenant id, user id, roles, scopes and customer id come from the authorization context built from the authenticated principal, never from a request body, route, query string or form.
 - **S-3** Visibility is not ownership. A "public only" filter hides internal data; it does not prove the caller may see this record. Customer and public reads verify ownership of the specific record (legacy SEC-03: a public tracking path could expose another customer's payment amount).
 - **S-4** Cookies are host-only (no `Domain`) and carry V4 names: the `__Host-` prefix (`__Host-vx4-auth`, `__Host-vx4-device`), except the customer cookie, which is `__Secure-vx4-customer` because it is scoped to `Path=/customer`. Every cookie is `HttpOnly`, `Secure` always, `SameSite=Lax`, with a short `ExpireTimeSpan`, idle-deadline stamping and a bounded `MaxAge`. One cookie scheme per process. No policy-scheme router that guesses the scheme from path, referer or cookie. V4 never writes a domain-wide cookie and ignores any `vx-*` cookie it receives.
-- **S-5** Data Protection keys are persisted to the plane's own schema under a per-app name, never to local disk or memory. Each deployable has its own key ring and an application name that differs from V3's.
+- **S-5** Data Protection keys are persisted to the plane's own schema under a per-app name, never to local disk or memory. Each deployable has its own key ring and an application name that differs from V3's. Public.Web, which has no database, keeps its ring in a configured folder outside the web root (ADR-0015).
 - **S-6** Authentication, registration, device-registration and public endpoints carry named rate-limit policies. Every anonymous endpoint is listed in its plane document with its policy.
-- **S-7** Internal APIs authenticate every caller (internal API key header handler at minimum, with an allowed-caller list), are never routed publicly, and receive tenant context explicitly. Platform requires short-lived signed service tokens instead of a key (ADR-0014).
+- **S-7** Internal APIs authenticate every caller (internal API key header handler at minimum, with an allowed-caller list), are never routed publicly, and receive tenant context explicitly. Platform requires short-lived signed service tokens instead of a key (ADR-0014). Public.Web vouches for the visitor address on public routes with the same kind of token; it never authorizes (ADR-0015).
 - **S-8** CORS uses explicit per-environment origins, never a wildcard. `AllowedHosts` is restricted outside Development.
 - **S-9** Never echo raw HTTP responses, exception text or stack traces to a UI or API consumer (legacy SEC-02). Show a generic, localized error with a correlation id (5.5). APIs return an error code, its arguments and the correlation id; Platform also returns its own text for the code in the caller’s language, which consumers never parse (ADR-0014).
 - **S-10** Every web host sends CSP, HSTS, `X-Content-Type-Options` and frame protection. Relaxations that Blazor Server needs (legacy allows `'unsafe-inline'` and `'unsafe-eval'`) are recorded as tracked exceptions, not silently copied.
@@ -352,14 +353,14 @@ Plane teams own the presenters and state of their feature components (`*Presente
 
 ## 12. Build order and verification gates
 
-Planes are built one at a time, in order. Within a plane the order is Domain, Application, Infrastructure, Api, Web.
+Planes are built one at a time, in order, except that Operations and Customer are built together slice by slice (ADR-0017). Within a plane the order is Domain, Application, Infrastructure, Api, Web.
 
 | Stage | Scope |
 |---|---|
 | 1 | Platform, `Contracts.Platform`, `Shared.Kernel`, `Architecture.Tests` |
 | 2 | Public (goes live with Platform, before Operations) |
-| 3 | Operations, `Contracts.Operations` |
-| 4 | Customer |
+| 3 | Operations, `Contracts.Operations` and Customer, built together slice by slice (ADR-0017) |
+| 4 | Retired (Customer moved into Stage 3 by ADR-0017) |
 | 5 | Edge |
 | Parallel | `Shared.UI` and `Shared.UI.Gallery` |
 

@@ -14,10 +14,12 @@ IMPORTANT NOTES:
 - Placeholder look: Frontend/UI designs the final experience
 =========================================================
 *@
+@inherits OperationsAllowedComponent
+@using Vixly.Operations.Domain.Access
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.roles.title"]" Company="@Company" Section="roles" Error="@Error" Info="@Info">
-    <p><a class="vx-button vx-button--primary" href="/staff/roles/new">@T["ui.roles.add"]</a></p>
+    @if (Can(OperationsPermissions.RolesCreate)) { <p><a class="vx-button vx-button--primary" href="/staff/roles/new">@T["ui.roles.add"]</a></p> }
     <section class="ops-editor__panel">
         <ul class="ops-editor__list">
             @foreach (OperationsRoleSummary role in Roles)
@@ -35,7 +37,7 @@ IMPORTANT NOTES:
                     }
                     <span>@VixlyText.Format(T, "ui.roles.holders", "count", role.Holders)</span>
                     @if (!role.IsActive) { <span class="ops-editor__status" data-status="inactive">@T["ui.roles.inactive"]</span> }
-                    @if (!role.IsAdministrator)
+                    @if (!role.IsAdministrator && Can(OperationsPermissions.RolesEdit))
                     {
                         <form method="post" action="/staff/roles/@role.RoleId/active" class="ops-editor__inline">
                             <AntiforgeryToken />

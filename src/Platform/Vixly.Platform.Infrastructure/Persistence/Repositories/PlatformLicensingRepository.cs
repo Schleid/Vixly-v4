@@ -110,4 +110,21 @@ internal sealed class PlatformLicensingRepository : IPlatformLicensingRepository
             item => item.PlatformTenantId == platformTenantId && item.EventCode == PlatformDeviceEventCodes.LinkSent && item.CreatedUtc >= sinceUtc,
             cancellationToken);
     }
+
+    public void AddSupportRequest(PlatformOwnerSupportRequest request) => _context.OwnerSupportRequests.Add(request ?? throw new ArgumentNullException(nameof(request)));
+
+    public Task<PlatformOwnerSupportRequest?> GetSupportRequestAsync(Guid requestId, CancellationToken cancellationToken)
+    {
+        return _context.OwnerSupportRequests.FirstOrDefaultAsync(item => item.Id == requestId, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<PlatformOwnerSupportRequest>> ListOpenSupportRequestsAsync(Guid platformTenantId, CancellationToken cancellationToken)
+    {
+        return await _context.OwnerSupportRequests.AsNoTracking()
+            .Where(item => item.PlatformTenantId == platformTenantId
+                && (item.Status == PlatformOwnerSupportStatus.Pending || item.Status == PlatformOwnerSupportStatus.Approved))
+            .OrderByDescending(item => item.RequestedUtc)
+            .Take(20)
+            .ToListAsync(cancellationToken);
+    }
 }

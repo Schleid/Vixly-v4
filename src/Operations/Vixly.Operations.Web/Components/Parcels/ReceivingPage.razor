@@ -1,0 +1,98 @@
+@*
+=========================================================
+FILE: ReceivingPage.razor
+
+PURPOSE:
+The dock seen from the office: open carrier deliveries and warehouse receipts (Slice 3B).
+
+RESPONSIBILITIES:
+- Link to the scan app; list open deliveries and the receipts, newest first
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Receipts are printed for the driver from here or from the scan app
+=========================================================
+*@
+@using Vixly.Operations.Domain.Locations
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.receiving.title"]" Company="@Company" Section="receiving" Error="@Error">
+    <div class="ops-list-bar">
+        <div class="ops-editor__inline">
+            <a class="vx-button vx-button--primary" href="/staff/scan">@T["ui.receiving.open_scan"]</a>
+            <a class="vx-button vx-button--secondary" href="/staff/inspection">@T["ui.inspection.title"]</a>
+        </div>
+    </div>
+    @if (Open.Count > 0)
+    {
+        <section class="ops-editor__panel" aria-labelledby="open-title">
+            <h2 id="open-title">@T["ui.receiving.open"]</h2>
+            <OperationsTableViewport Label="@T["ui.receiving.open"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.parcels.warehouse"]</th><th scope="col">@T["ui.receiving.carrier"]</th><th scope="col">@T["ui.receipt.closed"]</th><th scope="col" class="ops-editor__number">@T["ui.receipt.pieces"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsDeliverySummary delivery in Open)
+                        {
+                            <tr>
+                                <td class="ops-editor__code">@Code(delivery.WarehouseId)</td>
+                                <td>@(delivery.Carrier ?? "—")</td>
+                                <td>@delivery.OpenedUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td class="ops-editor__number"><span class="ops-editor__status" data-status="registered">@VixlyText.Format(T, "ui.scan.pieces", "count", delivery.Pieces)</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        </section>
+    }
+    <section class="ops-editor__panel" aria-labelledby="receipts-title">
+        <h2 id="receipts-title">@T["ui.receiving.receipts"]</h2>
+        @if (Receipts.Count == 0)
+        {
+            <p>@T["ui.receiving.none"]</p>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.receiving.receipts"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.parcels.receipt"]</th><th scope="col">@T["ui.parcels.warehouse"]</th><th scope="col">@T["ui.receiving.carrier"]</th><th scope="col" class="ops-editor__number">@T["ui.receipt.pieces"]</th><th scope="col" class="ops-editor__number">@T["ui.receipt.damaged"]</th><th scope="col">@T["ui.receipt.closed"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsWarehouseReceipt receipt in Receipts)
+                        {
+                            <tr>
+                                <td class="ops-editor__code"><a href="/staff/receipts/@receipt.Id" target="_blank" rel="noopener">@receipt.Number</a></td>
+                                <td class="ops-editor__code">@Code(receipt.WarehouseId)</td>
+                                <td>@(receipt.Carrier ?? "—")</td>
+                                <td class="ops-editor__number">@receipt.PieceCount</td>
+                                <td class="ops-editor__number">@receipt.DamagedCount</td>
+                                <td>@receipt.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+        <nav class="ops-editor__inline ops-list-pager" aria-label="@T["ui.customers.pages"]">
+            @if (Page > 1) { <a class="vx-button vx-button--secondary" href="/staff/receiving?page=@(Page - 1)">@T["ui.customers.previous"]</a> }
+            @if (Page * 25 < TotalCount) { <a class="vx-button vx-button--secondary" href="/staff/receiving?page=@(Page + 1)">@T["ui.customers.next"]</a> }
+        </nav>
+    </section>
+</EditorShell>
+
+@code {
+    private string Code(Guid warehouseId) => Warehouses.FirstOrDefault(warehouse => warehouse.Id == warehouseId)?.Code ?? string.Empty;
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsDeliverySummary> Open { get; set; } = Array.Empty<OperationsDeliverySummary>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouseReceipt> Receipts { get; set; } = Array.Empty<OperationsWarehouseReceipt>();
+
+    [Parameter] public int TotalCount { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public int Page { get; set; } = 1;
+
+    [Parameter] public string? Error { get; set; }
+}
