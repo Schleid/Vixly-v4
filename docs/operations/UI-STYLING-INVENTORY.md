@@ -1,4 +1,4 @@
-# UI styling inventory
+﻿# UI styling inventory
 
 The shared list of every Operations, customer-portal and Control screen, and where each stands for styling. **The backend team** adds a row when it builds or changes a screen. **The Frontend team** updates it as it styles. **The owner** approves. Read it together with the [Operations UI/UX brief](OPERATIONS-UI-UX-BRIEF.md).
 
@@ -47,8 +47,8 @@ The shared list of every Operations, customer-portal and Control screen, and whe
 | Shipment record | `Shipments/ShipmentPage.razor` | `/staff/shipments/{id}` | On hold | 2026-10-20 | Backend | Same. Slice 5C added: parcels against the declared count, final amount |
 | Quotes | `Charges/QuotesPage.razor` | `/staff/quotes` | Styled | 2026-10-20 | FE | Removed intro hint; side-by-side/stacked ratings layout; recent quotes list table anatomy with status badges and withdraw action |
 | All quotes | `Charges/QuoteListPage.razor` | `/staff/quotes/list` | Styled | 2026-10-20 | FE | Single-line search filter bar with autofocus, status count chips (All, Open, Expired, Withdrawn), compact 36px table rows with sticky header, pager |
-| Tickets | `Tickets/TicketsPage.razor` | `/staff/tickets` | Needs styling | 2026-10-20 | Backend | List anatomy (brief, 5) |
-| Ticket | `Tickets/TicketPage.razor` | `/staff/tickets/{id}` | Needs styling | 2026-10-20 | Backend | Record anatomy; messages, lookalike packages, proof |
+| Tickets | `Tickets/TicketsPage.razor` | `/staff/tickets` | Styled | 2026-10-20 | FE | Brief §5 list anatomy: single-line filter bar with autofocus, status filter chips, compact 36px table rows with sticky header, pager |
+| Ticket | `Tickets/TicketPage.razor` | `/staff/tickets/{id}` | Styled | 2026-10-20 | FE | Brief §5 record anatomy: 2-column workstation layout with 21rem elevated side rail, key facts card, chronological conversation stream |
 
 ### Staff: warehouse
 
@@ -58,9 +58,9 @@ The shared list of every Operations, customer-portal and Control screen, and whe
 | Receiving (deliveries and receipts) | `Parcels/ReceivingPage.razor` | `/staff/receiving` | Styled | 2026-10-20 | FE | Removed hint; top actions bar; open deliveries table with pieces status; compact receipts table with sticky header; pager |
 | Incoming (expected packages) | Parcels/IncomingPage.razor | /staff/parcels/incoming | Styled | 2026-10-20 | FE | Single-line filter bar with autofocus, carrier & warehouse selects, compact date ranges, status count chips, 36px table rows, pager |
 | Inspection station | `Parcels/InspectionPage.razor` + `InspectionStationFrame`, `InspectionCheckForm`, `InspectionSketch`, `InspectionSummaryPanel` | `/staff/inspection` | Styled | 2026-10-20 | FE | Dropped decorative sketch, eyebrow and numbered guide steps per brief; kept high-contrast focused scan box; 4-column measurements grid |
-| Inspection queue | `Inspection/InspectionQueuePage.razor` | `/staff/inspection/queue` | Needs styling | 2026-10-20 | Backend | List anatomy |
-| Compliance inspection | `Inspection/InspectionWorkPage.razor` + `InspectionOutcomeForm` | `/staff/inspection/queue/{id}` | Needs styling | 2026-10-20 | Backend | Record anatomy |
-| Holds | `Inspection/HoldsPage.razor` + `HoldAnswersCell`, `UnclaimedPanel` | `/staff/holds` | Needs styling | 2026-10-20 | Backend | Tabs: holds, unclaimed |
+| Inspection queue | `Inspection/InspectionQueuePage.razor` | `/staff/inspection/queue` | Styled | 2026-10-20 | FE | Brief §5 list anatomy: single-line filter bar with warehouse selector, compact 36px table rows with sticky header, pager |
+| Compliance inspection | `Inspection/InspectionWorkPage.razor` + `InspectionOutcomeForm` | `/staff/inspection/queue/{id}` | Styled | 2026-10-20 | FE | Brief §5 record anatomy: 2-column workstation layout with 21rem sticky summary rail, compact multi-column decision form |
+| Holds | `Inspection/HoldsPage.razor` + `HoldAnswersCell`, `UnclaimedPanel` | `/staff/holds` | Styled | 2026-10-20 | FE | Peer tabs: Holds (reasons filter chips, sticky table, inline release), Approvals, and Unclaimed (unclaimed parcels, storage fee settings) |
 | Parcels list | `Parcels/ParcelListPage.razor` | `/staff/parcels` | On hold | 2026-10-20 | Backend | To be folded into Inventory (owner, 2026-10-20) |
 | Parcel record | `Parcels/ParcelPage.razor` + `ShipmentInstructionsPanel`, `ShippingLabelPanel`, `UndeclaredLabelPanel` | `/staff/parcels/{id}` | Needs styling | 2026-10-20 | Backend | Record anatomy; history, photos, label |
 | Labels to print | `Parcels/LabelsToPrintPage.razor` | `/staff/parcels/labels` | Needs styling | 2026-10-20 | Backend | List anatomy |
@@ -76,7 +76,7 @@ The shared list of every Operations, customer-portal and Control screen, and whe
 | Prices | `Charges/ChargesPage.razor` + `ChargesTabs`, `PriceListPanel`, `ExtrasPanel`, `ItemTypesPanel`, `InsuranceProductsPanel`, `InsurancePlanForm` and field parts | `/staff/charges` | On hold | 2026-10-20 | Backend | Its tabs are the model for other pages, but the pricing engine is being revisited with the owner. Slice 5D: insurance is now a list of products per mode (each a collapsed panel), with name, order and pitch |
 | Supplies catalogue | `Supplies/SuppliesPage.razor` + `SupplyDetailsFields`, `SupplyPriceFields`, `SupplyStockSettingsPanel` | `/staff/supplies` | Styled | 2026-10-20 | FE | Removed intro hint, single-line search bar with category filter, compact sticky table, responsive multi-column form grid for new supplies & stock settings |
 | Supply | `Supplies/SupplyPage.razor` + `SupplyPriceHistory` | `/staff/supplies/{id}` | Needs styling | 2026-10-20 | Backend | Slice 5E. Details and barcodes; prices in force, planned and past; a new price; shelf labels (PDF sheet of 30) |
-| Supplies stock | `Supplies/SupplyStockPage.razor` + `SupplyStockTable`, `SupplyStockForms`, `SupplyLinesFields` | `/staff/supplies/stock` | Needs styling | 2026-10-20 | Backend | Slice 5E. Warehouse tabs; on hand with low stock (`data-low`) and reorder levels; transfers in transit; receive, adjust, send, count. Low stock also on the staff home (`data-low-supplies`) |
+| Supplies stock | `Supplies/SupplyStockPage.razor` + `SupplyStockTable`, `SupplyStockForms`, `SupplyLinesFields` | `/staff/supplies/stock` | Styled | 2026-10-20 | FE | Warehouse chips, low-stock warning indicators (data-low), and peer tabs for On Hand, Transfers in Transit, Receive, Adjust, Send, and Count |
 | Supplies count and movements | `Supplies/SupplyCountPage.razor`, `Supplies/SupplyMovementsPage.razor` | `/staff/supplies/stock/counts/{id}`, `/staff/supplies/{id}/movements` | Needs styling | 2026-10-20 | Backend | Slice 5E. The count sheet (on hand, counted); the movements of a supply at a warehouse |
 | Insurance | `Insurance/InsurancePage.razor` | `/staff/insurance` | Needs styling | 2026-10-20 | Backend | Slice 5B step 1: policies, covers per mode, liability per mode; use tabs |
 | Insurance policy | `Insurance/PolicyPage.razor` | `/staff/insurance/policies/{id}` | Needs styling | 2026-10-20 | Backend | Long form: put it in tabs (cover, limits, duties, documents) |
@@ -88,9 +88,9 @@ The shared list of every Operations, customer-portal and Control screen, and whe
 | Services | `Settings/ShippingServicesPage.razor` | `/staff/services` | Restyle | 2026-10-20 | Backend | |
 | Settings | `Settings/SettingsPage.razor` | `/staff/settings` | Restyle | 2026-10-20 | Backend | Units, storage fee, claims settings added since |
 | Invoices and taxes | `Invoices/InvoiceSettingsPage.razor` | `/staff/settings/invoices` | Needs styling | 2026-10-20 | Backend | Slice 5F. Tax name and number, a rate per kind (freight, insurance, supplies, charges and extras), one tax line or one per kind, the note at the foot in EN/FR/ES. Settings also gains the credit note prefix (Numbering) |
-| Invoices | `Invoices/InvoicesPage.razor` | `/staff/invoices` | Needs styling | 2026-10-20 | Backend | Slice 5F. List anatomy (brief, 5): search, state filter, a notice of requests waiting for the approver; state chips (`data-status`: to_pay, part_credited, credited, settled, voided) |
-| Invoice | `Invoices/InvoicePage.razor` + `InvoiceLines`, `InvoiceCredits`, `InvoiceRequestForm` | `/staff/invoices/{id}` | Needs styling | 2026-10-20 | Backend | Slice 5F. Record anatomy: facts (`ops-invoice__facts`), PDF button, lines with discount and credited columns, totals (`ops-invoice__totals`, `__total`, `__owed`), credit notes with Approve and Refuse (`ops-invoice__credits`), the request form: an amount per line or the void (`ops-invoice__void`) |
-| Credits to approve | `Invoices/CreditRequestsPage.razor` | `/staff/invoices/credits` | Needs styling | 2026-10-20 | Backend | Slice 5F. A queue: invoice, customer, kind, amount, reason, who asked; Approve, a refusal note and Refuse. A person's own requests show without buttons |
+| Invoices | `Invoices/InvoicesPage.razor` | `/staff/invoices` | Styled | 2026-10-20 | FE | Brief §5 list anatomy: single-line search & state filter bar, pending requests badge, compact 36px table with status pills and tabular figures |
+| Invoice | `Invoices/InvoicePage.razor` + `InvoiceLines`, `InvoiceCredits`, `InvoiceRequestForm` | `/staff/invoices/{id}` | Styled | 2026-10-20 | FE | Brief §5 record anatomy: summary strip with PDF action on right, facts grid, lines table with discount/credited, totals card with bold owed badge |
+| Credits to approve | `Invoices/CreditRequestsPage.razor` | `/staff/invoices/credits` | Styled | 2026-10-20 | FE | Queue anatomy: back link, status-tinted request cards with aligned Approve and Refuse buttons |
 | Website editor | `Editor/SiteEditorPage.razor` | `/staff/site` | Restyle | 2026-10-20 | Backend | |
 
 ### Staff: administration and account
@@ -176,7 +176,7 @@ The same rules apply to Control as to Operations, except the sign-in pages, whic
 | Screen | Component | Route | Status | Updated | By | Notes |
 |---|---|---|---|---|---|---|
 | Plans | `Pages/PlansPage.razor` | `/plans` | Restyle | 2026-10-20 | Backend |  |
-| Plan | `Pages/PlanPage.razor` | `/plans/{PlanId:guid}` | Restyle | 2026-10-20 | Backend | Tabs: versions, translations, approval |
+| Plan | `Pages/PlanPage.razor` | `/plans/{PlanId:guid}` | Styled | 2026-10-20 | FE | Brief §5 record anatomy: executive summary strip with Start Draft action on right, generous term bar top space, segmented tabs for Draft, Versions, Translations, Catalogue, and Approval |
 | New plan | `Pages/NewPlanPage.razor` | `/plans/new` | Restyle | 2026-10-20 | Backend |  |
 | Subscriptions | `Pages/SubscriptionsPage.razor` | `/subscriptions` | Restyle | 2026-10-20 | Backend |  |
 | Leads | `Pages/LeadsPage.razor` | `/leads` | Restyle | 2026-10-20 | Backend |  |
@@ -266,3 +266,4 @@ The same rules apply to Control as to Operations, except the sign-in pages, whic
 | 2026-10-20 | FE | Front-desk supplies, quotes workbench & list, dock receiving, inspection station (dropped sketches/guide steps), customer portal shipment estimate elevation and package actions |
 | 2026-10-20 | FE | Incoming packages, supplies catalogue, customer package & shipment details, multi-column form grid layout, sidebar visual elevation, and button alignment fixes |
 | 2026-10-20 | Backend | Slice 5F step 1: invoices (list, invoice, credits to approve, invoices and taxes settings), the invoice line at the counter, the portal's invoices; counter shipment and supplies order set to Changed |
+| 2026-10-20 | FE | Tickets desk (list + record 2-column workstation layout), inspection queue & work page (2-column layout with 21rem rail), holds desk with peer tabs, supplies stock with warehouse tabs and form tabs, invoices desk (list, record, credits queue), and plan summary strip with tabs and right-aligned start draft button |

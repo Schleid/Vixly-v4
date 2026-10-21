@@ -3,102 +3,102 @@
 FILE: HoldsPage.razor
 
 PURPOSE:
-Open holds at the warehouses the person covers, and refused parcels waiting for a disposal decision (Slice 3C design section 6).
-
-RESPONSIBILITIES:
-- List held parcels by reason, oldest first, with what is awaited
-- Release a hold with a note
-- Approve or decline a disposal (the Owner or an administrator)
+Open holds at the warehouses the person covers, approvals,
+and unclaimed parcels in peer tabs.
 
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10)
-- Unidentified, awaiting information and refused end by their own steps, not by a release
+- Brief §5 list anatomy and tabbed panels
 =========================================================
 *@
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.holds.title"]" Company="@Company" Section="holds" Error="@Error" Info="@Info">
     <div class="ops-compact-tabs" data-section-tabs="holds" data-tabs-label="@T["ui.holds.title"]">
-    <nav class="ops-editor__inline" aria-label="@T["ui.holds.reasons"]">
-        <a href="/staff/holds" aria-current="@(Reason == OperationsHoldReasons.None ? "page" : null)">@T["ui.holds.all"]</a>
-        @foreach (OperationsHoldReasons reason in Enum.GetValues<OperationsHoldReasons>().Where(item => item != OperationsHoldReasons.None))
-        {
-            <a href="/staff/holds?reason=@reason" aria-current="@(Reason == reason ? "page" : null)">@T["ui.hold." + reason]</a>
-        }
-    </nav>
-    @if (Approvals.Count > 0)
-    {
-        <section class="ops-editor__panel" aria-labelledby="approvals-title">
-            <h2 id="approvals-title">@T["ui.holds.approvals"]</h2>
-            @if (!CanApprove) { <p class="ops-editor__hint">@T["ui.holds.approvals_hint"]</p> }
-            @foreach (OperationsInspectionQueueItem item in Approvals)
+        <section class="ops-editor__panel" data-tab-label="@T["ui.holds.title"]" data-tab-default>
+            <div class="ops-filter-chips" aria-label="@T["ui.holds.reasons"]">
+                <a href="/staff/holds" class="ops-filter-chip @(Reason == OperationsHoldReasons.None ? "active" : null)">@T["ui.holds.all"] (@TotalCount)</a>
+                @foreach (OperationsHoldReasons reason in Enum.GetValues<OperationsHoldReasons>().Where(item => item != OperationsHoldReasons.None))
+                {
+                    <a href="/staff/holds?reason=@reason" class="ops-filter-chip @(Reason == reason ? "active" : null)">@T["ui.hold." + reason]</a>
+                }
+            </div>
+            @if (Items.Count == 0)
             {
-                <article>
-                    <p><a href="/staff/inspection/queue/@item.Inspection.Id"><strong>@item.Parcel.Number</strong></a> · @(item.Parcel.CustomerCode ?? T["ui.hold.Unidentified"].Value) · @item.Inspection.ItemsFound</p>
-                    <p>@VixlyText.Format(T, "ui.holds.called", new Dictionary<string, object> { ["date"] = item.Inspection.CalledCustomerUtc?.ToString("yyyy-MM-dd") ?? string.Empty, ["notes"] = item.Inspection.CallNotes ?? string.Empty })</p>
-                    @if (CanApprove)
-                    {
-                        <form method="post" action="/staff/holds/disposals/@item.Inspection.Id" class="ops-editor__inline">
-                            <AntiforgeryToken />
-                            <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
-                            <label>@T["ui.holds.note"] <input name="note" maxlength="@OperationsInspectionLimits.CallNotesMaxLength" /></label>
-                            <button type="submit" name="decision" value="approve" class="vx-button vx-button--primary">@T["ui.holds.approve"]</button>
-                            <button type="submit" name="decision" value="decline" class="vx-button vx-button--secondary">@T["ui.holds.decline"]</button>
-                        </form>
-                    }
-                </article>
+                <div class="ops-editor__empty"><h2>@T["ui.holds.none"]</h2></div>
             }
+            else
+            {
+                <OperationsTableViewport Label="@T["ui.holds.title"]">
+                    <table class="ops-editor__table">
+                        <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.parcels.number"]</th><th scope="col">@T["ui.customers.code"]</th><th scope="col">@T["ui.parcels.holds"]</th><th scope="col">@T["ui.holds.awaited"]</th><th scope="col">@T["ui.holds.release"]</th></tr></thead>
+                        <tbody>
+                            @foreach (OperationsHeldParcel held in Items)
+                            {
+                                <tr>
+                                    <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/parcels/@held.Parcel.ParcelId">@held.Parcel.Number</a> <small>@held.Parcel.WarehouseCode</small></td>
+                                    <td class="ops-editor__code">@(held.Parcel.CustomerCode ?? T["ui.hold.Unidentified"])</td>
+                                    <td>@string.Join(", ", Reasons(held.Parcel.HoldReasons).Select(reason => T["ui.hold." + reason].Value))</td>
+                                    <td>@if (Awaits(held)) { @held.Inspection!.CustomerAction @if (held.Inspection.Fee is { } fee) { <small>@fee.ToString("0.00") @held.Inspection.FeeCurrency</small> } }
+                                        <HoldAnswersCell T="T" Answers="held.Answers" CanApprove="CanApprove" /></td>
+                                    <td>
+                                        @if (Choices(held).Any())
+                                        {
+                                            <form method="post" action="/staff/holds/@held.Parcel.ParcelId/release" class="ops-editor__inline">
+                                                <AntiforgeryToken />
+                                                <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+                                                <select name="reason" aria-label="@T["ui.holds.reason"]">
+                                                    @foreach (OperationsHoldReasons reason in Choices(held))
+                                                    {
+                                                        <option value="@reason">@(reason == OperationsHoldReasons.Refused ? T["ui.holds.returned"] : T["ui.hold." + reason])</option>
+                                                    }
+                                                </select>
+                                                <input name="note" required maxlength="@OperationsInspectionLimits.CallNotesMaxLength" placeholder="@T["ui.holds.note"]" aria-label="@T["ui.holds.note"]" />
+                                                <button type="submit" class="vx-button vx-button--secondary">@T["ui.holds.release"]</button>
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </OperationsTableViewport>
+            }
+            <p class="ops-editor__list-footer">@VixlyText.Format(T, "ui.holds.count", "count", TotalCount)</p>
+            <nav class="ops-editor__inline" aria-label="@T["ui.customers.pages"]">
+                @if (Page > 1) { <a href="@PageLink(Page - 1)">@T["ui.customers.previous"]</a> }
+                @if (Page * PageSize < TotalCount) { <a href="@PageLink(Page + 1)">@T["ui.customers.next"]</a> }
+            </nav>
         </section>
-    }
-    <UnclaimedPanel T="T" Items="Unclaimed" Count="UnclaimedCount" Days="UnclaimedDays" CanApprove="CanApprove" FreeDays="StorageFreeDays" FeePerDay="StorageFeePerDay" Currency="@CurrencyCode" />
-    <section class="ops-editor__panel" data-tab-label="@T["ui.holds.title"]" data-tab-default>
-        @if (Items.Count == 0)
+
+        @if (Approvals.Count > 0)
         {
-            <div class="ops-editor__empty"><h2>@T["ui.holds.none"]</h2></div>
-        }
-        else
-        {
-            <OperationsTableViewport Label="@T["ui.holds.title"]">
-                <table class="ops-editor__table">
-                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.parcels.number"]</th><th scope="col">@T["ui.customers.code"]</th><th scope="col">@T["ui.parcels.holds"]</th><th scope="col">@T["ui.holds.awaited"]</th><th scope="col">@T["ui.holds.release"]</th></tr></thead>
-                    <tbody>
-                        @foreach (OperationsHeldParcel held in Items)
+            <section class="ops-editor__panel" data-tab-label="@T["ui.holds.approvals"]" aria-labelledby="approvals-title">
+                <h2 id="approvals-title">@T["ui.holds.approvals"]</h2>
+                @if (!CanApprove) { <p class="ops-editor__hint">@T["ui.holds.approvals_hint"]</p> }
+                <div class="ops-editor__list">
+                @foreach (OperationsInspectionQueueItem item in Approvals)
+                {
+                    <article style="padding: 0.85rem 0; border-bottom: 1px solid var(--vx-color-border);">
+                        <p style="margin: 0 0 0.4rem;"><a href="/staff/inspection/queue/@item.Inspection.Id"><strong>@item.Parcel.Number</strong></a> · @(item.Parcel.CustomerCode ?? T["ui.hold.Unidentified"].Value) · @item.Inspection.ItemsFound</p>
+                        <p class="ops-editor__hint" style="margin-bottom: 0.5rem;">@VixlyText.Format(T, "ui.holds.called", new Dictionary<string, object> { ["date"] = item.Inspection.CalledCustomerUtc?.ToString("yyyy-MM-dd") ?? string.Empty, ["notes"] = item.Inspection.CallNotes ?? string.Empty })</p>
+                        @if (CanApprove)
                         {
-                            <tr>
-                                <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/parcels/@held.Parcel.ParcelId">@held.Parcel.Number</a> <small>@held.Parcel.WarehouseCode</small></td>
-                                <td class="ops-editor__code">@(held.Parcel.CustomerCode ?? T["ui.hold.Unidentified"])</td>
-                                <td>@string.Join(", ", Reasons(held.Parcel.HoldReasons).Select(reason => T["ui.hold." + reason].Value))</td>
-                                <td>@if (Awaits(held)) { @held.Inspection!.CustomerAction @if (held.Inspection.Fee is { } fee) { <small>@fee.ToString("0.00") @held.Inspection.FeeCurrency</small> } }
-                                    <HoldAnswersCell T="T" Answers="held.Answers" CanApprove="CanApprove" /></td>
-                                <td>
-                                    @if (Choices(held).Any())
-                                    {
-                                        <form method="post" action="/staff/holds/@held.Parcel.ParcelId/release" class="ops-editor__inline">
-                                            <AntiforgeryToken />
-                                            <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
-                                            <select name="reason" aria-label="@T["ui.holds.reason"]">
-                                                @foreach (OperationsHoldReasons reason in Choices(held))
-                                                {
-                                                    <option value="@reason">@(reason == OperationsHoldReasons.Refused ? T["ui.holds.returned"] : T["ui.hold." + reason])</option>
-                                                }
-                                            </select>
-                                            <input name="note" required maxlength="@OperationsInspectionLimits.CallNotesMaxLength" placeholder="@T["ui.holds.note"]" aria-label="@T["ui.holds.note"]" />
-                                            <button type="submit" class="vx-button vx-button--secondary">@T["ui.holds.release"]</button>
-                                        </form>
-                                    }
-                                </td>
-                            </tr>
+                            <form method="post" action="/staff/holds/disposals/@item.Inspection.Id" class="ops-editor__inline">
+                                <AntiforgeryToken />
+                                <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+                                <label>@T["ui.holds.note"] <input name="note" maxlength="@OperationsInspectionLimits.CallNotesMaxLength" /></label>
+                                <button type="submit" name="decision" value="approve" class="vx-button vx-button--primary">@T["ui.holds.approve"]</button>
+                                <button type="submit" name="decision" value="decline" class="vx-button vx-button--secondary">@T["ui.holds.decline"]</button>
+                            </form>
                         }
-                    </tbody>
-                </table>
-            </OperationsTableViewport>
+                    </article>
+                }
+                </div>
+            </section>
         }
-        <p class="ops-editor__list-footer">@VixlyText.Format(T, "ui.holds.count", "count", TotalCount)</p>
-        <nav class="ops-editor__inline" aria-label="@T["ui.customers.pages"]">
-            @if (Page > 1) { <a href="@PageLink(Page - 1)">@T["ui.customers.previous"]</a> }
-            @if (Page * PageSize < TotalCount) { <a href="@PageLink(Page + 1)">@T["ui.customers.next"]</a> }
-        </nav>
-    </section>
+
+        <UnclaimedPanel T="T" Items="Unclaimed" Count="UnclaimedCount" Days="UnclaimedDays" CanApprove="CanApprove" FreeDays="StorageFreeDays" FeePerDay="StorageFeePerDay" Currency="@CurrencyCode" />
     </div>
 </EditorShell>
 
@@ -107,11 +107,9 @@ IMPORTANT NOTES:
 
     private string PageLink(int page) => "/staff/holds?page=" + page + (Reason == OperationsHoldReasons.None ? null : "&reason=" + Reason);
 
-    // What a person may end here; a parcel refused for return ends its hold by leaving ("returned to sender").
     private IEnumerable<OperationsHoldReasons> Choices(OperationsHeldParcel held) =>
         Reasons(held.Parcel.HoldReasons).Where(reason => Releasable.Contains(reason) || (reason == OperationsHoldReasons.Refused && held.Inspection is { Result: "refused_returned", Status: OperationsInspectionStatus.Done }));
 
-    // What the inspection asked of the customer, while that hold is still open.
     private static bool Awaits(OperationsHeldParcel held) =>
         held.Inspection is { CustomerAction: not null } inspection
         && ((inspection.HoldReason != OperationsHoldReasons.None && held.Parcel.HoldReasons.HasFlag(inspection.HoldReason))
@@ -121,34 +119,19 @@ IMPORTANT NOTES:
         Enum.GetValues<OperationsHoldReasons>().Where(reason => reason != OperationsHoldReasons.None && reasons.HasFlag(reason));
 
     [Parameter] public string? Company { get; set; }
-
     [Parameter] public OperationsHoldReasons Reason { get; set; }
-
     [Parameter] public IReadOnlyList<OperationsHeldParcel> Items { get; set; } = Array.Empty<OperationsHeldParcel>();
-
     [Parameter] public int TotalCount { get; set; }
-
     [Parameter] public int Page { get; set; } = 1;
-
     [Parameter] public IReadOnlyList<OperationsInspectionQueueItem> Approvals { get; set; } = Array.Empty<OperationsInspectionQueueItem>();
-
     [Parameter] public bool CanApprove { get; set; }
-
     [Parameter] public IReadOnlyList<OperationsHeldParcel> Unclaimed { get; set; } = Array.Empty<OperationsHeldParcel>();
-
     [Parameter] public int UnclaimedCount { get; set; }
-
     [Parameter] public int UnclaimedDays { get; set; }
-
     [Parameter] public int StorageFreeDays { get; set; }
-
     [Parameter] public decimal? StorageFeePerDay { get; set; }
-
     [Parameter] public string CurrencyCode { get; set; } = string.Empty;
-
     [Parameter] public IReadOnlyList<OperationsHoldReasons> Releasable { get; set; } = Array.Empty<OperationsHoldReasons>();
-
     [Parameter] public string? Error { get; set; }
-
     [Parameter] public string? Info { get; set; }
 }

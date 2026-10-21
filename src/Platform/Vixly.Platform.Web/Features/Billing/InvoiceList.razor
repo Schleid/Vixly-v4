@@ -43,9 +43,6 @@ IMPORTANT NOTES:
     </form>
 }
 
-<div class="vx-control-list-summary" aria-live="polite">
-    <VxMetricCard Label="@T["ui.invoices.title"]" Value="@(Presenter.State.Loaded && Presenter.State.Error is null ? Presenter.State.TotalCount.ToString("N0") : "—")" Detail="@T["ui.control.filtered_results"]" />
-</div>
 
 @if (Presenter.State.Error is not null)
 {

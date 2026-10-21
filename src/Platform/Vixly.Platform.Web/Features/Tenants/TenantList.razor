@@ -35,9 +35,6 @@ IMPORTANT NOTES:
     <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
 </form>
 
-<div class="vx-control-list-summary" aria-live="polite">
-    <VxMetricCard Label="@T["ui.tenants.title"]" Value="@(Presenter.State.Loaded && Presenter.State.Error is null ? Presenter.State.TotalCount.ToString("N0") : "—")" Detail="@T["ui.control.filtered_results"]" />
-</div>
 
 @if (Presenter.State.Error is not null)
 {

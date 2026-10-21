@@ -3,7 +3,7 @@
 FILE: UnclaimedPanel.razor
 
 PURPOSE:
-Packages waiting for their customer past the company's days: return to sender or dispose of (Slice 3E, Q-R6).
+Packages waiting for their customer past the company''s days: return to sender or dispose of (Slice 3E, Q-R6).
 
 RESPONSIBILITIES:
 - List them, oldest first, with the reminders sent
@@ -14,7 +14,7 @@ IMPORTANT NOTES:
 - Shown to everyone with the holds page; decided only by the Owner or an administrator
 =========================================================
 *@
-<section class="ops-editor__panel" aria-labelledby="unclaimed-title">
+<section class="ops-editor__panel" data-tab-label="@VixlyText.Format(T, "ui.holds.unclaimed", "days", Days)" aria-labelledby="unclaimed-title">
     <h2 id="unclaimed-title">@VixlyText.Format(T, "ui.holds.unclaimed", "days", Days)</h2>
     @if (Items.Count == 0)
     {
@@ -23,7 +23,7 @@ IMPORTANT NOTES:
     else
     {
         <p class="ops-editor__hint">@(CanApprove ? T["ui.holds.unclaimed_hint"] : T["ui.holds.approvals_hint"])</p>
-        <ul>
+        <ul class="ops-editor__list">
             @foreach (OperationsHeldParcel held in Items)
             {
                 <li>
@@ -46,12 +46,12 @@ IMPORTANT NOTES:
     }
     @if (CanApprove)
     {
-        <form method="post" action="/staff/holds/unclaimed-days" class="ops-editor__inline">
+        <form method="post" action="/staff/holds/unclaimed-days" class="ops-editor__inline" style="margin-top: 1rem;">
             <AntiforgeryToken />
             <label>@T["ui.holds.unclaimed_days"] <input name="days" type="number" min="@OperationsHoldLimits.MinUnclaimedDays" max="@OperationsHoldLimits.MaxUnclaimedDays" step="1" value="@Days" required /></label>
             <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
         </form>
-        <form method="post" action="/staff/holds/storage-fee" class="ops-editor__inline">
+        <form method="post" action="/staff/holds/storage-fee" class="ops-editor__inline" style="margin-top: 0.5rem;">
             <AntiforgeryToken />
             <label>@T["ui.holds.free_days"] <input name="freeDays" type="number" min="0" max="@OperationsHoldLimits.MaxUnclaimedDays" step="1" value="@FreeDays" required /></label>
             <label>@VixlyText.Format(T, "ui.holds.storage_fee", "currency", Currency) <input name="fee" inputmode="decimal" value="@FeePerDay?.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)" placeholder="0.00" /></label>
@@ -72,7 +72,6 @@ IMPORTANT NOTES:
 
     [Parameter] public bool CanApprove { get; set; }
 
-    // Slice 4D step 3: free days, the storage fee per day (none when empty) and the company's currency.
     [Parameter] public int FreeDays { get; set; }
 
     [Parameter] public decimal? FeePerDay { get; set; }

@@ -9,14 +9,17 @@ RESPONSIBILITIES:
 - List each request with the invoice, customer, amount, reason and who asked; approve or refuse
 
 IMPORTANT NOTES:
-- Markup only. Text comes from OperationsText (L-10)
-- A person's own requests are listed without the buttons
+- Page component (UI-6): <= 80 lines
+- Text comes from OperationsText (L-10)
+- A person''s own requests are listed without the buttons
 =========================================================
 *@
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.invoices.requests_title"]" Company="@Company" Section="invoices" Error="@Error" Info="@Info">
-    <p><a href="/staff/invoices">@T["ui.invoices.back"]</a></p>
+    <div class="ops-record-top">
+        <a href="/staff/invoices" class="ops-editor__back-link">@T["ui.invoices.back"]</a>
+    </div>
     @if (Requests.Count == 0)
     {
         <div class="ops-editor__empty"><p>@T["ui.invoices.no_requests"]</p></div>
@@ -26,7 +29,7 @@ IMPORTANT NOTES:
         <ul class="ops-invoice__credits">
             @foreach (OperationsCreditRequestRow row in Requests)
             {
-                <li>
+                <li data-status="Requested">
                     <strong><a href="/staff/invoices/@row.InvoiceId">@row.InvoiceNumber</a></strong> · @row.Customer · @T["ui.invoices.credit_kind." + row.Kind]
                     · @OperationsInvoiceWords.Money(row.Total, row.CurrencyCode)
                     <br /><span class="ops-editor__hint">@VixlyText.Format(T, "ui.invoices.asked_by", new Dictionary<string, object> { ["name"] = row.RequestedBy, ["when"] = row.RequestedUtc.ToString("g", CultureInfo.CurrentCulture), ["reason"] = row.Reason })</span>
@@ -36,7 +39,7 @@ IMPORTANT NOTES:
                     }
                     else
                     {
-                        <form method="post" action="/staff/invoices/credits/@row.CreditNoteId/decide" class="ops-editor__inline">
+                        <form method="post" action="/staff/invoices/credits/@row.CreditNoteId/decide" class="ops-editor__inline" style="margin-top: 0.5rem;">
                             <AntiforgeryToken />
                             <input type="hidden" name="back" value="credits" />
                             <button type="submit" name="approve" value="true" class="vx-button vx-button--primary">@T["ui.invoices.approve"]</button>

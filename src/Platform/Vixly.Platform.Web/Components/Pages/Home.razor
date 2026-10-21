@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @attribute [Authorize]
 @using Vixly.Platform.Web.Features.Dashboard
 @inject IStringLocalizer<PlatformText> T
@@ -17,7 +17,7 @@
 <PageTitle>@T["ui.home.title"] · @T["ui.app.name"]</PageTitle>
 <div class="vx-dashboard">
     <header class="vx-dashboard__header">
-        <div><p class="vx-control-eyebrow">@T["ui.control.workspace"]</p><h1 class="vx-page-title">@T["ui.home.title"]</h1><p class="vx-dashboard__subtitle">@T["ui.home.subtitle"]</p></div>
+        <h1 class="vx-page-title">@T["ui.home.title"]</h1>
         <div class="vx-dashboard__actions">
             <a href="/offers/new" class="vx-button vx-button--primary">+ @T["ui.offers.new"]</a>
             <a href="/users/invite" class="vx-button vx-button--secondary">@T["ui.invite.title"]</a>

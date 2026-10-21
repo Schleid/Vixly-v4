@@ -1,4 +1,4 @@
-/* =========================================================
+﻿/* =========================================================
    FILE: vixly.css
    PURPOSE: Platform console presentation; shared-style extraction pending.
    NOTES:
@@ -123,9 +123,10 @@ p {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    background: var(--vx-color-chrome-surface);
+    background: linear-gradient(180deg, #090e17 0%, #0d1527 40%, #060911 100%);
     color: var(--vx-color-chrome-text);
-    border-right: 1px solid var(--vx-color-border);
+    border-right: 1px solid rgba(0, 0, 0, 0.4);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.28), inset -1px 0 0 rgba(255, 255, 255, 0.05);
     z-index: 40;
     overflow-y: auto;
     overflow-x: hidden;
@@ -159,7 +160,8 @@ p {
     border-radius: 0.5rem;
     overflow: hidden;
     flex-shrink: 0;
-    box-shadow: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .vx-sidebar__logo-img {
@@ -189,9 +191,10 @@ p {
     text-transform: uppercase;
     padding: 0.15rem 0.45rem;
     border-radius: 9999px;
-    background: var(--vx-color-chrome-accent-soft);
-    color: var(--vx-color-chrome-accent);
-    border: 1px solid var(--vx-color-chrome-active-border);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.35) 100%);
+    color: #93c5fd;
+    border: 1px solid rgba(96, 165, 250, 0.4);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.25);
 }
 
 /* Edge Mesh Telemetry in Sidebar */
@@ -211,8 +214,9 @@ p {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--vx-color-chrome-success);
-    box-shadow: none;
+    background: #34d399;
+    box-shadow: 0 0 8px #34d399, 0 0 16px rgba(52, 211, 153, 0.4);
+    animation: vx-pulse 2.5s ease-in-out infinite;
 }
 
 /* Navigation Groups & Items */
@@ -268,16 +272,24 @@ p {
     color: var(--vx-color-chrome-accent);
 }
 
+.vx-nav-item:hover {
+    color: #ffffff;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+    transform: translateX(3px);
+}
+
 .vx-nav-item.active {
-    color: var(--vx-color-chrome-text-strong);
-    background: var(--vx-color-chrome-active);
-    border: 1px solid var(--vx-color-chrome-active-border);
+    color: #ffffff;
+    background: linear-gradient(90deg, rgba(37, 99, 235, 0.28) 0%, rgba(37, 99, 235, 0.08) 100%);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    border-left: 3.5px solid #3b82f6;
     font-weight: 600;
-    box-shadow: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .vx-nav-item.active .vx-nav-item__icon {
-    color: var(--vx-color-chrome-accent);
+    color: #60a5fa;
+    filter: drop-shadow(0 0 6px rgba(96, 165, 250, 0.5));
 }
 
 /* User Card in Sidebar Footer */
@@ -287,26 +299,37 @@ p {
     background: var(--vx-color-chrome-footer);
 }
 
+.vx-sidebar__footer {
+    padding: 0.85rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.45) 100%);
+}
+
 .vx-user-card {
     display: flex;
     align-items: center;
     gap: 0.65rem;
-    padding: 0.4rem 0.5rem;
+    padding: 0.55rem 0.75rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 0.6rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(8px);
 }
 
 .vx-user-card__avatar {
     width: 2rem;
     height: 2rem;
     border-radius: 50%;
-    background: var(--vx-color-chrome-avatar);
-    color: var(--vx-color-chrome-text-strong);
+    background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+    color: #ffffff;
     font-size: 0.8125rem;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: none;
+    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .vx-user-card__meta {
@@ -804,9 +827,9 @@ p {
 .vx-toolbar {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 0.85rem;
-    padding: 0.85rem 1.25rem;
+    align-items: flex-end;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
     background: var(--vx-color-surface);
     border: 1px solid var(--vx-color-border);
     border-radius: var(--vx-radius-md);
@@ -814,6 +837,45 @@ p {
     width: 100%;
     box-sizing: border-box;
     box-shadow: var(--vx-shadow-1);
+}
+
+.vx-toolbar input,
+.vx-toolbar select {
+    height: 32px !important;
+    min-height: 32px !important;
+    box-sizing: border-box !important;
+    padding: 0.25rem 0.65rem !important;
+    font-size: 0.8125rem !important;
+    line-height: 1 !important;
+    vertical-align: middle;
+}
+
+.vx-toolbar .vx-button {
+    height: 32px !important;
+    min-height: 32px !important;
+    box-sizing: border-box !important;
+    padding: 0 0.85rem !important;
+    font-size: 0.8125rem !important;
+    line-height: 1 !important;
+    vertical-align: middle;
+    align-self: flex-end;
+    margin: 0;
+}
+
+.vx-control-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.vx-control-filter label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--vx-color-text-muted);
+    line-height: 1.2;
+    margin-bottom: 2px;
 }
 
 /* Plan Preview & Term Bar Toolbar (All Plans) */
@@ -2637,4 +2699,137 @@ details.vx-nav-group .vx-nav-item { margin-block: var(--vx-space-1); }
     margin-top: 2.25rem !important;
     padding-top: 1.75rem !important;
     border-top: 1px dashed var(--vx-color-border) !important;
+}
+
+
+/* Brief §5 Record Page Summary Strip */
+.vx-summary-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    padding: 0.875rem 1.25rem;
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-workbench, 0.5rem);
+    margin-bottom: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.vx-summary-strip__main {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.vx-summary-strip__title {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--vx-color-text);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    line-height: 1.2;
+}
+
+.vx-summary-strip__facts {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    font-size: 0.8125rem;
+    color: var(--vx-color-text-muted);
+}
+
+.vx-summary-strip__fact {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.vx-summary-strip__fact-label {
+    font-weight: 500;
+    color: var(--vx-color-text-subtle);
+}
+
+.vx-summary-strip__fact-value {
+    font-weight: 650;
+    color: var(--vx-color-text);
+    font-family: var(--vx-font-mono, monospace);
+    font-variant-numeric: tabular-nums;
+}
+
+.vx-summary-strip__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-left: auto;
+}
+
+/* Brief §5 Record Page Segmented Tabs */
+.vx-tabs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--vx-color-border);
+    margin-bottom: 1.25rem;
+    overflow-x: auto;
+}
+
+.vx-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--vx-color-text-muted);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 150ms ease, border-color 150ms ease;
+    white-space: nowrap;
+    line-height: 1.4;
+}
+
+.vx-tab-btn:hover {
+    color: var(--vx-color-text);
+}
+
+.vx-tab-btn.active,
+.vx-tab-btn[aria-selected="true"] {
+    color: var(--vx-color-primary, #2563eb);
+    border-bottom-color: var(--vx-color-primary, #2563eb);
+    font-weight: 700;
+}
+
+.vx-tab-btn .vx-tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    background: var(--vx-color-surface-sunken);
+    color: var(--vx-color-text-muted);
+}
+
+.vx-tab-btn.active .vx-tab-badge {
+    background: rgba(37, 99, 235, 0.12);
+    color: var(--vx-color-primary, #2563eb);
+}
+
+/* Plan Preview & Term Bar Toolbar (All Plans) */
+.vx-plan-term-bar,
+#plan-draft .vx-toolbar,
+.vx-card > .vx-toolbar:last-child {
+    margin-top: 2.75rem !important;
+    padding-top: 1.5rem !important;
+    border-top: 1px solid var(--vx-color-border) !important;
 }

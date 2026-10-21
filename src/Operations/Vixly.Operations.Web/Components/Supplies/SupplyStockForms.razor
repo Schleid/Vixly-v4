@@ -16,7 +16,7 @@ IMPORTANT NOTES:
 - Each form carries a key: sent twice, it moves the stock once (ADR-0019)
 =========================================================
 *@
-<section class="ops-editor__panel" aria-labelledby="stock-receive">
+<section class="ops-editor__panel" data-tab-label="@T["ui.supplies.stock.receive"]" aria-labelledby="stock-receive">
     <h2 id="stock-receive">@T["ui.supplies.stock.receive"]</h2>
     <form method="post" action="/staff/supplies/stock/receive" class="ops-editor__form">
         <AntiforgeryToken />
@@ -28,7 +28,7 @@ IMPORTANT NOTES:
         <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.stock.receive_save"]</button>
     </form>
 </section>
-<section class="ops-editor__panel" aria-labelledby="stock-adjust">
+<section class="ops-editor__panel" data-tab-label="@T["ui.supplies.stock.adjust"]" aria-labelledby="stock-adjust">
     <h2 id="stock-adjust">@T["ui.supplies.stock.adjust"]</h2>
     <form method="post" action="/staff/supplies/stock/adjust" class="ops-editor__form">
         <AntiforgeryToken />
@@ -52,7 +52,7 @@ IMPORTANT NOTES:
 </section>
 @if (AllWarehouses.Count(item => item.Id != WarehouseId && item.Status == OperationsLocationStatus.Active) > 0)
 {
-    <section class="ops-editor__panel" aria-labelledby="stock-send">
+    <section class="ops-editor__panel" data-tab-label="@T["ui.supplies.stock.send"]" aria-labelledby="stock-send">
         <h2 id="stock-send">@T["ui.supplies.stock.send"]</h2>
         <form method="post" action="/staff/supplies/stock/transfers" class="ops-editor__form">
             <AntiforgeryToken />
@@ -69,7 +69,7 @@ IMPORTANT NOTES:
         </form>
     </section>
 }
-<section class="ops-editor__panel" aria-labelledby="stock-count">
+<section class="ops-editor__panel" data-tab-label="@T["ui.supplies.stock.count"]" aria-labelledby="stock-count">
     <h2 id="stock-count">@T["ui.supplies.stock.count"]</h2>
     @if (OpenCountId is { } open)
     {

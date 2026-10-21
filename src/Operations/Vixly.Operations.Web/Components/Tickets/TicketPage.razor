@@ -1,114 +1,79 @@
-﻿@*
-=========================================================
-FILE: TicketPage.razor
-
-PURPOSE:
-One customer's ticket for staff: what it knows, the messages, and the undeclared packages that resemble it (Slice 4D step 4).
-
-RESPONSIBILITIES:
-- Show the ticket, the proof link and the messages
-- Give a package that resembles it to the customer (how staff checked it), answer, or resolve
-
-IMPORTANT NOTES:
-- Markup only. Text comes from OperationsText (L-10)
-- Forms only for staff with ops.parcels.assign at the warehouse; the use cases check again
-=========================================================
-*@
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.tickets.ticket"]" Company="@Company" Section="parcels" Error="@Error" Info="@Info">
-    <div class="ops-support-workflow">
-    <VxWorkspaceArt Kind="support" />
-    <p><a href="/staff/tickets">@T["ui.tickets.back"]</a></p>
-    <section class="ops-editor__panel">
-        <dl class="ops-editor__details">
-            <dt>@T["ui.tickets.status"]</dt><dd>@T["ui.tickets.status." + Ticket.Status]</dd>
-            <dt>@T["ui.customers.code"]</dt><dd>@CustomerCode @(CustomerName is null ? null : "· " + CustomerName)</dd>
-            <dt>@T["ui.receiving.warehouse"]</dt><dd>@WarehouseCode</dd>
-            <dt>@T["ui.tickets.carrier"]</dt><dd>@Ticket.Carrier</dd>
-            <dt>@T["ui.tickets.tracking"]</dt><dd>@Ticket.TrackingNumber</dd>
-            @if (!string.IsNullOrWhiteSpace(Ticket.Store)) { <dt>@T["ui.tickets.store"]</dt><dd>@Ticket.Store</dd> }
-            @if (!string.IsNullOrWhiteSpace(Ticket.OrderNumber)) { <dt>@T["ui.tickets.order"]</dt><dd>@Ticket.OrderNumber</dd> }
-            @if (Ticket.DeliveredOn is { } day) { <dt>@T["ui.tickets.delivered"]</dt><dd>@day.ToString("yyyy-MM-dd")</dd> }
-            <dt>@T["ui.tickets.contents"]</dt><dd>@Ticket.Contents</dd>
-            @if (Ticket.ProofKey is not null) { <dt>@T["ui.tickets.proof"]</dt><dd><a href="/staff/tickets/@Ticket.Id/proof" target="_blank" rel="noopener">@T["ui.tickets.proof_open"]</a></dd> }
-            @if (Ticket.ParcelId is { } found) { <dt>@T["ui.tickets.found"]</dt><dd><a href="/staff/parcels/@found">@T["ui.tickets.open_parcel"]</a></dd> }
-        </dl>
-    </section>
-    <section class="ops-editor__panel">
-        <h2>@T["ui.tickets.messages"]</h2>
-        <ol>
-            @foreach (OperationsTicketMessage message in Ticket.Messages)
-            {
-                <li><time datetime="@message.SentUtc.ToString("O")">@message.SentUtc.ToString("yyyy-MM-dd HH:mm")</time> <strong>@(message.FromStaff ? T["ui.tickets.from_staff"] : T["ui.tickets.from_customer"])</strong> @message.Text</li>
-            }
-        </ol>
-    </section>
-    @if (Ticket.Status != OperationsTicketStatus.Resolved)
-    {
-        <section class="ops-editor__panel">
-            <h2>@T["ui.tickets.lookalikes"]</h2>
-            <p class="ops-editor__hint">@T["ui.tickets.lookalikes_hint"]</p>
-            @if (Lookalikes.Count == 0)
-            {
-                <p>@T["ui.tickets.lookalikes_none"]</p>
-            }
-            else
-            {
-                <ul>
-                    @foreach (OperationsParcelSummary parcel in Lookalikes)
-                    {
-                        <li>
-                            <a href="/staff/parcels/@parcel.ParcelId">@parcel.Number</a> · @parcel.Carrier · @parcel.CarrierTrackingNumber · @parcel.ReceivedUtc.ToString("yyyy-MM-dd")
-                            @if (!string.IsNullOrWhiteSpace(parcel.LabelName)) { <span> · @parcel.LabelName</span> }
-                            @if (CanAnswer && CustomerCode is not null)
-                            {
-                                <form method="post" action="/staff/tickets/@Ticket.Id/link" class="ops-editor__inline ops-panel--restricted">
-                                    <AntiforgeryToken />
-                                    <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
-                                    <input type="hidden" name="parcel" value="@parcel.ParcelId" />
-                                    <select name="verifiedBy" required aria-label="@T["ui.parcels.verified_by"]">
-                                        @foreach (string method in OperationsTrackingCodes.VerificationMethods) { <option value="@method">@T["ui.parcels.verified." + method]</option> }
-                                    </select>
-                                    <button type="submit" class="vx-button vx-button--primary">@T["ui.tickets.link"]</button>
-                                </form>
-                            }
-                        </li>
+    <div class="customer-portal__actions--top">
+        <a href="/staff/tickets" class="customer-portal__back-link">← @T["ui.tickets.back"]</a>
+    </div>
+    <div class="ops-record-layout">
+        <aside class="ops-record-rail">
+            <section class="ops-record-summary">
+                <h2>@Ticket.TrackingNumber</h2>
+                <p>@(CustomerCode ?? T["ui.hold.Unidentified"].Value) @(CustomerName is null ? null : "· " + CustomerName)</p>
+                <dl>
+                    <dt>@T["ui.tickets.status"]</dt><dd><span class="ops-ticket-status" data-status="@Ticket.Status">@T["ui.tickets.status." + Ticket.Status]</span></dd>
+                    <dt>@T["ui.receiving.warehouse"]</dt><dd>@WarehouseCode</dd>
+                    <dt>@T["ui.tickets.carrier"]</dt><dd>@Ticket.Carrier</dd>
+                    @if (!string.IsNullOrWhiteSpace(Ticket.Store)) { <dt>@T["ui.tickets.store"]</dt><dd>@Ticket.Store</dd> }
+                    @if (!string.IsNullOrWhiteSpace(Ticket.OrderNumber)) { <dt>@T["ui.tickets.order"]</dt><dd>@Ticket.OrderNumber</dd> }
+                    @if (Ticket.DeliveredOn is { } day) { <dt>@T["ui.tickets.delivered"]</dt><dd>@day.ToString("yyyy-MM-dd")</dd> }
+                    <dt>@T["ui.tickets.contents"]</dt><dd>@Ticket.Contents</dd>
+                </dl>
+                @if (Ticket.ProofKey is not null) { <p><a href="/staff/tickets/@Ticket.Id/proof" target="_blank" rel="noopener" class="vx-button vx-button--secondary">@T["ui.tickets.proof_open"]</a></p> }
+                @if (Ticket.ParcelId is { } found) { <p><a href="/staff/parcels/@found" class="vx-button vx-button--primary">@T["ui.tickets.open_parcel"]</a></p> }
+            </section>
+        </aside>
+        <div class="ops-record-workflows">
+            <section class="ops-editor__panel">
+                <h2>@T["ui.tickets.messages"]</h2>
+                <ol>
+                    @foreach (OperationsTicketMessage msg in Ticket.Messages) {
+                        <li><time datetime="@msg.SentUtc.ToString("O")">@msg.SentUtc.ToString("yyyy-MM-dd HH:mm")</time> <strong>@(msg.FromStaff ? T["ui.tickets.from_staff"] : T["ui.tickets.from_customer"])</strong> @msg.Text</li>
                     }
-                </ul>
+                </ol>
+            </section>
+            @if (Ticket.Status != OperationsTicketStatus.Resolved && Lookalikes.Count > 0)
+            {
+                <section class="ops-editor__panel">
+                    <h2>@T["ui.tickets.lookalikes"]</h2>
+                    <ul>
+                        @foreach (OperationsParcelSummary p in Lookalikes) {
+                            <li><a href="/staff/parcels/@p.ParcelId">@p.Number</a> · @p.Carrier · @p.CarrierTrackingNumber · @p.ReceivedUtc.ToString("yyyy-MM-dd")
+                                @if (CanAnswer && CustomerCode is not null) {
+                                    <form method="post" action="/staff/tickets/@Ticket.Id/link" class="ops-editor__inline ops-panel--restricted">
+                                        <AntiforgeryToken /><input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" /><input type="hidden" name="parcel" value="@p.ParcelId" />
+                                        <select name="verifiedBy" required aria-label="@T["ui.parcels.verified_by"]">
+                                            @foreach (string m in OperationsTrackingCodes.VerificationMethods) { <option value="@m">@T["ui.parcels.verified." + m]</option> }
+                                        </select>
+                                        <button type="submit" class="vx-button vx-button--primary">@T["ui.tickets.link"]</button>
+                                    </form>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </section>
             }
-        </section>
-    }
-    @if (CanAnswer)
-    {
-        <form method="post" action="/staff/tickets/@Ticket.Id/answer" class="ops-editor__panel ops-panel--restricted">
-            <AntiforgeryToken />
-            <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
-            <h2>@T["ui.tickets.answer"]</h2>
-            <label>@T["ui.tickets.message"] <textarea name="message" maxlength="1000" rows="3"></textarea></label>
-            <label><input type="checkbox" name="resolve" value="true" /> @T["ui.tickets.resolve"]</label>
-            <button type="submit" class="vx-button vx-button--primary">@T["ui.tickets.send"]</button>
-        </form>
-    }
+            @if (CanAnswer)
+            {
+                <form method="post" action="/staff/tickets/@Ticket.Id/answer" class="ops-editor__panel ops-editor__form ops-panel--restricted">
+                    <AntiforgeryToken /><input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+                    <h2>@T["ui.tickets.answer"]</h2>
+                    <label class="span-full">@T["ui.tickets.message"] <textarea name="message" maxlength="1000" rows="3"></textarea></label>
+                    <label class="span-full"><input type="checkbox" name="resolve" value="true" /> @T["ui.tickets.resolve"]</label>
+                    <div class="ops-editor__form-actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.tickets.send"]</button></div>
+                </form>
+            }
+        </div>
     </div>
 </EditorShell>
 
 @code {
     [Parameter] public string? Company { get; set; }
-
     [Parameter, EditorRequired] public OperationsTicket Ticket { get; set; } = null!;
-
     [Parameter] public string? WarehouseCode { get; set; }
-
     [Parameter] public string? CustomerCode { get; set; }
-
     [Parameter] public string? CustomerName { get; set; }
-
     [Parameter] public IReadOnlyList<OperationsParcelSummary> Lookalikes { get; set; } = Array.Empty<OperationsParcelSummary>();
-
     [Parameter] public bool CanAnswer { get; set; }
-
     [Parameter] public string? Error { get; set; }
-
     [Parameter] public string? Info { get; set; }
 }

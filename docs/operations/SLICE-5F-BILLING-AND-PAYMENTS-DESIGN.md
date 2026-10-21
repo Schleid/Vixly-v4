@@ -6,7 +6,7 @@
 | Date | 2026-10-20 |
 | Builds on | Slice 5C (final shipments, the counter), 5D (insurance, the estimate, the page to sign), 5E (supplies) |
 | Source | The owner, 2026-10-20 evening: "we keep a central cashier where payment is processed; we could also, using a tablet, have the clerk send the payment to the customer, who launches the payment… some companies may not want to hire a cashier" |
-| Status | **Agreed with the owner on 2026-10-20** (payments and the invoice rules); credit accounts (F-10) and the first card provider are open. Step 1 (the invoice) is being built |
+| Status | **Agreed with the owner on 2026-10-20** (payments and the invoice rules); credit accounts (F-10) and the first provider (Stripe) answered. Step 1 (the invoice) is being built |
 
 ## 1. What the owner said
 
@@ -48,7 +48,7 @@
 
 | # | Decision |
 |---|---|
-| P-13 | **One provider first**, then others as companies need them. Each company connects its own provider account (Vixly never holds the company's money). *Owner to choose the first provider* (question F-8). |
+| P-13 | **One provider first**, then others as companies need them. Each company connects its own provider account (Vixly never holds the company's money). **Stripe first** (owner, 2026-10-20). |
 
 ## 3. The invoice (the owner's answers, 2026-10-20)
 
@@ -65,11 +65,14 @@
 | F-9 | **No freight discount at the counter.** A lower freight price is given only through a **special quote** (Slice 4). Discounts at the counter are for supplies only (Slice 5E). |
 | F-10 | **Bill my account:** a customer with a credit account sees *Bill my account* as a payment method (owner, 2026-10-20). Questions below. |
 
-### Open with the owner
+### Owner's answers, 2026-10-20 (evening)
 
-- **F-10 credit accounts:** who opens an account and sets its limit (a right, with approval?), whether a charge above the limit is refused or needs approval, the payment term (e.g. 30 days) and monthly statements, and how the customer pays the account later (the cashier, the portal). The staff customer record had its credit account section removed earlier (2026-10-20 inventory): the account would come back under its own right.
-- **F-8 first provider:** the first adapter to build behind the common interface.
+- **F-8:** the first card provider is **Stripe**.
+- **F-10:** the company's **credit department** opens credit accounts and manages credit (limits, holds, follow-up): a right of its own, *manage credit accounts*, given to that department.
 
+- **Above the limit:** a company setting: refuse *Bill my account*, or let the charge wait for the credit department's approval.
+- **Terms and statements:** company settings, 30 days and a monthly statement by default; the credit department can give a customer other terms.
+- **Paying the account:** at the cashier (step 2), then on the portal once Stripe comes in (step 4).
 
 ## 4. Step 1 in detail: the invoice (built from 2026-10-20)
 
@@ -89,15 +92,34 @@ The owner asked to start with the invoice while F-10 and the provider are open. 
 | I-10 | **Settings → Invoices:** the tax name, the tax number, the rates, one line or one per kind, and a note printed at the foot of every invoice in English, French and Spanish (payment terms, bank details). The currency can no longer change once an invoice exists. |
 | I-11 | **Shipments made final before this step** have no invoice. |
 
-## 5. Steps
+## 5. Step 2 in detail: the cashier (from 2026-10-20)
+
+Points marked *industry standard* follow common point-of-sale practice; each company sets them in its settings.
+
+| # | Decision |
+|---|---|
+| C-1 | **Settings → Payments:** the methods the company accepts: cash, Zelle, cheque, bank transfer, and up to three others it names (MonCash, Natcash...). Each on or off. Zelle: the QR picture (PNG or JPEG), the Zelle tag, the email or phone, the name shown, the terms in EN/FR/ES. Card comes with Stripe (step 4). |
+| C-2 | **The cashier** (`/staff/cashier`, new right *take payments*, per warehouse): find by phone, email, customer code, or by invoice, shipment or order number; the customer's invoices to pay at that warehouse; **Pay**. |
+| C-3 | **Paid in full** (F-4): one or more tenders whose total is exactly what is owed; overpaying is refused. Cash: the amount handed over and the change, worked out on screen. Cheque and transfer: their reference. Each payment is numbered (PAY, Settings → Numbering) and prints a receipt in the customer's language. |
+| C-4 | **Cash drawer** (*industry standard*): a cashier opens their drawer at a warehouse with a starting float; cash is taken only into an open drawer; closing it, the cashier counts and the difference (over or short) is recorded with a note. The drawer's report: float, cash in, change out, expected, counted, difference. |
+| C-5 | **Zelle** (P-9 to P-11): the cashier records *the customer says it is sent* with the confirmation number when shown, after the customer accepted the Zelle terms (the cashier ticks that the customer accepted them; on the customer screen in step 3 the customer does). The invoice is then **awaiting confirmation**. |
+| C-6 | **To verify** (`/staff/cashier/verify`, new right *confirm payments*, per warehouse): Zelle and bank transfers waiting; *received* (with the bank reference) settles them; *not received* takes the payment back, the invoice is owed again and the customer is told by email. Who and when are kept. |
+| C-7 | **Where an invoice stands:** to pay, awaiting confirmation, paid. **A final shipment is released only when its invoice is paid** (F-3); the shipments desk and the counter show *unpaid*, *awaiting confirmation* or *paid*. Holding bundles and dispatch uses this when they are built. |
+| C-8 | **Refunds** (F-7) come with credit notes: an approved credit note on a paid invoice is refunded in cash from a drawer, or recorded for Zelle or transfer, by a person with the right *refund payments*, with a reason. |
+| C-9 | **A void of a paid invoice** is refused (F-6): a credit note and a refund instead. |
+
+Step 2b, credit accounts (F-10), follows: the credit department's accounts (limit, terms, statements), *Bill my account*, and paying the account at the cashier.
+
+## 6. Steps
 
 | Step | Content |
 |---|---|
 | 1 | The invoice from a final shipment and from a supplies order; numbers, taxes, PDF in the customer's language; corrections |
 | 2 | The cashier: find, pay (cash with drawers, Zelle and other recorded methods), receipts; the payment settings; *Zelle to verify*; release on payment |
+| 2b | Credit accounts: the credit department's accounts, limits and terms, *Bill my account*, statements, paying the account |
 | 3 | The customer screen: pairing, the summary, methods, Zelle steps, insurance acceptance and signature |
 | 4 | The first card provider (terminal and payment page) |
 
-## 6. Not in this slice
+## 7. Not in this slice
 
 Payments on the customer portal (later) and reports. Credit accounts: see F-10.

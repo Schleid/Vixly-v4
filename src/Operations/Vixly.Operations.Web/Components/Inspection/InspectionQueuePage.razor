@@ -1,35 +1,17 @@
-﻿@*
-=========================================================
-FILE: InspectionQueuePage.razor
-
-PURPOSE:
-The inspection queue of the warehouses the person covers, oldest first (Slice 3C design section 5).
-
-RESPONSIBILITIES:
-- List parcels waiting for compliance inspection, with why each was chosen
-- Scanning an ID label opens the parcel
-
-IMPORTANT NOTES:
-- Markup only. Text comes from OperationsText (L-10)
-- Scoped by place (ops.inspection.perform per warehouse)
-=========================================================
-*@
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.inspection.queue.title"]" Company="@Company" Section="inspection_queue" Error="@Error" Info="@Info">
-    <form method="get" action="/staff/inspection/queue" class="ops-editor__inline ops-editor__search">
+    <form method="get" action="/staff/inspection/queue" class="ops-list-bar">
         <input name="code" placeholder="@T["ui.inspection.scan"]" aria-label="@T["ui.inspection.scan"]" maxlength="60" autocomplete="off" autocapitalize="characters" spellcheck="false" autofocus />
         @if (Warehouses.Count > 1)
         {
             <select name="warehouse" aria-label="@T["ui.receiving.warehouse"]">
                 <option value="">@T["ui.parcels.all_warehouses"]</option>
-                @foreach (OperationsWarehouse warehouse in Warehouses)
-                {
-                    <option value="@warehouse.Id" selected="@(warehouse.Id == WarehouseId)">@warehouse.Code</option>
-                }
+                @foreach (OperationsWarehouse wh in Warehouses) { <option value="@wh.Id" selected="@(wh.Id == WarehouseId)">@wh.Code</option> }
             </select>
         }
-        <button type="submit" class="vx-button vx-button--secondary">@T["ui.inspection.find"]</button>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.inspection.find"]</button>
+        <a href="/staff/inspection/queue" class="vx-button vx-button--subtle">@T["ui.receiving.clear"]</a>
     </form>
     <section class="ops-editor__panel">
         @if (Items.Count == 0)
@@ -49,40 +31,34 @@ IMPORTANT NOTES:
                                 <td class="ops-editor__code">@(item.Parcel.CustomerCode ?? T["ui.hold.Unidentified"])</td>
                                 <td>@(item.Parcel.DeclaredContents ?? T["ui.parcels.not_declared"].Value)</td>
                                 <td>@OperationsInspectionWords.Why(T, item.Inspection.Why, item.Inspection.Reason)</td>
-                                <td>@T["ui.inspection.status." + item.Inspection.Status]</td>
-                                <td>@item.Inspection.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td><span class="ops-ticket-status" data-status="@item.Inspection.Status">@T["ui.inspection.status." + item.Inspection.Status]</span></td>
+                                <td class="ops-editor__numeric">@item.Inspection.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </OperationsTableViewport>
+            @if (TotalCount > PageSize)
+            {
+                <nav class="ops-list-pager" aria-label="@T["ui.customers.pages"]">
+                    @if (Page > 1) { <a href="@PageLink(Page - 1)" class="ops-list-pager__link">@T["ui.customers.previous"]</a> }
+                    <span class="ops-list-pager__info">@Page / @((TotalCount + PageSize - 1) / PageSize)</span>
+                    @if (Page * PageSize < TotalCount) { <a href="@PageLink(Page + 1)" class="ops-list-pager__link">@T["ui.customers.next"]</a> }
+                </nav>
+            }
         }
-        <p class="ops-editor__list-footer">@VixlyText.Format(T, "ui.inspection.queue.count", "count", TotalCount)</p>
-        <nav class="ops-editor__inline" aria-label="@T["ui.customers.pages"]">
-            @if (Page > 1) { <a href="@PageLink(Page - 1)">@T["ui.customers.previous"]</a> }
-            @if (Page * PageSize < TotalCount) { <a href="@PageLink(Page + 1)">@T["ui.customers.next"]</a> }
-        </nav>
     </section>
 </EditorShell>
 
 @code {
     public const int PageSize = 25;
-
-    private string PageLink(int page) => "/staff/inspection/queue?page=" + page + (WarehouseId is { } warehouse ? "&warehouse=" + warehouse : null);
-
+    private string PageLink(int page) => "/staff/inspection/queue?page=" + page + (WarehouseId is { } wh ? "&warehouse=" + wh : null);
     [Parameter] public string? Company { get; set; }
-
     [Parameter] public IReadOnlyList<OperationsInspectionQueueItem> Items { get; set; } = Array.Empty<OperationsInspectionQueueItem>();
-
     [Parameter] public int TotalCount { get; set; }
-
     [Parameter] public int Page { get; set; } = 1;
-
     [Parameter] public Guid? WarehouseId { get; set; }
-
     [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
-
     [Parameter] public string? Error { get; set; }
-
     [Parameter] public string? Info { get; set; }
 }

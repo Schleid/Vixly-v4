@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    FILE: vixly-primitives.css
    PURPOSE: Styles for the parts of the Vixly.Shared.UI
    primitives that no stylesheet covered yet (card header and
@@ -19,29 +19,62 @@
     justify-content: center;
     gap: var(--vx-space-2);
     box-sizing: border-box;
-    min-height: var(--vx-control-min);
-    padding: var(--vx-space-3) var(--vx-space-5);
+    height: 32px;
+    min-height: 32px;
+    padding: 0 0.85rem;
+    font-size: 0.8125rem;
     border: var(--vx-border-width) solid var(--vx-color-border-control);
     border-radius: var(--vx-radius-sm);
     background: var(--vx-color-surface);
     color: var(--vx-color-text);
     font: inherit;
     font-weight: 600;
-    line-height: 1.4;
+    line-height: 1;
+    vertical-align: middle;
     text-align: center;
     text-decoration: none;
     cursor: pointer;
     transition: background var(--vx-transition-fast), border-color var(--vx-transition-fast);
 }
 :where(.vx-button:hover:not(:disabled)) { background: var(--vx-color-surface-sunken); }
-.vx-button--primary { background: var(--vx-color-link); border-color: var(--vx-color-link); color: var(--vx-color-surface); }
-.vx-button--primary:hover:not(:disabled) { background: var(--vx-color-link); border-color: var(--vx-color-text-muted); }
+.vx-button--primary { background: var(--vx-color-link); border-color: var(--vx-color-link); color: #ffffff !important; }
+.vx-button--primary:hover:not(:disabled) { background: var(--vx-color-primary-hover, #1d4ed8); border-color: var(--vx-color-primary-hover, #1d4ed8); color: #ffffff !important; }
+.vx-button--secondary { background: var(--vx-color-surface-sunken); border-color: var(--vx-color-border-control); color: var(--vx-color-text); }
+.vx-button--secondary:hover:not(:disabled) { background: var(--vx-color-surface); border-color: var(--vx-color-primary); color: var(--vx-color-text); }
+.vx-button--danger { background: var(--vx-color-danger-bg); border-color: var(--vx-color-danger); color: var(--vx-color-danger); }
+.vx-button--danger:hover:not(:disabled) { background: var(--vx-color-danger); border-color: var(--vx-color-danger); color: #ffffff !important; }
+
 :where(.vx-button:focus-visible) { outline: var(--vx-focus-width) solid var(--vx-color-focus); outline-offset: var(--vx-space-1); }
 :where(.vx-button:disabled) { cursor: not-allowed; opacity: 0.6; }
+/* Button Density Variants */
+/* Comfortable density variant (sign-in, customer portal per Brief §4) */
+.vx-button--comfortable,
+[data-density="comfortable"] .vx-button,
+body.customer-portal .vx-button,
+.vx-auth__terminal .vx-button {
+    height: 40px;
+    min-height: 40px;
+    padding: 0 1.25rem;
+    font-size: 0.875rem;
+}
+
+/* Compact table row button (36px row per Brief §4) */
+.vx-button--sm,
+.ops-editor__table .vx-button,
+.vx-table .vx-button {
+    height: 28px;
+    min-height: 28px;
+    padding: 0 0.55rem;
+    font-size: 0.75rem;
+    line-height: 1;
+}
 :where(.vx-card) { background: var(--vx-color-surface); border: var(--vx-border-width) solid var(--vx-color-border); border-radius: var(--vx-radius-lg); box-shadow: var(--vx-shadow-1); }
 :where(.vx-message) { padding: var(--vx-space-4); border: var(--vx-border-width) solid var(--vx-color-info); border-radius: var(--vx-radius-md); background: var(--vx-color-info-bg); color: var(--vx-color-info); }
 :where(.vx-message--error) { background: var(--vx-color-danger-bg); border-color: var(--vx-color-danger); color: var(--vx-color-danger); }
-.vx-input { box-sizing: border-box; width: 100%; min-width: 0; min-height: var(--vx-control-min); }
+.vx-input { box-sizing: border-box; width: 100%; min-width: 0; height: 32px; min-height: 32px; padding: 0.25rem 0.5rem; font-size: 0.8125rem; border: 1px solid var(--vx-color-border-control); border-radius: var(--vx-radius-sm); background: var(--vx-color-surface); color: var(--vx-color-text); }
+[data-density="comfortable"] .vx-input,
+body.customer-portal .vx-input,
+.vx-auth__terminal .vx-input { height: 40px; min-height: 40px; font-size: 0.875rem; }
 textarea.vx-input { resize: vertical; }
 
 /* ---------- Button ---------- */
