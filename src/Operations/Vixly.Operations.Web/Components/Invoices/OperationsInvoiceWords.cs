@@ -31,12 +31,12 @@ public static class OperationsInvoiceWords
             : (line.Label ?? string.Empty) + (line.Code is { } code ? " (" + code + ")" : string.Empty);
     }
 
-    // To pay, paid, credited, voided: the key of its state.
-    public static string State(bool voided, decimal owed, decimal credited) =>
-        voided ? "voided" : owed <= 0m && credited > 0m ? "credited" : owed <= 0m ? "settled" : credited > 0m ? "part_credited" : "to_pay";
+    // To pay, awaiting confirmation, paid, credited, voided: the key of its state (review of 5F: a pending Zelle is never "settled").
+    public static string State(bool voided, decimal owed, decimal credited, decimal pending) =>
+        voided ? "voided" : owed > 0m ? (credited > 0m ? "part_credited" : "to_pay") : pending > 0m ? "awaiting" : credited > 0m ? "credited" : "settled";
 
     public static string State(OperationsInvoice invoice) =>
-        State((invoice ?? throw new ArgumentNullException(nameof(invoice))).Status == OperationsInvoiceStatus.Voided, invoice.Owed, invoice.CreditedTotal);
+        State((invoice ?? throw new ArgumentNullException(nameof(invoice))).Status == OperationsInvoiceStatus.Voided, invoice.Owed, invoice.CreditedTotal, invoice.PendingTotal);
 
     public static string Money(decimal amount, string currency) => OperationsChargeWords.Money(amount, currency);
 

@@ -154,6 +154,41 @@ public sealed class OperationsDbContext : DbContext, IDataProtectionKeyContext
 
     public DbSet<Vixly.Operations.Domain.Billing.OperationsCreditNote> CreditNotes => Set<Vixly.Operations.Domain.Billing.OperationsCreditNote>();
 
+    // Slice 5F step 2: payments, cash drawers and refunds.
+    public DbSet<Vixly.Operations.Domain.Billing.OperationsPayment> Payments => Set<Vixly.Operations.Domain.Billing.OperationsPayment>();
+
+    public DbSet<Vixly.Operations.Domain.Billing.OperationsCashDrawer> CashDrawers => Set<Vixly.Operations.Domain.Billing.OperationsCashDrawer>();
+
+    public DbSet<Vixly.Operations.Domain.Billing.OperationsRefund> Refunds => Set<Vixly.Operations.Domain.Billing.OperationsRefund>();
+
+    // Slice 5F step 2b: customers' credit accounts.
+    public DbSet<Vixly.Operations.Domain.Billing.OperationsCreditAccount> CreditAccounts => Set<Vixly.Operations.Domain.Billing.OperationsCreditAccount>();
+
+    // Slice 6A: bundles and repack boxes.
+    public DbSet<Vixly.Operations.Domain.Bundles.OperationsBundle> Bundles => Set<Vixly.Operations.Domain.Bundles.OperationsBundle>();
+
+    public DbSet<Vixly.Operations.Domain.Bundles.OperationsRepackBox> RepackBoxes => Set<Vixly.Operations.Domain.Bundles.OperationsRepackBox>();
+
+    // Slice 6B: carriers, their rates and dispatches.
+    public DbSet<Vixly.Operations.Domain.Dispatch.OperationsCarrier> Carriers => Set<Vixly.Operations.Domain.Dispatch.OperationsCarrier>();
+
+    public DbSet<Vixly.Operations.Domain.Dispatch.OperationsCarrierRate> CarrierRates => Set<Vixly.Operations.Domain.Dispatch.OperationsCarrierRate>();
+
+    public DbSet<Vixly.Operations.Domain.Dispatch.OperationsDispatch> Dispatches => Set<Vixly.Operations.Domain.Dispatch.OperationsDispatch>();
+
+    public DbSet<Vixly.Operations.Domain.Dispatch.OperationsDispatchBundle> DispatchBundles => Set<Vixly.Operations.Domain.Dispatch.OperationsDispatchBundle>();
+
+    // Slice 7 step 2: releases at the pickup counter.
+    public DbSet<Vixly.Operations.Domain.Pickup.OperationsPickupRelease> PickupReleases => Set<Vixly.Operations.Domain.Pickup.OperationsPickupRelease>();
+
+    // Slice 7: what did not match at a destination.
+    public DbSet<Vixly.Operations.Domain.Arrivals.OperationsArrivalDiscrepancy> ArrivalDiscrepancies => Set<Vixly.Operations.Domain.Arrivals.OperationsArrivalDiscrepancy>();
+
+    public DbSet<Vixly.Operations.Domain.Dispatch.OperationsDispatchShipment> DispatchShipments => Set<Vixly.Operations.Domain.Dispatch.OperationsDispatchShipment>();
+
+    // Slice 6C: the company's own causes of delays and exceptions.
+    public DbSet<Vixly.Operations.Domain.Events.OperationsEventReason> EventReasons => Set<Vixly.Operations.Domain.Events.OperationsEventReason>();
+
     // Slice 4D step 3: the counts of the undeclared parcels area.
     public DbSet<Vixly.Operations.Domain.Holds.OperationsStockCount> StockCounts => Set<Vixly.Operations.Domain.Holds.OperationsStockCount>();
 

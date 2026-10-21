@@ -165,11 +165,18 @@ public sealed class OperationsCustomerAccounts
         return true;
     }
 
-    public async Task SendAsync(OperationsCustomer customer, OperationsCustomerMailKind kind, string link, CancellationToken cancellationToken)
+    public Task SendAsync(OperationsCustomer customer, OperationsCustomerMailKind kind, string link, CancellationToken cancellationToken) =>
+        SendAsync(customer, kind, link, new Dictionary<string, string>(StringComparer.Ordinal), new Dictionary<string, string>(StringComparer.Ordinal), cancellationToken);
+
+    public async Task SendAsync(OperationsCustomer customer, OperationsCustomerMailKind kind, string link, IReadOnlyDictionary<string, string> extra, IReadOnlyDictionary<string, string> worded,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(customer);
+        ArgumentNullException.ThrowIfNull(extra);
+        ArgumentNullException.ThrowIfNull(worded);
         string company = (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty;
-        await _mailer.SendAsync(new OperationsCustomerMail(kind, customer.Email.Value, customer.FullName, customer.PreferredLanguage, company, link), cancellationToken);
+        await _mailer.SendAsync(new OperationsCustomerMail(kind, customer.Email.Value, customer.FullName, customer.PreferredLanguage, company, link) { Extra = extra, Worded = worded },
+            cancellationToken);
     }
 
     public string SignInLink(string portalSlug) => _links.Page(portalSlug, "/customer/sign-in");

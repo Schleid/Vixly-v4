@@ -1,0 +1,55 @@
+﻿@*
+=========================================================
+FILE: ZelleTermsPanel.razor
+
+PURPOSE:
+Zelle at the cashier (Slice 5F, P-9 and C-5): a strong warning and the company's terms, the customer's acceptance, then the details to pay with.
+
+RESPONSIBILITIES:
+- Show the warning and the terms in the customer's language
+- The acceptance box
+- The QR code, Zelle tag, email or phone, name, the exact amount and the number to write in the memo
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The invoice waits for finance until the money is seen in the bank
+=========================================================
+*@
+<fieldset class="ops-cashier__zelle" data-zelle>
+    <legend>@T["ui.payments.method.Zelle"]</legend>
+    <p class="ops-editor__notice ops-cashier__warning" role="alert">@VixlyText.Format(T, "ui.cashier.zelle_warning", "memo", Invoice.Reference)</p>
+    @if (Settings.ZelleTerms(Invoice.Language) is { } terms)
+    {
+        <blockquote class="ops-cashier__terms" lang="@Invoice.Language">@terms</blockquote>
+    }
+    <label><input type="checkbox" name="zelleTerms" value="true" /> @T["ui.cashier.zelle_accepted"]</label>
+    <dl class="ops-cashier__zelle-details">
+        @if (HasQr)
+        {
+            <div><dt>@T["ui.cashier.zelle_qr"]</dt><dd><img src="/staff/settings/payments/zelle-qr" alt="@T["ui.cashier.zelle_qr"]" width="200" height="200" /></dd></div>
+        }
+        @if (Settings.ZelleTag is { } tag)
+        {
+            <div><dt>@T["ui.cashier.zelle_tag"]</dt><dd><strong>@tag</strong></dd></div>
+        }
+        @if (Settings.ZelleContact is { } contact)
+        {
+            <div><dt>@T["ui.cashier.zelle_contact"]</dt><dd><strong>@contact</strong></dd></div>
+        }
+        @if (Settings.ZelleName is { } name)
+        {
+            <div><dt>@T["ui.cashier.zelle_name"]</dt><dd>@name</dd></div>
+        }
+        <div><dt>@T["ui.cashier.zelle_memo"]</dt><dd><strong class="ops-cashier__memo">@Invoice.Reference</strong></dd></div>
+    </dl>
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsTenantSettings Settings { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsInvoice Invoice { get; set; } = null!;
+
+    [Parameter] public bool HasQr { get; set; }
+}

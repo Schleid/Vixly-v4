@@ -60,9 +60,10 @@ public static class OperationsInvoiceEndpoints
             IStringLocalizer<OperationsText> text) =>
             await RequestsAsync(http, null, Done(done, text), list, brand, errors));
 
-        staff.MapGet("/invoices/{invoiceId:guid}", async (HttpContext http, Guid invoiceId, string? done, GetOperationsInvoiceUseCase get, GetOperationsSignInBrandUseCase brand,
+        staff.MapGet("/invoices/{invoiceId:guid}", async (HttpContext http, Guid invoiceId, string? done, string? why, GetOperationsInvoiceUseCase get, GetOperationsSignInBrandUseCase brand,
             OperationsErrorText errors, IStringLocalizer<OperationsText> text) =>
-            await InvoiceAsync(http, invoiceId, null, Done(done, text), get, brand, errors));
+            await InvoiceAsync(http, invoiceId, done == "refund_refused" && why is { Length: > 0 and <= 80 } && why.StartsWith("ops.", StringComparison.Ordinal) ? Error.Create(why) : null,
+                Done(done, text), get, brand, errors));
 
         staff.MapGet("/invoices/{invoiceId:guid}/pdf", async (HttpContext http, Guid invoiceId, Guid? credit, GetOperationsInvoiceDocumentUseCase document) =>
         {
@@ -158,7 +159,8 @@ public static class OperationsInvoiceEndpoints
     private static decimal Percent(string? typed) =>
         string.IsNullOrWhiteSpace(typed) ? 0m : Vixly.Operations.Application.Charges.OperationsPriceText.Number(typed.Trim().Replace(',', '.')) ?? -1m;
 
-    private static string? Done(string? done, IStringLocalizer<OperationsText> text) => done is "requested" or "approved" or "refused" ? text["ui.invoices.done." + done].Value : null;
+    private static string? Done(string? done, IStringLocalizer<OperationsText> text) =>
+        done is "requested" or "approved" or "refused" or "refunded" ? text["ui.invoices.done." + done].Value : null;
 
     private static async Task<IResult> InvoiceAsync(HttpContext http, Guid invoiceId, Error? error, string? info, GetOperationsInvoiceUseCase get, GetOperationsSignInBrandUseCase brand,
         OperationsErrorText errors)
@@ -173,6 +175,12 @@ public static class OperationsInvoiceEndpoints
             CanRequest = response.CanRequest,
             CanApprove = response.CanApprove,
             UserId = response.UserId,
+            Payments = response.Payments,
+            Refunds = response.Refunds,
+            CanTake = response.CanTake,
+            CanRefund = response.CanRefund,
+            OtherNames = response.OtherNames,
+            Methods = response.Methods,
             Error = errors.Describe(error ?? response.Error),
             Info = info
         });

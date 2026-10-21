@@ -48,6 +48,12 @@ internal sealed class OperationsShipmentConfiguration : IEntityTypeConfiguration
         // Slice 5D: the customer's signature, kept in the file store.
         builder.Property(item => item.CustomerSignatureKey).HasMaxLength(200).IsUnicode(false);
 
+        // Slice 7 step 2: who may collect, the pickup code's hash.
+        builder.Property(item => item.CollectorName).HasMaxLength(OperationsShipmentInstructions.RecipientMaxLength);
+        builder.Property(item => item.CollectorPhone).HasMaxLength(OperationsShipmentInstructions.PhoneMaxLength).IsUnicode(false);
+        builder.Property(item => item.PickupCodeProtected).HasMaxLength(1000).IsUnicode(false);
+        builder.HasIndex(item => new { item.TenantId, item.PickupRemindersSent, item.PickupReadyUtc }).HasFilter("[PickupReadyUtc] IS NOT NULL AND [PickedUpUtc] IS NULL");
+
         // Slice 5D: the insurance product chosen; a product in use is never deleted.
         builder.HasOne<Vixly.Operations.Domain.Charges.OperationsInsurancePlan>().WithMany().HasForeignKey(item => item.InsurancePlanId).OnDelete(DeleteBehavior.Restrict);
         builder.OwnsOne(item => item.DeliveryAddress, address =>

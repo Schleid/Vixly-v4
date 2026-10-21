@@ -34,6 +34,26 @@ public static class OperationsTimeZones
         return DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(utcNow, zone).DateTime);
     }
 
+    // Slice 6B: a clock time where the company works, as a moment (an invalid local time moves forward with the clock).
+    public static DateTimeOffset At(DateTime local, string? timeZone)
+    {
+        TimeZoneInfo zone = timeZone is not null && TimeZoneInfo.TryFindSystemTimeZoneById(timeZone, out TimeZoneInfo? found) ? found : TimeZoneInfo.Utc;
+        DateTime unspecified = DateTime.SpecifyKind(local, DateTimeKind.Unspecified);
+
+        if (zone.IsInvalidTime(unspecified))
+        {
+            unspecified = unspecified.AddHours(1);
+        }
+
+        return new DateTimeOffset(unspecified, zone.GetUtcOffset(unspecified));
+    }
+
+    public static DateTime Local(DateTimeOffset moment, string? timeZone)
+    {
+        TimeZoneInfo zone = timeZone is not null && TimeZoneInfo.TryFindSystemTimeZoneById(timeZone, out TimeZoneInfo? found) ? found : TimeZoneInfo.Utc;
+        return TimeZoneInfo.ConvertTime(moment, zone).DateTime;
+    }
+
     // The start of a calendar day in a time zone, as a moment (prices start at midnight where the company works).
     public static DateTimeOffset StartOfDay(DateOnly day, string? timeZone)
     {

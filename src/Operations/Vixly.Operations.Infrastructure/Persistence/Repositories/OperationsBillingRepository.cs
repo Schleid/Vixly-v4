@@ -64,7 +64,8 @@ internal sealed class OperationsBillingRepository : IOperationsBillingRepository
 
         query = filter switch
         {
-            OperationsInvoiceFilter.Owed => query.Where(invoice => invoice.Status == OperationsInvoiceStatus.Issued && invoice.Total > invoice.CreditedTotal + invoice.PaidTotal),
+            OperationsInvoiceFilter.Owed => query.Where(invoice => invoice.Status == OperationsInvoiceStatus.Issued
+                && invoice.Total - invoice.CreditedTotal - invoice.PaidTotal - invoice.PendingTotal + invoice.RefundedTotal > 0m),
             OperationsInvoiceFilter.Credited => query.Where(invoice => invoice.CreditedTotal > 0m),
             OperationsInvoiceFilter.Voided => query.Where(invoice => invoice.Status == OperationsInvoiceStatus.Voided),
             _ => query
@@ -77,6 +78,19 @@ internal sealed class OperationsBillingRepository : IOperationsBillingRepository
         await _context.Invoices.AsNoTracking().Where(invoice => invoice.CustomerId == customerId).OrderByDescending(invoice => invoice.IssuedUtc).Take(take).ToListAsync(cancellationToken);
 
     public Task<bool> AnyInvoiceAsync(CancellationToken cancellationToken) => _context.Invoices.AnyAsync(cancellationToken);
+
+    public Task<OperationsInvoice?> FindByNumberAsync(string number, CancellationToken cancellationToken) =>
+        _context.Invoices.AsNoTracking().OrderByDescending(invoice => invoice.IssuedUtc).FirstOrDefaultAsync(invoice => invoice.Number == number || invoice.Reference == number, cancellationToken);
+
+    public async Task<IReadOnlyList<OperationsInvoice>> ListOpenInvoicesAsync(Guid customerId, IReadOnlyCollection<Guid> warehouseIds, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(warehouseIds);
+
+        return await _context.Invoices.AsNoTracking()
+            .Where(invoice => invoice.CustomerId == customerId && warehouseIds.Contains(invoice.WarehouseId) && invoice.Status == OperationsInvoiceStatus.Issued
+                && (invoice.PendingTotal > 0m || invoice.Total - invoice.CreditedTotal - invoice.PaidTotal + invoice.RefundedTotal > 0m))
+            .OrderBy(invoice => invoice.IssuedUtc).Take(100).ToListAsync(cancellationToken);
+    }
 
     public Task<OperationsCreditNote?> GetCreditNoteAsync(Guid creditNoteId, CancellationToken cancellationToken) =>
         _context.CreditNotes.FirstOrDefaultAsync(note => note.Id == creditNoteId, cancellationToken);

@@ -1,0 +1,65 @@
+﻿@*
+=========================================================
+FILE: DiscrepancyRows.razor
+
+PURPOSE:
+What did not match at a destination (Slice 7, R-2), with a resolve form on the open lines the person may settle.
+
+RESPONSIBILITIES:
+- One row per discrepancy
+- Lost or settled, with a note
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Lost tells the customer when the company sends those emails
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<OperationsTableViewport Label="@T["ui.arrivals.discrepancies"]">
+    <table class="ops-editor__table">
+        <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.arrivals.code"]</th><th scope="col">@T["ui.arrivals.kind"]</th><th scope="col">@T["ui.dispatch.number"]</th><th scope="col">@T["ui.arrivals.warehouse"]</th><th scope="col">@T["ui.arrivals.noted"]</th><th scope="col">@T["ui.dispatch.state"]</th><th scope="col">@T["ui.arrivals.resolution"]</th></tr></thead>
+        <tbody>
+            @foreach (OperationsDiscrepancyRow row in Rows)
+            {
+                <tr data-status="@row.Status">
+                    <td class="ops-editor__identity-cell ops-editor__code">@row.Code</td>
+                    <td>@T["ui.arrivals.discrepancy." + row.Kind]</td>
+                    <td>@row.DispatchNumber</td>
+                    <td>@row.WarehouseCode</td>
+                    <td>@OperationsDispatchWords.Time(row.CreatedUtc, TimeZone)</td>
+                    <td><span class="ops-editor__status" data-status="@row.Status.ToString().ToLowerInvariant()">@T["ui.arrivals.discrepancy_status." + row.Status]</span></td>
+                    <td>
+                        @if (row.CanResolve)
+                        {
+                            <form method="post" action="/staff/arrivals/discrepancies/@row.Id" class="ops-editor__form">
+                                <AntiforgeryToken />
+                                <label>@T["ui.arrivals.outcome"]
+                                    <select name="outcome">
+                                        <option value="@OperationsDiscrepancyStatus.Resolved">@T["ui.arrivals.discrepancy_status.Resolved"]</option>
+                                        @if (row.Kind is OperationsDiscrepancyKind.MissingBundle or OperationsDiscrepancyKind.MissingParcel)
+                                        {
+                                            <option value="@OperationsDiscrepancyStatus.Lost">@T["ui.arrivals.discrepancy_status.Lost"]</option>
+                                        }
+                                    </select>
+                                </label>
+                                <label>@T["ui.arrivals.note"] <input name="note" maxlength="@OperationsArrivalDiscrepancy.NoteMaxLength" required /></label>
+                                <button type="submit" class="vx-button">@T["ui.arrivals.resolve"]</button>
+                            </form>
+                        }
+                        else
+                        {
+                            @row.Note
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</OperationsTableViewport>
+
+@code {
+    [Parameter] public IReadOnlyList<OperationsDiscrepancyRow> Rows { get; set; } = Array.Empty<OperationsDiscrepancyRow>();
+
+    [Parameter] public string? TimeZone { get; set; }
+}

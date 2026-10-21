@@ -94,6 +94,26 @@ public sealed class OperationsInvoicing
             utcNow, cancellationToken);
     }
 
+    // Slice 7 step 2 (R-4, R-10): a shipment's destination charges and storage, billed at the pickup counter of the warehouse; in the shipment invoice's currency.
+    public async Task<OperationsInvoice?> IssueForDestinationAsync(OperationsShipment shipment, OperationsWarehouse warehouse, IReadOnlyList<OperationsInvoiceLine> lines, DateTimeOffset utcNow,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(shipment);
+        ArgumentNullException.ThrowIfNull(warehouse);
+        ArgumentNullException.ThrowIfNull(lines);
+
+        if (await _customers.GetAsync(shipment.CustomerId, cancellationToken) is not { } customer)
+        {
+            return null;
+        }
+
+        string currency = (await _billing.FindShipmentInvoiceAsync(shipment.Id, cancellationToken))?.CurrencyCode
+            ?? (await _settings.FindAsync(cancellationToken))?.CurrencyCode ?? OperationsTenantSettings.DefaultCurrency;
+        OperationsWarehouse? origin = await _locations.GetWarehouseAsync(shipment.OriginWarehouseId, cancellationToken);
+        return await IssueAsync(OperationsInvoiceKind.Destination, customer, warehouse, shipment.Id, null, shipment.Number ?? string.Empty, (origin?.Name ?? string.Empty) + " → " + warehouse.Name,
+            shipment.ServiceCode, currency, lines, utcNow, cancellationToken);
+    }
+
     // An order of supplies on its own was confirmed: its own invoice (F-1).
     public async Task<OperationsInvoice?> IssueForOrderAsync(OperationsSupplySale sale, DateTimeOffset utcNow, CancellationToken cancellationToken)
     {

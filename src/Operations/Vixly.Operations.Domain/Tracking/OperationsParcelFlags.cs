@@ -23,5 +23,8 @@ public enum OperationsParcelFlags
     InspectionInProgress = 16,
 
     // Received at the dock, not yet checked (condition, weight, size, photos) at the inspection station (Slice 3B).
-    AwaitingCheck = 32
+    AwaitingCheck = 32,
+
+    // Slice 7 (R-3): held by customs at the destination; released by clearance.
+    CustomsHeld = 64
 }

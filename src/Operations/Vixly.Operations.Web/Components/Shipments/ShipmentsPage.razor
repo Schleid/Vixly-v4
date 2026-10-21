@@ -67,7 +67,7 @@ IMPORTANT NOTES:
                         @foreach (OperationsShipmentRow row in Rows)
                         {
                             <tr>
-                                <td><a href="/staff/shipments/@row.ShipmentId">@(row.Number ?? T["ui.shipments_desk.not_numbered"].Value)</a>@(row.Status == OperationsShipmentStatus.Cancelled ? " · " + T["ui.shipments_desk.view.cancelled"].Value : null)</td>
+                                <td><a href="/staff/shipments/@row.ShipmentId">@(row.Number ?? T["ui.shipments_desk.not_numbered"].Value)</a>@(row.Status == OperationsShipmentStatus.Cancelled ? " · " + T["ui.shipments_desk.view.cancelled"].Value : null)@if (Payments.TryGetValue(row.ShipmentId, out Vixly.Operations.Domain.Billing.OperationsPaymentState paid)) { <span class="ops-editor__status" data-status="@Vixly.Operations.Web.Components.Cashier.OperationsPaymentWords.State(paid)"> @T["ui.payments.state." + Vixly.Operations.Web.Components.Cashier.OperationsPaymentWords.State(paid)]</span> }</td>
                                 <td>@(Warehouses.FirstOrDefault(warehouse => warehouse.Id == row.OriginWarehouseId)?.Code)</td>
                                 <td>@row.CustomerCode</td>
                                 <td>@(row.CountryCode is null ? T["ui.shipments_desk.waiting_short"].Value : string.Join(", ", new[] { row.City, row.CountryCode }.Where(part => part is not null)) + " · " + row.RecipientName)</td>
@@ -92,6 +92,10 @@ IMPORTANT NOTES:
     [Parameter] public string? Company { get; set; }
 
     [Parameter] public IReadOnlyList<OperationsShipmentRow> Rows { get; set; } = Array.Empty<OperationsShipmentRow>();
+
+    // Slice 5F (C-7): paid, awaiting confirmation or unpaid, for final shipments with an invoice.
+    [Parameter] public IReadOnlyDictionary<Guid, Vixly.Operations.Domain.Billing.OperationsPaymentState> Payments { get; set; } =
+        new Dictionary<Guid, Vixly.Operations.Domain.Billing.OperationsPaymentState>();
 
     [Parameter] public int TotalCount { get; set; }
 

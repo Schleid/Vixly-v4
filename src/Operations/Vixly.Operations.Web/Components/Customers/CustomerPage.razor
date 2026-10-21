@@ -60,14 +60,11 @@ IMPORTANT NOTES:
     }
     @if (CanSetCredit)
     {
-        <form method="post" action="/staff/customers/@Customer.CustomerId/credit" class="ops-editor__panel ops-panel--restricted">
-            <AntiforgeryToken />
+        <section class="ops-editor__panel ops-panel--restricted">
             <h2>@T["ui.customers.credit"]</h2>
-            <p>@T["ui.customers.credit_hint"]</p>
-            <input type="hidden" name="allowed" value="@(Customer.CreditAllowed ? "false" : "true")" />
-            <label>@T["ui.customers.reason"] <input name="reason" maxlength="300" required /></label>
-            <button type="submit" class="vx-button vx-button--secondary">@(Customer.CreditAllowed ? T["ui.customers.credit_remove"] : T["ui.customers.credit_allow"])</button>
-        </form>
+            <p>@T["ui.customers.credit_account_hint"]</p>
+            <a class="vx-button vx-button--secondary" href="/staff/credit/customers/@Customer.CustomerId">@T["ui.customers.credit_account"]</a>
+        </section>
     }
     </div>
 </EditorShell>

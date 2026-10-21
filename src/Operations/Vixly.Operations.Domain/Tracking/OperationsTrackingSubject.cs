@@ -18,5 +18,8 @@ public enum OperationsTrackingSubject
     PreAlert = 2,
     Receipt = 3,
     Bundle = 4,
-    Dispatch = 5
+    Dispatch = 5,
+
+    // Slice 6C: a customer shipment (manual events).
+    Shipment = 6
 }

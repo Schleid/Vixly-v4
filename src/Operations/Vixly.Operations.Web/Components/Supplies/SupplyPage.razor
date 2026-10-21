@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: SupplyPage.razor
 
@@ -26,7 +26,12 @@ IMPORTANT NOTES:
         <form method="post" action="/staff/supplies/@supply.Id" class="ops-editor__form">
             <AntiforgeryToken />
             <SupplyDetailsFields T="T" Form="Details" />
-            <label><input type="checkbox" name="active" value="true" checked="@Details.Active" /> @T["ui.charges.in_use"]</label>
+            <div class="ops-checkbox-group" style="margin: 0.75rem 0;">
+                <label class="ops-checkbox-label">
+                    <input type="checkbox" name="active" value="true" checked="@Details.Active" />
+                    <span>@T["ui.charges.in_use"]</span>
+                </label>
+            </div>
             <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
         </form>
     </section>

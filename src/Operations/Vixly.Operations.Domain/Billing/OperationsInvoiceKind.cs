@@ -18,5 +18,8 @@ public enum OperationsInvoiceKind
     Shipment = 1,
 
     // An order of supplies on its own.
-    SupplyOrder = 2
+    SupplyOrder = 2,
+
+    // Slice 7 step 2 (R-4, R-10): a shipment's destination charges and storage, billed at the pickup counter.
+    Destination = 3
 }

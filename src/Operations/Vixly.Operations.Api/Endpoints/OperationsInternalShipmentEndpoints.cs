@@ -100,6 +100,18 @@ public static class OperationsInternalShipmentEndpoints
             return response.Succeeded ? Results.NoContent() : OperationsApiErrors.Problem(http, response.Error!);
         });
 
+        // Slice 7 step 2 (R-6): who may collect the customer's booked shipment.
+        shipments.MapPut("/{shipmentId:guid}/collector", async (HttpContext http, Guid shipmentId, CustomerCollectorBody body,
+            Vixly.Operations.Application.UseCases.Pickup.ChangeMyOperationsCollector.ChangeMyOperationsCollectorUseCase useCase, CancellationToken cancellationToken) =>
+        {
+            Vixly.Operations.Application.UseCases.Pickup.ChangeMyOperationsCollector.ChangeMyOperationsCollectorResponse response = await useCase.ExecuteAsync(
+                OperationsInternalPackageEndpoints.Context(http), new Vixly.Operations.Application.UseCases.Pickup.ChangeMyOperationsCollector.ChangeMyOperationsCollectorRequest
+                {
+                    SessionToken = OperationsInternalPackageEndpoints.Session(http), ShipmentId = shipmentId, Name = body?.Name, Phone = body?.Phone
+                }, cancellationToken);
+            return response.Succeeded ? Results.NoContent() : OperationsApiErrors.Problem(http, response.Error!);
+        });
+
         shipments.MapDelete("/{shipmentId:guid}", async (HttpContext http, Guid shipmentId, CancelMyOperationsShipmentUseCase useCase, CancellationToken cancellationToken) =>
         {
             CancelMyOperationsShipmentResponse response = await useCase.ExecuteAsync(OperationsInternalPackageEndpoints.Context(http),

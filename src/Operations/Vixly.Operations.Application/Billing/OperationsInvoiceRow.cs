@@ -26,4 +26,5 @@ public sealed record OperationsInvoiceRow(
     decimal Credited,
     decimal Owed,
     bool Voided,
-    string WarehouseCode);
+    string WarehouseCode,
+    decimal Pending = 0m);

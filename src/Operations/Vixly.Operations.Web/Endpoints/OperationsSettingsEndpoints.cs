@@ -45,7 +45,7 @@ public static class OperationsSettingsEndpoints
         staff.MapPost("/settings", async (HttpContext http, [FromForm] string? currencyCode, [FromForm] string? weightUnit, [FromForm] string? dimensionUnit,
             [FromForm] bool? allowCollect, [FromForm] bool? allowCredit, [FromForm] bool? pickup, [FromForm] bool? homeDelivery, [FromForm] bool? requireSecondFactor,
             [FromForm] string? shipmentPrefix, [FromForm] string? receivingPrefix, [FromForm] string? invoicePrefix, [FromForm] string? paymentPrefix, [FromForm] string? customerPrefix, [FromForm] string? parcelPrefix, [FromForm] string? supplyOrderPrefix,
-            [FromForm] string? creditNotePrefix,
+            [FromForm] string? creditNotePrefix, [FromForm] string? bundlePrefix, [FromForm] string? boxPrefix, [FromForm] string? dispatchPrefix,
             [FromForm] string? timeZone, UpdateOperationsTenantSettingsUseCase update, GetOperationsTenantSettingsUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
         {
             UpdateOperationsTenantSettingsResponse response = await update.ExecuteAsync(OperationsCurrentUser.Context(http), new UpdateOperationsTenantSettingsRequest
@@ -65,6 +65,9 @@ public static class OperationsSettingsEndpoints
                 ParcelPrefix = parcelPrefix,
                 SupplyOrderPrefix = supplyOrderPrefix,
                 CreditNotePrefix = creditNotePrefix,
+                BundlePrefix = bundlePrefix,
+                BoxPrefix = boxPrefix,
+                DispatchPrefix = dispatchPrefix,
                 TimeZone = timeZone ?? string.Empty
             }, http.RequestAborted);
 

@@ -43,6 +43,12 @@ public interface IOperationsBillingRepository
 
     Task<bool> AnyInvoiceAsync(CancellationToken cancellationToken);
 
+    // Slice 5F step 2: read only, an invoice by its number or its shipment's or order's number.
+    Task<Domain.Billing.OperationsInvoice?> FindByNumberAsync(string number, CancellationToken cancellationToken);
+
+    // Read only, oldest first: a customer's invoices still to pay or waiting for finance, in these warehouses.
+    Task<IReadOnlyList<Domain.Billing.OperationsInvoice>> ListOpenInvoicesAsync(Guid customerId, IReadOnlyCollection<Guid> warehouseIds, CancellationToken cancellationToken);
+
     // Tracked.
     Task<OperationsCreditNote?> GetCreditNoteAsync(Guid creditNoteId, CancellationToken cancellationToken);
 

@@ -80,7 +80,23 @@ public static class CustomerShipmentEndpoints
         }).RequireRateLimiting(CustomerRateLimits.Estimate);
 
         portal.MapGet("/{shipmentId:guid}", async (HttpContext http, Guid shipmentId, string? done, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
-            await ShipmentAsync(http, api, text, shipmentId, null, null, done is "created" or "matched" or "added" or "changed" or "moved" ? text["ui.shipments.done." + done].Value : null));
+            await ShipmentAsync(http, api, text, shipmentId, null, null, done is "created" or "matched" or "added" or "changed" or "moved" or "collector" ? text["ui.shipments.done." + done].Value : null));
+
+        // Slice 7 step 2 (R-6): the person the customer names to collect it, or none.
+        portal.MapPost("/{shipmentId:guid}/collector", async (HttpContext http, Guid shipmentId, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
+        {
+            if (Signed(http) is not { } signedIn)
+            {
+                return Results.Redirect("/customer/sign-in");
+            }
+
+            IFormCollection form = await http.Request.ReadFormAsync(http.RequestAborted);
+            CustomerCall<object> call = await api.ChangeCollectorAsync(signedIn.Tenant, signedIn.Session, shipmentId,
+                new CustomerCollectorBody(form["collectorName"].ToString(), form["collectorPhone"].ToString()), http, http.RequestAborted);
+            return call.Succeeded
+                ? Results.Redirect("/customer/packages/shipments/" + shipmentId + "?done=collector")
+                : await ShipmentAsync(http, api, text, shipmentId, null, CustomerPortalEndpoints.Describe(text, call), null);
+        });
 
         portal.MapPost("/{shipmentId:guid}/packages", async (HttpContext http, Guid shipmentId, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
         {

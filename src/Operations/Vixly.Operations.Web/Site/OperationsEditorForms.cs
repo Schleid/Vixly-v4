@@ -127,6 +127,7 @@ public static class OperationsEditorForms
             TimeZone = Text(form, "timeZone"),
             ManagerUserId = Id(form, "manager"),
             DeliversHome = Flag(form, "deliversHome"),
+            ClearsCustoms = Flag(form, "clearsCustoms"),
             HomeArea = (Text(form, "homeArea") ?? string.Empty).Split(['\r', '\n', ','], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Take(200).ToList(),
             HubWarehouseId = Id(form, "hub"),
             OperatedBy = Enum<OperationsDestinationOperator>(form, "operatedBy") is OperationsDestinationOperator.Partner ? OperationsDestinationOperator.Partner : OperationsDestinationOperator.Company,
@@ -148,7 +149,7 @@ public static class OperationsEditorForms
             Phone = warehouse.Phone, Email = warehouse.Email, OpeningHours = warehouse.OpeningHours,
             ShowOnSite = warehouse.ShowOnSite, Status = warehouse.Status, Roles = warehouse.Roles, AcceptingDeliveries = warehouse.AcceptingDeliveries,
             TimeZone = warehouse.TimeZone, ManagerUserId = warehouse.ManagerUserId,
-            DeliversHome = warehouse.DeliversHome, HomeArea = warehouse.HomeArea, HubWarehouseId = warehouse.HubWarehouseId, OperatedBy = warehouse.OperatedBy,
+            DeliversHome = warehouse.DeliversHome, ClearsCustoms = warehouse.ClearsCustoms, HomeArea = warehouse.HomeArea, HubWarehouseId = warehouse.HubWarehouseId, OperatedBy = warehouse.OperatedBy,
             PartnerName = warehouse.PartnerName, PartnerPhone = warehouse.PartnerPhone, PartnerEmail = warehouse.PartnerEmail
         };
     }

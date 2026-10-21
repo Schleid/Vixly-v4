@@ -135,6 +135,10 @@ public sealed class CustomerOperationsApi
     public Task<CustomerCall<object>> ChangeShipmentAsync(Guid tenantId, string session, Guid shipmentId, CustomerShipmentInstructionsBody body, HttpContext http, CancellationToken cancellationToken) =>
         SendAsync<object>(HttpMethod.Put, "internal/v1/customers/me/shipments/" + shipmentId, tenantId, session, body, http, cancellationToken);
 
+    // Slice 7 step 2 (R-6): who may collect a booked shipment.
+    public Task<CustomerCall<object>> ChangeCollectorAsync(Guid tenantId, string session, Guid shipmentId, CustomerCollectorBody body, HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<object>(HttpMethod.Put, "internal/v1/customers/me/shipments/" + shipmentId + "/collector", tenantId, session, body, http, cancellationToken);
+
     public Task<CustomerCall<object>> CancelShipmentAsync(Guid tenantId, string session, Guid shipmentId, HttpContext http, CancellationToken cancellationToken) =>
         SendAsync<object>(HttpMethod.Delete, "internal/v1/customers/me/shipments/" + shipmentId, tenantId, session, null, http, cancellationToken);
 
@@ -178,6 +182,13 @@ public sealed class CustomerOperationsApi
         CancellationToken cancellationToken) =>
         PdfAsync(tenantId, session, "internal/v1/customers/me/invoices/" + invoiceId + "/pdf" + (creditNoteId is { } credit ? "?credit=" + credit : string.Empty), "invoice", http,
             cancellationToken);
+
+    // Slice 5F step 2b (K-8): the customer's own credit account and its statement.
+    public Task<CustomerCall<Vixly.Contracts.Operations.Billing.CustomerCreditAccountDto>> GetCreditAccountAsync(Guid tenantId, string session, HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<Vixly.Contracts.Operations.Billing.CustomerCreditAccountDto>(HttpMethod.Get, "internal/v1/customers/me/credit", tenantId, session, null, http, cancellationToken);
+
+    public Task<(byte[] Content, string FileName)?> GetCreditStatementAsync(Guid tenantId, string session, HttpContext http, CancellationToken cancellationToken) =>
+        PdfAsync(tenantId, session, "internal/v1/customers/me/credit/statement", "statement", http, cancellationToken);
 
     // Slice 5A: a document of the customer's own shipment (PDF); Operations checks the ownership (S-3).
     // The certificate has its own address (Slice 5B); the other documents go by kind.

@@ -50,6 +50,7 @@ public static class OperationsPermissions
     public const string AuditView = "ops.audit.view";
     public const string CustomersView = "ops.customers.view";
     public const string CustomersManage = "ops.customers.manage";
+    // Slice 5F step 2b (K-1): the credit department's right: open and manage credit accounts, decide charges above a limit.
     public const string CustomersCredit = "ops.customers.credit";
 
     // Slice 3B: given per warehouse (a warehouse grant counts for that warehouse's parcels).
@@ -106,6 +107,36 @@ public static class OperationsPermissions
 
     public const string CreditsApprove = "ops.credits.approve";
 
+    // Slice 5F step 2: take payments at the cashier, confirm Zelle and transfers, give money back. Given per warehouse.
+    public const string PaymentsTake = "ops.payments.take";
+
+    public const string PaymentsConfirm = "ops.payments.confirm";
+
+    public const string PaymentsRefund = "ops.payments.refund";
+
+    // Slice 6A (D-11): open, close and void bundles, switch a consolidated shipment's way (the ship manager); scan parcels into bundles and repack boxes (workers). Given per warehouse.
+    public const string BundlesManage = "ops.bundles.manage";
+
+    public const string BundlesFill = "ops.bundles.fill";
+
+    // Slice 6B (D-8): dispatches (per warehouse) and the company's carriers and their rates.
+    public const string DispatchesManage = "ops.dispatches.manage";
+
+    public const string CarriersManage = "ops.carriers.manage";
+
+    // Slice 6C (E-6): the events workspace (per warehouse) and recording events by hand.
+    public const string EventsView = "ops.events.view";
+
+    public const string EventsAdd = "ops.events.add";
+
+    // Slice 7 (R-1 to R-3): receiving at a destination warehouse, and recording customs there; given per warehouse.
+    public const string ArrivalsReceive = "ops.arrivals.receive";
+
+    public const string CustomsRecord = "ops.customs.record";
+
+    // Slice 7 step 2 (R-5, R-9): the pickup counter at a destination: charges, proof, release; given per warehouse.
+    public const string PickupRelease = "ops.pickup.release";
+
     public static IReadOnlyList<string> All { get; } = new[]
     {
         StaffView, StaffInvite, StaffEdit, StaffLock, StaffSuspend, StaffReactivate, StaffDeactivate, StaffResetSecondFactor, StaffEndSessions,
@@ -126,7 +157,13 @@ public static class OperationsPermissions
         CounterServe,
         SuppliesStock,
         DiscountsApprove,
-        InvoicesView, CreditsRequest, CreditsApprove
+        InvoicesView, CreditsRequest, CreditsApprove,
+        PaymentsTake, PaymentsConfirm, PaymentsRefund,
+        BundlesManage, BundlesFill,
+        DispatchesManage, CarriersManage,
+        EventsView, EventsAdd,
+        ArrivalsReceive, CustomsRecord,
+        PickupRelease
     };
 
     // Held only by the system roles; a tenant role can never include them.

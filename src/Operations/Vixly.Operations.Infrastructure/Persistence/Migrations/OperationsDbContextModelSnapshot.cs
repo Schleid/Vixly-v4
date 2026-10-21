@@ -146,6 +146,82 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.ToTable("RoleGrants", "ops");
                 });
 
+            modelBuilder.Entity("Vixly.Operations.Domain.Arrivals.OperationsArrivalDiscrepancy", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("BundleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("DispatchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid?>("ParcelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ResolvedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("ResolvedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("WarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DispatchId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.HasIndex("TenantId", "DispatchId");
+
+                    b.HasIndex("TenantId", "DispatchId", "BundleId")
+                        .IsUnique()
+                        .HasFilter("[Status] = 1 AND [BundleId] IS NOT NULL AND [ParcelId] IS NULL AND [DispatchId] IS NOT NULL");
+
+                    b.HasIndex("TenantId", "DispatchId", "ParcelId")
+                        .IsUnique()
+                        .HasFilter("[Status] = 1 AND [ParcelId] IS NOT NULL AND [DispatchId] IS NOT NULL");
+
+                    b.HasIndex("TenantId", "Status", "WarehouseId");
+
+                    b.ToTable("ArrivalDiscrepancies", "ops");
+                });
+
             modelBuilder.Entity("Vixly.Operations.Domain.Audit.OperationsAuditEntry", b =>
                 {
                     b.Property<Guid>("Id")
@@ -221,6 +297,138 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.HasIndex("TenantId", "TargetId", "CreatedUtc");
 
                     b.ToTable("AuditEntries", "ops");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Billing.OperationsCashDrawer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("CashIn")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<decimal>("CashOut")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<string>("CloseNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("ClosedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal?>("Counted")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal?>("Difference")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<decimal>("Float")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("OpenedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("WarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.HasIndex("TenantId", "UserId", "WarehouseId")
+                        .IsUnique()
+                        .HasFilter("[Status] = 1");
+
+                    b.HasIndex("TenantId", "WarehouseId", "OpenedUtc");
+
+                    b.ToTable("CashDrawers", "ops");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Billing.OperationsCreditAccount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ChangedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal>("Limit")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<Guid>("OpenedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("StatementMonth")
+                        .HasMaxLength(7)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(7)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("TermsDays")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "CustomerId")
+                        .IsUnique();
+
+                    b.ToTable("CreditAccounts", "ops");
                 });
 
             modelBuilder.Entity("Vixly.Operations.Domain.Billing.OperationsCreditNote", b =>
@@ -319,6 +527,15 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("AccountDecidedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("AccountRequestedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("AccountRequestedUtc")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<DateTimeOffset>("CreatedUtc")
                         .HasColumnType("datetimeoffset");
 
@@ -339,6 +556,9 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.Property<decimal>("DiscountTotal")
                         .HasPrecision(14, 2)
                         .HasColumnType("decimal(14,2)");
+
+                    b.Property<DateOnly?>("DueOn")
+                        .HasColumnType("date");
 
                     b.Property<decimal>("Gross")
                         .HasPrecision(14, 2)
@@ -372,7 +592,14 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(20)");
 
+                    b.Property<int>("OnAccount")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("PaidTotal")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<decimal>("PendingTotal")
                         .HasPrecision(14, 2)
                         .HasColumnType("decimal(14,2)");
 
@@ -381,6 +608,10 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         .HasMaxLength(30)
                         .IsUnicode(false)
                         .HasColumnType("varchar(30)");
+
+                    b.Property<decimal>("RefundedTotal")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
 
                     b.Property<string>("Route")
                         .HasMaxLength(300)
@@ -458,9 +689,170 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("TenantId", "CustomerId", "IssuedUtc");
 
+                    b.HasIndex("TenantId", "OnAccount", "CustomerId")
+                        .HasFilter("[OnAccount] <> 0");
+
                     b.HasIndex("TenantId", "WarehouseId", "IssuedUtc");
 
                     b.ToTable("Invoices", "ops");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Billing.OperationsPayment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CurrencyCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .IsUnicode(false)
+                        .HasColumnType("char(3)")
+                        .IsFixedLength();
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("DrawerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("InvoiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<bool>("Pending")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("RequestKey")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TakenByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("TakenUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Total")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<Guid>("WarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("ZelleTermsAccepted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("DrawerId");
+
+                    b.HasIndex("InvoiceId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.HasIndex("TenantId", "InvoiceId");
+
+                    b.HasIndex("TenantId", "Number")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId", "RequestKey")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId", "WarehouseId", "Pending");
+
+                    b.ToTable("Payments", "ops");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Billing.OperationsRefund", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<Guid>("ByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("DrawerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("InvoiceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Method")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Reference")
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<Guid>("RequestKey")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("WarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DrawerId");
+
+                    b.HasIndex("InvoiceId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "InvoiceId");
+
+                    b.HasIndex("TenantId", "Number")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId", "RequestKey")
+                        .IsUnique();
+
+                    b.ToTable("Refunds", "ops");
                 });
 
             modelBuilder.Entity("Vixly.Operations.Domain.Branding.OperationsSiteImage", b =>
@@ -546,6 +938,269 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("IX_TenantBrands_TenantId_One");
 
                     b.ToTable("TenantBrands", "ops");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Bundles.OperationsBundle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("ArrivedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Basis")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("ClosedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("ClosedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CurrentWarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DestinationCountryCode")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .IsUnicode(false)
+                        .HasColumnType("char(2)")
+                        .IsFixedLength();
+
+                    b.Property<Guid?>("DestinationWarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("DispatchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("Divisor")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<decimal?>("HeightCm")
+                        .HasPrecision(8, 1)
+                        .HasColumnType("decimal(8,1)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal?>("LengthCm")
+                        .HasPrecision(8, 1)
+                        .HasColumnType("decimal(8,1)");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<DateTimeOffset?>("OpenedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("ParcelCount")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ParcelsVolumetricKg")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<decimal>("ParcelsWeightKg")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<Guid?>("RequestKey")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("ServiceCode")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("TargetKg")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TypeName")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("VoidReason")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<Guid?>("VoidedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("VoidedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal?>("VolumetricKg")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<Guid>("WarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("WeightKg")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<decimal?>("WidthCm")
+                        .HasPrecision(8, 1)
+                        .HasColumnType("decimal(8,1)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurrentWarehouseId");
+
+                    b.HasIndex("DestinationWarehouseId");
+
+                    b.HasIndex("DispatchId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.HasIndex("TenantId", "CurrentWarehouseId")
+                        .HasFilter("[CurrentWarehouseId] IS NOT NULL");
+
+                    b.HasIndex("TenantId", "DispatchId")
+                        .HasFilter("[DispatchId] IS NOT NULL");
+
+                    b.HasIndex("TenantId", "Number")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId", "RequestKey")
+                        .IsUnique()
+                        .HasFilter("[RequestKey] IS NOT NULL");
+
+                    b.HasIndex("TenantId", "WarehouseId", "Status");
+
+                    b.ToTable("Bundles", "ops");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Bundles.OperationsRepackBox", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("BundleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ClosedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("ClosedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal?>("HeightCm")
+                        .HasPrecision(8, 1)
+                        .HasColumnType("decimal(8,1)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal?>("LengthCm")
+                        .HasPrecision(8, 1)
+                        .HasColumnType("decimal(8,1)");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<int>("ParcelCount")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ParcelsWeightKg")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<Guid?>("RequestKey")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("ShipmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("VoidReason")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<Guid?>("VoidedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("VoidedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("WarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("WeightKg")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<decimal?>("WidthCm")
+                        .HasPrecision(8, 1)
+                        .HasColumnType("decimal(8,1)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BundleId");
+
+                    b.HasIndex("ShipmentId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.HasIndex("TenantId", "BundleId");
+
+                    b.HasIndex("TenantId", "Number")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId", "ShipmentId")
+                        .IsUnique()
+                        .HasFilter("[Status] <> 3");
+
+                    b.HasIndex("TenantId", "WarehouseId", "Status");
+
+                    b.ToTable("RepackBoxes", "ops");
                 });
 
             modelBuilder.Entity("Vixly.Operations.Domain.Charges.OperationsChargeExtra", b =>
@@ -1108,6 +1763,424 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.HasIndex("TenantId", "CustomerId", "Purpose");
 
                     b.ToTable("CustomerTokens", "ops");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Dispatch.OperationsCarrier", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AccountNumber")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("AirlinePrefix")
+                        .HasMaxLength(3)
+                        .IsUnicode(false)
+                        .HasColumnType("char(3)")
+                        .IsFixedLength();
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("Carriers", "ops");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Dispatch.OperationsCarrierRate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BundleType")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<Guid>("CarrierId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .IsUnicode(false)
+                        .HasColumnType("char(2)")
+                        .IsFixedLength();
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("DestinationWarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal?>("Minimum")
+                        .HasPrecision(14, 4)
+                        .HasColumnType("decimal(14,4)");
+
+                    b.Property<decimal?>("PerBundle")
+                        .HasPrecision(14, 4)
+                        .HasColumnType("decimal(14,4)");
+
+                    b.Property<decimal?>("PerKg")
+                        .HasPrecision(14, 4)
+                        .HasColumnType("decimal(14,4)");
+
+                    b.Property<DateOnly>("StartsOn")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarrierId");
+
+                    b.HasIndex("DestinationWarehouseId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "CarrierId", "CountryCode", "StartsOn");
+
+                    b.ToTable("CarrierRates", "ops");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Dispatch.OperationsDispatch", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("ArrivedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("BundleCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CancelReason")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<DateTimeOffset?>("CancelledUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("ChargesCollect")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("ClosedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<decimal?>("CostComputed")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<string>("CostCurrencyCode")
+                        .HasMaxLength(3)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(3)");
+
+                    b.Property<string>("CostNote")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<decimal?>("CostTotal")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("CutoffUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("DepartedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DestinationCountryCode")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .IsUnicode(false)
+                        .HasColumnType("char(2)")
+                        .IsFixedLength();
+
+                    b.Property<Guid?>("DestinationWarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Documents")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ExportReference")
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("HandlingInstructions")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<bool>("Onward")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("ReceivedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("ReceivingWarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("RequestKey")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("ServiceCode")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(40)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("WarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DestinationWarehouseId");
+
+                    b.HasIndex("ReceivingWarehouseId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.HasIndex("TenantId", "Number")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId", "RequestKey")
+                        .IsUnique()
+                        .HasFilter("[RequestKey] IS NOT NULL");
+
+                    b.HasIndex("TenantId", "ReceivingWarehouseId", "Status");
+
+                    b.HasIndex("TenantId", "WarehouseId", "Status");
+
+                    b.ToTable("Dispatches", "ops");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Dispatch.OperationsDispatchBundle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("ArrivedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("BundleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("DispatchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("MissingUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BundleId");
+
+                    b.HasIndex("DispatchId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "BundleId");
+
+                    b.HasIndex("TenantId", "DispatchId", "BundleId")
+                        .IsUnique();
+
+                    b.ToTable("DispatchBundles", "ops");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Dispatch.OperationsDispatchShipment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("ChargeableKg")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.Property<decimal?>("CostShare")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CurrencyCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(3)");
+
+                    b.Property<decimal>("DeclaredValue")
+                        .HasPrecision(14, 2)
+                        .HasColumnType("decimal(14,2)");
+
+                    b.Property<Guid>("DispatchId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("HouseNumber")
+                        .IsRequired()
+                        .HasMaxLength(48)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(48)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Pieces")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ShipmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("WeightKg")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("decimal(12,3)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DispatchId");
+
+                    b.HasIndex("ShipmentId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "HouseNumber")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId", "ShipmentId");
+
+                    b.HasIndex("TenantId", "DispatchId", "ShipmentId")
+                        .IsUnique();
+
+                    b.ToTable("DispatchShipments", "ops");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Events.OperationsEventReason", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(16)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TextEn")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("TextEs")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("TextFr")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "Code")
+                        .IsUnique();
+
+                    b.ToTable("EventReasons", "ops");
                 });
 
             modelBuilder.Entity("Vixly.Operations.Domain.Holds.OperationsHoldAnswer", b =>
@@ -2121,6 +3194,9 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("BranchId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("ClearsCustoms")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(12)
@@ -2274,6 +3350,81 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         .HasFilter("[ProcessedUtc] IS NULL");
 
                     b.ToTable("OutboxMessages", "ops");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Pickup.OperationsPickupRelease", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("CodeChecked")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Collector")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CollectorName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTimeOffset>("CreatedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int?>("IdKind")
+                        .HasColumnType("int");
+
+                    b.Property<string>("IdLast")
+                        .HasMaxLength(4)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(4)");
+
+                    b.Property<DateTimeOffset?>("LastModifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("ParcelCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhotoKey")
+                        .HasMaxLength(200)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<Guid>("ReleasedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("RequestKey")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ShipmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SignatureKey")
+                        .HasMaxLength(200)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("WarehouseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ShipmentId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.HasIndex("TenantId", "RequestKey")
+                        .IsUnique()
+                        .HasFilter("[RequestKey] IS NOT NULL");
+
+                    b.HasIndex("TenantId", "ShipmentId");
+
+                    b.ToTable("PickupReleases", "ops");
                 });
 
             modelBuilder.Entity("Vixly.Operations.Domain.Platform.OperationsPlatformFeedPosition", b =>
@@ -2855,15 +4006,53 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("AcceptBankTransfer")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("AcceptCash")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("AcceptCheque")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("AcceptZelle")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("AllowCollect")
                         .HasColumnType("bit");
 
                     b.Property<bool>("AllowCredit")
                         .HasColumnType("bit");
 
+                    b.Property<string>("BoxPrefix")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(6)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(6)")
+                        .HasDefaultValue("CB");
+
+                    b.Property<string>("BundlePrefix")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(6)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(6)")
+                        .HasDefaultValue("BD");
+
+                    b.Property<int>("BundleTargetRule")
+                        .HasColumnType("int");
+
+                    b.Property<string>("BundleTypes")
+                        .HasMaxLength(372)
+                        .HasColumnType("nvarchar(372)");
+
                     b.Property<decimal>("ChargesTaxPercent")
                         .HasPrecision(6, 3)
                         .HasColumnType("decimal(6,3)");
+
+                    b.Property<int>("ConsolidationWay")
+                        .HasColumnType("int");
 
                     b.Property<bool>("CountSupplyStock")
                         .HasColumnType("bit");
@@ -2878,6 +4067,15 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(6)")
                         .HasDefaultValue("CN");
+
+                    b.Property<int>("CreditOverLimit")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("CreditStatements")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("CreditTermsDays")
+                        .HasColumnType("int");
 
                     b.Property<string>("CurrencyCode")
                         .IsRequired()
@@ -2897,8 +4095,37 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.Property<int>("DeliveryModes")
                         .HasColumnType("int");
 
+                    b.Property<bool>("DestinationCharges")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("DestinationStorage")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("DestinationStorageFeePerDay")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<int>("DestinationStorageFreeDays")
+                        .HasColumnType("int");
+
                     b.Property<int>("DimensionUnit")
                         .HasColumnType("int");
+
+                    b.Property<string>("DisabledEventCauses")
+                        .HasMaxLength(400)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(400)");
+
+                    b.Property<string>("DispatchPrefix")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(6)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(6)")
+                        .HasDefaultValue("DSP");
+
+                    b.Property<bool>("EventEmails")
+                        .HasColumnType("bit");
 
                     b.Property<decimal>("FreightTaxPercent")
                         .HasPrecision(6, 3)
@@ -2934,6 +4161,18 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("LastModifiedUtc")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("OtherMethod1")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("OtherMethod2")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("OtherMethod3")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
                     b.Property<string>("ParcelPrefix")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -2947,6 +4186,12 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         .HasMaxLength(6)
                         .IsUnicode(false)
                         .HasColumnType("varchar(6)");
+
+                    b.Property<bool>("PickupEmails")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PickupProofs")
+                        .HasColumnType("int");
 
                     b.Property<string>("ReceivingPrefix")
                         .IsRequired()
@@ -3036,6 +4281,34 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.Property<int>("WeightUnit")
                         .HasColumnType("int");
 
+                    b.Property<string>("ZelleContact")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("ZelleName")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("ZelleQrKey")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("ZelleTag")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("ZelleTermsEn")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("ZelleTermsEs")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("ZelleTermsFr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("TenantId")
@@ -3061,6 +4334,18 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.Property<DateTimeOffset?>("BookedUtc")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("CollectorName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CollectorPhone")
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<int?>("ConsolidationWay")
+                        .HasColumnType("int");
+
                     b.Property<bool>("CreatedAtCounter")
                         .HasColumnType("bit");
 
@@ -3080,6 +4365,9 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTimeOffset?>("CustomerSignedUtc")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("DestinationBillKey")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("DestinationBranchId")
                         .HasColumnType("uniqueidentifier");
@@ -3117,6 +4405,29 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("ParcelCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset?>("PickedUpUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("PickupCodeFailures")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PickupCodeProtected")
+                        .HasMaxLength(1000)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<DateTimeOffset?>("PickupCodeUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("PickupNotifiedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("PickupReadyUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("PickupRemindersSent")
                         .HasColumnType("int");
 
                     b.Property<string>("RecipientName")
@@ -3174,6 +4485,9 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.HasIndex("TenantId", "CustomerId", "Status");
 
                     b.HasIndex("TenantId", "OriginWarehouseId", "CreatedUtc");
+
+                    b.HasIndex("TenantId", "PickupRemindersSent", "PickupReadyUtc")
+                        .HasFilter("[PickupReadyUtc] IS NOT NULL AND [PickedUpUtc] IS NULL");
 
                     b.ToTable("Shipments", "ops");
                 });
@@ -3668,6 +4982,12 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.Property<bool>("ArrivedDamaged")
                         .HasColumnType("bit");
 
+                    b.Property<Guid?>("BoxId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("BundleId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Carrier")
                         .HasMaxLength(40)
                         .HasColumnType("nvarchar(40)");
@@ -3698,6 +5018,13 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
 
                     b.Property<Guid?>("DeliveryId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("DestinationFeePerDay")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<int?>("DestinationFreeDays")
+                        .HasColumnType("int");
 
                     b.Property<int>("Flags")
                         .HasColumnType("int");
@@ -3748,6 +5075,9 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("PreAlertId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset?>("ReadyUtc")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<int>("RemindersSent")
                         .HasColumnType("int");
 
@@ -3760,6 +5090,9 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset?>("ShippingLabelUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("StorageBilledUtc")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<decimal?>("StorageFeePerDay")
@@ -3788,6 +5121,10 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BoxId");
+
+                    b.HasIndex("BundleId");
+
                     b.HasIndex("DeliveryId");
 
                     b.HasIndex("PreAlertId");
@@ -3799,6 +5136,10 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.HasIndex("TenantId");
 
                     b.HasIndex("WarehouseId");
+
+                    b.HasIndex("TenantId", "BoxId");
+
+                    b.HasIndex("TenantId", "BundleId");
 
                     b.HasIndex("TenantId", "CustomerId");
 
@@ -3837,6 +5178,9 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.Property<string>("ArgumentsJson")
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
+
+                    b.Property<Guid?>("CausedByEventId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -3898,6 +5242,9 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("TenantId");
 
+                    b.HasIndex("TenantId", "CausedByEventId")
+                        .HasFilter("[CausedByEventId] IS NOT NULL");
+
                     b.HasIndex("TenantId", "IdempotencyKey")
                         .IsUnique();
 
@@ -3908,6 +5255,38 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.HasIndex("TenantId", "SubjectKind", "SubjectId", "OccurredUtc");
 
                     b.ToTable("TrackingEvents", "ops");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Arrivals.OperationsArrivalDiscrepancy", b =>
+                {
+                    b.HasOne("Vixly.Operations.Domain.Dispatch.OperationsDispatch", null)
+                        .WithMany()
+                        .HasForeignKey("DispatchId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Operations.Domain.Locations.OperationsWarehouse", null)
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Billing.OperationsCashDrawer", b =>
+                {
+                    b.HasOne("Vixly.Operations.Domain.Locations.OperationsWarehouse", null)
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Billing.OperationsCreditAccount", b =>
+                {
+                    b.HasOne("Vixly.Operations.Domain.Customers.OperationsCustomer", null)
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Vixly.Operations.Domain.Billing.OperationsCreditNote", b =>
@@ -4150,6 +5529,90 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Taxes");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Billing.OperationsPayment", b =>
+                {
+                    b.HasOne("Vixly.Operations.Domain.Customers.OperationsCustomer", null)
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Operations.Domain.Billing.OperationsCashDrawer", null)
+                        .WithMany()
+                        .HasForeignKey("DrawerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Operations.Domain.Billing.OperationsInvoice", null)
+                        .WithMany()
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Operations.Domain.Locations.OperationsWarehouse", null)
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsMany("Vixly.Operations.Domain.Billing.OperationsPaymentTender", "Tenders", b1 =>
+                        {
+                            b1.Property<Guid>("OperationsPaymentId");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAddOrUpdate();
+
+                            b1.Property<decimal>("Amount")
+                                .HasPrecision(14, 2);
+
+                            b1.Property<decimal?>("CashGiven")
+                                .HasPrecision(14, 2);
+
+                            b1.Property<decimal?>("Change")
+                                .HasPrecision(14, 2);
+
+                            b1.Property<string>("CheckNote");
+
+                            b1.Property<Guid?>("CheckedByUserId");
+
+                            b1.Property<DateTimeOffset?>("CheckedUtc");
+
+                            b1.Property<Guid>("Id");
+
+                            b1.Property<int>("Method");
+
+                            b1.Property<string>("Reference");
+
+                            b1.Property<int>("Status");
+
+                            b1.HasKey("OperationsPaymentId", "__synthesizedOrdinal");
+
+                            b1.ToTable("Payments", "ops");
+
+                            b1
+                                .ToJson("Tenders")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OperationsPaymentId");
+                        });
+
+                    b.Navigation("Tenders");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Billing.OperationsRefund", b =>
+                {
+                    b.HasOne("Vixly.Operations.Domain.Billing.OperationsCashDrawer", null)
+                        .WithMany()
+                        .HasForeignKey("DrawerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Operations.Domain.Billing.OperationsInvoice", null)
+                        .WithMany()
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Vixly.Operations.Domain.Branding.OperationsTenantBrand", b =>
@@ -4421,6 +5884,50 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Texts");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Bundles.OperationsBundle", b =>
+                {
+                    b.HasOne("Vixly.Operations.Domain.Locations.OperationsWarehouse", null)
+                        .WithMany()
+                        .HasForeignKey("CurrentWarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Operations.Domain.Locations.OperationsWarehouse", null)
+                        .WithMany()
+                        .HasForeignKey("DestinationWarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Operations.Domain.Dispatch.OperationsDispatch", null)
+                        .WithMany()
+                        .HasForeignKey("DispatchId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Operations.Domain.Locations.OperationsWarehouse", null)
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Bundles.OperationsRepackBox", b =>
+                {
+                    b.HasOne("Vixly.Operations.Domain.Bundles.OperationsBundle", null)
+                        .WithMany()
+                        .HasForeignKey("BundleId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Operations.Domain.Shipments.OperationsShipment", null)
+                        .WithMany()
+                        .HasForeignKey("ShipmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Operations.Domain.Locations.OperationsWarehouse", null)
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Vixly.Operations.Domain.Charges.OperationsChargeExtra", b =>
@@ -4827,6 +6334,124 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.HasOne("Vixly.Operations.Domain.Customers.OperationsCustomer", null)
                         .WithMany()
                         .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Dispatch.OperationsCarrierRate", b =>
+                {
+                    b.HasOne("Vixly.Operations.Domain.Dispatch.OperationsCarrier", null)
+                        .WithMany()
+                        .HasForeignKey("CarrierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Operations.Domain.Locations.OperationsWarehouse", null)
+                        .WithMany()
+                        .HasForeignKey("DestinationWarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Dispatch.OperationsDispatch", b =>
+                {
+                    b.HasOne("Vixly.Operations.Domain.Locations.OperationsWarehouse", null)
+                        .WithMany()
+                        .HasForeignKey("DestinationWarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Operations.Domain.Locations.OperationsWarehouse", null)
+                        .WithMany()
+                        .HasForeignKey("ReceivingWarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Operations.Domain.Locations.OperationsWarehouse", null)
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsMany("Vixly.Operations.Domain.Dispatch.OperationsDispatchLeg", "Legs", b1 =>
+                        {
+                            b1.Property<Guid>("OperationsDispatchId");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAddOrUpdate();
+
+                            b1.Property<DateTimeOffset?>("ArrivedUtc");
+
+                            b1.Property<Guid?>("CarrierId");
+
+                            b1.Property<DateTimeOffset?>("DepartedUtc");
+
+                            b1.Property<string>("Driver");
+
+                            b1.Property<string>("From")
+                                .IsRequired()
+                                .HasMaxLength(80);
+
+                            b1.Property<Guid>("Id");
+
+                            b1.Property<int>("Kind");
+
+                            b1.Property<string>("Reference");
+
+                            b1.Property<Guid?>("RequestKey");
+
+                            b1.Property<DateTimeOffset?>("ScheduledArrivalUtc");
+
+                            b1.Property<DateTimeOffset?>("ScheduledDepartureUtc");
+
+                            b1.Property<int>("Sequence");
+
+                            b1.Property<int>("Status");
+
+                            b1.Property<string>("To")
+                                .IsRequired()
+                                .HasMaxLength(80);
+
+                            b1.Property<string>("Vehicle");
+
+                            b1.HasKey("OperationsDispatchId", "__synthesizedOrdinal");
+
+                            b1.ToTable("Dispatches", "ops");
+
+                            b1
+                                .ToJson("Legs")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OperationsDispatchId");
+                        });
+
+                    b.Navigation("Legs");
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Dispatch.OperationsDispatchBundle", b =>
+                {
+                    b.HasOne("Vixly.Operations.Domain.Bundles.OperationsBundle", null)
+                        .WithMany()
+                        .HasForeignKey("BundleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Operations.Domain.Dispatch.OperationsDispatch", null)
+                        .WithMany()
+                        .HasForeignKey("DispatchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Dispatch.OperationsDispatchShipment", b =>
+                {
+                    b.HasOne("Vixly.Operations.Domain.Dispatch.OperationsDispatch", null)
+                        .WithMany()
+                        .HasForeignKey("DispatchId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Operations.Domain.Shipments.OperationsShipment", null)
+                        .WithMany()
+                        .HasForeignKey("ShipmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -5264,6 +6889,21 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         });
 
                     b.Navigation("Address")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Vixly.Operations.Domain.Pickup.OperationsPickupRelease", b =>
+                {
+                    b.HasOne("Vixly.Operations.Domain.Shipments.OperationsShipment", null)
+                        .WithMany()
+                        .HasForeignKey("ShipmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Vixly.Operations.Domain.Locations.OperationsWarehouse", null)
+                        .WithMany()
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -5737,6 +7377,16 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Vixly.Operations.Domain.Tracking.OperationsParcel", b =>
                 {
+                    b.HasOne("Vixly.Operations.Domain.Bundles.OperationsRepackBox", null)
+                        .WithMany()
+                        .HasForeignKey("BoxId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Vixly.Operations.Domain.Bundles.OperationsBundle", null)
+                        .WithMany()
+                        .HasForeignKey("BundleId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Vixly.Operations.Domain.Receiving.OperationsInboundDelivery", null)
                         .WithMany()
                         .HasForeignKey("DeliveryId")

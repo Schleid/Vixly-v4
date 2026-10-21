@@ -125,7 +125,7 @@ public sealed class OperationsShipmentInstructions
         return new(null, address, address.CountryCode, Name(recipientName), Phone(recipientPhone), Checked(options));
     }
 
-    private static string Name(string? value)
+    internal static string Name(string? value)
     {
         string text = value?.Trim() ?? string.Empty;
 
@@ -134,7 +134,7 @@ public sealed class OperationsShipmentInstructions
             : text;
     }
 
-    private static string Phone(string? value) =>
+    internal static string Phone(string? value) =>
         PhoneNumber.TryCreate(value, out PhoneNumber? phone) && phone.Value.StartsWith('+') && phone.Value.Length <= PhoneMaxLength
             ? phone.Value
             : throw new DomainException(OperationsShipmentErrors.RecipientPhoneInvalid);

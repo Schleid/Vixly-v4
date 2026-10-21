@@ -1,0 +1,35 @@
+@*
+=========================================================
+FILE: EventsPage.razor
+
+PURPOSE:
+The events workspace (Slice 6C, E-6): find a parcel, shipment, bundle or dispatch by its number.
+
+RESPONSIBILITIES:
+- The search form
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Subjects of other warehouses are not found
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.events.title"]" Company="@Company" Section="events" Error="@Error" Info="@Info">
+    <form method="post" action="/staff/events" class="ops-list-bar" role="search" aria-labelledby="events-search">
+        <AntiforgeryToken />
+        <label style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0; font-weight: 600;"><span id="events-search">@T["ui.events.number"]</span> <input name="query" value="@Query" maxlength="64" autocomplete="off" autofocus required style="height: 32px; min-height: 32px; width: 20rem;" /></label>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.events.find"]</button>
+        <span class="ops-editor__hint" style="margin: 0; margin-inline-start: 0.5rem;">@T["ui.events.search_hint"]</span>
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public string? Query { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

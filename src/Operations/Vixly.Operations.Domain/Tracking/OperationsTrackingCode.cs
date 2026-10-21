@@ -26,6 +26,9 @@ public sealed record OperationsTrackingCode(
     // Arguments a customer may see on their own history; every other argument is staff-only (review M1).
     public IReadOnlyList<string> CustomerArguments { get; init; } = Array.Empty<string>();
 
+    // Slice 6C: arguments that may be left out.
+    public IReadOnlyList<string> OptionalArguments { get; init; } = Array.Empty<string>();
+
     // The argument that names a hold reason (OperationsHoldReasons), for hold_opened and hold_released.
     public const string ReasonArgument = "reason";
 

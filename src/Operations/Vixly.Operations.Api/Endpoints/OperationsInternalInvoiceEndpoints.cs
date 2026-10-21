@@ -1,6 +1,8 @@
 ﻿using Vixly.Contracts.Operations.Billing;
 using Vixly.Contracts.Operations.Internal;
 using Vixly.Operations.Api.Internal;
+using Vixly.Operations.Application.UseCases.Billing.GetMyOperationsCreditAccount;
+using Vixly.Operations.Application.UseCases.Billing.GetMyOperationsCreditStatement;
 using Vixly.Operations.Application.UseCases.Billing.GetMyOperationsInvoiceDocument;
 using Vixly.Operations.Application.UseCases.Billing.ListMyOperationsInvoices;
 using Vixly.Operations.Domain.Billing;
@@ -16,6 +18,7 @@ namespace Vixly.Operations.Api.Endpoints;
 // RESPONSIBILITIES:
 // - List the customer's invoices with their approved credit notes
 // - Send the PDF of an invoice or credit note
+// - Slice 5F step 2b: the customer's credit account and its statement (K-8)
 //
 // IMPORTANT NOTES:
 // - Customer scope only; every read checks ownership (S-3)
@@ -36,10 +39,19 @@ public static class OperationsInternalInvoiceEndpoints
 
             return response.Succeeded
                 ? Results.Ok(new CustomerInvoicesDto(response.Invoices.Select(invoice => new CustomerInvoiceDto(invoice.Id, invoice.Number,
-                    invoice.Kind == OperationsInvoiceKind.Shipment ? "shipment" : "order", invoice.Reference, invoice.IssuedOn, invoice.CurrencyCode, invoice.Total, invoice.CreditedTotal,
+                    invoice.Kind switch { OperationsInvoiceKind.Shipment => "shipment", OperationsInvoiceKind.Destination => "destination", _ => "order" }, invoice.Reference, invoice.IssuedOn, invoice.CurrencyCode, invoice.Total, invoice.CreditedTotal,
                     invoice.Owed, invoice.Status == OperationsInvoiceStatus.Voided,
                     response.CreditNotes.Where(note => note.InvoiceId == invoice.Id && note.Number is not null)
-                        .Select(note => new CustomerCreditNoteDto(note.Id, note.Number!, note.DecidedOn ?? invoice.IssuedOn, note.Total)).ToList()))
+                        .Select(note => new CustomerCreditNoteDto(note.Id, note.Number!, note.DecidedOn ?? invoice.IssuedOn, note.Total)).ToList(),
+                    invoice.PaymentState switch
+                    {
+                        OperationsPaymentState.Paid => "paid",
+                        OperationsPaymentState.AwaitingConfirmation => "awaiting",
+                        OperationsPaymentState.Voided => "voided",
+                        OperationsPaymentState.OnAccount => "on_account",
+                        OperationsPaymentState.AwaitingCredit => "awaiting_credit",
+                        _ => "unpaid"
+                    }))
                     .ToList()))
                 : OperationsApiErrors.Problem(http, response.Error!);
         });
@@ -59,6 +71,44 @@ public static class OperationsInternalInvoiceEndpoints
             http.Response.Headers.CacheControl = "private, no-store";
             http.Response.Headers.XContentTypeOptions = "nosniff";
             return Results.File(response.Content, "application/pdf", response.FileName);
+        });
+
+        // Slice 5F step 2b (K-8): the customer's own credit account and its statement.
+        RouteGroupBuilder credit = endpoints.MapGroup("/internal/v1/customers/me/credit")
+            .WithMetadata(new OperationsInternalEndpointMetadata(OperationsCallerClaims.CustomerScope, true));
+
+        credit.MapGet("", async (HttpContext http, GetMyOperationsCreditAccountUseCase useCase, CancellationToken cancellationToken) =>
+        {
+            GetMyOperationsCreditAccountResponse response = await useCase.ExecuteAsync(OperationsInternalPackageEndpoints.Context(http),
+                new GetMyOperationsCreditAccountRequest { SessionToken = OperationsInternalPackageEndpoints.Session(http) }, cancellationToken);
+
+            if (!response.Succeeded)
+            {
+                return OperationsApiErrors.Problem(http, response.Error!);
+            }
+
+            DateOnly today = response.Today;
+            return Results.Ok(response.Account is not { } account
+                ? new CustomerCreditAccountDto(false, "none", 0m, response.TermsDays, response.CurrencyCode, 0m, 0m, 0m, Array.Empty<CustomerCreditItemDto>())
+                : new CustomerCreditAccountDto(true, account.Status.ToString().ToLowerInvariant(), account.Limit, response.TermsDays, response.CurrencyCode, response.Position.Owed,
+                    account.IsActive ? response.Position.Available : 0m, response.Position.Overdue,
+                    response.Items.Select(item => new CustomerCreditItemDto(item.Id, item.Number, item.Reference, item.IssuedOn, item.DueOn, item.Owed, item.DueOn is { } due && due < today))
+                        .ToList()));
+        });
+
+        credit.MapGet("/statement", async (HttpContext http, GetMyOperationsCreditStatementUseCase useCase, CancellationToken cancellationToken) =>
+        {
+            GetMyOperationsCreditStatementResponse response = await useCase.ExecuteAsync(OperationsInternalPackageEndpoints.Context(http),
+                new GetMyOperationsCreditStatementRequest { SessionToken = OperationsInternalPackageEndpoints.Session(http) }, cancellationToken);
+
+            if (!response.Succeeded)
+            {
+                return OperationsApiErrors.Problem(http, response.Error!);
+            }
+
+            http.Response.Headers.CacheControl = "private, no-store";
+            http.Response.Headers.XContentTypeOptions = "nosniff";
+            return Results.File(response.Pdf, "application/pdf", "statement.pdf");
         });
 
         return endpoints;

@@ -37,6 +37,13 @@ public sealed class SmtpOperationsCustomerMailer : IOperationsCustomerMailer
             OperationsCustomerMailKind.ParcelReminder => "parcel_reminder",
             OperationsCustomerMailKind.ParcelFinalNotice => "parcel_final_notice",
             OperationsCustomerMailKind.TicketAnswered => "ticket_answered",
+            OperationsCustomerMailKind.PaymentNotReceived => "payment_not_received",
+            OperationsCustomerMailKind.CreditStatement => "credit_statement",
+            OperationsCustomerMailKind.ShipmentUpdate => "shipment_update",
+            OperationsCustomerMailKind.ReadyForPickup => "ready_for_pickup",
+            OperationsCustomerMailKind.PickupCode => "pickup_code",
+            OperationsCustomerMailKind.PickupReminder => "pickup_reminder",
+            OperationsCustomerMailKind.PickupFinalNotice => "pickup_final_notice",
             _ => "password_reset"
         };
         Dictionary<string, object> values = new(StringComparer.Ordinal)
@@ -51,7 +58,23 @@ public sealed class SmtpOperationsCustomerMailer : IOperationsCustomerMailer
             mail.ToName,
             mail.CompanyName,
             mail.Language,
-            text => (VixlyText.Format(text, "email.customer." + kind + ".subject", values), VixlyText.Format(text, "email.customer." + kind + ".body", values)),
+            text =>
+            {
+                // Slice 6C: values as they are, and keys worded in the customer's language.
+                Dictionary<string, object> all = new(values, StringComparer.Ordinal);
+
+                foreach ((string name, string value) in mail.Extra)
+                {
+                    all[name] = value;
+                }
+
+                foreach ((string name, string key) in mail.Worded)
+                {
+                    all[name] = text[key].Value;
+                }
+
+                return (VixlyText.Format(text, "email.customer." + kind + ".subject", all), VixlyText.Format(text, "email.customer." + kind + ".body", all));
+            },
             cancellationToken);
     }
 }

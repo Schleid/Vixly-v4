@@ -64,8 +64,8 @@ IMPORTANT NOTES:
                             <td>@row.Customer</td>
                             <td>@row.WarehouseCode</td>
                             <td class="ops-editor__number">@OperationsInvoiceWords.Money(row.Total, row.CurrencyCode)</td>
-                            <td class="ops-editor__number">@OperationsInvoiceWords.Money(row.Owed, row.CurrencyCode)</td>
-                            <td><span class="ops-editor__status" data-status="@OperationsInvoiceWords.State(row.Voided, row.Owed, row.Credited)">@T["ui.invoices.status." + OperationsInvoiceWords.State(row.Voided, row.Owed, row.Credited)]</span></td>
+                            <td class="ops-editor__number">@OperationsInvoiceWords.Money(Math.Max(row.Owed, 0m), row.CurrencyCode)</td>
+                            <td><span class="ops-editor__status" data-status="@OperationsInvoiceWords.State(row.Voided, row.Owed, row.Credited, row.Pending)">@T["ui.invoices.status." + OperationsInvoiceWords.State(row.Voided, row.Owed, row.Credited, row.Pending)]</span></td>
                         </tr>
                     }
                 </tbody>

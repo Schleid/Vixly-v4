@@ -1,0 +1,98 @@
+﻿@*
+=========================================================
+FILE: RepackBoxesPage.razor
+
+PURPOSE:
+Consolidated shipments waiting to travel (Slice 6A, D-4): how each goes, repacked or kept together, and its repack box.
+
+RESPONSIBILITIES:
+- Switch a shipment's way before any of its parcels is boxed or bundled (ship manager)
+- Start or open its repack box
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The company's way applies unless the ship manager switched it
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.boxes.title"]" Company="@Company" Section="bundles" Error="@Error" Info="@Info">
+    <p><a href="/staff/bundles">@T["ui.bundles.back"]</a></p>
+    <p class="ops-editor__hint">@VixlyText.Format(T, "ui.boxes.company_way", "way", T["ui.boxes.way." + CompanyWay].Value)</p>
+    @if (Shipments.Count == 0)
+    {
+        <div class="ops-editor__empty"><p>@T["ui.boxes.none"]</p></div>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.boxes.title"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.bundles.shipment"]</th><th scope="col">@T["ui.bundles.warehouse"]</th><th scope="col" class="ops-editor__number">@T["ui.bundles.parcels"]</th><th scope="col">@T["ui.boxes.way"]</th><th scope="col">@T["ui.boxes.box"]</th></tr></thead>
+                <tbody>
+                    @foreach (OperationsRepackShipmentRow row in Shipments)
+                    {
+                        <tr>
+                            <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/shipments/@row.ShipmentId">@(row.Number ?? "—")</a>@if (!row.Paid) { <small> · @T["ui.boxes.unpaid"]</small> }</td>
+                            <td>@(Warehouses.FirstOrDefault(warehouse => warehouse.Id == row.WarehouseId)?.Code)</td>
+                            <td class="ops-editor__number">@row.Parcels</td>
+                            <td>
+                                @if (ManageWarehouses.Contains(row.WarehouseId) && row.BoxId is null)
+                                {
+                                    <form method="post" action="/staff/bundles/boxes/way" class="ops-editor__inline">
+                                        <AntiforgeryToken />
+                                        <input type="hidden" name="shipment" value="@row.ShipmentId" />
+                                        <select name="way" aria-label="@T["ui.boxes.way"]">
+                                            @foreach (OperationsConsolidationWay way in Enum.GetValues<OperationsConsolidationWay>())
+                                            {
+                                                <option value="@way" selected="@(way == row.Way)">@T["ui.boxes.way." + way]</option>
+                                            }
+                                        </select>
+                                        <button type="submit" class="vx-button vx-button--secondary">@T["ui.boxes.switch"]</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    @T["ui.boxes.way." + row.Way]
+                                }
+                                @if (row.Switched) { <small> · @T["ui.boxes.switched"]</small> }
+                            </td>
+                            <td>
+                                @if (row.BoxId is { } boxId)
+                                {
+                                    <a class="ops-editor__code" href="/staff/bundles/boxes/@boxId">@row.BoxNumber</a> <small>@T["ui.boxes.status." + row.BoxStatus]</small>
+                                }
+                                else if (row.Way == OperationsConsolidationWay.Repack && FillWarehouses.Contains(row.WarehouseId))
+                                {
+                                    <form method="post" action="/staff/bundles/boxes" class="ops-editor__inline">
+                                        <AntiforgeryToken />
+                                        <input type="hidden" name="shipment" value="@row.ShipmentId" />
+                                        <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+                                        <button type="submit" class="vx-button vx-button--primary">@T["ui.boxes.start"]</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsRepackShipmentRow> Shipments { get; set; } = Array.Empty<OperationsRepackShipmentRow>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<Guid> ManageWarehouses { get; set; } = Array.Empty<Guid>();
+
+    [Parameter] public OperationsConsolidationWay CompanyWay { get; set; }
+
+    [Parameter] public IReadOnlyList<Guid> FillWarehouses { get; set; } = Array.Empty<Guid>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

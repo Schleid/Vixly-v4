@@ -32,12 +32,20 @@ public sealed class GetOperationsInvoiceUseCase
 
     private readonly IOperationsUserRepository _users;
 
+    private readonly IOperationsPaymentRepository _payments;
+
+    private readonly IOperationsSettingsRepository _settings;
+
     public GetOperationsInvoiceUseCase(
         OperationsBillingDesk desk,
         IOperationsBillingRepository billing,
         IOperationsLocationRepository locations,
-        IOperationsUserRepository users)
+        IOperationsUserRepository users,
+        IOperationsPaymentRepository payments,
+        IOperationsSettingsRepository settings)
     {
+        _payments = payments ?? throw new ArgumentNullException(nameof(payments));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _desk = desk ?? throw new ArgumentNullException(nameof(desk));
         _billing = billing ?? throw new ArgumentNullException(nameof(billing));
         _locations = locations ?? throw new ArgumentNullException(nameof(locations));
@@ -81,6 +89,11 @@ public sealed class GetOperationsInvoiceUseCase
         return GetOperationsInvoiceResponse.Success(invoice, notes, people,
             at is not null && access!.CoversWarehouse(OperationsPermissions.CreditsRequest, at.Id, at.BranchId),
             at is not null && access!.CoversWarehouse(OperationsPermissions.CreditsApprove, at.Id, at.BranchId),
-            access!.User.Id);
+            access!.User.Id)
+            .WithPayments(await _payments.ListInvoicePaymentsAsync(invoice.Id, cancellationToken), await _payments.ListInvoiceRefundsAsync(invoice.Id, cancellationToken),
+                at is not null && access.CoversWarehouse(OperationsPermissions.PaymentsTake, at.Id, at.BranchId),
+                at is not null && invoice.Refundable > 0m && access.CoversWarehouse(OperationsPermissions.PaymentsRefund, at.Id, at.BranchId),
+                (await _settings.FindAsync(cancellationToken)) is { } settings ? OperationsPaymentNames.Others(settings) : new Dictionary<OperationsPaymentMethod, string>(),
+                (await _settings.FindAsync(cancellationToken)) is { } accepting ? OperationsPaymentNames.Accepted(accepting) : new[] { OperationsPaymentMethod.Cash });
     }
 }

@@ -101,6 +101,42 @@ public sealed class OperationsParcel : OperationsEntity
         (StorageFreeDays, StorageFeePerDay) = (freeDays, feePerDay);
     }
 
+    // Slice 7 step 2 (R-10): when it became ready for pickup at its destination; the destination's storage terms of that day, kept apart from the origin's (review);
+    // how far its storage was billed.
+    public DateTimeOffset? ReadyUtc { get; private set; }
+
+    public int? DestinationFreeDays { get; private set; }
+
+    public decimal? DestinationFeePerDay { get; private set; }
+
+    public DateTimeOffset? StorageBilledUtc { get; private set; }
+
+    public void MarkReady(int freeDays, decimal? feePerDay, DateTimeOffset utcNow)
+    {
+        if (ReadyUtc is null)
+        {
+            (ReadyUtc, DestinationFreeDays, DestinationFeePerDay) = (utcNow, Math.Max(0, freeDays), feePerDay is > 0m ? feePerDay : null);
+            MarkAsModified(utcNow);
+        }
+    }
+
+    // The storage at the destination from when it became ready to that time (R-10).
+    public decimal DestinationStorage(DateTimeOffset utcNow) =>
+        ReadyUtc is { } ready && DestinationFeePerDay is { } fee ? Vixly.Operations.Domain.Holds.OperationsStorageFees.Accrued(ready, utcNow, DestinationFreeDays ?? 0, fee) : 0m;
+
+    // What is owed and not billed yet (review: a second visit owes the days since the last bill; within a day of a bill nothing more is owed,
+    // so paying at the cashier never makes a new day due at the counter).
+    public decimal UnbilledStorage(DateTimeOffset utcNow) =>
+        StorageBilledUtc is { } billed && utcNow - billed < TimeSpan.FromDays(1)
+            ? 0m
+            : Math.Max(0m, DestinationStorage(utcNow) - (StorageBilledUtc is { } since ? DestinationStorage(since) : 0m));
+
+    public void StorageBilled(DateTimeOffset utcNow)
+    {
+        StorageBilledUtc = utcNow;
+        MarkAsModified(utcNow);
+    }
+
     // The fee runs while the package waits at its warehouse for its customer or its owner, not once it is booked to leave (Slice 5).
     public bool OwesStorage => Milestone is null or OperationsMilestone.ReceivedAtOrigin;
 
@@ -289,6 +325,52 @@ public sealed class OperationsParcel : OperationsEntity
     }
 
     public bool IsAtOrigin => Milestone is null || Milestone < OperationsMilestone.DepartedOrigin;
+
+    // Slice 6A: the bundle it travels in, and the repack box it went into for a consolidated shipment.
+    public Guid? BundleId { get; private set; }
+
+    public Guid? BoxId { get; private set; }
+
+    public void Pack(Guid bundleId, DateTimeOffset utcNow)
+    {
+        if (BundleId is not null)
+        {
+            throw new DomainException(Vixly.Operations.Domain.Bundles.OperationsBundleErrors.InAnotherBundle);
+        }
+
+        BundleId = bundleId;
+        MarkAsModified(utcNow);
+    }
+
+    public void Unpack(DateTimeOffset utcNow)
+    {
+        BundleId = null;
+        MarkAsModified(utcNow);
+    }
+
+    public void Box(Guid boxId, DateTimeOffset utcNow)
+    {
+        if (BoxId is not null || BundleId is not null)
+        {
+            throw new DomainException(Vixly.Operations.Domain.Bundles.OperationsBundleErrors.InAnotherBox);
+        }
+
+        BoxId = boxId;
+        MarkAsModified(utcNow);
+    }
+
+    // Slice 7 (R-1): received at a destination warehouse: it is now there, off any shelf.
+    public void ArriveAt(Guid warehouseId, DateTimeOffset utcNow)
+    {
+        (WarehouseId, StorageLocationId) = (warehouseId, null);
+        MarkAsModified(utcNow);
+    }
+
+    public void Unbox(DateTimeOffset utcNow)
+    {
+        BoxId = null;
+        MarkAsModified(utcNow);
+    }
 
     public static string OriginKeyOf(Guid warehouseId, string carrierTrackingNumber) => warehouseId.ToString("N") + ":" + carrierTrackingNumber;
 }

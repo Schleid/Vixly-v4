@@ -23,4 +23,5 @@ public sealed record CustomerInvoiceDto(
     decimal Credited,
     decimal Owed,
     bool Voided,
-    IReadOnlyList<CustomerCreditNoteDto> CreditNotes);
+    IReadOnlyList<CustomerCreditNoteDto> CreditNotes,
+    string State = "unpaid");

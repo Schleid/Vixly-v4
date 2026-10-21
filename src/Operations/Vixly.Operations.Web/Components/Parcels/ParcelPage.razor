@@ -18,7 +18,17 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@(Parcel.Number ?? string.Empty)" Company="@Company" Section="parcels" Error="@Error" Info="@Info">
-    <div class="ops-list-bar__actions" style="margin-bottom: 0.75rem;"><a href="/staff/parcels" class="vx-button vx-button--secondary">@T["ui.parcels.back"]</a> <a class="vx-button vx-button--secondary" href="/staff/parcels/@Parcel.ParcelId/label" target="_blank" rel="noopener">@T["ui.parcels.print_label"]</a></div>
+    <div class="ops-list-bar__actions" style="margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <a href="/staff/parcels" class="vx-button vx-button--secondary">@T["ui.parcels.back"]</a>
+            <a class="vx-button vx-button--secondary" href="/staff/parcels/@Parcel.ParcelId/label" target="_blank" rel="noopener">@T["ui.parcels.print_label"]</a>
+        </div>
+    
+        @if (CanCheck)
+        {
+            <a class="vx-button vx-button--primary" href="/staff/inspection/@Parcel.ParcelId">@T["ui.inspection.title"]</a>
+        }
+    </div>
     <div class="ops-record-layout" data-editable="@((CanAssign || CanPutAway) ? "true" : "false")">
     <aside class="ops-record-rail">
     <section class="ops-editor__panel ops-record-summary" aria-labelledby="parcel-details">
@@ -55,10 +65,6 @@ IMPORTANT NOTES:
     }
     </aside>
     <div class="ops-record-workflows">
-    @if (CanCheck)
-    {
-        <p><a class="vx-button vx-button--primary" href="/staff/inspection/@Parcel.ParcelId">@T["ui.inspection.title"]</a></p>
-    }
     <ShippingLabelPanel ParcelId="Parcel.ParcelId" Cleared="ShippingCleared" PrintedUtc="Parcel.ShippingLabelUtc"
         Printers="Printers.Where(printer => printer.Media == Vixly.Operations.Domain.Printing.OperationsLabelMedia.ShippingLabel).ToList()" />
     @if (Printers.Any(printer => printer.Media == Vixly.Operations.Domain.Printing.OperationsLabelMedia.IdLabel))
@@ -92,7 +98,7 @@ IMPORTANT NOTES:
                 <legend>@T["ui.parcels.verified_by"]</legend>
                 @foreach (string method in OperationsTrackingCodes.VerificationMethods)
                 {
-                    <label><input type="radio" name="verifiedBy" value="@method" required /> @T["ui.parcels.verified." + method]</label>
+                    <label class="ops-checkbox-label"><input type="radio" name="verifiedBy" value="@method" required /> <span>@T["ui.parcels.verified." + method]</span></label>
                 }
             </fieldset>
             <button type="submit" class="vx-button vx-button--primary">@T["ui.parcels.assign_submit"]</button>

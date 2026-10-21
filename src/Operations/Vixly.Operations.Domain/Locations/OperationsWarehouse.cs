@@ -71,6 +71,9 @@ public sealed class OperationsWarehouse : OperationsEntity
     // Slice 4C: as a destination, it also delivers to homes in its area (pickup is its pickup-point role).
     public bool DeliversHome { get; private set; }
 
+    // Slice 7 (R-3): parcels wait for customs clearance here before they are ready.
+    public bool ClearsCustoms { get; private set; }
+
     // Slice 4C: the gateway that serves it (Jérémie through Les Cayes); the route does not change the price.
     public Guid? HubWarehouseId { get; private set; }
 
@@ -150,6 +153,7 @@ public sealed class OperationsWarehouse : OperationsEntity
             ? OperationsLocationText.Required(terms.PartnerName, OperationsLocationLimits.NameMaxLength, OperationsDestinationErrors.PartnerInvalid, OperationsDestinationErrors.PartnerInvalid)
             : null;
         DeliversHome = terms.DeliversHome;
+        ClearsCustoms = terms.ClearsCustoms;
         HubWarehouseId = terms.HubWarehouseId == Guid.Empty ? null : terms.HubWarehouseId;
         OperatedBy = terms.OperatedBy;
         PartnerName = partnerName;

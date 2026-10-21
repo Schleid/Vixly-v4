@@ -20,4 +20,7 @@ public sealed record CustomerShipmentDto(Guid ShipmentId, bool HasInstructions, 
     bool Booked = false,
     decimal? BookedTotal = null,
     string? BookedCurrency = null,
-    Guid? InsurancePlanId = null);
+    Guid? InsurancePlanId = null,
+    string? CollectorName = null,
+    string? CollectorPhone = null,
+    DateTimeOffset? PickedUpUtc = null);

@@ -48,6 +48,67 @@ public sealed class OperationsTracker
                 : null;
     }
 
+    // Slice 6B: one event on each of many parcels already loaded (a dispatch's), with three queries in all instead of three per parcel.
+    // The first refusal is returned and nothing after it is recorded; the caller abandons its save.
+    public async Task<Vixly.Shared.Kernel.Errors.Error?> RecordManyAsync(IReadOnlyList<(OperationsTrackingDraft Draft, OperationsParcel Parcel)> items, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        Guid tenantId = _scope.TenantId ?? throw new InvalidOperationException("Tracking events are written inside a tenant.");
+
+        if (items.Count == 0)
+        {
+            return null;
+        }
+
+        Dictionary<string, OperationsTrackingEvent> earlier = (await _tracking.FindByKeysAsync(items.Select(item => item.Draft.IdempotencyKey).Where(key => !string.IsNullOrWhiteSpace(key)).ToList(),
+            cancellationToken)).GroupBy(item => item.IdempotencyKey!, StringComparer.Ordinal).ToDictionary(group => group.Key, group => group.First(), StringComparer.Ordinal);
+        ILookup<Guid, OperationsTrackingEvent> histories = (await _tracking.ListForSubjectsAsync(OperationsTrackingSubject.Parcel, items.Select(item => item.Parcel.Id).ToList(), cancellationToken))
+            .ToLookup(item => item.SubjectId);
+        DateTimeOffset utcNow = _timeProvider.GetUtcNow();
+
+        foreach ((OperationsTrackingDraft draft, OperationsParcel parcel) in items)
+        {
+            if (draft.SubjectKind != OperationsTrackingSubject.Parcel || draft.SubjectId != parcel.Id)
+            {
+                throw new ArgumentException("Each draft is on its own parcel.", nameof(items));
+            }
+
+            if (!string.IsNullOrWhiteSpace(draft.IdempotencyKey) && earlier.TryGetValue(draft.IdempotencyKey, out OperationsTrackingEvent? repeat))
+            {
+                if (repeat.SubjectId == draft.SubjectId && repeat.Code == draft.Code)
+                {
+                    continue;
+                }
+
+                return OperationsTrackingApplicationErrors.IdempotencyKeyReused;
+            }
+
+            List<OperationsTrackingEvent> history = histories[parcel.Id].ToList();
+
+            if (draft.VoidsEventId is { } target
+                && (history.FirstOrDefault(item => item.Id == target) is not { VoidsEventId: null } || history.Any(item => item.VoidsEventId == target)))
+            {
+                return OperationsTrackingApplicationErrors.VoidTargetInvalid;
+            }
+
+            OperationsTrackingEvent trackingEvent;
+
+            try
+            {
+                trackingEvent = OperationsTrackingEvent.Record(tenantId, draft, utcNow);
+            }
+            catch (DomainException exception)
+            {
+                return exception.Error;
+            }
+
+            _tracking.Add(trackingEvent);
+            parcel.Project(OperationsTrackingProjection.Replay(history.Append(trackingEvent)), utcNow);
+        }
+
+        return null;
+    }
+
     public async Task<OperationsTrackingResult> RecordAsync(OperationsTrackingDraft draft, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(draft);

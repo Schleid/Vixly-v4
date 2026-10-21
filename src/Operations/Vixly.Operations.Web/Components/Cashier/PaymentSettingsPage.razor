@@ -1,0 +1,87 @@
+@*
+=========================================================
+FILE: PaymentSettingsPage.razor
+
+PURPOSE:
+Settings → Payments (Slice 5F, C-1 and P-8): the methods the company accepts and its Zelle details.
+
+RESPONSIBILITIES:
+- The methods on or off and the names of the company's other methods
+- Zelle: the QR picture, tag, email or phone, name and terms in three languages
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Zelle is offered only with a tag or an email or phone, and its terms in English
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.payment_settings.title"]" Company="@Company" Section="payment_settings" Error="@Error" Info="@Info">
+    @if (Settings is { } settings)
+    {
+    <form method="post" action="/staff/settings/payments" enctype="multipart/form-data" class="ops-editor__form">
+        <AntiforgeryToken />
+        <fieldset class="ops-editor__panel" disabled="@(!CanEdit)">
+            <legend>@T["ui.payment_settings.methods"]</legend>
+            <div class="ops-checkbox-group" style="margin-bottom: 1rem;">
+                <label class="ops-checkbox-label"><input type="checkbox" name="cash" value="true" checked="@settings.AcceptCash" /> <span>@T["ui.payments.method.Cash"]</span></label>
+                <label class="ops-checkbox-label"><input type="checkbox" name="zelle" value="true" checked="@settings.AcceptZelle" /> <span>@T["ui.payments.method.Zelle"]</span></label>
+                <label class="ops-checkbox-label"><input type="checkbox" name="cheque" value="true" checked="@settings.AcceptCheque" /> <span>@T["ui.payments.method.Cheque"]</span></label>
+                <label class="ops-checkbox-label"><input type="checkbox" name="transfer" value="true" checked="@settings.AcceptBankTransfer" /> <span>@T["ui.payments.method.BankTransfer"]</span></label>
+            </div>
+            <div class="ops-charges-trio">
+                <div><label>@T["ui.payment_settings.other"] 1 <input name="other1" value="@settings.OtherMethod1" maxlength="30" /></label></div>
+                <div><label>@T["ui.payment_settings.other"] 2 <input name="other2" value="@settings.OtherMethod2" maxlength="30" /></label></div>
+                <div><label>@T["ui.payment_settings.other"] 3 <input name="other3" value="@settings.OtherMethod3" maxlength="30" /></label></div>
+            </div>
+            <p class="ops-editor__hint">@T["ui.payment_settings.other_hint"]</p>
+        </fieldset>
+        <fieldset class="ops-editor__panel" disabled="@(!CanEdit)" style="margin-top: 1rem;">
+            <legend>@T["ui.payments.method.Zelle"]</legend>
+            <div class="ops-charges-duo" style="margin-bottom: 0.5rem;">
+                <div>
+                    @if (settings.ZelleQrKey is not null)
+                    {
+                        <div style="margin-bottom: 0.75rem;">
+                            <img src="/staff/settings/payments/zelle-qr" alt="@T["ui.cashier.zelle_qr"]" width="140" height="140" style="border: 1px solid var(--vx-color-border); border-radius: 0.35rem;" />
+                            <div class="ops-checkbox-group" style="margin-top: 0.35rem;">
+                                <label class="ops-checkbox-label"><input type="checkbox" name="removeQr" value="true" /> <span>@T["ui.payment_settings.remove_qr"]</span></label>
+                            </div>
+                        </div>
+                    }
+                    <label>@T["ui.payment_settings.qr"] <input type="file" name="qr" accept="image/png,image/jpeg" style="height: 32px;" /></label>
+                </div>
+                <div>
+                    <label style="margin-bottom: 0.4rem;">@T["ui.cashier.zelle_tag"] <input name="zelleTag" value="@settings.ZelleTag" maxlength="120" /></label>
+                    <label style="margin-bottom: 0.4rem;">@T["ui.cashier.zelle_contact"] <input name="zelleContact" value="@settings.ZelleContact" maxlength="120" /></label>
+                    <label>@T["ui.cashier.zelle_name"] <input name="zelleName" value="@settings.ZelleName" maxlength="120" /></label>
+                </div>
+            </div>
+            <div class="ops-charges-trio">
+                <div><label>@T["ui.payment_settings.terms_en"] <textarea name="termsEn" rows="3" maxlength="2000">@settings.ZelleTermsEn</textarea></label></div>
+                <div><label>@T["ui.payment_settings.terms_fr"] <textarea name="termsFr" rows="3" maxlength="2000">@settings.ZelleTermsFr</textarea></label></div>
+                <div><label>@T["ui.payment_settings.terms_es"] <textarea name="termsEs" rows="3" maxlength="2000">@settings.ZelleTermsEs</textarea></label></div>
+            </div>
+            <p class="ops-editor__hint">@T["ui.payment_settings.zelle_hint"]</p>
+        </fieldset>
+        @if (CanEdit)
+        {
+            <div style="margin-top: 1rem;">
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.payment_settings.save"]</button>
+            </div>
+        }
+    </form>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsTenantSettings? Settings { get; set; }
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

@@ -5,7 +5,6 @@ using Vixly.Operations.Application.Security;
 using Vixly.Operations.Application.UseCases.Customers.ChangeOperationsCustomerStatus;
 using Vixly.Operations.Application.UseCases.Customers.GetOperationsCustomer;
 using Vixly.Operations.Application.UseCases.Customers.ListOperationsCustomers;
-using Vixly.Operations.Application.UseCases.Customers.SetOperationsCustomerCredit;
 using Vixly.Operations.Application.UseCases.SignIn.GetOperationsSignInBrand;
 using Vixly.Operations.Domain.Customers;
 using Vixly.Operations.Resources;
@@ -67,15 +66,6 @@ public static class OperationsCustomerEndpoints
                 new ChangeOperationsCustomerStatusRequest { CustomerId = customerId, Status = chosen.Value, Reason = reason ?? string.Empty }, http.RequestAborted);
 
             return await AfterAsync(http, customerId, response.Succeeded, response.Error, "status", get, brand, errors);
-        });
-
-        staff.MapPost("/customers/{customerId:guid}/credit", async (HttpContext http, Guid customerId, [FromForm] bool allowed, [FromForm] string? reason,
-            SetOperationsCustomerCreditUseCase useCase, GetOperationsCustomerUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
-        {
-            SetOperationsCustomerCreditResponse response = await useCase.ExecuteAsync(OperationsCurrentUser.Context(http),
-                new SetOperationsCustomerCreditRequest { CustomerId = customerId, Allowed = allowed, Reason = reason ?? string.Empty }, http.RequestAborted);
-
-            return await AfterAsync(http, customerId, response.Succeeded, response.Error, "credit", get, brand, errors);
         });
 
         return endpoints;

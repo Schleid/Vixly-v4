@@ -29,5 +29,22 @@ public enum OperationsCustomerMailKind
     ParcelFinalNotice = 13,
 
     // Slice 4D step 4: staff answered or resolved the customer's ticket.
-    TicketAnswered = 14
+    TicketAnswered = 14,
+
+    // Slice 5F: finance found no Zelle or transfer for the customer's payment.
+    PaymentNotReceived = 15,
+
+    // Slice 5F step 2b (K-7): the monthly statement of a credit account is ready on the portal.
+    CreditStatement = 16,
+
+    // Slice 6C (E-5): a delay or an exception on one of the customer's shipments.
+    ShipmentUpdate = 17,
+
+    // Slice 7 (R-1): a shipment is ready for pickup at a destination warehouse.
+    ReadyForPickup = 18,
+
+    // Slice 7 step 2 (R-5, R-10): the pickup code, and the reminders of a shipment waiting at its destination.
+    PickupCode = 19,
+    PickupReminder = 20,
+    PickupFinalNotice = 21
 }

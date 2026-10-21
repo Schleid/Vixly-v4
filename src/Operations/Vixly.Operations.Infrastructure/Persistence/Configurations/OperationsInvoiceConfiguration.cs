@@ -38,7 +38,8 @@ internal sealed class OperationsInvoiceConfiguration : IEntityTypeConfiguration<
         builder.Property(invoice => invoice.Note).HasMaxLength(OperationsBillingLimits.NoteMaxLength);
 
         foreach (string money in new[] { nameof(OperationsInvoice.Gross), nameof(OperationsInvoice.DiscountTotal), nameof(OperationsInvoice.Subtotal), nameof(OperationsInvoice.TaxTotal),
-            nameof(OperationsInvoice.Total), nameof(OperationsInvoice.CreditedTotal), nameof(OperationsInvoice.PaidTotal) })
+            nameof(OperationsInvoice.Total), nameof(OperationsInvoice.CreditedTotal), nameof(OperationsInvoice.PaidTotal), nameof(OperationsInvoice.PendingTotal),
+            nameof(OperationsInvoice.RefundedTotal) })
         {
             builder.Property<decimal>(money).HasPrecision(14, 2);
         }
@@ -80,6 +81,9 @@ internal sealed class OperationsInvoiceConfiguration : IEntityTypeConfiguration<
         builder.Navigation(invoice => invoice.Taxes).UsePropertyAccessMode(PropertyAccessMode.Field);
         builder.Ignore(invoice => invoice.Owed);
         builder.Ignore(invoice => invoice.CanVoid);
+        builder.Ignore(invoice => invoice.Refundable);
+        builder.Ignore(invoice => invoice.PaymentState);
+        builder.Ignore(invoice => invoice.Released);
         builder.HasOne<OperationsCustomer>().WithMany().HasForeignKey(invoice => invoice.CustomerId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<OperationsWarehouse>().WithMany().HasForeignKey(invoice => invoice.WarehouseId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<OperationsShipment>().WithMany().HasForeignKey(invoice => invoice.ShipmentId).OnDelete(DeleteBehavior.Restrict);
@@ -89,5 +93,8 @@ internal sealed class OperationsInvoiceConfiguration : IEntityTypeConfiguration<
         builder.HasIndex(invoice => new { invoice.TenantId, invoice.SupplySaleId }).IsUnique().HasFilter("[SupplySaleId] IS NOT NULL AND [Kind] = 2");
         builder.HasIndex(invoice => new { invoice.TenantId, invoice.CustomerId, invoice.IssuedUtc });
         builder.HasIndex(invoice => new { invoice.TenantId, invoice.WarehouseId, invoice.IssuedUtc });
+
+        // Slice 5F step 2b: the invoices on credit accounts, and the charges waiting for the credit department.
+        builder.HasIndex(invoice => new { invoice.TenantId, invoice.OnAccount, invoice.CustomerId }).HasFilter("[OnAccount] <> 0");
     }
 }

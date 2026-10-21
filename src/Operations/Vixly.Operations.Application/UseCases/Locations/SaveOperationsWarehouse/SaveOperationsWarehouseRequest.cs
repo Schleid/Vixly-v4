@@ -58,6 +58,9 @@ public sealed class SaveOperationsWarehouseRequest
     // Slice 4C: as a destination: home delivery in its area, the hub that serves it, who runs it.
     public bool DeliversHome { get; init; }
 
+    // Slice 7 (R-3): customs is cleared here: parcels wait for clearance before they are ready.
+    public bool ClearsCustoms { get; init; }
+
     public IReadOnlyList<string>? HomeArea { get; init; }
 
     public Guid? HubWarehouseId { get; init; }

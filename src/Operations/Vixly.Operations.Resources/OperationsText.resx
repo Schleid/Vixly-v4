@@ -17,6 +17,18 @@ If you forgot your password, use "Forgot your password?" on that page. If this w
   <data name="email.customer.account_exists.subject" xml:space="preserve">
     <value>{company}: you already have an account</value>
   </data>
+  <data name="email.customer.credit_statement.body" xml:space="preserve">
+    <value>Hello {name},
+
+Your monthly statement is ready. You can see what is owed on your account, its due dates and the statement on your account page:
+{link}
+
+Thank you,
+{company}</value>
+  </data>
+  <data name="email.customer.credit_statement.subject" xml:space="preserve">
+    <value>{company}: your statement is ready</value>
+  </data>
   <data name="email.customer.parcel_action_needed.body" xml:space="preserve">
     <value>Hello {name},
 
@@ -80,6 +92,108 @@ If you did not ask for this, ignore this email: your password stays the same.</v
   <data name="email.customer.password_reset.subject" xml:space="preserve">
     <value>{company}: reset your password</value>
   </data>
+  <data name="email.customer.payment_not_received.body" xml:space="preserve">
+    <value>Hello {name},
+
+We could not find your Zelle or bank transfer payment in our account. Your invoice is still to pay and your shipment waits. Please check your bank, or contact us.
+
+Your invoices:
+{link}
+
+Thank you,
+{company}</value>
+  </data>
+  <data name="email.customer.payment_not_received.subject" xml:space="preserve">
+    <value>{company}: we have not received your payment</value>
+  </data>
+  <data name="email.customer.pickup_code.body" xml:space="preserve">
+    <value>Hello {name},
+
+Your pickup code for shipment {shipment} at {place} is: {code}
+
+Give it at the counter, with an ID. Keep it to yourself: whoever has it may collect your shipment.
+
+{link}
+
+Thank you,
+{company}</value>
+  </data>
+  <data name="email.customer.pickup_code.subject" xml:space="preserve">
+    <value>{company}: your pickup code for {shipment}</value>
+  </data>
+  <data name="email.customer.pickup_final_notice.body" xml:space="preserve">
+    <value>Hello {name},
+
+This is the final notice: your shipment {shipment} has been waiting at {place} for a long time.
+{hours}
+
+Please collect it, or contact us.
+{link}
+
+Thank you,
+{company}</value>
+  </data>
+  <data name="email.customer.pickup_final_notice.subject" xml:space="preserve">
+    <value>{company}: final notice for your shipment {shipment}</value>
+  </data>
+  <data name="email.customer.pickup_reminder.body" xml:space="preserve">
+    <value>Hello {name},
+
+Your shipment {shipment} is still waiting for you at {place}.
+{hours}
+
+Storage may be charged once the free days have passed.
+{link}
+
+Thank you,
+{company}</value>
+  </data>
+  <data name="email.customer.pickup_reminder.subject" xml:space="preserve">
+    <value>{company}: your shipment {shipment} is waiting for you</value>
+  </data>
+  <data name="email.customer.ready_for_pickup.body" xml:space="preserve">
+    <value>Hello {name},
+
+Your shipment {shipment} is ready for pickup at {place}.
+{address}
+{hours}
+
+You can see it on your account:
+{link}
+
+Thank you,
+{company}</value>
+  </data>
+  <data name="email.customer.ready_for_pickup.subject" xml:space="preserve">
+    <value>{company}: your shipment {shipment} is ready for pickup</value>
+  </data>
+  <data name="email.customer.shipment_update.body" xml:space="preserve">
+    <value>Hello {name},
+
+{kind} on your {item} {shipment}: {cause}.
+{message}
+
+You can follow it on your account:
+{link}
+
+Thank you,
+{company}</value>
+  </data>
+  <data name="email.customer.shipment_update.delay" xml:space="preserve">
+    <value>A delay</value>
+  </data>
+  <data name="email.customer.shipment_update.exception" xml:space="preserve">
+    <value>An exception</value>
+  </data>
+  <data name="email.customer.shipment_update.item_package" xml:space="preserve">
+    <value>package</value>
+  </data>
+  <data name="email.customer.shipment_update.item_shipment" xml:space="preserve">
+    <value>shipment</value>
+  </data>
+  <data name="email.customer.shipment_update.subject" xml:space="preserve">
+    <value>{company}: update on your {item} {shipment}</value>
+  </data>
   <data name="email.customer.ticket_answered.body" xml:space="preserve">
     <value>Hello {name},
 
@@ -140,6 +254,39 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ops.access.step_up_required" xml:space="preserve">
     <value>Confirm with your authenticator app first.</value>
+  </data>
+  <data name="ops.arrivals.bundles_unopened" xml:space="preserve">
+    <value>Open each bundle that ends here and scan its parcels first.</value>
+  </data>
+  <data name="ops.arrivals.customs_not_here" xml:space="preserve">
+    <value>Customs is not cleared at this warehouse.</value>
+  </data>
+  <data name="ops.arrivals.customs_step_invalid" xml:space="preserve">
+    <value>Choose a customs step.</value>
+  </data>
+  <data name="ops.arrivals.moved_on" xml:space="preserve">
+    <value>This went on from here since: it is not received again.</value>
+  </data>
+  <data name="ops.arrivals.not_departed" xml:space="preserve">
+    <value>This dispatch has not left yet.</value>
+  </data>
+  <data name="ops.arrivals.not_found" xml:space="preserve">
+    <value>This dispatch is not received at this warehouse.</value>
+  </data>
+  <data name="ops.arrivals.not_here" xml:space="preserve">
+    <value>Not here: scan the bundles in first, or it does not end at this warehouse.</value>
+  </data>
+  <data name="ops.arrivals.not_open" xml:space="preserve">
+    <value>This discrepancy is closed already.</value>
+  </data>
+  <data name="ops.arrivals.reason_required" xml:space="preserve">
+    <value>Choose lost or settled and write a note.</value>
+  </data>
+  <data name="ops.arrivals.received" xml:space="preserve">
+    <value>This dispatch was received already.</value>
+  </data>
+  <data name="ops.arrivals.unknown_code" xml:space="preserve">
+    <value>No bundle, box or parcel has that number.</value>
   </data>
   <data name="ops.auth.code_invalid" xml:space="preserve">
     <value>That code did not work. Try again.</value>
@@ -215,6 +362,111 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ops.brand.text_too_long" xml:space="preserve">
     <value>A text is longer than allowed.</value>
+  </data>
+  <data name="ops.bundles.blocked" xml:space="preserve">
+    <value>Refused: this parcel is on hold or waiting for an inspection.</value>
+  </data>
+  <data name="ops.bundles.box_incomplete" xml:space="preserve">
+    <value>Every parcel of the shipment must be in the box before it is closed.</value>
+  </data>
+  <data name="ops.bundles.box_not_closed" xml:space="preserve">
+    <value>Close the box with its weight and size first.</value>
+  </data>
+  <data name="ops.bundles.box_not_open" xml:space="preserve">
+    <value>This box is not open.</value>
+  </data>
+  <data name="ops.bundles.box_open_already" xml:space="preserve">
+    <value>This shipment already has a box.</value>
+  </data>
+  <data name="ops.bundles.cannot_void" xml:space="preserve">
+    <value>This can no longer be voided (take out its parcels first, or it is in a bundle or on a dispatch).</value>
+  </data>
+  <data name="ops.bundles.destination_required" xml:space="preserve">
+    <value>Choose a destination.</value>
+  </data>
+  <data name="ops.bundles.divisor_required" xml:space="preserve">
+    <value>This service has no volumetric divisor: use a weight target or free fill.</value>
+  </data>
+  <data name="ops.bundles.empty" xml:space="preserve">
+    <value>The bundle is empty.</value>
+  </data>
+  <data name="ops.bundles.full" xml:space="preserve">
+    <value>The bundle holds the most parcels it can.</value>
+  </data>
+  <data name="ops.bundles.in_another_box" xml:space="preserve">
+    <value>Refused: this parcel is in a repack box; it goes with its box.</value>
+  </data>
+  <data name="ops.bundles.in_another_bundle" xml:space="preserve">
+    <value>Refused: already in another bundle.</value>
+  </data>
+  <data name="ops.bundles.kept_together" xml:space="preserve">
+    <value>Refused: this consolidated shipment’s parcels travel together, and some are in another bundle.</value>
+  </data>
+  <data name="ops.bundles.kept_together_incomplete" xml:space="preserve">
+    <value>A consolidated shipment kept together is only partly in this bundle: add its other parcels, or take these out, before closing.</value>
+  </data>
+  <data name="ops.bundles.measurements_invalid" xml:space="preserve">
+    <value>Enter the weight and the three sides, above zero.</value>
+  </data>
+  <data name="ops.bundles.not_consolidated" xml:space="preserve">
+    <value>This shipment is not consolidated.</value>
+  </data>
+  <data name="ops.bundles.not_final" xml:space="preserve">
+    <value>Refused: its shipment is not final, or no longer waiting here to travel.</value>
+  </data>
+  <data name="ops.bundles.not_found" xml:space="preserve">
+    <value>This bundle or box was not found.</value>
+  </data>
+  <data name="ops.bundles.not_in_bundle" xml:space="preserve">
+    <value>This is not in this bundle or box.</value>
+  </data>
+  <data name="ops.bundles.not_open" xml:space="preserve">
+    <value>This bundle is not open.</value>
+  </data>
+  <data name="ops.bundles.not_paid" xml:space="preserve">
+    <value>Refused: its shipment is not paid yet.</value>
+  </data>
+  <data name="ops.bundles.not_repacked" xml:space="preserve">
+    <value>This shipment is not repacked: its parcels go into a bundle as they are.</value>
+  </data>
+  <data name="ops.bundles.reason_required" xml:space="preserve">
+    <value>Give a short reason.</value>
+  </data>
+  <data name="ops.bundles.repack_first" xml:space="preserve">
+    <value>Refused: this consolidated shipment is repacked first; scan its box instead.</value>
+  </data>
+  <data name="ops.bundles.service_required" xml:space="preserve">
+    <value>Choose a service the company offers.</value>
+  </data>
+  <data name="ops.bundles.settings_invalid" xml:space="preserve">
+    <value>Check the bundle types (up to 12, each different) and the choices.</value>
+  </data>
+  <data name="ops.bundles.target_invalid" xml:space="preserve">
+    <value>Give a target above zero for a target size, none for free fill.</value>
+  </data>
+  <data name="ops.bundles.target_reached" xml:space="preserve">
+    <value>Refused: this parcel would take the bundle past its target. Open another bundle.</value>
+  </data>
+  <data name="ops.bundles.type_invalid" xml:space="preserve">
+    <value>Choose one of the company’s bundle types.</value>
+  </data>
+  <data name="ops.bundles.unknown_code" xml:space="preserve">
+    <value>This barcode is not a parcel, a bundle or a box here.</value>
+  </data>
+  <data name="ops.bundles.way_locked" xml:space="preserve">
+    <value>Its way is fixed once a box is started or one of its parcels is bundled: void the box, or take its parcels out of the bundle first.</value>
+  </data>
+  <data name="ops.bundles.wrong_destination" xml:space="preserve">
+    <value>Refused: this parcel goes to another destination.</value>
+  </data>
+  <data name="ops.bundles.wrong_service" xml:space="preserve">
+    <value>Refused: this parcel travels with another service.</value>
+  </data>
+  <data name="ops.bundles.wrong_shipment" xml:space="preserve">
+    <value>Refused: this parcel belongs to another shipment.</value>
+  </data>
+  <data name="ops.bundles.wrong_warehouse" xml:space="preserve">
+    <value>Refused: this parcel is at another warehouse.</value>
   </data>
   <data name="ops.charges.bands_invalid" xml:space="preserve">
     <value>Check the bands: the first starts at 0, each start once, each with an amount (and a base only for "base plus per unit").</value>
@@ -357,6 +609,48 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ops.company.time_zone_invalid" xml:space="preserve">
     <value>Choose a time zone from the list, for example America/Port-au-Prince.</value>
   </data>
+  <data name="ops.credit.account_exists" xml:space="preserve">
+    <value>This customer already has a credit account.</value>
+  </data>
+  <data name="ops.credit.already_on_account" xml:space="preserve">
+    <value>This invoice is already billed to the account.</value>
+  </data>
+  <data name="ops.credit.balance_open" xml:space="preserve">
+    <value>The account can be closed only once nothing is owed or waiting on it.</value>
+  </data>
+  <data name="ops.credit.credit_off" xml:space="preserve">
+    <value>Credit is switched off for the company.</value>
+  </data>
+  <data name="ops.credit.limit_invalid" xml:space="preserve">
+    <value>Enter a limit of zero or more, to the cent.</value>
+  </data>
+  <data name="ops.credit.not_active" xml:space="preserve">
+    <value>The customer has no active credit account.</value>
+  </data>
+  <data name="ops.credit.not_awaiting" xml:space="preserve">
+    <value>This charge is no longer waiting.</value>
+  </data>
+  <data name="ops.credit.not_found" xml:space="preserve">
+    <value>This customer or credit account was not found.</value>
+  </data>
+  <data name="ops.credit.nothing_owed" xml:space="preserve">
+    <value>Nothing to bill: the invoice is paid or waits for a payment check.</value>
+  </data>
+  <data name="ops.credit.over_limit" xml:space="preserve">
+    <value>Above the account’s limit: refused. Take a payment, or ask the credit department.</value>
+  </data>
+  <data name="ops.credit.own_request" xml:space="preserve">
+    <value>You asked for this charge: another person decides it.</value>
+  </data>
+  <data name="ops.credit.reason_required" xml:space="preserve">
+    <value>Give a reason (300 characters at most).</value>
+  </data>
+  <data name="ops.credit.settings_invalid" xml:space="preserve">
+    <value>Enter terms of 0 to 365 days and choose what a charge above the limit does.</value>
+  </data>
+  <data name="ops.credit.terms_invalid" xml:space="preserve">
+    <value>Enter terms of 0 to 365 days, or leave them empty.</value>
+  </data>
   <data name="ops.customers.code_invalid" xml:space="preserve">
     <value>The customer code is not valid.</value>
   </data>
@@ -461,6 +755,117 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ops.devices.too_many_pending" xml:space="preserve">
     <value>Too many devices are waiting for approval. Approve or deny them first.</value>
+  </data>
+  <data name="ops.dispatch.bundle_elsewhere" xml:space="preserve">
+    <value>That bundle is on another dispatch.</value>
+  </data>
+  <data name="ops.dispatch.bundle_not_closed" xml:space="preserve">
+    <value>Only a closed bundle can go on a dispatch.</value>
+  </data>
+  <data name="ops.dispatch.cannot_cancel" xml:space="preserve">
+    <value>A dispatch that has left cannot be cancelled.</value>
+  </data>
+  <data name="ops.dispatch.carrier_inactive" xml:space="preserve">
+    <value>That carrier is switched off.</value>
+  </data>
+  <data name="ops.dispatch.carrier_invalid" xml:space="preserve">
+    <value>Check the carrier: a name and a kind are needed, and the kind cannot change once it has rates.</value>
+  </data>
+  <data name="ops.dispatch.carrier_taken" xml:space="preserve">
+    <value>Another carrier already has that name.</value>
+  </data>
+  <data name="ops.dispatch.cost_invalid" xml:space="preserve">
+    <value>Check the amount: zero or more, with at most two decimals.</value>
+  </data>
+  <data name="ops.dispatch.destination_required" xml:space="preserve">
+    <value>Choose a destination.</value>
+  </data>
+  <data name="ops.dispatch.leg_not_found" xml:space="preserve">
+    <value>That leg was not found.</value>
+  </data>
+  <data name="ops.dispatch.leg_order" xml:space="preserve">
+    <value>Legs leave in order, each after the one before has arrived.</value>
+  </data>
+  <data name="ops.dispatch.leg_time_invalid" xml:space="preserve">
+    <value>Check the time: it cannot be in the future or before the previous step.</value>
+  </data>
+  <data name="ops.dispatch.not_closed" xml:space="preserve">
+    <value>Close the dispatch first.</value>
+  </data>
+  <data name="ops.dispatch.not_found" xml:space="preserve">
+    <value>That dispatch was not found.</value>
+  </data>
+  <data name="ops.dispatch.not_planned" xml:space="preserve">
+    <value>The dispatch is no longer planned: it cannot change now.</value>
+  </data>
+  <data name="ops.dispatch.nothing_to_close" xml:space="preserve">
+    <value>A dispatch needs at least one bundle and one leg to close.</value>
+  </data>
+  <data name="ops.dispatch.parcel_held" xml:space="preserve">
+    <value>A parcel on this dispatch is on hold or waiting for a check: release it first, or cancel the dispatch.</value>
+  </data>
+  <data name="ops.dispatch.prefix_invalid" xml:space="preserve">
+    <value>An airline prefix is three digits, for an air carrier only.</value>
+  </data>
+  <data name="ops.dispatch.rate_invalid" xml:space="preserve">
+    <value>Check the rate: air needs a rate per weight (and an optional minimum), ocean and ground a rate per bundle; it starts today or later.</value>
+  </data>
+  <data name="ops.dispatch.rate_started" xml:space="preserve">
+    <value>That rate has started: add a new one instead.</value>
+  </data>
+  <data name="ops.dispatch.reason_required" xml:space="preserve">
+    <value>Give a reason.</value>
+  </data>
+  <data name="ops.dispatch.service_required" xml:space="preserve">
+    <value>Choose a service the company offers.</value>
+  </data>
+  <data name="ops.dispatch.text_invalid" xml:space="preserve">
+    <value>Check the text: it is too long or contains characters that are not allowed.</value>
+  </data>
+  <data name="ops.dispatch.too_many_bundles" xml:space="preserve">
+    <value>A dispatch holds at most 500 bundles.</value>
+  </data>
+  <data name="ops.dispatch.too_many_legs" xml:space="preserve">
+    <value>A dispatch has at most six legs.</value>
+  </data>
+  <data name="ops.dispatch.unknown_code" xml:space="preserve">
+    <value>That code was not recognised.</value>
+  </data>
+  <data name="ops.dispatch.wrong_destination" xml:space="preserve">
+    <value>That bundle goes to another destination.</value>
+  </data>
+  <data name="ops.dispatch.wrong_service" xml:space="preserve">
+    <value>That bundle travels by another service.</value>
+  </data>
+  <data name="ops.dispatch.wrong_warehouse" xml:space="preserve">
+    <value>That bundle is at another warehouse.</value>
+  </data>
+  <data name="ops.events.kind_invalid" xml:space="preserve">
+    <value>Choose a note, a delay or an exception.</value>
+  </data>
+  <data name="ops.events.not_found" xml:space="preserve">
+    <value>Nothing with that number was found here.</value>
+  </data>
+  <data name="ops.events.not_manual" xml:space="preserve">
+    <value>Only an event recorded by hand here can be voided.</value>
+  </data>
+  <data name="ops.events.note_required" xml:space="preserve">
+    <value>Write the note.</value>
+  </data>
+  <data name="ops.events.reason_required" xml:space="preserve">
+    <value>Choose a cause the company offers.</value>
+  </data>
+  <data name="ops.events.text_invalid" xml:space="preserve">
+    <value>Check the text: it is too long or contains characters that are not allowed.</value>
+  </data>
+  <data name="ops.events.time_invalid" xml:space="preserve">
+    <value>Check the time: not in the future, at most 30 days back.</value>
+  </data>
+  <data name="ops.events.too_many_reasons" xml:space="preserve">
+    <value>The company has 40 causes of its own already.</value>
+  </data>
+  <data name="ops.events.void_reason_required" xml:space="preserve">
+    <value>Say why it is voided.</value>
   </data>
   <data name="ops.holds.answer_not_found" xml:space="preserve">
     <value>This answer was not found.</value>
@@ -861,6 +1266,117 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ops.messaging.type_invalid" xml:space="preserve">
     <value>The message type is not valid.</value>
   </data>
+  <data name="ops.payments.amount_invalid" xml:space="preserve">
+    <value>Enter amounts with up to two decimals.</value>
+  </data>
+  <data name="ops.payments.cash_given_too_low" xml:space="preserve">
+    <value>The cash handed over is less than the cash amount.</value>
+  </data>
+  <data name="ops.payments.drawer_closed" xml:space="preserve">
+    <value>This cash drawer is closed.</value>
+  </data>
+  <data name="ops.payments.drawer_not_found" xml:space="preserve">
+    <value>This cash drawer was not found.</value>
+  </data>
+  <data name="ops.payments.drawer_open" xml:space="preserve">
+    <value>Your cash drawer is already open here.</value>
+  </data>
+  <data name="ops.payments.drawer_required" xml:space="preserve">
+    <value>Open your cash drawer at this warehouse before taking or giving back cash.</value>
+  </data>
+  <data name="ops.payments.drawer_short" xml:space="preserve">
+    <value>The cash drawer does not hold that much cash.</value>
+  </data>
+  <data name="ops.payments.method_name_invalid" xml:space="preserve">
+    <value>Each other method needs its own short name (up to 30 characters).</value>
+  </data>
+  <data name="ops.payments.method_not_accepted" xml:space="preserve">
+    <value>The company does not accept this payment method.</value>
+  </data>
+  <data name="ops.payments.not_awaiting" xml:space="preserve">
+    <value>This payment is not waiting for confirmation.</value>
+  </data>
+  <data name="ops.payments.not_found" xml:space="preserve">
+    <value>This payment was not found.</value>
+  </data>
+  <data name="ops.payments.not_in_full" xml:space="preserve">
+    <value>The amounts must add up to exactly what is owed.</value>
+  </data>
+  <data name="ops.payments.nothing_owed" xml:space="preserve">
+    <value>Nothing is owed on this invoice.</value>
+  </data>
+  <data name="ops.payments.one_cash_tender" xml:space="preserve">
+    <value>Use one cash line only.</value>
+  </data>
+  <data name="ops.payments.own_payment" xml:space="preserve">
+    <value>Another person confirms the money arrived, never the one who took the payment.</value>
+  </data>
+  <data name="ops.payments.picture_invalid" xml:space="preserve">
+    <value>The QR code must be a PNG or JPEG picture of up to 1 MB.</value>
+  </data>
+  <data name="ops.payments.reason_required" xml:space="preserve">
+    <value>Give a reason.</value>
+  </data>
+  <data name="ops.payments.refund_too_high" xml:space="preserve">
+    <value>This is more than can be given back on this invoice.</value>
+  </data>
+  <data name="ops.payments.text_invalid" xml:space="preserve">
+    <value>This text is too long or has characters that are not allowed.</value>
+  </data>
+  <data name="ops.payments.zelle_incomplete" xml:space="preserve">
+    <value>Zelle needs a Zelle tag or an email or phone, and the terms in English.</value>
+  </data>
+  <data name="ops.payments.zelle_terms_required" xml:space="preserve">
+    <value>The customer must accept the Zelle terms first.</value>
+  </data>
+  <data name="ops.pickup.amount_invalid" xml:space="preserve">
+    <value>Check the amounts: not negative, at most two decimals, and only when the company bills destination charges.</value>
+  </data>
+  <data name="ops.pickup.bill_first" xml:space="preserve">
+    <value>Storage is owed: bill it first, then take the payment.</value>
+  </data>
+  <data name="ops.pickup.billed" xml:space="preserve">
+    <value>This shipment was billed at the destination already.</value>
+  </data>
+  <data name="ops.pickup.code_locked" xml:space="preserve">
+    <value>This code is stopped after too many wrong tries: send the customer a new one.</value>
+  </data>
+  <data name="ops.pickup.code_not_sent" xml:space="preserve">
+    <value>No code was sent: send one to the customer first.</value>
+  </data>
+  <data name="ops.pickup.code_wait" xml:space="preserve">
+    <value>A code was just sent. Wait two minutes before sending another.</value>
+  </data>
+  <data name="ops.pickup.code_wrong" xml:space="preserve">
+    <value>That code does not match the last one sent.</value>
+  </data>
+  <data name="ops.pickup.collector_invalid" xml:space="preserve">
+    <value>Choose who collects: the recipient, the person named or the customer.</value>
+  </data>
+  <data name="ops.pickup.id_required" xml:space="preserve">
+    <value>Choose the ID shown and type its last 4 letters or digits.</value>
+  </data>
+  <data name="ops.pickup.not_found" xml:space="preserve">
+    <value>This shipment has nothing at this warehouse.</value>
+  </data>
+  <data name="ops.pickup.nothing_ready" xml:space="preserve">
+    <value>Nothing of this shipment is ready for pickup here.</value>
+  </data>
+  <data name="ops.pickup.nothing_to_bill" xml:space="preserve">
+    <value>There is nothing to bill.</value>
+  </data>
+  <data name="ops.pickup.pay_first" xml:space="preserve">
+    <value>Every invoice of the shipment is paid first, at the cashier.</value>
+  </data>
+  <data name="ops.pickup.photo_required" xml:space="preserve">
+    <value>Take a photo of the person (JPEG, PNG or WebP, at most 10 MB).</value>
+  </data>
+  <data name="ops.pickup.settings_invalid" xml:space="preserve">
+    <value>Check the settings: free days 0 to 365, a fee above zero when storage is charged, at most two decimals.</value>
+  </data>
+  <data name="ops.pickup.signature_required" xml:space="preserve">
+    <value>The person collecting signs on the screen.</value>
+  </data>
   <data name="ops.printing.address_invalid" xml:space="preserve">
     <value>Enter the address as host:port with a raw printing port from 9100 to 9109 (for example 192.168.1.50:9100), or the Windows printer name.</value>
   </data>
@@ -1025,6 +1541,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ops.shipments.booked" xml:space="preserve">
     <value>This shipment is final: it can no longer change.</value>
+  </data>
+  <data name="ops.shipments.collector_locked" xml:space="preserve">
+    <value>Who may collect is named once the shipment is booked, until it is collected.</value>
   </data>
   <data name="ops.shipments.delivery_mode_unavailable" xml:space="preserve">
     <value>This delivery is not offered there. Choose pickup at a branch or delivery to an address.</value>
@@ -1521,6 +2040,213 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.app.name" xml:space="preserve">
     <value>Operations</value>
   </data>
+  <data name="ui.arrivals.actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ui.arrivals.back" xml:space="preserve">
+    <value>Back to arrivals</value>
+  </data>
+  <data name="ui.arrivals.bundle" xml:space="preserve">
+    <value>Bundle</value>
+  </data>
+  <data name="ui.arrivals.bundle_state.arrived" xml:space="preserve">
+    <value>Arrived, to open</value>
+  </data>
+  <data name="ui.arrivals.bundle_state.expected" xml:space="preserve">
+    <value>Expected</value>
+  </data>
+  <data name="ui.arrivals.bundle_state.opened" xml:space="preserve">
+    <value>Opened</value>
+  </data>
+  <data name="ui.arrivals.bundle_state.passing" xml:space="preserve">
+    <value>Here, going on</value>
+  </data>
+  <data name="ui.arrivals.code" xml:space="preserve">
+    <value>Bundle, box or parcel number</value>
+  </data>
+  <data name="ui.arrivals.coming" xml:space="preserve">
+    <value>On their way here</value>
+  </data>
+  <data name="ui.arrivals.customs" xml:space="preserve">
+    <value>Customs</value>
+  </data>
+  <data name="ui.arrivals.customs.cleared" xml:space="preserve">
+    <value>Cleared</value>
+  </data>
+  <data name="ui.arrivals.customs.held" xml:space="preserve">
+    <value>Held</value>
+  </data>
+  <data name="ui.arrivals.customs.in_customs" xml:space="preserve">
+    <value>With customs</value>
+  </data>
+  <data name="ui.arrivals.customs_all" xml:space="preserve">
+    <value>The whole dispatch</value>
+  </data>
+  <data name="ui.arrivals.customs_hint" xml:space="preserve">
+    <value>Parcels held by customs cannot be collected or sent on until they are cleared.</value>
+  </data>
+  <data name="ui.arrivals.customs_message" xml:space="preserve">
+    <value>Line for the customer (held only)</value>
+  </data>
+  <data name="ui.arrivals.customs_record" xml:space="preserve">
+    <value>Record</value>
+  </data>
+  <data name="ui.arrivals.customs_scope" xml:space="preserve">
+    <value>For</value>
+  </data>
+  <data name="ui.arrivals.customs_step" xml:space="preserve">
+    <value>Step</value>
+  </data>
+  <data name="ui.arrivals.departed" xml:space="preserve">
+    <value>Departed</value>
+  </data>
+  <data name="ui.arrivals.discrepancies" xml:space="preserve">
+    <value>Discrepancies</value>
+  </data>
+  <data name="ui.arrivals.discrepancy.ExtraBundle" xml:space="preserve">
+    <value>Bundle not on the dispatch</value>
+  </data>
+  <data name="ui.arrivals.discrepancy.ExtraParcel" xml:space="preserve">
+    <value>Parcel not on the dispatch</value>
+  </data>
+  <data name="ui.arrivals.discrepancy.MissingBundle" xml:space="preserve">
+    <value>Bundle missing</value>
+  </data>
+  <data name="ui.arrivals.discrepancy.MissingParcel" xml:space="preserve">
+    <value>Parcel missing</value>
+  </data>
+  <data name="ui.arrivals.discrepancy_status.Found" xml:space="preserve">
+    <value>Found</value>
+  </data>
+  <data name="ui.arrivals.discrepancy_status.Lost" xml:space="preserve">
+    <value>Lost</value>
+  </data>
+  <data name="ui.arrivals.discrepancy_status.Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="ui.arrivals.discrepancy_status.Resolved" xml:space="preserve">
+    <value>Settled</value>
+  </data>
+  <data name="ui.arrivals.dispatch_title" xml:space="preserve">
+    <value>Receive {number}</value>
+  </data>
+  <data name="ui.arrivals.done.bundle" xml:space="preserve">
+    <value>Bundle {number} received.</value>
+  </data>
+  <data name="ui.arrivals.done.bundle_again" xml:space="preserve">
+    <value>Bundle {number} was received already.</value>
+  </data>
+  <data name="ui.arrivals.done.customs" xml:space="preserve">
+    <value>Customs recorded.</value>
+  </data>
+  <data name="ui.arrivals.done.extra_bundle" xml:space="preserve">
+    <value>Bundle {number} is not on this dispatch: noted as a discrepancy.</value>
+  </data>
+  <data name="ui.arrivals.done.extra_parcel" xml:space="preserve">
+    <value>{number} is not on this dispatch: noted as a discrepancy.</value>
+  </data>
+  <data name="ui.arrivals.done.finished" xml:space="preserve">
+    <value>Received. Everything matched.</value>
+  </data>
+  <data name="ui.arrivals.done.finished_missing" xml:space="preserve">
+    <value>Received. What was missing is listed below.</value>
+  </data>
+  <data name="ui.arrivals.done.opened" xml:space="preserve">
+    <value>Bundle opened: scan its parcels.</value>
+  </data>
+  <data name="ui.arrivals.done.parcel" xml:space="preserve">
+    <value>{number} received.</value>
+  </data>
+  <data name="ui.arrivals.done.parcel_again" xml:space="preserve">
+    <value>{number} was received already.</value>
+  </data>
+  <data name="ui.arrivals.done.parcel_again_ready" xml:space="preserve">
+    <value>{number} was received already; now ready for pickup.</value>
+  </data>
+  <data name="ui.arrivals.done.parcel_ready" xml:space="preserve">
+    <value>{number} received and ready for pickup.</value>
+  </data>
+  <data name="ui.arrivals.done.resolved" xml:space="preserve">
+    <value>Resolved.</value>
+  </data>
+  <data name="ui.arrivals.finish" xml:space="preserve">
+    <value>Finish receiving</value>
+  </data>
+  <data name="ui.arrivals.finish_button" xml:space="preserve">
+    <value>Finish</value>
+  </data>
+  <data name="ui.arrivals.finish_hint" xml:space="preserve">
+    <value>What was not scanned is listed as missing, for the staff here and at the origin to sort out.</value>
+  </data>
+  <data name="ui.arrivals.kind" xml:space="preserve">
+    <value>What</value>
+  </data>
+  <data name="ui.arrivals.no_discrepancies" xml:space="preserve">
+    <value>Nothing to sort out.</value>
+  </data>
+  <data name="ui.arrivals.none_coming" xml:space="preserve">
+    <value>No dispatch is on its way here.</value>
+  </data>
+  <data name="ui.arrivals.not_yet" xml:space="preserve">
+    <value>Not yet</value>
+  </data>
+  <data name="ui.arrivals.note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="ui.arrivals.noted" xml:space="preserve">
+    <value>Noted</value>
+  </data>
+  <data name="ui.arrivals.onward" xml:space="preserve">
+    <value>onward from a hub</value>
+  </data>
+  <data name="ui.arrivals.open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="ui.arrivals.outcome" xml:space="preserve">
+    <value>Outcome</value>
+  </data>
+  <data name="ui.arrivals.parcels_here" xml:space="preserve">
+    <value>Parcels here</value>
+  </data>
+  <data name="ui.arrivals.receive" xml:space="preserve">
+    <value>Receive</value>
+  </data>
+  <data name="ui.arrivals.received" xml:space="preserve">
+    <value>Received lately</value>
+  </data>
+  <data name="ui.arrivals.received_at" xml:space="preserve">
+    <value>Received</value>
+  </data>
+  <data name="ui.arrivals.resolution" xml:space="preserve">
+    <value>Resolution</value>
+  </data>
+  <data name="ui.arrivals.resolve" xml:space="preserve">
+    <value>Resolve</value>
+  </data>
+  <data name="ui.arrivals.scan" xml:space="preserve">
+    <value>Scan</value>
+  </data>
+  <data name="ui.arrivals.scan_hint" xml:space="preserve">
+    <value>Scan each bundle as it comes off the truck, then open the bundles that end here and scan their parcels.</value>
+  </data>
+  <data name="ui.arrivals.show" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="ui.arrivals.summary" xml:space="preserve">
+    <value>Dispatch</value>
+  </data>
+  <data name="ui.arrivals.title" xml:space="preserve">
+    <value>Arrivals</value>
+  </data>
+  <data name="ui.arrivals.view_all" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="ui.arrivals.view_open" xml:space="preserve">
+    <value>Open only</value>
+  </data>
+  <data name="ui.arrivals.warehouse" xml:space="preserve">
+    <value>Warehouse</value>
+  </data>
   <data name="ui.audit.all_areas" xml:space="preserve">
     <value>Everything</value>
   </data>
@@ -1685,6 +2411,528 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.billing.trial_ends" xml:space="preserve">
     <value>Trial ends on {date}</value>
+  </data>
+  <data name="ui.boxes.back" xml:space="preserve">
+    <value>Back to consolidated shipments</value>
+  </data>
+  <data name="ui.boxes.box" xml:space="preserve">
+    <value>Box</value>
+  </data>
+  <data name="ui.boxes.box_title" xml:space="preserve">
+    <value>Repack box {number}</value>
+  </data>
+  <data name="ui.boxes.close" xml:space="preserve">
+    <value>Close the box</value>
+  </data>
+  <data name="ui.boxes.close_button" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="ui.boxes.company_way" xml:space="preserve">
+    <value>Company default: {way}.</value>
+  </data>
+  <data name="ui.boxes.counts" xml:space="preserve">
+    <value>{inside} of {total} parcels in the box</value>
+  </data>
+  <data name="ui.boxes.in_box" xml:space="preserve">
+    <value>in the box</value>
+  </data>
+  <data name="ui.boxes.none" xml:space="preserve">
+    <value>No consolidated shipment is waiting to travel.</value>
+  </data>
+  <data name="ui.boxes.start" xml:space="preserve">
+    <value>Start the box</value>
+  </data>
+  <data name="ui.boxes.status.Closed" xml:space="preserve">
+    <value>closed</value>
+  </data>
+  <data name="ui.boxes.status.Open" xml:space="preserve">
+    <value>open</value>
+  </data>
+  <data name="ui.boxes.status.Voided" xml:space="preserve">
+    <value>voided</value>
+  </data>
+  <data name="ui.boxes.switch" xml:space="preserve">
+    <value>Switch</value>
+  </data>
+  <data name="ui.boxes.switched" xml:space="preserve">
+    <value>chosen for this shipment</value>
+  </data>
+  <data name="ui.boxes.title" xml:space="preserve">
+    <value>Consolidated shipments</value>
+  </data>
+  <data name="ui.boxes.unpaid" xml:space="preserve">
+    <value>unpaid</value>
+  </data>
+  <data name="ui.boxes.void" xml:space="preserve">
+    <value>Void the box</value>
+  </data>
+  <data name="ui.boxes.way" xml:space="preserve">
+    <value>How it travels</value>
+  </data>
+  <data name="ui.boxes.way.KeepTogether" xml:space="preserve">
+    <value>Kept together in one bundle</value>
+  </data>
+  <data name="ui.boxes.way.Repack" xml:space="preserve">
+    <value>Repacked into one box</value>
+  </data>
+  <data name="ui.boxes.where" xml:space="preserve">
+    <value>Where</value>
+  </data>
+  <data name="ui.bundle_settings.target" xml:space="preserve">
+    <value>When a bundle reaches its target</value>
+  </data>
+  <data name="ui.bundle_settings.target.Refuse" xml:space="preserve">
+    <value>Refuse the parcel</value>
+  </data>
+  <data name="ui.bundle_settings.target.Warn" xml:space="preserve">
+    <value>Warn and accept the parcel</value>
+  </data>
+  <data name="ui.bundle_settings.title" xml:space="preserve">
+    <value>Bundle settings</value>
+  </data>
+  <data name="ui.bundle_settings.types" xml:space="preserve">
+    <value>Bundle types</value>
+  </data>
+  <data name="ui.bundle_settings.types_hint" xml:space="preserve">
+    <value>One per line, in your own words (box, sack, pallet...), up to {count}. None: bundles have no type.</value>
+  </data>
+  <data name="ui.bundle_settings.way" xml:space="preserve">
+    <value>Consolidated shipments</value>
+  </data>
+  <data name="ui.bundle_settings.way_hint.KeepTogether" xml:space="preserve">
+    <value>their parcels travel unchanged, all in the same bundle</value>
+  </data>
+  <data name="ui.bundle_settings.way_hint.Repack" xml:space="preserve">
+    <value>their parcels go into one new box, weighed and labelled, then into a bundle</value>
+  </data>
+  <data name="ui.bundles.add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="ui.bundles.back" xml:space="preserve">
+    <value>Back to bundles</value>
+  </data>
+  <data name="ui.bundles.basis" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="ui.bundles.basis.Free" xml:space="preserve">
+    <value>Free fill</value>
+  </data>
+  <data name="ui.bundles.basis.Volumetric" xml:space="preserve">
+    <value>Target in volumetric weight</value>
+  </data>
+  <data name="ui.bundles.basis.Weight" xml:space="preserve">
+    <value>Target in weight</value>
+  </data>
+  <data name="ui.bundles.box" xml:space="preserve">
+    <value>Box</value>
+  </data>
+  <data name="ui.bundles.boxes" xml:space="preserve">
+    <value>Consolidated shipments</value>
+  </data>
+  <data name="ui.bundles.bundle_title" xml:space="preserve">
+    <value>Bundle {number}</value>
+  </data>
+  <data name="ui.bundles.change_bundle" xml:space="preserve">
+    <value>Another bundle</value>
+  </data>
+  <data name="ui.bundles.close" xml:space="preserve">
+    <value>Close the bundle</value>
+  </data>
+  <data name="ui.bundles.close_button" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="ui.bundles.close_hint" xml:space="preserve">
+    <value>A closed bundle takes nothing more and cannot be reopened. Its label prints again with its weight.</value>
+  </data>
+  <data name="ui.bundles.closed_weight" xml:space="preserve">
+    <value>Weighed and measured</value>
+  </data>
+  <data name="ui.bundles.create" xml:space="preserve">
+    <value>Open bundle</value>
+  </data>
+  <data name="ui.bundles.destination" xml:space="preserve">
+    <value>Destination</value>
+  </data>
+  <data name="ui.bundles.done.closed" xml:space="preserve">
+    <value>Bundle closed. Print its label again with its weight.</value>
+  </data>
+  <data name="ui.bundles.done.created" xml:space="preserve">
+    <value>Bundle opened. Print its label.</value>
+  </data>
+  <data name="ui.bundles.done.voided" xml:space="preserve">
+    <value>Bundle voided. Its parcels are ready to bundle again.</value>
+  </data>
+  <data name="ui.bundles.empty" xml:space="preserve">
+    <value>No parcel in it yet.</value>
+  </data>
+  <data name="ui.bundles.fill" xml:space="preserve">
+    <value>Fill a bundle</value>
+  </data>
+  <data name="ui.bundles.fill_of" xml:space="preserve">
+    <value>{filled} of {target}</value>
+  </data>
+  <data name="ui.bundles.fill_title" xml:space="preserve">
+    <value>Fill a bundle</value>
+  </data>
+  <data name="ui.bundles.filled" xml:space="preserve">
+    <value>Filled</value>
+  </data>
+  <data name="ui.bundles.gross_weight" xml:space="preserve">
+    <value>Gross weight ({unit})</value>
+  </data>
+  <data name="ui.bundles.height" xml:space="preserve">
+    <value>Height ({unit})</value>
+  </data>
+  <data name="ui.bundles.home_delivery" xml:space="preserve">
+    <value>{country}, home delivery</value>
+  </data>
+  <data name="ui.bundles.in_bundle" xml:space="preserve">
+    <value>in bundle {number}</value>
+  </data>
+  <data name="ui.bundles.label" xml:space="preserve">
+    <value>Print label</value>
+  </data>
+  <data name="ui.bundles.label.open" xml:space="preserve">
+    <value>Open, not weighed yet</value>
+  </data>
+  <data name="ui.bundles.label.parcels" xml:space="preserve">
+    <value>{count} parcels</value>
+  </data>
+  <data name="ui.bundles.label.repacked" xml:space="preserve">
+    <value>{count} parcels repacked</value>
+  </data>
+  <data name="ui.bundles.last_scan" xml:space="preserve">
+    <value>Last scan</value>
+  </data>
+  <data name="ui.bundles.length" xml:space="preserve">
+    <value>Length ({unit})</value>
+  </data>
+  <data name="ui.bundles.list" xml:space="preserve">
+    <value>Bundles</value>
+  </data>
+  <data name="ui.bundles.meter" xml:space="preserve">
+    <value>{count} parcels · {filled}</value>
+  </data>
+  <data name="ui.bundles.new" xml:space="preserve">
+    <value>New bundle</value>
+  </data>
+  <data name="ui.bundles.no_shelf" xml:space="preserve">
+    <value>no shelf recorded</value>
+  </data>
+  <data name="ui.bundles.none" xml:space="preserve">
+    <value>No bundle yet.</value>
+  </data>
+  <data name="ui.bundles.not_open" xml:space="preserve">
+    <value>This bundle is no longer open.</value>
+  </data>
+  <data name="ui.bundles.note.added" xml:space="preserve">
+    <value>Added.</value>
+  </data>
+  <data name="ui.bundles.note.closed" xml:space="preserve">
+    <value>Closed.</value>
+  </data>
+  <data name="ui.bundles.note.out" xml:space="preserve">
+    <value>Taken out.</value>
+  </data>
+  <data name="ui.bundles.note.past" xml:space="preserve">
+    <value>The bundle is past its target.</value>
+  </data>
+  <data name="ui.bundles.note.repeat" xml:space="preserve">
+    <value>Already in: scanned twice.</value>
+  </data>
+  <data name="ui.bundles.note.split" xml:space="preserve">
+    <value>Warning: this shipment’s other parcels are in another bundle.</value>
+  </data>
+  <data name="ui.bundles.number" xml:space="preserve">
+    <value>Number</value>
+  </data>
+  <data name="ui.bundles.on_shelf" xml:space="preserve">
+    <value>on shelf {shelf}</value>
+  </data>
+  <data name="ui.bundles.open_scan" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="ui.bundles.parcels" xml:space="preserve">
+    <value>Parcels</value>
+  </data>
+  <data name="ui.bundles.parcels_weight" xml:space="preserve">
+    <value>parcels: {weight}, volumetric {volumetric}</value>
+  </data>
+  <data name="ui.bundles.ready" xml:space="preserve">
+    <value>Ready to bundle</value>
+  </data>
+  <data name="ui.bundles.ready_none" xml:space="preserve">
+    <value>No parcel is waiting to be bundled.</value>
+  </data>
+  <data name="ui.bundles.scan_bundle" xml:space="preserve">
+    <value>Scan the bundle or box barcode</value>
+  </data>
+  <data name="ui.bundles.scan_parcel" xml:space="preserve">
+    <value>Scan a parcel</value>
+  </data>
+  <data name="ui.bundles.scanned" xml:space="preserve">
+    <value>In this bundle</value>
+  </data>
+  <data name="ui.bundles.service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="ui.bundles.shipment" xml:space="preserve">
+    <value>Shipment</value>
+  </data>
+  <data name="ui.bundles.shipment_counts" xml:space="preserve">
+    <value>{bundled} of {total} in bundles, {here} here</value>
+  </data>
+  <data name="ui.bundles.shipments" xml:space="preserve">
+    <value>Its shipments</value>
+  </data>
+  <data name="ui.bundles.shipments_count" xml:space="preserve">
+    <value>shipments: {count}</value>
+  </data>
+  <data name="ui.bundles.split_warning" xml:space="preserve">
+    <value>Some of its parcels are in another bundle: the shipment travels split.</value>
+  </data>
+  <data name="ui.bundles.state" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="ui.bundles.status.Closed" xml:space="preserve">
+    <value>Closed</value>
+  </data>
+  <data name="ui.bundles.status.Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="ui.bundles.status.Voided" xml:space="preserve">
+    <value>Voided</value>
+  </data>
+  <data name="ui.bundles.take_out" xml:space="preserve">
+    <value>Take out</value>
+  </data>
+  <data name="ui.bundles.take_out_box" xml:space="preserve">
+    <value>Take out the box</value>
+  </data>
+  <data name="ui.bundles.target" xml:space="preserve">
+    <value>Target ({unit})</value>
+  </data>
+  <data name="ui.bundles.title" xml:space="preserve">
+    <value>Bundles</value>
+  </data>
+  <data name="ui.bundles.to_bundle" xml:space="preserve">
+    <value>Bundle details</value>
+  </data>
+  <data name="ui.bundles.type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ui.bundles.void" xml:space="preserve">
+    <value>Void the bundle</value>
+  </data>
+  <data name="ui.bundles.void_button" xml:space="preserve">
+    <value>Void</value>
+  </data>
+  <data name="ui.bundles.void_hint" xml:space="preserve">
+    <value>Its parcels go back to ready to bundle; start again with a new bundle.</value>
+  </data>
+  <data name="ui.bundles.void_reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="ui.bundles.volumetric" xml:space="preserve">
+    <value>volumetric {weight}</value>
+  </data>
+  <data name="ui.bundles.waiting" xml:space="preserve">
+    <value>Unpaid or held</value>
+  </data>
+  <data name="ui.bundles.warehouse" xml:space="preserve">
+    <value>Warehouse</value>
+  </data>
+  <data name="ui.bundles.weight" xml:space="preserve">
+    <value>Weight</value>
+  </data>
+  <data name="ui.bundles.width" xml:space="preserve">
+    <value>Width ({unit})</value>
+  </data>
+  <data name="ui.carriers.account" xml:space="preserve">
+    <value>Account number</value>
+  </data>
+  <data name="ui.carriers.active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="ui.carriers.add_rate" xml:space="preserve">
+    <value>Add a rate</value>
+  </data>
+  <data name="ui.carriers.air_hint" xml:space="preserve">
+    <value>Charged on the chargeable weight (the greater of actual and volumetric). A later rate replaces this one from its start.</value>
+  </data>
+  <data name="ui.carriers.any_type" xml:space="preserve">
+    <value>Any type</value>
+  </data>
+  <data name="ui.carriers.back" xml:space="preserve">
+    <value>Back to carriers</value>
+  </data>
+  <data name="ui.carriers.done.rate" xml:space="preserve">
+    <value>Rate added.</value>
+  </data>
+  <data name="ui.carriers.done.removed" xml:space="preserve">
+    <value>Rate removed.</value>
+  </data>
+  <data name="ui.carriers.done.saved" xml:space="preserve">
+    <value>Carrier saved.</value>
+  </data>
+  <data name="ui.carriers.edit" xml:space="preserve">
+    <value>Change the carrier</value>
+  </data>
+  <data name="ui.carriers.inactive" xml:space="preserve">
+    <value>Switched off</value>
+  </data>
+  <data name="ui.carriers.kind" xml:space="preserve">
+    <value>Kind</value>
+  </data>
+  <data name="ui.carriers.list" xml:space="preserve">
+    <value>Carriers</value>
+  </data>
+  <data name="ui.carriers.minimum" xml:space="preserve">
+    <value>Minimum</value>
+  </data>
+  <data name="ui.carriers.minimum_in" xml:space="preserve">
+    <value>Minimum ({currency})</value>
+  </data>
+  <data name="ui.carriers.name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ui.carriers.new" xml:space="preserve">
+    <value>New carrier</value>
+  </data>
+  <data name="ui.carriers.none" xml:space="preserve">
+    <value>No carriers yet.</value>
+  </data>
+  <data name="ui.carriers.ocean_hint" xml:space="preserve">
+    <value>Charged per bundle, for one bundle type or any. A later rate replaces this one from its start.</value>
+  </data>
+  <data name="ui.carriers.per_bundle" xml:space="preserve">
+    <value>Per bundle</value>
+  </data>
+  <data name="ui.carriers.per_bundle_in" xml:space="preserve">
+    <value>Rate ({currency} per bundle)</value>
+  </data>
+  <data name="ui.carriers.per_weight" xml:space="preserve">
+    <value>Per weight</value>
+  </data>
+  <data name="ui.carriers.per_weight_in" xml:space="preserve">
+    <value>Rate ({currency} per {unit} chargeable)</value>
+  </data>
+  <data name="ui.carriers.prefix" xml:space="preserve">
+    <value>Airline prefix</value>
+  </data>
+  <data name="ui.carriers.prefix_hint" xml:space="preserve">
+    <value>Air only: the three digits that start its air waybill numbers.</value>
+  </data>
+  <data name="ui.carriers.rates" xml:space="preserve">
+    <value>Rates</value>
+  </data>
+  <data name="ui.carriers.rates_none" xml:space="preserve">
+    <value>No rates yet.</value>
+  </data>
+  <data name="ui.carriers.starts" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="ui.carriers.state" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="ui.carriers.title" xml:space="preserve">
+    <value>Carriers</value>
+  </data>
+  <data name="ui.cashier.amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="ui.cashier.awaiting_hint" xml:space="preserve">
+    <value>Part of it waits for finance to see the money in the bank; until then the shipment stays on hold.</value>
+  </data>
+  <data name="ui.cashier.back" xml:space="preserve">
+    <value>Back to the cashier</value>
+  </data>
+  <data name="ui.cashier.cash_given" xml:space="preserve">
+    <value>Cash handed over</value>
+  </data>
+  <data name="ui.cashier.cash_needs_drawer" xml:space="preserve">
+    <value>Cash needs your cash drawer open at this warehouse.</value>
+  </data>
+  <data name="ui.cashier.change" xml:space="preserve">
+    <value>Change to give: {amount}</value>
+  </data>
+  <data name="ui.cashier.drawer_open" xml:space="preserve">
+    <value>Drawer open at {warehouse}: {expected} expected</value>
+  </data>
+  <data name="ui.cashier.drawers" xml:space="preserve">
+    <value>Cash drawers</value>
+  </data>
+  <data name="ui.cashier.find" xml:space="preserve">
+    <value>Phone, email, customer code, or an invoice, shipment or order number</value>
+  </data>
+  <data name="ui.cashier.find_button" xml:space="preserve">
+    <value>Find</value>
+  </data>
+  <data name="ui.cashier.in_full" xml:space="preserve">
+    <value>Paid in full: the amounts must add up to exactly what is owed. Several methods may be combined.</value>
+  </data>
+  <data name="ui.cashier.method" xml:space="preserve">
+    <value>Method</value>
+  </data>
+  <data name="ui.cashier.next" xml:space="preserve">
+    <value>Clear · next customer</value>
+  </data>
+  <data name="ui.cashier.no_drawer" xml:space="preserve">
+    <value>No cash drawer open.</value>
+  </data>
+  <data name="ui.cashier.not_found" xml:space="preserve">
+    <value>No customer or invoice matches.</value>
+  </data>
+  <data name="ui.cashier.nothing_to_pay" xml:space="preserve">
+    <value>Nothing to pay.</value>
+  </data>
+  <data name="ui.cashier.open_drawer" xml:space="preserve">
+    <value>Open a drawer</value>
+  </data>
+  <data name="ui.cashier.pay" xml:space="preserve">
+    <value>Pay</value>
+  </data>
+  <data name="ui.cashier.receipt" xml:space="preserve">
+    <value>Print the receipt</value>
+  </data>
+  <data name="ui.cashier.reference" xml:space="preserve">
+    <value>Reference</value>
+  </data>
+  <data name="ui.cashier.take" xml:space="preserve">
+    <value>Take the payment</value>
+  </data>
+  <data name="ui.cashier.taken" xml:space="preserve">
+    <value>Payment {number} of {total} on invoice {invoice}</value>
+  </data>
+  <data name="ui.cashier.title" xml:space="preserve">
+    <value>Cashier</value>
+  </data>
+  <data name="ui.cashier.to_pay" xml:space="preserve">
+    <value>To pay</value>
+  </data>
+  <data name="ui.cashier.to_pay_now" xml:space="preserve">
+    <value>To pay: {amount}</value>
+  </data>
+  <data name="ui.cashier.zelle_accepted" xml:space="preserve">
+    <value>The customer read and accepted the Zelle terms</value>
+  </data>
+  <data name="ui.cashier.zelle_contact" xml:space="preserve">
+    <value>Email or phone</value>
+  </data>
+  <data name="ui.cashier.zelle_memo" xml:space="preserve">
+    <value>Memo (required)</value>
+  </data>
+  <data name="ui.cashier.zelle_name" xml:space="preserve">
+    <value>Name shown</value>
+  </data>
+  <data name="ui.cashier.zelle_qr" xml:space="preserve">
+    <value>Zelle QR code</value>
+  </data>
+  <data name="ui.cashier.zelle_tag" xml:space="preserve">
+    <value>Zelle tag</value>
+  </data>
+  <data name="ui.cashier.zelle_warning" xml:space="preserve">
+    <value>Important: the customer must write {memo} in the Zelle memo. The shipment stays on hold until the company sees the money in its bank.</value>
   </data>
   <data name="ui.certificate.accepted" xml:space="preserve">
     <value>Terms accepted</value>
@@ -2046,6 +3294,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.charges.line.Consolidation" xml:space="preserve">
     <value>Consolidation</value>
   </data>
+  <data name="ui.charges.line.Duties" xml:space="preserve">
+    <value>Customs duties</value>
+  </data>
   <data name="ui.charges.line.Extra" xml:space="preserve">
     <value>Extra</value>
   </data>
@@ -2057,6 +3308,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.charges.line.Item" xml:space="preserve">
     <value>Item</value>
+  </data>
+  <data name="ui.charges.line.LocalFee" xml:space="preserve">
+    <value>Local fees</value>
+  </data>
+  <data name="ui.charges.line.LocalTax" xml:space="preserve">
+    <value>Local taxes</value>
   </data>
   <data name="ui.charges.line.Minimum" xml:space="preserve">
     <value>Minimum charge adjustment</value>
@@ -2072,6 +3329,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.charges.line.SmallPackage" xml:space="preserve">
     <value>Small package</value>
+  </data>
+  <data name="ui.charges.line.Storage" xml:space="preserve">
+    <value>Storage</value>
   </data>
   <data name="ui.charges.line.freight_of" xml:space="preserve">
     <value>Freight, package {piece} ({basis})</value>
@@ -3492,8 +4752,161 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.counts.title" xml:space="preserve">
     <value>Counts</value>
   </data>
+  <data name="ui.credit.account_not_active" xml:space="preserve">
+    <value>The customer’s credit account is on hold or closed.</value>
+  </data>
+  <data name="ui.credit.account_title" xml:space="preserve">
+    <value>Credit account · {name}</value>
+  </data>
+  <data name="ui.credit.approve" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="ui.credit.available" xml:space="preserve">
+    <value>Available</value>
+  </data>
+  <data name="ui.credit.awaiting" xml:space="preserve">
+    <value>Awaiting approval</value>
+  </data>
+  <data name="ui.credit.back" xml:space="preserve">
+    <value>Back to credit accounts</value>
+  </data>
+  <data name="ui.credit.bill_available" xml:space="preserve">
+    <value>Available on the account: {amount}.</value>
+  </data>
+  <data name="ui.credit.bill_button" xml:space="preserve">
+    <value>Bill {amount} to the account</value>
+  </data>
+  <data name="ui.credit.bill_title" xml:space="preserve">
+    <value>Bill the customer’s account</value>
+  </data>
+  <data name="ui.credit.change" xml:space="preserve">
+    <value>Change the account</value>
+  </data>
+  <data name="ui.credit.change_hint" xml:space="preserve">
+    <value>A hold or a close needs a reason. Closed only once nothing is owed.</value>
+  </data>
+  <data name="ui.credit.charges_link" xml:space="preserve">
+    <value>Charges to approve ({count})</value>
+  </data>
+  <data name="ui.credit.charges_none" xml:space="preserve">
+    <value>No charge is waiting.</value>
+  </data>
+  <data name="ui.credit.charges_title" xml:space="preserve">
+    <value>Charges to approve</value>
+  </data>
+  <data name="ui.credit.customer" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="ui.credit.customer_code" xml:space="preserve">
+    <value>Customer code</value>
+  </data>
+  <data name="ui.credit.done.awaiting_credit" xml:space="preserve">
+    <value>Above the limit: the charge waits for the credit department.</value>
+  </data>
+  <data name="ui.credit.done.billed" xml:space="preserve">
+    <value>Billed to the account. A shipment billed this way is released.</value>
+  </data>
+  <data name="ui.credit.done.changed" xml:space="preserve">
+    <value>Credit account changed.</value>
+  </data>
+  <data name="ui.credit.done.decided" xml:space="preserve">
+    <value>Decision recorded.</value>
+  </data>
+  <data name="ui.credit.done.opened" xml:space="preserve">
+    <value>Credit account opened.</value>
+  </data>
+  <data name="ui.credit.items" xml:space="preserve">
+    <value>Open items</value>
+  </data>
+  <data name="ui.credit.limit" xml:space="preserve">
+    <value>Limit ({currency})</value>
+  </data>
+  <data name="ui.credit.limit_short" xml:space="preserve">
+    <value>Limit</value>
+  </data>
+  <data name="ui.credit.limit_terms" xml:space="preserve">
+    <value>Limit {limit} · {days} days</value>
+  </data>
+  <data name="ui.credit.marked" xml:space="preserve">
+    <value>Customers marked for credit without an account</value>
+  </data>
+  <data name="ui.credit.marked_hint" xml:space="preserve">
+    <value>They were allowed credit before credit accounts existed. Open their account with a limit, or leave them: they cannot be billed until then.</value>
+  </data>
+  <data name="ui.credit.none" xml:space="preserve">
+    <value>No credit account yet.</value>
+  </data>
+  <data name="ui.credit.note" xml:space="preserve">
+    <value>Note (required to refuse)</value>
+  </data>
+  <data name="ui.credit.off" xml:space="preserve">
+    <value>Credit is switched off for the company: accounts cannot be billed.</value>
+  </data>
+  <data name="ui.credit.open" xml:space="preserve">
+    <value>Open a credit account</value>
+  </data>
+  <data name="ui.credit.open_button" xml:space="preserve">
+    <value>Open the account</value>
+  </data>
+  <data name="ui.credit.overdue" xml:space="preserve">
+    <value>Overdue</value>
+  </data>
+  <data name="ui.credit.owed" xml:space="preserve">
+    <value>Owed</value>
+  </data>
+  <data name="ui.credit.reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="ui.credit.refuse" xml:space="preserve">
+    <value>Refuse</value>
+  </data>
+  <data name="ui.credit.state" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="ui.credit.statement" xml:space="preserve">
+    <value>Statement (PDF)</value>
+  </data>
+  <data name="ui.credit.status.Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="ui.credit.status.Closed" xml:space="preserve">
+    <value>Closed</value>
+  </data>
+  <data name="ui.credit.status.OnHold" xml:space="preserve">
+    <value>On hold</value>
+  </data>
+  <data name="ui.credit.terms" xml:space="preserve">
+    <value>Terms (days)</value>
+  </data>
+  <data name="ui.credit.terms_hint" xml:space="preserve">
+    <value>Empty: the company’s terms.</value>
+  </data>
+  <data name="ui.credit.title" xml:space="preserve">
+    <value>Credit accounts</value>
+  </data>
+  <data name="ui.credit_settings.over_limit" xml:space="preserve">
+    <value>When a charge goes above the limit</value>
+  </data>
+  <data name="ui.credit_settings.over_limit.AskCreditDepartment" xml:space="preserve">
+    <value>Let it wait for the credit department</value>
+  </data>
+  <data name="ui.credit_settings.over_limit.Refuse" xml:space="preserve">
+    <value>Refuse it</value>
+  </data>
+  <data name="ui.credit_settings.statements" xml:space="preserve">
+    <value>Tell customers each month that their statement is ready</value>
+  </data>
+  <data name="ui.credit_settings.terms" xml:space="preserve">
+    <value>Terms (days)</value>
+  </data>
+  <data name="ui.credit_settings.title" xml:space="preserve">
+    <value>Credit settings</value>
+  </data>
   <data name="ui.customers.back" xml:space="preserve">
     <value>All customers</value>
+  </data>
+  <data name="ui.customers.clear" xml:space="preserve">
+    <value>Clear</value>
   </data>
   <data name="ui.customers.code" xml:space="preserve">
     <value>Customer code</value>
@@ -3509,6 +4922,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.customers.credit" xml:space="preserve">
     <value>Credit</value>
+  </data>
+  <data name="ui.customers.credit_account" xml:space="preserve">
+    <value>Credit account</value>
+  </data>
+  <data name="ui.customers.credit_account_hint" xml:space="preserve">
+    <value>The credit department opens and manages the customer’s credit account: limit, terms and state.</value>
   </data>
   <data name="ui.customers.credit_allow" xml:space="preserve">
     <value>Allow credit</value>
@@ -3810,6 +5229,414 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.devices.waiting.title" xml:space="preserve">
     <value>Waiting for approval</value>
   </data>
+  <data name="ui.dispatch.add_bundle" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="ui.dispatch.add_leg" xml:space="preserve">
+    <value>Add a leg</value>
+  </data>
+  <data name="ui.dispatch.arrive" xml:space="preserve">
+    <value>Arrived</value>
+  </data>
+  <data name="ui.dispatch.arrived_at" xml:space="preserve">
+    <value>Arrived</value>
+  </data>
+  <data name="ui.dispatch.arrives" xml:space="preserve">
+    <value>Arrives</value>
+  </data>
+  <data name="ui.dispatch.at" xml:space="preserve">
+    <value>At</value>
+  </data>
+  <data name="ui.dispatch.back" xml:space="preserve">
+    <value>Back to dispatches</value>
+  </data>
+  <data name="ui.dispatch.bundle_manifest" xml:space="preserve">
+    <value>Bundle manifest</value>
+  </data>
+  <data name="ui.dispatch.bundles" xml:space="preserve">
+    <value>Bundles</value>
+  </data>
+  <data name="ui.dispatch.bundles_none" xml:space="preserve">
+    <value>No bundles on this dispatch yet.</value>
+  </data>
+  <data name="ui.dispatch.cancel" xml:space="preserve">
+    <value>Cancel the dispatch</value>
+  </data>
+  <data name="ui.dispatch.cancel_button" xml:space="preserve">
+    <value>Cancel the dispatch</value>
+  </data>
+  <data name="ui.dispatch.cancel_hint" xml:space="preserve">
+    <value>Only before it leaves. Its bundles are free again.</value>
+  </data>
+  <data name="ui.dispatch.cancel_reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="ui.dispatch.candidates" xml:space="preserve">
+    <value>Closed bundles that fit</value>
+  </data>
+  <data name="ui.dispatch.candidates_none" xml:space="preserve">
+    <value>No closed bundle for this destination and service is waiting.</value>
+  </data>
+  <data name="ui.dispatch.carrier" xml:space="preserve">
+    <value>Carrier</value>
+  </data>
+  <data name="ui.dispatch.carrier_none" xml:space="preserve">
+    <value>No carrier (own truck)</value>
+  </data>
+  <data name="ui.dispatch.chargeable" xml:space="preserve">
+    <value>Chargeable</value>
+  </data>
+  <data name="ui.dispatch.charges" xml:space="preserve">
+    <value>Charges</value>
+  </data>
+  <data name="ui.dispatch.close" xml:space="preserve">
+    <value>Close the dispatch</value>
+  </data>
+  <data name="ui.dispatch.close_button" xml:space="preserve">
+    <value>Close and manifest</value>
+  </data>
+  <data name="ui.dispatch.close_hint" xml:space="preserve">
+    <value>Its bundles are then manifested: nothing more can be added. Needs at least one bundle and one leg.</value>
+  </data>
+  <data name="ui.dispatch.closed_at" xml:space="preserve">
+    <value>Manifested</value>
+  </data>
+  <data name="ui.dispatch.consignee" xml:space="preserve">
+    <value>Consignee</value>
+  </data>
+  <data name="ui.dispatch.cost" xml:space="preserve">
+    <value>Carrier cost</value>
+  </data>
+  <data name="ui.dispatch.cost.at_departure" xml:space="preserve">
+    <value>Worked out when the dispatch leaves</value>
+  </data>
+  <data name="ui.dispatch.cost.computed" xml:space="preserve">
+    <value>Worked out from the rates</value>
+  </data>
+  <data name="ui.dispatch.cost.correct_in" xml:space="preserve">
+    <value>Cost from the carrier’s invoice ({currency})</value>
+  </data>
+  <data name="ui.dispatch.cost.hint" xml:space="preserve">
+    <value>Leave the amount empty to go back to the worked-out cost. Each shipment’s share follows its chargeable weight.</value>
+  </data>
+  <data name="ui.dispatch.cost.missing" xml:space="preserve">
+    <value>No rate for leg(s) {legs}: add the rate, or type the cost from the carrier’s invoice.</value>
+  </data>
+  <data name="ui.dispatch.cost.note" xml:space="preserve">
+    <value>Why</value>
+  </data>
+  <data name="ui.dispatch.cost.recost" xml:space="preserve">
+    <value>Work out again</value>
+  </data>
+  <data name="ui.dispatch.cost.share" xml:space="preserve">
+    <value>Cost share</value>
+  </data>
+  <data name="ui.dispatch.cost.total" xml:space="preserve">
+    <value>Cost kept</value>
+  </data>
+  <data name="ui.dispatch.cost.unknown" xml:space="preserve">
+    <value>Unknown: a carrier has no rate for this destination</value>
+  </data>
+  <data name="ui.dispatch.create" xml:space="preserve">
+    <value>Plan the dispatch</value>
+  </data>
+  <data name="ui.dispatch.customer" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="ui.dispatch.cutoff" xml:space="preserve">
+    <value>Cutoff</value>
+  </data>
+  <data name="ui.dispatch.cutoff_in" xml:space="preserve">
+    <value>Cutoff ({zone})</value>
+  </data>
+  <data name="ui.dispatch.depart" xml:space="preserve">
+    <value>Departed</value>
+  </data>
+  <data name="ui.dispatch.departed_at" xml:space="preserve">
+    <value>Departed</value>
+  </data>
+  <data name="ui.dispatch.departs" xml:space="preserve">
+    <value>Departs</value>
+  </data>
+  <data name="ui.dispatch.destination" xml:space="preserve">
+    <value>Destination</value>
+  </data>
+  <data name="ui.dispatch.dispatch_title" xml:space="preserve">
+    <value>Dispatch {number}</value>
+  </data>
+  <data name="ui.dispatch.document.CertificateOfOrigin" xml:space="preserve">
+    <value>Certificate of origin</value>
+  </data>
+  <data name="ui.dispatch.document.CommercialInvoice" xml:space="preserve">
+    <value>Commercial invoice</value>
+  </data>
+  <data name="ui.dispatch.document.DangerousGoodsDeclaration" xml:space="preserve">
+    <value>Dangerous goods declaration</value>
+  </data>
+  <data name="ui.dispatch.document.ExportDeclaration" xml:space="preserve">
+    <value>Export declaration</value>
+  </data>
+  <data name="ui.dispatch.document.ExportLicence" xml:space="preserve">
+    <value>Export licence</value>
+  </data>
+  <data name="ui.dispatch.document.PackingList" xml:space="preserve">
+    <value>Packing list</value>
+  </data>
+  <data name="ui.dispatch.documents" xml:space="preserve">
+    <value>Documents attached</value>
+  </data>
+  <data name="ui.dispatch.done.arrived" xml:space="preserve">
+    <value>Arrival recorded.</value>
+  </data>
+  <data name="ui.dispatch.done.bundle" xml:space="preserve">
+    <value>Bundle added.</value>
+  </data>
+  <data name="ui.dispatch.done.cancelled" xml:space="preserve">
+    <value>Dispatch cancelled.</value>
+  </data>
+  <data name="ui.dispatch.done.closed" xml:space="preserve">
+    <value>Dispatch closed and manifested.</value>
+  </data>
+  <data name="ui.dispatch.done.cost" xml:space="preserve">
+    <value>Cost saved.</value>
+  </data>
+  <data name="ui.dispatch.done.costed" xml:space="preserve">
+    <value>Cost worked out again.</value>
+  </data>
+  <data name="ui.dispatch.done.created" xml:space="preserve">
+    <value>Dispatch planned.</value>
+  </data>
+  <data name="ui.dispatch.done.departed" xml:space="preserve">
+    <value>Departure recorded.</value>
+  </data>
+  <data name="ui.dispatch.done.instructions" xml:space="preserve">
+    <value>Instructions saved.</value>
+  </data>
+  <data name="ui.dispatch.done.leg" xml:space="preserve">
+    <value>Leg added.</value>
+  </data>
+  <data name="ui.dispatch.done.removed" xml:space="preserve">
+    <value>Removed.</value>
+  </data>
+  <data name="ui.dispatch.driver" xml:space="preserve">
+    <value>Driver</value>
+  </data>
+  <data name="ui.dispatch.export_reference" xml:space="preserve">
+    <value>Export filing reference (ITN)</value>
+  </data>
+  <data name="ui.dispatch.free_bundles" xml:space="preserve">
+    <value>{warehouse}: {count} closed bundles not on a dispatch</value>
+  </data>
+  <data name="ui.dispatch.from" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="ui.dispatch.handling" xml:space="preserve">
+    <value>Handling instructions</value>
+  </data>
+  <data name="ui.dispatch.hawb" xml:space="preserve">
+    <value>House waybill</value>
+  </data>
+  <data name="ui.dispatch.hawb_all" xml:space="preserve">
+    <value>House air waybills</value>
+  </data>
+  <data name="ui.dispatch.house" xml:space="preserve">
+    <value>House number</value>
+  </data>
+  <data name="ui.dispatch.instructions" xml:space="preserve">
+    <value>Shipper’s letter of instruction</value>
+  </data>
+  <data name="ui.dispatch.leg_from" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="ui.dispatch.leg_hint" xml:space="preserve">
+    <value>A carrier sets the mode. Legs leave in order, each after the one before has arrived.</value>
+  </data>
+  <data name="ui.dispatch.leg_status.Arrived" xml:space="preserve">
+    <value>Arrived</value>
+  </data>
+  <data name="ui.dispatch.leg_status.Cancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="ui.dispatch.leg_status.Departed" xml:space="preserve">
+    <value>Departed</value>
+  </data>
+  <data name="ui.dispatch.leg_status.Planned" xml:space="preserve">
+    <value>Planned</value>
+  </data>
+  <data name="ui.dispatch.leg_to" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="ui.dispatch.legs" xml:space="preserve">
+    <value>Legs</value>
+  </data>
+  <data name="ui.dispatch.legs_none" xml:space="preserve">
+    <value>No legs yet: add the flight, sailing or truck.</value>
+  </data>
+  <data name="ui.dispatch.list" xml:space="preserve">
+    <value>Dispatches</value>
+  </data>
+  <data name="ui.dispatch.manifest" xml:space="preserve">
+    <value>Dispatch manifest</value>
+  </data>
+  <data name="ui.dispatch.mode" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="ui.dispatch.mode.air" xml:space="preserve">
+    <value>Air</value>
+  </data>
+  <data name="ui.dispatch.mode.ground" xml:space="preserve">
+    <value>Ground</value>
+  </data>
+  <data name="ui.dispatch.mode.ocean" xml:space="preserve">
+    <value>Ocean</value>
+  </data>
+  <data name="ui.dispatch.new" xml:space="preserve">
+    <value>New dispatch</value>
+  </data>
+  <data name="ui.dispatch.new_hint" xml:space="preserve">
+    <value>Only closed bundles for the same destination and service can go on it.</value>
+  </data>
+  <data name="ui.dispatch.none" xml:space="preserve">
+    <value>No dispatches yet.</value>
+  </data>
+  <data name="ui.dispatch.notes" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="ui.dispatch.number" xml:space="preserve">
+    <value>Number</value>
+  </data>
+  <data name="ui.dispatch.pieces" xml:space="preserve">
+    <value>{count} pieces</value>
+  </data>
+  <data name="ui.dispatch.places_hint" xml:space="preserve">
+    <value>From and To are shown to the customer: type a city or an airport, never a carrier.</value>
+  </data>
+  <data name="ui.dispatch.reference" xml:space="preserve">
+    <value>Reference (AWB, B/L, truck)</value>
+  </data>
+  <data name="ui.dispatch.remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ui.dispatch.scan_bundle" xml:space="preserve">
+    <value>Scan or type a bundle number</value>
+  </data>
+  <data name="ui.dispatch.service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="ui.dispatch.shipment" xml:space="preserve">
+    <value>Shipment</value>
+  </data>
+  <data name="ui.dispatch.shipments" xml:space="preserve">
+    <value>Shipments on this dispatch</value>
+  </data>
+  <data name="ui.dispatch.sli" xml:space="preserve">
+    <value>Letter of instruction</value>
+  </data>
+  <data name="ui.dispatch.state" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="ui.dispatch.status.Arrived" xml:space="preserve">
+    <value>Arrived</value>
+  </data>
+  <data name="ui.dispatch.status.Cancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="ui.dispatch.status.Closed" xml:space="preserve">
+    <value>Manifested</value>
+  </data>
+  <data name="ui.dispatch.status.Departed" xml:space="preserve">
+    <value>Departed</value>
+  </data>
+  <data name="ui.dispatch.status.Planned" xml:space="preserve">
+    <value>Planned</value>
+  </data>
+  <data name="ui.dispatch.times_in" xml:space="preserve">
+    <value>Times are in {zone}.</value>
+  </data>
+  <data name="ui.dispatch.title" xml:space="preserve">
+    <value>Dispatches</value>
+  </data>
+  <data name="ui.dispatch.vehicle" xml:space="preserve">
+    <value>Vehicle</value>
+  </data>
+  <data name="ui.dispatch.view.all" xml:space="preserve">
+    <value>Show all dispatches</value>
+  </data>
+  <data name="ui.dispatch.view.open" xml:space="preserve">
+    <value>Show open dispatches</value>
+  </data>
+  <data name="ui.drawers.back" xml:space="preserve">
+    <value>Back to the drawers</value>
+  </data>
+  <data name="ui.drawers.cash_in" xml:space="preserve">
+    <value>Cash in</value>
+  </data>
+  <data name="ui.drawers.cash_out" xml:space="preserve">
+    <value>Cash out (refunds)</value>
+  </data>
+  <data name="ui.drawers.close" xml:space="preserve">
+    <value>Close my drawer</value>
+  </data>
+  <data name="ui.drawers.close_button" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="ui.drawers.close_hint" xml:space="preserve">
+    <value>Count the cash in the drawer. Any difference with the expected cash is recorded.</value>
+  </data>
+  <data name="ui.drawers.counted" xml:space="preserve">
+    <value>Counted</value>
+  </data>
+  <data name="ui.drawers.difference" xml:space="preserve">
+    <value>Difference</value>
+  </data>
+  <data name="ui.drawers.done.closed" xml:space="preserve">
+    <value>Your cash drawer is closed.</value>
+  </data>
+  <data name="ui.drawers.done.opened" xml:space="preserve">
+    <value>Your cash drawer is open.</value>
+  </data>
+  <data name="ui.drawers.expected" xml:space="preserve">
+    <value>Expected cash</value>
+  </data>
+  <data name="ui.drawers.float" xml:space="preserve">
+    <value>Starting float</value>
+  </data>
+  <data name="ui.drawers.none" xml:space="preserve">
+    <value>No cash drawer yet.</value>
+  </data>
+  <data name="ui.drawers.note" xml:space="preserve">
+    <value>Note (required when it does not match)</value>
+  </data>
+  <data name="ui.drawers.open" xml:space="preserve">
+    <value>Open my cash drawer</value>
+  </data>
+  <data name="ui.drawers.open_button" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="ui.drawers.opened" xml:space="preserve">
+    <value>Opened</value>
+  </data>
+  <data name="ui.drawers.person" xml:space="preserve">
+    <value>Cashier</value>
+  </data>
+  <data name="ui.drawers.report" xml:space="preserve">
+    <value>Cash drawer report</value>
+  </data>
+  <data name="ui.drawers.state" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="ui.drawers.status.Closed" xml:space="preserve">
+    <value>Closed</value>
+  </data>
+  <data name="ui.drawers.status.Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="ui.drawers.title" xml:space="preserve">
+    <value>Cash drawers</value>
+  </data>
+  <data name="ui.drawers.warehouse" xml:space="preserve">
+    <value>Warehouse</value>
+  </data>
   <data name="ui.editor.address" xml:space="preserve">
     <value>Address</value>
   </data>
@@ -3878,6 +5705,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.editor.destination" xml:space="preserve">
     <value>As a destination</value>
+  </data>
+  <data name="ui.editor.destination.clears_customs" xml:space="preserve">
+    <value>Customs is cleared here</value>
+  </data>
+  <data name="ui.editor.destination.clears_customs_hint" xml:space="preserve">
+    <value>Parcels received here wait for customs clearance before they are ready for pickup.</value>
   </data>
   <data name="ui.editor.destination.delivers_home" xml:space="preserve">
     <value>Delivers to homes from here</value>
@@ -3951,11 +5784,26 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.editor.nav.account" xml:space="preserve">
     <value>My account</value>
   </data>
+  <data name="ui.editor.nav.arrivals" xml:space="preserve">
+    <value>Arrivals</value>
+  </data>
   <data name="ui.editor.nav.audit" xml:space="preserve">
     <value>History</value>
   </data>
   <data name="ui.editor.nav.billing" xml:space="preserve">
     <value>Billing</value>
+  </data>
+  <data name="ui.editor.nav.bundle_settings" xml:space="preserve">
+    <value>Bundle settings</value>
+  </data>
+  <data name="ui.editor.nav.bundles" xml:space="preserve">
+    <value>Bundles</value>
+  </data>
+  <data name="ui.editor.nav.carriers" xml:space="preserve">
+    <value>Carriers</value>
+  </data>
+  <data name="ui.editor.nav.cashier" xml:space="preserve">
+    <value>Cashier</value>
   </data>
   <data name="ui.editor.nav.charges" xml:space="preserve">
     <value>Prices</value>
@@ -3966,11 +5814,26 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.editor.nav.counter" xml:space="preserve">
     <value>Front desk</value>
   </data>
+  <data name="ui.editor.nav.credit" xml:space="preserve">
+    <value>Credit accounts</value>
+  </data>
+  <data name="ui.editor.nav.credit_settings" xml:space="preserve">
+    <value>Credit settings</value>
+  </data>
   <data name="ui.editor.nav.customers" xml:space="preserve">
     <value>Customers</value>
   </data>
   <data name="ui.editor.nav.devices" xml:space="preserve">
     <value>Devices</value>
+  </data>
+  <data name="ui.editor.nav.dispatches" xml:space="preserve">
+    <value>Dispatches</value>
+  </data>
+  <data name="ui.editor.nav.event_settings" xml:space="preserve">
+    <value>Events settings</value>
+  </data>
+  <data name="ui.editor.nav.events" xml:space="preserve">
+    <value>Events</value>
   </data>
   <data name="ui.editor.nav.holds" xml:space="preserve">
     <value>Holds</value>
@@ -4002,6 +5865,15 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.editor.nav.parcels" xml:space="preserve">
     <value>Parcels</value>
   </data>
+  <data name="ui.editor.nav.payment_settings" xml:space="preserve">
+    <value>Payment methods</value>
+  </data>
+  <data name="ui.editor.nav.pickup" xml:space="preserve">
+    <value>Pickup counter</value>
+  </data>
+  <data name="ui.editor.nav.pickup_settings" xml:space="preserve">
+    <value>Pickup settings</value>
+  </data>
   <data name="ui.editor.nav.quotes" xml:space="preserve">
     <value>Quotes</value>
   </data>
@@ -4031,6 +5903,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.editor.nav.supplies_stock" xml:space="preserve">
     <value>Supplies stock</value>
+  </data>
+  <data name="ui.editor.nav.verify" xml:space="preserve">
+    <value>Payments to verify</value>
   </data>
   <data name="ui.editor.nav.workspace" xml:space="preserve">
     <value>Home</value>
@@ -4349,6 +6224,204 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.estimate.what_if" xml:space="preserve">
     <value>What if</value>
+  </data>
+  <data name="ui.event_reason.address_problem" xml:space="preserve">
+    <value>Problem with the address</value>
+  </data>
+  <data name="ui.event_reason.capacity" xml:space="preserve">
+    <value>No space on the planned departure</value>
+  </data>
+  <data name="ui.event_reason.carrier_delay" xml:space="preserve">
+    <value>Carrier delay</value>
+  </data>
+  <data name="ui.event_reason.customs_hold" xml:space="preserve">
+    <value>Held by customs</value>
+  </data>
+  <data name="ui.event_reason.customs_inspection" xml:space="preserve">
+    <value>Customs inspection</value>
+  </data>
+  <data name="ui.event_reason.damaged" xml:space="preserve">
+    <value>Package damaged</value>
+  </data>
+  <data name="ui.event_reason.documents_missing" xml:space="preserve">
+    <value>Documents missing</value>
+  </data>
+  <data name="ui.event_reason.documents_pending" xml:space="preserve">
+    <value>Waiting for documents</value>
+  </data>
+  <data name="ui.event_reason.flight_rebooked" xml:space="preserve">
+    <value>Flight rebooked by the airline</value>
+  </data>
+  <data name="ui.event_reason.holiday" xml:space="preserve">
+    <value>Public holiday</value>
+  </data>
+  <data name="ui.event_reason.missed_connection" xml:space="preserve">
+    <value>Missed connection</value>
+  </data>
+  <data name="ui.event_reason.missing_in_transit" xml:space="preserve">
+    <value>Missing in transit</value>
+  </data>
+  <data name="ui.event_reason.recipient_unreachable" xml:space="preserve">
+    <value>Recipient could not be reached</value>
+  </data>
+  <data name="ui.event_reason.refused" xml:space="preserve">
+    <value>Refused by the recipient</value>
+  </data>
+  <data name="ui.event_reason.security_check" xml:space="preserve">
+    <value>Security check</value>
+  </data>
+  <data name="ui.event_reason.weather" xml:space="preserve">
+    <value>Bad weather</value>
+  </data>
+  <data name="ui.event_settings.active" xml:space="preserve">
+    <value>Offered</value>
+  </data>
+  <data name="ui.event_settings.add" xml:space="preserve">
+    <value>Add a cause</value>
+  </data>
+  <data name="ui.event_settings.add_hint" xml:space="preserve">
+    <value>English is required; the customer reads French or Spanish when given, English otherwise. Events keep the words they were recorded with.</value>
+  </data>
+  <data name="ui.event_settings.emails" xml:space="preserve">
+    <value>Email customers about delays and exceptions (one email per shipment)</value>
+  </data>
+  <data name="ui.event_settings.own" xml:space="preserve">
+    <value>The company’s own causes</value>
+  </data>
+  <data name="ui.event_settings.own_none" xml:space="preserve">
+    <value>None yet.</value>
+  </data>
+  <data name="ui.event_settings.pickup_emails" xml:space="preserve">
+    <value>Email customers when a shipment is ready for pickup</value>
+  </data>
+  <data name="ui.event_settings.standard.Delay" xml:space="preserve">
+    <value>Standard causes of delays offered</value>
+  </data>
+  <data name="ui.event_settings.standard.Exception" xml:space="preserve">
+    <value>Standard causes of exceptions offered</value>
+  </data>
+  <data name="ui.event_settings.title" xml:space="preserve">
+    <value>Events settings</value>
+  </data>
+  <data name="ui.events.add" xml:space="preserve">
+    <value>Record an event</value>
+  </data>
+  <data name="ui.events.add_hint" xml:space="preserve">
+    <value>A delay or an exception is shown to the customer with its cause and your line; a note is never shown.</value>
+  </data>
+  <data name="ui.events.add_hint_all" xml:space="preserve">
+    <value>A delay or an exception reaches every parcel inside and is shown to their customers (one email per shipment when the company sends them); a note stays here.</value>
+  </data>
+  <data name="ui.events.at" xml:space="preserve">
+    <value>When it happened ({zone}; empty: now)</value>
+  </data>
+  <data name="ui.events.back" xml:space="preserve">
+    <value>Find another</value>
+  </data>
+  <data name="ui.events.cause" xml:space="preserve">
+    <value>Cause (delay or exception)</value>
+  </data>
+  <data name="ui.events.cause_none" xml:space="preserve">
+    <value>— choose for a delay or an exception —</value>
+  </data>
+  <data name="ui.events.customer_sees" xml:space="preserve">
+    <value>customer sees</value>
+  </data>
+  <data name="ui.events.done.recorded" xml:space="preserve">
+    <value>Event recorded.</value>
+  </data>
+  <data name="ui.events.done.voided" xml:space="preserve">
+    <value>Event voided.</value>
+  </data>
+  <data name="ui.events.event_kind.Delay" xml:space="preserve">
+    <value>Delay</value>
+  </data>
+  <data name="ui.events.event_kind.Exception" xml:space="preserve">
+    <value>Exception</value>
+  </data>
+  <data name="ui.events.event_kind.Note" xml:space="preserve">
+    <value>Note (staff only)</value>
+  </data>
+  <data name="ui.events.filter.all" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="ui.events.filter.customer" xml:space="preserve">
+    <value>What the customer sees</value>
+  </data>
+  <data name="ui.events.filter.manual" xml:space="preserve">
+    <value>Recorded by hand</value>
+  </data>
+  <data name="ui.events.filter.voided" xml:space="preserve">
+    <value>Corrections</value>
+  </data>
+  <data name="ui.events.find" xml:space="preserve">
+    <value>Find</value>
+  </data>
+  <data name="ui.events.history" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="ui.events.kind.Bundle" xml:space="preserve">
+    <value>Bundle</value>
+  </data>
+  <data name="ui.events.kind.Dispatch" xml:space="preserve">
+    <value>Dispatch</value>
+  </data>
+  <data name="ui.events.kind.Parcel" xml:space="preserve">
+    <value>Parcel</value>
+  </data>
+  <data name="ui.events.kind.Shipment" xml:space="preserve">
+    <value>Shipment</value>
+  </data>
+  <data name="ui.events.message" xml:space="preserve">
+    <value>Line for the customer (optional)</value>
+  </data>
+  <data name="ui.events.milestone" xml:space="preserve">
+    <value>Where it stands</value>
+  </data>
+  <data name="ui.events.none" xml:space="preserve">
+    <value>Nothing here yet.</value>
+  </data>
+  <data name="ui.events.note" xml:space="preserve">
+    <value>Note for staff</value>
+  </data>
+  <data name="ui.events.number" xml:space="preserve">
+    <value>Number or tracking number</value>
+  </data>
+  <data name="ui.events.open_subject" xml:space="preserve">
+    <value>Open its page</value>
+  </data>
+  <data name="ui.events.parcels" xml:space="preserve">
+    <value>{count} parcels</value>
+  </data>
+  <data name="ui.events.record" xml:space="preserve">
+    <value>Record</value>
+  </data>
+  <data name="ui.events.search" xml:space="preserve">
+    <value>Find a parcel, shipment, bundle or dispatch</value>
+  </data>
+  <data name="ui.events.search_hint" xml:space="preserve">
+    <value>Scan or type its number; a carrier’s tracking number finds the parcel.</value>
+  </data>
+  <data name="ui.events.state" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="ui.events.subject_title" xml:space="preserve">
+    <value>{kind} {number}</value>
+  </data>
+  <data name="ui.events.title" xml:space="preserve">
+    <value>Events</value>
+  </data>
+  <data name="ui.events.via" xml:space="preserve">
+    <value>via {source}</value>
+  </data>
+  <data name="ui.events.void" xml:space="preserve">
+    <value>Void</value>
+  </data>
+  <data name="ui.events.void_reason" xml:space="preserve">
+    <value>Why</value>
+  </data>
+  <data name="ui.events.what" xml:space="preserve">
+    <value>Kind</value>
   </data>
   <data name="ui.forgot.back" xml:space="preserve">
     <value>Back to sign-in</value>
@@ -5448,6 +7521,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.invoice.pdf.description" xml:space="preserve">
     <value>Description</value>
   </data>
+  <data name="ui.invoice.pdf.destination" xml:space="preserve">
+    <value>At the destination</value>
+  </data>
   <data name="ui.invoice.pdf.discount" xml:space="preserve">
     <value>Discount</value>
   </data>
@@ -5466,11 +7542,17 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.invoice.pdf.paid" xml:space="preserve">
     <value>Paid</value>
   </data>
+  <data name="ui.invoice.pdf.pending" xml:space="preserve">
+    <value>Awaiting confirmation</value>
+  </data>
   <data name="ui.invoice.pdf.quantity" xml:space="preserve">
     <value>Qty</value>
   </data>
   <data name="ui.invoice.pdf.reason" xml:space="preserve">
     <value>Reason: {reason}</value>
+  </data>
+  <data name="ui.invoice.pdf.refunded" xml:space="preserve">
+    <value>Given back</value>
   </data>
   <data name="ui.invoice.pdf.shipment" xml:space="preserve">
     <value>SHIPMENT</value>
@@ -5607,11 +7689,17 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.invoices.description" xml:space="preserve">
     <value>Description</value>
   </data>
+  <data name="ui.invoices.destination" xml:space="preserve">
+    <value>At the destination</value>
+  </data>
   <data name="ui.invoices.discount" xml:space="preserve">
     <value>Discount</value>
   </data>
   <data name="ui.invoices.done.approved" xml:space="preserve">
     <value>Approved.</value>
+  </data>
+  <data name="ui.invoices.done.refunded" xml:space="preserve">
+    <value>The money given back is recorded.</value>
   </data>
   <data name="ui.invoices.done.refused" xml:space="preserve">
     <value>Refused.</value>
@@ -5658,8 +7746,14 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.invoices.owed" xml:space="preserve">
     <value>To pay</value>
   </data>
+  <data name="ui.invoices.paid" xml:space="preserve">
+    <value>Paid</value>
+  </data>
   <data name="ui.invoices.pdf" xml:space="preserve">
     <value>Invoice PDF</value>
+  </data>
+  <data name="ui.invoices.pending" xml:space="preserve">
+    <value>Awaiting confirmation</value>
   </data>
   <data name="ui.invoices.quantity" xml:space="preserve">
     <value>Qty</value>
@@ -5672,6 +7766,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.invoices.reference" xml:space="preserve">
     <value>Shipment or order</value>
+  </data>
+  <data name="ui.invoices.refundable" xml:space="preserve">
+    <value>To give back</value>
+  </data>
+  <data name="ui.invoices.refunded" xml:space="preserve">
+    <value>Given back</value>
   </data>
   <data name="ui.invoices.refusal_note" xml:space="preserve">
     <value>Note (when refusing)</value>
@@ -5708,6 +7808,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.invoices.state" xml:space="preserve">
     <value>State</value>
+  </data>
+  <data name="ui.invoices.status.awaiting" xml:space="preserve">
+    <value>Awaiting confirmation</value>
   </data>
   <data name="ui.invoices.status.credited" xml:space="preserve">
     <value>Credited</value>
@@ -5807,6 +7910,78 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.legal.version" xml:space="preserve">
     <value>Version</value>
+  </data>
+  <data name="ui.manifest.arrives" xml:space="preserve">
+    <value>Arrives</value>
+  </data>
+  <data name="ui.manifest.bundle_title" xml:space="preserve">
+    <value>Bundle manifest</value>
+  </data>
+  <data name="ui.manifest.carrier" xml:space="preserve">
+    <value>Carrier</value>
+  </data>
+  <data name="ui.manifest.consignee" xml:space="preserve">
+    <value>Consignee</value>
+  </data>
+  <data name="ui.manifest.contents" xml:space="preserve">
+    <value>Contents</value>
+  </data>
+  <data name="ui.manifest.country" xml:space="preserve">
+    <value>Country</value>
+  </data>
+  <data name="ui.manifest.customer" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="ui.manifest.cutoff" xml:space="preserve">
+    <value>Cutoff</value>
+  </data>
+  <data name="ui.manifest.departs" xml:space="preserve">
+    <value>Departs</value>
+  </data>
+  <data name="ui.manifest.dispatch" xml:space="preserve">
+    <value>Dispatch</value>
+  </data>
+  <data name="ui.manifest.dispatch_title" xml:space="preserve">
+    <value>Dispatch manifest</value>
+  </data>
+  <data name="ui.manifest.draft" xml:space="preserve">
+    <value>DRAFT: not yet closed</value>
+  </data>
+  <data name="ui.manifest.from" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="ui.manifest.leg" xml:space="preserve">
+    <value>#</value>
+  </data>
+  <data name="ui.manifest.mode" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="ui.manifest.page" xml:space="preserve">
+    <value>Page</value>
+  </data>
+  <data name="ui.manifest.pieces" xml:space="preserve">
+    <value>{count} pieces</value>
+  </data>
+  <data name="ui.manifest.pieces_short" xml:space="preserve">
+    <value>Pcs</value>
+  </data>
+  <data name="ui.manifest.reference" xml:space="preserve">
+    <value>Reference</value>
+  </data>
+  <data name="ui.manifest.shipment" xml:space="preserve">
+    <value>Shipment</value>
+  </data>
+  <data name="ui.manifest.to" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="ui.manifest.totals" xml:space="preserve">
+    <value>{bundles} bundles · {pieces} pieces · {weight}</value>
+  </data>
+  <data name="ui.manifest.value" xml:space="preserve">
+    <value>Declared value</value>
+  </data>
+  <data name="ui.manifest.weight" xml:space="preserve">
+    <value>Weight</value>
   </data>
   <data name="ui.milestone.ArrivedDestinationCountry" xml:space="preserve">
     <value>Arrived in destination country</value>
@@ -5997,6 +8172,144 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.parcels.weight" xml:space="preserve">
     <value>Weight</value>
   </data>
+  <data name="ui.payment_settings.methods" xml:space="preserve">
+    <value>Methods the company accepts</value>
+  </data>
+  <data name="ui.payment_settings.other" xml:space="preserve">
+    <value>Another method (its name)</value>
+  </data>
+  <data name="ui.payment_settings.other_hint" xml:space="preserve">
+    <value>For example MonCash or Natcash. Leave empty to offer none. Cards come with the card provider.</value>
+  </data>
+  <data name="ui.payment_settings.qr" xml:space="preserve">
+    <value>Zelle QR code (PNG or JPEG, up to 1 MB)</value>
+  </data>
+  <data name="ui.payment_settings.remove_qr" xml:space="preserve">
+    <value>Remove the QR code</value>
+  </data>
+  <data name="ui.payment_settings.save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ui.payment_settings.terms_en" xml:space="preserve">
+    <value>Zelle terms in English</value>
+  </data>
+  <data name="ui.payment_settings.terms_es" xml:space="preserve">
+    <value>Zelle terms in Spanish</value>
+  </data>
+  <data name="ui.payment_settings.terms_fr" xml:space="preserve">
+    <value>Zelle terms in French</value>
+  </data>
+  <data name="ui.payment_settings.title" xml:space="preserve">
+    <value>Payment methods</value>
+  </data>
+  <data name="ui.payment_settings.zelle_hint" xml:space="preserve">
+    <value>The customer accepts these terms before seeing your Zelle details. Say that the shipment number goes in the memo and that the shipment waits until the money is in your bank.</value>
+  </data>
+  <data name="ui.payments.list" xml:space="preserve">
+    <value>Payments</value>
+  </data>
+  <data name="ui.payments.method.BankTransfer" xml:space="preserve">
+    <value>Bank transfer</value>
+  </data>
+  <data name="ui.payments.method.Cash" xml:space="preserve">
+    <value>Cash</value>
+  </data>
+  <data name="ui.payments.method.Cheque" xml:space="preserve">
+    <value>Cheque</value>
+  </data>
+  <data name="ui.payments.method.Other1" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="ui.payments.method.Other2" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="ui.payments.method.Other3" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="ui.payments.method.Zelle" xml:space="preserve">
+    <value>Zelle</value>
+  </data>
+  <data name="ui.payments.receipt.awaiting" xml:space="preserve">
+    <value>awaiting confirmation</value>
+  </data>
+  <data name="ui.payments.receipt.cash" xml:space="preserve">
+    <value>given {given}, change {change}</value>
+  </data>
+  <data name="ui.payments.receipt.for" xml:space="preserve">
+    <value>Payment of invoice {invoice} ({reference})</value>
+  </data>
+  <data name="ui.payments.receipt.owed" xml:space="preserve">
+    <value>Still owed: {amount}</value>
+  </data>
+  <data name="ui.payments.receipt.thanks" xml:space="preserve">
+    <value>Thank you.</value>
+  </data>
+  <data name="ui.payments.receipt.title" xml:space="preserve">
+    <value>RECEIPT</value>
+  </data>
+  <data name="ui.payments.receipt.total" xml:space="preserve">
+    <value>Total paid</value>
+  </data>
+  <data name="ui.payments.refund" xml:space="preserve">
+    <value>Refund</value>
+  </data>
+  <data name="ui.payments.refund_button" xml:space="preserve">
+    <value>Give back</value>
+  </data>
+  <data name="ui.payments.refund_title" xml:space="preserve">
+    <value>Give money back (up to {amount})</value>
+  </data>
+  <data name="ui.payments.state.awaiting" xml:space="preserve">
+    <value>Awaiting confirmation</value>
+  </data>
+  <data name="ui.payments.state.awaiting_credit" xml:space="preserve">
+    <value>Awaiting credit approval</value>
+  </data>
+  <data name="ui.payments.state.on_account" xml:space="preserve">
+    <value>On account</value>
+  </data>
+  <data name="ui.payments.state.paid" xml:space="preserve">
+    <value>Paid</value>
+  </data>
+  <data name="ui.payments.state.unpaid" xml:space="preserve">
+    <value>Unpaid</value>
+  </data>
+  <data name="ui.payments.state.voided" xml:space="preserve">
+    <value>Voided</value>
+  </data>
+  <data name="ui.payments.tender.AwaitingConfirmation" xml:space="preserve">
+    <value>awaiting confirmation</value>
+  </data>
+  <data name="ui.payments.tender.NotReceived" xml:space="preserve">
+    <value>not received</value>
+  </data>
+  <data name="ui.payments.tender.Settled" xml:space="preserve">
+    <value>received</value>
+  </data>
+  <data name="ui.payments_verify.confirmation" xml:space="preserve">
+    <value>confirmation {number}</value>
+  </data>
+  <data name="ui.payments_verify.done.not_received" xml:space="preserve">
+    <value>Marked not received: the invoice is owed again and the customer was told.</value>
+  </data>
+  <data name="ui.payments_verify.done.received" xml:space="preserve">
+    <value>Marked received.</value>
+  </data>
+  <data name="ui.payments_verify.none" xml:space="preserve">
+    <value>Nothing waits for confirmation.</value>
+  </data>
+  <data name="ui.payments_verify.not_received" xml:space="preserve">
+    <value>Not received</value>
+  </data>
+  <data name="ui.payments_verify.note" xml:space="preserve">
+    <value>Bank reference, or why it did not arrive</value>
+  </data>
+  <data name="ui.payments_verify.received" xml:space="preserve">
+    <value>Received</value>
+  </data>
+  <data name="ui.payments_verify.title" xml:space="preserve">
+    <value>Payments to verify</value>
+  </data>
   <data name="ui.permissions.area.audit" xml:space="preserve">
     <value>History</value>
   </data>
@@ -6033,6 +8346,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.permissions.area.parcels" xml:space="preserve">
     <value>Parcels</value>
   </data>
+  <data name="ui.permissions.area.payments" xml:space="preserve">
+    <value>Payments</value>
+  </data>
   <data name="ui.permissions.area.printers" xml:space="preserve">
     <value>Label printers</value>
   </data>
@@ -6057,6 +8373,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.permissions.area.warehouses" xml:space="preserve">
     <value>Warehouses</value>
   </data>
+  <data name="ui.permissions.ops.arrivals.receive" xml:space="preserve">
+    <value>Receive dispatches at a destination warehouse and settle what did not match</value>
+  </data>
   <data name="ui.permissions.ops.audit.view" xml:space="preserve">
     <value>See the history</value>
   </data>
@@ -6075,6 +8394,15 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.permissions.ops.brand.view" xml:space="preserve">
     <value>See the website</value>
   </data>
+  <data name="ui.permissions.ops.bundles.fill" xml:space="preserve">
+    <value>Fill bundles and repack boxes (scan in, take out)</value>
+  </data>
+  <data name="ui.permissions.ops.bundles.manage" xml:space="preserve">
+    <value>Manage bundles (open, close, void; switch a consolidated shipment’s way)</value>
+  </data>
+  <data name="ui.permissions.ops.carriers.manage" xml:space="preserve">
+    <value>Manage carriers and their rates</value>
+  </data>
   <data name="ui.permissions.ops.charges.configure" xml:space="preserve">
     <value>Set prices: rate cards, extras and insurance</value>
   </data>
@@ -6091,7 +8419,7 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Request credit notes and voids</value>
   </data>
   <data name="ui.permissions.ops.customers.credit" xml:space="preserve">
-    <value>Allow or remove customer credit</value>
+    <value>Manage credit accounts (the credit department)</value>
   </data>
   <data name="ui.permissions.ops.customers.manage" xml:space="preserve">
     <value>Create and change customers</value>
@@ -6099,11 +8427,23 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.permissions.ops.customers.view" xml:space="preserve">
     <value>See the customers</value>
   </data>
+  <data name="ui.permissions.ops.customs.record" xml:space="preserve">
+    <value>Record customs at a warehouse that clears customs</value>
+  </data>
   <data name="ui.permissions.ops.devices.view" xml:space="preserve">
     <value>See the devices</value>
   </data>
   <data name="ui.permissions.ops.discounts.approve" xml:space="preserve">
     <value>Approve supplies discounts above a clerk’s limit</value>
+  </data>
+  <data name="ui.permissions.ops.dispatches.manage" xml:space="preserve">
+    <value>Manage dispatches (bundles on, legs, close, depart, arrive, cancel)</value>
+  </data>
+  <data name="ui.permissions.ops.events.add" xml:space="preserve">
+    <value>Record notes, delays and exceptions, and void them</value>
+  </data>
+  <data name="ui.permissions.ops.events.view" xml:space="preserve">
+    <value>See the events of parcels, shipments, bundles and dispatches</value>
   </data>
   <data name="ui.permissions.ops.holds.manage" xml:space="preserve">
     <value>See holds and release them</value>
@@ -6131,6 +8471,18 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.permissions.ops.parcels.view" xml:space="preserve">
     <value>See the parcels, their photos and history</value>
+  </data>
+  <data name="ui.permissions.ops.payments.confirm" xml:space="preserve">
+    <value>Confirm Zelle and transfers</value>
+  </data>
+  <data name="ui.permissions.ops.payments.refund" xml:space="preserve">
+    <value>Give money back</value>
+  </data>
+  <data name="ui.permissions.ops.payments.take" xml:space="preserve">
+    <value>Take payments at the cashier</value>
+  </data>
+  <data name="ui.permissions.ops.pickup.release" xml:space="preserve">
+    <value>Serve the pickup counter: bill destination charges and release parcels with proof</value>
   </data>
   <data name="ui.permissions.ops.printers.manage" xml:space="preserve">
     <value>Set up label printers and print programs</value>
@@ -6209,6 +8561,255 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.permissions.ops.warehouses.view" xml:space="preserve">
     <value>See the warehouses</value>
+  </data>
+  <data name="ui.pickup.back" xml:space="preserve">
+    <value>Back to the counter</value>
+  </data>
+  <data name="ui.pickup.bill" xml:space="preserve">
+    <value>Destination charges</value>
+  </data>
+  <data name="ui.pickup.bill_button" xml:space="preserve">
+    <value>Bill</value>
+  </data>
+  <data name="ui.pickup.bill_hint" xml:space="preserve">
+    <value>An invoice with the storage owed today and the charges typed; it is paid at the cashier. A later visit is billed for the days since.</value>
+  </data>
+  <data name="ui.pickup.code" xml:space="preserve">
+    <value>Pickup code</value>
+  </data>
+  <data name="ui.pickup.code_checked" xml:space="preserve">
+    <value>code checked</value>
+  </data>
+  <data name="ui.pickup.code_not_sent" xml:space="preserve">
+    <value>No code was sent yet.</value>
+  </data>
+  <data name="ui.pickup.code_send" xml:space="preserve">
+    <value>Send a code by email</value>
+  </data>
+  <data name="ui.pickup.code_sent" xml:space="preserve">
+    <value>A code was sent to the customer. Send a new one if it was lost; the last one replaces the others.</value>
+  </data>
+  <data name="ui.pickup.code_typed" xml:space="preserve">
+    <value>Code given by the customer</value>
+  </data>
+  <data name="ui.pickup.collector" xml:space="preserve">
+    <value>Person named</value>
+  </data>
+  <data name="ui.pickup.collector.Customer" xml:space="preserve">
+    <value>The customer</value>
+  </data>
+  <data name="ui.pickup.collector.Named" xml:space="preserve">
+    <value>The person named</value>
+  </data>
+  <data name="ui.pickup.collector.Recipient" xml:space="preserve">
+    <value>The recipient</value>
+  </data>
+  <data name="ui.pickup.collector_kind" xml:space="preserve">
+    <value>Collected by</value>
+  </data>
+  <data name="ui.pickup.customer" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="ui.pickup.done.billed" xml:space="preserve">
+    <value>Billed: take the payment at the cashier.</value>
+  </data>
+  <data name="ui.pickup.done.code" xml:space="preserve">
+    <value>A new code was sent to the customer.</value>
+  </data>
+  <data name="ui.pickup.done.released" xml:space="preserve">
+    <value>Released. The customer sees it collected.</value>
+  </data>
+  <data name="ui.pickup.find" xml:space="preserve">
+    <value>Find a shipment</value>
+  </data>
+  <data name="ui.pickup.id_hint" xml:space="preserve">
+    <value>Check the name and photo; only the last 4 characters of the number are kept, never the full number.</value>
+  </data>
+  <data name="ui.pickup.id_kind" xml:space="preserve">
+    <value>ID shown</value>
+  </data>
+  <data name="ui.pickup.id_kind.DriverLicence" xml:space="preserve">
+    <value>Driving licence</value>
+  </data>
+  <data name="ui.pickup.id_kind.NationalId" xml:space="preserve">
+    <value>National ID card</value>
+  </data>
+  <data name="ui.pickup.id_kind.Other" xml:space="preserve">
+    <value>Other ID</value>
+  </data>
+  <data name="ui.pickup.id_kind.Passport" xml:space="preserve">
+    <value>Passport</value>
+  </data>
+  <data name="ui.pickup.id_last" xml:space="preserve">
+    <value>Its last 4 characters</value>
+  </data>
+  <data name="ui.pickup.invoice" xml:space="preserve">
+    <value>Invoice</value>
+  </data>
+  <data name="ui.pickup.invoice_kind" xml:space="preserve">
+    <value>For</value>
+  </data>
+  <data name="ui.pickup.invoice_kind.Destination" xml:space="preserve">
+    <value>At the destination</value>
+  </data>
+  <data name="ui.pickup.invoice_kind.Shipment" xml:space="preserve">
+    <value>The shipment</value>
+  </data>
+  <data name="ui.pickup.invoice_kind.SupplyOrder" xml:space="preserve">
+    <value>Supplies</value>
+  </data>
+  <data name="ui.pickup.no_collector" xml:space="preserve">
+    <value>No one named</value>
+  </data>
+  <data name="ui.pickup.no_invoice" xml:space="preserve">
+    <value>No invoice.</value>
+  </data>
+  <data name="ui.pickup.none" xml:space="preserve">
+    <value>Nothing is waiting here.</value>
+  </data>
+  <data name="ui.pickup.owed" xml:space="preserve">
+    <value>To pay</value>
+  </data>
+  <data name="ui.pickup.paid" xml:space="preserve">
+    <value>Paid</value>
+  </data>
+  <data name="ui.pickup.parcel" xml:space="preserve">
+    <value>Parcel</value>
+  </data>
+  <data name="ui.pickup.parcels" xml:space="preserve">
+    <value>Parcels</value>
+  </data>
+  <data name="ui.pickup.pay_first_hint" xml:space="preserve">
+    <value>Everything is paid at the cashier first; then the parcels are released here.</value>
+  </data>
+  <data name="ui.pickup.payment" xml:space="preserve">
+    <value>Payment</value>
+  </data>
+  <data name="ui.pickup.photo" xml:space="preserve">
+    <value>Photo of the person</value>
+  </data>
+  <data name="ui.pickup.photographed" xml:space="preserve">
+    <value>photographed</value>
+  </data>
+  <data name="ui.pickup.query" xml:space="preserve">
+    <value>Number, name or phone</value>
+  </data>
+  <data name="ui.pickup.query_hint" xml:space="preserve">
+    <value>The shipment number, the recipient or the person named, or the last digits of their phone.</value>
+  </data>
+  <data name="ui.pickup.ready" xml:space="preserve">
+    <value>Ready for pickup</value>
+  </data>
+  <data name="ui.pickup.recipient" xml:space="preserve">
+    <value>Recipient</value>
+  </data>
+  <data name="ui.pickup.release" xml:space="preserve">
+    <value>Release</value>
+  </data>
+  <data name="ui.pickup.release_title" xml:space="preserve">
+    <value>Release {count} parcels</value>
+  </data>
+  <data name="ui.pickup.released_line" xml:space="preserve">
+    <value>{count} parcels collected by {name} ({who}), {date} at {warehouse}</value>
+  </data>
+  <data name="ui.pickup.releases" xml:space="preserve">
+    <value>Collected</value>
+  </data>
+  <data name="ui.pickup.search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="ui.pickup.shipment" xml:space="preserve">
+    <value>Shipment</value>
+  </data>
+  <data name="ui.pickup.shipment_title" xml:space="preserve">
+    <value>Pickup of {number}</value>
+  </data>
+  <data name="ui.pickup.sign_here" xml:space="preserve">
+    <value>Signature of the person collecting</value>
+  </data>
+  <data name="ui.pickup.signed" xml:space="preserve">
+    <value>signed</value>
+  </data>
+  <data name="ui.pickup.since" xml:space="preserve">
+    <value>Ready since</value>
+  </data>
+  <data name="ui.pickup.state.collected" xml:space="preserve">
+    <value>Collected</value>
+  </data>
+  <data name="ui.pickup.state.elsewhere" xml:space="preserve">
+    <value>Not here</value>
+  </data>
+  <data name="ui.pickup.state.held" xml:space="preserve">
+    <value>Held by customs</value>
+  </data>
+  <data name="ui.pickup.state.here" xml:space="preserve">
+    <value>Here, not ready</value>
+  </data>
+  <data name="ui.pickup.state.ready" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="ui.pickup.storage" xml:space="preserve">
+    <value>Storage</value>
+  </data>
+  <data name="ui.pickup.storage_owed" xml:space="preserve">
+    <value>Storage not billed yet: {amount} {currency}.</value>
+  </data>
+  <data name="ui.pickup.title" xml:space="preserve">
+    <value>Pickup counter</value>
+  </data>
+  <data name="ui.pickup.to_pay" xml:space="preserve">
+    <value>To pay</value>
+  </data>
+  <data name="ui.pickup.total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="ui.pickup.unpaid" xml:space="preserve">
+    <value>To pay</value>
+  </data>
+  <data name="ui.pickup.who" xml:space="preserve">
+    <value>Who may collect</value>
+  </data>
+  <data name="ui.pickup_settings.charges" xml:space="preserve">
+    <value>Bill destination charges (duties, local taxes and fees)</value>
+  </data>
+  <data name="ui.pickup_settings.charges_hint" xml:space="preserve">
+    <value>Typed at the counter for each shipment, on one destination invoice paid before release.</value>
+  </data>
+  <data name="ui.pickup_settings.fee" xml:space="preserve">
+    <value>Fee per parcel per day ({currency})</value>
+  </data>
+  <data name="ui.pickup_settings.free_days" xml:space="preserve">
+    <value>Free days</value>
+  </data>
+  <data name="ui.pickup_settings.proof.Code" xml:space="preserve">
+    <value>A pickup code sent to the customer</value>
+  </data>
+  <data name="ui.pickup_settings.proof.Id" xml:space="preserve">
+    <value>An ID (its last 4 characters are kept)</value>
+  </data>
+  <data name="ui.pickup_settings.proof.Photo" xml:space="preserve">
+    <value>A photo of the person</value>
+  </data>
+  <data name="ui.pickup_settings.proof.Signature" xml:space="preserve">
+    <value>A signature on screen</value>
+  </data>
+  <data name="ui.pickup_settings.proofs" xml:space="preserve">
+    <value>Proof asked at the counter</value>
+  </data>
+  <data name="ui.pickup_settings.proofs_hint" xml:space="preserve">
+    <value>An ID and a signature by default. The code is emailed with the ready-for-pickup email, or from the counter.</value>
+  </data>
+  <data name="ui.pickup_settings.storage" xml:space="preserve">
+    <value>Charge storage, with reminders and a final notice</value>
+  </data>
+  <data name="ui.pickup_settings.storage_hint" xml:space="preserve">
+    <value>Counted from the day a parcel is ready for pickup, with the terms of that day. Reminders after 7, 14 and 21 days, a final notice after 25.</value>
+  </data>
+  <data name="ui.pickup_settings.storage_title" xml:space="preserve">
+    <value>Storage at the destination</value>
+  </data>
+  <data name="ui.pickup_settings.title" xml:space="preserve">
+    <value>Pickup settings</value>
   </data>
   <data name="ui.printers.add" xml:space="preserve">
     <value>Add</value>
@@ -6867,11 +9468,20 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.settings.pickup" xml:space="preserve">
     <value>Pickup at a pickup point</value>
   </data>
+  <data name="ui.settings.prefix.box" xml:space="preserve">
+    <value>Repack boxes</value>
+  </data>
+  <data name="ui.settings.prefix.bundle" xml:space="preserve">
+    <value>Bundles</value>
+  </data>
   <data name="ui.settings.prefix.credit_note" xml:space="preserve">
     <value>Credit note</value>
   </data>
   <data name="ui.settings.prefix.customer" xml:space="preserve">
     <value>Customer code prefix (for example C00042)</value>
+  </data>
+  <data name="ui.settings.prefix.dispatch" xml:space="preserve">
+    <value>Dispatch prefix</value>
   </data>
   <data name="ui.settings.prefix.invoice" xml:space="preserve">
     <value>Invoice prefix</value>
@@ -7302,6 +9912,84 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.signout" xml:space="preserve">
     <value>Sign out</value>
   </data>
+  <data name="ui.sli.account" xml:space="preserve">
+    <value>Account number</value>
+  </data>
+  <data name="ui.sli.authority" xml:space="preserve">
+    <value>Authority</value>
+  </data>
+  <data name="ui.sli.authority_text" xml:space="preserve">
+    <value>The shipper authorises the carrier or agent named above to prepare and sign the air waybill and the export documents for this shipment on its behalf.</value>
+  </data>
+  <data name="ui.sli.carrier" xml:space="preserve">
+    <value>Carrier or forwarding agent</value>
+  </data>
+  <data name="ui.sli.chargeable" xml:space="preserve">
+    <value>Chargeable weight</value>
+  </data>
+  <data name="ui.sli.charges" xml:space="preserve">
+    <value>Charges</value>
+  </data>
+  <data name="ui.sli.collect" xml:space="preserve">
+    <value>Collect</value>
+  </data>
+  <data name="ui.sli.consignee" xml:space="preserve">
+    <value>Consignee</value>
+  </data>
+  <data name="ui.sli.consolidation" xml:space="preserve">
+    <value>Consolidation as per attached manifest</value>
+  </data>
+  <data name="ui.sli.date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="ui.sli.departure" xml:space="preserve">
+    <value>Airport of departure</value>
+  </data>
+  <data name="ui.sli.destination" xml:space="preserve">
+    <value>Airport of destination</value>
+  </data>
+  <data name="ui.sli.documents" xml:space="preserve">
+    <value>Documents attached</value>
+  </data>
+  <data name="ui.sli.export" xml:space="preserve">
+    <value>Export filing reference</value>
+  </data>
+  <data name="ui.sli.export_none" xml:space="preserve">
+    <value>None declared</value>
+  </data>
+  <data name="ui.sli.goods" xml:space="preserve">
+    <value>Nature and quantity of goods</value>
+  </data>
+  <data name="ui.sli.gross" xml:space="preserve">
+    <value>Gross weight</value>
+  </data>
+  <data name="ui.sli.handling" xml:space="preserve">
+    <value>Handling instructions</value>
+  </data>
+  <data name="ui.sli.master" xml:space="preserve">
+    <value>Master air waybill</value>
+  </data>
+  <data name="ui.sli.pieces" xml:space="preserve">
+    <value>Pieces</value>
+  </data>
+  <data name="ui.sli.prepaid" xml:space="preserve">
+    <value>Prepaid</value>
+  </data>
+  <data name="ui.sli.shipper" xml:space="preserve">
+    <value>Shipper</value>
+  </data>
+  <data name="ui.sli.signature" xml:space="preserve">
+    <value>Signature of the shipper</value>
+  </data>
+  <data name="ui.sli.title" xml:space="preserve">
+    <value>Shipper’s letter of instruction</value>
+  </data>
+  <data name="ui.sli.value_carriage" xml:space="preserve">
+    <value>Declared value for carriage</value>
+  </data>
+  <data name="ui.sli.value_customs" xml:space="preserve">
+    <value>Declared value for customs</value>
+  </data>
   <data name="ui.staff.actions" xml:space="preserve">
     <value>Account and security</value>
   </data>
@@ -7436,6 +10124,57 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.staff.transfer_confirm" xml:space="preserve">
     <value>I give ownership of the company account to this person. I become an Administrator.</value>
+  </data>
+  <data name="ui.statement.age.0" xml:space="preserve">
+    <value>Current</value>
+  </data>
+  <data name="ui.statement.age.1" xml:space="preserve">
+    <value>1-30 days</value>
+  </data>
+  <data name="ui.statement.age.2" xml:space="preserve">
+    <value>31-60 days</value>
+  </data>
+  <data name="ui.statement.age.3" xml:space="preserve">
+    <value>61-90 days</value>
+  </data>
+  <data name="ui.statement.age.4" xml:space="preserve">
+    <value>Over 90 days</value>
+  </data>
+  <data name="ui.statement.amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="ui.statement.date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="ui.statement.due" xml:space="preserve">
+    <value>Due</value>
+  </data>
+  <data name="ui.statement.footer" xml:space="preserve">
+    <value>Please pay by the due date of each invoice.</value>
+  </data>
+  <data name="ui.statement.invoice" xml:space="preserve">
+    <value>Invoice</value>
+  </data>
+  <data name="ui.statement.nothing_owed" xml:space="preserve">
+    <value>Nothing is owed.</value>
+  </data>
+  <data name="ui.statement.overdue" xml:space="preserve">
+    <value>Of which overdue: {amount}</value>
+  </data>
+  <data name="ui.statement.owed" xml:space="preserve">
+    <value>Owed</value>
+  </data>
+  <data name="ui.statement.reference" xml:space="preserve">
+    <value>For</value>
+  </data>
+  <data name="ui.statement.terms" xml:space="preserve">
+    <value>Terms: {days} days</value>
+  </data>
+  <data name="ui.statement.title" xml:space="preserve">
+    <value>Statement</value>
+  </data>
+  <data name="ui.statement.total_due" xml:space="preserve">
+    <value>Total due: {amount}</value>
   </data>
   <data name="ui.storage.add" xml:space="preserve">
     <value>Add a shelf</value>
@@ -8025,11 +10764,35 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.tickets.tracking" xml:space="preserve">
     <value>Tracking number</value>
   </data>
+  <data name="ui.tracking.arrived_destination_country" xml:space="preserve">
+    <value>Arrived in the destination country ({country})</value>
+  </data>
+  <data name="ui.tracking.arrived_destination_warehouse" xml:space="preserve">
+    <value>Arrived at {place}</value>
+  </data>
   <data name="ui.tracking.auctioned" xml:space="preserve">
     <value>Sold at auction</value>
   </data>
   <data name="ui.tracking.booked" xml:space="preserve">
     <value>Shipment final: all parcels in, amount fixed</value>
+  </data>
+  <data name="ui.tracking.boxed" xml:space="preserve">
+    <value>Repacked in box {box}</value>
+  </data>
+  <data name="ui.tracking.bundle_arrived" xml:space="preserve">
+    <value>Bundle arrived at {warehouse}</value>
+  </data>
+  <data name="ui.tracking.bundle_closed" xml:space="preserve">
+    <value>Bundle closed: {weight}, {size}</value>
+  </data>
+  <data name="ui.tracking.bundle_created" xml:space="preserve">
+    <value>Bundle opened</value>
+  </data>
+  <data name="ui.tracking.bundle_opened" xml:space="preserve">
+    <value>Bundle opened at {warehouse}</value>
+  </data>
+  <data name="ui.tracking.bundle_voided" xml:space="preserve">
+    <value>Bundle voided</value>
   </data>
   <data name="ui.tracking.cancelled" xml:space="preserve">
     <value>Cancelled</value>
@@ -8043,17 +10806,53 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.tracking.customer_assigned" xml:space="preserve">
     <value>Assigned to customer {customer}</value>
   </data>
+  <data name="ui.tracking.customs_cleared" xml:space="preserve">
+    <value>Cleared by customs</value>
+  </data>
+  <data name="ui.tracking.customs_held" xml:space="preserve">
+    <value>Held by customs{message}</value>
+  </data>
+  <data name="ui.tracking.delayed" xml:space="preserve">
+    <value>Delayed: {cause}{message}</value>
+  </data>
+  <data name="ui.tracking.departed_origin" xml:space="preserve">
+    <value>Departed the origin ({mode})</value>
+  </data>
+  <data name="ui.tracking.dispatch_arrived" xml:space="preserve">
+    <value>Leg arrived: {leg}</value>
+  </data>
+  <data name="ui.tracking.dispatch_cancelled" xml:space="preserve">
+    <value>Dispatch cancelled</value>
+  </data>
+  <data name="ui.tracking.dispatch_closed" xml:space="preserve">
+    <value>Dispatch closed and manifested</value>
+  </data>
+  <data name="ui.tracking.dispatch_departed" xml:space="preserve">
+    <value>Leg departed: {leg}</value>
+  </data>
+  <data name="ui.tracking.dispatch_received" xml:space="preserve">
+    <value>Received at {warehouse}</value>
+  </data>
   <data name="ui.tracking.disposed" xml:space="preserve">
     <value>Disposed of</value>
   </data>
   <data name="ui.tracking.event_voided" xml:space="preserve">
     <value>Correction: an earlier entry was voided</value>
   </data>
+  <data name="ui.tracking.exception" xml:space="preserve">
+    <value>Exception: {cause}{message}</value>
+  </data>
   <data name="ui.tracking.hold_opened" xml:space="preserve">
     <value>On hold: {reason}</value>
   </data>
   <data name="ui.tracking.hold_released" xml:space="preserve">
     <value>Hold released: {reason}</value>
+  </data>
+  <data name="ui.tracking.in_customs" xml:space="preserve">
+    <value>With customs</value>
+  </data>
+  <data name="ui.tracking.in_transit" xml:space="preserve">
+    <value>In transit at {place}</value>
   </data>
   <data name="ui.tracking.inspection_completed" xml:space="preserve">
     <value>Inspection completed: {result}</value>
@@ -8067,14 +10866,29 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.tracking.label_recorded" xml:space="preserve">
     <value>Label details recorded</value>
   </data>
+  <data name="ui.tracking.manifested" xml:space="preserve">
+    <value>Manifested on dispatch {dispatch}</value>
+  </data>
+  <data name="ui.tracking.note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="ui.tracking.packed" xml:space="preserve">
+    <value>Packed in bundle {bundle}</value>
+  </data>
   <data name="ui.tracking.photo_added" xml:space="preserve">
     <value>Photo added ({kind})</value>
+  </data>
+  <data name="ui.tracking.picked_up" xml:space="preserve">
+    <value>Collected at {place}</value>
   </data>
   <data name="ui.tracking.pre_alerted" xml:space="preserve">
     <value>Pre-alerted by the customer</value>
   </data>
   <data name="ui.tracking.put_away" xml:space="preserve">
     <value>Put away at {location}</value>
+  </data>
+  <data name="ui.tracking.ready_for_pickup" xml:space="preserve">
+    <value>Ready for pickup at {place}</value>
   </data>
   <data name="ui.tracking.received_at_origin" xml:space="preserve">
     <value>Received at {warehouse}</value>
@@ -8126,6 +10940,78 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.verify.use_recovery" xml:space="preserve">
     <value>Use a recovery code instead</value>
+  </data>
+  <data name="ui.waybill.agent" xml:space="preserve">
+    <value>Issued by (agent)</value>
+  </data>
+  <data name="ui.waybill.chargeable" xml:space="preserve">
+    <value>Chargeable weight</value>
+  </data>
+  <data name="ui.waybill.charges" xml:space="preserve">
+    <value>Charges</value>
+  </data>
+  <data name="ui.waybill.collect" xml:space="preserve">
+    <value>Collect</value>
+  </data>
+  <data name="ui.waybill.consignee" xml:space="preserve">
+    <value>Consignee</value>
+  </data>
+  <data name="ui.waybill.departure" xml:space="preserve">
+    <value>Airport of departure</value>
+  </data>
+  <data name="ui.waybill.destination" xml:space="preserve">
+    <value>Airport of destination</value>
+  </data>
+  <data name="ui.waybill.goods" xml:space="preserve">
+    <value>Nature and quantity of goods</value>
+  </data>
+  <data name="ui.waybill.goods_fallback" xml:space="preserve">
+    <value>Personal effects</value>
+  </data>
+  <data name="ui.waybill.gross" xml:space="preserve">
+    <value>Gross weight</value>
+  </data>
+  <data name="ui.waybill.handling" xml:space="preserve">
+    <value>Handling information</value>
+  </data>
+  <data name="ui.waybill.house" xml:space="preserve">
+    <value>House air waybill number</value>
+  </data>
+  <data name="ui.waybill.house_title" xml:space="preserve">
+    <value>House air waybill</value>
+  </data>
+  <data name="ui.waybill.issued" xml:space="preserve">
+    <value>Issued on, at</value>
+  </data>
+  <data name="ui.waybill.master" xml:space="preserve">
+    <value>Master air waybill</value>
+  </data>
+  <data name="ui.waybill.pieces" xml:space="preserve">
+    <value>Pieces</value>
+  </data>
+  <data name="ui.waybill.prepaid" xml:space="preserve">
+    <value>Prepaid</value>
+  </data>
+  <data name="ui.waybill.routing" xml:space="preserve">
+    <value>Routing and carriers</value>
+  </data>
+  <data name="ui.waybill.shipper" xml:space="preserve">
+    <value>Shipper</value>
+  </data>
+  <data name="ui.waybill.signature_agent" xml:space="preserve">
+    <value>Signature of the issuing agent</value>
+  </data>
+  <data name="ui.waybill.terms" xml:space="preserve">
+    <value>Conditions</value>
+  </data>
+  <data name="ui.waybill.terms_text" xml:space="preserve">
+    <value>The goods described are accepted in apparent good order and condition for carriage subject to the conditions of the master air waybill.</value>
+  </data>
+  <data name="ui.waybill.value_carriage" xml:space="preserve">
+    <value>Declared value for carriage</value>
+  </data>
+  <data name="ui.waybill.value_customs" xml:space="preserve">
+    <value>Declared value for customs</value>
   </data>
   <data name="ui.workspace.body" xml:space="preserve">
     <value>Your workspace is being prepared.</value>

@@ -1,0 +1,86 @@
+﻿@*
+=========================================================
+FILE: PickupsPage.razor
+
+PURPOSE:
+The pickup counter of a destination warehouse (Slice 7 step 2, R-9): the shipments ready, oldest first, and a search.
+
+RESPONSIBILITIES:
+- Choose the warehouse; find a shipment by its number, recipient, person named or phone
+- List the shipments ready, each linked to its counter page
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.pickup.title"]" Company="@Company" Section="pickup" Error="@Error" Info="@Info">
+    <form method="get" action="/staff/pickup" class="ops-editor__panel ops-editor__form" role="search" aria-labelledby="pickup-search">
+        <h2 id="pickup-search">@T["ui.pickup.find"]</h2>
+        @if (Warehouses.Count > 1)
+        {
+            <label>@T["ui.arrivals.warehouse"]
+                <select name="warehouse">
+                    @foreach (OperationsArrivalPlace place in Warehouses)
+                    {
+                        <option value="@place.Id" selected="@(place.Id == WarehouseId)">@place.Code · @place.Name</option>
+                    }
+                </select>
+            </label>
+        }
+        else
+        {
+            <input type="hidden" name="warehouse" value="@WarehouseId" />
+        }
+        <label>@T["ui.pickup.query"] <input name="query" value="@Query" maxlength="64" autocomplete="off" autofocus /></label>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.pickup.search"]</button>
+        <p class="ops-editor__hint">@T["ui.pickup.query_hint"]</p>
+    </form>
+    <section class="ops-editor__panel" aria-labelledby="ready-title">
+        <h2 id="ready-title">@T["ui.pickup.ready"]</h2>
+        @if (Rows.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.pickup.none"]</p></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.pickup.ready"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.pickup.shipment"]</th><th scope="col">@T["ui.pickup.recipient"]</th><th scope="col">@T["ui.pickup.collector"]</th><th scope="col" class="ops-editor__number">@T["ui.pickup.parcels"]</th><th scope="col">@T["ui.pickup.since"]</th><th scope="col">@T["ui.pickup.payment"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsPickupRow row in Rows)
+                        {
+                            <tr data-status="@(row.Unpaid ? "unpaid" : "paid")">
+                                <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/pickup/@row.ShipmentId?warehouse=@WarehouseId">@row.Number</a></td>
+                                <td>@row.RecipientName</td>
+                                <td>@row.CollectorName</td>
+                                <td class="ops-editor__number">@row.Ready</td>
+                                <td>@OperationsDispatchWords.Time(row.ReadySince, TimeZone)</td>
+                                <td><span class="ops-editor__status" data-status="@(row.Unpaid ? "unpaid" : "paid")">@T[row.Unpaid ? "ui.pickup.unpaid" : "ui.pickup.paid"]</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsArrivalPlace> Warehouses { get; set; } = Array.Empty<OperationsArrivalPlace>();
+
+    [Parameter] public Guid WarehouseId { get; set; }
+
+    [Parameter] public string? Query { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsPickupRow> Rows { get; set; } = Array.Empty<OperationsPickupRow>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private string? TimeZone => Warehouses.FirstOrDefault(place => place.Id == WarehouseId)?.TimeZone;
+}

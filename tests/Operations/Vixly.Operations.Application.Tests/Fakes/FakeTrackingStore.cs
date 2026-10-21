@@ -37,6 +37,12 @@ internal sealed class FakeTrackingStore : IOperationsTrackingRepository
     public Task<IReadOnlyList<OperationsTrackingEvent>> ListForSubjectAsync(OperationsTrackingSubject kind, Guid subjectId, CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyList<OperationsTrackingEvent>>(Events.Where(item => item.SubjectKind == kind && item.SubjectId == subjectId).ToList());
 
+    public Task<IReadOnlyList<OperationsTrackingEvent>> ListForSubjectsAsync(OperationsTrackingSubject kind, IReadOnlyCollection<Guid> subjectIds, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<OperationsTrackingEvent>>(Events.Where(item => item.SubjectKind == kind && subjectIds.Contains(item.SubjectId)).ToList());
+
+    public Task<IReadOnlyList<OperationsTrackingEvent>> FindByKeysAsync(IReadOnlyCollection<string> idempotencyKeys, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<OperationsTrackingEvent>>(Events.Where(item => item.IdempotencyKey is not null && idempotencyKeys.Contains(item.IdempotencyKey)).ToList());
+
     public Task<OperationsParcel?> GetParcelAsync(Guid packageId, CancellationToken cancellationToken) =>
         Task.FromResult(Parcels.FirstOrDefault(item => item.Id == packageId));
 }

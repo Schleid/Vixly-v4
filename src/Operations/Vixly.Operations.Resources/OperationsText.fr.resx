@@ -17,6 +17,18 @@ Si vous avez oublié votre mot de passe, utilisez « Mot de passe oublié ? » s
   <data name="email.customer.account_exists.subject" xml:space="preserve">
     <value>{company} : vous avez déjà un compte</value>
   </data>
+  <data name="email.customer.credit_statement.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Votre relevé mensuel est prêt. Vous pouvez voir ce qui est dû sur votre compte, les échéances et le relevé sur votre page :
+{link}
+
+Merci,
+{company}</value>
+  </data>
+  <data name="email.customer.credit_statement.subject" xml:space="preserve">
+    <value>{company} : votre relevé est prêt</value>
+  </data>
   <data name="email.customer.parcel_action_needed.body" xml:space="preserve">
     <value>Bonjour {name},
 
@@ -80,6 +92,108 @@ Si vous n'avez rien demandé, ignorez cet e-mail : votre mot de passe reste le m
   <data name="email.customer.password_reset.subject" xml:space="preserve">
     <value>{company} : réinitialisez votre mot de passe</value>
   </data>
+  <data name="email.customer.payment_not_received.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Nous n’avons pas trouvé votre paiement Zelle ou votre virement sur notre compte. Votre facture reste à payer et votre expédition attend. Vérifiez auprès de votre banque ou contactez-nous.
+
+Vos factures :
+{link}
+
+Merci,
+{company}</value>
+  </data>
+  <data name="email.customer.payment_not_received.subject" xml:space="preserve">
+    <value>{company} : nous n’avons pas reçu votre paiement</value>
+  </data>
+  <data name="email.customer.pickup_code.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Votre code de retrait pour l’envoi {shipment} à {place} est : {code}
+
+Donnez-le au comptoir, avec une pièce d’identité. Gardez-le pour vous : qui le possède peut retirer votre envoi.
+
+{link}
+
+Merci,
+{company}</value>
+  </data>
+  <data name="email.customer.pickup_code.subject" xml:space="preserve">
+    <value>{company} : votre code de retrait pour {shipment}</value>
+  </data>
+  <data name="email.customer.pickup_final_notice.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Ceci est le dernier avis : votre envoi {shipment} attend depuis longtemps à {place}.
+{hours}
+
+Merci de le retirer, ou de nous contacter.
+{link}
+
+Merci,
+{company}</value>
+  </data>
+  <data name="email.customer.pickup_final_notice.subject" xml:space="preserve">
+    <value>{company} : dernier avis pour votre envoi {shipment}</value>
+  </data>
+  <data name="email.customer.pickup_reminder.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Votre envoi {shipment} vous attend toujours à {place}.
+{hours}
+
+L’entreposage peut être facturé une fois les jours gratuits passés.
+{link}
+
+Merci,
+{company}</value>
+  </data>
+  <data name="email.customer.pickup_reminder.subject" xml:space="preserve">
+    <value>{company} : votre envoi {shipment} vous attend</value>
+  </data>
+  <data name="email.customer.ready_for_pickup.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Votre envoi {shipment} est prêt à être retiré à {place}.
+{address}
+{hours}
+
+Vous pouvez le voir sur votre compte :
+{link}
+
+Merci,
+{company}</value>
+  </data>
+  <data name="email.customer.ready_for_pickup.subject" xml:space="preserve">
+    <value>{company} : votre envoi {shipment} est prêt à être retiré</value>
+  </data>
+  <data name="email.customer.shipment_update.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+{kind} sur votre {item} {shipment} : {cause}.
+{message}
+
+Vous pouvez le suivre sur votre compte :
+{link}
+
+Merci,
+{company}</value>
+  </data>
+  <data name="email.customer.shipment_update.delay" xml:space="preserve">
+    <value>Un retard</value>
+  </data>
+  <data name="email.customer.shipment_update.exception" xml:space="preserve">
+    <value>Un incident</value>
+  </data>
+  <data name="email.customer.shipment_update.item_package" xml:space="preserve">
+    <value>colis</value>
+  </data>
+  <data name="email.customer.shipment_update.item_shipment" xml:space="preserve">
+    <value>envoi</value>
+  </data>
+  <data name="email.customer.shipment_update.subject" xml:space="preserve">
+    <value>{company} : du nouveau sur votre {item} {shipment}</value>
+  </data>
   <data name="email.customer.ticket_answered.body" xml:space="preserve">
     <value>Bonjour {name},
 
@@ -140,6 +254,39 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ops.access.step_up_required" xml:space="preserve">
     <value>Confirmez d’abord avec votre application d’authentification.</value>
+  </data>
+  <data name="ops.arrivals.bundles_unopened" xml:space="preserve">
+    <value>Ouvrez d’abord chaque groupage qui s’arrête ici et scannez ses colis.</value>
+  </data>
+  <data name="ops.arrivals.customs_not_here" xml:space="preserve">
+    <value>La douane n’est pas faite dans cet entrepôt.</value>
+  </data>
+  <data name="ops.arrivals.customs_step_invalid" xml:space="preserve">
+    <value>Choisissez une étape de douane.</value>
+  </data>
+  <data name="ops.arrivals.moved_on" xml:space="preserve">
+    <value>Ceci est reparti d’ici depuis : il n’est pas reçu à nouveau.</value>
+  </data>
+  <data name="ops.arrivals.not_departed" xml:space="preserve">
+    <value>Cette expédition n’est pas encore partie.</value>
+  </data>
+  <data name="ops.arrivals.not_found" xml:space="preserve">
+    <value>Cette expédition n’est pas reçue dans cet entrepôt.</value>
+  </data>
+  <data name="ops.arrivals.not_here" xml:space="preserve">
+    <value>Pas ici : scannez d’abord les groupages, ou ils ne s’arrêtent pas dans cet entrepôt.</value>
+  </data>
+  <data name="ops.arrivals.not_open" xml:space="preserve">
+    <value>Cet écart est déjà clos.</value>
+  </data>
+  <data name="ops.arrivals.reason_required" xml:space="preserve">
+    <value>Choisissez perdu ou réglé et rédigez une note.</value>
+  </data>
+  <data name="ops.arrivals.received" xml:space="preserve">
+    <value>Cette expédition a déjà été reçue.</value>
+  </data>
+  <data name="ops.arrivals.unknown_code" xml:space="preserve">
+    <value>Aucun groupage, carton ou colis ne porte ce numéro.</value>
   </data>
   <data name="ops.auth.code_invalid" xml:space="preserve">
     <value>Ce code n’a pas fonctionné. Réessayez.</value>
@@ -215,6 +362,111 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ops.brand.text_too_long" xml:space="preserve">
     <value>Un texte dépasse la longueur permise.</value>
+  </data>
+  <data name="ops.bundles.blocked" xml:space="preserve">
+    <value>Refusé : ce colis est retenu ou attend une inspection.</value>
+  </data>
+  <data name="ops.bundles.box_incomplete" xml:space="preserve">
+    <value>Tous les colis de l’envoi doivent être dans le carton avant sa fermeture.</value>
+  </data>
+  <data name="ops.bundles.box_not_closed" xml:space="preserve">
+    <value>Fermez d’abord le carton avec son poids et sa taille.</value>
+  </data>
+  <data name="ops.bundles.box_not_open" xml:space="preserve">
+    <value>Ce carton n’est pas ouvert.</value>
+  </data>
+  <data name="ops.bundles.box_open_already" xml:space="preserve">
+    <value>Cet envoi a déjà un carton.</value>
+  </data>
+  <data name="ops.bundles.cannot_void" xml:space="preserve">
+    <value>Impossible d’annuler (retirez d’abord ses colis, ou il est dans un groupage ou une expédition).</value>
+  </data>
+  <data name="ops.bundles.destination_required" xml:space="preserve">
+    <value>Choisissez une destination.</value>
+  </data>
+  <data name="ops.bundles.divisor_required" xml:space="preserve">
+    <value>Ce service n’a pas de diviseur volumétrique : utilisez un objectif en poids ou un remplissage libre.</value>
+  </data>
+  <data name="ops.bundles.empty" xml:space="preserve">
+    <value>Le groupage est vide.</value>
+  </data>
+  <data name="ops.bundles.full" xml:space="preserve">
+    <value>Le groupage contient déjà le maximum de colis.</value>
+  </data>
+  <data name="ops.bundles.in_another_box" xml:space="preserve">
+    <value>Refusé : ce colis est dans un carton de reconditionnement ; il part avec son carton.</value>
+  </data>
+  <data name="ops.bundles.in_another_bundle" xml:space="preserve">
+    <value>Refusé : déjà dans un autre groupage.</value>
+  </data>
+  <data name="ops.bundles.kept_together" xml:space="preserve">
+    <value>Refusé : les colis de cet envoi consolidé voyagent ensemble, et certains sont dans un autre groupage.</value>
+  </data>
+  <data name="ops.bundles.kept_together_incomplete" xml:space="preserve">
+    <value>Un envoi consolidé gardé ensemble n’est que partiellement dans ce groupage : ajoutez ses autres colis, ou retirez ceux-ci, avant de fermer.</value>
+  </data>
+  <data name="ops.bundles.measurements_invalid" xml:space="preserve">
+    <value>Saisissez le poids et les trois côtés, supérieurs à zéro.</value>
+  </data>
+  <data name="ops.bundles.not_consolidated" xml:space="preserve">
+    <value>Cet envoi n’est pas consolidé.</value>
+  </data>
+  <data name="ops.bundles.not_final" xml:space="preserve">
+    <value>Refusé : son envoi n’est pas définitif, ou n’attend plus ici de partir.</value>
+  </data>
+  <data name="ops.bundles.not_found" xml:space="preserve">
+    <value>Ce groupage ou ce carton est introuvable.</value>
+  </data>
+  <data name="ops.bundles.not_in_bundle" xml:space="preserve">
+    <value>Ceci n’est pas dans ce groupage ou ce carton.</value>
+  </data>
+  <data name="ops.bundles.not_open" xml:space="preserve">
+    <value>Ce groupage n’est pas ouvert.</value>
+  </data>
+  <data name="ops.bundles.not_paid" xml:space="preserve">
+    <value>Refusé : son envoi n’est pas encore payé.</value>
+  </data>
+  <data name="ops.bundles.not_repacked" xml:space="preserve">
+    <value>Cet envoi n’est pas reconditionné : ses colis vont tels quels dans un groupage.</value>
+  </data>
+  <data name="ops.bundles.reason_required" xml:space="preserve">
+    <value>Indiquez un motif court.</value>
+  </data>
+  <data name="ops.bundles.repack_first" xml:space="preserve">
+    <value>Refusé : cet envoi consolidé est d’abord reconditionné ; scannez son carton.</value>
+  </data>
+  <data name="ops.bundles.service_required" xml:space="preserve">
+    <value>Choisissez un service proposé par l’entreprise.</value>
+  </data>
+  <data name="ops.bundles.settings_invalid" xml:space="preserve">
+    <value>Vérifiez les types de groupage (jusqu’à 12, tous différents) et les choix.</value>
+  </data>
+  <data name="ops.bundles.target_invalid" xml:space="preserve">
+    <value>Indiquez un objectif supérieur à zéro, ou aucun pour un remplissage libre.</value>
+  </data>
+  <data name="ops.bundles.target_reached" xml:space="preserve">
+    <value>Refusé : ce colis ferait dépasser l’objectif du groupage. Ouvrez un autre groupage.</value>
+  </data>
+  <data name="ops.bundles.type_invalid" xml:space="preserve">
+    <value>Choisissez un des types de groupage de l’entreprise.</value>
+  </data>
+  <data name="ops.bundles.unknown_code" xml:space="preserve">
+    <value>Ce code-barres n’est ni un colis, ni un groupage, ni un carton ici.</value>
+  </data>
+  <data name="ops.bundles.way_locked" xml:space="preserve">
+    <value>Le mode est fixé dès qu’un carton est commencé ou qu’un colis est groupé : annulez le carton, ou retirez d’abord ses colis du groupage.</value>
+  </data>
+  <data name="ops.bundles.wrong_destination" xml:space="preserve">
+    <value>Refusé : ce colis va vers une autre destination.</value>
+  </data>
+  <data name="ops.bundles.wrong_service" xml:space="preserve">
+    <value>Refusé : ce colis voyage avec un autre service.</value>
+  </data>
+  <data name="ops.bundles.wrong_shipment" xml:space="preserve">
+    <value>Refusé : ce colis appartient à un autre envoi.</value>
+  </data>
+  <data name="ops.bundles.wrong_warehouse" xml:space="preserve">
+    <value>Refusé : ce colis est dans un autre entrepôt.</value>
   </data>
   <data name="ops.charges.bands_invalid" xml:space="preserve">
     <value>Vérifiez les tranches : la première commence à 0, chaque début une seule fois, chacune avec un montant (et une base seulement pour « base plus par unité »).</value>
@@ -357,6 +609,48 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ops.company.time_zone_invalid" xml:space="preserve">
     <value>Choisissez un fuseau horaire de la liste, par exemple America/Port-au-Prince.</value>
   </data>
+  <data name="ops.credit.account_exists" xml:space="preserve">
+    <value>Ce client a déjà un compte de crédit.</value>
+  </data>
+  <data name="ops.credit.already_on_account" xml:space="preserve">
+    <value>Cette facture est déjà facturée au compte.</value>
+  </data>
+  <data name="ops.credit.balance_open" xml:space="preserve">
+    <value>Le compte ne peut être fermé que lorsque rien n’y est dû ni en attente.</value>
+  </data>
+  <data name="ops.credit.credit_off" xml:space="preserve">
+    <value>Le crédit est désactivé pour l’entreprise.</value>
+  </data>
+  <data name="ops.credit.limit_invalid" xml:space="preserve">
+    <value>Saisissez une limite de zéro ou plus, au centime près.</value>
+  </data>
+  <data name="ops.credit.not_active" xml:space="preserve">
+    <value>Le client n’a pas de compte de crédit actif.</value>
+  </data>
+  <data name="ops.credit.not_awaiting" xml:space="preserve">
+    <value>Cette charge n’est plus en attente.</value>
+  </data>
+  <data name="ops.credit.not_found" xml:space="preserve">
+    <value>Ce client ou ce compte de crédit est introuvable.</value>
+  </data>
+  <data name="ops.credit.nothing_owed" xml:space="preserve">
+    <value>Rien à facturer : la facture est payée ou attend la vérification d’un paiement.</value>
+  </data>
+  <data name="ops.credit.over_limit" xml:space="preserve">
+    <value>Au-delà de la limite du compte : refusé. Encaissez un paiement, ou voyez le service crédit.</value>
+  </data>
+  <data name="ops.credit.own_request" xml:space="preserve">
+    <value>Vous avez demandé cette charge : une autre personne décide.</value>
+  </data>
+  <data name="ops.credit.reason_required" xml:space="preserve">
+    <value>Indiquez un motif (300 caractères au plus).</value>
+  </data>
+  <data name="ops.credit.settings_invalid" xml:space="preserve">
+    <value>Saisissez des conditions de 0 à 365 jours et choisissez l’effet d’une charge au-delà de la limite.</value>
+  </data>
+  <data name="ops.credit.terms_invalid" xml:space="preserve">
+    <value>Saisissez des conditions de 0 à 365 jours, ou laissez vide.</value>
+  </data>
   <data name="ops.customers.code_invalid" xml:space="preserve">
     <value>Le code client n'est pas valide.</value>
   </data>
@@ -461,6 +755,117 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ops.devices.too_many_pending" xml:space="preserve">
     <value>Trop d’appareils attendent une approbation. Approuvez-les ou refusez-les d’abord.</value>
+  </data>
+  <data name="ops.dispatch.bundle_elsewhere" xml:space="preserve">
+    <value>Ce colis groupé est dans une autre expédition.</value>
+  </data>
+  <data name="ops.dispatch.bundle_not_closed" xml:space="preserve">
+    <value>Seul un colis groupé fermé peut être ajouté à une expédition.</value>
+  </data>
+  <data name="ops.dispatch.cannot_cancel" xml:space="preserve">
+    <value>Une expédition partie ne peut pas être annulée.</value>
+  </data>
+  <data name="ops.dispatch.carrier_inactive" xml:space="preserve">
+    <value>Ce transporteur est désactivé.</value>
+  </data>
+  <data name="ops.dispatch.carrier_invalid" xml:space="preserve">
+    <value>Vérifiez le transporteur : un nom et un type sont requis, et le type ne change plus une fois des tarifs saisis.</value>
+  </data>
+  <data name="ops.dispatch.carrier_taken" xml:space="preserve">
+    <value>Un autre transporteur porte déjà ce nom.</value>
+  </data>
+  <data name="ops.dispatch.cost_invalid" xml:space="preserve">
+    <value>Vérifiez le montant : zéro ou plus, avec au plus deux décimales.</value>
+  </data>
+  <data name="ops.dispatch.destination_required" xml:space="preserve">
+    <value>Choisissez une destination.</value>
+  </data>
+  <data name="ops.dispatch.leg_not_found" xml:space="preserve">
+    <value>Étape introuvable.</value>
+  </data>
+  <data name="ops.dispatch.leg_order" xml:space="preserve">
+    <value>Les étapes partent dans l’ordre, chacune après l’arrivée de la précédente.</value>
+  </data>
+  <data name="ops.dispatch.leg_time_invalid" xml:space="preserve">
+    <value>Vérifiez l’heure : elle ne peut être ni future ni antérieure à l’étape précédente.</value>
+  </data>
+  <data name="ops.dispatch.not_closed" xml:space="preserve">
+    <value>Clôturez d’abord l’expédition.</value>
+  </data>
+  <data name="ops.dispatch.not_found" xml:space="preserve">
+    <value>Expédition introuvable.</value>
+  </data>
+  <data name="ops.dispatch.not_planned" xml:space="preserve">
+    <value>L’expédition n’est plus planifiée : elle ne peut plus changer.</value>
+  </data>
+  <data name="ops.dispatch.nothing_to_close" xml:space="preserve">
+    <value>Une expédition a besoin d’au moins un colis groupé et une étape pour être clôturée.</value>
+  </data>
+  <data name="ops.dispatch.parcel_held" xml:space="preserve">
+    <value>Un colis de cette expédition est en attente ou à contrôler : libérez-le d’abord, ou annulez l’expédition.</value>
+  </data>
+  <data name="ops.dispatch.prefix_invalid" xml:space="preserve">
+    <value>Un préfixe de compagnie aérienne compte trois chiffres, pour un transporteur aérien uniquement.</value>
+  </data>
+  <data name="ops.dispatch.rate_invalid" xml:space="preserve">
+    <value>Vérifiez le tarif : l’aérien demande un tarif au poids (et un minimum facultatif), le maritime et le routier un tarif par colis groupé ; il commence aujourd’hui ou plus tard.</value>
+  </data>
+  <data name="ops.dispatch.rate_started" xml:space="preserve">
+    <value>Ce tarif a déjà commencé : ajoutez-en un nouveau.</value>
+  </data>
+  <data name="ops.dispatch.reason_required" xml:space="preserve">
+    <value>Indiquez un motif.</value>
+  </data>
+  <data name="ops.dispatch.service_required" xml:space="preserve">
+    <value>Choisissez un service proposé par l’entreprise.</value>
+  </data>
+  <data name="ops.dispatch.text_invalid" xml:space="preserve">
+    <value>Vérifiez le texte : il est trop long ou contient des caractères non autorisés.</value>
+  </data>
+  <data name="ops.dispatch.too_many_bundles" xml:space="preserve">
+    <value>Une expédition contient au plus 500 colis groupés.</value>
+  </data>
+  <data name="ops.dispatch.too_many_legs" xml:space="preserve">
+    <value>Une expédition compte au plus six étapes.</value>
+  </data>
+  <data name="ops.dispatch.unknown_code" xml:space="preserve">
+    <value>Code non reconnu.</value>
+  </data>
+  <data name="ops.dispatch.wrong_destination" xml:space="preserve">
+    <value>Ce colis groupé va vers une autre destination.</value>
+  </data>
+  <data name="ops.dispatch.wrong_service" xml:space="preserve">
+    <value>Ce colis groupé voyage avec un autre service.</value>
+  </data>
+  <data name="ops.dispatch.wrong_warehouse" xml:space="preserve">
+    <value>Ce colis groupé est dans un autre entrepôt.</value>
+  </data>
+  <data name="ops.events.kind_invalid" xml:space="preserve">
+    <value>Choisissez une note, un retard ou un incident.</value>
+  </data>
+  <data name="ops.events.not_found" xml:space="preserve">
+    <value>Rien n’a été trouvé avec ce numéro ici.</value>
+  </data>
+  <data name="ops.events.not_manual" xml:space="preserve">
+    <value>Seul un événement saisi à la main ici peut être annulé.</value>
+  </data>
+  <data name="ops.events.note_required" xml:space="preserve">
+    <value>Rédigez la note.</value>
+  </data>
+  <data name="ops.events.reason_required" xml:space="preserve">
+    <value>Choisissez une cause proposée par l’entreprise.</value>
+  </data>
+  <data name="ops.events.text_invalid" xml:space="preserve">
+    <value>Vérifiez le texte : il est trop long ou contient des caractères non autorisés.</value>
+  </data>
+  <data name="ops.events.time_invalid" xml:space="preserve">
+    <value>Vérifiez l’heure : pas dans le futur, au plus 30 jours en arrière.</value>
+  </data>
+  <data name="ops.events.too_many_reasons" xml:space="preserve">
+    <value>L’entreprise a déjà 40 causes propres.</value>
+  </data>
+  <data name="ops.events.void_reason_required" xml:space="preserve">
+    <value>Indiquez pourquoi il est annulé.</value>
   </data>
   <data name="ops.holds.answer_not_found" xml:space="preserve">
     <value>Cette réponse est introuvable.</value>
@@ -861,6 +1266,117 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ops.messaging.type_invalid" xml:space="preserve">
     <value>Le type de message n’est pas valide.</value>
   </data>
+  <data name="ops.payments.amount_invalid" xml:space="preserve">
+    <value>Saisissez des montants avec au plus deux décimales.</value>
+  </data>
+  <data name="ops.payments.cash_given_too_low" xml:space="preserve">
+    <value>L’argent remis est inférieur au montant en espèces.</value>
+  </data>
+  <data name="ops.payments.drawer_closed" xml:space="preserve">
+    <value>Cette caisse est fermée.</value>
+  </data>
+  <data name="ops.payments.drawer_not_found" xml:space="preserve">
+    <value>Cette caisse est introuvable.</value>
+  </data>
+  <data name="ops.payments.drawer_open" xml:space="preserve">
+    <value>Votre caisse est déjà ouverte ici.</value>
+  </data>
+  <data name="ops.payments.drawer_required" xml:space="preserve">
+    <value>Ouvrez votre caisse dans cet entrepôt avant d’encaisser ou de rendre des espèces.</value>
+  </data>
+  <data name="ops.payments.drawer_short" xml:space="preserve">
+    <value>La caisse ne contient pas autant d’espèces.</value>
+  </data>
+  <data name="ops.payments.method_name_invalid" xml:space="preserve">
+    <value>Chaque autre mode a besoin de son propre nom court (30 caractères au plus).</value>
+  </data>
+  <data name="ops.payments.method_not_accepted" xml:space="preserve">
+    <value>L’entreprise n’accepte pas ce mode de paiement.</value>
+  </data>
+  <data name="ops.payments.not_awaiting" xml:space="preserve">
+    <value>Ce paiement n’attend pas de confirmation.</value>
+  </data>
+  <data name="ops.payments.not_found" xml:space="preserve">
+    <value>Ce paiement est introuvable.</value>
+  </data>
+  <data name="ops.payments.not_in_full" xml:space="preserve">
+    <value>Les montants doivent faire exactement ce qui est dû.</value>
+  </data>
+  <data name="ops.payments.nothing_owed" xml:space="preserve">
+    <value>Rien n’est dû sur cette facture.</value>
+  </data>
+  <data name="ops.payments.one_cash_tender" xml:space="preserve">
+    <value>Utilisez une seule ligne en espèces.</value>
+  </data>
+  <data name="ops.payments.own_payment" xml:space="preserve">
+    <value>Une autre personne confirme l’arrivée de l’argent, jamais celle qui a encaissé.</value>
+  </data>
+  <data name="ops.payments.picture_invalid" xml:space="preserve">
+    <value>Le code QR doit être une image PNG ou JPEG d’au plus 1 Mo.</value>
+  </data>
+  <data name="ops.payments.reason_required" xml:space="preserve">
+    <value>Indiquez un motif.</value>
+  </data>
+  <data name="ops.payments.refund_too_high" xml:space="preserve">
+    <value>C’est plus que ce qui peut être rendu sur cette facture.</value>
+  </data>
+  <data name="ops.payments.text_invalid" xml:space="preserve">
+    <value>Ce texte est trop long ou contient des caractères non autorisés.</value>
+  </data>
+  <data name="ops.payments.zelle_incomplete" xml:space="preserve">
+    <value>Zelle demande un identifiant Zelle ou un courriel ou téléphone, et les conditions en anglais.</value>
+  </data>
+  <data name="ops.payments.zelle_terms_required" xml:space="preserve">
+    <value>Le client doit d’abord accepter les conditions Zelle.</value>
+  </data>
+  <data name="ops.pickup.amount_invalid" xml:space="preserve">
+    <value>Vérifiez les montants : pas négatifs, deux décimales au plus, et seulement si l’entreprise facture des frais à destination.</value>
+  </data>
+  <data name="ops.pickup.bill_first" xml:space="preserve">
+    <value>De l’entreposage est dû : facturez-le d’abord, puis encaissez.</value>
+  </data>
+  <data name="ops.pickup.billed" xml:space="preserve">
+    <value>Cet envoi a déjà été facturé à destination.</value>
+  </data>
+  <data name="ops.pickup.code_locked" xml:space="preserve">
+    <value>Ce code est bloqué après trop d’essais erronés : envoyez-en un nouveau au client.</value>
+  </data>
+  <data name="ops.pickup.code_not_sent" xml:space="preserve">
+    <value>Aucun code n’a été envoyé : envoyez-en un au client d’abord.</value>
+  </data>
+  <data name="ops.pickup.code_wait" xml:space="preserve">
+    <value>Un code vient d’être envoyé. Attendez deux minutes avant d’en envoyer un autre.</value>
+  </data>
+  <data name="ops.pickup.code_wrong" xml:space="preserve">
+    <value>Ce code ne correspond pas au dernier envoyé.</value>
+  </data>
+  <data name="ops.pickup.collector_invalid" xml:space="preserve">
+    <value>Choisissez qui retire : le destinataire, la personne désignée ou le client.</value>
+  </data>
+  <data name="ops.pickup.id_required" xml:space="preserve">
+    <value>Choisissez la pièce présentée et saisissez ses 4 derniers caractères.</value>
+  </data>
+  <data name="ops.pickup.not_found" xml:space="preserve">
+    <value>Cet envoi n’a rien dans cet entrepôt.</value>
+  </data>
+  <data name="ops.pickup.nothing_ready" xml:space="preserve">
+    <value>Rien de cet envoi n’est prêt à être retiré ici.</value>
+  </data>
+  <data name="ops.pickup.nothing_to_bill" xml:space="preserve">
+    <value>Il n’y a rien à facturer.</value>
+  </data>
+  <data name="ops.pickup.pay_first" xml:space="preserve">
+    <value>Toutes les factures de l’envoi se paient d’abord, à la caisse.</value>
+  </data>
+  <data name="ops.pickup.photo_required" xml:space="preserve">
+    <value>Prenez une photo de la personne (JPEG, PNG ou WebP, 10 Mo au plus).</value>
+  </data>
+  <data name="ops.pickup.settings_invalid" xml:space="preserve">
+    <value>Vérifiez les paramètres : 0 à 365 jours gratuits, des frais supérieurs à zéro si l’entreposage est facturé, deux décimales au plus.</value>
+  </data>
+  <data name="ops.pickup.signature_required" xml:space="preserve">
+    <value>La personne qui retire signe à l’écran.</value>
+  </data>
   <data name="ops.printing.address_invalid" xml:space="preserve">
     <value>Saisissez l'adresse sous la forme hôte:port avec un port d'impression brute de 9100 à 9109 (par exemple 192.168.1.50:9100), ou le nom de l'imprimante Windows.</value>
   </data>
@@ -1025,6 +1541,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ops.shipments.booked" xml:space="preserve">
     <value>Cet envoi est finalisé : il ne peut plus changer.</value>
+  </data>
+  <data name="ops.shipments.collector_locked" xml:space="preserve">
+    <value>La personne qui peut retirer l’envoi se désigne une fois l’envoi réservé, jusqu’au retrait.</value>
   </data>
   <data name="ops.shipments.delivery_mode_unavailable" xml:space="preserve">
     <value>Cette livraison n’est pas proposée là-bas. Choisissez le retrait en agence ou la livraison à une adresse.</value>
@@ -1521,6 +2040,213 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.app.name" xml:space="preserve">
     <value>Opérations</value>
   </data>
+  <data name="ui.arrivals.actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ui.arrivals.back" xml:space="preserve">
+    <value>Retour aux arrivées</value>
+  </data>
+  <data name="ui.arrivals.bundle" xml:space="preserve">
+    <value>Groupage</value>
+  </data>
+  <data name="ui.arrivals.bundle_state.arrived" xml:space="preserve">
+    <value>Arrivé, à ouvrir</value>
+  </data>
+  <data name="ui.arrivals.bundle_state.expected" xml:space="preserve">
+    <value>Attendu</value>
+  </data>
+  <data name="ui.arrivals.bundle_state.opened" xml:space="preserve">
+    <value>Ouvert</value>
+  </data>
+  <data name="ui.arrivals.bundle_state.passing" xml:space="preserve">
+    <value>Ici, poursuit sa route</value>
+  </data>
+  <data name="ui.arrivals.code" xml:space="preserve">
+    <value>Numéro de groupage, de carton ou de colis</value>
+  </data>
+  <data name="ui.arrivals.coming" xml:space="preserve">
+    <value>En route vers ici</value>
+  </data>
+  <data name="ui.arrivals.customs" xml:space="preserve">
+    <value>Douane</value>
+  </data>
+  <data name="ui.arrivals.customs.cleared" xml:space="preserve">
+    <value>Dédouané</value>
+  </data>
+  <data name="ui.arrivals.customs.held" xml:space="preserve">
+    <value>Retenu</value>
+  </data>
+  <data name="ui.arrivals.customs.in_customs" xml:space="preserve">
+    <value>En douane</value>
+  </data>
+  <data name="ui.arrivals.customs_all" xml:space="preserve">
+    <value>Toute l’expédition</value>
+  </data>
+  <data name="ui.arrivals.customs_hint" xml:space="preserve">
+    <value>Les colis retenus par la douane ne peuvent être ni retirés ni réexpédiés avant d’être dédouanés.</value>
+  </data>
+  <data name="ui.arrivals.customs_message" xml:space="preserve">
+    <value>Message pour le client (retenu seulement)</value>
+  </data>
+  <data name="ui.arrivals.customs_record" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="ui.arrivals.customs_scope" xml:space="preserve">
+    <value>Pour</value>
+  </data>
+  <data name="ui.arrivals.customs_step" xml:space="preserve">
+    <value>Étape</value>
+  </data>
+  <data name="ui.arrivals.departed" xml:space="preserve">
+    <value>Parti</value>
+  </data>
+  <data name="ui.arrivals.discrepancies" xml:space="preserve">
+    <value>Écarts</value>
+  </data>
+  <data name="ui.arrivals.discrepancy.ExtraBundle" xml:space="preserve">
+    <value>Groupage hors expédition</value>
+  </data>
+  <data name="ui.arrivals.discrepancy.ExtraParcel" xml:space="preserve">
+    <value>Colis hors expédition</value>
+  </data>
+  <data name="ui.arrivals.discrepancy.MissingBundle" xml:space="preserve">
+    <value>Groupage manquant</value>
+  </data>
+  <data name="ui.arrivals.discrepancy.MissingParcel" xml:space="preserve">
+    <value>Colis manquant</value>
+  </data>
+  <data name="ui.arrivals.discrepancy_status.Found" xml:space="preserve">
+    <value>Retrouvé</value>
+  </data>
+  <data name="ui.arrivals.discrepancy_status.Lost" xml:space="preserve">
+    <value>Perdu</value>
+  </data>
+  <data name="ui.arrivals.discrepancy_status.Open" xml:space="preserve">
+    <value>Ouvert</value>
+  </data>
+  <data name="ui.arrivals.discrepancy_status.Resolved" xml:space="preserve">
+    <value>Réglé</value>
+  </data>
+  <data name="ui.arrivals.dispatch_title" xml:space="preserve">
+    <value>Recevoir {number}</value>
+  </data>
+  <data name="ui.arrivals.done.bundle" xml:space="preserve">
+    <value>Groupage {number} reçu.</value>
+  </data>
+  <data name="ui.arrivals.done.bundle_again" xml:space="preserve">
+    <value>Le groupage {number} était déjà reçu.</value>
+  </data>
+  <data name="ui.arrivals.done.customs" xml:space="preserve">
+    <value>Douane enregistrée.</value>
+  </data>
+  <data name="ui.arrivals.done.extra_bundle" xml:space="preserve">
+    <value>Le groupage {number} n’est pas sur cette expédition : noté comme écart.</value>
+  </data>
+  <data name="ui.arrivals.done.extra_parcel" xml:space="preserve">
+    <value>{number} n’est pas sur cette expédition : noté comme écart.</value>
+  </data>
+  <data name="ui.arrivals.done.finished" xml:space="preserve">
+    <value>Reçu. Tout correspond.</value>
+  </data>
+  <data name="ui.arrivals.done.finished_missing" xml:space="preserve">
+    <value>Reçu. Ce qui manquait est listé ci-dessous.</value>
+  </data>
+  <data name="ui.arrivals.done.opened" xml:space="preserve">
+    <value>Groupage ouvert : scannez ses colis.</value>
+  </data>
+  <data name="ui.arrivals.done.parcel" xml:space="preserve">
+    <value>{number} reçu.</value>
+  </data>
+  <data name="ui.arrivals.done.parcel_again" xml:space="preserve">
+    <value>{number} était déjà reçu.</value>
+  </data>
+  <data name="ui.arrivals.done.parcel_again_ready" xml:space="preserve">
+    <value>{number} était déjà reçu ; il est maintenant prêt à être retiré.</value>
+  </data>
+  <data name="ui.arrivals.done.parcel_ready" xml:space="preserve">
+    <value>{number} reçu et prêt à être retiré.</value>
+  </data>
+  <data name="ui.arrivals.done.resolved" xml:space="preserve">
+    <value>Résolu.</value>
+  </data>
+  <data name="ui.arrivals.finish" xml:space="preserve">
+    <value>Terminer la réception</value>
+  </data>
+  <data name="ui.arrivals.finish_button" xml:space="preserve">
+    <value>Terminer</value>
+  </data>
+  <data name="ui.arrivals.finish_hint" xml:space="preserve">
+    <value>Ce qui n’a pas été scanné est listé comme manquant, à régler par l’équipe d’ici et celle d’origine.</value>
+  </data>
+  <data name="ui.arrivals.kind" xml:space="preserve">
+    <value>Quoi</value>
+  </data>
+  <data name="ui.arrivals.no_discrepancies" xml:space="preserve">
+    <value>Rien à régler.</value>
+  </data>
+  <data name="ui.arrivals.none_coming" xml:space="preserve">
+    <value>Aucune expédition n’est en route vers ici.</value>
+  </data>
+  <data name="ui.arrivals.not_yet" xml:space="preserve">
+    <value>Pas encore</value>
+  </data>
+  <data name="ui.arrivals.note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="ui.arrivals.noted" xml:space="preserve">
+    <value>Noté</value>
+  </data>
+  <data name="ui.arrivals.onward" xml:space="preserve">
+    <value>suite depuis un hub</value>
+  </data>
+  <data name="ui.arrivals.open" xml:space="preserve">
+    <value>Ouvrir</value>
+  </data>
+  <data name="ui.arrivals.outcome" xml:space="preserve">
+    <value>Issue</value>
+  </data>
+  <data name="ui.arrivals.parcels_here" xml:space="preserve">
+    <value>Colis ici</value>
+  </data>
+  <data name="ui.arrivals.receive" xml:space="preserve">
+    <value>Recevoir</value>
+  </data>
+  <data name="ui.arrivals.received" xml:space="preserve">
+    <value>Reçues récemment</value>
+  </data>
+  <data name="ui.arrivals.received_at" xml:space="preserve">
+    <value>Reçu</value>
+  </data>
+  <data name="ui.arrivals.resolution" xml:space="preserve">
+    <value>Résolution</value>
+  </data>
+  <data name="ui.arrivals.resolve" xml:space="preserve">
+    <value>Résoudre</value>
+  </data>
+  <data name="ui.arrivals.scan" xml:space="preserve">
+    <value>Scanner</value>
+  </data>
+  <data name="ui.arrivals.scan_hint" xml:space="preserve">
+    <value>Scannez chaque groupage à la descente du camion, puis ouvrez les groupages qui s’arrêtent ici et scannez leurs colis.</value>
+  </data>
+  <data name="ui.arrivals.show" xml:space="preserve">
+    <value>Afficher</value>
+  </data>
+  <data name="ui.arrivals.summary" xml:space="preserve">
+    <value>Expédition</value>
+  </data>
+  <data name="ui.arrivals.title" xml:space="preserve">
+    <value>Arrivées</value>
+  </data>
+  <data name="ui.arrivals.view_all" xml:space="preserve">
+    <value>Tous</value>
+  </data>
+  <data name="ui.arrivals.view_open" xml:space="preserve">
+    <value>Ouverts seulement</value>
+  </data>
+  <data name="ui.arrivals.warehouse" xml:space="preserve">
+    <value>Entrepôt</value>
+  </data>
   <data name="ui.audit.all_areas" xml:space="preserve">
     <value>Tout</value>
   </data>
@@ -1685,6 +2411,528 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.billing.trial_ends" xml:space="preserve">
     <value>L’essai se termine le {date}</value>
+  </data>
+  <data name="ui.boxes.back" xml:space="preserve">
+    <value>Retour aux envois consolidés</value>
+  </data>
+  <data name="ui.boxes.box" xml:space="preserve">
+    <value>Carton</value>
+  </data>
+  <data name="ui.boxes.box_title" xml:space="preserve">
+    <value>Carton de reconditionnement {number}</value>
+  </data>
+  <data name="ui.boxes.close" xml:space="preserve">
+    <value>Fermer le carton</value>
+  </data>
+  <data name="ui.boxes.close_button" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="ui.boxes.company_way" xml:space="preserve">
+    <value>Par défaut dans l’entreprise : {way}.</value>
+  </data>
+  <data name="ui.boxes.counts" xml:space="preserve">
+    <value>{inside} colis sur {total} dans le carton</value>
+  </data>
+  <data name="ui.boxes.in_box" xml:space="preserve">
+    <value>dans le carton</value>
+  </data>
+  <data name="ui.boxes.none" xml:space="preserve">
+    <value>Aucun envoi consolidé n’attend de partir.</value>
+  </data>
+  <data name="ui.boxes.start" xml:space="preserve">
+    <value>Commencer le carton</value>
+  </data>
+  <data name="ui.boxes.status.Closed" xml:space="preserve">
+    <value>fermé</value>
+  </data>
+  <data name="ui.boxes.status.Open" xml:space="preserve">
+    <value>ouvert</value>
+  </data>
+  <data name="ui.boxes.status.Voided" xml:space="preserve">
+    <value>annulé</value>
+  </data>
+  <data name="ui.boxes.switch" xml:space="preserve">
+    <value>Changer</value>
+  </data>
+  <data name="ui.boxes.switched" xml:space="preserve">
+    <value>choisi pour cet envoi</value>
+  </data>
+  <data name="ui.boxes.title" xml:space="preserve">
+    <value>Envois consolidés</value>
+  </data>
+  <data name="ui.boxes.unpaid" xml:space="preserve">
+    <value>impayé</value>
+  </data>
+  <data name="ui.boxes.void" xml:space="preserve">
+    <value>Annuler le carton</value>
+  </data>
+  <data name="ui.boxes.way" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="ui.boxes.way.KeepTogether" xml:space="preserve">
+    <value>Gardé ensemble dans un groupage</value>
+  </data>
+  <data name="ui.boxes.way.Repack" xml:space="preserve">
+    <value>Reconditionné dans un carton</value>
+  </data>
+  <data name="ui.boxes.where" xml:space="preserve">
+    <value>Où</value>
+  </data>
+  <data name="ui.bundle_settings.target" xml:space="preserve">
+    <value>Quand un groupage atteint son objectif</value>
+  </data>
+  <data name="ui.bundle_settings.target.Refuse" xml:space="preserve">
+    <value>Refuser le colis</value>
+  </data>
+  <data name="ui.bundle_settings.target.Warn" xml:space="preserve">
+    <value>Avertir et accepter le colis</value>
+  </data>
+  <data name="ui.bundle_settings.title" xml:space="preserve">
+    <value>Paramètres des groupages</value>
+  </data>
+  <data name="ui.bundle_settings.types" xml:space="preserve">
+    <value>Types de groupage</value>
+  </data>
+  <data name="ui.bundle_settings.types_hint" xml:space="preserve">
+    <value>Un par ligne, avec vos propres mots (carton, sac, palette...), jusqu’à {count}. Aucun : les groupages n’ont pas de type.</value>
+  </data>
+  <data name="ui.bundle_settings.way" xml:space="preserve">
+    <value>Envois consolidés</value>
+  </data>
+  <data name="ui.bundle_settings.way_hint.KeepTogether" xml:space="preserve">
+    <value>leurs colis voyagent tels quels, tous dans le même groupage</value>
+  </data>
+  <data name="ui.bundle_settings.way_hint.Repack" xml:space="preserve">
+    <value>leurs colis vont dans un nouveau carton, pesé et étiqueté, puis dans un groupage</value>
+  </data>
+  <data name="ui.bundles.add" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="ui.bundles.back" xml:space="preserve">
+    <value>Retour aux groupages</value>
+  </data>
+  <data name="ui.bundles.basis" xml:space="preserve">
+    <value>Taille</value>
+  </data>
+  <data name="ui.bundles.basis.Free" xml:space="preserve">
+    <value>Remplissage libre</value>
+  </data>
+  <data name="ui.bundles.basis.Volumetric" xml:space="preserve">
+    <value>Objectif en poids volumétrique</value>
+  </data>
+  <data name="ui.bundles.basis.Weight" xml:space="preserve">
+    <value>Objectif en poids</value>
+  </data>
+  <data name="ui.bundles.box" xml:space="preserve">
+    <value>Carton</value>
+  </data>
+  <data name="ui.bundles.boxes" xml:space="preserve">
+    <value>Envois consolidés</value>
+  </data>
+  <data name="ui.bundles.bundle_title" xml:space="preserve">
+    <value>Groupage {number}</value>
+  </data>
+  <data name="ui.bundles.change_bundle" xml:space="preserve">
+    <value>Un autre groupage</value>
+  </data>
+  <data name="ui.bundles.close" xml:space="preserve">
+    <value>Fermer le groupage</value>
+  </data>
+  <data name="ui.bundles.close_button" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="ui.bundles.close_hint" xml:space="preserve">
+    <value>Un groupage fermé ne prend plus rien et ne peut pas être rouvert. Son étiquette s’imprime de nouveau avec son poids.</value>
+  </data>
+  <data name="ui.bundles.closed_weight" xml:space="preserve">
+    <value>Pesé et mesuré</value>
+  </data>
+  <data name="ui.bundles.create" xml:space="preserve">
+    <value>Ouvrir le groupage</value>
+  </data>
+  <data name="ui.bundles.destination" xml:space="preserve">
+    <value>Destination</value>
+  </data>
+  <data name="ui.bundles.done.closed" xml:space="preserve">
+    <value>Groupage fermé. Réimprimez son étiquette avec son poids.</value>
+  </data>
+  <data name="ui.bundles.done.created" xml:space="preserve">
+    <value>Groupage ouvert. Imprimez son étiquette.</value>
+  </data>
+  <data name="ui.bundles.done.voided" xml:space="preserve">
+    <value>Groupage annulé. Ses colis sont de nouveau prêts à grouper.</value>
+  </data>
+  <data name="ui.bundles.empty" xml:space="preserve">
+    <value>Aucun colis pour l’instant.</value>
+  </data>
+  <data name="ui.bundles.fill" xml:space="preserve">
+    <value>Remplir un groupage</value>
+  </data>
+  <data name="ui.bundles.fill_of" xml:space="preserve">
+    <value>{filled} sur {target}</value>
+  </data>
+  <data name="ui.bundles.fill_title" xml:space="preserve">
+    <value>Remplir un groupage</value>
+  </data>
+  <data name="ui.bundles.filled" xml:space="preserve">
+    <value>Rempli</value>
+  </data>
+  <data name="ui.bundles.gross_weight" xml:space="preserve">
+    <value>Poids brut ({unit})</value>
+  </data>
+  <data name="ui.bundles.height" xml:space="preserve">
+    <value>Hauteur ({unit})</value>
+  </data>
+  <data name="ui.bundles.home_delivery" xml:space="preserve">
+    <value>{country}, livraison à domicile</value>
+  </data>
+  <data name="ui.bundles.in_bundle" xml:space="preserve">
+    <value>dans le groupage {number}</value>
+  </data>
+  <data name="ui.bundles.label" xml:space="preserve">
+    <value>Imprimer l’étiquette</value>
+  </data>
+  <data name="ui.bundles.label.open" xml:space="preserve">
+    <value>Ouvert, pas encore pesé</value>
+  </data>
+  <data name="ui.bundles.label.parcels" xml:space="preserve">
+    <value>{count} colis</value>
+  </data>
+  <data name="ui.bundles.label.repacked" xml:space="preserve">
+    <value>{count} colis reconditionnés</value>
+  </data>
+  <data name="ui.bundles.last_scan" xml:space="preserve">
+    <value>Dernier scan</value>
+  </data>
+  <data name="ui.bundles.length" xml:space="preserve">
+    <value>Longueur ({unit})</value>
+  </data>
+  <data name="ui.bundles.list" xml:space="preserve">
+    <value>Groupages</value>
+  </data>
+  <data name="ui.bundles.meter" xml:space="preserve">
+    <value>{count} colis · {filled}</value>
+  </data>
+  <data name="ui.bundles.new" xml:space="preserve">
+    <value>Nouveau groupage</value>
+  </data>
+  <data name="ui.bundles.no_shelf" xml:space="preserve">
+    <value>aucune étagère enregistrée</value>
+  </data>
+  <data name="ui.bundles.none" xml:space="preserve">
+    <value>Aucun groupage pour l’instant.</value>
+  </data>
+  <data name="ui.bundles.not_open" xml:space="preserve">
+    <value>Ce groupage n’est plus ouvert.</value>
+  </data>
+  <data name="ui.bundles.note.added" xml:space="preserve">
+    <value>Ajouté.</value>
+  </data>
+  <data name="ui.bundles.note.closed" xml:space="preserve">
+    <value>Fermé.</value>
+  </data>
+  <data name="ui.bundles.note.out" xml:space="preserve">
+    <value>Retiré.</value>
+  </data>
+  <data name="ui.bundles.note.past" xml:space="preserve">
+    <value>Le groupage a dépassé son objectif.</value>
+  </data>
+  <data name="ui.bundles.note.repeat" xml:space="preserve">
+    <value>Déjà dedans : scanné deux fois.</value>
+  </data>
+  <data name="ui.bundles.note.split" xml:space="preserve">
+    <value>Attention : les autres colis de cet envoi sont dans un autre groupage.</value>
+  </data>
+  <data name="ui.bundles.number" xml:space="preserve">
+    <value>Numéro</value>
+  </data>
+  <data name="ui.bundles.on_shelf" xml:space="preserve">
+    <value>sur l’étagère {shelf}</value>
+  </data>
+  <data name="ui.bundles.open_scan" xml:space="preserve">
+    <value>Ouvrir</value>
+  </data>
+  <data name="ui.bundles.parcels" xml:space="preserve">
+    <value>Colis</value>
+  </data>
+  <data name="ui.bundles.parcels_weight" xml:space="preserve">
+    <value>colis : {weight}, volumétrique {volumetric}</value>
+  </data>
+  <data name="ui.bundles.ready" xml:space="preserve">
+    <value>Prêts à grouper</value>
+  </data>
+  <data name="ui.bundles.ready_none" xml:space="preserve">
+    <value>Aucun colis n’attend d’être groupé.</value>
+  </data>
+  <data name="ui.bundles.scan_bundle" xml:space="preserve">
+    <value>Scannez le code-barres du groupage ou du carton</value>
+  </data>
+  <data name="ui.bundles.scan_parcel" xml:space="preserve">
+    <value>Scannez un colis</value>
+  </data>
+  <data name="ui.bundles.scanned" xml:space="preserve">
+    <value>Dans ce groupage</value>
+  </data>
+  <data name="ui.bundles.service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="ui.bundles.shipment" xml:space="preserve">
+    <value>Envoi</value>
+  </data>
+  <data name="ui.bundles.shipment_counts" xml:space="preserve">
+    <value>{bundled} sur {total} groupés, {here} ici</value>
+  </data>
+  <data name="ui.bundles.shipments" xml:space="preserve">
+    <value>Ses envois</value>
+  </data>
+  <data name="ui.bundles.shipments_count" xml:space="preserve">
+    <value>envois : {count}</value>
+  </data>
+  <data name="ui.bundles.split_warning" xml:space="preserve">
+    <value>Certains de ses colis sont dans un autre groupage : l’envoi voyage en plusieurs parties.</value>
+  </data>
+  <data name="ui.bundles.state" xml:space="preserve">
+    <value>État</value>
+  </data>
+  <data name="ui.bundles.status.Closed" xml:space="preserve">
+    <value>Fermé</value>
+  </data>
+  <data name="ui.bundles.status.Open" xml:space="preserve">
+    <value>Ouvert</value>
+  </data>
+  <data name="ui.bundles.status.Voided" xml:space="preserve">
+    <value>Annulé</value>
+  </data>
+  <data name="ui.bundles.take_out" xml:space="preserve">
+    <value>Retirer</value>
+  </data>
+  <data name="ui.bundles.take_out_box" xml:space="preserve">
+    <value>Retirer le carton</value>
+  </data>
+  <data name="ui.bundles.target" xml:space="preserve">
+    <value>Objectif ({unit})</value>
+  </data>
+  <data name="ui.bundles.title" xml:space="preserve">
+    <value>Groupages</value>
+  </data>
+  <data name="ui.bundles.to_bundle" xml:space="preserve">
+    <value>Détails du groupage</value>
+  </data>
+  <data name="ui.bundles.type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ui.bundles.void" xml:space="preserve">
+    <value>Annuler le groupage</value>
+  </data>
+  <data name="ui.bundles.void_button" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="ui.bundles.void_hint" xml:space="preserve">
+    <value>Ses colis redeviennent prêts à grouper ; recommencez avec un nouveau groupage.</value>
+  </data>
+  <data name="ui.bundles.void_reason" xml:space="preserve">
+    <value>Motif</value>
+  </data>
+  <data name="ui.bundles.volumetric" xml:space="preserve">
+    <value>volumétrique {weight}</value>
+  </data>
+  <data name="ui.bundles.waiting" xml:space="preserve">
+    <value>Impayés ou retenus</value>
+  </data>
+  <data name="ui.bundles.warehouse" xml:space="preserve">
+    <value>Entrepôt</value>
+  </data>
+  <data name="ui.bundles.weight" xml:space="preserve">
+    <value>Poids</value>
+  </data>
+  <data name="ui.bundles.width" xml:space="preserve">
+    <value>Largeur ({unit})</value>
+  </data>
+  <data name="ui.carriers.account" xml:space="preserve">
+    <value>Numéro de compte</value>
+  </data>
+  <data name="ui.carriers.active" xml:space="preserve">
+    <value>Actif</value>
+  </data>
+  <data name="ui.carriers.add_rate" xml:space="preserve">
+    <value>Ajouter un tarif</value>
+  </data>
+  <data name="ui.carriers.air_hint" xml:space="preserve">
+    <value>Facturé au poids taxable (le plus élevé du poids réel et volumétrique). Un tarif plus récent remplace celui-ci à partir de sa date.</value>
+  </data>
+  <data name="ui.carriers.any_type" xml:space="preserve">
+    <value>Tout type</value>
+  </data>
+  <data name="ui.carriers.back" xml:space="preserve">
+    <value>Retour aux transporteurs</value>
+  </data>
+  <data name="ui.carriers.done.rate" xml:space="preserve">
+    <value>Tarif ajouté.</value>
+  </data>
+  <data name="ui.carriers.done.removed" xml:space="preserve">
+    <value>Tarif retiré.</value>
+  </data>
+  <data name="ui.carriers.done.saved" xml:space="preserve">
+    <value>Transporteur enregistré.</value>
+  </data>
+  <data name="ui.carriers.edit" xml:space="preserve">
+    <value>Modifier le transporteur</value>
+  </data>
+  <data name="ui.carriers.inactive" xml:space="preserve">
+    <value>Désactivé</value>
+  </data>
+  <data name="ui.carriers.kind" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="ui.carriers.list" xml:space="preserve">
+    <value>Transporteurs</value>
+  </data>
+  <data name="ui.carriers.minimum" xml:space="preserve">
+    <value>Minimum</value>
+  </data>
+  <data name="ui.carriers.minimum_in" xml:space="preserve">
+    <value>Minimum ({currency})</value>
+  </data>
+  <data name="ui.carriers.name" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="ui.carriers.new" xml:space="preserve">
+    <value>Nouveau transporteur</value>
+  </data>
+  <data name="ui.carriers.none" xml:space="preserve">
+    <value>Aucun transporteur pour le moment.</value>
+  </data>
+  <data name="ui.carriers.ocean_hint" xml:space="preserve">
+    <value>Facturé par colis groupé, pour un type ou tous. Un tarif plus récent remplace celui-ci à partir de sa date.</value>
+  </data>
+  <data name="ui.carriers.per_bundle" xml:space="preserve">
+    <value>Par colis groupé</value>
+  </data>
+  <data name="ui.carriers.per_bundle_in" xml:space="preserve">
+    <value>Tarif ({currency} par colis groupé)</value>
+  </data>
+  <data name="ui.carriers.per_weight" xml:space="preserve">
+    <value>Au poids</value>
+  </data>
+  <data name="ui.carriers.per_weight_in" xml:space="preserve">
+    <value>Tarif ({currency} par {unit} taxable)</value>
+  </data>
+  <data name="ui.carriers.prefix" xml:space="preserve">
+    <value>Préfixe de la compagnie</value>
+  </data>
+  <data name="ui.carriers.prefix_hint" xml:space="preserve">
+    <value>Aérien uniquement : les trois chiffres au début de ses numéros de LTA.</value>
+  </data>
+  <data name="ui.carriers.rates" xml:space="preserve">
+    <value>Tarifs</value>
+  </data>
+  <data name="ui.carriers.rates_none" xml:space="preserve">
+    <value>Aucun tarif pour le moment.</value>
+  </data>
+  <data name="ui.carriers.starts" xml:space="preserve">
+    <value>À partir du</value>
+  </data>
+  <data name="ui.carriers.state" xml:space="preserve">
+    <value>État</value>
+  </data>
+  <data name="ui.carriers.title" xml:space="preserve">
+    <value>Transporteurs</value>
+  </data>
+  <data name="ui.cashier.amount" xml:space="preserve">
+    <value>Montant</value>
+  </data>
+  <data name="ui.cashier.awaiting_hint" xml:space="preserve">
+    <value>Une partie attend que la finance voie l’argent en banque ; jusque-là l’expédition reste en attente.</value>
+  </data>
+  <data name="ui.cashier.back" xml:space="preserve">
+    <value>Retour à la caisse</value>
+  </data>
+  <data name="ui.cashier.cash_given" xml:space="preserve">
+    <value>Espèces remises</value>
+  </data>
+  <data name="ui.cashier.cash_needs_drawer" xml:space="preserve">
+    <value>Les espèces demandent votre caisse ouverte dans cet entrepôt.</value>
+  </data>
+  <data name="ui.cashier.change" xml:space="preserve">
+    <value>Monnaie à rendre : {amount}</value>
+  </data>
+  <data name="ui.cashier.drawer_open" xml:space="preserve">
+    <value>Caisse ouverte à {warehouse} : {expected} attendus</value>
+  </data>
+  <data name="ui.cashier.drawers" xml:space="preserve">
+    <value>Caisses</value>
+  </data>
+  <data name="ui.cashier.find" xml:space="preserve">
+    <value>Téléphone, courriel, code client, ou un numéro de facture, d’expédition ou de commande</value>
+  </data>
+  <data name="ui.cashier.find_button" xml:space="preserve">
+    <value>Rechercher</value>
+  </data>
+  <data name="ui.cashier.in_full" xml:space="preserve">
+    <value>Payé en totalité : les montants doivent faire exactement ce qui est dû. Plusieurs modes peuvent être combinés.</value>
+  </data>
+  <data name="ui.cashier.method" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="ui.cashier.next" xml:space="preserve">
+    <value>Effacer · client suivant</value>
+  </data>
+  <data name="ui.cashier.no_drawer" xml:space="preserve">
+    <value>Aucune caisse ouverte.</value>
+  </data>
+  <data name="ui.cashier.not_found" xml:space="preserve">
+    <value>Aucun client ni facture ne correspond.</value>
+  </data>
+  <data name="ui.cashier.nothing_to_pay" xml:space="preserve">
+    <value>Rien à payer.</value>
+  </data>
+  <data name="ui.cashier.open_drawer" xml:space="preserve">
+    <value>Ouvrir une caisse</value>
+  </data>
+  <data name="ui.cashier.pay" xml:space="preserve">
+    <value>Payer</value>
+  </data>
+  <data name="ui.cashier.receipt" xml:space="preserve">
+    <value>Imprimer le reçu</value>
+  </data>
+  <data name="ui.cashier.reference" xml:space="preserve">
+    <value>Référence</value>
+  </data>
+  <data name="ui.cashier.take" xml:space="preserve">
+    <value>Encaisser</value>
+  </data>
+  <data name="ui.cashier.taken" xml:space="preserve">
+    <value>Paiement {number} de {total} sur la facture {invoice}</value>
+  </data>
+  <data name="ui.cashier.title" xml:space="preserve">
+    <value>Caisse</value>
+  </data>
+  <data name="ui.cashier.to_pay" xml:space="preserve">
+    <value>À payer</value>
+  </data>
+  <data name="ui.cashier.to_pay_now" xml:space="preserve">
+    <value>À payer : {amount}</value>
+  </data>
+  <data name="ui.cashier.zelle_accepted" xml:space="preserve">
+    <value>Le client a lu et accepté les conditions Zelle</value>
+  </data>
+  <data name="ui.cashier.zelle_contact" xml:space="preserve">
+    <value>Courriel ou téléphone</value>
+  </data>
+  <data name="ui.cashier.zelle_memo" xml:space="preserve">
+    <value>Mémo (obligatoire)</value>
+  </data>
+  <data name="ui.cashier.zelle_name" xml:space="preserve">
+    <value>Nom affiché</value>
+  </data>
+  <data name="ui.cashier.zelle_qr" xml:space="preserve">
+    <value>Code QR Zelle</value>
+  </data>
+  <data name="ui.cashier.zelle_tag" xml:space="preserve">
+    <value>Identifiant Zelle</value>
+  </data>
+  <data name="ui.cashier.zelle_warning" xml:space="preserve">
+    <value>Important : le client doit écrire {memo} dans le mémo Zelle. L’expédition reste en attente jusqu’à ce que l’entreprise voie l’argent sur son compte.</value>
   </data>
   <data name="ui.certificate.accepted" xml:space="preserve">
     <value>Conditions acceptées</value>
@@ -2046,6 +3294,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.charges.line.Consolidation" xml:space="preserve">
     <value>Consolidation</value>
   </data>
+  <data name="ui.charges.line.Duties" xml:space="preserve">
+    <value>Droits de douane</value>
+  </data>
   <data name="ui.charges.line.Extra" xml:space="preserve">
     <value>Supplément</value>
   </data>
@@ -2057,6 +3308,12 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.charges.line.Item" xml:space="preserve">
     <value>Article</value>
+  </data>
+  <data name="ui.charges.line.LocalFee" xml:space="preserve">
+    <value>Frais locaux</value>
+  </data>
+  <data name="ui.charges.line.LocalTax" xml:space="preserve">
+    <value>Taxes locales</value>
   </data>
   <data name="ui.charges.line.Minimum" xml:space="preserve">
     <value>Ajustement au minimum</value>
@@ -2072,6 +3329,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.charges.line.SmallPackage" xml:space="preserve">
     <value>Petit colis</value>
+  </data>
+  <data name="ui.charges.line.Storage" xml:space="preserve">
+    <value>Entreposage</value>
   </data>
   <data name="ui.charges.line.freight_of" xml:space="preserve">
     <value>Fret, colis {piece} ({basis})</value>
@@ -3492,8 +4752,161 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.counts.title" xml:space="preserve">
     <value>Comptages</value>
   </data>
+  <data name="ui.credit.account_not_active" xml:space="preserve">
+    <value>Le compte de crédit du client est suspendu ou fermé.</value>
+  </data>
+  <data name="ui.credit.account_title" xml:space="preserve">
+    <value>Compte de crédit · {name}</value>
+  </data>
+  <data name="ui.credit.approve" xml:space="preserve">
+    <value>Approuver</value>
+  </data>
+  <data name="ui.credit.available" xml:space="preserve">
+    <value>Disponible</value>
+  </data>
+  <data name="ui.credit.awaiting" xml:space="preserve">
+    <value>En attente d’approbation</value>
+  </data>
+  <data name="ui.credit.back" xml:space="preserve">
+    <value>Retour aux comptes de crédit</value>
+  </data>
+  <data name="ui.credit.bill_available" xml:space="preserve">
+    <value>Disponible sur le compte : {amount}.</value>
+  </data>
+  <data name="ui.credit.bill_button" xml:space="preserve">
+    <value>Facturer {amount} au compte</value>
+  </data>
+  <data name="ui.credit.bill_title" xml:space="preserve">
+    <value>Facturer le compte du client</value>
+  </data>
+  <data name="ui.credit.change" xml:space="preserve">
+    <value>Modifier le compte</value>
+  </data>
+  <data name="ui.credit.change_hint" xml:space="preserve">
+    <value>Une suspension ou une fermeture demande un motif. Fermé seulement quand plus rien n’est dû.</value>
+  </data>
+  <data name="ui.credit.charges_link" xml:space="preserve">
+    <value>Charges à approuver ({count})</value>
+  </data>
+  <data name="ui.credit.charges_none" xml:space="preserve">
+    <value>Aucune charge en attente.</value>
+  </data>
+  <data name="ui.credit.charges_title" xml:space="preserve">
+    <value>Charges à approuver</value>
+  </data>
+  <data name="ui.credit.customer" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="ui.credit.customer_code" xml:space="preserve">
+    <value>Code client</value>
+  </data>
+  <data name="ui.credit.done.awaiting_credit" xml:space="preserve">
+    <value>Au-delà de la limite : la charge attend le service crédit.</value>
+  </data>
+  <data name="ui.credit.done.billed" xml:space="preserve">
+    <value>Facturé au compte. Un envoi facturé ainsi est libéré.</value>
+  </data>
+  <data name="ui.credit.done.changed" xml:space="preserve">
+    <value>Compte de crédit modifié.</value>
+  </data>
+  <data name="ui.credit.done.decided" xml:space="preserve">
+    <value>Décision enregistrée.</value>
+  </data>
+  <data name="ui.credit.done.opened" xml:space="preserve">
+    <value>Compte de crédit ouvert.</value>
+  </data>
+  <data name="ui.credit.items" xml:space="preserve">
+    <value>Pièces ouvertes</value>
+  </data>
+  <data name="ui.credit.limit" xml:space="preserve">
+    <value>Limite ({currency})</value>
+  </data>
+  <data name="ui.credit.limit_short" xml:space="preserve">
+    <value>Limite</value>
+  </data>
+  <data name="ui.credit.limit_terms" xml:space="preserve">
+    <value>Limite {limit} · {days} jours</value>
+  </data>
+  <data name="ui.credit.marked" xml:space="preserve">
+    <value>Clients marqués pour le crédit sans compte</value>
+  </data>
+  <data name="ui.credit.marked_hint" xml:space="preserve">
+    <value>Ils avaient le crédit avant l’existence des comptes de crédit. Ouvrez leur compte avec une limite, ou laissez-les : ils ne peuvent pas être facturés d’ici là.</value>
+  </data>
+  <data name="ui.credit.none" xml:space="preserve">
+    <value>Aucun compte de crédit pour l’instant.</value>
+  </data>
+  <data name="ui.credit.note" xml:space="preserve">
+    <value>Note (obligatoire pour refuser)</value>
+  </data>
+  <data name="ui.credit.off" xml:space="preserve">
+    <value>Le crédit est désactivé pour l’entreprise : aucun compte ne peut être facturé.</value>
+  </data>
+  <data name="ui.credit.open" xml:space="preserve">
+    <value>Ouvrir un compte de crédit</value>
+  </data>
+  <data name="ui.credit.open_button" xml:space="preserve">
+    <value>Ouvrir le compte</value>
+  </data>
+  <data name="ui.credit.overdue" xml:space="preserve">
+    <value>En retard</value>
+  </data>
+  <data name="ui.credit.owed" xml:space="preserve">
+    <value>Dû</value>
+  </data>
+  <data name="ui.credit.reason" xml:space="preserve">
+    <value>Motif</value>
+  </data>
+  <data name="ui.credit.refuse" xml:space="preserve">
+    <value>Refuser</value>
+  </data>
+  <data name="ui.credit.state" xml:space="preserve">
+    <value>État</value>
+  </data>
+  <data name="ui.credit.statement" xml:space="preserve">
+    <value>Relevé (PDF)</value>
+  </data>
+  <data name="ui.credit.status.Active" xml:space="preserve">
+    <value>Actif</value>
+  </data>
+  <data name="ui.credit.status.Closed" xml:space="preserve">
+    <value>Fermé</value>
+  </data>
+  <data name="ui.credit.status.OnHold" xml:space="preserve">
+    <value>Suspendu</value>
+  </data>
+  <data name="ui.credit.terms" xml:space="preserve">
+    <value>Conditions (jours)</value>
+  </data>
+  <data name="ui.credit.terms_hint" xml:space="preserve">
+    <value>Vide : les conditions de l’entreprise.</value>
+  </data>
+  <data name="ui.credit.title" xml:space="preserve">
+    <value>Comptes de crédit</value>
+  </data>
+  <data name="ui.credit_settings.over_limit" xml:space="preserve">
+    <value>Quand une charge dépasse la limite</value>
+  </data>
+  <data name="ui.credit_settings.over_limit.AskCreditDepartment" xml:space="preserve">
+    <value>La faire attendre le service crédit</value>
+  </data>
+  <data name="ui.credit_settings.over_limit.Refuse" xml:space="preserve">
+    <value>La refuser</value>
+  </data>
+  <data name="ui.credit_settings.statements" xml:space="preserve">
+    <value>Prévenir chaque mois les clients que leur relevé est prêt</value>
+  </data>
+  <data name="ui.credit_settings.terms" xml:space="preserve">
+    <value>Conditions (jours)</value>
+  </data>
+  <data name="ui.credit_settings.title" xml:space="preserve">
+    <value>Paramètres du crédit</value>
+  </data>
   <data name="ui.customers.back" xml:space="preserve">
     <value>Tous les clients</value>
+  </data>
+  <data name="ui.customers.clear" xml:space="preserve">
+    <value>Effacer</value>
   </data>
   <data name="ui.customers.code" xml:space="preserve">
     <value>Code client</value>
@@ -3509,6 +4922,12 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.customers.credit" xml:space="preserve">
     <value>Crédit</value>
+  </data>
+  <data name="ui.customers.credit_account" xml:space="preserve">
+    <value>Compte de crédit</value>
+  </data>
+  <data name="ui.customers.credit_account_hint" xml:space="preserve">
+    <value>Le service crédit ouvre et gère le compte de crédit du client : limite, conditions et état.</value>
   </data>
   <data name="ui.customers.credit_allow" xml:space="preserve">
     <value>Autoriser le crédit</value>
@@ -3810,6 +5229,414 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.devices.waiting.title" xml:space="preserve">
     <value>En attente d’approbation</value>
   </data>
+  <data name="ui.dispatch.add_bundle" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="ui.dispatch.add_leg" xml:space="preserve">
+    <value>Ajouter une étape</value>
+  </data>
+  <data name="ui.dispatch.arrive" xml:space="preserve">
+    <value>Arrivée</value>
+  </data>
+  <data name="ui.dispatch.arrived_at" xml:space="preserve">
+    <value>Arrivée le</value>
+  </data>
+  <data name="ui.dispatch.arrives" xml:space="preserve">
+    <value>Arrivée</value>
+  </data>
+  <data name="ui.dispatch.at" xml:space="preserve">
+    <value>Le</value>
+  </data>
+  <data name="ui.dispatch.back" xml:space="preserve">
+    <value>Retour aux expéditions</value>
+  </data>
+  <data name="ui.dispatch.bundle_manifest" xml:space="preserve">
+    <value>Manifeste du colis groupé</value>
+  </data>
+  <data name="ui.dispatch.bundles" xml:space="preserve">
+    <value>Colis groupés</value>
+  </data>
+  <data name="ui.dispatch.bundles_none" xml:space="preserve">
+    <value>Aucun colis groupé dans cette expédition.</value>
+  </data>
+  <data name="ui.dispatch.cancel" xml:space="preserve">
+    <value>Annuler l’expédition</value>
+  </data>
+  <data name="ui.dispatch.cancel_button" xml:space="preserve">
+    <value>Annuler l’expédition</value>
+  </data>
+  <data name="ui.dispatch.cancel_hint" xml:space="preserve">
+    <value>Uniquement avant le départ. Ses colis groupés sont libérés.</value>
+  </data>
+  <data name="ui.dispatch.cancel_reason" xml:space="preserve">
+    <value>Motif</value>
+  </data>
+  <data name="ui.dispatch.candidates" xml:space="preserve">
+    <value>Colis groupés fermés compatibles</value>
+  </data>
+  <data name="ui.dispatch.candidates_none" xml:space="preserve">
+    <value>Aucun colis groupé fermé n’attend pour cette destination et ce service.</value>
+  </data>
+  <data name="ui.dispatch.carrier" xml:space="preserve">
+    <value>Transporteur</value>
+  </data>
+  <data name="ui.dispatch.carrier_none" xml:space="preserve">
+    <value>Aucun transporteur (camion propre)</value>
+  </data>
+  <data name="ui.dispatch.chargeable" xml:space="preserve">
+    <value>Taxable</value>
+  </data>
+  <data name="ui.dispatch.charges" xml:space="preserve">
+    <value>Frais</value>
+  </data>
+  <data name="ui.dispatch.close" xml:space="preserve">
+    <value>Clôturer l’expédition</value>
+  </data>
+  <data name="ui.dispatch.close_button" xml:space="preserve">
+    <value>Clôturer et manifester</value>
+  </data>
+  <data name="ui.dispatch.close_hint" xml:space="preserve">
+    <value>Ses colis groupés sont alors manifestés : plus rien ne peut être ajouté. Il faut au moins un colis groupé et une étape.</value>
+  </data>
+  <data name="ui.dispatch.closed_at" xml:space="preserve">
+    <value>Manifestée le</value>
+  </data>
+  <data name="ui.dispatch.consignee" xml:space="preserve">
+    <value>Destinataire</value>
+  </data>
+  <data name="ui.dispatch.cost" xml:space="preserve">
+    <value>Coût transporteur</value>
+  </data>
+  <data name="ui.dispatch.cost.at_departure" xml:space="preserve">
+    <value>Calculé au départ de l’expédition</value>
+  </data>
+  <data name="ui.dispatch.cost.computed" xml:space="preserve">
+    <value>Calculé d’après les tarifs</value>
+  </data>
+  <data name="ui.dispatch.cost.correct_in" xml:space="preserve">
+    <value>Coût selon la facture du transporteur ({currency})</value>
+  </data>
+  <data name="ui.dispatch.cost.hint" xml:space="preserve">
+    <value>Laissez le montant vide pour revenir au coût calculé. La part de chaque envoi suit son poids taxable.</value>
+  </data>
+  <data name="ui.dispatch.cost.missing" xml:space="preserve">
+    <value>Pas de tarif pour l’étape {legs} : ajoutez le tarif ou saisissez le coût de la facture du transporteur.</value>
+  </data>
+  <data name="ui.dispatch.cost.note" xml:space="preserve">
+    <value>Motif</value>
+  </data>
+  <data name="ui.dispatch.cost.recost" xml:space="preserve">
+    <value>Recalculer</value>
+  </data>
+  <data name="ui.dispatch.cost.share" xml:space="preserve">
+    <value>Part du coût</value>
+  </data>
+  <data name="ui.dispatch.cost.total" xml:space="preserve">
+    <value>Coût retenu</value>
+  </data>
+  <data name="ui.dispatch.cost.unknown" xml:space="preserve">
+    <value>Inconnu : un transporteur n’a pas de tarif pour cette destination</value>
+  </data>
+  <data name="ui.dispatch.create" xml:space="preserve">
+    <value>Planifier l’expédition</value>
+  </data>
+  <data name="ui.dispatch.customer" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="ui.dispatch.cutoff" xml:space="preserve">
+    <value>Heure limite</value>
+  </data>
+  <data name="ui.dispatch.cutoff_in" xml:space="preserve">
+    <value>Heure limite ({zone})</value>
+  </data>
+  <data name="ui.dispatch.depart" xml:space="preserve">
+    <value>Partie</value>
+  </data>
+  <data name="ui.dispatch.departed_at" xml:space="preserve">
+    <value>Partie le</value>
+  </data>
+  <data name="ui.dispatch.departs" xml:space="preserve">
+    <value>Départ</value>
+  </data>
+  <data name="ui.dispatch.destination" xml:space="preserve">
+    <value>Destination</value>
+  </data>
+  <data name="ui.dispatch.dispatch_title" xml:space="preserve">
+    <value>Expédition {number}</value>
+  </data>
+  <data name="ui.dispatch.document.CertificateOfOrigin" xml:space="preserve">
+    <value>Certificat d’origine</value>
+  </data>
+  <data name="ui.dispatch.document.CommercialInvoice" xml:space="preserve">
+    <value>Facture commerciale</value>
+  </data>
+  <data name="ui.dispatch.document.DangerousGoodsDeclaration" xml:space="preserve">
+    <value>Déclaration de marchandises dangereuses</value>
+  </data>
+  <data name="ui.dispatch.document.ExportDeclaration" xml:space="preserve">
+    <value>Déclaration d’export</value>
+  </data>
+  <data name="ui.dispatch.document.ExportLicence" xml:space="preserve">
+    <value>Licence d’exportation</value>
+  </data>
+  <data name="ui.dispatch.document.PackingList" xml:space="preserve">
+    <value>Liste de colisage</value>
+  </data>
+  <data name="ui.dispatch.documents" xml:space="preserve">
+    <value>Documents joints</value>
+  </data>
+  <data name="ui.dispatch.done.arrived" xml:space="preserve">
+    <value>Arrivée enregistrée.</value>
+  </data>
+  <data name="ui.dispatch.done.bundle" xml:space="preserve">
+    <value>Colis groupé ajouté.</value>
+  </data>
+  <data name="ui.dispatch.done.cancelled" xml:space="preserve">
+    <value>Expédition annulée.</value>
+  </data>
+  <data name="ui.dispatch.done.closed" xml:space="preserve">
+    <value>Expédition clôturée et manifestée.</value>
+  </data>
+  <data name="ui.dispatch.done.cost" xml:space="preserve">
+    <value>Coût enregistré.</value>
+  </data>
+  <data name="ui.dispatch.done.costed" xml:space="preserve">
+    <value>Coût recalculé.</value>
+  </data>
+  <data name="ui.dispatch.done.created" xml:space="preserve">
+    <value>Expédition planifiée.</value>
+  </data>
+  <data name="ui.dispatch.done.departed" xml:space="preserve">
+    <value>Départ enregistré.</value>
+  </data>
+  <data name="ui.dispatch.done.instructions" xml:space="preserve">
+    <value>Instructions enregistrées.</value>
+  </data>
+  <data name="ui.dispatch.done.leg" xml:space="preserve">
+    <value>Étape ajoutée.</value>
+  </data>
+  <data name="ui.dispatch.done.removed" xml:space="preserve">
+    <value>Retiré.</value>
+  </data>
+  <data name="ui.dispatch.driver" xml:space="preserve">
+    <value>Chauffeur</value>
+  </data>
+  <data name="ui.dispatch.export_reference" xml:space="preserve">
+    <value>Référence de déclaration d’export</value>
+  </data>
+  <data name="ui.dispatch.free_bundles" xml:space="preserve">
+    <value>{warehouse} : {count} colis groupés fermés hors expédition</value>
+  </data>
+  <data name="ui.dispatch.from" xml:space="preserve">
+    <value>Départ</value>
+  </data>
+  <data name="ui.dispatch.handling" xml:space="preserve">
+    <value>Instructions de manutention</value>
+  </data>
+  <data name="ui.dispatch.hawb" xml:space="preserve">
+    <value>LTA maison</value>
+  </data>
+  <data name="ui.dispatch.hawb_all" xml:space="preserve">
+    <value>LTA maison</value>
+  </data>
+  <data name="ui.dispatch.house" xml:space="preserve">
+    <value>Numéro maison</value>
+  </data>
+  <data name="ui.dispatch.instructions" xml:space="preserve">
+    <value>Lettre d’instructions de l’expéditeur</value>
+  </data>
+  <data name="ui.dispatch.leg_from" xml:space="preserve">
+    <value>De</value>
+  </data>
+  <data name="ui.dispatch.leg_hint" xml:space="preserve">
+    <value>Le transporteur fixe le mode. Les étapes partent dans l’ordre, chacune après l’arrivée de la précédente.</value>
+  </data>
+  <data name="ui.dispatch.leg_status.Arrived" xml:space="preserve">
+    <value>Arrivée</value>
+  </data>
+  <data name="ui.dispatch.leg_status.Cancelled" xml:space="preserve">
+    <value>Annulée</value>
+  </data>
+  <data name="ui.dispatch.leg_status.Departed" xml:space="preserve">
+    <value>Partie</value>
+  </data>
+  <data name="ui.dispatch.leg_status.Planned" xml:space="preserve">
+    <value>Prévue</value>
+  </data>
+  <data name="ui.dispatch.leg_to" xml:space="preserve">
+    <value>À</value>
+  </data>
+  <data name="ui.dispatch.legs" xml:space="preserve">
+    <value>Étapes</value>
+  </data>
+  <data name="ui.dispatch.legs_none" xml:space="preserve">
+    <value>Aucune étape : ajoutez le vol, la traversée ou le camion.</value>
+  </data>
+  <data name="ui.dispatch.list" xml:space="preserve">
+    <value>Expéditions</value>
+  </data>
+  <data name="ui.dispatch.manifest" xml:space="preserve">
+    <value>Manifeste d’expédition</value>
+  </data>
+  <data name="ui.dispatch.mode" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="ui.dispatch.mode.air" xml:space="preserve">
+    <value>Aérien</value>
+  </data>
+  <data name="ui.dispatch.mode.ground" xml:space="preserve">
+    <value>Routier</value>
+  </data>
+  <data name="ui.dispatch.mode.ocean" xml:space="preserve">
+    <value>Maritime</value>
+  </data>
+  <data name="ui.dispatch.new" xml:space="preserve">
+    <value>Nouvelle expédition</value>
+  </data>
+  <data name="ui.dispatch.new_hint" xml:space="preserve">
+    <value>Seuls les colis groupés fermés pour la même destination et le même service peuvent y être ajoutés.</value>
+  </data>
+  <data name="ui.dispatch.none" xml:space="preserve">
+    <value>Aucune expédition pour le moment.</value>
+  </data>
+  <data name="ui.dispatch.notes" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="ui.dispatch.number" xml:space="preserve">
+    <value>Numéro</value>
+  </data>
+  <data name="ui.dispatch.pieces" xml:space="preserve">
+    <value>{count} pièces</value>
+  </data>
+  <data name="ui.dispatch.places_hint" xml:space="preserve">
+    <value>Départ et arrivée sont montrés au client : saisissez une ville ou un aéroport, jamais un transporteur.</value>
+  </data>
+  <data name="ui.dispatch.reference" xml:space="preserve">
+    <value>Référence (LTA, connaissement, camion)</value>
+  </data>
+  <data name="ui.dispatch.remove" xml:space="preserve">
+    <value>Retirer</value>
+  </data>
+  <data name="ui.dispatch.scan_bundle" xml:space="preserve">
+    <value>Scannez ou saisissez un numéro de colis groupé</value>
+  </data>
+  <data name="ui.dispatch.service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="ui.dispatch.shipment" xml:space="preserve">
+    <value>Envoi</value>
+  </data>
+  <data name="ui.dispatch.shipments" xml:space="preserve">
+    <value>Envois de cette expédition</value>
+  </data>
+  <data name="ui.dispatch.sli" xml:space="preserve">
+    <value>Lettre d’instructions</value>
+  </data>
+  <data name="ui.dispatch.state" xml:space="preserve">
+    <value>État</value>
+  </data>
+  <data name="ui.dispatch.status.Arrived" xml:space="preserve">
+    <value>Arrivée</value>
+  </data>
+  <data name="ui.dispatch.status.Cancelled" xml:space="preserve">
+    <value>Annulée</value>
+  </data>
+  <data name="ui.dispatch.status.Closed" xml:space="preserve">
+    <value>Manifestée</value>
+  </data>
+  <data name="ui.dispatch.status.Departed" xml:space="preserve">
+    <value>Partie</value>
+  </data>
+  <data name="ui.dispatch.status.Planned" xml:space="preserve">
+    <value>Planifiée</value>
+  </data>
+  <data name="ui.dispatch.times_in" xml:space="preserve">
+    <value>Les heures sont en {zone}.</value>
+  </data>
+  <data name="ui.dispatch.title" xml:space="preserve">
+    <value>Expéditions</value>
+  </data>
+  <data name="ui.dispatch.vehicle" xml:space="preserve">
+    <value>Véhicule</value>
+  </data>
+  <data name="ui.dispatch.view.all" xml:space="preserve">
+    <value>Voir toutes les expéditions</value>
+  </data>
+  <data name="ui.dispatch.view.open" xml:space="preserve">
+    <value>Voir les expéditions en cours</value>
+  </data>
+  <data name="ui.drawers.back" xml:space="preserve">
+    <value>Retour aux caisses</value>
+  </data>
+  <data name="ui.drawers.cash_in" xml:space="preserve">
+    <value>Entrées</value>
+  </data>
+  <data name="ui.drawers.cash_out" xml:space="preserve">
+    <value>Sorties (remboursements)</value>
+  </data>
+  <data name="ui.drawers.close" xml:space="preserve">
+    <value>Fermer ma caisse</value>
+  </data>
+  <data name="ui.drawers.close_button" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="ui.drawers.close_hint" xml:space="preserve">
+    <value>Comptez les espèces de la caisse. Tout écart avec les espèces attendues est enregistré.</value>
+  </data>
+  <data name="ui.drawers.counted" xml:space="preserve">
+    <value>Compté</value>
+  </data>
+  <data name="ui.drawers.difference" xml:space="preserve">
+    <value>Écart</value>
+  </data>
+  <data name="ui.drawers.done.closed" xml:space="preserve">
+    <value>Votre caisse est fermée.</value>
+  </data>
+  <data name="ui.drawers.done.opened" xml:space="preserve">
+    <value>Votre caisse est ouverte.</value>
+  </data>
+  <data name="ui.drawers.expected" xml:space="preserve">
+    <value>Espèces attendues</value>
+  </data>
+  <data name="ui.drawers.float" xml:space="preserve">
+    <value>Fond de caisse</value>
+  </data>
+  <data name="ui.drawers.none" xml:space="preserve">
+    <value>Aucune caisse pour l’instant.</value>
+  </data>
+  <data name="ui.drawers.note" xml:space="preserve">
+    <value>Note (obligatoire en cas d’écart)</value>
+  </data>
+  <data name="ui.drawers.open" xml:space="preserve">
+    <value>Ouvrir ma caisse</value>
+  </data>
+  <data name="ui.drawers.open_button" xml:space="preserve">
+    <value>Ouvrir</value>
+  </data>
+  <data name="ui.drawers.opened" xml:space="preserve">
+    <value>Ouverte le</value>
+  </data>
+  <data name="ui.drawers.person" xml:space="preserve">
+    <value>Caissier</value>
+  </data>
+  <data name="ui.drawers.report" xml:space="preserve">
+    <value>Rapport de caisse</value>
+  </data>
+  <data name="ui.drawers.state" xml:space="preserve">
+    <value>État</value>
+  </data>
+  <data name="ui.drawers.status.Closed" xml:space="preserve">
+    <value>Fermée</value>
+  </data>
+  <data name="ui.drawers.status.Open" xml:space="preserve">
+    <value>Ouverte</value>
+  </data>
+  <data name="ui.drawers.title" xml:space="preserve">
+    <value>Caisses</value>
+  </data>
+  <data name="ui.drawers.warehouse" xml:space="preserve">
+    <value>Entrepôt</value>
+  </data>
   <data name="ui.editor.address" xml:space="preserve">
     <value>Adresse</value>
   </data>
@@ -3878,6 +5705,12 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.editor.destination" xml:space="preserve">
     <value>Comme destination</value>
+  </data>
+  <data name="ui.editor.destination.clears_customs" xml:space="preserve">
+    <value>La douane est faite ici</value>
+  </data>
+  <data name="ui.editor.destination.clears_customs_hint" xml:space="preserve">
+    <value>Les colis reçus ici attendent le dédouanement avant d’être prêts à être retirés.</value>
   </data>
   <data name="ui.editor.destination.delivers_home" xml:space="preserve">
     <value>Livre à domicile depuis ici</value>
@@ -3951,11 +5784,26 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.editor.nav.account" xml:space="preserve">
     <value>Mon compte</value>
   </data>
+  <data name="ui.editor.nav.arrivals" xml:space="preserve">
+    <value>Arrivées</value>
+  </data>
   <data name="ui.editor.nav.audit" xml:space="preserve">
     <value>Historique</value>
   </data>
   <data name="ui.editor.nav.billing" xml:space="preserve">
     <value>Facturation</value>
+  </data>
+  <data name="ui.editor.nav.bundle_settings" xml:space="preserve">
+    <value>Paramètres des groupages</value>
+  </data>
+  <data name="ui.editor.nav.bundles" xml:space="preserve">
+    <value>Groupages</value>
+  </data>
+  <data name="ui.editor.nav.carriers" xml:space="preserve">
+    <value>Transporteurs</value>
+  </data>
+  <data name="ui.editor.nav.cashier" xml:space="preserve">
+    <value>Caisse</value>
   </data>
   <data name="ui.editor.nav.charges" xml:space="preserve">
     <value>Prix</value>
@@ -3966,11 +5814,26 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.editor.nav.counter" xml:space="preserve">
     <value>Comptoir</value>
   </data>
+  <data name="ui.editor.nav.credit" xml:space="preserve">
+    <value>Comptes de crédit</value>
+  </data>
+  <data name="ui.editor.nav.credit_settings" xml:space="preserve">
+    <value>Paramètres du crédit</value>
+  </data>
   <data name="ui.editor.nav.customers" xml:space="preserve">
     <value>Clients</value>
   </data>
   <data name="ui.editor.nav.devices" xml:space="preserve">
     <value>Appareils</value>
+  </data>
+  <data name="ui.editor.nav.dispatches" xml:space="preserve">
+    <value>Expéditions</value>
+  </data>
+  <data name="ui.editor.nav.event_settings" xml:space="preserve">
+    <value>Paramètres des événements</value>
+  </data>
+  <data name="ui.editor.nav.events" xml:space="preserve">
+    <value>Événements</value>
   </data>
   <data name="ui.editor.nav.holds" xml:space="preserve">
     <value>Retenues</value>
@@ -4002,6 +5865,15 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.editor.nav.parcels" xml:space="preserve">
     <value>Colis</value>
   </data>
+  <data name="ui.editor.nav.payment_settings" xml:space="preserve">
+    <value>Modes de paiement</value>
+  </data>
+  <data name="ui.editor.nav.pickup" xml:space="preserve">
+    <value>Comptoir de retrait</value>
+  </data>
+  <data name="ui.editor.nav.pickup_settings" xml:space="preserve">
+    <value>Paramètres du retrait</value>
+  </data>
   <data name="ui.editor.nav.quotes" xml:space="preserve">
     <value>Devis</value>
   </data>
@@ -4031,6 +5903,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.editor.nav.supplies_stock" xml:space="preserve">
     <value>Stock de fournitures</value>
+  </data>
+  <data name="ui.editor.nav.verify" xml:space="preserve">
+    <value>Paiements à vérifier</value>
   </data>
   <data name="ui.editor.nav.workspace" xml:space="preserve">
     <value>Accueil</value>
@@ -4349,6 +6224,204 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.estimate.what_if" xml:space="preserve">
     <value>Et si</value>
+  </data>
+  <data name="ui.event_reason.address_problem" xml:space="preserve">
+    <value>Problème d’adresse</value>
+  </data>
+  <data name="ui.event_reason.capacity" xml:space="preserve">
+    <value>Pas de place sur le départ prévu</value>
+  </data>
+  <data name="ui.event_reason.carrier_delay" xml:space="preserve">
+    <value>Retard du transporteur</value>
+  </data>
+  <data name="ui.event_reason.customs_hold" xml:space="preserve">
+    <value>Retenu par la douane</value>
+  </data>
+  <data name="ui.event_reason.customs_inspection" xml:space="preserve">
+    <value>Inspection douanière</value>
+  </data>
+  <data name="ui.event_reason.damaged" xml:space="preserve">
+    <value>Colis endommagé</value>
+  </data>
+  <data name="ui.event_reason.documents_missing" xml:space="preserve">
+    <value>Documents manquants</value>
+  </data>
+  <data name="ui.event_reason.documents_pending" xml:space="preserve">
+    <value>En attente de documents</value>
+  </data>
+  <data name="ui.event_reason.flight_rebooked" xml:space="preserve">
+    <value>Vol reprogrammé par la compagnie</value>
+  </data>
+  <data name="ui.event_reason.holiday" xml:space="preserve">
+    <value>Jour férié</value>
+  </data>
+  <data name="ui.event_reason.missed_connection" xml:space="preserve">
+    <value>Correspondance manquée</value>
+  </data>
+  <data name="ui.event_reason.missing_in_transit" xml:space="preserve">
+    <value>Manquant en transit</value>
+  </data>
+  <data name="ui.event_reason.recipient_unreachable" xml:space="preserve">
+    <value>Destinataire injoignable</value>
+  </data>
+  <data name="ui.event_reason.refused" xml:space="preserve">
+    <value>Refusé par le destinataire</value>
+  </data>
+  <data name="ui.event_reason.security_check" xml:space="preserve">
+    <value>Contrôle de sécurité</value>
+  </data>
+  <data name="ui.event_reason.weather" xml:space="preserve">
+    <value>Mauvais temps</value>
+  </data>
+  <data name="ui.event_settings.active" xml:space="preserve">
+    <value>Proposée</value>
+  </data>
+  <data name="ui.event_settings.add" xml:space="preserve">
+    <value>Ajouter une cause</value>
+  </data>
+  <data name="ui.event_settings.add_hint" xml:space="preserve">
+    <value>L’anglais est requis ; le client lit le français ou l’espagnol s’ils sont donnés, l’anglais sinon. Les événements gardent les mots avec lesquels ils ont été saisis.</value>
+  </data>
+  <data name="ui.event_settings.emails" xml:space="preserve">
+    <value>Prévenir les clients par e-mail des retards et incidents (un e-mail par envoi)</value>
+  </data>
+  <data name="ui.event_settings.own" xml:space="preserve">
+    <value>Causes propres à l’entreprise</value>
+  </data>
+  <data name="ui.event_settings.own_none" xml:space="preserve">
+    <value>Aucune pour le moment.</value>
+  </data>
+  <data name="ui.event_settings.pickup_emails" xml:space="preserve">
+    <value>Envoyer un e-mail aux clients quand un envoi est prêt à être retiré</value>
+  </data>
+  <data name="ui.event_settings.standard.Delay" xml:space="preserve">
+    <value>Causes standard de retard proposées</value>
+  </data>
+  <data name="ui.event_settings.standard.Exception" xml:space="preserve">
+    <value>Causes standard d’incident proposées</value>
+  </data>
+  <data name="ui.event_settings.title" xml:space="preserve">
+    <value>Paramètres des événements</value>
+  </data>
+  <data name="ui.events.add" xml:space="preserve">
+    <value>Enregistrer un événement</value>
+  </data>
+  <data name="ui.events.add_hint" xml:space="preserve">
+    <value>Un retard ou un incident est montré au client avec sa cause et votre ligne ; une note ne l’est jamais.</value>
+  </data>
+  <data name="ui.events.add_hint_all" xml:space="preserve">
+    <value>Un retard ou un incident atteint chaque colis à l’intérieur et est montré à leurs clients (un e-mail par envoi si l’entreprise les envoie) ; une note reste ici.</value>
+  </data>
+  <data name="ui.events.at" xml:space="preserve">
+    <value>Quand c’est arrivé ({zone} ; vide : maintenant)</value>
+  </data>
+  <data name="ui.events.back" xml:space="preserve">
+    <value>Chercher un autre</value>
+  </data>
+  <data name="ui.events.cause" xml:space="preserve">
+    <value>Cause (retard ou incident)</value>
+  </data>
+  <data name="ui.events.cause_none" xml:space="preserve">
+    <value>— à choisir pour un retard ou un incident —</value>
+  </data>
+  <data name="ui.events.customer_sees" xml:space="preserve">
+    <value>vu par le client</value>
+  </data>
+  <data name="ui.events.done.recorded" xml:space="preserve">
+    <value>Événement enregistré.</value>
+  </data>
+  <data name="ui.events.done.voided" xml:space="preserve">
+    <value>Événement annulé.</value>
+  </data>
+  <data name="ui.events.event_kind.Delay" xml:space="preserve">
+    <value>Retard</value>
+  </data>
+  <data name="ui.events.event_kind.Exception" xml:space="preserve">
+    <value>Incident</value>
+  </data>
+  <data name="ui.events.event_kind.Note" xml:space="preserve">
+    <value>Note (personnel seulement)</value>
+  </data>
+  <data name="ui.events.filter.all" xml:space="preserve">
+    <value>Tout</value>
+  </data>
+  <data name="ui.events.filter.customer" xml:space="preserve">
+    <value>Ce que voit le client</value>
+  </data>
+  <data name="ui.events.filter.manual" xml:space="preserve">
+    <value>Saisis à la main</value>
+  </data>
+  <data name="ui.events.filter.voided" xml:space="preserve">
+    <value>Corrections</value>
+  </data>
+  <data name="ui.events.find" xml:space="preserve">
+    <value>Trouver</value>
+  </data>
+  <data name="ui.events.history" xml:space="preserve">
+    <value>Historique</value>
+  </data>
+  <data name="ui.events.kind.Bundle" xml:space="preserve">
+    <value>Groupage</value>
+  </data>
+  <data name="ui.events.kind.Dispatch" xml:space="preserve">
+    <value>Expédition</value>
+  </data>
+  <data name="ui.events.kind.Parcel" xml:space="preserve">
+    <value>Colis</value>
+  </data>
+  <data name="ui.events.kind.Shipment" xml:space="preserve">
+    <value>Envoi</value>
+  </data>
+  <data name="ui.events.message" xml:space="preserve">
+    <value>Ligne pour le client (facultatif)</value>
+  </data>
+  <data name="ui.events.milestone" xml:space="preserve">
+    <value>Étape</value>
+  </data>
+  <data name="ui.events.none" xml:space="preserve">
+    <value>Rien pour le moment.</value>
+  </data>
+  <data name="ui.events.note" xml:space="preserve">
+    <value>Note pour le personnel</value>
+  </data>
+  <data name="ui.events.number" xml:space="preserve">
+    <value>Numéro ou numéro de suivi</value>
+  </data>
+  <data name="ui.events.open_subject" xml:space="preserve">
+    <value>Ouvrir sa page</value>
+  </data>
+  <data name="ui.events.parcels" xml:space="preserve">
+    <value>{count} colis</value>
+  </data>
+  <data name="ui.events.record" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="ui.events.search" xml:space="preserve">
+    <value>Trouver un colis, un envoi, un groupage ou une expédition</value>
+  </data>
+  <data name="ui.events.search_hint" xml:space="preserve">
+    <value>Scannez ou saisissez son numéro ; le numéro de suivi du transporteur trouve le colis.</value>
+  </data>
+  <data name="ui.events.state" xml:space="preserve">
+    <value>État</value>
+  </data>
+  <data name="ui.events.subject_title" xml:space="preserve">
+    <value>{kind} {number}</value>
+  </data>
+  <data name="ui.events.title" xml:space="preserve">
+    <value>Événements</value>
+  </data>
+  <data name="ui.events.via" xml:space="preserve">
+    <value>via {source}</value>
+  </data>
+  <data name="ui.events.void" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="ui.events.void_reason" xml:space="preserve">
+    <value>Motif</value>
+  </data>
+  <data name="ui.events.what" xml:space="preserve">
+    <value>Type</value>
   </data>
   <data name="ui.forgot.back" xml:space="preserve">
     <value>Retour à la connexion</value>
@@ -5448,6 +7521,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.invoice.pdf.description" xml:space="preserve">
     <value>Description</value>
   </data>
+  <data name="ui.invoice.pdf.destination" xml:space="preserve">
+    <value>À destination</value>
+  </data>
   <data name="ui.invoice.pdf.discount" xml:space="preserve">
     <value>Remise</value>
   </data>
@@ -5466,11 +7542,17 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.invoice.pdf.paid" xml:space="preserve">
     <value>Payé</value>
   </data>
+  <data name="ui.invoice.pdf.pending" xml:space="preserve">
+    <value>En attente de confirmation</value>
+  </data>
   <data name="ui.invoice.pdf.quantity" xml:space="preserve">
     <value>Qté</value>
   </data>
   <data name="ui.invoice.pdf.reason" xml:space="preserve">
     <value>Motif : {reason}</value>
+  </data>
+  <data name="ui.invoice.pdf.refunded" xml:space="preserve">
+    <value>Remboursé</value>
   </data>
   <data name="ui.invoice.pdf.shipment" xml:space="preserve">
     <value>EXPÉDITION</value>
@@ -5607,11 +7689,17 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.invoices.description" xml:space="preserve">
     <value>Description</value>
   </data>
+  <data name="ui.invoices.destination" xml:space="preserve">
+    <value>À destination</value>
+  </data>
   <data name="ui.invoices.discount" xml:space="preserve">
     <value>Remise</value>
   </data>
   <data name="ui.invoices.done.approved" xml:space="preserve">
     <value>Approuvé.</value>
+  </data>
+  <data name="ui.invoices.done.refunded" xml:space="preserve">
+    <value>Le remboursement est enregistré.</value>
   </data>
   <data name="ui.invoices.done.refused" xml:space="preserve">
     <value>Refusé.</value>
@@ -5658,8 +7746,14 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.invoices.owed" xml:space="preserve">
     <value>À payer</value>
   </data>
+  <data name="ui.invoices.paid" xml:space="preserve">
+    <value>Payé</value>
+  </data>
   <data name="ui.invoices.pdf" xml:space="preserve">
     <value>PDF de la facture</value>
+  </data>
+  <data name="ui.invoices.pending" xml:space="preserve">
+    <value>En attente de confirmation</value>
   </data>
   <data name="ui.invoices.quantity" xml:space="preserve">
     <value>Qté</value>
@@ -5672,6 +7766,12 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.invoices.reference" xml:space="preserve">
     <value>Expédition ou commande</value>
+  </data>
+  <data name="ui.invoices.refundable" xml:space="preserve">
+    <value>À rembourser</value>
+  </data>
+  <data name="ui.invoices.refunded" xml:space="preserve">
+    <value>Remboursé</value>
   </data>
   <data name="ui.invoices.refusal_note" xml:space="preserve">
     <value>Note (en cas de refus)</value>
@@ -5708,6 +7808,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.invoices.state" xml:space="preserve">
     <value>État</value>
+  </data>
+  <data name="ui.invoices.status.awaiting" xml:space="preserve">
+    <value>En attente de confirmation</value>
   </data>
   <data name="ui.invoices.status.credited" xml:space="preserve">
     <value>Créditée</value>
@@ -5807,6 +7910,78 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.legal.version" xml:space="preserve">
     <value>Version</value>
+  </data>
+  <data name="ui.manifest.arrives" xml:space="preserve">
+    <value>Arrivée</value>
+  </data>
+  <data name="ui.manifest.bundle_title" xml:space="preserve">
+    <value>Manifeste du colis groupé</value>
+  </data>
+  <data name="ui.manifest.carrier" xml:space="preserve">
+    <value>Transporteur</value>
+  </data>
+  <data name="ui.manifest.consignee" xml:space="preserve">
+    <value>Destinataire</value>
+  </data>
+  <data name="ui.manifest.contents" xml:space="preserve">
+    <value>Contenu</value>
+  </data>
+  <data name="ui.manifest.country" xml:space="preserve">
+    <value>Pays</value>
+  </data>
+  <data name="ui.manifest.customer" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="ui.manifest.cutoff" xml:space="preserve">
+    <value>Heure limite</value>
+  </data>
+  <data name="ui.manifest.departs" xml:space="preserve">
+    <value>Départ</value>
+  </data>
+  <data name="ui.manifest.dispatch" xml:space="preserve">
+    <value>Expédition</value>
+  </data>
+  <data name="ui.manifest.dispatch_title" xml:space="preserve">
+    <value>Manifeste d’expédition</value>
+  </data>
+  <data name="ui.manifest.draft" xml:space="preserve">
+    <value>BROUILLON : pas encore clôturée</value>
+  </data>
+  <data name="ui.manifest.from" xml:space="preserve">
+    <value>De</value>
+  </data>
+  <data name="ui.manifest.leg" xml:space="preserve">
+    <value>#</value>
+  </data>
+  <data name="ui.manifest.mode" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="ui.manifest.page" xml:space="preserve">
+    <value>Page</value>
+  </data>
+  <data name="ui.manifest.pieces" xml:space="preserve">
+    <value>{count} pièces</value>
+  </data>
+  <data name="ui.manifest.pieces_short" xml:space="preserve">
+    <value>Pcs</value>
+  </data>
+  <data name="ui.manifest.reference" xml:space="preserve">
+    <value>Référence</value>
+  </data>
+  <data name="ui.manifest.shipment" xml:space="preserve">
+    <value>Envoi</value>
+  </data>
+  <data name="ui.manifest.to" xml:space="preserve">
+    <value>À</value>
+  </data>
+  <data name="ui.manifest.totals" xml:space="preserve">
+    <value>{bundles} colis groupés · {pieces} pièces · {weight}</value>
+  </data>
+  <data name="ui.manifest.value" xml:space="preserve">
+    <value>Valeur déclarée</value>
+  </data>
+  <data name="ui.manifest.weight" xml:space="preserve">
+    <value>Poids</value>
   </data>
   <data name="ui.milestone.ArrivedDestinationCountry" xml:space="preserve">
     <value>Arrivé dans le pays de destination</value>
@@ -5997,6 +8172,144 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.parcels.weight" xml:space="preserve">
     <value>Poids</value>
   </data>
+  <data name="ui.payment_settings.methods" xml:space="preserve">
+    <value>Modes acceptés par l’entreprise</value>
+  </data>
+  <data name="ui.payment_settings.other" xml:space="preserve">
+    <value>Autre mode (son nom)</value>
+  </data>
+  <data name="ui.payment_settings.other_hint" xml:space="preserve">
+    <value>Par exemple MonCash ou Natcash. Laissez vide pour n’en proposer aucun. Les cartes viendront avec le prestataire de cartes.</value>
+  </data>
+  <data name="ui.payment_settings.qr" xml:space="preserve">
+    <value>Code QR Zelle (PNG ou JPEG, 1 Mo au plus)</value>
+  </data>
+  <data name="ui.payment_settings.remove_qr" xml:space="preserve">
+    <value>Retirer le code QR</value>
+  </data>
+  <data name="ui.payment_settings.save" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="ui.payment_settings.terms_en" xml:space="preserve">
+    <value>Conditions Zelle en anglais</value>
+  </data>
+  <data name="ui.payment_settings.terms_es" xml:space="preserve">
+    <value>Conditions Zelle en espagnol</value>
+  </data>
+  <data name="ui.payment_settings.terms_fr" xml:space="preserve">
+    <value>Conditions Zelle en français</value>
+  </data>
+  <data name="ui.payment_settings.title" xml:space="preserve">
+    <value>Modes de paiement</value>
+  </data>
+  <data name="ui.payment_settings.zelle_hint" xml:space="preserve">
+    <value>Le client accepte ces conditions avant de voir vos coordonnées Zelle. Indiquez que le numéro d’expédition va dans le mémo et que l’expédition attend que l’argent soit sur votre compte.</value>
+  </data>
+  <data name="ui.payments.list" xml:space="preserve">
+    <value>Paiements</value>
+  </data>
+  <data name="ui.payments.method.BankTransfer" xml:space="preserve">
+    <value>Virement bancaire</value>
+  </data>
+  <data name="ui.payments.method.Cash" xml:space="preserve">
+    <value>Espèces</value>
+  </data>
+  <data name="ui.payments.method.Cheque" xml:space="preserve">
+    <value>Chèque</value>
+  </data>
+  <data name="ui.payments.method.Other1" xml:space="preserve">
+    <value>Autre</value>
+  </data>
+  <data name="ui.payments.method.Other2" xml:space="preserve">
+    <value>Autre</value>
+  </data>
+  <data name="ui.payments.method.Other3" xml:space="preserve">
+    <value>Autre</value>
+  </data>
+  <data name="ui.payments.method.Zelle" xml:space="preserve">
+    <value>Zelle</value>
+  </data>
+  <data name="ui.payments.receipt.awaiting" xml:space="preserve">
+    <value>en attente de confirmation</value>
+  </data>
+  <data name="ui.payments.receipt.cash" xml:space="preserve">
+    <value>remis {given}, monnaie {change}</value>
+  </data>
+  <data name="ui.payments.receipt.for" xml:space="preserve">
+    <value>Paiement de la facture {invoice} ({reference})</value>
+  </data>
+  <data name="ui.payments.receipt.owed" xml:space="preserve">
+    <value>Reste dû : {amount}</value>
+  </data>
+  <data name="ui.payments.receipt.thanks" xml:space="preserve">
+    <value>Merci.</value>
+  </data>
+  <data name="ui.payments.receipt.title" xml:space="preserve">
+    <value>REÇU</value>
+  </data>
+  <data name="ui.payments.receipt.total" xml:space="preserve">
+    <value>Total payé</value>
+  </data>
+  <data name="ui.payments.refund" xml:space="preserve">
+    <value>Remboursement</value>
+  </data>
+  <data name="ui.payments.refund_button" xml:space="preserve">
+    <value>Rembourser</value>
+  </data>
+  <data name="ui.payments.refund_title" xml:space="preserve">
+    <value>Rembourser (jusqu’à {amount})</value>
+  </data>
+  <data name="ui.payments.state.awaiting" xml:space="preserve">
+    <value>En attente de confirmation</value>
+  </data>
+  <data name="ui.payments.state.awaiting_credit" xml:space="preserve">
+    <value>En attente du service crédit</value>
+  </data>
+  <data name="ui.payments.state.on_account" xml:space="preserve">
+    <value>Sur compte</value>
+  </data>
+  <data name="ui.payments.state.paid" xml:space="preserve">
+    <value>Payée</value>
+  </data>
+  <data name="ui.payments.state.unpaid" xml:space="preserve">
+    <value>Non payée</value>
+  </data>
+  <data name="ui.payments.state.voided" xml:space="preserve">
+    <value>Annulée</value>
+  </data>
+  <data name="ui.payments.tender.AwaitingConfirmation" xml:space="preserve">
+    <value>en attente de confirmation</value>
+  </data>
+  <data name="ui.payments.tender.NotReceived" xml:space="preserve">
+    <value>non reçu</value>
+  </data>
+  <data name="ui.payments.tender.Settled" xml:space="preserve">
+    <value>reçu</value>
+  </data>
+  <data name="ui.payments_verify.confirmation" xml:space="preserve">
+    <value>confirmation {number}</value>
+  </data>
+  <data name="ui.payments_verify.done.not_received" xml:space="preserve">
+    <value>Marqué non reçu : la facture est de nouveau due et le client a été prévenu.</value>
+  </data>
+  <data name="ui.payments_verify.done.received" xml:space="preserve">
+    <value>Marqué reçu.</value>
+  </data>
+  <data name="ui.payments_verify.none" xml:space="preserve">
+    <value>Rien n’attend de confirmation.</value>
+  </data>
+  <data name="ui.payments_verify.not_received" xml:space="preserve">
+    <value>Non reçu</value>
+  </data>
+  <data name="ui.payments_verify.note" xml:space="preserve">
+    <value>Référence bancaire, ou pourquoi il n’est pas arrivé</value>
+  </data>
+  <data name="ui.payments_verify.received" xml:space="preserve">
+    <value>Reçu</value>
+  </data>
+  <data name="ui.payments_verify.title" xml:space="preserve">
+    <value>Paiements à vérifier</value>
+  </data>
   <data name="ui.permissions.area.audit" xml:space="preserve">
     <value>Historique</value>
   </data>
@@ -6033,6 +8346,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.permissions.area.parcels" xml:space="preserve">
     <value>Colis</value>
   </data>
+  <data name="ui.permissions.area.payments" xml:space="preserve">
+    <value>Paiements</value>
+  </data>
   <data name="ui.permissions.area.printers" xml:space="preserve">
     <value>Imprimantes d'étiquettes</value>
   </data>
@@ -6057,6 +8373,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.permissions.area.warehouses" xml:space="preserve">
     <value>Entrepôts</value>
   </data>
+  <data name="ui.permissions.ops.arrivals.receive" xml:space="preserve">
+    <value>Recevoir les expéditions dans un entrepôt de destination et régler les écarts</value>
+  </data>
   <data name="ui.permissions.ops.audit.view" xml:space="preserve">
     <value>Voir l’historique</value>
   </data>
@@ -6075,6 +8394,15 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.permissions.ops.brand.view" xml:space="preserve">
     <value>Voir le site web</value>
   </data>
+  <data name="ui.permissions.ops.bundles.fill" xml:space="preserve">
+    <value>Remplir les groupages et les cartons de reconditionnement (scanner, retirer)</value>
+  </data>
+  <data name="ui.permissions.ops.bundles.manage" xml:space="preserve">
+    <value>Gérer les groupages (ouvrir, fermer, annuler ; changer le mode d’un envoi consolidé)</value>
+  </data>
+  <data name="ui.permissions.ops.carriers.manage" xml:space="preserve">
+    <value>Gérer les transporteurs et leurs tarifs</value>
+  </data>
   <data name="ui.permissions.ops.charges.configure" xml:space="preserve">
     <value>Définir les prix : grilles, suppléments et assurance</value>
   </data>
@@ -6091,7 +8419,7 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Demander des avoirs et des annulations</value>
   </data>
   <data name="ui.permissions.ops.customers.credit" xml:space="preserve">
-    <value>Autoriser ou retirer le crédit client</value>
+    <value>Gérer les comptes de crédit (le service crédit)</value>
   </data>
   <data name="ui.permissions.ops.customers.manage" xml:space="preserve">
     <value>Créer et modifier les clients</value>
@@ -6099,11 +8427,23 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.permissions.ops.customers.view" xml:space="preserve">
     <value>Voir les clients</value>
   </data>
+  <data name="ui.permissions.ops.customs.record" xml:space="preserve">
+    <value>Enregistrer la douane dans un entrepôt qui dédouane</value>
+  </data>
   <data name="ui.permissions.ops.devices.view" xml:space="preserve">
     <value>Voir les appareils</value>
   </data>
   <data name="ui.permissions.ops.discounts.approve" xml:space="preserve">
     <value>Approuver les remises sur fournitures au-delà de la limite d’un employé</value>
+  </data>
+  <data name="ui.permissions.ops.dispatches.manage" xml:space="preserve">
+    <value>Gérer les expéditions (colis groupés, étapes, clôture, départ, arrivée, annulation)</value>
+  </data>
+  <data name="ui.permissions.ops.events.add" xml:space="preserve">
+    <value>Enregistrer notes, retards et incidents, et les annuler</value>
+  </data>
+  <data name="ui.permissions.ops.events.view" xml:space="preserve">
+    <value>Voir les événements des colis, envois, groupages et expéditions</value>
   </data>
   <data name="ui.permissions.ops.holds.manage" xml:space="preserve">
     <value>Voir les retenues et les lever</value>
@@ -6131,6 +8471,18 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.permissions.ops.parcels.view" xml:space="preserve">
     <value>Voir les colis, leurs photos et leur historique</value>
+  </data>
+  <data name="ui.permissions.ops.payments.confirm" xml:space="preserve">
+    <value>Confirmer Zelle et virements</value>
+  </data>
+  <data name="ui.permissions.ops.payments.refund" xml:space="preserve">
+    <value>Rembourser</value>
+  </data>
+  <data name="ui.permissions.ops.payments.take" xml:space="preserve">
+    <value>Encaisser à la caisse</value>
+  </data>
+  <data name="ui.permissions.ops.pickup.release" xml:space="preserve">
+    <value>Tenir le comptoir de retrait : facturer les frais à destination et remettre les colis avec preuve</value>
   </data>
   <data name="ui.permissions.ops.printers.manage" xml:space="preserve">
     <value>Configurer les imprimantes et les programmes d'impression</value>
@@ -6209,6 +8561,255 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.permissions.ops.warehouses.view" xml:space="preserve">
     <value>Voir les entrepôts</value>
+  </data>
+  <data name="ui.pickup.back" xml:space="preserve">
+    <value>Retour au comptoir</value>
+  </data>
+  <data name="ui.pickup.bill" xml:space="preserve">
+    <value>Frais à destination</value>
+  </data>
+  <data name="ui.pickup.bill_button" xml:space="preserve">
+    <value>Facturer</value>
+  </data>
+  <data name="ui.pickup.bill_hint" xml:space="preserve">
+    <value>Une facture avec l’entreposage dû à ce jour et les frais saisis ; elle se paie à la caisse. Une visite plus tard est facturée pour les jours depuis.</value>
+  </data>
+  <data name="ui.pickup.code" xml:space="preserve">
+    <value>Code de retrait</value>
+  </data>
+  <data name="ui.pickup.code_checked" xml:space="preserve">
+    <value>code vérifié</value>
+  </data>
+  <data name="ui.pickup.code_not_sent" xml:space="preserve">
+    <value>Aucun code n’a encore été envoyé.</value>
+  </data>
+  <data name="ui.pickup.code_send" xml:space="preserve">
+    <value>Envoyer un code par e-mail</value>
+  </data>
+  <data name="ui.pickup.code_sent" xml:space="preserve">
+    <value>Un code a été envoyé au client. Envoyez-en un nouveau s’il a été perdu ; le dernier remplace les autres.</value>
+  </data>
+  <data name="ui.pickup.code_typed" xml:space="preserve">
+    <value>Code donné par le client</value>
+  </data>
+  <data name="ui.pickup.collector" xml:space="preserve">
+    <value>Personne désignée</value>
+  </data>
+  <data name="ui.pickup.collector.Customer" xml:space="preserve">
+    <value>Le client</value>
+  </data>
+  <data name="ui.pickup.collector.Named" xml:space="preserve">
+    <value>La personne désignée</value>
+  </data>
+  <data name="ui.pickup.collector.Recipient" xml:space="preserve">
+    <value>Le destinataire</value>
+  </data>
+  <data name="ui.pickup.collector_kind" xml:space="preserve">
+    <value>Retiré par</value>
+  </data>
+  <data name="ui.pickup.customer" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="ui.pickup.done.billed" xml:space="preserve">
+    <value>Facturé : encaissez le paiement à la caisse.</value>
+  </data>
+  <data name="ui.pickup.done.code" xml:space="preserve">
+    <value>Un nouveau code a été envoyé au client.</value>
+  </data>
+  <data name="ui.pickup.done.released" xml:space="preserve">
+    <value>Remis. Le client le voit retiré.</value>
+  </data>
+  <data name="ui.pickup.find" xml:space="preserve">
+    <value>Trouver un envoi</value>
+  </data>
+  <data name="ui.pickup.id_hint" xml:space="preserve">
+    <value>Vérifiez le nom et la photo ; seuls les 4 derniers caractères du numéro sont gardés, jamais le numéro complet.</value>
+  </data>
+  <data name="ui.pickup.id_kind" xml:space="preserve">
+    <value>Pièce présentée</value>
+  </data>
+  <data name="ui.pickup.id_kind.DriverLicence" xml:space="preserve">
+    <value>Permis de conduire</value>
+  </data>
+  <data name="ui.pickup.id_kind.NationalId" xml:space="preserve">
+    <value>Carte d’identité</value>
+  </data>
+  <data name="ui.pickup.id_kind.Other" xml:space="preserve">
+    <value>Autre pièce</value>
+  </data>
+  <data name="ui.pickup.id_kind.Passport" xml:space="preserve">
+    <value>Passeport</value>
+  </data>
+  <data name="ui.pickup.id_last" xml:space="preserve">
+    <value>Ses 4 derniers caractères</value>
+  </data>
+  <data name="ui.pickup.invoice" xml:space="preserve">
+    <value>Facture</value>
+  </data>
+  <data name="ui.pickup.invoice_kind" xml:space="preserve">
+    <value>Pour</value>
+  </data>
+  <data name="ui.pickup.invoice_kind.Destination" xml:space="preserve">
+    <value>À destination</value>
+  </data>
+  <data name="ui.pickup.invoice_kind.Shipment" xml:space="preserve">
+    <value>L’envoi</value>
+  </data>
+  <data name="ui.pickup.invoice_kind.SupplyOrder" xml:space="preserve">
+    <value>Fournitures</value>
+  </data>
+  <data name="ui.pickup.no_collector" xml:space="preserve">
+    <value>Personne de désigné</value>
+  </data>
+  <data name="ui.pickup.no_invoice" xml:space="preserve">
+    <value>Aucune facture.</value>
+  </data>
+  <data name="ui.pickup.none" xml:space="preserve">
+    <value>Rien n’attend ici.</value>
+  </data>
+  <data name="ui.pickup.owed" xml:space="preserve">
+    <value>À payer</value>
+  </data>
+  <data name="ui.pickup.paid" xml:space="preserve">
+    <value>Payé</value>
+  </data>
+  <data name="ui.pickup.parcel" xml:space="preserve">
+    <value>Colis</value>
+  </data>
+  <data name="ui.pickup.parcels" xml:space="preserve">
+    <value>Colis</value>
+  </data>
+  <data name="ui.pickup.pay_first_hint" xml:space="preserve">
+    <value>Tout se paie d’abord à la caisse ; ensuite les colis sont remis ici.</value>
+  </data>
+  <data name="ui.pickup.payment" xml:space="preserve">
+    <value>Paiement</value>
+  </data>
+  <data name="ui.pickup.photo" xml:space="preserve">
+    <value>Photo de la personne</value>
+  </data>
+  <data name="ui.pickup.photographed" xml:space="preserve">
+    <value>photographié</value>
+  </data>
+  <data name="ui.pickup.query" xml:space="preserve">
+    <value>Numéro, nom ou téléphone</value>
+  </data>
+  <data name="ui.pickup.query_hint" xml:space="preserve">
+    <value>Le numéro de l’envoi, le destinataire ou la personne désignée, ou les derniers chiffres de son téléphone.</value>
+  </data>
+  <data name="ui.pickup.ready" xml:space="preserve">
+    <value>Prêts à être retirés</value>
+  </data>
+  <data name="ui.pickup.recipient" xml:space="preserve">
+    <value>Destinataire</value>
+  </data>
+  <data name="ui.pickup.release" xml:space="preserve">
+    <value>Remettre</value>
+  </data>
+  <data name="ui.pickup.release_title" xml:space="preserve">
+    <value>Remettre {count} colis</value>
+  </data>
+  <data name="ui.pickup.released_line" xml:space="preserve">
+    <value>{count} colis retirés par {name} ({who}), {date} à {warehouse}</value>
+  </data>
+  <data name="ui.pickup.releases" xml:space="preserve">
+    <value>Retiré</value>
+  </data>
+  <data name="ui.pickup.search" xml:space="preserve">
+    <value>Rechercher</value>
+  </data>
+  <data name="ui.pickup.shipment" xml:space="preserve">
+    <value>Envoi</value>
+  </data>
+  <data name="ui.pickup.shipment_title" xml:space="preserve">
+    <value>Retrait de {number}</value>
+  </data>
+  <data name="ui.pickup.sign_here" xml:space="preserve">
+    <value>Signature de la personne qui retire</value>
+  </data>
+  <data name="ui.pickup.signed" xml:space="preserve">
+    <value>signé</value>
+  </data>
+  <data name="ui.pickup.since" xml:space="preserve">
+    <value>Prêt depuis</value>
+  </data>
+  <data name="ui.pickup.state.collected" xml:space="preserve">
+    <value>Retiré</value>
+  </data>
+  <data name="ui.pickup.state.elsewhere" xml:space="preserve">
+    <value>Pas ici</value>
+  </data>
+  <data name="ui.pickup.state.held" xml:space="preserve">
+    <value>Retenu par la douane</value>
+  </data>
+  <data name="ui.pickup.state.here" xml:space="preserve">
+    <value>Ici, pas prêt</value>
+  </data>
+  <data name="ui.pickup.state.ready" xml:space="preserve">
+    <value>Prêt</value>
+  </data>
+  <data name="ui.pickup.storage" xml:space="preserve">
+    <value>Entreposage</value>
+  </data>
+  <data name="ui.pickup.storage_owed" xml:space="preserve">
+    <value>Entreposage pas encore facturé : {amount} {currency}.</value>
+  </data>
+  <data name="ui.pickup.title" xml:space="preserve">
+    <value>Comptoir de retrait</value>
+  </data>
+  <data name="ui.pickup.to_pay" xml:space="preserve">
+    <value>À payer</value>
+  </data>
+  <data name="ui.pickup.total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="ui.pickup.unpaid" xml:space="preserve">
+    <value>À payer</value>
+  </data>
+  <data name="ui.pickup.who" xml:space="preserve">
+    <value>Qui peut retirer</value>
+  </data>
+  <data name="ui.pickup_settings.charges" xml:space="preserve">
+    <value>Facturer des frais à destination (droits, taxes et frais locaux)</value>
+  </data>
+  <data name="ui.pickup_settings.charges_hint" xml:space="preserve">
+    <value>Saisis au comptoir pour chaque envoi, sur une facture à destination payée avant la remise.</value>
+  </data>
+  <data name="ui.pickup_settings.fee" xml:space="preserve">
+    <value>Frais par colis et par jour ({currency})</value>
+  </data>
+  <data name="ui.pickup_settings.free_days" xml:space="preserve">
+    <value>Jours gratuits</value>
+  </data>
+  <data name="ui.pickup_settings.proof.Code" xml:space="preserve">
+    <value>Un code de retrait envoyé au client</value>
+  </data>
+  <data name="ui.pickup_settings.proof.Id" xml:space="preserve">
+    <value>Une pièce d’identité (ses 4 derniers caractères sont gardés)</value>
+  </data>
+  <data name="ui.pickup_settings.proof.Photo" xml:space="preserve">
+    <value>Une photo de la personne</value>
+  </data>
+  <data name="ui.pickup_settings.proof.Signature" xml:space="preserve">
+    <value>Une signature à l’écran</value>
+  </data>
+  <data name="ui.pickup_settings.proofs" xml:space="preserve">
+    <value>Preuves demandées au comptoir</value>
+  </data>
+  <data name="ui.pickup_settings.proofs_hint" xml:space="preserve">
+    <value>Une pièce et une signature par défaut. Le code part avec l’e-mail « prêt à être retiré », ou depuis le comptoir.</value>
+  </data>
+  <data name="ui.pickup_settings.storage" xml:space="preserve">
+    <value>Facturer l’entreposage, avec rappels et dernier avis</value>
+  </data>
+  <data name="ui.pickup_settings.storage_hint" xml:space="preserve">
+    <value>Compté depuis le jour où le colis est prêt, aux conditions de ce jour. Rappels après 7, 14 et 21 jours, dernier avis après 25.</value>
+  </data>
+  <data name="ui.pickup_settings.storage_title" xml:space="preserve">
+    <value>Entreposage à destination</value>
+  </data>
+  <data name="ui.pickup_settings.title" xml:space="preserve">
+    <value>Paramètres du retrait</value>
   </data>
   <data name="ui.printers.add" xml:space="preserve">
     <value>Ajouter</value>
@@ -6867,11 +9468,20 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.settings.pickup" xml:space="preserve">
     <value>Retrait à un point de retrait</value>
   </data>
+  <data name="ui.settings.prefix.box" xml:space="preserve">
+    <value>Cartons de reconditionnement</value>
+  </data>
+  <data name="ui.settings.prefix.bundle" xml:space="preserve">
+    <value>Groupages</value>
+  </data>
   <data name="ui.settings.prefix.credit_note" xml:space="preserve">
     <value>Avoir</value>
   </data>
   <data name="ui.settings.prefix.customer" xml:space="preserve">
     <value>Préfixe des codes clients (par exemple C00042)</value>
+  </data>
+  <data name="ui.settings.prefix.dispatch" xml:space="preserve">
+    <value>Préfixe des expéditions</value>
   </data>
   <data name="ui.settings.prefix.invoice" xml:space="preserve">
     <value>Préfixe des factures</value>
@@ -7302,6 +9912,84 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.signout" xml:space="preserve">
     <value>Se déconnecter</value>
   </data>
+  <data name="ui.sli.account" xml:space="preserve">
+    <value>Numéro de compte</value>
+  </data>
+  <data name="ui.sli.authority" xml:space="preserve">
+    <value>Mandat</value>
+  </data>
+  <data name="ui.sli.authority_text" xml:space="preserve">
+    <value>L’expéditeur autorise le transporteur ou l’agent nommé ci-dessus à établir et signer en son nom la LTA et les documents d’export de cet envoi.</value>
+  </data>
+  <data name="ui.sli.carrier" xml:space="preserve">
+    <value>Transporteur ou transitaire</value>
+  </data>
+  <data name="ui.sli.chargeable" xml:space="preserve">
+    <value>Poids taxable</value>
+  </data>
+  <data name="ui.sli.charges" xml:space="preserve">
+    <value>Frais</value>
+  </data>
+  <data name="ui.sli.collect" xml:space="preserve">
+    <value>Port dû</value>
+  </data>
+  <data name="ui.sli.consignee" xml:space="preserve">
+    <value>Destinataire</value>
+  </data>
+  <data name="ui.sli.consolidation" xml:space="preserve">
+    <value>Groupage selon le manifeste joint</value>
+  </data>
+  <data name="ui.sli.date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="ui.sli.departure" xml:space="preserve">
+    <value>Aéroport de départ</value>
+  </data>
+  <data name="ui.sli.destination" xml:space="preserve">
+    <value>Aéroport de destination</value>
+  </data>
+  <data name="ui.sli.documents" xml:space="preserve">
+    <value>Documents joints</value>
+  </data>
+  <data name="ui.sli.export" xml:space="preserve">
+    <value>Référence de déclaration d’export</value>
+  </data>
+  <data name="ui.sli.export_none" xml:space="preserve">
+    <value>Aucune</value>
+  </data>
+  <data name="ui.sli.goods" xml:space="preserve">
+    <value>Nature et quantité des marchandises</value>
+  </data>
+  <data name="ui.sli.gross" xml:space="preserve">
+    <value>Poids brut</value>
+  </data>
+  <data name="ui.sli.handling" xml:space="preserve">
+    <value>Instructions de manutention</value>
+  </data>
+  <data name="ui.sli.master" xml:space="preserve">
+    <value>LTA principale</value>
+  </data>
+  <data name="ui.sli.pieces" xml:space="preserve">
+    <value>Pièces</value>
+  </data>
+  <data name="ui.sli.prepaid" xml:space="preserve">
+    <value>Port payé</value>
+  </data>
+  <data name="ui.sli.shipper" xml:space="preserve">
+    <value>Expéditeur</value>
+  </data>
+  <data name="ui.sli.signature" xml:space="preserve">
+    <value>Signature de l’expéditeur</value>
+  </data>
+  <data name="ui.sli.title" xml:space="preserve">
+    <value>Lettre d’instructions de l’expéditeur</value>
+  </data>
+  <data name="ui.sli.value_carriage" xml:space="preserve">
+    <value>Valeur déclarée pour le transport</value>
+  </data>
+  <data name="ui.sli.value_customs" xml:space="preserve">
+    <value>Valeur déclarée en douane</value>
+  </data>
   <data name="ui.staff.actions" xml:space="preserve">
     <value>Compte et sécurité</value>
   </data>
@@ -7436,6 +10124,57 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.staff.transfer_confirm" xml:space="preserve">
     <value>Je donne la propriété du compte de l’entreprise à cette personne. Je deviens Administrateur.</value>
+  </data>
+  <data name="ui.statement.age.0" xml:space="preserve">
+    <value>Courant</value>
+  </data>
+  <data name="ui.statement.age.1" xml:space="preserve">
+    <value>1-30 jours</value>
+  </data>
+  <data name="ui.statement.age.2" xml:space="preserve">
+    <value>31-60 jours</value>
+  </data>
+  <data name="ui.statement.age.3" xml:space="preserve">
+    <value>61-90 jours</value>
+  </data>
+  <data name="ui.statement.age.4" xml:space="preserve">
+    <value>Plus de 90 jours</value>
+  </data>
+  <data name="ui.statement.amount" xml:space="preserve">
+    <value>Montant</value>
+  </data>
+  <data name="ui.statement.date" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="ui.statement.due" xml:space="preserve">
+    <value>Échéance</value>
+  </data>
+  <data name="ui.statement.footer" xml:space="preserve">
+    <value>Merci de régler chaque facture à son échéance.</value>
+  </data>
+  <data name="ui.statement.invoice" xml:space="preserve">
+    <value>Facture</value>
+  </data>
+  <data name="ui.statement.nothing_owed" xml:space="preserve">
+    <value>Rien n’est dû.</value>
+  </data>
+  <data name="ui.statement.overdue" xml:space="preserve">
+    <value>Dont en retard : {amount}</value>
+  </data>
+  <data name="ui.statement.owed" xml:space="preserve">
+    <value>Dû</value>
+  </data>
+  <data name="ui.statement.reference" xml:space="preserve">
+    <value>Pour</value>
+  </data>
+  <data name="ui.statement.terms" xml:space="preserve">
+    <value>Conditions : {days} jours</value>
+  </data>
+  <data name="ui.statement.title" xml:space="preserve">
+    <value>Relevé de compte</value>
+  </data>
+  <data name="ui.statement.total_due" xml:space="preserve">
+    <value>Total dû : {amount}</value>
   </data>
   <data name="ui.storage.add" xml:space="preserve">
     <value>Ajouter un emplacement</value>
@@ -8025,11 +10764,35 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.tickets.tracking" xml:space="preserve">
     <value>Numéro de suivi</value>
   </data>
+  <data name="ui.tracking.arrived_destination_country" xml:space="preserve">
+    <value>Arrivé dans le pays de destination ({country})</value>
+  </data>
+  <data name="ui.tracking.arrived_destination_warehouse" xml:space="preserve">
+    <value>Arrivé à {place}</value>
+  </data>
   <data name="ui.tracking.auctioned" xml:space="preserve">
     <value>Vendu aux enchères</value>
   </data>
   <data name="ui.tracking.booked" xml:space="preserve">
     <value>Envoi finalisé : tous les colis reçus, montant fixé</value>
+  </data>
+  <data name="ui.tracking.boxed" xml:space="preserve">
+    <value>Reconditionné dans le carton {box}</value>
+  </data>
+  <data name="ui.tracking.bundle_arrived" xml:space="preserve">
+    <value>Groupage arrivé à {warehouse}</value>
+  </data>
+  <data name="ui.tracking.bundle_closed" xml:space="preserve">
+    <value>Groupage fermé : {weight}, {size}</value>
+  </data>
+  <data name="ui.tracking.bundle_created" xml:space="preserve">
+    <value>Groupage ouvert</value>
+  </data>
+  <data name="ui.tracking.bundle_opened" xml:space="preserve">
+    <value>Groupage ouvert à {warehouse}</value>
+  </data>
+  <data name="ui.tracking.bundle_voided" xml:space="preserve">
+    <value>Groupage annulé</value>
   </data>
   <data name="ui.tracking.cancelled" xml:space="preserve">
     <value>Annulé</value>
@@ -8043,17 +10806,53 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.tracking.customer_assigned" xml:space="preserve">
     <value>Attribué au client {customer}</value>
   </data>
+  <data name="ui.tracking.customs_cleared" xml:space="preserve">
+    <value>Dédouané</value>
+  </data>
+  <data name="ui.tracking.customs_held" xml:space="preserve">
+    <value>Retenu par la douane{message}</value>
+  </data>
+  <data name="ui.tracking.delayed" xml:space="preserve">
+    <value>Retardé : {cause}{message}</value>
+  </data>
+  <data name="ui.tracking.departed_origin" xml:space="preserve">
+    <value>Parti de l’origine ({mode})</value>
+  </data>
+  <data name="ui.tracking.dispatch_arrived" xml:space="preserve">
+    <value>Étape arrivée : {leg}</value>
+  </data>
+  <data name="ui.tracking.dispatch_cancelled" xml:space="preserve">
+    <value>Expédition annulée</value>
+  </data>
+  <data name="ui.tracking.dispatch_closed" xml:space="preserve">
+    <value>Expédition clôturée et manifestée</value>
+  </data>
+  <data name="ui.tracking.dispatch_departed" xml:space="preserve">
+    <value>Étape partie : {leg}</value>
+  </data>
+  <data name="ui.tracking.dispatch_received" xml:space="preserve">
+    <value>Reçu à {warehouse}</value>
+  </data>
   <data name="ui.tracking.disposed" xml:space="preserve">
     <value>Éliminé</value>
   </data>
   <data name="ui.tracking.event_voided" xml:space="preserve">
     <value>Correction : une entrée précédente a été annulée</value>
   </data>
+  <data name="ui.tracking.exception" xml:space="preserve">
+    <value>Incident : {cause}{message}</value>
+  </data>
   <data name="ui.tracking.hold_opened" xml:space="preserve">
     <value>En attente : {reason}</value>
   </data>
   <data name="ui.tracking.hold_released" xml:space="preserve">
     <value>Retenue levée : {reason}</value>
+  </data>
+  <data name="ui.tracking.in_customs" xml:space="preserve">
+    <value>En douane</value>
+  </data>
+  <data name="ui.tracking.in_transit" xml:space="preserve">
+    <value>En transit à {place}</value>
   </data>
   <data name="ui.tracking.inspection_completed" xml:space="preserve">
     <value>Inspection terminée : {result}</value>
@@ -8067,14 +10866,29 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.tracking.label_recorded" xml:space="preserve">
     <value>Détails de l’étiquette enregistrés</value>
   </data>
+  <data name="ui.tracking.manifested" xml:space="preserve">
+    <value>Manifesté sur l’expédition {dispatch}</value>
+  </data>
+  <data name="ui.tracking.note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="ui.tracking.packed" xml:space="preserve">
+    <value>Mis dans le groupage {bundle}</value>
+  </data>
   <data name="ui.tracking.photo_added" xml:space="preserve">
     <value>Photo ajoutée ({kind})</value>
+  </data>
+  <data name="ui.tracking.picked_up" xml:space="preserve">
+    <value>Retiré à {place}</value>
   </data>
   <data name="ui.tracking.pre_alerted" xml:space="preserve">
     <value>Préalerté par le client</value>
   </data>
   <data name="ui.tracking.put_away" xml:space="preserve">
     <value>Rangé en {location}</value>
+  </data>
+  <data name="ui.tracking.ready_for_pickup" xml:space="preserve">
+    <value>Prêt à être retiré à {place}</value>
   </data>
   <data name="ui.tracking.received_at_origin" xml:space="preserve">
     <value>Reçu à {warehouse}</value>
@@ -8126,6 +10940,78 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.verify.use_recovery" xml:space="preserve">
     <value>Utiliser plutôt un code de récupération</value>
+  </data>
+  <data name="ui.waybill.agent" xml:space="preserve">
+    <value>Émise par (agent)</value>
+  </data>
+  <data name="ui.waybill.chargeable" xml:space="preserve">
+    <value>Poids taxable</value>
+  </data>
+  <data name="ui.waybill.charges" xml:space="preserve">
+    <value>Frais</value>
+  </data>
+  <data name="ui.waybill.collect" xml:space="preserve">
+    <value>Port dû</value>
+  </data>
+  <data name="ui.waybill.consignee" xml:space="preserve">
+    <value>Destinataire</value>
+  </data>
+  <data name="ui.waybill.departure" xml:space="preserve">
+    <value>Aéroport de départ</value>
+  </data>
+  <data name="ui.waybill.destination" xml:space="preserve">
+    <value>Aéroport de destination</value>
+  </data>
+  <data name="ui.waybill.goods" xml:space="preserve">
+    <value>Nature et quantité des marchandises</value>
+  </data>
+  <data name="ui.waybill.goods_fallback" xml:space="preserve">
+    <value>Effets personnels</value>
+  </data>
+  <data name="ui.waybill.gross" xml:space="preserve">
+    <value>Poids brut</value>
+  </data>
+  <data name="ui.waybill.handling" xml:space="preserve">
+    <value>Informations de manutention</value>
+  </data>
+  <data name="ui.waybill.house" xml:space="preserve">
+    <value>Numéro de LTA maison</value>
+  </data>
+  <data name="ui.waybill.house_title" xml:space="preserve">
+    <value>Lettre de transport aérien maison</value>
+  </data>
+  <data name="ui.waybill.issued" xml:space="preserve">
+    <value>Émise le, à</value>
+  </data>
+  <data name="ui.waybill.master" xml:space="preserve">
+    <value>LTA principale</value>
+  </data>
+  <data name="ui.waybill.pieces" xml:space="preserve">
+    <value>Pièces</value>
+  </data>
+  <data name="ui.waybill.prepaid" xml:space="preserve">
+    <value>Port payé</value>
+  </data>
+  <data name="ui.waybill.routing" xml:space="preserve">
+    <value>Itinéraire et transporteurs</value>
+  </data>
+  <data name="ui.waybill.shipper" xml:space="preserve">
+    <value>Expéditeur</value>
+  </data>
+  <data name="ui.waybill.signature_agent" xml:space="preserve">
+    <value>Signature de l’agent émetteur</value>
+  </data>
+  <data name="ui.waybill.terms" xml:space="preserve">
+    <value>Conditions</value>
+  </data>
+  <data name="ui.waybill.terms_text" xml:space="preserve">
+    <value>Les marchandises décrites sont acceptées en bon état apparent pour le transport, aux conditions de la LTA principale.</value>
+  </data>
+  <data name="ui.waybill.value_carriage" xml:space="preserve">
+    <value>Valeur déclarée pour le transport</value>
+  </data>
+  <data name="ui.waybill.value_customs" xml:space="preserve">
+    <value>Valeur déclarée en douane</value>
   </data>
   <data name="ui.workspace.body" xml:space="preserve">
     <value>Votre espace de travail est en préparation.</value>

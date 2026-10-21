@@ -32,11 +32,15 @@ public sealed class ListOperationsShipmentsUseCase
 
     private readonly IOperationsReceivingRepository _receiving;
 
+    private readonly IOperationsBillingRepository _billing;
+
     public ListOperationsShipmentsUseCase(
         OperationsOwnerCheck owner,
         OperationsReceivingScope scope,
-        IOperationsReceivingRepository receiving)
+        IOperationsReceivingRepository receiving,
+        IOperationsBillingRepository billing)
     {
+        _billing = billing ?? throw new ArgumentNullException(nameof(billing));
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
         _scope = scope ?? throw new ArgumentNullException(nameof(scope));
         _receiving = receiving ?? throw new ArgumentNullException(nameof(receiving));
@@ -66,7 +70,10 @@ public sealed class ListOperationsShipmentsUseCase
         OperationsShipmentFilter filter = new(shown, request.View, Trimmed(request.ServiceCode, 40), Trimmed(request.CountryCode, 2)?.ToUpperInvariant(), Trimmed(request.Search, 60));
         (IReadOnlyList<OperationsShipmentRow> rows, int total) = await _receiving.ListShipmentsAsync(filter, request.Export ? 1 : Math.Max(request.Page, 1),
             request.Export ? MaxExport : PageSize, cancellationToken);
-        return ListOperationsShipmentsResponse.Success(rows, total, await _receiving.CountShipmentsAsync(filter, cancellationToken), warehouses);
+        Dictionary<Guid, Vixly.Operations.Domain.Billing.OperationsPaymentState> payments = (await _billing.ListShipmentInvoicesAsync(
+                rows.Where(row => row.Status == Vixly.Operations.Domain.Shipments.OperationsShipmentStatus.Booked).Select(row => row.ShipmentId).ToList(), cancellationToken))
+            .Where(invoice => invoice.ShipmentId is not null).ToDictionary(invoice => invoice.ShipmentId!.Value, invoice => invoice.PaymentState);
+        return ListOperationsShipmentsResponse.Success(rows, total, await _receiving.CountShipmentsAsync(filter, cancellationToken), warehouses).WithPayments(payments);
     }
 
     public const int PageSize = 25;

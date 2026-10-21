@@ -59,7 +59,23 @@ IMPORTANT NOTES:
     {
         <div><dt>@T["ui.invoices.credited"]</dt><dd>-@Money(Invoice.CreditedTotal)</dd></div>
     }
-    <div class="ops-invoice__owed"><dt>@T["ui.invoices.owed"]</dt><dd>@Money(Invoice.Owed)</dd></div>
+    @if (Invoice.PaidTotal > 0m)
+    {
+        <div><dt>@T["ui.invoices.paid"]</dt><dd>-@Money(Invoice.PaidTotal)</dd></div>
+    }
+    @if (Invoice.PendingTotal > 0m)
+    {
+        <div><dt>@T["ui.invoices.pending"]</dt><dd>-@Money(Invoice.PendingTotal)</dd></div>
+    }
+    @if (Invoice.RefundedTotal > 0m)
+    {
+        <div><dt>@T["ui.invoices.refunded"]</dt><dd>@Money(Invoice.RefundedTotal)</dd></div>
+    }
+    <div class="ops-invoice__owed"><dt>@T["ui.invoices.owed"]</dt><dd>@Money(Math.Max(Invoice.Owed, 0m))</dd></div>
+    @if (Invoice.Refundable > 0m)
+    {
+        <div><dt>@T["ui.invoices.refundable"]</dt><dd>@Money(Invoice.Refundable)</dd></div>
+    }
 </dl>
 
 @code {

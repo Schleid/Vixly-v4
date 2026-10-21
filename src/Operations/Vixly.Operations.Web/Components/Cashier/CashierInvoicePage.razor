@@ -1,0 +1,101 @@
+﻿@*
+=========================================================
+FILE: CashierInvoicePage.razor
+
+PURPOSE:
+Pay an invoice at the cashier (Slice 5F, F-4, C-3 to C-5): the amount owed, one or more tenders adding up to it, the Zelle terms and details.
+
+RESPONSIBILITIES:
+- Show the invoice's summary and what is owed
+- The tender rows: method, amount, cash given, reference
+- Zelle: the warning, the terms in the customer's language, the acceptance, then the QR, tag, contact, amount and memo
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Paid in full: the rules refuse more or less than what is owed
+- Cash needs the person's open drawer at this warehouse
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@(Invoice?.Number ?? T["ui.cashier.title"].Value)" Company="@Company" Section="cashier" Error="@Error" Info="@Info">
+    <p><a href="/staff/cashier?customer=@Invoice?.CustomerId">@T["ui.cashier.back"]</a></p>
+    @if (Invoice is { } invoice && Settings is { } settings)
+    {
+    <section class="ops-editor__panel ops-cashier__summary" aria-labelledby="pay-title">
+        <h2 id="pay-title">@invoice.Number · @invoice.Reference · @OperationsBillingRows.Customer(invoice)</h2>
+        <InvoiceLines T="T" Invoice="invoice" />
+    </section>
+    @if (invoice.Owed > 0m)
+    {
+    <BillAccountPanel Invoice="invoice" Account="Account" Position="Position" />
+    <form method="post" action="/staff/cashier/invoices/@invoice.Id/pay" class="ops-editor__panel ops-editor__form ops-cashier__pay" aria-labelledby="tenders-title">
+        <AntiforgeryToken />
+        <input type="hidden" name="key" value="@Key" />
+        <h2 id="tenders-title">@VixlyText.Format(T, "ui.cashier.to_pay_now", "amount", OperationsInvoiceWords.Money(invoice.Owed, invoice.CurrencyCode))</h2>
+        <p class="ops-editor__hint">@T["ui.cashier.in_full"]</p>
+        @if (Drawer is null && Methods.Contains(OperationsPaymentMethod.Cash))
+        {
+            <p class="ops-editor__notice">@T["ui.cashier.cash_needs_drawer"] <a href="/staff/cashier/drawers">@T["ui.cashier.open_drawer"]</a></p>
+        }
+        @for (int row = 1; row <= 3; row++)
+        {
+            int index = row;
+            <div class="ops-cashier__tender" data-row="@index">
+                <label>@T["ui.cashier.method"]
+                    <select name="method_@index">
+                        @foreach (OperationsPaymentMethod method in Methods)
+                        {
+                            <option value="@method">@OperationsPaymentWords.Method(T, method, Others)</option>
+                        }
+                    </select>
+                </label>
+                <label>@T["ui.cashier.amount"] <input name="amount_@index" inputmode="decimal" size="9" value="@(index == 1 ? invoice.Owed.ToString("0.00", CultureInfo.InvariantCulture) : null)" /></label>
+                <label>@T["ui.cashier.cash_given"] <input name="given_@index" inputmode="decimal" size="9" /></label>
+                <label>@T["ui.cashier.reference"] <input name="reference_@index" maxlength="60" size="14" /></label>
+            </div>
+        }
+        @if (Methods.Contains(OperationsPaymentMethod.Zelle))
+        {
+            <ZelleTermsPanel T="T" Settings="settings" Invoice="invoice" HasQr="@(settings.ZelleQrKey is not null)" />
+        }
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.cashier.take"]</button>
+    </form>
+    }
+    else
+    {
+        <p class="ops-editor__notice">@T["ui.payments.state." + OperationsPaymentWords.State(invoice.PaymentState)]</p>
+    }
+    <PaymentsList T="T" Payments="Payments" Refunds="Refunds" Others="Others" />
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsInvoice? Invoice { get; set; }
+
+    [Parameter] public OperationsTenantSettings? Settings { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsPaymentMethod> Methods { get; set; } = Array.Empty<OperationsPaymentMethod>();
+
+    [Parameter] public OperationsCashDrawer? Drawer { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsPayment> Payments { get; set; } = Array.Empty<OperationsPayment>();
+
+    [Parameter] public IReadOnlyList<OperationsRefund> Refunds { get; set; } = Array.Empty<OperationsRefund>();
+
+    // Slice 5F step 2b: the customer's credit account, when the company allows credit.
+    [Parameter] public OperationsCreditAccount? Account { get; set; }
+
+    [Parameter] public OperationsCreditPosition? Position { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private IReadOnlyDictionary<OperationsPaymentMethod, string> Others => Settings is null ? new Dictionary<OperationsPaymentMethod, string>() : OperationsPaymentNames.Others(Settings);
+
+    // The form's key: the same payment sent twice is taken once (ADR-0019).
+    private readonly string Key = Guid.NewGuid().ToString("N");
+}

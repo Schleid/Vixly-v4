@@ -1,0 +1,45 @@
+﻿@*
+=========================================================
+FILE: DiscrepanciesPage.razor
+
+PURPOSE:
+Every discrepancy the person can see, at the destination and at the origin (Slice 7, R-2).
+
+RESPONSIBILITIES:
+- Open ones, or all
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.arrivals.discrepancies"]" Company="@Company" Section="arrivals" Error="@Error" Info="@Info">
+    <p class="ops-editor__actions">
+        <a href="/staff/arrivals">@T["ui.arrivals.back"]</a>
+        @if (All) { <a href="/staff/arrivals/discrepancies">@T["ui.arrivals.view_open"]</a> } else { <a href="/staff/arrivals/discrepancies?view=all">@T["ui.arrivals.view_all"]</a> }
+    </p>
+    <section class="ops-editor__panel" aria-labelledby="list-title">
+        <h2 id="list-title">@T["ui.arrivals.discrepancies"]</h2>
+        @if (Items.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.arrivals.no_discrepancies"]</p></div>
+        }
+        else
+        {
+            <DiscrepancyRows Rows="Items" />
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsDiscrepancyRow> Items { get; set; } = Array.Empty<OperationsDiscrepancyRow>();
+
+    [Parameter] public bool All { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

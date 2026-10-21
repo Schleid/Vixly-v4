@@ -27,6 +27,7 @@ public static class OperationsBillingRows
         ArgumentNullException.ThrowIfNull(warehouses);
 
         return new OperationsInvoiceRow(invoice.Id, invoice.Number, invoice.Kind, invoice.Reference, Customer(invoice), invoice.IssuedOn, invoice.CurrencyCode, invoice.Total, invoice.CreditedTotal,
-            invoice.Owed, invoice.Status == OperationsInvoiceStatus.Voided, warehouses.TryGetValue(invoice.WarehouseId, out OperationsWarehouse? warehouse) ? warehouse.Code : string.Empty);
+            invoice.Owed, invoice.Status == OperationsInvoiceStatus.Voided, warehouses.TryGetValue(invoice.WarehouseId, out OperationsWarehouse? warehouse) ? warehouse.Code : string.Empty,
+            invoice.PendingTotal);
     }
 }

@@ -40,6 +40,8 @@ IMPORTANT NOTES:
     <label><input type="checkbox" name="deliversHome" value="true" checked="@Form.DeliversHome" /> @T["ui.editor.destination.delivers_home"]</label>
     <label>@T["ui.editor.destination.home_area"] <textarea name="homeArea" rows="3">@string.Join(Environment.NewLine, Form.HomeArea ?? Array.Empty<string>())</textarea></label>
     <p class="ops-editor__hint">@T["ui.editor.destination.home_area_hint"]</p>
+    <label><input type="checkbox" name="clearsCustoms" value="true" checked="@Form.ClearsCustoms" /> @T["ui.editor.destination.clears_customs"]</label>
+    <p class="ops-editor__hint">@T["ui.editor.destination.clears_customs_hint"]</p>
 </fieldset>
 
 @code {

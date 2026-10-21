@@ -94,6 +94,113 @@ public sealed class OperationsShipment : OperationsEntity
     // Slice 5C: when it became final, and the amount then (the price of its service for its parcels).
     public DateTimeOffset? BookedUtc { get; private set; }
 
+    // Slice 7 step 2 (R-6): someone the customer names to collect it, with the same proof as the recipient.
+    public string? CollectorName { get; private set; }
+
+    public string? CollectorPhone { get; private set; }
+
+    // Slice 7 step 2 (R-5): the pickup code sent to the customer, kept protected with the server's key; wrong tries counted (review).
+    public const int PickupCodeTries = 5;
+
+    public string? PickupCodeProtected { get; private set; }
+
+    public DateTimeOffset? PickupCodeUtc { get; private set; }
+
+    public int PickupCodeFailures { get; private set; }
+
+    // Collected (the last release at the counter).
+    public DateTimeOffset? PickedUpUtc { get; private set; }
+
+    // R-10 (review): when its first parcel became ready for pickup, and the reminders sent since; kept on the shipment.
+    public DateTimeOffset? PickupReadyUtc { get; private set; }
+
+    public int PickupRemindersSent { get; private set; }
+
+    // The last bill at the destination's request key: a double click bills once (review).
+    public Guid? DestinationBillKey { get; private set; }
+
+    public void ChangeCollector(string? name, string? phone, DateTimeOffset utcNow)
+    {
+        // A person may collect only what is picked up at a branch or warehouse, once booked, until it is collected (R-6, review).
+        if (Status != OperationsShipmentStatus.Booked || PickedUpUtc is not null || DeliveryAddress is not null || (DestinationBranchId is null && DestinationWarehouseId is null))
+        {
+            throw new DomainException(OperationsShipmentErrors.CollectorLocked);
+        }
+
+        (CollectorName, CollectorPhone) = string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(phone)
+            ? (null, null)
+            : (OperationsShipmentInstructions.Name(name), OperationsShipmentInstructions.Phone(phone));
+        MarkAsModified(utcNow);
+    }
+
+    public void SetPickupCode(string protectedCode, DateTimeOffset utcNow)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(protectedCode);
+        (PickupCodeProtected, PickupCodeUtc, PickupCodeFailures) = (protectedCode, utcNow, 0);
+        MarkAsModified(utcNow);
+    }
+
+    // Every try is counted first, in the database in one statement (review: tries sent at once are all counted); after five, the code no longer works.
+    public bool PickupCodeLocked => PickupCodeFailures >= PickupCodeTries;
+
+    // The right code: the tries start again.
+    public void PickupCodeAccepted(DateTimeOffset utcNow)
+    {
+        if (PickupCodeFailures != 0)
+        {
+            PickupCodeFailures = 0;
+            MarkAsModified(utcNow);
+        }
+    }
+
+    public void MarkPickupReady(DateTimeOffset utcNow)
+    {
+        if (PickupReadyUtc is null)
+        {
+            PickupReadyUtc = utcNow;
+            MarkAsModified(utcNow);
+        }
+    }
+
+    public bool PickupRemind(int sent, DateTimeOffset utcNow)
+    {
+        if (PickupRemindersSent != sent - 1 || sent > Vixly.Operations.Domain.Holds.OperationsHoldLimits.ReminderDays.Count)
+        {
+            return false;
+        }
+
+        PickupRemindersSent = sent;
+        MarkAsModified(utcNow);
+        return true;
+    }
+
+    public void BilledAtDestination(Guid? requestKey, DateTimeOffset utcNow)
+    {
+        DestinationBillKey = requestKey;
+        MarkAsModified(utcNow);
+    }
+
+    public void PickedUp(DateTimeOffset utcNow)
+    {
+        PickedUpUtc = utcNow;
+        MarkAsModified(utcNow);
+    }
+
+    // Slice 7 (R-1): the customer was told it is ready for pickup (once).
+    public DateTimeOffset? PickupNotifiedUtc { get; private set; }
+
+    public bool NotePickupNotified(DateTimeOffset utcNow)
+    {
+        if (PickupNotifiedUtc is not null)
+        {
+            return false;
+        }
+
+        PickupNotifiedUtc = utcNow;
+        MarkAsModified(utcNow);
+        return true;
+    }
+
     public decimal? BookedTotal { get; private set; }
 
     public string? BookedCurrencyCode { get; private set; }
@@ -283,6 +390,36 @@ public sealed class OperationsShipment : OperationsEntity
             (Options, InsurancePlanId, InsuranceAcceptedUtc, InsuranceRecordedByUserId) = (Options | OperationsShipmentOptions.Insured, planId, utcNow, recordedBy);
         }
 
+        MarkAsModified(utcNow);
+    }
+
+    // Slice 6A (D-4): how this consolidated shipment travels when the ship manager switched it; none: the company's way.
+    public Vixly.Operations.Domain.Bundles.OperationsConsolidationWay? ConsolidationWay { get; private set; }
+
+    public Vixly.Operations.Domain.Bundles.OperationsConsolidationWay WayOr(Vixly.Operations.Domain.Bundles.OperationsConsolidationWay companyWay) => ConsolidationWay ?? companyWay;
+
+    // Switched for a consolidated shipment, before any of its parcels is boxed or bundled (the use case checks that); never on a cancelled one.
+    public void ChooseConsolidation(Vixly.Operations.Domain.Bundles.OperationsConsolidationWay way, DateTimeOffset utcNow)
+    {
+        if (!Options.HasFlag(OperationsShipmentOptions.Consolidate) || Status == OperationsShipmentStatus.Cancelled || !Enum.IsDefined(way))
+        {
+            throw new DomainException(Vixly.Operations.Domain.Bundles.OperationsBundleErrors.NotConsolidated);
+        }
+
+        ConsolidationWay = way;
+        MarkAsModified(utcNow);
+    }
+
+    // Slice 6A (review): when its first parcel is boxed or bundled, the way in effect is kept on the shipment, so a later change of the company's way never strands it;
+    // touching the row makes two scans of its parcels at the same moment clash on its row version.
+    public void StartConsolidating(Vixly.Operations.Domain.Bundles.OperationsConsolidationWay companyWay, DateTimeOffset utcNow)
+    {
+        if (!Options.HasFlag(OperationsShipmentOptions.Consolidate))
+        {
+            return;
+        }
+
+        ConsolidationWay ??= companyWay;
         MarkAsModified(utcNow);
     }
 

@@ -30,5 +30,10 @@ public interface IOperationsTrackingRepository
 
     Task<IReadOnlyList<OperationsTrackingEvent>> ListForSubjectAsync(OperationsTrackingSubject kind, Guid subjectId, CancellationToken cancellationToken);
 
+    // Slice 6B: many subjects at once (a dispatch's parcels), with the events of this unit of work.
+    Task<IReadOnlyList<OperationsTrackingEvent>> ListForSubjectsAsync(OperationsTrackingSubject kind, IReadOnlyCollection<Guid> subjectIds, CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<OperationsTrackingEvent>> FindByKeysAsync(IReadOnlyCollection<string> idempotencyKeys, CancellationToken cancellationToken);
+
     Task<OperationsParcel?> GetParcelAsync(Guid packageId, CancellationToken cancellationToken);
 }

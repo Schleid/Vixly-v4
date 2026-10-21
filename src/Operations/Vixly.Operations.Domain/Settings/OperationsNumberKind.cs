@@ -35,5 +35,13 @@ public enum OperationsNumberKind
     SupplyOrder = 9,
 
     // Slice 5F: an approved credit note (the company's prefix, CN by default).
-    CreditNote = 10
+    CreditNote = 10,
+
+    // Slice 6A: a bundle (BD by default) and a repack box (CB by default).
+    Bundle = 11,
+
+    Box = 12,
+
+    // Slice 6B: a dispatch (DSP by default).
+    Dispatch = 13
 }

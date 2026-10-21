@@ -32,5 +32,8 @@ internal sealed class OperationsTrackingEventConfiguration : IEntityTypeConfigur
         builder.HasIndex(item => new { item.TenantId, item.IdempotencyKey }).IsUnique();
         builder.HasIndex(item => new { item.TenantId, item.SubjectKind, item.SubjectId, item.OccurredUtc });
         builder.HasIndex(item => new { item.TenantId, item.VoidsEventId }).HasFilter("[VoidsEventId] IS NOT NULL").IsUnique();
+
+        // Slice 6C: the copies of an event on a shipment, bundle or dispatch.
+        builder.HasIndex(item => new { item.TenantId, item.CausedByEventId }).HasFilter("[CausedByEventId] IS NOT NULL");
     }
 }

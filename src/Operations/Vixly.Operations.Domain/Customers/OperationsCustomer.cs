@@ -195,6 +195,16 @@ public sealed class OperationsCustomer : OperationsEntity
         MarkAsModified(utcNow);
     }
 
+    // Slice 5F step 2b (K-1): the mark follows the customer's credit account; the account keeps its own reason (none when opened or made active again).
+    public void FollowCreditAccount(bool active, string? reason, DateTimeOffset utcNow)
+    {
+        string? text = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();
+        CreditReason = text is { Length: > OperationsCustomerLimits.ReasonMaxLength } ? text[..OperationsCustomerLimits.ReasonMaxLength] : text;
+        CreditAllowed = active;
+        CreditChangedUtc = utcNow;
+        MarkAsModified(utcNow);
+    }
+
     // The details a new customer needs, checked before a code is taken, so a refused form never uses a number.
     public static void CheckDetails(string? firstName, string? lastName, string? companyName, string? phone)
     {

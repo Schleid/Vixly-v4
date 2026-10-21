@@ -77,6 +77,9 @@ IMPORTANT NOTES:
             <label>@T["ui.settings.prefix.parcel"] <input name="parcelPrefix" value="@Settings.ParcelPrefix" maxlength="6" required /></label>
             <label>@T["ui.settings.prefix.supply_order"] <input name="supplyOrderPrefix" value="@Settings.SupplyOrderPrefix" maxlength="6" required /></label>
             <label>@T["ui.settings.prefix.credit_note"] <input name="creditNotePrefix" value="@Settings.CreditNotePrefix" maxlength="6" required /></label>
+            <label>@T["ui.settings.prefix.bundle"] <input name="bundlePrefix" value="@Settings.BundlePrefix" maxlength="6" required /></label>
+            <label>@T["ui.settings.prefix.box"] <input name="boxPrefix" value="@Settings.BoxPrefix" maxlength="6" required /></label>
+            <label>@T["ui.settings.prefix.dispatch"] <input name="dispatchPrefix" value="@Settings.DispatchPrefix" maxlength="6" required /></label>
             <p class="ops-editor__hint">@VixlyText.Format(T, "ui.settings.prefix_hint", "example", Settings.ShipmentPrefix + DateTime.UtcNow.ToString("yy", System.Globalization.CultureInfo.InvariantCulture) + "000001")</p>
         </fieldset>
         @if (CurrencyLocked)

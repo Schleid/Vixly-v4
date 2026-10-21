@@ -1,0 +1,124 @@
+﻿@*
+=========================================================
+FILE: CarrierPage.razor
+
+PURPOSE:
+One carrier and its rates (Slice 6B, D-1).
+
+RESPONSIBILITIES:
+- Change the carrier
+- List its rates by destination with their start; add a rate; remove one not yet started
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Air: per weight with a minimum; ocean: per bundle, for a bundle type or any
+- A later start replaces an earlier rate from that day
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@Carrier.Name" Company="@Company" Section="carriers" Error="@Error" Info="@Info">
+    <p class="ops-editor__actions"><a href="/staff/carriers">@T["ui.carriers.back"]</a></p>
+    <CarrierForm Carrier="@Carrier" />
+    <section class="ops-editor__panel" aria-labelledby="rates-title">
+        <h2 id="rates-title">@T["ui.carriers.rates"]</h2>
+        @if (Rates.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.carriers.rates_none"]</p></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.carriers.rates"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.dispatch.destination"]</th><th scope="col">@T["ui.bundles.type"]</th><th scope="col" class="ops-editor__number">@T[Air ? "ui.carriers.per_weight" : "ui.carriers.per_bundle"]</th>@if (Air) { <th scope="col" class="ops-editor__number">@T["ui.carriers.minimum"]</th> }<th scope="col">@T["ui.carriers.starts"]</th><th scope="col"></th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsCarrierRate rate in Rates)
+                        {
+                            <tr>
+                                <td>@OperationsBundleWords.Destination(T, rate.DestinationWarehouseId, rate.CountryCode, Destinations)</td>
+                                <td>@(rate.BundleType ?? (Air ? string.Empty : T["ui.carriers.any_type"].Value))</td>
+                                <td class="ops-editor__number">@(Air ? Money(rate.PerKg!.Value * Vixly.Operations.Application.Settings.OperationsUnits.ToKilograms(1m, WeightUnit)) : Money(rate.PerBundle!.Value))</td>
+                                @if (Air) { <td class="ops-editor__number">@(rate.Minimum is { } minimum ? Money(minimum) : string.Empty)</td> }
+                                <td>@rate.StartsOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)</td>
+                                <td>
+                                    @if (rate.StartsOn > Today)
+                                    {
+                                        <form method="post" action="/staff/carriers/@Carrier.Id/rates/@rate.Id/remove" class="ops-editor__inline">
+                                            <AntiforgeryToken />
+                                            <button type="submit" class="vx-button vx-button--secondary">@T["ui.dispatch.remove"]</button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+        @if (Destinations.Count > 0)
+        {
+            <form method="post" action="/staff/carriers/@Carrier.Id/rates" class="ops-editor__form" aria-labelledby="rate-title">
+                <AntiforgeryToken />
+                <h3 id="rate-title">@T["ui.carriers.add_rate"]</h3>
+                <label>@T["ui.dispatch.destination"]
+                    <select name="destination">
+                        @foreach (OperationsWarehouse destination in Destinations)
+                        {
+                            <option value="@OperationsBundleWords.DestinationValue(destination.Id, destination.Address.CountryCode)">@destination.Code · @destination.Name</option>
+                        }
+                    </select>
+                </label>
+                @if (Air)
+                {
+                    <label>@VixlyText.Format(T, "ui.carriers.per_weight_in", new Dictionary<string, object> { ["currency"] = CurrencyCode, ["unit"] = WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg" }) <input name="perWeight" inputmode="decimal" size="8" required /></label>
+                    <label>@VixlyText.Format(T, "ui.carriers.minimum_in", "currency", CurrencyCode) <input name="minimum" inputmode="decimal" size="8" /></label>
+                }
+                else
+                {
+                    @if (BundleTypes.Count > 0)
+                    {
+                        <label>@T["ui.bundles.type"]
+                            <select name="type">
+                                <option value="">@T["ui.carriers.any_type"]</option>
+                                @foreach (string type in BundleTypes)
+                                {
+                                    <option value="@type">@type</option>
+                                }
+                            </select>
+                        </label>
+                    }
+                    <label>@VixlyText.Format(T, "ui.carriers.per_bundle_in", "currency", CurrencyCode) <input name="perBundle" inputmode="decimal" size="8" required /></label>
+                }
+                <label>@T["ui.carriers.starts"] <input type="date" name="starts" value="@Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" min="@Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" required /></label>
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.carriers.add_rate"]</button>
+                <p class="ops-editor__hint">@T[Air ? "ui.carriers.air_hint" : "ui.carriers.ocean_hint"]</p>
+            </form>
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsCarrier Carrier { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsCarrierRate> Rates { get; set; } = Array.Empty<OperationsCarrierRate>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Destinations { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<string> BundleTypes { get; set; } = Array.Empty<string>();
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
+
+    [Parameter] public DateOnly Today { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private bool Air => Carrier.Kind == OperationsCarrierKind.Air;
+
+    private string Money(decimal amount) => amount.ToString("0.00##", CultureInfo.CurrentUICulture) + " " + CurrencyCode;
+}

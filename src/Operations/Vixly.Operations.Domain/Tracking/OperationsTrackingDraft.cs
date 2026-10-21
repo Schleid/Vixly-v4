@@ -32,5 +32,8 @@ public sealed record OperationsTrackingDraft(
 
     public string? Note { get; init; }
 
+    // Slice 6C: the source event of a copy on a parcel.
+    public Guid? CausedByEventId { get; init; }
+
     public Guid? VoidsEventId { get; init; }
 }

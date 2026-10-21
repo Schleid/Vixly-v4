@@ -489,50 +489,110 @@ body.ops-editor { padding-left:16rem; background:var(--vx-color-app); }
     margin-top: 0 !important;
 }
 
-/* List Single-Line Bar Enhancement */
-form.ops-list-bar {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.85rem;
-    padding: 0.65rem 0.85rem;
-    background: var(--vx-color-surface);
-    border: 1px solid var(--vx-color-border);
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+/* List Single-Line Bar Enhancement: Controls on ONE row without overflowing or wrapping buttons */
+form.ops-list-bar,
+.ops-list-bar,
+.ops-editor__filters {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem 0.75rem !important;
+    flex-wrap: wrap !important;
+    margin-bottom: 0.85rem !important;
+    padding: 0.65rem 0.85rem !important;
+    background: var(--vx-color-surface) !important;
+    border: 1px solid var(--vx-color-border) !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
 }
-form.ops-list-bar input:not([type=hidden]):not([type=checkbox]),
-form.ops-list-bar select {
+form.ops-list-bar input:not([type=hidden]):not([type=checkbox]):not([type=radio]),
+.ops-list-bar input:not([type=hidden]):not([type=checkbox]):not([type=radio]),
+.ops-editor__filters input:not([type=hidden]):not([type=checkbox]):not([type=radio]) {
     height: 32px !important;
     min-height: 32px !important;
     box-sizing: border-box !important;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.8125rem;
-    border: 1px solid var(--vx-color-border-control);
-    border-radius: 0.35rem;
-    background: var(--vx-color-surface);
-    color: var(--vx-color-text);
+    padding: 0.25rem 0.65rem !important;
+    font-size: 0.8125rem !important;
+    border: 1px solid var(--vx-color-border-control) !important;
+    border-radius: 0.35rem !important;
+    background: var(--vx-color-surface) !important;
+    color: var(--vx-color-text) !important;
+    width: auto !important;
+    min-width: 12rem !important;
+    max-width: 22rem !important;
+    flex: 0 1 18rem !important;
+    margin: 0 !important;
+}
+form.ops-list-bar select,
+.ops-list-bar select,
+.ops-editor__filters select {
+    height: 32px !important;
+    min-height: 32px !important;
+    box-sizing: border-box !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.8125rem !important;
+    border: 1px solid var(--vx-color-border-control) !important;
+    border-radius: 0.35rem !important;
+    background: var(--vx-color-surface) !important;
+    color: var(--vx-color-text) !important;
+    width: auto !important;
+    min-width: 8rem !important;
+    max-width: 16rem !important;
+    flex: 0 1 auto !important;
+    margin: 0 !important;
+}
+form.ops-list-bar > label,
+.ops-list-bar > label,
+.ops-editor__filters > label {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    width: auto !important;
+    flex: 0 1 auto !important;
+    margin: 0 !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    color: var(--vx-color-text) !important;
+}
+form.ops-list-bar > label > input:not([type=checkbox]):not([type=radio]),
+.ops-list-bar > label > input:not([type=checkbox]):not([type=radio]),
+.ops-editor__filters > label > input:not([type=checkbox]):not([type=radio]) {
+    width: auto !important;
+    min-width: 12rem !important;
+    max-width: 22rem !important;
+    flex: 0 1 18rem !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
 }
 form.ops-list-bar input:focus,
-form.ops-list-bar select:focus {
-    border-color: var(--vx-color-primary);
-    box-shadow: 0 0 0 2px var(--vx-color-primary-soft);
-    outline: none;
+form.ops-list-bar select:focus,
+.ops-list-bar input:focus,
+.ops-list-bar select:focus,
+.ops-editor__filters input:focus,
+.ops-editor__filters select:focus {
+    border-color: var(--vx-color-primary) !important;
+    box-shadow: 0 0 0 2px var(--vx-color-primary-soft) !important;
+    outline: none !important;
 }
-form.ops-list-bar .vx-button {
+form.ops-list-bar .vx-button,
+.ops-list-bar .vx-button,
+.ops-editor__filters .vx-button,
+.ops-editor__inline .vx-button {
     height: 32px !important;
     min-height: 32px !important;
     box-sizing: border-box !important;
-    padding: 0 0.85rem;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    border-radius: 0.35rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    white-space: nowrap;
+    padding: 0 0.85rem !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    border-radius: 0.35rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    margin: 0 !important;
+    flex-shrink: 0 !important;
 }
 .ops-list-bar__date {
     display: inline-flex;
@@ -961,3 +1021,194 @@ tr[data-low="true"] td:first-child {
     box-sizing: border-box !important;
     margin: 0;
 }
+
+/* Side-by-side card layouts for density (Prices, Coverage, Terms) */
+.ops-charges-duo {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.ops-charges-trio {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 992px) {
+    .ops-charges-trio {
+        grid-template-columns: 1fr;
+    }
+    .ops-charges-duo {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Horizontal Checkboxes and Radio Groups */
+.ops-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.5rem;
+    margin: 0.5rem 0;
+}
+
+.ops-checkbox-label {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    color: var(--vx-color-text) !important;
+    cursor: pointer;
+    user-select: none;
+    margin: 0 !important;
+    width: auto !important;
+}
+
+.ops-checkbox-label input[type="checkbox"],
+.ops-checkbox-label input[type="radio"] {
+    width: 1rem !important;
+    height: 1rem !important;
+    min-height: 1rem !important;
+    margin: 0 !important;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Compact Quantity Breaks Table in Supplies */
+.ops-supply-breaks-table {
+    width: 100%;
+    max-width: 38rem;
+    margin: 0.5rem 0 1rem;
+    border-collapse: collapse;
+}
+
+.ops-supply-breaks-table th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.4rem 0.6rem;
+    background: var(--vx-color-app);
+    color: var(--vx-color-text-muted);
+    border-bottom: 1px solid var(--vx-color-border);
+    text-align: left;
+}
+
+.ops-supply-breaks-table td {
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px solid var(--vx-color-border);
+    vertical-align: middle;
+}
+
+.ops-supply-breaks-table input {
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.8125rem !important;
+    width: 100% !important;
+    max-width: 10rem !important;
+    box-sizing: border-box !important;
+}
+
+/* Cashier Drawer Bar */
+.ops-cashier__drawers-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--vx-color-text-muted);
+}
+
+/* Cashier Tender Rows */
+.ops-cashier__tender {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 2fr;
+    gap: 0.75rem;
+    align-items: flex-end;
+    padding: 0.5rem 0;
+    border-bottom: 1px dashed var(--vx-color-border);
+}
+@media (max-width: 768px) {
+    .ops-cashier__tender {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+.ops-cashier__tender label {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.25rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    color: var(--vx-color-text-muted) !important;
+    margin: 0 !important;
+    width: 100% !important;
+}
+.ops-cashier__tender input,
+.ops-cashier__tender select {
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.8125rem !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+/* Cashier Verification Queue Card */
+.ops-cashier__verify li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Station Anatomy: Bundle Fill Station */
+.ops-bundle-fill__scan {
+    display: flex !important;
+    align-items: flex-end !important;
+    gap: 0.75rem !important;
+    margin: 0.75rem 0 !important;
+}
+.ops-bundle-fill__scan label {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.35rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    flex: 1 1 20rem !important;
+    max-width: 32rem !important;
+    margin: 0 !important;
+}
+.ops-bundle-fill__scan input {
+    height: 44px !important;
+    min-height: 44px !important;
+    font-size: 1.125rem !important;
+    font-family: var(--vx-font-mono, monospace) !important;
+    padding: 0.5rem 0.75rem !important;
+    letter-spacing: 0.05em !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+.ops-bundle-fill__scan button {
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 1.25rem !important;
+    font-size: 0.9375rem !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+}
+.ops-bundle-fill__meter {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--vx-color-primary);
+    margin: 0.5rem 0;
+}
+

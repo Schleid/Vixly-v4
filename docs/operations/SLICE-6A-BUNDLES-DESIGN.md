@@ -6,7 +6,7 @@
 | Date | 2026-10-20 |
 | Builds on | Slice 5C (final shipments), ADR-0018 (milestones), ADR-0021 (tracking events), ADR-0019 (double-click protection) |
 | Source | The owner's walk-through of V3 bundles with Claude, 2026-10-20 |
-| Status | **Draft: nothing is built.** Decisions B-1 to B-9 are Claude's reading of what the owner said. The questions in section 4 need the owner's answer before building |
+| Status | **Built 2026-10-21** as section 5 says, after the cashier (Slice 5F step 2a), since bundling needs release on payment. The owner answered every question on 2026-10-21 (section 4). Verification: [Slice 6A verification](SLICE-6A-VERIFICATION.md) |
 
 ## 1. What the owner said (2026-10-20)
 
@@ -38,15 +38,50 @@
 
 The closed bundle's weight and size are stored now. Carrier fees (per kg, per volumetric kg, per piece, minimums) and the cost per shipment, sharing the bundle's cost among its shipments by weight, come with dispatch and carriers (Slice 6B), once the owner has shown how the fees are agreed with carriers.
 
-## 4. Questions for the owner
+## 4. The owner's answers (2026-10-21)
 
-1. **Payment before bundling:** can a final shipment go into a bundle before it is paid? (Milestones place *Awaiting payment* and *Released* before *Consolidated*; collect shipments are paid at destination.)
-2. **Target:** a warning only, or does the bundle refuse parcels past the target?
-3. **Consolidation:** is a consolidated shipment (the customer's option) packed by the company into one box *before* bundling (a new box with its own weight), or are its parcels simply kept together in one bundle?
-4. **Reopen:** may a closed bundle be reopened, and by whom?
-5. **Bundle types:** do you need a type (box, sack, pallet, container) on the bundle and on its label?
-6. **Labels:** the same label printers as parcel labels (4x6), or another size?
+| # | Answer |
+|---|---|
+| A-1 | **Payment before bundling:** settled by billing (Slice 5F, F-3): an unpaid prepaid shipment is held and cannot be bundled; collect shipments and charges to a credit account are released. |
+| A-2 | **Target:** a company setting: *warn and accept* or *refuse past the target*. |
+| A-3 | **Consolidation:** both ways exist: the parcels repacked into one new box (weighed and measured, with its own label) before bundling, or kept together unchanged in one bundle. *Which one applies, and who chooses: see the question below.* |
+| A-4 | **No reopening.** A closed bundle that is wrong is **voided**: its parcels go back to *ready to bundle* and the work starts again in a new bundle. Replaces B-5's reopen. |
+| A-5 | **Bundle types are the company's own** (Settings: box, sack, pallet, container, or its own words); chosen when the bundle is created and printed on its label. |
+| A-6 | **Labels:** the same 4×6 label printers as parcels (Claude's default; the owner may change it). |
 
-## 5. Not in this slice
+- **A-3 (answered):** the company sets the default way in its settings; the ship manager can switch it for a consolidated shipment (for example too many parcels to repack).
+- **A-4 (answered):** voiding a closed bundle is for the ship manager (*manage bundles*), with a reason, and only until the bundle is on a manifest.
+
+## 5. As built (from 2026-10-21)
+
+B-1 to B-9 with the owner's answers (section 4):
+
+| # | Decision |
+|---|---|
+| D-1 | **Company settings** (Settings → Bundles): the bundle types (the company's own words: box, sack, pallet...), *when a bundle reaches its target*: warn and accept, or refuse; *consolidated shipments*: repacked into one box, or kept together in one bundle; the bundle prefix (BD) and the box prefix (CB) under Numbering. |
+| D-2 | **A bundle**: origin warehouse, destination (a destination warehouse, or a country for home delivery), service, type, size policy (free fill, or a target in actual or volumetric weight in the company's unit), number and 4×6 label. States: open, closed, voided (manifested and departed come with dispatch). |
+| D-3 | **Fill by scan**: the bundle's barcode first, then parcels. Accepted only at the bundle's warehouse, in a final shipment **paid** (F-3; a shipment made final before billing has no invoice and passes), clear of holds and inspections, not in a bundle, the destination and service matching. Each refusal says why. The same scan twice is a repeat. Beside each scan: the shipment, how many of its parcels are in bundles, and where the missing ones are (their shelf). A split across bundles is a warning. |
+| D-4 | **Consolidated shipments** (the customer's option): the company's way applies, and the ship manager may switch it for a shipment. *Repacked*: its parcels are scanned into a **box** (numbered CB, its own label), weighed and measured, and the box is scanned into a bundle (its parcels go in with it); a loose parcel of that shipment is refused in a bundle. *Kept together*: its parcels go into one bundle; one already in another bundle refuses the next. |
+| D-5 | **Target**: the parcels' weight (actual or volumetric, as the bundle's policy) against the target: past it, warn or refuse as the company chose. |
+| D-6 | **Take out** a parcel from an open bundle (a wrong scan): its *packed* event is voided (ADR-0021). |
+| D-7 | **Close**: gross weight and length, width, height; the volumetric weight with the service's divisor; the parcel count and the parcels' weight for comparison. Its label prints again with the weight. A closed bundle takes nothing more and is never reopened. |
+| D-8 | **Void** (owner, A-4): an empty open bundle, or a closed one until it is manifested, by the ship manager with a reason; its parcels' *packed* events are voided and they are ready to bundle again. |
+| D-9 | **Events**: each parcel put in a bundle gets *packed for departure* (customer-visible, milestone Consolidated; the bundle number is internal). |
+| D-10 | **Screens**: **Bundles** (*manage bundles*): ready to bundle (final, paid parcels not in a bundle, by destination and service, with counts and weight), open and closed bundles, *New bundle*; a bundle's page (parcels, shipments' completeness, close, void, label). **Fill** (*fill bundles*): one scan box, keyboard-first, the last scans with their result. **Boxes** for consolidated shipments. |
+| D-11 | **Rights**: *manage bundles* and *fill bundles*, per warehouse. |
+
+**Details settled while building** (2026-10-21):
+
+- **Closing** a bundle or a repack box is open to *manage bundles* and *fill bundles* alike: the person at the scale weighs it. Voiding stays with *manage bundles*.
+- **Paid** (D-3): a shipment whose invoice is unpaid or waiting for finance (Zelle, cheque, transfer) is refused; a voided invoice asks nothing. Collect shipments and credit accounts are released by Slice 5F step 2b when it is built; until then they wait for payment like any other.
+- **A repack box** takes every parcel of its shipment before it closes (they are repacked together); a parcel in a box goes into a bundle only with its box, and *Take out* on one of its parcels takes the whole box out. A box is voided while in no bundle; voiding the bundle takes its boxes out, still closed.
+- **A ready parcel** is one of a final shipment, still at the warehouse, in no bundle, measured and clear of holds and inspections. The fill station checks the same at each scan.
+- **Labels** are 4 x 6 PDFs (bundle: route, service, type, parcels, barcode and, once closed, weight and size; box: route, recipient, service, weight, its barcode and the shipment's).
+- **Numbering**: two prefixes under Settings → Numbering, BD and CB; a company already using one of them for another kind of number gets BDL (or BNDL) and CBX (or RPK).
+- **Events**: *packed* on each parcel (customer: *Packed for departure*; staff: the bundle number), *repacked* on each parcel put in a box (internal); *bundle opened*, *closed* (weight and size) and *voided* (with the reason) on the bundle. Taking out or voiding voids the parcel's event, so its milestone goes back to final.
+- **The way stays with the shipment** once its first parcel is boxed or bundled, so a later change of the company's way never strands it; scans of one consolidated shipment's parcels at the same instant clash, and the second is scanned again. A bundle holding only part of a kept-together shipment cannot be closed.
+- **Left as is**: a bundle or box number is used even when its creation then fails.
+
+## 6. Not in this slice
 
 Dispatch, manifests, carriers and their fees (Slice 6B, after reading the V3 dispatch code with the owner); air waybills and container numbers; costs per shipment.

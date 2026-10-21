@@ -84,18 +84,18 @@ public sealed partial class OperationsCustomerHttpTests : IClassFixture<Operatio
         Assert.Contains("Enter a reason.", noReason, StringComparison.Ordinal);
         (HttpResponseMessage suspended, string _) = await owner.PostAsync(customerPath + "/status", page, ("status", "suspended"), ("reason", "Unpaid shipments"));
         Assert.Equal(customerPath + "?done=status", suspended.Headers.Location?.OriginalString);
+        // Slice 5F step 2b: credit is the credit department's account now; the old toggle is gone.
         (HttpResponseMessage credit, string _) = await owner.PostAsync(customerPath + "/credit", page, ("allowed", "true"), ("reason", "Good customer since 2019"));
-        Assert.Equal(customerPath + "?done=credit", credit.Headers.Location?.OriginalString);
+        Assert.True(credit.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.MethodNotAllowed);
 
         (HttpResponseMessage _, string after) = await owner.GetAsync(customerPath);
         Assert.Contains("Ana Pierre", after, StringComparison.Ordinal);
         Assert.Contains("Suspended", after, StringComparison.Ordinal);
         Assert.Contains("Unpaid shipments", after, StringComparison.Ordinal);
-        Assert.Contains("Credit allowed", after, StringComparison.Ordinal);
+        Assert.Contains("/staff/credit/customers/", after, StringComparison.Ordinal);
 
         (HttpResponseMessage _, string history) = await owner.GetAsync("/staff/audit?area=customers");
         Assert.Contains("ops.customers.status_changed", history, StringComparison.Ordinal);
-        Assert.Contains("ops.customers.credit_changed", history, StringComparison.Ordinal);
     }
 
     [SqlServerFact]

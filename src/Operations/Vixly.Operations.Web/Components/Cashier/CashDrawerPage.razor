@@ -1,0 +1,79 @@
+﻿@*
+=========================================================
+FILE: CashDrawerPage.razor
+
+PURPOSE:
+A cash drawer's report (Slice 5F, C-4), and closing one's own with the count.
+
+RESPONSIBILITIES:
+- Show float, cash in, cash out, expected, counted and difference
+- List its cash payments and refunds
+- Close it with the count and a note when it does not match
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.drawers.report"]" Company="@Company" Section="cashier" Error="@Error" Info="@Info">
+    <p><a href="/staff/cashier/drawers">@T["ui.drawers.back"]</a></p>
+    @if (Drawer is { } drawer)
+    {
+    <section class="ops-editor__panel" aria-labelledby="report-title">
+        <h2 id="report-title">@Person · @drawer.OpenedUtc.ToString("g", CultureInfo.CurrentCulture) · @T["ui.drawers.status." + drawer.Status]</h2>
+        <dl class="ops-invoice__totals">
+            <div><dt>@T["ui.drawers.float"]</dt><dd>@Amount(drawer.Float)</dd></div>
+            <div><dt>@T["ui.drawers.cash_in"]</dt><dd>@Amount(drawer.CashIn)</dd></div>
+            <div><dt>@T["ui.drawers.cash_out"]</dt><dd>-@Amount(drawer.CashOut)</dd></div>
+            <div class="ops-invoice__total"><dt>@T["ui.drawers.expected"]</dt><dd>@Amount(drawer.Expected)</dd></div>
+            @if (drawer.Counted is { } counted)
+            {
+                <div><dt>@T["ui.drawers.counted"]</dt><dd>@Amount(counted)</dd></div>
+                <div class="ops-invoice__owed" data-difference="@Math.Sign(drawer.Difference ?? 0m)"><dt>@T["ui.drawers.difference"]</dt><dd>@Amount(drawer.Difference ?? 0m)@(drawer.CloseNote is { } note ? " · " + note : string.Empty)</dd></div>
+            }
+        </dl>
+        <ul class="ops-cashier__payments">
+            @foreach (OperationsPayment payment in Payments)
+            {
+                <li>@payment.Number · @payment.TakenUtc.ToString("t", CultureInfo.CurrentCulture) · +@Amount(payment.Cash)</li>
+            }
+            @foreach (OperationsRefund refund in Refunds)
+            {
+                <li data-refund>@refund.Number · @refund.CreatedUtc.ToString("t", CultureInfo.CurrentCulture) · -@Amount(refund.Amount)</li>
+            }
+        </ul>
+    </section>
+    @if (Own && drawer.Status == OperationsCashDrawerStatus.Open)
+    {
+        <form method="post" action="/staff/cashier/drawers/@drawer.Id/close" class="ops-editor__panel ops-editor__form" aria-labelledby="close-title">
+            <AntiforgeryToken />
+            <h2 id="close-title">@T["ui.drawers.close"]</h2>
+            <label>@T["ui.drawers.counted"] <input name="counted" inputmode="decimal" size="9" required /></label>
+            <label>@T["ui.drawers.note"] <input name="note" maxlength="500" size="40" /></label>
+            <p class="ops-editor__hint">@T["ui.drawers.close_hint"]</p>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.drawers.close_button"]</button>
+        </form>
+    }
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsCashDrawer? Drawer { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsPayment> Payments { get; set; } = Array.Empty<OperationsPayment>();
+
+    [Parameter] public IReadOnlyList<OperationsRefund> Refunds { get; set; } = Array.Empty<OperationsRefund>();
+
+    [Parameter] public string Person { get; set; } = string.Empty;
+
+    [Parameter] public bool Own { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private static string Amount(decimal amount) => amount.ToString("N2", CultureInfo.CurrentCulture);
+}

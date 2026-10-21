@@ -40,6 +40,36 @@ internal sealed class OperationsTrackingRepository : IOperationsTrackingReposito
     public async Task<OperationsTrackingEvent?> FindEventAsync(Guid eventId, CancellationToken cancellationToken) =>
         await _context.TrackingEvents.FirstOrDefaultAsync(item => item.Id == eventId, cancellationToken);
 
+    // In slices of 1,000, below SQL Server's parameter limit.
+    public async Task<IReadOnlyList<OperationsTrackingEvent>> ListForSubjectsAsync(OperationsTrackingSubject kind, IReadOnlyCollection<Guid> subjectIds, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(subjectIds);
+        List<OperationsTrackingEvent> stored = new();
+
+        foreach (Guid[] slice in subjectIds.Distinct().Chunk(1000))
+        {
+            // Read-only: events never change once written, and thousands of tracked rows would slow the save (review).
+            stored.AddRange(await _context.TrackingEvents.AsNoTracking().Where(item => item.SubjectKind == kind && slice.Contains(item.SubjectId)).ToListAsync(cancellationToken));
+        }
+
+        HashSet<Guid> ids = subjectIds.ToHashSet();
+        return stored.Concat(_context.TrackingEvents.Local.Where(item => item.SubjectKind == kind && ids.Contains(item.SubjectId))).DistinctBy(item => item.Id).ToList();
+    }
+
+    public async Task<IReadOnlyList<OperationsTrackingEvent>> FindByKeysAsync(IReadOnlyCollection<string> idempotencyKeys, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(idempotencyKeys);
+        List<OperationsTrackingEvent> found = new();
+
+        foreach (string[] slice in idempotencyKeys.Distinct(StringComparer.Ordinal).Chunk(1000))
+        {
+            found.AddRange(await _context.TrackingEvents.AsNoTracking().Where(item => item.IdempotencyKey != null && slice.Contains(item.IdempotencyKey)).ToListAsync(cancellationToken));
+        }
+
+        HashSet<string> keys = idempotencyKeys.ToHashSet(StringComparer.Ordinal);
+        return found.Concat(_context.TrackingEvents.Local.Where(item => item.IdempotencyKey is not null && keys.Contains(item.IdempotencyKey))).DistinctBy(item => item.Id).ToList();
+    }
+
     public async Task<IReadOnlyList<OperationsTrackingEvent>> ListForSubjectAsync(OperationsTrackingSubject kind, Guid subjectId, CancellationToken cancellationToken)
     {
         List<OperationsTrackingEvent> stored = await _context.TrackingEvents

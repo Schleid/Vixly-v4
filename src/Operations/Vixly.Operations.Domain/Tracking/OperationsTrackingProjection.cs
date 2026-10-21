@@ -52,7 +52,11 @@ public static class OperationsTrackingProjection
                 holds &= ~item.HoldReason();
             }
 
-            last = item.OccurredUtc;
+            // Slice 6C: a note, a delay or an exception changes nothing in the parcel's state, so its last event stays (review: the holds queue sorts by it).
+            if (!OperationsTrackingCodes.ManualCodes.Contains(code.Name, StringComparer.Ordinal))
+            {
+                last = item.OccurredUtc;
+            }
         }
 
         flags = holds == OperationsHoldReasons.None ? flags & ~OperationsParcelFlags.OnHold : flags | OperationsParcelFlags.OnHold;

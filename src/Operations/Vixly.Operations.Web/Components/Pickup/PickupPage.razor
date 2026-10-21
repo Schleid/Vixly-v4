@@ -1,0 +1,235 @@
+﻿@*
+=========================================================
+FILE: PickupPage.razor
+
+PURPOSE:
+A shipment at the pickup counter (Slice 7 step 2, R-4 to R-6, R-9, R-10): who may collect, its parcels, what is owed, the release with the proof the company asks.
+
+RESPONSIBILITIES:
+- Facts: customer, recipient, the person named
+- Parcels here and their storage; invoices with a link to the cashier
+- Destination charges and storage billed once
+- The release form: who collects, ID, signature, code, photo; releases done
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Pay first: the release form shows once every invoice is paid or on account
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@VixlyText.Format(T, "ui.pickup.shipment_title", "number", Number)" Company="@Company" Section="pickup" Error="@Error" Info="@Info">
+    <p class="ops-editor__actions"><a href="/staff/pickup?warehouse=@Here.Id">@T["ui.pickup.back"]</a></p>
+    <section class="ops-editor__panel" aria-labelledby="who-title">
+        <h2 id="who-title">@T["ui.pickup.who"]</h2>
+        <dl class="ops-editor__facts">
+            <dt>@T["ui.pickup.customer"]</dt><dd>@CustomerName @CustomerPhone</dd>
+            <dt>@T["ui.pickup.recipient"]</dt><dd>@RecipientName @RecipientPhone</dd>
+            <dt>@T["ui.pickup.collector"]</dt><dd>@(CollectorName is null ? T["ui.pickup.no_collector"].Value : CollectorName + " " + CollectorPhone)</dd>
+            <dt>@T["ui.arrivals.warehouse"]</dt><dd>@Here.Code · @Here.Name</dd>
+        </dl>
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="parcels-title">
+        <h2 id="parcels-title">@T["ui.pickup.parcels"]</h2>
+        <OperationsTableViewport Label="@T["ui.pickup.parcels"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.pickup.parcel"]</th><th scope="col">@T["ui.dispatch.state"]</th><th scope="col" class="ops-editor__number">@T["ui.pickup.storage"]</th></tr></thead>
+                <tbody>
+                    @foreach (OperationsPickupParcelRow parcel in Parcels)
+                    {
+                        string state = parcel.Ready ? "ready" : parcel.CustomsHeld ? "held" : parcel.Milestone == OperationsMilestone.Delivered ? "collected" : parcel.Here ? "here" : "elsewhere";
+                        <tr data-status="@state">
+                            <td class="ops-editor__identity-cell ops-editor__code">@parcel.Number</td>
+                            <td><span class="ops-editor__status" data-status="@state">@T["ui.pickup.state." + state]</span></td>
+                            <td class="ops-editor__number">@(parcel.Storage > 0m ? parcel.Storage.ToString("N2", CultureInfo.CurrentCulture) : string.Empty)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="owed-title">
+        <h2 id="owed-title">@T["ui.pickup.owed"]</h2>
+        @if (Invoices.Count == 0)
+        {
+            <p>@T["ui.pickup.no_invoice"]</p>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.pickup.owed"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.pickup.invoice"]</th><th scope="col">@T["ui.pickup.invoice_kind"]</th><th scope="col" class="ops-editor__number">@T["ui.pickup.total"]</th><th scope="col" class="ops-editor__number">@T["ui.pickup.to_pay"]</th><th scope="col">@T["ui.pickup.payment"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsPickupInvoiceRow invoice in Invoices)
+                        {
+                            <tr data-status="@invoice.State">
+                                <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/cashier/invoices/@invoice.InvoiceId">@invoice.Number</a></td>
+                                <td>@T["ui.pickup.invoice_kind." + invoice.Kind]</td>
+                                <td class="ops-editor__number">@invoice.Total.ToString("N2", CultureInfo.CurrentCulture) @invoice.CurrencyCode</td>
+                                <td class="ops-editor__number">@Math.Max(0m, invoice.Owed).ToString("N2", CultureInfo.CurrentCulture)</td>
+                                <td><span class="ops-editor__status" data-status="@Vixly.Operations.Web.Components.Cashier.OperationsPaymentWords.State(invoice.State)">@T["ui.payments.state." + Vixly.Operations.Web.Components.Cashier.OperationsPaymentWords.State(invoice.State)]</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+        @if (StorageOwed > 0m)
+        {
+            <p>@VixlyText.Format(T, "ui.pickup.storage_owed", new Dictionary<string, object> { ["amount"] = StorageOwed.ToString("N2", CultureInfo.CurrentCulture), ["currency"] = CurrencyCode })</p>
+        }
+        @if (PayFirst)
+        {
+            <p class="ops-editor__hint">@T["ui.pickup.pay_first_hint"]</p>
+        }
+    </section>
+    @if (CanBill)
+    {
+        <form method="post" action="/staff/pickup/@ShipmentId/bill" class="ops-editor__panel ops-editor__form" aria-labelledby="bill-title">
+            <AntiforgeryToken />
+            <input type="hidden" name="warehouse" value="@Here.Id" />
+            <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+            <h2 id="bill-title">@T["ui.pickup.bill"]</h2>
+            @if (DestinationCharges)
+            {
+                <label>@T["ui.charges.line.Duties"] <input name="duties" type="number" min="0" step="0.01" inputmode="decimal" /></label>
+                <label>@T["ui.charges.line.LocalTax"] <input name="localTax" type="number" min="0" step="0.01" inputmode="decimal" /></label>
+                <label>@T["ui.charges.line.LocalFee"] <input name="localFee" type="number" min="0" step="0.01" inputmode="decimal" /></label>
+            }
+            <button type="submit" class="vx-button">@T["ui.pickup.bill_button"]</button>
+            <p class="ops-editor__hint">@T["ui.pickup.bill_hint"]</p>
+        </form>
+    }
+    @if (Parcels.Any(parcel => parcel.Ready))
+    {
+        @if (Proofs.HasFlag(OperationsPickupProofs.Code))
+        {
+            <form method="post" action="/staff/pickup/@ShipmentId/code" class="ops-editor__panel ops-editor__form" aria-labelledby="code-title">
+                <AntiforgeryToken />
+                <input type="hidden" name="warehouse" value="@Here.Id" />
+                <h2 id="code-title">@T["ui.pickup.code"]</h2>
+                <p class="ops-editor__hint">@T[CodeSent ? "ui.pickup.code_sent" : "ui.pickup.code_not_sent"]</p>
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.pickup.code_send"]</button>
+            </form>
+        }
+        @if (!PayFirst)
+        {
+            <form method="post" action="/staff/pickup/@ShipmentId/release" enctype="multipart/form-data" class="ops-editor__panel ops-editor__form" aria-labelledby="release-title" data-signature-pad="@(Proofs.HasFlag(OperationsPickupProofs.Signature) ? "on" : null)">
+                <AntiforgeryToken />
+                <input type="hidden" name="warehouse" value="@Here.Id" />
+                <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+                <h2 id="release-title">@VixlyText.Format(T, "ui.pickup.release_title", "count", Parcels.Count(parcel => parcel.Ready))</h2>
+                <fieldset>
+                    <legend>@T["ui.pickup.collector_kind"]</legend>
+                    <label><input type="radio" name="collector" value="@OperationsPickupCollector.Recipient" checked /> @T["ui.pickup.collector.Recipient"] (@RecipientName)</label>
+                    @if (CollectorName is not null)
+                    {
+                        <label><input type="radio" name="collector" value="@OperationsPickupCollector.Named" /> @T["ui.pickup.collector.Named"] (@CollectorName)</label>
+                    }
+                    <label><input type="radio" name="collector" value="@OperationsPickupCollector.Customer" /> @T["ui.pickup.collector.Customer"] (@CustomerName)</label>
+                </fieldset>
+                @if (Proofs.HasFlag(OperationsPickupProofs.Id))
+                {
+                    <label>@T["ui.pickup.id_kind"]
+                        <select name="idKind" required>
+                            @foreach (OperationsPickupIdKind kind in Enum.GetValues<OperationsPickupIdKind>())
+                            {
+                                <option value="@kind">@T["ui.pickup.id_kind." + kind]</option>
+                            }
+                        </select>
+                    </label>
+                    <label>@T["ui.pickup.id_last"] <input name="idLast" maxlength="@OperationsPickupRelease.IdLastLength" minlength="@OperationsPickupRelease.IdLastLength" pattern="[A-Za-z0-9]{4}" autocomplete="off" required /></label>
+                    <p class="ops-editor__hint">@T["ui.pickup.id_hint"]</p>
+                }
+                @if (Proofs.HasFlag(OperationsPickupProofs.Code))
+                {
+                    <label>@T["ui.pickup.code_typed"] <input name="code" maxlength="@OperationsPickupCode.Length" inputmode="numeric" pattern="[0-9]{6}" autocomplete="off" required /></label>
+                }
+                @if (Proofs.HasFlag(OperationsPickupProofs.Photo))
+                {
+                    <label>@T["ui.pickup.photo"] <input name="photo" type="file" accept="image/jpeg,image/png,image/webp" capture="user" required /></label>
+                }
+                @if (Proofs.HasFlag(OperationsPickupProofs.Signature))
+                {
+                    <input type="hidden" name="signature" />
+                    <p class="ops-editor__hint">@T["ui.pickup.sign_here"]</p>
+                    <canvas width="600" height="160" aria-label="@T["ui.pickup.sign_here"]"></canvas>
+                    <p><button type="button" class="vx-button vx-button--secondary" data-signature-clear>@T["ui.counter.sign_clear"]</button></p>
+                }
+                <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.pickup.release"]</button></p>
+            </form>
+            @if (Proofs.HasFlag(OperationsPickupProofs.Signature))
+            {
+                <script src="/js/ops-signature.js?v=20261020-1" defer></script>
+            }
+        }
+    }
+    @if (Releases.Count > 0)
+    {
+        <section class="ops-editor__panel" aria-labelledby="releases-title">
+            <h2 id="releases-title">@T["ui.pickup.releases"]</h2>
+            <ul class="ops-editor__list">
+                @foreach (OperationsPickupReleaseRow release in Releases)
+                {
+                    <li>
+                        @VixlyText.Format(T, "ui.pickup.released_line", new Dictionary<string, object>
+                        {
+                            ["name"] = release.CollectorName, ["who"] = T["ui.pickup.collector." + release.Collector].Value, ["count"] = release.ParcelCount,
+                            ["date"] = OperationsDispatchWords.Time(release.ReleasedUtc, Here.TimeZone), ["warehouse"] = release.WarehouseCode
+                        })
+                        @if (release.IdKind is { } idKind) { <span> · @T["ui.pickup.id_kind." + idKind] …@release.IdLast</span> }
+                        @if (release.Signed) { <span> · @T["ui.pickup.signed"]</span> }
+                        @if (release.Photographed) { <span> · @T["ui.pickup.photographed"]</span> }
+                        @if (release.CodeChecked) { <span> · @T["ui.pickup.code_checked"]</span> }
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public Guid ShipmentId { get; set; }
+
+    [Parameter] public string Number { get; set; } = string.Empty;
+
+    [Parameter] public string CustomerName { get; set; } = string.Empty;
+
+    [Parameter] public string? CustomerPhone { get; set; }
+
+    [Parameter] public string? RecipientName { get; set; }
+
+    [Parameter] public string? RecipientPhone { get; set; }
+
+    [Parameter] public string? CollectorName { get; set; }
+
+    [Parameter] public string? CollectorPhone { get; set; }
+
+    [Parameter] public OperationsArrivalPlace Here { get; set; } = new(Guid.Empty, string.Empty, string.Empty, false);
+
+    [Parameter] public IReadOnlyList<OperationsPickupParcelRow> Parcels { get; set; } = Array.Empty<OperationsPickupParcelRow>();
+
+    [Parameter] public IReadOnlyList<OperationsPickupInvoiceRow> Invoices { get; set; } = Array.Empty<OperationsPickupInvoiceRow>();
+
+    [Parameter] public IReadOnlyList<OperationsPickupReleaseRow> Releases { get; set; } = Array.Empty<OperationsPickupReleaseRow>();
+
+    [Parameter] public decimal StorageOwed { get; set; }
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public OperationsPickupProofs Proofs { get; set; }
+
+    [Parameter] public bool DestinationCharges { get; set; }
+
+    [Parameter] public bool CanBill { get; set; }
+
+    [Parameter] public bool CodeSent { get; set; }
+
+    [Parameter] public bool PayFirst { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

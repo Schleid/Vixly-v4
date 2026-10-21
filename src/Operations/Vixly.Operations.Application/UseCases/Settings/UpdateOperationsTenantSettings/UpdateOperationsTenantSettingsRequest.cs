@@ -50,6 +50,14 @@ public sealed class UpdateOperationsTenantSettingsRequest
     // Slice 5F: an approved credit note; null keeps the current one.
     public string? CreditNotePrefix { get; init; }
 
+    // Slice 6A: bundles and repack boxes; null keeps the current one.
+    public string? BundlePrefix { get; init; }
+
+    public string? BoxPrefix { get; init; }
+
+    // Slice 6B.
+    public string? DispatchPrefix { get; init; }
+
     // Slice 4B: the company's IANA time zone (null keeps the current one).
     public string? TimeZone { get; init; }
 }

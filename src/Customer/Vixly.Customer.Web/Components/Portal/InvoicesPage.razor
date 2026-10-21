@@ -19,6 +19,10 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<CustomerText> T
 
 <CustomerShell Brand="@Brand" Title="@T["ui.invoices.title"]" SignedIn="true" Error="@Error" ReturnHere="/customer/invoices">
+    @if (Credit is { } credit)
+    {
+        <CreditAccountPanel Credit="credit" />
+    }
     @if (Invoices is { } invoices)
     {
         @if (invoices.Invoices.Count == 0)
@@ -38,7 +42,7 @@ IMPORTANT NOTES:
                             <td>@invoice.IssuedOn.ToString("d", CultureInfo.CurrentCulture)</td>
                             <td>@T["ui.invoices.kind." + invoice.Kind] @invoice.Reference</td>
                             <td>@Money(invoice.Total, invoice.CurrencyCode)</td>
-                            <td>@Money(invoice.Owed, invoice.CurrencyCode)</td>
+                            <td>@Money(Math.Max(invoice.Owed, 0m), invoice.CurrencyCode) <span class="customer-portal__status" data-status="@invoice.State">@T["ui.invoices.state." + invoice.State]</span></td>
                             <td>
                                 @foreach (CustomerCreditNoteDto note in invoice.CreditNotes)
                                 {
@@ -58,6 +62,9 @@ IMPORTANT NOTES:
     [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
 
     [Parameter] public CustomerInvoicesDto? Invoices { get; set; }
+
+    // Slice 5F step 2b: the customer's credit account, when there is one.
+    [Parameter] public CustomerCreditAccountDto? Credit { get; set; }
 
     [Parameter] public string? Error { get; set; }
 

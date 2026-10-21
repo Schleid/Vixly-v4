@@ -582,6 +582,30 @@ internal sealed class QuestPdfOperationsLabelRenderer : IOperationsLabelRenderer
     public byte[] RenderInvoice(Vixly.Operations.Application.Billing.OperationsInvoiceDocument document) =>
         OperationsInvoiceLayout.Render(document ?? throw new ArgumentNullException(nameof(document)), _text, number => BarcodeSvg(number, 6));
 
+    public byte[] RenderPaymentReceipt(Vixly.Operations.Application.Billing.OperationsPaymentReceipt receipt) =>
+        OperationsPaymentReceiptLayout.Render(receipt ?? throw new ArgumentNullException(nameof(receipt)), _text, number => BarcodeSvg(number, 6));
+
+    public byte[] RenderBundleLabel(Vixly.Operations.Application.Bundles.OperationsBundleLabel label) =>
+        OperationsBundleLabelLayout.Render(label ?? throw new ArgumentNullException(nameof(label)), _text, number => BarcodeSvg(number, 4));
+
+    public byte[] RenderRepackBoxLabel(Vixly.Operations.Application.Bundles.OperationsRepackBoxLabel label) =>
+        OperationsBundleLabelLayout.Render(label ?? throw new ArgumentNullException(nameof(label)), _text, number => BarcodeSvg(number, 4));
+
+    public byte[] RenderDispatchManifest(Vixly.Operations.Application.Dispatch.OperationsDispatchManifest manifest) =>
+        OperationsManifestLayout.RenderDispatch(manifest ?? throw new ArgumentNullException(nameof(manifest)), _text);
+
+    public byte[] RenderBundleManifest(Vixly.Operations.Application.Dispatch.OperationsBundleManifest manifest) =>
+        OperationsManifestLayout.RenderBundle(manifest ?? throw new ArgumentNullException(nameof(manifest)), _text);
+
+    public byte[] RenderHouseWaybills(IReadOnlyList<Vixly.Operations.Application.Dispatch.OperationsHouseWaybill> waybills) =>
+        OperationsWaybillLayout.RenderHouseWaybills(waybills ?? throw new ArgumentNullException(nameof(waybills)), _text);
+
+    public byte[] RenderShipperLetter(Vixly.Operations.Application.Dispatch.OperationsShipperLetter letter) =>
+        OperationsWaybillLayout.RenderShipperLetter(letter ?? throw new ArgumentNullException(nameof(letter)), _text);
+
+    public byte[] RenderCreditStatement(Vixly.Operations.Application.Billing.OperationsCreditStatement statement) =>
+        OperationsCreditStatementLayout.Render(statement ?? throw new ArgumentNullException(nameof(statement)), _text);
+
     // A stored signature that cannot be read is left out rather than failing the page (Slice 5D).
     private static Image? Picture(byte[]? content)
     {

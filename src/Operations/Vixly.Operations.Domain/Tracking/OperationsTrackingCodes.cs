@@ -58,6 +58,68 @@ public static class OperationsTrackingCodes
     // Slice 5C: the shipment is final (all its parcels in, measured and clear); its amount is fixed.
     public const string Booked = "ops.tracking.booked";
 
+    // Slice 6A: a parcel put in a bundle (customer: packed for departure; the bundle is internal), or in a consolidated shipment's repack box.
+    public const string Packed = "ops.tracking.packed";
+
+    public const string Boxed = "ops.tracking.boxed";
+
+    // Slice 6A: on the bundle itself (ADR-0021: the company sees them all).
+    public const string BundleCreated = "ops.tracking.bundle_created";
+
+    public const string BundleClosed = "ops.tracking.bundle_closed";
+
+    public const string BundleVoided = "ops.tracking.bundle_voided";
+
+    // Slice 6B (D-5): each parcel follows its dispatch; the customer sees departed, in transit and arrived in the destination country.
+    public const string Manifested = "ops.tracking.manifested";
+
+    public const string DepartedOrigin = "ops.tracking.departed_origin";
+
+    public const string InTransit = "ops.tracking.in_transit";
+
+    public const string ArrivedDestinationCountry = "ops.tracking.arrived_destination_country";
+
+    // On the dispatch itself.
+    public const string DispatchClosed = "ops.tracking.dispatch_closed";
+
+    public const string DispatchDeparted = "ops.tracking.dispatch_departed";
+
+    public const string DispatchArrived = "ops.tracking.dispatch_arrived";
+
+    public const string DispatchCancelled = "ops.tracking.dispatch_cancelled";
+
+    // Slice 6C (E-1, E-2): recorded by hand. A note is internal; a delay or an exception shows the customer its cause and an optional line.
+    public const string Note = "ops.tracking.note";
+
+    public const string Delayed = "ops.tracking.delayed";
+
+    public const string ExceptionRaised = "ops.tracking.exception";
+
+    // The causes' wording: a standard cause is worded by ui.event_reason.<cause>; a company's own carries its words in each language.
+    public static IReadOnlyList<string> CauseArguments { get; } = new[] { "label_en", "label_fr", "label_es", "message", "source" };
+
+    public static IReadOnlyList<string> ManualCodes { get; } = new[] { Note, Delayed, ExceptionRaised };
+
+    // Slice 7 (R-1, R-3): at the destination.
+    public const string ArrivedDestinationWarehouse = "ops.tracking.arrived_destination_warehouse";
+
+    public const string InCustoms = "ops.tracking.in_customs";
+
+    public const string CustomsCleared = "ops.tracking.customs_cleared";
+
+    public const string CustomsHeld = "ops.tracking.customs_held";
+
+    public const string ReadyForPickup = "ops.tracking.ready_for_pickup";
+
+    // Slice 7 step 2 (R-5, R-9): collected at the pickup counter, after payment and with the company's proof.
+    public const string PickedUp = "ops.tracking.picked_up";
+
+    public const string BundleArrived = "ops.tracking.bundle_arrived";
+
+    public const string BundleOpened = "ops.tracking.bundle_opened";
+
+    public const string DispatchReceived = "ops.tracking.dispatch_received";
+
     private const OperationsParcelFlags Inspection = OperationsParcelFlags.InspectionPending | OperationsParcelFlags.InspectionInProgress;
 
     // The results of an inspection (ADR-0022 outcomes).
@@ -77,7 +139,11 @@ public static class OperationsTrackingCodes
     // Slice 4D step 3: or the customer's mailbox code written on the label, checked by staff.
     public static IReadOnlyList<string> VerificationMethods { get; } = new[] { "tracking_number", "sender", "order_number", "label_code" };
 
-    public static IReadOnlyList<string> VoidReasons { get; } = new[] { "entered_in_error", "wrong_parcel", "wrong_step", "duplicate", "other" };
+    // Slice 6A: a parcel taken out of a bundle or a box, or freed when its bundle or box is voided.
+    public static IReadOnlyList<string> VoidReasons { get; } = new[] { "entered_in_error", "wrong_parcel", "wrong_step", "duplicate", "other", "taken_out", "bundle_voided", "box_voided", "dispatch_cancelled" };
+
+    // Slice 6B: how a parcel left its origin (the customer sees by air, by sea or by road).
+    public static IReadOnlyList<string> Modes { get; } = new[] { "air", "ocean", "ground" };
 
     public static IReadOnlyList<string> HoldReasonNames { get; } = Enum.GetNames<OperationsHoldReasons>().Where(name => name != nameof(OperationsHoldReasons.None)).ToArray();
 
@@ -101,6 +167,33 @@ public static class OperationsTrackingCodes
         Code(Auctioned, OperationsTrackingVisibility.Customer, OperationsMilestone.Disposed),
         Code(Cancelled, OperationsTrackingVisibility.Customer, OperationsMilestone.Cancelled),
         Code(Booked, OperationsTrackingVisibility.Customer, OperationsMilestone.Booked),
+        Code(Packed, OperationsTrackingVisibility.Customer, OperationsMilestone.Consolidated, arguments: new[] { "bundle" }),
+        Code(Boxed, OperationsTrackingVisibility.Internal, null, arguments: new[] { "box" }),
+        Code(BundleCreated, OperationsTrackingVisibility.Internal, null),
+        Code(BundleClosed, OperationsTrackingVisibility.Internal, null, arguments: new[] { "weight", "size" }),
+        Code(BundleVoided, OperationsTrackingVisibility.Internal, null),
+        Code(Manifested, OperationsTrackingVisibility.Customer, OperationsMilestone.Manifested, arguments: new[] { "dispatch" }) with { CustomerArguments = Array.Empty<string>() },
+        Code(DepartedOrigin, OperationsTrackingVisibility.Customer, OperationsMilestone.DepartedOrigin, arguments: new[] { "mode" }) with { Choices = Choice("mode", Modes), CustomerArguments = new[] { "mode" } },
+        Code(InTransit, OperationsTrackingVisibility.Customer, OperationsMilestone.InTransit, arguments: new[] { "place" }) with { CustomerArguments = new[] { "place" } },
+        Code(ArrivedDestinationCountry, OperationsTrackingVisibility.Customer, OperationsMilestone.ArrivedDestinationCountry, arguments: new[] { "country" }) with { CustomerArguments = new[] { "country" } },
+        Code(DispatchClosed, OperationsTrackingVisibility.Internal, null),
+        Code(DispatchDeparted, OperationsTrackingVisibility.Internal, null, arguments: new[] { "leg" }),
+        Code(DispatchArrived, OperationsTrackingVisibility.Internal, null, arguments: new[] { "leg" }),
+        Code(DispatchCancelled, OperationsTrackingVisibility.Internal, null),
+        Code(Note, OperationsTrackingVisibility.Internal, null),
+        Code(ArrivedDestinationWarehouse, OperationsTrackingVisibility.Customer, OperationsMilestone.ArrivedDestinationWarehouse, arguments: new[] { "place" }) with { CustomerArguments = new[] { "place" } },
+        Code(InCustoms, OperationsTrackingVisibility.Customer, OperationsMilestone.InCustoms),
+        Code(CustomsCleared, OperationsTrackingVisibility.Customer, OperationsMilestone.CustomsCleared, clears: OperationsParcelFlags.CustomsHeld),
+        Code(CustomsHeld, OperationsTrackingVisibility.Customer, null, sets: OperationsParcelFlags.CustomsHeld) with { OptionalArguments = new[] { "message" }, CustomerArguments = new[] { "message" } },
+        Code(ReadyForPickup, OperationsTrackingVisibility.Customer, OperationsMilestone.ReadyForPickup, arguments: new[] { "place" }) with { CustomerArguments = new[] { "place" } },
+        Code(PickedUp, OperationsTrackingVisibility.Customer, OperationsMilestone.Delivered, arguments: new[] { "place" }) with { CustomerArguments = new[] { "place" } },
+        Code(BundleArrived, OperationsTrackingVisibility.Internal, null, arguments: new[] { "warehouse" }),
+        Code(BundleOpened, OperationsTrackingVisibility.Internal, null, arguments: new[] { "warehouse" }),
+        Code(DispatchReceived, OperationsTrackingVisibility.Internal, null, arguments: new[] { "warehouse" }),
+        Code(Delayed, OperationsTrackingVisibility.Customer, null, arguments: new[] { "cause" }) with
+            { OptionalArguments = CauseArguments, CustomerArguments = new[] { "cause", "label_en", "label_fr", "label_es", "message" } },
+        Code(ExceptionRaised, OperationsTrackingVisibility.Customer, null, arguments: new[] { "cause" }) with
+            { OptionalArguments = CauseArguments, CustomerArguments = new[] { "cause", "label_en", "label_fr", "label_es", "message" } },
         Code(EventVoided, OperationsTrackingVisibility.Internal, null, arguments: new[] { "why" }) with { Choices = Choice("why", VoidReasons) }
     };
 

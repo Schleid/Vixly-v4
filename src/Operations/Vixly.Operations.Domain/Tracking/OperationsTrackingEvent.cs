@@ -88,6 +88,9 @@ public sealed class OperationsTrackingEvent : OperationsEntity
 
     public string? Note { get; private set; }
 
+    // Slice 6C (E-4): the event on a shipment, bundle or dispatch this parcel's copy comes from.
+    public Guid? CausedByEventId { get; private set; }
+
     public static OperationsTrackingEvent Record(Guid tenantId, OperationsTrackingDraft draft, DateTimeOffset recordedUtc)
     {
         ArgumentNullException.ThrowIfNull(draft);
@@ -143,7 +146,8 @@ public sealed class OperationsTrackingEvent : OperationsEntity
             Visibility = code.Visibility,
             IdempotencyKey = draft.IdempotencyKey,
             VoidsEventId = code.Voids ? draft.VoidsEventId : null,
-            Note = Clip(draft.Note, NoteMaxLength)
+            Note = Clip(draft.Note, NoteMaxLength),
+            CausedByEventId = draft.CausedByEventId
         };
     }
 
@@ -160,7 +164,7 @@ public sealed class OperationsTrackingEvent : OperationsEntity
     {
         Dictionary<string, string> given = arguments is null ? new(StringComparer.Ordinal) : new(arguments, StringComparer.Ordinal);
 
-        if (given.Keys.Any(name => !code.Arguments.Contains(name, StringComparer.Ordinal)))
+        if (given.Keys.Any(name => !code.Arguments.Contains(name, StringComparer.Ordinal) && !code.OptionalArguments.Contains(name, StringComparer.Ordinal)))
         {
             throw new DomainException(OperationsTrackingErrors.ArgumentUnknown);
         }

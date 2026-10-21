@@ -25,6 +25,16 @@ public sealed class ListOperationsShipmentsResponse
 
     public bool Succeeded { get; private init; }
 
+    // Slice 5F (C-7): where each final shipment's invoice stands (none: not final or made final before billing).
+    public IReadOnlyDictionary<Guid, Vixly.Operations.Domain.Billing.OperationsPaymentState> Payments { get; private set; } =
+        new Dictionary<Guid, Vixly.Operations.Domain.Billing.OperationsPaymentState>();
+
+    internal ListOperationsShipmentsResponse WithPayments(IReadOnlyDictionary<Guid, Vixly.Operations.Domain.Billing.OperationsPaymentState> payments)
+    {
+        Payments = payments;
+        return this;
+    }
+
     public Error? Error { get; private init; }
 
     public IReadOnlyList<OperationsShipmentRow> Rows { get; private init; } = Array.Empty<OperationsShipmentRow>();

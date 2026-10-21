@@ -45,6 +45,8 @@ public static class OperationsWebHost
         builder.Services.AddHostedService<OperationsPlatformFeedWorker>();
         builder.Services.AddSingleton<OperationsUnclaimedWorker>();
         builder.Services.AddHostedService(provider => provider.GetRequiredService<OperationsUnclaimedWorker>());
+        builder.Services.AddSingleton<OperationsStatementWorker>();
+        builder.Services.AddHostedService(provider => provider.GetRequiredService<OperationsStatementWorker>());
 
         if (builder.Environment.IsDevelopment())
         {
@@ -135,6 +137,13 @@ public static class OperationsWebHost
         app.MapOperationsQuotesEndpoints();
         app.MapOperationsSupplyEndpoints();
         app.MapOperationsInvoiceEndpoints();
+        app.MapOperationsCashierEndpoints();
+        app.MapOperationsBundleEndpoints();
+        app.MapOperationsDispatchEndpoints();
+        app.MapOperationsEventEndpoints();
+        app.MapOperationsArrivalEndpoints();
+        app.MapOperationsPickupEndpoints();
+        app.MapOperationsCreditEndpoints();
         app.MapOperationsSupplyStockEndpoints();
         app.MapOperationsPrinterEndpoints();
         app.MapOperationsPrintAgentEndpoints();

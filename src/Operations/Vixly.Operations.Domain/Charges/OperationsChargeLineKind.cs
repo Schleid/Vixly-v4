@@ -27,5 +27,11 @@ public enum OperationsChargeLineKind
     Preferred = 9,
 
     // Slice 4C, ground: a flat price for the whole shipment.
-    ShipmentFreight = 10
+    ShipmentFreight = 10,
+
+    // Slice 7 step 2 (R-4, R-10): at the destination.
+    Duties = 11,
+    LocalTax = 12,
+    LocalFee = 13,
+    Storage = 14
 }

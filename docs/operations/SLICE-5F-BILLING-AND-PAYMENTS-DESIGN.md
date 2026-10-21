@@ -110,6 +110,24 @@ Points marked *industry standard* follow common point-of-sale practice; each com
 
 Step 2b, credit accounts (F-10), follows: the credit department's accounts (limit, terms, statements), *Bill my account*, and paying the account at the cashier.
 
+## 5b. Step 2b in detail: credit accounts (from 2026-10-21)
+
+The owner's answers of 2026-10-20 (F-10) with common accounts-receivable practice (*open-item* accounts: each charged invoice stays owed until paid; the statement lists them with their due dates and age). Points marked *industry standard* are Claude's reading; each is a company setting or a credit department decision.
+
+| # | Decision |
+|---|---|
+| K-1 | **A credit account per customer**, opened by the **credit department** (the right *manage credit accounts*, formerly *allow customer credit*, with the second check). It has a **limit** in the company's currency, **terms** in days (empty: the company's), and a state: **active**, **on hold** or **closed**, each change with a reason, audited. Closed only once nothing is owed on it. The customer's old *credit allowed* mark follows the account (active: on). |
+| K-2 | **Settings → Credit:** the company's terms (**30 days** by default) and what happens **above the limit**: *refuse* (default) or *ask the credit department*. The monthly statement is on by default. Credit itself stays switched on or off in Settings (*allow credit*). |
+| K-3 | **Bill the account** at the cashier (right *take payments*): for a customer with an active account, the whole amount owed on the invoice is charged to the account, due after the terms (from the day it is charged). Within what is available, at once; above it, refused or waiting for the credit department, as the company chose. |
+| K-4 | **A charged invoice releases its shipment** (F-3): it can be bundled and dispatched; it stays **owed on the account** until it is paid at the cashier like any invoice (any method, Zelle checked by finance). Its state reads *on account*; waiting for the credit department, *awaiting credit approval* (not released). |
+| K-5 | **Available** = limit − owed on the account − charges awaiting approval. **Overdue**: what is past its due date. On hold or closed: no new charge; what is owed stays owed. An overdue account is not held by itself: the credit department decides (*industry standard*: shown, not automatic). |
+| K-6 | **The credit department's screens:** *Credit accounts* (each account's owed, available, overdue, state; open one for a customer by code), the account (its open items with due dates and their age: current, 1-30, 31-60, 61-90, over 90 days; change its limit, terms or state; the statement), *Charges to approve* (approve or refuse with a note; a person never approves a charge they asked for). |
+| K-7 | **The statement** (PDF, in the customer's language): the company, the customer, the date, every open item (invoice, reference, date, due date, amount, owed), the totals by age and the total due. **Monthly**: on the 1st, each customer with something owed gets an email saying their statement is ready, with the link to the portal. |
+| K-8 | **On the portal**, *Account*: owed, available, overdue, the open items and the statement PDF. Paying the account on the portal comes with Stripe (step 4). |
+| K-9 | **Corrections** work as before: a credit note lowers what is owed; a void (nothing paid) takes the invoice off the account. |
+
+**Details settled while building** (2026-10-21): deciding a charge asks for the second check and a refusal needs a note; a charge paid at the cashier while waiting leaves the queue; an account opened during a month gets its first notice on the 1st of the next; the old *credit allowed* toggle is gone, and customers marked that way before are listed on *Credit accounts* for the credit department to open (they cannot be billed until then). Verification: [Slice 5F verification](SLICE-5F-VERIFICATION.md), section 8.
+
 ## 6. Steps
 
 | Step | Content |

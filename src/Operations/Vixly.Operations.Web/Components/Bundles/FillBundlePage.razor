@@ -1,0 +1,83 @@
+﻿@*
+=========================================================
+FILE: FillBundlePage.razor
+
+PURPOSE:
+The fill station (Slice 6A, D-3 and D-10): scan the bundle or box barcode, then each parcel; large and keyboard-first for scanners.
+
+RESPONSIBILITIES:
+- Without a bundle: one scan box for the bundle or repack box barcode
+- With an open bundle: the scan box, the last scan's shipment, the last parcels with take out
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- A refusal says why (wrong destination, unpaid, on hold...); a split is a warning
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.bundles.fill_title"]" Company="@Company" Section="bundles" Error="@Error" Info="@Info">
+    <div class="ops-bundle-fill">
+    @if (Bundle is null)
+    {
+        <p><a href="/staff/bundles">@T["ui.bundles.back"]</a></p>
+        <form method="post" action="/staff/bundles/fill" class="ops-editor__panel ops-editor__search ops-bundle-fill__scan">
+            <AntiforgeryToken />
+            <label>@T["ui.bundles.scan_bundle"] <input name="code" maxlength="40" autocomplete="off" autofocus required /></label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.bundles.open_scan"]</button>
+        </form>
+    }
+    else
+    {
+        <p class="ops-editor__actions"><a href="/staff/bundles/@Bundle.Id">@T["ui.bundles.to_bundle"]</a> <a href="/staff/bundles/fill">@T["ui.bundles.change_bundle"]</a></p>
+        <section class="ops-editor__panel ops-bundle-fill__head" aria-labelledby="fill-title">
+            <h2 id="fill-title"><span class="ops-editor__code">@Bundle.Number</span> · @T["ui.services.name." + Bundle.ServiceCode]@if (Bundle.TypeName is { } type) { <text> · @type</text> }</h2>
+            <p class="ops-bundle-fill__meter">@VixlyText.Format(T, "ui.bundles.meter", new Dictionary<string, object> { ["count"] = Bundle.ParcelCount, ["filled"] = OperationsBundleWords.Fill(T, Bundle, WeightUnit) })</p>
+            @if (Bundle.IsOpen)
+            {
+                <form method="post" action="/staff/bundles/@Bundle.Id/scan" class="ops-editor__search ops-bundle-fill__scan">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+                    <label>@T["ui.bundles.scan_parcel"] <input name="code" maxlength="40" autocomplete="off" autofocus required /></label>
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.bundles.add"]</button>
+                </form>
+            }
+            else
+            {
+                <p class="ops-editor__notice">@T["ui.bundles.not_open"]</p>
+            }
+        </section>
+        @if (Focus is not null)
+        {
+            <BundleShipmentsPanel Title="@T["ui.bundles.last_scan"]" Id="last-scan" Lines="@(new[] { Focus })" />
+        }
+        <section class="ops-editor__panel" aria-labelledby="scanned-title">
+            <h2 id="scanned-title">@T["ui.bundles.scanned"]</h2>
+            @if (Parcels.Count == 0)
+            {
+                <div class="ops-editor__empty"><p>@T["ui.bundles.empty"]</p></div>
+            }
+            else
+            {
+                <BundleParcelsTable Parcels="@Parcels.Take(20).ToList()" WeightUnit="@WeightUnit" TakeOutFrom="@(Bundle.IsOpen ? Bundle.Id : null)" />
+            }
+        </section>
+    }
+    </div>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsBundle? Bundle { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsBundleParcelRow> Parcels { get; set; } = Array.Empty<OperationsBundleParcelRow>();
+
+    [Parameter] public OperationsBundleShipmentLine? Focus { get; set; }
+
+    [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

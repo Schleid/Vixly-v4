@@ -83,15 +83,15 @@ IMPORTANT NOTES:
     }
     else
     {
-        <p class="ops-editor__hint">@T["ui.supplies.stock.count_hint"]</p>
-        <form method="post" action="/staff/supplies/stock/counts" class="ops-editor__inline">
+        <form method="post" action="/staff/supplies/stock/counts" class="ops-list-bar" style="margin-top: 0.5rem;">
             <AntiforgeryToken />
             <input type="hidden" name="warehouse" value="@WarehouseId" />
-            <select name="category" aria-label="@T["ui.supplies.category"]">
+            <select name="category" aria-label="@T["ui.supplies.category"]" style="min-width: 14rem; height: 32px;">
                 <option value="">@T["ui.supplies.category_all"]</option>
                 @foreach (OperationsSupplyCategory category in Enum.GetValues<OperationsSupplyCategory>()) { <option value="@category">@T["ui.supplies.category." + category]</option> }
             </select>
-            <button type="submit" class="vx-button vx-button--secondary">@T["ui.supplies.stock.count_open"]</button>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.stock.count_open"]</button>
+            <span class="ops-editor__hint" style="margin: 0; margin-inline-start: 0.5rem;">@T["ui.supplies.stock.count_hint"]</span>
         </form>
     }
 </section>

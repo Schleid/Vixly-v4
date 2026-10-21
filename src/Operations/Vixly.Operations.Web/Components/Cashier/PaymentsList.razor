@@ -1,0 +1,46 @@
+﻿@*
+=========================================================
+FILE: PaymentsList.razor
+
+PURPOSE:
+The payments and refunds of an invoice (Slice 5F, C-3, C-6 and C-8).
+
+RESPONSIBILITIES:
+- List each payment with its tenders and state, each refund with its reason, with the receipt
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@if (Payments.Count > 0 || Refunds.Count > 0)
+{
+<section class="ops-editor__panel" aria-labelledby="payments-title">
+    <h2 id="payments-title">@T["ui.payments.list"]</h2>
+    <ul class="ops-cashier__payments">
+        @foreach (OperationsPayment payment in Payments)
+        {
+            <li>
+                <a href="/staff/cashier/payments/@payment.Id/receipt" target="_blank" rel="noopener">@payment.Number</a> · @payment.TakenUtc.ToString("g", CultureInfo.CurrentCulture)
+                @foreach (OperationsPaymentTender tender in payment.Tenders)
+                {
+                    <span class="ops-cashier__tender-line" data-status="@tender.Status"> · @OperationsPaymentWords.Method(T, tender.Method, Others) @OperationsInvoiceWords.Money(tender.Amount, payment.CurrencyCode)@(tender.Status == OperationsTenderStatus.Settled ? string.Empty : " (" + T["ui.payments.tender." + tender.Status].Value + ")")</span>
+                }
+            </li>
+        }
+        @foreach (OperationsRefund refund in Refunds)
+        {
+            <li data-refund>@refund.Number · @T["ui.payments.refund"] · @OperationsPaymentWords.Method(T, refund.Method, Others) -@refund.Amount.ToString("N2", CultureInfo.CurrentCulture) · @refund.Reason</li>
+        }
+    </ul>
+</section>
+}
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsPayment> Payments { get; set; } = Array.Empty<OperationsPayment>();
+
+    [Parameter] public IReadOnlyList<OperationsRefund> Refunds { get; set; } = Array.Empty<OperationsRefund>();
+
+    [Parameter] public IReadOnlyDictionary<OperationsPaymentMethod, string> Others { get; set; } = new Dictionary<OperationsPaymentMethod, string>();
+}

@@ -1,0 +1,48 @@
+﻿@*
+=========================================================
+FILE: BundleShipmentsPanel.razor
+
+PURPOSE:
+The shipments beside a bundle (Slice 6A, D-3): how many of their parcels are in bundles, and where the others are.
+
+RESPONSIBILITIES:
+- One row per shipment: in this bundle, in bundles, of how many; the missing parcels with their shelf or bundle
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- A split across bundles is a warning, never an error
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<section class="ops-editor__panel ops-bundle-shipments" aria-labelledby="@Id">
+    <h2 id="@Id">@Title</h2>
+    @foreach (OperationsBundleShipmentLine line in Lines)
+    {
+        <article class="ops-bundle-shipment" data-complete="@line.Complete" data-split="@line.Split">
+            <h3><a href="/staff/shipments/@line.ShipmentId">@(line.Number ?? "—")</a> · @VixlyText.Format(T, "ui.bundles.shipment_counts", new Dictionary<string, object> { ["bundled"] = line.InBundles, ["total"] = line.Parcels, ["here"] = line.InThis })</h3>
+            @if (line.Split)
+            {
+                <p class="ops-editor__notice" role="status">@T["ui.bundles.split_warning"]</p>
+            }
+            @if (line.Elsewhere.Count > 0)
+            {
+                <ul>
+                    @foreach (OperationsBundleMissing parcel in line.Elsewhere)
+                    {
+                        <li><span class="ops-editor__code">@parcel.Number</span> · @(parcel.BundleNumber is { } bundle ? VixlyText.Format(T, "ui.bundles.in_bundle", "number", bundle)
+                            : parcel.ShelfCode is { } shelf ? VixlyText.Format(T, "ui.bundles.on_shelf", "shelf", shelf) : T["ui.bundles.no_shelf"].Value)</li>
+                    }
+                </ul>
+            }
+        </article>
+    }
+</section>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+
+    [Parameter] public string Id { get; set; } = "bundle-shipments";
+
+    [Parameter] public IReadOnlyList<OperationsBundleShipmentLine> Lines { get; set; } = Array.Empty<OperationsBundleShipmentLine>();
+}

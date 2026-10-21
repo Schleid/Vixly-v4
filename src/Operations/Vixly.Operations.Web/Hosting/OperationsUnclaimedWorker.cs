@@ -82,7 +82,8 @@ public sealed class OperationsUnclaimedWorker : BackgroundService
         await using (AsyncServiceScope system = _scopes.CreateAsyncScope())
         {
             system.ServiceProvider.GetRequiredService<IOperationsTenantScope>().EnterSystem();
-            tenants = await system.ServiceProvider.GetRequiredService<IOperationsHoldRepository>().ListTenantsWithWaitingAsync(utcNow.AddDays(-OperationsHoldLimits.ReminderDays[0]), cancellationToken);
+            tenants = (await system.ServiceProvider.GetRequiredService<IOperationsHoldRepository>().ListTenantsWithWaitingAsync(utcNow.AddDays(-OperationsHoldLimits.ReminderDays[0]), cancellationToken))
+                .Union(await system.ServiceProvider.GetRequiredService<IOperationsPickupRepository>().ListTenantsWithRemindableAsync(utcNow, cancellationToken)).ToList();
         }
 
         int sent = 0;
@@ -102,6 +103,11 @@ public sealed class OperationsUnclaimedWorker : BackgroundService
 
                 services.GetRequiredService<IOperationsTenantScope>().Enter(tenantId);
                 sent += await services.GetRequiredService<OperationsUnclaimedReminders>().SendAsync(tenantId, account.Slug, utcNow, cancellationToken);
+
+                // Slice 7 step 2 (R-10): shipments waiting at their pickup counter, in their own scope's unit of work.
+                await using AsyncServiceScope pickup = _scopes.CreateAsyncScope();
+                pickup.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenantId);
+                sent += await pickup.ServiceProvider.GetRequiredService<Vixly.Operations.Application.Pickup.OperationsPickupReminders>().SendAsync(tenantId, account.Slug, utcNow, cancellationToken);
             }
             catch (Exception exception) when (exception is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
             {

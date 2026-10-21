@@ -46,6 +46,13 @@ internal sealed class FakeBillingStore : IOperationsBillingRepository
 
     public Task<bool> AnyInvoiceAsync(CancellationToken cancellationToken) => Task.FromResult(Invoices.Count > 0);
 
+    public Task<OperationsInvoice?> FindByNumberAsync(string number, CancellationToken cancellationToken) =>
+        Task.FromResult(Invoices.FirstOrDefault(invoice => invoice.Number == number || invoice.Reference == number));
+
+    public Task<IReadOnlyList<OperationsInvoice>> ListOpenInvoicesAsync(Guid customerId, IReadOnlyCollection<Guid> warehouseIds, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<OperationsInvoice>>(Invoices.Where(invoice => invoice.CustomerId == customerId && warehouseIds.Contains(invoice.WarehouseId)
+            && (invoice.Owed > 0m || invoice.PendingTotal > 0m)).ToList());
+
     public Task<OperationsCreditNote?> GetCreditNoteAsync(Guid creditNoteId, CancellationToken cancellationToken) =>
         Task.FromResult(CreditNotes.FirstOrDefault(note => note.Id == creditNoteId));
 

@@ -119,12 +119,115 @@ public sealed class OperationsInvoice : OperationsEntity
     // Approved credit notes, tax included.
     public decimal CreditedTotal { get; private set; }
 
-    // Slice 5F step 2: payments.
+    // Slice 5F step 2: payments settled, payments waiting for finance (Zelle, transfer), and money given back.
     public decimal PaidTotal { get; private set; }
 
-    public decimal Owed => Status == OperationsInvoiceStatus.Voided ? 0m : Total - CreditedTotal - PaidTotal;
+    public decimal PendingTotal { get; private set; }
 
-    public bool CanVoid => Status == OperationsInvoiceStatus.Issued && CreditedTotal == 0m && PaidTotal == 0m;
+    public decimal RefundedTotal { get; private set; }
+
+    // What the customer still has to pay; below zero, what can be given back after a credit note.
+    public decimal Owed => Status == OperationsInvoiceStatus.Voided ? 0m : Total - CreditedTotal - PaidTotal - PendingTotal + RefundedTotal;
+
+    // At most what was credited beyond what was owed, and never more than was paid (C-8).
+    public decimal Refundable => Owed < 0m ? Math.Min(-Owed, PaidTotal - RefundedTotal) : 0m;
+
+    public bool CanVoid => Status == OperationsInvoiceStatus.Issued && CreditedTotal == 0m && PaidTotal == 0m && PendingTotal == 0m;
+
+    public OperationsPaymentState PaymentState => Status == OperationsInvoiceStatus.Voided ? OperationsPaymentState.Voided
+        : Owed > 0m ? OnAccount switch
+        {
+            OperationsAccountCharge.Charged => OperationsPaymentState.OnAccount,
+            OperationsAccountCharge.AwaitingApproval => OperationsPaymentState.AwaitingCredit,
+            _ => OperationsPaymentState.Unpaid
+        }
+        : PendingTotal > 0m ? OnAccount == OperationsAccountCharge.Charged ? OperationsPaymentState.OnAccount : OperationsPaymentState.AwaitingConfirmation
+        : OperationsPaymentState.Paid;
+
+    // Slice 5F step 2b (K-3, K-4): billed to the customer's credit account; charged, the shipment is released and the invoice stays owed until paid.
+    public OperationsAccountCharge OnAccount { get; private set; }
+
+    public DateOnly? DueOn { get; private set; }
+
+    public Guid? AccountRequestedByUserId { get; private set; }
+
+    public DateTimeOffset? AccountRequestedUtc { get; private set; }
+
+    public Guid? AccountDecidedByUserId { get; private set; }
+
+    // Released for bundling and dispatch (F-3): paid, or charged to the account.
+    public bool Released => PaymentState is OperationsPaymentState.Paid or OperationsPaymentState.OnAccount;
+
+    // The cashier bills the account: at once within what is available, or waiting for the credit department (K-3).
+    public void ChargeToAccount(bool approved, DateOnly dueOn, Guid userId, DateTimeOffset utcNow)
+    {
+        EnsureIssued();
+
+        if (OnAccount != OperationsAccountCharge.None)
+        {
+            throw new DomainException(OperationsCreditErrors.AlreadyOnAccount);
+        }
+
+        if (Owed <= 0m || PendingTotal > 0m)
+        {
+            throw new DomainException(OperationsCreditErrors.NothingOwed);
+        }
+
+        (OnAccount, DueOn, AccountRequestedByUserId, AccountRequestedUtc) = (approved ? OperationsAccountCharge.Charged : OperationsAccountCharge.AwaitingApproval, approved ? dueOn : null, userId, utcNow);
+        AccountDecidedByUserId = approved ? userId : null;
+        MarkAsModified(utcNow);
+    }
+
+    // The credit department decides a charge above the limit; never the person who asked for it.
+    public void DecideCharge(bool approve, DateOnly dueOn, Guid userId, DateTimeOffset utcNow)
+    {
+        EnsureIssued();
+
+        if (OnAccount != OperationsAccountCharge.AwaitingApproval)
+        {
+            throw new DomainException(OperationsCreditErrors.NotAwaiting);
+        }
+
+        // Paid meanwhile at the cashier (review): nothing is left to put on the account.
+        if (Owed <= 0m)
+        {
+            throw new DomainException(OperationsCreditErrors.NothingOwed);
+        }
+
+        if (AccountRequestedByUserId == userId)
+        {
+            throw new DomainException(OperationsCreditErrors.OwnRequest);
+        }
+
+        (OnAccount, DueOn, AccountDecidedByUserId) = (approve ? OperationsAccountCharge.Charged : OperationsAccountCharge.None, approve ? dueOn : null, userId);
+        MarkAsModified(utcNow);
+    }
+
+    internal void Paid(decimal settled, decimal pending, DateTimeOffset utcNow)
+    {
+        EnsureIssued();
+        (PaidTotal, PendingTotal) = (PaidTotal + settled, PendingTotal + pending);
+        MarkAsModified(utcNow);
+    }
+
+    // Finance checked a Zelle or transfer: received, it is paid; not received, it is owed again.
+    internal void Confirmed(decimal amount, bool received, DateTimeOffset utcNow)
+    {
+        PendingTotal -= amount;
+
+        if (received)
+        {
+            PaidTotal += amount;
+        }
+
+        MarkAsModified(utcNow);
+    }
+
+    internal void Refunded(decimal amount, DateTimeOffset utcNow)
+    {
+        RefundedTotal += amount;
+        MarkAsModified(utcNow);
+    }
 
     public static OperationsInvoice Issue(Guid tenantId, string number, OperationsInvoiceDraft draft, DateOnly issuedOn, DateTimeOffset utcNow)
     {

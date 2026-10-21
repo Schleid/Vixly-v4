@@ -126,7 +126,7 @@ public sealed class SaveOperationsWarehouseUseCase
 
             warehouse.ChangeOperation(request.TimeZone, request.ManagerUserId, utcNow);
             warehouse.ChangeDestination(new OperationsDestinationTerms(request.DeliversHome, request.HubWarehouseId, request.OperatedBy, request.PartnerName, request.PartnerPhone,
-                request.PartnerEmail, request.HomeArea), utcNow);
+                request.PartnerEmail, request.HomeArea) { ClearsCustoms = request.ClearsCustoms }, utcNow);
 
             // Added once every rule passed.
             if (created)

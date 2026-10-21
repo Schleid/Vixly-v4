@@ -226,7 +226,6 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.ListOperationsCustomers.ListOperationsCustomersUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.GetOperationsCustomer.GetOperationsCustomerUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.ChangeOperationsCustomerStatus.ChangeOperationsCustomerStatusUseCase>();
-        services.AddScoped<Vixly.Operations.Application.UseCases.Customers.SetOperationsCustomerCredit.SetOperationsCustomerCreditUseCase>();
 
         // Receiving (Slice 3B).
         services.AddScoped<IOperationsReceivingRepository, OperationsReceivingRepository>();
@@ -238,6 +237,13 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<IOperationsChargeRepository, OperationsChargeRepository>();
         services.AddScoped<IOperationsSupplyRepository, OperationsSupplyRepository>();
         services.AddScoped<IOperationsBillingRepository, OperationsBillingRepository>();
+        services.AddScoped<IOperationsPaymentRepository, OperationsPaymentRepository>();
+        services.AddScoped<IOperationsBundleRepository, OperationsBundleRepository>();
+        services.AddScoped<IOperationsDispatchRepository, OperationsDispatchRepository>();
+        services.AddScoped<IOperationsEventRepository, OperationsEventRepository>();
+        services.AddScoped<IOperationsArrivalRepository, OperationsArrivalRepository>();
+        services.AddScoped<IOperationsPickupRepository, OperationsPickupRepository>();
+        services.AddScoped<IOperationsCreditRepository, OperationsCreditRepository>();
         services.AddScoped<Vixly.Operations.Application.Holds.OperationsUnclaimedReminders>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Holds.AnswerMyOperationsHold.AnswerMyOperationsHoldUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Holds.ReviewOperationsHoldAnswer.ReviewOperationsHoldAnswerUseCase>();
@@ -271,6 +277,122 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<Vixly.Operations.Application.UseCases.Counter.ConfirmOperationsSupplyOrder.ConfirmOperationsSupplyOrderUseCase>();
         // Slice 5F step 1: invoices and credit notes.
         services.AddScoped<Vixly.Operations.Application.Billing.OperationsBillingDesk>();
+        // Slice 5F step 2b: credit accounts.
+        services.AddScoped<Vixly.Operations.Application.Billing.OperationsCreditBook>();
+        services.AddScoped<Vixly.Operations.Application.Billing.OperationsCreditStatements>();
+        services.AddScoped<Vixly.Operations.Application.Billing.OperationsStatementNotices>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Credit.ListOperationsCreditAccounts.ListOperationsCreditAccountsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Credit.GetOperationsCreditAccount.GetOperationsCreditAccountUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Credit.OpenOperationsCreditAccount.OpenOperationsCreditAccountUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Credit.ChangeOperationsCreditAccount.ChangeOperationsCreditAccountUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Credit.ListOperationsCreditCharges.ListOperationsCreditChargesUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Credit.DecideOperationsCreditCharge.DecideOperationsCreditChargeUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.BillOperationsAccount.BillOperationsAccountUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Credit.GetOperationsCreditStatement.GetOperationsCreditStatementUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Credit.GetOperationsCreditSettings.GetOperationsCreditSettingsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Credit.SaveOperationsCreditSettings.SaveOperationsCreditSettingsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Billing.GetMyOperationsCreditAccount.GetMyOperationsCreditAccountUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Billing.GetMyOperationsCreditStatement.GetMyOperationsCreditStatementUseCase>();
+        // Slice 6A: bundles and repack boxes.
+        services.AddScoped<Vixly.Operations.Application.Bundles.OperationsBundleDesk>();
+        services.AddScoped<Vixly.Operations.Application.Bundles.OperationsBundling>();
+        services.AddScoped<Vixly.Operations.Application.Bundles.OperationsBundleShipments>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.GetOperationsBundles.GetOperationsBundlesUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.CreateOperationsBundle.CreateOperationsBundleUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.GetOperationsBundle.GetOperationsBundleUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.FindOperationsBundleCode.FindOperationsBundleCodeUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.ScanIntoOperationsBundle.ScanIntoOperationsBundleUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.TakeOutOfOperationsBundle.TakeOutOfOperationsBundleUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.CloseOperationsBundle.CloseOperationsBundleUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.VoidOperationsBundle.VoidOperationsBundleUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.GetOperationsBundleLabel.GetOperationsBundleLabelUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.GetOperationsRepackBoxes.GetOperationsRepackBoxesUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.ChooseOperationsConsolidation.ChooseOperationsConsolidationUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.OpenOperationsRepackBox.OpenOperationsRepackBoxUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.GetOperationsRepackBox.GetOperationsRepackBoxUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.ScanIntoOperationsRepackBox.ScanIntoOperationsRepackBoxUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.TakeOutOfOperationsRepackBox.TakeOutOfOperationsRepackBoxUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.CloseOperationsRepackBox.CloseOperationsRepackBoxUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.VoidOperationsRepackBox.VoidOperationsRepackBoxUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.GetOperationsRepackBoxLabel.GetOperationsRepackBoxLabelUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.GetOperationsBundleSettings.GetOperationsBundleSettingsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.SaveOperationsBundleSettings.SaveOperationsBundleSettingsUseCase>();
+        // Slice 7 step 2: the pickup counter.
+        services.AddScoped<Vixly.Operations.Application.Pickup.OperationsPickupDesk>();
+        services.AddScoped<Vixly.Operations.Application.Pickup.OperationsPickupReminders>();
+        services.AddScoped<Vixly.Operations.Application.Pickup.OperationsPickupCodes>();
+        services.AddSingleton<IOperationsSecretProtector, Vixly.Operations.Infrastructure.Security.OperationsSecretProtector>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Pickup.GetOperationsPickups.GetOperationsPickupsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Pickup.GetOperationsPickup.GetOperationsPickupUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Pickup.BillOperationsPickup.BillOperationsPickupUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Pickup.SendOperationsPickupCode.SendOperationsPickupCodeUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Pickup.ReleaseOperationsPickup.ReleaseOperationsPickupUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Pickup.GetOperationsPickupSettings.GetOperationsPickupSettingsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Pickup.SaveOperationsPickupSettings.SaveOperationsPickupSettingsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Pickup.ChangeMyOperationsCollector.ChangeMyOperationsCollectorUseCase>();
+        // Slice 7 step 1: destination receiving.
+        services.AddScoped<Vixly.Operations.Application.Arrivals.OperationsArrivalDesk>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Arrivals.GetOperationsArrivals.GetOperationsArrivalsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Arrivals.GetOperationsArrival.GetOperationsArrivalUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Arrivals.ScanOperationsArrival.ScanOperationsArrivalUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Arrivals.OpenOperationsArrivalBundle.OpenOperationsArrivalBundleUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Arrivals.FinishOperationsArrival.FinishOperationsArrivalUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Arrivals.RecordOperationsCustoms.RecordOperationsCustomsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Arrivals.GetOperationsDiscrepancies.GetOperationsDiscrepanciesUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Arrivals.ResolveOperationsDiscrepancy.ResolveOperationsDiscrepancyUseCase>();
+        // Slice 6C: operational events.
+        services.AddScoped<Vixly.Operations.Application.Events.OperationsEventDesk>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Events.FindOperationsEventSubject.FindOperationsEventSubjectUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Events.GetOperationsEventTimeline.GetOperationsEventTimelineUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Events.AddOperationsEvent.AddOperationsEventUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Events.VoidOperationsEvent.VoidOperationsEventUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Events.GetOperationsEventSettings.GetOperationsEventSettingsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Events.SaveOperationsEventSettings.SaveOperationsEventSettingsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Events.SaveOperationsEventReason.SaveOperationsEventReasonUseCase>();
+        // Slice 6B: carriers, dispatches and manifests.
+        services.AddScoped<Vixly.Operations.Application.Dispatch.OperationsDispatching>();
+        services.AddScoped<Vixly.Operations.Application.Dispatch.OperationsManifests>();
+        services.AddScoped<Vixly.Operations.Application.Dispatch.OperationsDispatchPapers>();
+        services.AddScoped<Vixly.Operations.Application.Dispatch.OperationsDispatchCosting>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.RecostOperationsDispatch.RecostOperationsDispatchUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.CorrectOperationsDispatchCost.CorrectOperationsDispatchCostUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.SaveOperationsDispatchInstructions.SaveOperationsDispatchInstructionsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.GetOperationsHouseWaybills.GetOperationsHouseWaybillsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.GetOperationsShipperLetter.GetOperationsShipperLetterUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.GetOperationsCarriers.GetOperationsCarriersUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.GetOperationsCarrier.GetOperationsCarrierUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.SaveOperationsCarrier.SaveOperationsCarrierUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.AddOperationsCarrierRate.AddOperationsCarrierRateUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.RemoveOperationsCarrierRate.RemoveOperationsCarrierRateUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.GetOperationsDispatches.GetOperationsDispatchesUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.CreateOperationsDispatch.CreateOperationsDispatchUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.GetOperationsDispatch.GetOperationsDispatchUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.AddBundleToOperationsDispatch.AddBundleToOperationsDispatchUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.RemoveBundleFromOperationsDispatch.RemoveBundleFromOperationsDispatchUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.AddOperationsDispatchLeg.AddOperationsDispatchLegUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.RemoveOperationsDispatchLeg.RemoveOperationsDispatchLegUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.CloseOperationsDispatch.CloseOperationsDispatchUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.DepartOperationsDispatchLeg.DepartOperationsDispatchLegUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.ArriveOperationsDispatchLeg.ArriveOperationsDispatchLegUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.CancelOperationsDispatch.CancelOperationsDispatchUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.GetOperationsDispatchManifest.GetOperationsDispatchManifestUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dispatch.GetOperationsBundleManifest.GetOperationsBundleManifestUseCase>();
+        // Slice 5F step 2: the cashier.
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.GetOperationsCashier.GetOperationsCashierUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.GetOperationsCashierInvoice.GetOperationsCashierInvoiceUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.TakeOperationsPayment.TakeOperationsPaymentUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.GetOperationsPayment.GetOperationsPaymentUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.GetOperationsPaymentReceipt.GetOperationsPaymentReceiptUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.OpenOperationsCashDrawer.OpenOperationsCashDrawerUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.CloseOperationsCashDrawer.CloseOperationsCashDrawerUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.ListOperationsCashDrawers.ListOperationsCashDrawersUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.GetOperationsCashDrawer.GetOperationsCashDrawerUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.ListOperationsPaymentsToVerify.ListOperationsPaymentsToVerifyUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.CheckOperationsPayment.CheckOperationsPaymentUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.RefundOperationsPayment.RefundOperationsPaymentUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.GetOperationsPaymentSettings.GetOperationsPaymentSettingsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.SaveOperationsPaymentSettings.SaveOperationsPaymentSettingsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.GetOperationsZelleQr.GetOperationsZelleQrUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Billing.ListOperationsInvoices.ListOperationsInvoicesUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Billing.GetOperationsInvoice.GetOperationsInvoiceUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Billing.GetOperationsInvoiceDocument.GetOperationsInvoiceDocumentUseCase>();
@@ -342,6 +464,11 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<Vixly.Operations.Application.UseCases.Printing.FinishOperationsPrintJob.FinishOperationsPrintJobUseCase>();
         services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Receiving.OperationsParcelNoticeHandler>();
         services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Tickets.OperationsTicketNoticeHandler>();
+        services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Billing.OperationsPaymentNoticeHandler>();
+        services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Billing.OperationsStatementNoticeHandler>();
+        services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Events.OperationsEventNoticeHandler>();
+        services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Arrivals.OperationsPickupNoticeHandler>();
+        services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Pickup.OperationsPickupReminderHandler>();
         // Operations.Web writes the files and Operations.Api reads them for the portal: both must name the same folder.
         services.AddOptions<Vixly.Operations.Infrastructure.Files.OperationsFileOptions>()
             .Bind(configuration.GetSection(Vixly.Operations.Infrastructure.Files.OperationsFileOptions.SectionName))

@@ -84,7 +84,7 @@ internal static class OperationsInvoiceLayout
                     });
                     row.RelativeItem().Column(about =>
                     {
-                        about.Item().Text(Word(invoice.Kind == OperationsInvoiceKind.Shipment ? "shipment" : "order")).FontSize(9).SemiBold();
+                        about.Item().Text(Word(invoice.Kind switch { OperationsInvoiceKind.Shipment => "shipment", OperationsInvoiceKind.Destination => "destination", _ => "order" })).FontSize(9).SemiBold();
                         about.Item().Text(invoice.Reference);
 
                         if (invoice.Route is { } route)
@@ -251,7 +251,17 @@ internal static class OperationsInvoiceLayout
                 Row(text["ui.invoice.pdf.paid"].Value, -invoice.PaidTotal);
             }
 
-            Row(text["ui.invoice.pdf.owed"].Value, invoice.Owed, true);
+            if (invoice.PendingTotal > 0m)
+            {
+                Row(text["ui.invoice.pdf.pending"].Value, -invoice.PendingTotal);
+            }
+
+            if (invoice.RefundedTotal > 0m)
+            {
+                Row(text["ui.invoice.pdf.refunded"].Value, invoice.RefundedTotal);
+            }
+
+            Row(text["ui.invoice.pdf.owed"].Value, Math.Max(invoice.Owed, 0m), true);
         });
     }
 

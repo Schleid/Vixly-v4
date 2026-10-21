@@ -94,7 +94,8 @@ public sealed class UpdateOperationsTenantSettingsUseCase
             settings.ChangeCurrency(request.CurrencyCode, anyInvoice, utcNow);
             settings.ChangeWork(request.WeightUnit, request.DimensionUnit, request.AllowCollect, request.AllowCredit, request.DeliveryModes, utcNow);
             settings.ChangePrefixes(request.ShipmentPrefix, request.ReceivingPrefix, request.InvoicePrefix, request.PaymentPrefix, request.CustomerPrefix ?? settings.CustomerPrefix, request.ParcelPrefix ?? settings.ParcelPrefix,
-                request.SupplyOrderPrefix ?? settings.SupplyOrderPrefix, request.CreditNotePrefix ?? settings.CreditNotePrefix, utcNow);
+                request.SupplyOrderPrefix ?? settings.SupplyOrderPrefix, request.CreditNotePrefix ?? settings.CreditNotePrefix, request.BundlePrefix ?? settings.BundlePrefix,
+                request.BoxPrefix ?? settings.BoxPrefix, request.DispatchPrefix ?? settings.DispatchPrefix, utcNow);
             settings.RequireSecondFactor(request.RequireSecondFactorForAllStaff, utcNow);
 
             if (request.TimeZone is not null)
@@ -128,6 +129,7 @@ public sealed class UpdateOperationsTenantSettingsUseCase
         credit = settings.AllowCredit,
         delivery = settings.DeliveryModes.ToString(),
         secondFactorForAll = settings.RequireSecondFactorForAllStaff,
-        prefixes = new[] { settings.ShipmentPrefix, settings.ReceivingPrefix, settings.InvoicePrefix, settings.PaymentPrefix, settings.CustomerPrefix, settings.ParcelPrefix, settings.SupplyOrderPrefix, settings.CreditNotePrefix }
+        prefixes = new[] { settings.ShipmentPrefix, settings.ReceivingPrefix, settings.InvoicePrefix, settings.PaymentPrefix, settings.CustomerPrefix, settings.ParcelPrefix, settings.SupplyOrderPrefix, settings.CreditNotePrefix,
+            settings.BundlePrefix, settings.BoxPrefix, settings.DispatchPrefix }
     };
 }

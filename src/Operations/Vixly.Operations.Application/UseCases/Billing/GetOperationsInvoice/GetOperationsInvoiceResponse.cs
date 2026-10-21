@@ -24,6 +24,26 @@ public sealed class GetOperationsInvoiceResponse
 
     public bool Succeeded { get; private init; }
 
+    // Slice 5F step 2: its payments and refunds, and what the person may do with it at the cashier.
+    public IReadOnlyList<OperationsPayment> Payments { get; private set; } = Array.Empty<OperationsPayment>();
+
+    public IReadOnlyList<OperationsRefund> Refunds { get; private set; } = Array.Empty<OperationsRefund>();
+
+    public bool CanTake { get; private set; }
+
+    public bool CanRefund { get; private set; }
+
+    public IReadOnlyDictionary<OperationsPaymentMethod, string> OtherNames { get; private set; } = new Dictionary<OperationsPaymentMethod, string>();
+
+    public IReadOnlyList<OperationsPaymentMethod> Methods { get; private set; } = Array.Empty<OperationsPaymentMethod>();
+
+    internal GetOperationsInvoiceResponse WithPayments(IReadOnlyList<OperationsPayment> payments, IReadOnlyList<OperationsRefund> refunds, bool canTake, bool canRefund,
+        IReadOnlyDictionary<OperationsPaymentMethod, string> otherNames, IReadOnlyList<OperationsPaymentMethod> methods)
+    {
+        (Payments, Refunds, CanTake, CanRefund, OtherNames, Methods) = (payments, refunds, canTake, canRefund, otherNames, methods);
+        return this;
+    }
+
     public Error? Error { get; private init; }
 
     public OperationsInvoice Invoice { get; private init; } = null!;

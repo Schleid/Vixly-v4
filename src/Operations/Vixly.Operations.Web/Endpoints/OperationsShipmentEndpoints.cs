@@ -49,6 +49,7 @@ public static class OperationsShipmentEndpoints
             {
                 Company = await OperationsStaffResults.CompanyAsync(http, brand),
                 Rows = response.Rows,
+                Payments = response.Payments,
                 TotalCount = response.TotalCount,
                 Counts = response.Counts,
                 Warehouses = response.Warehouses,

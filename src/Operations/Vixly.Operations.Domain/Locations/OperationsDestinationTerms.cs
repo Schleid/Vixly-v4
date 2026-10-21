@@ -19,4 +19,8 @@ public sealed record OperationsDestinationTerms(
     string? PartnerName,
     string? PartnerPhone,
     string? PartnerEmail,
-    IReadOnlyList<string>? HomeArea);
+    IReadOnlyList<string>? HomeArea)
+{
+    // Slice 7 (R-3): the destination records customs (in customs, cleared, held) before parcels are released.
+    public bool ClearsCustoms { get; init; }
+}

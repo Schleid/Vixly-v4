@@ -51,13 +51,34 @@ public static class CustomerInvoiceEndpoints
                 return Results.Redirect("/customer/sign-in");
             }
 
+            CustomerCall<CustomerCreditAccountDto> credit = await api.GetCreditAccountAsync(tenant, session, http, http.RequestAborted);
+
             return new RazorComponentResult<InvoicesPage>(new
             {
                 Brand = await api.GetBrandAsync(tenant, http.RequestAborted),
                 Invoices = call.Value,
+                Credit = credit.Value is { HasAccount: true } account ? account : null,
                 Error = call.Value is null ? CustomerPortalEndpoints.Describe(text, call) : null
             });
         });
+
+        // Slice 5F step 2b (K-8): the credit account's statement.
+        portal.MapGet("/statement", async (HttpContext http, CustomerOperationsApi api) =>
+        {
+            if (CustomerTenantMiddleware.Host(http)?.TenantId is not { } tenant || CustomerSessionCookie.Read(http.Request) is not { } session
+                || await api.GetCreditStatementAsync(tenant, session, http, http.RequestAborted) is not { } document)
+            {
+                return Results.NotFound();
+            }
+
+            http.Response.Headers.CacheControl = "private, no-store";
+            http.Response.Headers.XContentTypeOptions = "nosniff";
+            http.Response.Headers.ContentSecurityPolicy = "default-src 'none'; sandbox";
+            return Results.File(document.Content, "application/pdf", document.FileName);
+        });
+
+        // The monthly notice links here: the account is shown with the invoices.
+        endpoints.MapGet("/account", () => Results.Redirect("/customer/invoices#account"));
 
         portal.MapGet("/{invoiceId:guid}/pdf", async (HttpContext http, Guid invoiceId, Guid? credit, CustomerOperationsApi api) =>
         {

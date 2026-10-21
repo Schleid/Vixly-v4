@@ -539,6 +539,10 @@ public sealed partial class OperationsCustomerPackageFlowTests : IClassFixture<O
             Vixly.Operations.Domain.Billing.OperationsCreditNote credit = Vixly.Operations.Domain.Billing.OperationsCreditNote.RequestCredit(_tenant, invoice,
                 new Dictionary<Guid, decimal> { [invoice.Lines[0].Id] = 4.50m }, "Damaged", Guid.NewGuid(), Guid.NewGuid(), now);
             credit.Approve(invoice, "CN26000777", Guid.NewGuid(), DateOnly.FromDateTime(now.UtcDateTime), now);
+
+            // Slice 5F step 2b: billed to Ana's credit account, due in 30 days.
+            invoice.ChargeToAccount(true, DateOnly.FromDateTime(now.UtcDateTime).AddDays(30), Guid.NewGuid(), now);
+            context.Add(Vixly.Operations.Domain.Billing.OperationsCreditAccount.Open(_tenant, anaId, 500m, null, Guid.NewGuid(), now));
             context.AddRange(invoice, credit);
             (invoiceId, creditId) = (invoice.Id, credit.Id);
             return Task.CompletedTask;
@@ -551,11 +555,17 @@ public sealed partial class OperationsCustomerPackageFlowTests : IClassFixture<O
         HttpResponseMessage pdf = await ana.GetAsync("/customer/invoices/" + invoiceId + "/pdf");
         Assert.Equal("application/pdf", pdf.Content.Headers.ContentType?.MediaType);
         Assert.Equal("application/pdf", (await ana.GetAsync("/customer/invoices/" + invoiceId + "/pdf?credit=" + creditId)).Content.Headers.ContentType?.MediaType);
+        Assert.Contains("Your credit account", list, StringComparison.Ordinal);
+        Assert.Contains("On your account", list, StringComparison.Ordinal);
+        Assert.Contains("pay within 30 days", list, StringComparison.Ordinal);
+        Assert.Equal("application/pdf", (await ana.GetAsync("/customer/invoices/statement")).Content.Headers.ContentType?.MediaType);
 
         // Another customer never sees it nor prints it.
         Browser ben = await ConfirmedAsync("ben@example.com");
         Assert.DoesNotContain("INV26000777", await ben.GetStringAsync("/customer/invoices"), StringComparison.Ordinal);
         Assert.Equal(HttpStatusCode.NotFound, (await ben.GetAsync("/customer/invoices/" + invoiceId + "/pdf")).StatusCode);
+        Assert.DoesNotContain("Your credit account", WebUtility.HtmlDecode(await ben.GetStringAsync("/customer/invoices")), StringComparison.Ordinal);
+        Assert.Equal(HttpStatusCode.NotFound, (await ben.GetAsync("/customer/invoices/statement")).StatusCode);
     }
 
     // Slice 4D step 4: a customer reports a package the carrier delivered; staff find it and the customer sees it, never another customer.
@@ -872,6 +882,35 @@ public sealed partial class OperationsCustomerPackageFlowTests : IClassFixture<O
 
     private static OperationsLocationDetails Details(string code, string name) =>
         new(code, name, OperationsPostalAddress.Create("8400 NW 25th St", null, "Doral", "FL", "33122", "US"), null, null, null, true);
+
+    // Slice 7 step 2 (R-6): once the shipment is booked, the customer names who may collect it (same rules as the recipient), or no one; never another customer's.
+    [SqlServerFact]
+    public async Task Customer_NamesWhoMayCollect_OnceBooked()
+    {
+        Browser ana = await ConfirmedAsync("ana.collect@example.com");
+        string shipmentPath = (await ana.PostAsync("/customer/packages/shipments/new", "/customer/packages/shipments/new", Shipment("TBA0003330001"))).Headers.Location!.OriginalString;
+        Guid shipment = Guid.Parse(shipmentPath["/customer/packages/shipments/".Length..^"?done=created".Length]);
+        string page = "/customer/packages/shipments/" + shipment;
+        string collector = page + "/collector";
+        Dictionary<string, string> cousin = new() { ["collectorName"] = "Marie Joseph", ["collectorPhone"] = "+50937111111" };
+        Assert.DoesNotContain("name=\"collectorName\"", await ana.GetStringAsync(page), StringComparison.Ordinal);
+        Assert.Contains("once the shipment is booked", WebUtility.HtmlDecode(await Read(await ana.PostAsync(page, collector, cousin))), StringComparison.Ordinal);
+
+        await WithDatabaseAsync(context => context.Database.ExecuteSqlInterpolatedAsync($"UPDATE [ops].[Shipments] SET [Status] = 1 WHERE [Id] = {shipment}"));
+        Assert.Contains("name=\"collectorName\"", await ana.GetStringAsync(page), StringComparison.Ordinal);
+        Dictionary<string, string> local = new() { ["collectorName"] = "Marie Joseph", ["collectorPhone"] = "37111111" };
+        Assert.DoesNotContain("done=collector", (await ana.PostAsync(page, collector, local)).Headers.Location?.OriginalString ?? string.Empty, StringComparison.Ordinal);
+        Assert.Equal(page + "?done=collector", (await ana.PostAsync(page, collector, cousin)).Headers.Location?.OriginalString);
+        Assert.Contains("value=\"Marie Joseph\"", await ana.GetStringAsync(page), StringComparison.Ordinal);
+
+        // Another customer: not found.
+        Browser ben = await ConfirmedAsync("ben.collect@example.com");
+        Assert.Equal(HttpStatusCode.NotFound, (await ben.PostAsync("/customer/packages", collector, cousin)).StatusCode);
+
+        // No one: both cleared.
+        Assert.Equal(page + "?done=collector", (await ana.PostAsync(page, collector, new() { ["collectorName"] = "", ["collectorPhone"] = "" })).Headers.Location?.OriginalString);
+        Assert.DoesNotContain("value=\"Marie Joseph\"", await ana.GetStringAsync(page), StringComparison.Ordinal);
+    }
 
     private async Task WithDatabaseAsync(Func<OperationsDbContext, Task> work)
     {

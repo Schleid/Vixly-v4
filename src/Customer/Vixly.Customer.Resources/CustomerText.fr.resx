@@ -176,6 +176,9 @@
   <data name="ops.shipments.booked" xml:space="preserve">
     <value>Cet envoi est finalisé : il ne peut plus changer.</value>
   </data>
+  <data name="ops.shipments.collector_locked" xml:space="preserve">
+    <value>La personne qui peut retirer l’envoi se désigne une fois l’envoi réservé, jusqu’au retrait.</value>
+  </data>
   <data name="ops.shipments.delivery_mode_unavailable" xml:space="preserve">
     <value>Cette livraison n’est pas proposée là-bas. Choisissez le retrait en agence ou la livraison à une adresse.</value>
   </data>
@@ -278,6 +281,42 @@
   <data name="ui.app.name" xml:space="preserve">
     <value>Espace client</value>
   </data>
+  <data name="ui.credit.available" xml:space="preserve">
+    <value>Disponible</value>
+  </data>
+  <data name="ui.credit.awaiting" xml:space="preserve">
+    <value>En attente d’approbation</value>
+  </data>
+  <data name="ui.credit.due" xml:space="preserve">
+    <value>Échéance</value>
+  </data>
+  <data name="ui.credit.items" xml:space="preserve">
+    <value>Pièces ouvertes</value>
+  </data>
+  <data name="ui.credit.overdue" xml:space="preserve">
+    <value>En retard</value>
+  </data>
+  <data name="ui.credit.owed" xml:space="preserve">
+    <value>Dû</value>
+  </data>
+  <data name="ui.credit.state.active" xml:space="preserve">
+    <value>Actif</value>
+  </data>
+  <data name="ui.credit.state.closed" xml:space="preserve">
+    <value>Fermé</value>
+  </data>
+  <data name="ui.credit.state.onhold" xml:space="preserve">
+    <value>Suspendu</value>
+  </data>
+  <data name="ui.credit.statement" xml:space="preserve">
+    <value>Télécharger le relevé (PDF)</value>
+  </data>
+  <data name="ui.credit.terms" xml:space="preserve">
+    <value>Limite {limit} · à régler sous {days} jours</value>
+  </data>
+  <data name="ui.credit.title" xml:space="preserve">
+    <value>Votre compte de crédit</value>
+  </data>
   <data name="ui.done.saved" xml:space="preserve">
     <value>Vos modifications sont enregistrées.</value>
   </data>
@@ -343,6 +382,54 @@
   </data>
   <data name="ui.estimate.what_if" xml:space="preserve">
     <value>Et si</value>
+  </data>
+  <data name="ui.event_reason.address_problem" xml:space="preserve">
+    <value>Problème d’adresse</value>
+  </data>
+  <data name="ui.event_reason.capacity" xml:space="preserve">
+    <value>Pas de place sur le départ prévu</value>
+  </data>
+  <data name="ui.event_reason.carrier_delay" xml:space="preserve">
+    <value>Retard du transporteur</value>
+  </data>
+  <data name="ui.event_reason.customs_hold" xml:space="preserve">
+    <value>Retenu par la douane</value>
+  </data>
+  <data name="ui.event_reason.customs_inspection" xml:space="preserve">
+    <value>Inspection douanière</value>
+  </data>
+  <data name="ui.event_reason.damaged" xml:space="preserve">
+    <value>Colis endommagé</value>
+  </data>
+  <data name="ui.event_reason.documents_missing" xml:space="preserve">
+    <value>Documents manquants</value>
+  </data>
+  <data name="ui.event_reason.documents_pending" xml:space="preserve">
+    <value>En attente de documents</value>
+  </data>
+  <data name="ui.event_reason.flight_rebooked" xml:space="preserve">
+    <value>Vol reprogrammé par la compagnie</value>
+  </data>
+  <data name="ui.event_reason.holiday" xml:space="preserve">
+    <value>Jour férié</value>
+  </data>
+  <data name="ui.event_reason.missed_connection" xml:space="preserve">
+    <value>Correspondance manquée</value>
+  </data>
+  <data name="ui.event_reason.missing_in_transit" xml:space="preserve">
+    <value>Manquant en transit</value>
+  </data>
+  <data name="ui.event_reason.recipient_unreachable" xml:space="preserve">
+    <value>Destinataire injoignable</value>
+  </data>
+  <data name="ui.event_reason.refused" xml:space="preserve">
+    <value>Refusé par le destinataire</value>
+  </data>
+  <data name="ui.event_reason.security_check" xml:space="preserve">
+    <value>Contrôle de sécurité</value>
+  </data>
+  <data name="ui.event_reason.weather" xml:space="preserve">
+    <value>Mauvais temps</value>
   </data>
   <data name="ui.field.company" xml:space="preserve">
     <value>Entreprise (facultatif)</value>
@@ -551,6 +638,9 @@
   <data name="ui.invoices.for" xml:space="preserve">
     <value>Pour</value>
   </data>
+  <data name="ui.invoices.kind.destination" xml:space="preserve">
+    <value>À destination</value>
+  </data>
   <data name="ui.invoices.kind.order" xml:space="preserve">
     <value>Commande de fournitures</value>
   </data>
@@ -565,6 +655,24 @@
   </data>
   <data name="ui.invoices.owed" xml:space="preserve">
     <value>À payer</value>
+  </data>
+  <data name="ui.invoices.state.awaiting" xml:space="preserve">
+    <value>en attente de confirmation</value>
+  </data>
+  <data name="ui.invoices.state.awaiting_credit" xml:space="preserve">
+    <value>En attente d’approbation</value>
+  </data>
+  <data name="ui.invoices.state.on_account" xml:space="preserve">
+    <value>Sur votre compte</value>
+  </data>
+  <data name="ui.invoices.state.paid" xml:space="preserve">
+    <value>payée</value>
+  </data>
+  <data name="ui.invoices.state.unpaid" xml:space="preserve">
+    <value>non payée</value>
+  </data>
+  <data name="ui.invoices.state.voided" xml:space="preserve">
+    <value>annulée</value>
   </data>
   <data name="ui.invoices.title" xml:space="preserve">
     <value>Factures</value>
@@ -968,6 +1076,21 @@
   <data name="ui.shipments.city" xml:space="preserve">
     <value>Ville</value>
   </data>
+  <data name="ui.shipments.collector_hint" xml:space="preserve">
+    <value>En plus du destinataire, vous pouvez désigner une personne. Elle présente une pièce d’identité au comptoir, comme le destinataire. Laissez les deux champs vides pour ne désigner personne.</value>
+  </data>
+  <data name="ui.shipments.collector_name" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="ui.shipments.collector_phone" xml:space="preserve">
+    <value>Téléphone, avec l’indicatif du pays</value>
+  </data>
+  <data name="ui.shipments.collector_save" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="ui.shipments.collector_title" xml:space="preserve">
+    <value>Qui peut le retirer</value>
+  </data>
   <data name="ui.shipments.commercial_invoice" xml:space="preserve">
     <value>Facture commerciale pro forma (PDF)</value>
   </data>
@@ -1000,6 +1123,9 @@
   </data>
   <data name="ui.shipments.done.changed" xml:space="preserve">
     <value>L'envoi a été modifié.</value>
+  </data>
+  <data name="ui.shipments.done.collector" xml:space="preserve">
+    <value>Enregistré : le comptoir lui demandera une pièce d’identité.</value>
   </data>
   <data name="ui.shipments.done.created" xml:space="preserve">
     <value>Votre envoi a été créé. Ajoutez-y des colis ci-dessous.</value>
@@ -1117,6 +1243,9 @@
   </data>
   <data name="ui.shipments.parcels_of" xml:space="preserve">
     <value>{entered} reçus sur {count}</value>
+  </data>
+  <data name="ui.shipments.picked_up" xml:space="preserve">
+    <value>Retiré le {date}.</value>
   </data>
   <data name="ui.shipments.pickup" xml:space="preserve">
     <value>Je le récupère en agence</value>
@@ -1304,6 +1433,12 @@
   <data name="ui.tickets.title" xml:space="preserve">
     <value>Colis manquants</value>
   </data>
+  <data name="ui.tracking.arrived_destination_country" xml:space="preserve">
+    <value>Arrivé dans le pays de destination ({country})</value>
+  </data>
+  <data name="ui.tracking.arrived_destination_warehouse" xml:space="preserve">
+    <value>Arrivé à {place}</value>
+  </data>
   <data name="ui.tracking.auctioned" xml:space="preserve">
     <value>Vendu aux enchères</value>
   </data>
@@ -1313,8 +1448,23 @@
   <data name="ui.tracking.cancelled" xml:space="preserve">
     <value>Annulé</value>
   </data>
+  <data name="ui.tracking.customs_cleared" xml:space="preserve">
+    <value>Dédouané</value>
+  </data>
+  <data name="ui.tracking.customs_held" xml:space="preserve">
+    <value>Retenu par la douane{message}</value>
+  </data>
+  <data name="ui.tracking.delayed" xml:space="preserve">
+    <value>Retardé : {cause}{message}</value>
+  </data>
+  <data name="ui.tracking.departed_origin" xml:space="preserve">
+    <value>Parti de l’origine par voie {mode}</value>
+  </data>
   <data name="ui.tracking.disposed" xml:space="preserve">
     <value>Éliminé</value>
+  </data>
+  <data name="ui.tracking.exception" xml:space="preserve">
+    <value>Incident : {cause}{message}</value>
   </data>
   <data name="ui.tracking.hold_opened" xml:space="preserve">
     <value>En attente : {reason}</value>
@@ -1322,11 +1472,38 @@
   <data name="ui.tracking.hold_released" xml:space="preserve">
     <value>N'est plus en attente</value>
   </data>
+  <data name="ui.tracking.in_customs" xml:space="preserve">
+    <value>En douane</value>
+  </data>
+  <data name="ui.tracking.in_transit" xml:space="preserve">
+    <value>En transit à {place}</value>
+  </data>
   <data name="ui.tracking.inspection_completed" xml:space="preserve">
     <value>Inspecté : {result}</value>
   </data>
+  <data name="ui.tracking.manifested" xml:space="preserve">
+    <value>Manifesté pour le départ</value>
+  </data>
+  <data name="ui.tracking.mode.air" xml:space="preserve">
+    <value>aérienne</value>
+  </data>
+  <data name="ui.tracking.mode.ground" xml:space="preserve">
+    <value>routière</value>
+  </data>
+  <data name="ui.tracking.mode.ocean" xml:space="preserve">
+    <value>maritime</value>
+  </data>
+  <data name="ui.tracking.packed" xml:space="preserve">
+    <value>Emballé pour le départ</value>
+  </data>
+  <data name="ui.tracking.picked_up" xml:space="preserve">
+    <value>Retiré à {place}</value>
+  </data>
   <data name="ui.tracking.pre_alerted" xml:space="preserve">
     <value>Vous nous avez annoncé ce colis</value>
+  </data>
+  <data name="ui.tracking.ready_for_pickup" xml:space="preserve">
+    <value>Prêt à être retiré à {place}</value>
   </data>
   <data name="ui.tracking.received_at_origin" xml:space="preserve">
     <value>Reçu à notre entrepôt</value>

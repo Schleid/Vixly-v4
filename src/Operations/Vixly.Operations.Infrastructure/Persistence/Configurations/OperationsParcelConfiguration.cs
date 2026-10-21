@@ -60,6 +60,9 @@ internal sealed class OperationsParcelConfiguration : IEntityTypeConfiguration<O
         builder.Property(item => item.LabelCode).HasMaxLength(20).IsUnicode(false);
         builder.Property(item => item.LabelSender).HasMaxLength(100);
         builder.Property(item => item.StorageFeePerDay).HasPrecision(12, 2);
+
+        // Slice 7 step 2: the destination's storage terms.
+        builder.Property(item => item.DestinationFeePerDay).HasPrecision(12, 2);
         builder.Ignore(item => item.OwesStorage);
 
         // Slice 4D step 2: the labels to print of a warehouse.
@@ -69,6 +72,12 @@ internal sealed class OperationsParcelConfiguration : IEntityTypeConfiguration<O
         builder.HasOne<OperationsShipment>().WithMany().HasForeignKey(item => item.ShipmentId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<OperationsWarehouse>().WithMany().HasForeignKey(item => item.WarehouseId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<OperationsStorageLocation>().WithMany().HasForeignKey(item => item.StorageLocationId).OnDelete(DeleteBehavior.Restrict);
+
+        // Slice 6A: the bundle and the repack box it is in.
+        builder.HasOne<Vixly.Operations.Domain.Bundles.OperationsBundle>().WithMany().HasForeignKey(item => item.BundleId).OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne<Vixly.Operations.Domain.Bundles.OperationsRepackBox>().WithMany().HasForeignKey(item => item.BoxId).OnDelete(DeleteBehavior.Restrict);
+        builder.HasIndex(item => new { item.TenantId, item.BundleId });
+        builder.HasIndex(item => new { item.TenantId, item.BoxId });
         builder.HasOne<OperationsPreAlert>().WithMany().HasForeignKey(item => item.PreAlertId).OnDelete(DeleteBehavior.Restrict);
 
         // The customer must be of the parcel's own tenant: the key includes the tenant (review M2).
