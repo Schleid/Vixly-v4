@@ -1,46 +1,302 @@
-/* Approved tenant staff entry. All colors derive from shared semantic tokens. */
+/* ==========================================================================
+   OPERATIONS LOGISTICS GATEWAY & STAFF AUTHENTICATION (ops-login.css)
+   ========================================================================== */
+
+:root {
+    --ops-login-bg: #070d19;
+    --ops-login-card-bg: #ffffff;
+    --ops-login-card-border: rgba(255, 255, 255, 0.12);
+    --ops-login-text: #0f172a;
+    --ops-login-text-muted: #64748b;
+    --ops-login-input-bg: #ffffff;
+    --ops-login-input-border: #cbd5e1;
+    --ops-login-primary: #2563eb;
+    --ops-login-primary-hover: #1d4ed8;
+    --ops-login-primary-glow: rgba(37, 99, 235, 0.35);
+    --ops-login-left-bg: linear-gradient(155deg, #091224 0%, #0c1b38 45%, #070f20 100%);
+    --ops-login-tile-bg: rgba(255, 255, 255, 0.04);
+    --ops-login-tile-border: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] {
+    --ops-login-bg: #040812;
+    --ops-login-card-bg: #0b1324;
+    --ops-login-card-border: rgba(255, 255, 255, 0.08);
+    --ops-login-text: #f8fafc;
+    --ops-login-text-muted: #94a3b8;
+    --ops-login-input-bg: #0f1c36;
+    --ops-login-input-border: #1e293b;
+    --ops-login-primary: #3b82f6;
+    --ops-login-primary-hover: #2563eb;
+    --ops-login-left-bg: linear-gradient(155deg, #070d1a 0%, #0a162e 45%, #050a16 100%);
+    --ops-login-tile-bg: rgba(255, 255, 255, 0.03);
+    --ops-login-tile-border: rgba(255, 255, 255, 0.06);
+}
+
 .ops-login {
     box-sizing: border-box;
     margin: 0;
     min-height: 100dvh;
-    display: grid;
-    place-items: center;
-    padding: clamp(1rem, 3vw, 3rem);
-    background: radial-gradient(circle at 50% 10%, #1e293b 0%, #0f172a 50%, #020617 100%);
-    color: var(--vx-color-text);
-    font-family: var(--vx-font);
+    display: flex;
+    flex-direction: column;
+    background: var(--ops-login-bg);
+    color: var(--ops-login-text);
+    font-family: var(--vx-font, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    position: relative;
+    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
 }
-.ops-login *, .ops-login *::before, .ops-login *::after { box-sizing: border-box; }
+
+.ops-login *, .ops-login *::before, .ops-login *::after {
+    box-sizing: border-box;
+}
+
+/* --------------------------------------------------------------------------
+   Atmospheric Backdrop
+   -------------------------------------------------------------------------- */
+.ops-login__backdrop {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.ops-login__glow-primary {
+    position: absolute;
+    top: -20%;
+    left: 45%;
+    transform: translateX(-50%);
+    width: 65rem;
+    height: 45rem;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, rgba(14, 165, 233, 0.06) 50%, transparent 75%);
+    filter: blur(65px);
+}
+
+.ops-login__glow-secondary {
+    position: absolute;
+    bottom: -15%;
+    right: 5%;
+    width: 50rem;
+    height: 40rem;
+    background: radial-gradient(circle, rgba(2, 132, 199, 0.12) 0%, transparent 65%);
+    filter: blur(70px);
+}
+
+.ops-login__grid-matrix {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 25%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 25%, transparent 85%);
+}
+
+/* --------------------------------------------------------------------------
+   Executive Topbar
+   -------------------------------------------------------------------------- */
+.ops-login__topbar {
+    position: relative;
+    z-index: 20;
+    width: 100%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(7, 13, 25, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.ops-login__topbar-inner {
+    max-width: 82rem;
+    margin: 0 auto;
+    padding: 0 1.75rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.ops-login__topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.ops-login__topbar-mark {
+    display: inline-grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+.ops-login__topbar-title {
+    color: #f8fafc;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.ops-login__topbar-tag {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.25rem;
+    background: rgba(59, 130, 246, 0.18);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    color: #93c5fd;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.ops-login__telemetry {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 2rem;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.ops-login__telemetry-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    animation: ops-telemetry-pulse 2s infinite ease-in-out;
+}
+
+@keyframes ops-telemetry-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.ops-login__telemetry-text {
+    color: #a7f3d0;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+.ops-login__topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ops-login__theme-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.ops-login__theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.ops-login__icon-sun { display: block; }
+.ops-login__icon-moon { display: none; }
+html[data-theme="dark"] .ops-login__icon-sun { display: none; }
+html[data-theme="dark"] .ops-login__icon-moon { display: block; }
+
+.ops-login__languages {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.2rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ops-login__languages a {
+    display: inline-grid;
+    place-items: center;
+    padding: 0.25rem 0.55rem;
+    border-radius: 0.35rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-decoration: none;
+    transition: all 120ms ease;
+}
+
+.ops-login__languages a:hover {
+    color: #ffffff;
+}
+
+.ops-login__languages a[aria-current="true"] {
+    background: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 1px 4px rgba(37, 99, 235, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   Stage and Central Console Card
+   -------------------------------------------------------------------------- */
+.ops-login__stage {
+    position: relative;
+    z-index: 10;
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: clamp(1.5rem, 3.5vw, 3rem) 1.25rem;
+}
 
 .ops-login__card {
     width: min(100%, 72rem);
     display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    background: var(--vx-color-surface);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
+    background: var(--ops-login-card-bg);
+    border: 1px solid var(--ops-login-card-border);
     border-radius: 1.5rem;
     overflow: hidden;
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    box-shadow:
+        0 30px 70px -15px rgba(0, 0, 0, 0.65),
+        0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
+/* --------------------------------------------------------------------------
+   Left Wing: Operations Command Showcase
+   -------------------------------------------------------------------------- */
 .ops-login__welcome {
     position: relative;
     isolation: isolate;
-    padding: clamp(2.5rem, 4vw, 3.5rem);
+    padding: clamp(2rem, 3.5vw, 3rem);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 2.5rem;
-    color: #ffffff;
-    background: linear-gradient(145deg, #090e17 0%, #0d1a33 60%, #080f21 100%);
+    gap: 1.75rem;
+    background: var(--ops-login-left-bg);
     border-right: 1px solid rgba(255, 255, 255, 0.08);
+    color: #ffffff;
 }
+
 .ops-login__welcome::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.18), transparent 60%);
+    background: radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.15), transparent 50%);
     pointer-events: none;
 }
 
@@ -58,327 +314,423 @@
     text-transform: uppercase;
 }
 
-.ops-login__intro { margin-top: 1rem; }
+.ops-login__intro {
+    margin-top: 0.85rem;
+}
+
 .ops-login__eyebrow {
-    margin: 0 0 0.85rem;
+    margin: 0 0 0.5rem;
     color: #60a5fa;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     font-size: 0.75rem;
-    line-height: 1.5;
+    line-height: 1.4;
     font-weight: 700;
 }
+
 .ops-login__intro h2 {
     margin: 0;
-    font-size: clamp(2.2rem, 3.5vw, 3.2rem);
+    font-size: clamp(1.85rem, 2.8vw, 2.5rem);
     font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -0.04em;
+    line-height: 1.15;
+    letter-spacing: -0.035em;
     color: #ffffff;
     overflow-wrap: anywhere;
 }
+
 .ops-login__intro h2 span {
     display: block;
     margin-top: 0.2rem;
-    color: #60a5fa;
+    background: linear-gradient(135deg, #60a5fa, #93c5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
+
 .ops-login__description {
-    margin: 1rem 0 0;
-    max-width: 28rem;
+    margin: 0.75rem 0 0;
+    max-width: 30rem;
     color: #94a3b8;
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     line-height: 1.6;
 }
 
+/* Bespoke Logistics Vector Artwork */
+.ops-login__artwork {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border-radius: 1rem;
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: grid;
+    place-items: center;
+}
+
+.ops-login__artwork-svg {
+    width: 100%;
+    height: auto;
+    max-height: 190px;
+    display: block;
+}
+
+/* Pillar Capability Tiles */
 .ops-login__tiles {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.75rem;
-    margin-top: 1.5rem;
 }
+
 .ops-login__tile {
     min-width: 0;
-    padding: 1rem 0.85rem;
+    padding: 0.85rem 0.75rem;
     display: flex;
     flex-direction: column;
     align-items: start;
-    gap: 0.35rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 0.5rem;
+    border: 1px solid var(--ops-login-tile-border);
     border-radius: 0.75rem;
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--ops-login-tile-bg);
     backdrop-filter: blur(8px);
+    transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
 }
-.ops-login__tile svg {
-    width: 1.5rem;
-    height: 1.5rem;
+
+.ops-login__tile:hover {
+    transform: translateY(-2px);
+    border-color: rgba(59, 130, 246, 0.35);
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.ops-login__tile-icon {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    background: rgba(37, 99, 235, 0.15);
+    border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+.ops-login__tile-icon svg {
+    width: 1.15rem;
+    height: 1.15rem;
     fill: none;
     stroke: #60a5fa;
     stroke-width: 1.8;
     stroke-linecap: round;
     stroke-linejoin: round;
-    margin-bottom: 0.35rem;
 }
-.ops-login__tile strong {
+
+.ops-login__tile-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.ops-login__tile-content strong {
     font-size: 0.8125rem;
     font-weight: 700;
     color: #f1f5f9;
     overflow-wrap: anywhere;
 }
-.ops-login__tile span {
+
+.ops-login__tile-content span {
     color: #94a3b8;
     font-size: 0.6875rem;
-    line-height: 1.45;
+    line-height: 1.4;
 }
 
+/* Security Assurance Strip */
+.ops-login__security-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    font-family: var(--vx-font-mono, monospace);
+}
+
+.ops-login__sep {
+    color: #334155;
+}
+
+/* --------------------------------------------------------------------------
+   Right Wing: Staff Authentication Console
+   -------------------------------------------------------------------------- */
 .ops-login__form-panel {
     min-width: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: clamp(2.5rem, 4vw, 3.5rem);
-    background: var(--vx-color-surface);
+    padding: clamp(2rem, 4vw, 3.5rem);
+    background: var(--ops-login-card-bg);
 }
 
 .ops-login__identity {
     display: flex;
     align-items: center;
     gap: 0.85rem;
-    margin-bottom: 2rem;
-    font-size: clamp(1.1rem, 1.6vw, 1.4rem);
-    line-height: 1.2;
+    margin-bottom: 1.75rem;
+    font-size: 1.15rem;
     font-weight: 750;
-    letter-spacing: -0.03em;
-    color: var(--vx-color-text);
+    letter-spacing: -0.02em;
+    color: var(--ops-login-text);
 }
+
 .ops-login__logo {
-    flex: 0 0 3rem;
-    width: 3rem;
-    height: 3rem;
-    display: grid;
+    display: inline-grid;
     place-items: center;
-    position: relative;
-    border-radius: 0.65rem;
-    background: var(--vx-color-primary-soft);
-    color: var(--vx-color-primary);
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     overflow: hidden;
 }
+
 .ops-login__initials {
-    font-weight: 750;
-    font-size: 1.25rem;
-    letter-spacing: -0.04em;
-}
-.ops-login__logo img {
-    display: block;
-    position: absolute;
-    inset: 0;
+    display: grid;
+    place-items: center;
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    background: var(--vx-color-surface);
 }
-.ops-login__logo[data-logo-loaded] { background: transparent; border-radius: 0; }
-.ops-login__logo[data-logo-loaded] .ops-login__initials { visibility: hidden; }
 
-.ops-login__header { margin-bottom: 1.5rem; }
-.ops-login__header h1 {
-    margin: 0 0 0.35rem;
-    font-size: clamp(1.4rem, 2.2vw, 1.85rem);
-    letter-spacing: -0.035em;
-    line-height: 1.2;
-    font-weight: 750;
-    color: var(--vx-color-text);
+.ops-login__logo[data-logo-loaded] .ops-login__initials {
+    display: none;
 }
+
+.ops-login__logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.ops-login__header {
+    margin-bottom: 1.5rem;
+}
+
+.ops-login__header h1 {
+    margin: 0 0 0.4rem;
+    font-size: 1.65rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    color: var(--ops-login-text);
+}
+
 .ops-login__header p {
     margin: 0;
-    color: var(--vx-color-text-subtle);
     font-size: 0.875rem;
-    line-height: 1.5;
+    color: var(--ops-login-text-muted);
 }
 
-.ops-login__form { display: grid; gap: 1rem; margin: 0; }
-.ops-login__field { display: grid; gap: 0.35rem; min-width: 0; }
-.ops-login__field label {
-    font-size: 0.75rem;
-    font-weight: 650;
-    color: var(--vx-color-text);
-}
-.ops-login__field input {
-    width: 100%;
-    min-width: 0;
-    height: 42px;
-    min-height: 42px;
-    box-sizing: border-box;
-    padding: 0 0.85rem;
-    font: inherit;
-    font-size: 0.875rem;
-    line-height: 1.4;
-    color: var(--vx-color-text);
-    background: var(--vx-color-surface);
-    border: 1.5px solid var(--vx-color-border-control);
-    border-radius: 0.5rem;
-    transition: border-color 150ms ease, box-shadow 150ms ease;
-}
-.ops-login__field input::placeholder { color: var(--vx-color-text-subtle); opacity: 1; }
-.ops-login__field input:focus-visible {
-    border-color: var(--vx-color-primary);
-    outline: 2px solid color-mix(in srgb, var(--vx-color-primary) 30%, transparent);
-    outline-offset: 1px;
-}
-.ops-login__field input:user-invalid { border-color: var(--vx-color-danger); }
-
-.ops-login__password { position: relative; min-width: 0; }
-.ops-login__password:has(button:not([hidden])) input { padding-right: 3rem; }
-.ops-login__password button {
-    position: absolute;
-    inset: 2px 2px 2px auto;
-    width: 38px;
-    border: 0;
-    background: transparent;
-    color: var(--vx-color-text-subtle);
-    border-radius: 0.4rem;
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-}
-.ops-login__password button[hidden] { display: none; }
-.ops-login__password svg {
-    width: 20px;
-    height: 20px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.7;
-    stroke-linecap: round;
-}
-.ops-login__eye-slash { display: none; }
-.ops-login__password button[aria-pressed=true] .ops-login__eye-slash { display: block; }
-
-.ops-login__forgot {
-    justify-self: end;
-    margin-top: -0.25rem;
-    color: var(--vx-color-link);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-decoration: none;
-}
-.ops-login__forgot:hover { text-decoration: underline; }
-
-.ops-login__form .vx-button {
-    width: 100%;
-    height: 44px;
-    min-height: 44px;
-    box-sizing: border-box;
-    border-radius: 0.5rem;
-    font-size: 0.9375rem;
-    font-weight: 650;
-    margin-top: 0.25rem;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
-    transition: background-color 150ms ease, box-shadow 150ms ease, transform 100ms ease;
-}
-.ops-login__form .vx-button--primary {
-    background: var(--vx-color-primary);
-    color: var(--vx-color-on-primary);
-    border-color: var(--vx-color-primary);
-}
-.ops-login__form .vx-button--primary:hover {
-    background: var(--vx-color-primary-hover);
-    border-color: var(--vx-color-primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+.ops-login__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
 }
 
-.ops-login :is(a, button):focus-visible { outline: 2px solid var(--vx-color-focus); outline-offset: 3px; }
+.ops-login__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
 
-.ops-login__protected {
+.ops-login__field-header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    color: var(--vx-color-text-subtle);
-    font-size: 0.6875rem;
-    line-height: 1.5;
-    margin: 1.25rem 0 0;
-}
-.ops-login__protected > span {
-    width: 7px;
-    height: 7px;
-    flex-shrink: 0;
-    border-radius: 50%;
-    background: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    justify-content: space-between;
+    gap: 0.75rem;
 }
 
-.ops-login__languages {
-    display: flex;
-    gap: 0.35rem;
-    margin: 1rem 0 -0.5rem;
+.ops-login__field label {
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: var(--ops-login-text);
 }
-.ops-login__languages a {
+
+.ops-login__input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.ops-login__input-icon {
+    position: absolute;
+    left: 0.95rem;
+    color: var(--ops-login-text-muted);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.ops-login__input-wrap input {
+    width: 100%;
+    height: 44px;
+    padding: 0.65rem 1rem 0.65rem 2.75rem;
+    border: 1px solid var(--ops-login-input-border);
+    border-radius: 0.65rem;
+    background: var(--ops-login-input-bg);
+    color: var(--ops-login-text);
+    font-family: inherit;
+    font-size: 0.9375rem;
+    box-sizing: border-box;
+    transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.ops-login__input-wrap input:focus {
+    outline: none;
+    border-color: var(--ops-login-primary);
+    box-shadow: 0 0 0 3px var(--ops-login-primary-glow);
+}
+
+.ops-login__password input {
+    padding-right: 2.75rem;
+}
+
+.ops-login__password button[data-password-toggle] {
+    position: absolute;
+    right: 0.5rem;
     display: grid;
     place-items: center;
-    min-width: 34px;
-    min-height: 30px;
-    border-radius: 0.35rem;
-    font-size: 0.6875rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ops-login-text-muted);
+    cursor: pointer;
+    border-radius: 0.4rem;
+    transition: color 120ms ease;
+}
+
+.ops-login__password button[data-password-toggle]:hover {
+    color: var(--ops-login-primary);
+}
+
+.ops-login__password button[data-password-toggle] svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+}
+
+.ops-login__password button[data-password-toggle] .ops-login__eye-slash {
+    display: none;
+}
+
+.ops-login__password button[data-password-toggle][aria-pressed="true"] .ops-login__eye-slash {
+    display: block;
+}
+
+.ops-login__forgot {
+    font-size: 0.75rem;
     font-weight: 600;
-    color: var(--vx-color-text-muted);
+    color: var(--ops-login-primary);
     text-decoration: none;
-    border: 1px solid transparent;
-}
-.ops-login__languages a[aria-current=true] {
-    background: var(--vx-color-primary-soft);
-    color: var(--vx-color-primary);
-    border-color: color-mix(in srgb, var(--vx-color-primary) 20%, transparent);
+    transition: opacity 120ms ease;
 }
 
-.ops-login .vx-auth__alert {
-    padding: 0.75rem 1rem;
-    border-inline-start: 3px solid var(--vx-color-danger);
-    background: var(--vx-color-danger-bg);
-    color: var(--vx-color-danger);
-    font-size: 0.8125rem;
-    margin-bottom: 1rem;
-    border-radius: 0.35rem;
-}
-.ops-login .vx-auth__info {
-    padding: 0.75rem 1rem;
-    border-inline-start: 3px solid var(--vx-color-info);
-    background: var(--vx-color-info-bg);
-    color: var(--vx-color-info);
-    font-size: 0.8125rem;
-    margin-bottom: 1rem;
-    border-radius: 0.35rem;
+.ops-login__forgot:hover {
+    text-decoration: underline;
+    opacity: 0.85;
 }
 
-.ops-login .vx-message { margin: 0 0 1rem; }
-
-@media (max-width: 1000px) {
-    .ops-login__welcome, .ops-login__form-panel { padding: 2rem; }
-    .ops-login__welcome { gap: 2rem; }
-    .ops-login__tile { padding: 0.85rem 0.6rem; }
+.ops-login__submit-btn {
+    width: 100%;
+    height: 46px;
+    margin-top: 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: none;
+    border-radius: 0.65rem;
+    background: linear-gradient(135deg, var(--ops-login-primary), var(--ops-login-primary-hover));
+    color: #ffffff !important;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px var(--ops-login-primary-glow);
+    transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
 }
 
-@media (max-width: 760px) {
-    .ops-login { padding: 1rem; }
+.ops-login__submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px var(--ops-login-primary-glow);
+}
+
+.ops-login__submit-btn:active {
+    transform: translateY(0);
+}
+
+.ops-login__submit-btn svg {
+    transition: transform 140ms ease;
+}
+
+.ops-login__submit-btn:hover svg {
+    transform: translateX(3px);
+}
+
+.ops-login__footer-trust {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--ops-login-input-border);
+}
+
+.ops-login__protected {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.75rem;
+    color: var(--ops-login-text-muted);
+    line-height: 1.4;
+}
+
+.ops-login__status-pulse {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 6px #10b981;
+    flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Layout
+   -------------------------------------------------------------------------- */
+@media (max-width: 960px) {
+    .ops-login__topbar-inner {
+        padding: 0 1rem;
+    }
+    .ops-login__telemetry {
+        display: none;
+    }
     .ops-login__card {
-        display: flex;
-        flex-direction: column;
-        max-width: 30rem;
-        border-radius: 1.25rem;
+        grid-template-columns: minmax(0, 1fr);
     }
     .ops-login__form-panel {
-        order: -1;
+        order: 1;
         padding: 2rem 1.5rem;
     }
-    .ops-login__identity { margin-bottom: 1.5rem; }
-    .ops-login__welcome { padding: 2rem 1.5rem; gap: 1.5rem; }
-    .ops-login__intro { margin: 0; }
-    .ops-login__intro h2 { font-size: clamp(1.8rem, 6vw, 2.4rem); }
-    .ops-login__description { font-size: 0.875rem; margin-top: 0.75rem; }
-    .ops-login__tile { border-radius: 0.5rem; }
-    .ops-login__tile strong { font-size: 0.75rem; }
-    .ops-login__tile span { font-size: 0.625rem; }
-    .ops-login__tiles { gap: 0.5rem; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .ops-login * { transition: none !important; }
+    .ops-login__welcome {
+        order: 2;
+        padding: 2rem 1.5rem;
+        border-right: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .ops-login__artwork {
+        display: none;
+    }
+    .ops-login__tiles {
+        grid-template-columns: 1fr;
+    }
 }

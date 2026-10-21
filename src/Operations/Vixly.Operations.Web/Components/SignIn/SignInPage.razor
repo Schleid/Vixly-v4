@@ -1,4 +1,4 @@
-﻿@inject IStringLocalizer<OperationsText> T
+@inject IStringLocalizer<OperationsText> T
 @inject IStringLocalizer<OperationsLoginText> L
 @* =========================================================
 FILE: SignInPage.razor
@@ -20,71 +20,154 @@ IMPORTANT NOTES:
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="referrer" content="no-referrer" />
     <meta name="robots" content="noindex" />
-    <title>@L["heading"] · @Company</title>
+    <title>@L["heading"] · @(string.IsNullOrWhiteSpace(Company) ? L["portal"] : Company)</title>
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-theme.css" />
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-primitives.css" />
     <link rel="stylesheet" href="/css/ops-login.css" />
+    <script src="/js/ops-theme.js"></script>
     <script src="/_content/Vixly.Shared.UI/vixly-forms.js" defer></script>
     <script src="/js/ops-login.js" defer></script>
 </head>
 <body class="ops-login">
-    <main class="ops-login__card" aria-labelledby="login-heading">
-        <section class="ops-login__welcome" aria-labelledby="welcome-heading">
-            <span class="ops-login__badge">@L["badge"]</span>
-            <div class="ops-login__intro">
-                <p class="ops-login__eyebrow">@L["eyebrow"]</p>
-                <h2 id="welcome-heading">@(string.IsNullOrWhiteSpace(Company) ? L["welcome_fallback"] : L["welcome"])<span>@Company</span></h2>
-                <p class="ops-login__description">@L["body"]</p>
+    <!-- Atmospheric Logistics Environment -->
+    <div class="ops-login__backdrop" aria-hidden="true">
+        <div class="ops-login__glow-primary"></div>
+        <div class="ops-login__glow-secondary"></div>
+        <div class="ops-login__grid-matrix"></div>
+    </div>
+
+    <!-- Executive Operations Topbar -->
+    <header class="ops-login__topbar">
+        <div class="ops-login__topbar-inner">
+            <div class="ops-login__topbar-brand">
+                <span class="ops-login__topbar-mark" aria-hidden="true">
+                    @(string.IsNullOrWhiteSpace(Company) ? "OP" : string.Concat(Company.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(w => System.Globalization.StringInfo.GetNextTextElement(w))).ToUpperInvariant())
+                </span>
+                <span class="ops-login__topbar-title">@(string.IsNullOrWhiteSpace(Company) ? L["portal"] : Company)</span>
+                <span class="ops-login__topbar-tag">OPERATIONS</span>
             </div>
-            <div class="ops-login__tiles">
-                <div class="ops-login__tile">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v9l9 5 9-5V8M12 13v9" /></svg>
-                    <strong>@L["shipments"]</strong><span>@L["shipments_body"]</span>
-                </div>
-                <div class="ops-login__tile">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13M7 21V11h10v10M8 15h8M8 18h8" /></svg>
-                    <strong>@L["warehouses"]</strong><span>@L["warehouses_body"]</span>
-                </div>
-                <div class="ops-login__tile">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.87M15 3.13a4 4 0 0 1 0 7.75" /><circle cx="9" cy="7" r="4" /></svg>
-                    <strong>@L["team"]</strong><span>@L["team_body"]</span>
-                </div>
+            <div class="ops-login__telemetry" role="status" aria-label="System status">
+                <span class="ops-login__telemetry-dot" aria-hidden="true"></span>
+                <span class="ops-login__telemetry-text">LOGISTICS DISPATCH NODE · OPERATIONAL</span>
             </div>
-        </section>
-        <section class="ops-login__form-panel">
-            <Vixly.Operations.Web.Features.SignIn.LoginBrand.OperationsLoginBrand Company="@Company" />
-            <header class="ops-login__header">
-                <h1 id="login-heading">@L["heading"]</h1>
-                <p>@(Setup ? T["ui.signin.setup_subtitle"] : L["subtitle"])</p>
-            </header>
-            <FormMessage Error="@Error" Info="@Info" />
-            <form method="post" action="/staff/sign-in" class="ops-login__form">
-                <AntiforgeryToken />
-                <input type="hidden" name="returnUrl" value="@ReturnUrl" />
-                <div class="ops-login__field">
-                    <label for="email">@T["ui.signin.email"]</label>
-                    <input id="email" name="email" type="email" autocomplete="username" required value="@Email" placeholder="@L["email_placeholder"]" />
-                </div>
-                <div class="ops-login__field">
-                    <label for="password">@T["ui.signin.password"]</label>
-                    <div class="ops-login__password">
-                        <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="@L["password_placeholder"]" />
-                        <button type="button" hidden data-password-toggle aria-controls="password" aria-pressed="false" aria-label="@L["show_password"]" data-show-label="@L["show_password"]" data-hide-label="@L["hide_password"]">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /><path class="ops-login__eye-slash" d="m3 3 18 18" /></svg>
-                        </button>
+            <div class="ops-login__topbar-actions">
+                <button type="button" class="ops-login__theme-toggle" data-vx-theme-toggle aria-label="Toggle theme" title="Toggle theme">
+                    <svg class="ops-login__icon-sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <svg class="ops-login__icon-moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+                <nav class="ops-login__languages" aria-label="@T["ui.language"]">
+                    @foreach (string language in new[] { "en", "fr", "es" })
+                    {
+                        <a href="/culture/@language?returnUrl=@ReturnUrl" hreflang="@language" lang="@language" aria-current="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == language ? "true" : null)">@language.ToUpperInvariant()</a>
+                    }
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dual-Wing Logistics Gateway -->
+    <main class="ops-login__stage">
+        <div class="ops-login__card" aria-labelledby="login-heading">
+            <!-- Left Wing: Visual Operations Showcase -->
+            <section class="ops-login__welcome" aria-labelledby="welcome-heading">
+                <div class="ops-login__welcome-header">
+                    <span class="ops-login__badge">@L["badge"]</span>
+                    <div class="ops-login__intro">
+                        <p class="ops-login__eyebrow">@L["eyebrow"]</p>
+                        <h2 id="welcome-heading">@(string.IsNullOrWhiteSpace(Company) ? L["welcome_fallback"] : L["welcome"])<span>@Company</span></h2>
+                        <p class="ops-login__description">@L["body"]</p>
                     </div>
                 </div>
-                <a class="ops-login__forgot" href="/staff/forgot-password">@T["ui.signin.forgot"]</a>
-                <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.signin.submit"]</VxButton>
-            </form>
-            <p class="ops-login__protected"><span aria-hidden="true"></span>@L["protected"]</p>
-            <nav class="ops-login__languages" aria-label="@T["ui.language"]">
-                @foreach (string language in new[] { "en", "fr", "es" })
-                {
-                    <a href="/culture/@language?returnUrl=@ReturnUrl" hreflang="@language" lang="@language" aria-current="@(System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == language ? "true" : null)">@language.ToUpperInvariant()</a>
-                }
-            </nav>
-        </section>
+
+                <!-- Bespoke Logistics Engine Vector Visual -->
+                <OperationsLogisticsArtwork />
+
+                <!-- Pillar Cards -->
+                <div class="ops-login__tiles">
+                    <div class="ops-login__tile">
+                        <div class="ops-login__tile-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 5v9l9 5 9-5V8M12 13v9" /></svg>
+                        </div>
+                        <div class="ops-login__tile-content">
+                            <strong>@L["shipments"]</strong>
+                            <span>@L["shipments_body"]</span>
+                        </div>
+                    </div>
+                    <div class="ops-login__tile">
+                        <div class="ops-login__tile-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21V8l9-5 9 5v13M7 21V11h10v10M8 15h8M8 18h8" /></svg>
+                        </div>
+                        <div class="ops-login__tile-content">
+                            <strong>@L["warehouses"]</strong>
+                            <span>@L["warehouses_body"]</span>
+                        </div>
+                    </div>
+                    <div class="ops-login__tile">
+                        <div class="ops-login__tile-icon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.87M15 3.13a4 4 0 0 1 0 7.75" /><circle cx="9" cy="7" r="4" /></svg>
+                        </div>
+                        <div class="ops-login__tile-content">
+                            <strong>@L["team"]</strong>
+                            <span>@L["team_body"]</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Assurance Strip -->
+                <div class="ops-login__security-strip">
+                    <span>256-BIT ENCRYPTION</span>
+                    <span class="ops-login__sep">·</span>
+                    <span>BARCODE READY</span>
+                    <span class="ops-login__sep">·</span>
+                    <span>TENANT ISOLATED</span>
+                </div>
+            </section>
+
+            <!-- Right Wing: Staff Authentication Console -->
+            <section class="ops-login__form-panel">
+                <Vixly.Operations.Web.Features.SignIn.LoginBrand.OperationsLoginBrand Company="@Company" />
+                <header class="ops-login__header">
+                    <h1 id="login-heading">@L["heading"]</h1>
+                    <p>@(Setup ? T["ui.signin.setup_subtitle"] : L["subtitle"])</p>
+                </header>
+                <FormMessage Error="@Error" Info="@Info" />
+                <form method="post" action="/staff/sign-in" class="ops-login__form">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+                    <div class="ops-login__field">
+                        <label for="email">@T["ui.signin.email"]</label>
+                        <div class="ops-login__input-wrap">
+                            <svg class="ops-login__input-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            <input id="email" name="email" type="email" autocomplete="username" required value="@Email" placeholder="@L["email_placeholder"]" />
+                        </div>
+                    </div>
+                    <div class="ops-login__field">
+                        <div class="ops-login__field-header">
+                            <label for="password">@T["ui.signin.password"]</label>
+                            <a class="ops-login__forgot" href="/staff/forgot-password">@T["ui.signin.forgot"]</a>
+                        </div>
+                        <div class="ops-login__input-wrap ops-login__password">
+                            <svg class="ops-login__input-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="@L["password_placeholder"]" />
+                            <button type="button" hidden data-password-toggle aria-controls="password" aria-pressed="false" aria-label="@L["show_password"]" data-show-label="@L["show_password"]" data-hide-label="@L["hide_password"]">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /><path class="ops-login__eye-slash" d="m3 3 18 18" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="vx-button vx-button--primary ops-login__submit-btn">
+                        <span>@T["ui.signin.submit"]</span>
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </button>
+                </form>
+
+                <div class="ops-login__footer-trust">
+                    <p class="ops-login__protected">
+                        <span class="ops-login__status-pulse" aria-hidden="true"></span>
+                        <span>@L["protected"]</span>
+                    </p>
+                </div>
+            </section>
+        </div>
     </main>
 </body>
 </html>
