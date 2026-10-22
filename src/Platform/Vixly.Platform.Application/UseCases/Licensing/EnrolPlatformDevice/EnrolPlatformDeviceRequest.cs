@@ -21,4 +21,7 @@ public sealed class EnrolPlatformDeviceRequest
     public PlatformDeviceKind Kind { get; init; }
 
     public string? PublicKey { get; init; }
+
+    // Where the person registering is, as the tenant's server saw them (owner, 2026-10-21).
+    public PlatformDeviceOrigin? Origin { get; init; }
 }

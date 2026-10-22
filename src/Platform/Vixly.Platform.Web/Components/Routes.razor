@@ -35,8 +35,11 @@ IMPORTANT NOTES:
     [Parameter]
     public string? CorrelationId { get; set; }
 
+    [Parameter]
+    public string? Country { get; set; }
+
     protected override void OnInitialized()
     {
-        Request.Capture(ClientIp, UserAgent, CorrelationId);
+        Request.Capture(ClientIp, UserAgent, CorrelationId, Country);
     }
 }

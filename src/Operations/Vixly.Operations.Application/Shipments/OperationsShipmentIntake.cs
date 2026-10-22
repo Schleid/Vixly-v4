@@ -61,6 +61,9 @@ public sealed class OperationsShipmentIntake
     public async Task<string> CurrencyAsync(CancellationToken cancellationToken) =>
         (await _settings.FindAsync(cancellationToken))?.CurrencyCode ?? OperationsTenantSettings.DefaultCurrency;
 
+    // Freight collect offered to senders (owner, 2026-10-21).
+    public async Task<bool> AllowCollectAsync(CancellationToken cancellationToken) => (await _settings.FindAsync(cancellationToken))?.AllowCollect == true;
+
     public async Task<OperationsDeliveryModes> DeliveryModesAsync(CancellationToken cancellationToken) =>
         (await _settings.FindAsync(cancellationToken))?.DeliveryModes ?? OperationsDeliveryModes.Pickup;
 
@@ -131,7 +134,14 @@ public sealed class OperationsShipmentIntake
         OperationsDeliveryModes modes = await DeliveryModesAsync(cancellationToken);
         OperationsShipmentOptions options = (draft.Consolidate ? OperationsShipmentOptions.Consolidate : OperationsShipmentOptions.None)
             | (draft.Refrigerated ? OperationsShipmentOptions.Refrigerated : OperationsShipmentOptions.None)
-            | (draft.Insured ? OperationsShipmentOptions.Insured : OperationsShipmentOptions.None);
+            | (draft.Insured ? OperationsShipmentOptions.Insured : OperationsShipmentOptions.None)
+            | (draft.Collect ? OperationsShipmentOptions.FreightCollect : OperationsShipmentOptions.None);
+
+        // Freight collect: the sender's choice, when the company allows it.
+        if (draft.Collect && !await AllowCollectAsync(cancellationToken))
+        {
+            return (null, OperationsShipmentErrors.CollectUnavailable);
+        }
 
         try
         {

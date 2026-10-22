@@ -26,5 +26,8 @@ public enum OperationsParcelFlags
     AwaitingCheck = 32,
 
     // Slice 7 (R-3): held by customs at the destination; released by clearance.
-    CustomsHeld = 64
+    CustomsHeld = 64,
+
+    // Slice 7 step 3 (R-14): its delivery failed too often; it goes back to its origin (staff plan the return).
+    ReturnPending = 128
 }

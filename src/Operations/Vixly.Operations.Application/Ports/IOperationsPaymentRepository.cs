@@ -22,6 +22,9 @@ public interface IOperationsPaymentRepository
 
     void Add(OperationsRefund refund);
 
+    // Slice 5F step 4 (review): a card refund Stripe refused is taken off.
+    void Remove(OperationsRefund refund);
+
     // Tracked.
     Task<OperationsPayment?> GetPaymentAsync(Guid paymentId, CancellationToken cancellationToken);
 

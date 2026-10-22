@@ -2,6 +2,7 @@
 using Vixly.Operations.Application.Identity;
 using Vixly.Operations.Application.Ports;
 using Vixly.Operations.Application.Security;
+using Vixly.Operations.Application.Staff;
 using Vixly.Operations.Domain.Common;
 using Vixly.Operations.Domain.Identity;
 using Vixly.Shared.Kernel.Domain;
@@ -28,6 +29,8 @@ public sealed class AcceptOperationsInvitationUseCase
 
     private readonly IOperationsUserRepository _users;
 
+    private readonly IOperationsCustomerRepository _customers;
+
     private readonly IOperationsPasswordHasher _hasher;
 
     private readonly IOperationsSecretGenerator _secrets;
@@ -38,17 +41,23 @@ public sealed class AcceptOperationsInvitationUseCase
 
     private readonly IOperationsUnitOfWork _unitOfWork;
 
+    private readonly OperationsAccess _access;
+
     public AcceptOperationsInvitationUseCase(
         IOperationsAccountTokenRepository tokens,
         IOperationsUserRepository users,
+        IOperationsCustomerRepository customers,
         IOperationsPasswordHasher hasher,
         IOperationsSecretGenerator secrets,
         OperationsSignInSteps steps,
         OperationsAuditTrail audit,
-        IOperationsUnitOfWork unitOfWork)
+        IOperationsUnitOfWork unitOfWork,
+        OperationsAccess access)
     {
+        _access = access ?? throw new ArgumentNullException(nameof(access));
         _tokens = tokens ?? throw new ArgumentNullException(nameof(tokens));
         _users = users ?? throw new ArgumentNullException(nameof(users));
+        _customers = customers ?? throw new ArgumentNullException(nameof(customers));
         _hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
         _secrets = secrets ?? throw new ArgumentNullException(nameof(secrets));
         _steps = steps ?? throw new ArgumentNullException(nameof(steps));
@@ -72,6 +81,19 @@ public sealed class AcceptOperationsInvitationUseCase
         if (token is null || user is null)
         {
             return AcceptOperationsInvitationResponse.Failure(OperationsAuthErrors.LinkInvalid);
+        }
+
+        // Review item 3: a customer's email never becomes a work email. Checked here, where only the mailbox's owner sees the answer (never at the invitation).
+        // The Owner, named by the platform when the company was opened, is not refused.
+        if (!user.IsOwner && await _customers.IsCustomerEmailAnywhereAsync(user.Email, cancellationToken))
+        {
+            return AcceptOperationsInvitationResponse.Failure(OperationsStaffErrors.EmailUnavailable);
+        }
+
+        // A partner agent (Slice 7 step 4, R-8) never starts a session while partner access is off; the link stays usable for later.
+        if (user.PartnerWarehouseId is { } partnerWarehouseId && !(await _access.PartnerScopeAsync(context, partnerWarehouseId, cancellationToken)).Open)
+        {
+            return AcceptOperationsInvitationResponse.Failure(OperationsAuthErrors.PartnerAgentsOff);
         }
 
         Error? weak = OperationsPasswordPolicy.Check(request.Password, user.Email.Value);

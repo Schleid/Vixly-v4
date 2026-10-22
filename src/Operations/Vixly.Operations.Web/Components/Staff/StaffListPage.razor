@@ -44,7 +44,7 @@ IMPORTANT NOTES:
                                 <td class="ops-editor__identity-cell"><a href="/staff/people/@member.UserId">@member.FullName</a>@if (member.IsOwner) { <small>@T["ui.staff.owner"]</small> }</td>
                                 <td>@member.Email</td>
                                 <td><span class="ops-editor__status" data-status="@member.Status.ToString().ToLowerInvariant()">@T["ui.staff.status." + member.Status.ToString().ToLowerInvariant()]</span>@if (!member.HasSecondFactor) { <small>@T["ui.staff.no_second_factor"]</small> }</td>
-                                <td>@foreach (OperationsStaffGrant grant in member.Grants) { <span class="ops-editor__grant">@RoleName(grant) @(grant.ScopeName is null ? null : "· " + grant.ScopeName)</span> }</td>
+                                <td>@if (member.PartnerWarehouse is { } partnerAt) { <span class="ops-editor__grant">@T["ui.staff.partner_agent"] · @partnerAt</span> }@foreach (OperationsStaffGrant grant in member.Grants) { <span class="ops-editor__grant">@RoleName(grant) @(grant.ScopeName is null ? null : "· " + grant.ScopeName)</span> }</td>
                             </tr>
                         }
                     </tbody>
@@ -91,6 +91,36 @@ IMPORTANT NOTES:
             <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.invite_submit"]</button>
         </form>
         </details>
+        @if (PartnerWarehouses.Count > 0)
+        {
+            @* Slice 7 step 4 (R-8): a partner's staff member, limited to the partner's warehouse. *@
+            <details id="invite-partner" class="ops-task-panel">
+            <summary>@T["ui.staff.invite_partner"]<span aria-hidden="true">+</span></summary>
+            <form method="post" action="/staff/people/invite-partner" class="ops-editor__panel">
+                <AntiforgeryToken />
+                <h2>@T["ui.staff.invite_partner"]</h2>
+                <p class="ops-editor__hint">@T["ui.staff.partner_agent_hint"]</p>
+                <label>@T["ui.staff.name"] <input name="fullName" maxlength="200" required /></label>
+                <label>@T["ui.editor.email"] <input type="email" name="email" maxlength="254" required /></label>
+                <label>@T["ui.staff.language"]
+                    <select name="language">
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                    </select>
+                </label>
+                <label>@T["ui.staff.partner_warehouse"]
+                    <select name="warehouseId" required>
+                        @foreach (Vixly.Operations.Domain.Locations.OperationsWarehouse warehouse in PartnerWarehouses)
+                        {
+                            <option value="@warehouse.Id">@warehouse.Name · @warehouse.PartnerName</option>
+                        }
+                    </select>
+                </label>
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.invite_submit"]</button>
+            </form>
+            </details>
+        }
     }
 </EditorShell>
 
@@ -114,6 +144,10 @@ IMPORTANT NOTES:
     [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Locations.OperationsBranch> Branches { get; set; } = Array.Empty<Vixly.Operations.Domain.Locations.OperationsBranch>();
 
     [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Locations.OperationsWarehouse> Warehouses { get; set; } = Array.Empty<Vixly.Operations.Domain.Locations.OperationsWarehouse>();
+
+    private IReadOnlyList<Vixly.Operations.Domain.Locations.OperationsWarehouse> PartnerWarehouses => Warehouses
+        .Where(warehouse => warehouse.OperatedBy == Vixly.Operations.Domain.Locations.OperationsDestinationOperator.Partner && warehouse.Status == Vixly.Operations.Domain.Locations.OperationsLocationStatus.Active)
+        .ToList();
 
     [Parameter] public string? Error { get; set; }
 

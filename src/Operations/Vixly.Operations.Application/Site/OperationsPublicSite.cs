@@ -24,6 +24,12 @@ public sealed record OperationsPublicSite(
 {
     public string? Text(string key) => Texts.TryGetValue(key, out string? value) ? value : null;
 
+    // The prices the company publishes (owner, 2026-10-21); none while it does not.
+    // Only the Pricing page carries the lists; every page knows whether the menu shows Pricing.
+    public Vixly.Operations.Application.Charges.OperationsPricingView? Pricing { get; init; }
+
+    public bool PricingShown { get; init; }
+
     // Countries in display order: those with locations or contacts, each once.
     public IReadOnlyList<string> Countries =>
         Locations.Select(location => location.CountryCode).Concat(Contacts.Select(contact => contact.CountryCode)).Distinct(StringComparer.Ordinal).ToList();

@@ -94,6 +94,6 @@ public sealed class GetOperationsInvoiceUseCase
                 at is not null && access.CoversWarehouse(OperationsPermissions.PaymentsTake, at.Id, at.BranchId),
                 at is not null && invoice.Refundable > 0m && access.CoversWarehouse(OperationsPermissions.PaymentsRefund, at.Id, at.BranchId),
                 (await _settings.FindAsync(cancellationToken)) is { } settings ? OperationsPaymentNames.Others(settings) : new Dictionary<OperationsPaymentMethod, string>(),
-                (await _settings.FindAsync(cancellationToken)) is { } accepting ? OperationsPaymentNames.Accepted(accepting) : new[] { OperationsPaymentMethod.Cash });
+                (await _settings.FindAsync(cancellationToken)) is { } accepting ? OperationsPaymentNames.RefundedBy(accepting) : new[] { OperationsPaymentMethod.Cash });
     }
 }

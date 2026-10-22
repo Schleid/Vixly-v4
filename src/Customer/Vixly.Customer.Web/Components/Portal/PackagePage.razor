@@ -62,6 +62,7 @@
             "reason" when !T["ui.hold." + pair.Value].ResourceNotFound => T["ui.hold." + pair.Value].Value,
             "result" when !T["ui.inspection." + pair.Value].ResourceNotFound => T["ui.inspection." + pair.Value].Value,
             "mode" when !T["ui.tracking.mode." + pair.Value].ResourceNotFound => T["ui.tracking.mode." + pair.Value].Value,
+            "failure" when !T["ui.delivery.failure." + pair.Value].ResourceNotFound => T["ui.delivery.failure." + pair.Value].Value,
             "country" => Country(pair.Value),
             _ => pair.Value
         }), StringComparer.Ordinal);

@@ -19,7 +19,7 @@ public static class PlanDisplay
 {
     public static IReadOnlyList<string> Features { get; } = new[]
     {
-        "homepage_content_customization", "portal_theme_customization", "custom_domain", "white_label_portal", "advanced_analytics", "data_export"
+        "homepage_content_customization", "portal_theme_customization", "custom_domain", "white_label_portal", "advanced_analytics", "data_export", "partner_agents"
     };
 
     public static bool Known(string code) => Features.Contains(code, StringComparer.Ordinal);

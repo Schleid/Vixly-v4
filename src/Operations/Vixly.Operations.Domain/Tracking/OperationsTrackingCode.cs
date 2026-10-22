@@ -26,6 +26,9 @@ public sealed record OperationsTrackingCode(
     // Arguments a customer may see on their own history; every other argument is staff-only (review M1).
     public IReadOnlyList<string> CustomerArguments { get; init; } = Array.Empty<string>();
 
+    // Slice 7 step 3: a milestone a parcel steps back to (a failed delivery: back at the warehouse), unless finished.
+    public bool Rewinds { get; init; }
+
     // Slice 6C: arguments that may be left out.
     public IReadOnlyList<string> OptionalArguments { get; init; } = Array.Empty<string>();
 

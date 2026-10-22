@@ -44,8 +44,13 @@
                     }
                 </dl>
                 @if (Detail.Shipment.Booked) { <p class="customer-portal__notice">@T["ui.shipments.booked_notice"]</p> }
+                @if (Detail.Shipment.Collect) { <p class="customer-portal__notice">@T["ui.shipments.collect_notice"]</p> }
                 @* Slice 7 step 2 (R-6): who may collect it at the pickup counter, with the same proof as the recipient; when it was collected. *@
-                @if (Detail.Shipment.PickedUpUtc is { } collected)
+                @if (Detail.Shipment.DeliveredUtc is { } delivered)
+                {
+                    <p class="customer-portal__notice">@VixlyText.Format(T, "ui.shipments.delivered", "date", delivered.ToLocalTime().ToString("d", System.Globalization.CultureInfo.CurrentCulture))</p>
+                }
+                else if (Detail.Shipment.PickedUpUtc is { } collected)
                 {
                     <p class="customer-portal__notice">@VixlyText.Format(T, "ui.shipments.picked_up", "date", collected.ToLocalTime().ToString("d", System.Globalization.CultureInfo.CurrentCulture))</p>
                 }

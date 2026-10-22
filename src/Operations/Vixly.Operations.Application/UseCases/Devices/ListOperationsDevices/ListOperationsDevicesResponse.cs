@@ -27,9 +27,12 @@ public sealed class ListOperationsDevicesResponse
 
     public IReadOnlyList<OperationsDevice> Devices { get; private init; } = Array.Empty<OperationsDevice>();
 
-    public static ListOperationsDevicesResponse Success(IReadOnlyList<OperationsDevice> devices)
+    // The company's licences (owner, 2026-10-21); none when Platform could not count them.
+    public OperationsDeviceSeats? Seats { get; private init; }
+
+    public static ListOperationsDevicesResponse Success(IReadOnlyList<OperationsDevice> devices, OperationsDeviceSeats? seats)
     {
-        return new ListOperationsDevicesResponse { Succeeded = true, Devices = devices };
+        return new ListOperationsDevicesResponse { Succeeded = true, Devices = devices, Seats = seats };
     }
 
     public static ListOperationsDevicesResponse Failure(Error error)

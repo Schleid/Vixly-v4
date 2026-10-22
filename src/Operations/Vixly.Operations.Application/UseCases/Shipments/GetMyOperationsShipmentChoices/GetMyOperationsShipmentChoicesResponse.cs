@@ -65,13 +65,16 @@ public sealed class GetMyOperationsShipmentChoicesResponse
         return this;
     }
 
+    // Freight collect offered (owner, 2026-10-21).
+    public bool AllowCollect { get; private init; }
+
     public static GetMyOperationsShipmentChoicesResponse Success(IReadOnlyList<OperationsChoice> origins, IReadOnlyList<OperationsChoice> branches, bool pickup, bool homeDelivery, string recipientName, string recipientPhone, IReadOnlyList<string> countries,
-        IReadOnlyList<OperationsWarehouse>? destinations = null, IReadOnlyList<OperationsInsurancePlan>? insurance = null, DateTimeOffset utcNow = default, string currencyCode = "", IReadOnlyList<string>? services = null)
+        IReadOnlyList<OperationsWarehouse>? destinations = null, IReadOnlyList<OperationsInsurancePlan>? insurance = null, DateTimeOffset utcNow = default, string currencyCode = "", IReadOnlyList<string>? services = null, bool allowCollect = false)
     {
         return new GetMyOperationsShipmentChoicesResponse
         {
             Succeeded = true, Origins = origins, Branches = branches, Pickup = pickup, HomeDelivery = homeDelivery, RecipientName = recipientName, RecipientPhone = recipientPhone, Countries = countries,
-            Destinations = destinations ?? Array.Empty<OperationsWarehouse>(), Insurance = insurance ?? Array.Empty<OperationsInsurancePlan>(), UtcNow = utcNow, CurrencyCode = currencyCode, Services = services ?? Array.Empty<string>()
+            Destinations = destinations ?? Array.Empty<OperationsWarehouse>(), Insurance = insurance ?? Array.Empty<OperationsInsurancePlan>(), UtcNow = utcNow, CurrencyCode = currencyCode, Services = services ?? Array.Empty<string>(), AllowCollect = allowCollect
         };
     }
 

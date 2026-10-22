@@ -4,7 +4,9 @@ using Microsoft.Extensions.Caching.Memory;
 using Vixly.Operations.Application.Platform;
 using Vixly.Operations.Application.Tenancy;
 using Vixly.Operations.Application.UseCases.Devices.VerifyOperationsDevice;
+using Vixly.Operations.Web.Hosting;
 using Vixly.Operations.Web.Tenancy;
+using Vixly.Shared.Hosting;
 
 namespace Vixly.Operations.Web.Security;
 
@@ -58,7 +60,9 @@ public sealed class OperationsDeviceGate
             return;
         }
 
-        string key = "ops-device:" + OperationsTenantMiddleware.Host(http)!.TenantId + ":" + device.DeviceId + ":" + Hash(device.Secret);
+        // The country and the session are part of the key: a positive answer holds only where and for whom it was given (owner, 2026-10-21).
+        string key = "ops-device:" + OperationsTenantMiddleware.Host(http)!.TenantId + ":" + device.DeviceId + ":" + Hash(device.Secret) + ":"
+            + VixlyClientCountry.Of(http) + ":" + OperationsCurrentUser.Context(http).SessionId;
 
         if (!cache.TryGetValue(key, out _))
         {
@@ -77,6 +81,14 @@ public sealed class OperationsDeviceGate
 
             if (!check.Allowed)
             {
+                // The session ended: signed in again from here, the second factor confirms the other country.
+                if (check.Code == VerifyOperationsDeviceUseCase.CountryChanged)
+                {
+                    OperationsCookies.Delete(http.Response, OperationsCookies.Session);
+                    http.Response.Redirect("/staff?country=1");
+                    return;
+                }
+
                 if (check.Code == "device_pending")
                 {
                     http.Response.Redirect("/devices/waiting");

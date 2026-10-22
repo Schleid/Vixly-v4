@@ -11,5 +11,6 @@
 //
 // IMPORTANT NOTES:
 // - Newest first, up to 100
+// - CardOffered (Slice 5F step 4): the company takes cards on Stripe's page
 // =========================================================
-public sealed record CustomerInvoicesDto(IReadOnlyList<CustomerInvoiceDto> Invoices);
+public sealed record CustomerInvoicesDto(IReadOnlyList<CustomerInvoiceDto> Invoices, bool CardOffered = false);

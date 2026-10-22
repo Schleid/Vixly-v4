@@ -31,6 +31,7 @@ IMPORTANT NOTES:
             <span data-drawer="open">@VixlyText.Format(T, "ui.cashier.drawer_open", new Dictionary<string, object> { ["warehouse"] = Warehouse(drawer.WarehouseId), ["expected"] = drawer.Expected.ToString("N2", CultureInfo.CurrentCulture) })</span>
         }
         <a href="/staff/cashier/drawers">@T["ui.cashier.drawers"]</a>
+        <a href="/staff/screens">@T["ui.screens.title"]</a>
     </div>
     @if (Matches.Count > 1)
     {

@@ -568,6 +568,72 @@ public sealed partial class OperationsCustomerPackageFlowTests : IClassFixture<O
         Assert.Equal(HttpStatusCode.NotFound, (await ben.GetAsync("/customer/invoices/statement")).StatusCode);
     }
 
+    // Slice 5F step 4: a customer pays their own invoice by card on Stripe's page, recorded on Stripe's word when they come back; never another customer's invoice.
+    [SqlServerFact]
+    public async Task Customer_PaysTheirInvoiceByCard_OnStripesPage_NeverAnothersInvoice()
+    {
+        Browser ana = await ConfirmedAsync("ana@example.com");
+        Guid anaId = await CustomerIdAsync("ana@example.com");
+        Guid invoiceId = Guid.Empty;
+
+        await WithDatabaseAsync(async context =>
+        {
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            Vixly.Operations.Domain.Billing.OperationsInvoiceLine[] lines =
+            {
+                new(null, Guid.NewGuid(), "TAPE", "Packing tape", null, 2m, null, 4.50m, 9.00m, 0m, 0m, Vixly.Operations.Domain.Billing.OperationsTaxKind.Supplies, true)
+            };
+            Vixly.Operations.Domain.Billing.OperationsInvoice invoice = Vixly.Operations.Domain.Billing.OperationsInvoice.Issue(_tenant, "INV26000888",
+                new Vixly.Operations.Domain.Billing.OperationsInvoiceDraft(Vixly.Operations.Domain.Billing.OperationsInvoiceKind.SupplyOrder, anaId, _warehouse, null, null, "SO26000888", null, null,
+                    "USD", "en", new Vixly.Operations.Domain.Billing.OperationsInvoiceParty("Ana's carrier", null, "Miami", null, "Ana", null, "+1", "ana@example.com"), lines, "Sales tax", false,
+                    new Vixly.Operations.Domain.Billing.OperationsTaxRates(0m, 0m, 0m, 0m), null), DateOnly.FromDateTime(now.UtcDateTime), now);
+            IOperationsSecretProtector protector = _api.Services.GetRequiredService<IOperationsSecretProtector>();
+            context.Add(Vixly.Operations.Domain.Billing.OperationsCardProvider.Connect(_tenant, "sk_test_portal1234567890", protector.Protect("sk_test_portal1234567890"),
+                "pk_test_portal1234567890", protector.Protect("whsec_portal1234567890abcd"), "Test", Guid.NewGuid(), now));
+            Vixly.Operations.Domain.Settings.OperationsTenantSettings? settings = await context.TenantSettings.SingleOrDefaultAsync();
+
+            if (settings is null)
+            {
+                settings = Vixly.Operations.Domain.Settings.OperationsTenantSettings.CreateDefault(_tenant, now);
+                context.Add(settings);
+            }
+
+            settings.ChangeCard(true, now);
+            context.Add(invoice);
+            invoiceId = invoice.Id;
+        });
+
+        string list = WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/invoices"));
+        Assert.Contains("action=\"/customer/invoices/" + invoiceId + "/card\"", list, StringComparison.Ordinal);
+
+        // Another customer cannot start one on Ana's invoice.
+        Browser ben = await ConfirmedAsync("ben@example.com");
+        Assert.Contains("This invoice was not found.", WebUtility.HtmlDecode(await Read(await ben.PostAsync("/customer/invoices", "/customer/invoices/" + invoiceId + "/card", new()))),
+            StringComparison.Ordinal);
+
+        // Ana: on to Stripe's page, back here; paid only once Stripe says so.
+        HttpResponseMessage started = await ana.PostAsync("/customer/invoices", "/customer/invoices/" + invoiceId + "/card", new());
+        string chargePath = started.Headers.Location!.OriginalString;
+        Assert.Matches("^/customer/invoices/card/[0-9a-f-]{36}$", chargePath);
+        string session = "cs_test_" + Guid.Parse(chargePath[^36..]).ToString("N");
+        Assert.EndsWith("/customer/invoices/card/" + chargePath[^36..], _api.Cards.Asked[session].ReturnUrl, StringComparison.Ordinal);
+        Assert.Equal(9.00m, _api.Cards.Asked[session].Amount);
+        string waiting = WebUtility.HtmlDecode(await ana.GetStringAsync(chargePath));
+        Assert.Contains("https://checkout.stripe.com/c/pay/" + session, waiting, StringComparison.Ordinal);
+        Assert.Equal(HttpStatusCode.NotFound, (await ben.GetAsync(chargePath)).StatusCode);
+
+        _api.Cards.Pay(session);
+        Assert.Contains("Thank you: your payment is confirmed.", WebUtility.HtmlDecode(await ana.GetStringAsync(chargePath)), StringComparison.Ordinal);
+        Assert.DoesNotContain("action=\"/customer/invoices/" + invoiceId + "/card\"", await ana.GetStringAsync("/customer/invoices"), StringComparison.Ordinal);
+
+        await WithDatabaseAsync(async context =>
+        {
+            Assert.Equal(0m, (await context.Invoices.AsNoTracking().SingleAsync(item => item.Id == invoiceId)).Owed);
+            Vixly.Operations.Domain.Billing.OperationsPayment payment = await context.Payments.AsNoTracking().SingleAsync(item => item.InvoiceId == invoiceId);
+            Assert.Null(payment.TakenByUserId);
+        });
+    }
+
     // Slice 4D step 4: a customer reports a package the carrier delivered; staff find it and the customer sees it, never another customer.
     [SqlServerFact]
     public async Task Customer_ReportsAMissingPackage_SeesTheAnswer_AndOnlyTheirOwnTickets()
@@ -823,6 +889,17 @@ public sealed partial class OperationsCustomerPackageFlowTests : IClassFixture<O
         Assert.Contains("Enter a weight above zero", refused, StringComparison.Ordinal);
         Assert.Contains("Choose where it ships from and to from the list.", WebUtility.HtmlDecode(await Read(await ana.PostAsync("/customer/rates", "/customer/rates",
             new Dictionary<string, string>(form) { ["destination"] = Guid.NewGuid().ToString() }))), StringComparison.Ordinal);
+
+        // The Pricing page (owner, 2026-10-21): the regular prices for everyone, a customer's own prices only to that customer, first.
+        string pricing = WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/pricing"));
+        Assert.Contains("href=\"/customer/pricing\"", pricing, StringComparison.Ordinal);
+        Assert.Contains("from 0 kg: 2.50 USD / kg", pricing, StringComparison.Ordinal);
+        Assert.DoesNotContain("0.50 USD", pricing, StringComparison.Ordinal);
+        Assert.DoesNotContain("Your prices", pricing, StringComparison.Ordinal);
+        string benPricing = WebUtility.HtmlDecode(await ben.GetStringAsync("/customer/pricing"));
+        Assert.True(benPricing.IndexOf("0.50 USD / kg", StringComparison.Ordinal) is > 0 and var own && own < benPricing.IndexOf("2.50 USD / kg", StringComparison.Ordinal));
+        Assert.Contains("Your prices", benPricing, StringComparison.Ordinal);
+        Assert.Contains("Haiti home delivery", benPricing, StringComparison.Ordinal);
 
         // Slice 5D: the shipment estimate beside the shipment form: the service's rates while no package is in, the customer's own prices, and nothing without a destination.
         Dictionary<string, string> building = new(StringComparer.Ordinal)

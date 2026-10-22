@@ -54,6 +54,19 @@ public static class OperationsBundleErrors
 
     public static Error NotPaid { get; } = Error.Create("ops.bundles.not_paid");
 
+    // The bundle's list (owner, 2026-10-21): only what is on it goes in; it closes once everything on it is scanned.
+    public static Error NotOnList { get; } = Error.Create("ops.bundles.not_on_list");
+
+    public static Error OnAnotherList { get; } = Error.Create("ops.bundles.on_another_list");
+
+    public static Error ItemsMissing { get; } = Error.Create("ops.bundles.items_missing");
+
+    public static Error ItemScanned { get; } = Error.Create("ops.bundles.item_scanned");
+
+    public static Error NothingChosen { get; } = Error.Create("ops.bundles.nothing_chosen");
+
+    public static Error NotAvailable { get; } = Error.Create("ops.bundles.not_available");
+
     public static Error Blocked { get; } = Error.Create("ops.bundles.blocked");
 
     public static Error InAnotherBundle { get; } = Error.Create("ops.bundles.in_another_bundle");

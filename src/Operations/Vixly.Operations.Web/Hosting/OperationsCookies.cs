@@ -23,6 +23,9 @@ public static class OperationsCookies
 
     public const string Culture = "__Host-vx4-ops-lang";
 
+    // Slice 5F step 3: a customer screen's own secret (kept 400 days, the most a browser keeps a cookie).
+    public const string Screen = "__Host-vx4-screen";
+
     // Between the password and the second factor (5 minutes).
     public const string SignIn = "__Host-vx4-ops-signin";
 

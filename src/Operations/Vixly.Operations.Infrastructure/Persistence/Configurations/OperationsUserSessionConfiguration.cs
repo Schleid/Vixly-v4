@@ -29,5 +29,10 @@ internal sealed class OperationsUserSessionConfiguration : IEntityTypeConfigurat
         builder.Property(item => item.UserAgent).HasMaxLength(OperationsIdentityLimits.UserAgentMaxLength);
         builder.Ignore(item => item.IsEnded);
         builder.HasIndex(item => new { item.UserId, item.EndedUtc });
+        builder.Property(item => item.DeviceName).HasMaxLength(OperationsIdentityLimits.DeviceNameMaxLength);
+        builder.Property(item => item.DeviceNumber).HasMaxLength(OperationsIdentityLimits.DeviceNumberMaxLength).IsUnicode(false);
+        builder.Property(item => item.Country).HasMaxLength(2).IsFixedLength().IsUnicode(false);
+        // Member activity (owner, 2026-10-21): the company's sign-ins, newest first.
+        builder.HasIndex(item => new { item.TenantId, item.CreatedUtc });
     }
 }

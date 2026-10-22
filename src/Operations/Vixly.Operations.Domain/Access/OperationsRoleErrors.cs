@@ -43,4 +43,7 @@ public static class OperationsRoleErrors
     public static Error StatusChangeInvalid { get; } = Error.Create("ops.staff.status_change_invalid");
 
     public static Error TransferNeedsAdministrator { get; } = Error.Create("ops.staff.transfer_needs_administrator");
+
+    // Slice 7 step 4 (R-8): a partner agent holds the partner agent's access at its warehouse and no role.
+    public static Error PartnerAgentNoRoles { get; } = Error.Create("ops.staff.partner_agent_no_roles");
 }

@@ -8887,7 +8887,7 @@ Gracias: hemos recibido el pago y se ha restablecido el acceso completo a Vixly 
     <comment>needs-review</comment>
   </data>
   <data name="ui.device.kind.phone" xml:space="preserve">
-    <value>Teléfono</value>
+    <value>Móvil</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.device.kind.scanner" xml:space="preserve">
@@ -10764,5 +10764,110 @@ Si nadie en {company} lo pidió, contáctenos de inmediato en {support}.</value>
   </data>
   <data name="ui.error.back" xml:space="preserve">
     <value>Volver a la consola</value>
+  </data>
+  <data name="ui.devices.system" xml:space="preserve">
+    <value>Sistema operativo</value>
+  </data>
+  <data name="ui.devices.browser" xml:space="preserve">
+    <value>Navegador</value>
+  </data>
+  <data name="ui.devices.address" xml:space="preserve">
+    <value>Dirección IP</value>
+  </data>
+  <data name="ui.device.approved_by_link" xml:space="preserve">
+    <value>El enlace enviado por correo al propietario</value>
+  </data>
+  <data name="ui.device.kind.desktop" xml:space="preserve">
+    <value>Ordenador de escritorio</value>
+  </data>
+  <data name="ui.device.kind.laptop" xml:space="preserve">
+    <value>Portátil</value>
+  </data>
+  <data name="ui.activity.title" xml:space="preserve">
+    <value>Actividad de inicio de sesión</value>
+  </data>
+  <data name="ui.activity.filtered" xml:space="preserve">
+    <value>Inicios de sesión de una sola persona.</value>
+  </data>
+  <data name="ui.activity.everyone" xml:space="preserve">
+    <value>Mostrar a todos</value>
+  </data>
+  <data name="ui.activity.count" xml:space="preserve">
+    <value>{count} inicios de sesión</value>
+  </data>
+  <data name="ui.activity.who" xml:space="preserve">
+    <value>Quién</value>
+  </data>
+  <data name="ui.activity.signed_in" xml:space="preserve">
+    <value>Inició sesión</value>
+  </data>
+  <data name="ui.activity.signed_out" xml:space="preserve">
+    <value>Cerró sesión</value>
+  </data>
+  <data name="ui.activity.address" xml:space="preserve">
+    <value>Dirección IP</value>
+  </data>
+  <data name="ui.activity.country" xml:space="preserve">
+    <value>País</value>
+  </data>
+  <data name="ui.activity.browser" xml:space="preserve">
+    <value>Navegador</value>
+  </data>
+  <data name="ui.activity.system" xml:space="preserve">
+    <value>Sistema operativo</value>
+  </data>
+  <data name="ui.activity.empty" xml:space="preserve">
+    <value>Aún no hay inicios de sesión.</value>
+  </data>
+  <data name="ui.activity.still_signed_in" xml:space="preserve">
+    <value>Sigue conectado</value>
+  </data>
+  <data name="ui.activity.ended.signed_out" xml:space="preserve">
+    <value>cerró sesión</value>
+  </data>
+  <data name="ui.activity.ended.ended_by_user" xml:space="preserve">
+    <value>terminada por la persona</value>
+  </data>
+  <data name="ui.activity.ended.ended_by_administrator" xml:space="preserve">
+    <value>terminada por un administrador</value>
+  </data>
+  <data name="ui.activity.ended.account_restricted" xml:space="preserve">
+    <value>cuenta restringida</value>
+  </data>
+  <data name="ui.activity.ended.idle_timeout" xml:space="preserve">
+    <value>inactividad</value>
+  </data>
+  <data name="ui.activity.ended.absolute_lifetime" xml:space="preserve">
+    <value>límite de la sesión</value>
+  </data>
+  <data name="ui.activity.ended.password_changed" xml:space="preserve">
+    <value>contraseña cambiada</value>
+  </data>
+  <data name="ui.activity.ended.second_factor_reset" xml:space="preserve">
+    <value>segundo paso restablecido</value>
+  </data>
+  <data name="ui.activity.ended.step_up_failed" xml:space="preserve">
+    <value>confirmación fallida</value>
+  </data>
+  <data name="ui.activity.country.tor" xml:space="preserve">
+    <value>Tor</value>
+  </data>
+  <data name="ui.activity.country.unknown" xml:space="preserve">
+    <value>Desconocido</value>
+  </data>
+  <data name="ui.licences.title" xml:space="preserve">
+    <value>Licencias</value>
+  </data>
+  <data name="ui.licences.licence" xml:space="preserve">
+    <value>Licencia</value>
+  </data>
+  <data name="ui.licences.device_id" xml:space="preserve">
+    <value>ID del dispositivo</value>
+  </data>
+  <data name="ui.licences.free" xml:space="preserve">
+    <value>Libre</value>
+  </data>
+  <data name="ui.plans.feature.partner_agents" xml:space="preserve">
+    <value>Agentes asociados</value>
   </data>
 </root>

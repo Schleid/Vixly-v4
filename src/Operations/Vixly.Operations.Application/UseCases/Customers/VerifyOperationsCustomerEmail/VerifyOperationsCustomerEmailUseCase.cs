@@ -31,6 +31,8 @@ public sealed class VerifyOperationsCustomerEmailUseCase
 {
     private readonly IOperationsCustomerRepository _customers;
 
+    private readonly IOperationsUserRepository _staff;
+
     private readonly OperationsCustomerAccounts _accounts;
 
     private readonly OperationsNumbering _numbering;
@@ -41,12 +43,14 @@ public sealed class VerifyOperationsCustomerEmailUseCase
 
     public VerifyOperationsCustomerEmailUseCase(
         IOperationsCustomerRepository customers,
+        IOperationsUserRepository staff,
         OperationsCustomerAccounts accounts,
         OperationsNumbering numbering,
         OperationsAuditTrail audit,
         IOperationsUnitOfWork unitOfWork)
     {
         _customers = customers ?? throw new ArgumentNullException(nameof(customers));
+        _staff = staff ?? throw new ArgumentNullException(nameof(staff));
         _accounts = accounts ?? throw new ArgumentNullException(nameof(accounts));
         _numbering = numbering ?? throw new ArgumentNullException(nameof(numbering));
         _audit = audit ?? throw new ArgumentNullException(nameof(audit));
@@ -68,6 +72,12 @@ public sealed class VerifyOperationsCustomerEmailUseCase
         if (token is null || customer is null || customer.Status != OperationsCustomerStatus.PendingVerification)
         {
             return VerifyOperationsCustomerEmailResponse.Failure(OperationsCustomerErrors.LinkInvalid);
+        }
+
+        // Review item 3: checked again here, for a work email that became one after the sign-up (only the mailbox's owner sees this).
+        if (await _staff.IsStaffEmailAnywhereAsync(customer.Email, cancellationToken))
+        {
+            return VerifyOperationsCustomerEmailResponse.Failure(OperationsCustomerErrors.EmailUnavailable);
         }
 
         try

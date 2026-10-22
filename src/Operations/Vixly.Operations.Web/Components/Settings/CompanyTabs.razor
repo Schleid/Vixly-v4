@@ -3,10 +3,10 @@
 FILE: CompanyTabs.razor
 
 PURPOSE:
-The tabs of the Company area: profile, billing and Terms (owner, 2026-10-18).
+The tabs of the Company area: profile, billing, Terms (owner, 2026-10-18) and licences (owner, 2026-10-21).
 
 RESPONSIBILITIES:
-- Link the three company pages and mark the current one
+- Link the company pages and mark the current one
 
 IMPORTANT NOTES:
 - Billing is the company's own subscription bill from the platform, not customer invoicing
@@ -19,6 +19,7 @@ IMPORTANT NOTES:
     <a href="/staff/company" aria-current="@(Current == "profile" ? "page" : null)">@T["ui.company.tab.profile"]</a>
     <a href="/staff/billing" aria-current="@(Current == "billing" ? "page" : null)">@T["ui.editor.nav.billing"]</a>
     <a href="/staff/legal" aria-current="@(Current == "legal" ? "page" : null)">@T["ui.editor.nav.legal"]</a>
+    <a href="/staff/devices" aria-current="@(Current == "licences" ? "page" : null)">@T["ui.licences.title"]</a>
 </nav>
 
 @code {

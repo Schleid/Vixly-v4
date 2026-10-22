@@ -17,6 +17,11 @@ public static class OperationsIdentityLimits
 {
     public const int NameMaxLength = 200;
 
+    // Owner, 2026-10-21: the device and country of a sign-in.
+    public const int DeviceNameMaxLength = 80;
+
+    public const int DeviceNumberMaxLength = 12;
+
     public const int PasswordHashMaxLength = 200;
 
     public const int MaxFailedSignIns = 5;

@@ -1,0 +1,105 @@
+﻿@*
+=========================================================
+FILE: ActivityPage.razor
+
+PURPOSE:
+Member activity (owner, 2026-10-21): each sign-in and how it
+ended, with the device, the browser and the country.
+
+RESPONSIBILITIES:
+- Render the sign-ins of the company, or of one member, newest
+  first, with paging
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- A sign-in from another country than its device's is marked (data-flag); it was confirmed with a second factor
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@using Vixly.Operations.Application.Audit
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.activity.title"]" Company="@Company" Section="activity" Error="@Error">
+    @if (MemberId is not null)
+    {
+        <p class="ops-editor__inline">
+            <span>@VixlyText.Format(T, "ui.activity.of", "name", MemberName ?? string.Empty)</span>
+            <a href="/staff/activity">@T["ui.activity.everyone"]</a>
+        </p>
+    }
+    <p class="ops-editor__hint">@T["ui.activity.refused_hint"] <a href="@("/staff/audit?area=auth" + (MemberId is null ? null : "&actor=" + MemberId))">@T["ui.activity.refused_link"]</a></p>
+    <section class="ops-editor__panel">
+        @if (Lines.Count == 0) { <p class="ops-editor__empty-message">@T["ui.editor.none"]</p> }
+        @if (Lines.Count > 0)
+        {
+        <OperationsTableViewport Label="@T["ui.activity.title"]">
+        <table class="ops-editor__table ops-activity">
+            <thead>
+                <tr>
+                    <th scope="col">@T["ui.activity.member"]</th>
+                    <th scope="col">@T["ui.activity.signed_in"]</th>
+                    <th scope="col">@T["ui.activity.signed_out"]</th>
+                    <th scope="col">@T["ui.activity.device"]</th>
+                    <th scope="col">@T["ui.activity.browser"]</th>
+                    <th scope="col">@T["ui.activity.country"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (OperationsActivityLine line in Lines)
+                {
+                    <tr data-flag="@(line.CountryChanged ? "country" : null)">
+                        <td><a href="/staff/activity?member=@line.UserId">@(line.MemberName ?? "-")</a></td>
+                        <td>@Time(line.SignedInUtc)</td>
+                        <td>
+                            @if (line.SignedOutUtc is { } signedOut)
+                            {
+                                @Time(signedOut) <span class="ops-editor__hint">@T["ui.activity.ended." + line.Ended]</span>
+                            }
+                            else
+                            {
+                                <span class="ops-editor__status" data-status="active">@T["ui.activity.still_signed_in"]</span>
+                            }
+                        </td>
+                        <td>@(line.DeviceName is null ? T["ui.activity.no_device"].Value : line.DeviceName + " · " + line.DeviceNumber)</td>
+                        <td>@(line.Browser ?? "-")</td>
+                        <td>
+                            @Country(line.Country)
+                            @if (line.CountryChanged) { <span class="ops-editor__status" data-status="warning">@T["ui.activity.country_changed"]</span> }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        </OperationsTableViewport>
+        }
+        <p>@VixlyText.Format(T, "ui.activity.count", "count", TotalCount)</p>
+        <p class="ops-editor__actions">
+            @if (Page > 1) { <a href="@PageLink(Page - 1)">@T["ui.audit.newer"]</a> }
+            @if (Page * PageSize < TotalCount) { <a href="@PageLink(Page + 1)">@T["ui.audit.older"]</a> }
+        </p>
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsActivityLine> Lines { get; set; } = Array.Empty<OperationsActivityLine>();
+
+    [Parameter] public int TotalCount { get; set; }
+
+    [Parameter] public int Page { get; set; } = 1;
+
+    [Parameter] public int PageSize { get; set; } = 50;
+
+    [Parameter] public Guid? MemberId { get; set; }
+
+    [Parameter] public string? MemberName { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    private string Country(string? code) => code switch { null => "-", "T1" => T["ui.activity.country.tor"].Value, "XX" => T["ui.activity.country.unknown"].Value, _ => code };
+
+    private static string Time(DateTimeOffset utc) => utc.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture) + " UTC";
+
+    private string PageLink(int page) => "/staff/activity?page=" + page + (MemberId is null ? null : "&member=" + MemberId);
+}

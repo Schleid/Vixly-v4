@@ -6,6 +6,7 @@ using Vixly.Operations.Application.Platform;
 using Vixly.Operations.Application.Ports;
 using Vixly.Operations.Domain.Customers;
 using Vixly.Operations.Web.Hosting;
+using Vixly.Shared.Kernel.Localization;
 using Vixly.Shared.Kernel.ValueObjects;
 
 namespace Vixly.Operations.Web.Tests;
@@ -116,6 +117,62 @@ public sealed class OperationsTenantSiteHttpTests : IClassFixture<OperationsWebD
         await PublishAsync(owner);
 
         Assert.Contains("Brand new headline", await (await visitor.GetAsync("/en")).Content.ReadAsStringAsync(), StringComparison.Ordinal);
+    }
+
+    // Prices on the public website (owner, 2026-10-21): only while the company publishes prices, only the regular lists marked to publish, never a customer's.
+    [SqlServerFact]
+    public async Task Pricing_OnThePublicWebsite_OnlyWhatTheCompanyPublishes()
+    {
+        using CookieClient owner = await OwnerAsync("priceco", "Price Co", "en");
+        (HttpResponseMessage _, string services) = await owner.GetAsync("/staff/services");
+        Assert.Equal("/staff/services?done=1", (await owner.PostAsync("/staff/services", services, ("offered", "air_standard"), ("offered", "air_express"), ("label_air_standard", "Air Miami"),
+            ("min_air_standard", "3"), ("max_air_standard", "5"), ("divisor_air_standard", "5000"), ("min_air_express", "2"), ("max_air_express", "3"), ("divisor_air_express", "6000"),
+            ("min_ocean_consolidated", "14"), ("max_ocean_consolidated", "28"), ("divisor_ocean_consolidated", "1000"), ("min_ocean_full_container", "14"),
+            ("max_ocean_full_container", "35"), ("min_ground", "1"), ("max_ground", "2"), ("divisor_ground", "5000"))).Response.Headers.Location?.OriginalString);
+        (HttpResponseMessage _, string charges) = await owner.GetAsync("/staff/charges");
+        // Never on the website: a regular list the company does not publish, and a customer's own list even when posted as published.
+        Assert.Equal(HttpStatusCode.Redirect, (await owner.PostAsync("/staff/charges/cards", charges, ("mode", "Air"), ("active", "true"),
+            ("service", "air_express"), ("band_from_0", "0"), ("band_kind_0", "PerUnit"), ("band_amount_0", "7.77"))).Response.StatusCode);
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            Guid tenant = _host.Platform.Portals["priceco"].TenantId!.Value;
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsCustomer customer = OperationsCustomer.SignUp(tenant, "Ana", "Pierre", null, EmailAddress.Create("ana@priceco-buyer.example"), "+50937123456", LanguageCode.En, "$2a$12$hash", DateTimeOffset.UtcNow);
+            customer.ConfirmEmail("C00001", DateTimeOffset.UtcNow);
+            scope.ServiceProvider.GetRequiredService<IOperationsCustomerRepository>().Add(customer);
+            await scope.ServiceProvider.GetRequiredService<IOperationsUnitOfWork>().SaveChangesAsync(CancellationToken.None);
+        }
+
+        Assert.Equal(HttpStatusCode.Redirect, (await owner.PostAsync("/staff/charges/cards", charges, ("mode", "Air"), ("active", "true"), ("published", "true"), ("customer", "C00001"),
+            ("service", "air_standard"), ("band_from_0", "0"), ("band_kind_0", "PerUnit"), ("band_amount_0", "9.99"))).Response.StatusCode);
+
+        (HttpResponseMessage _, string settings) = await owner.GetAsync("/staff/settings");
+        string form = settings[settings.IndexOf("action=\"/staff/settings\"", StringComparison.Ordinal)..];
+        form = form[..form.IndexOf("</form>", StringComparison.Ordinal)];
+        List<(string, string)> fields = Regex.Matches(form, "<input(?=[^>]*name=\"(?<n>[^\"]+)\")(?=[^>]*value=\"(?<v>[^\"]*)\")(?<rest>[^>]*)>")
+            .Where(match => !match.Value.Contains("type=\"checkbox\"", StringComparison.Ordinal) || match.Value.Contains("checked", StringComparison.Ordinal))
+            .Select(match => (match.Groups["n"].Value, WebUtility.HtmlDecode(match.Groups["v"].Value))).Where(field => field.Item1 != "__RequestVerificationToken").ToList();
+        fields.AddRange(Regex.Matches(form, "<select name=\"(?<n>[^\"]+)\"[\\s\\S]*?<option value=\"(?<v>[^\"]*)\" selected").Select(match => (match.Groups["n"].Value, match.Groups["v"].Value)));
+        fields.Add(("publicPricing", "true"));
+        (HttpResponseMessage settingsSaved, string _) = await owner.PostAsync("/staff/settings", settings, fields.ToArray());
+        Assert.Equal(HttpStatusCode.Redirect, settingsSaved.StatusCode);
+
+        // Prices public, but only an unpublished list and a customer's own: no page, no menu link, not in the sitemap.
+        Assert.Equal(HttpStatusCode.NotFound, (await owner.GetRawAsync("/en/pricing")).Response.StatusCode);
+        Assert.DoesNotContain("/en/pricing", (await owner.GetRawAsync("/en")).Raw, StringComparison.Ordinal);
+        Assert.DoesNotContain("/en/pricing", (await owner.GetRawAsync("/sitemap.xml")).Raw, StringComparison.Ordinal);
+
+        (HttpResponseMessage saved, string _) = await owner.PostAsync("/staff/charges/cards", charges, ("mode", "Air"), ("active", "true"), ("published", "true"),
+            ("service", "air_standard"), ("band_from_0", "0"), ("band_kind_0", "PerUnit"), ("band_amount_0", "3.25"));
+        Assert.Equal(HttpStatusCode.Redirect, saved.StatusCode);
+        (HttpResponseMessage page, string raw) = await owner.GetRawAsync("/en/pricing");
+        Assert.Equal(HttpStatusCode.OK, page.StatusCode);
+        Assert.Contains("3.25", raw, StringComparison.Ordinal);
+        Assert.Contains("Air Miami", raw, StringComparison.Ordinal);
+        Assert.DoesNotContain("7.77", raw, StringComparison.Ordinal);
+        Assert.DoesNotContain("9.99", raw, StringComparison.Ordinal);
+        Assert.Contains("/en/pricing", (await owner.GetRawAsync("/en")).Raw, StringComparison.Ordinal);
+        Assert.Contains("/en/pricing", (await owner.GetRawAsync("/sitemap.xml")).Raw, StringComparison.Ordinal);
     }
 
     [SqlServerFact]

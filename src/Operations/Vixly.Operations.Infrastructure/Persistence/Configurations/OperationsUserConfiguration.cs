@@ -30,10 +30,15 @@ internal sealed class OperationsUserConfiguration : IEntityTypeConfiguration<Ope
         builder.Property(user => user.Email).HasConversion(Persistence.OperationsValueConverters.Email).HasMaxLength(EmailAddress.MaxLength).IsRequired();
         builder.Property(user => user.PreferredLanguage).HasConversion(Persistence.OperationsValueConverters.Language).HasMaxLength(8).IsRequired();
         builder.HasIndex(user => new { user.TenantId, user.Email }).IsUnique();
+        // Review item 3: the check across companies (a customer email is never a work email) looks up by email alone.
+        builder.HasIndex(user => user.Email).HasDatabaseName("IX_Users_Email_AnyTenant");
         builder.HasIndex(user => user.TenantId).IsUnique().HasFilter("[IsOwner] = 1").HasDatabaseName("IX_Users_TenantId_Owner");
         builder.Ignore(user => user.HasSecondFactor);
         builder.Ignore(user => user.RequiresSecondFactor);
         builder.Ignore(user => user.UnusedRecoveryCodeCount);
+        // Slice 7 step 4 (R-8): a partner agent belongs to one partner-operated warehouse.
+        builder.Ignore(user => user.IsPartnerAgent);
+        builder.HasOne<Vixly.Operations.Domain.Locations.OperationsWarehouse>().WithMany().HasForeignKey(user => user.PartnerWarehouseId).OnDelete(DeleteBehavior.Restrict);
 
         builder.OwnsOne(user => user.Account, account =>
         {

@@ -52,6 +52,32 @@ public static class CustomerRateEndpoints
                 new Typed(from, to, weight, length, width, height, value, consolidated == "true", insured == "true", home == "true"));
         });
 
+        // The Pricing page (owner, 2026-10-21): the company's prices, the customer's own first.
+        endpoints.MapGet("/pricing", async (HttpContext http, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
+        {
+            http.Response.Headers.CacheControl = "no-store";
+
+            if (CustomerTenantMiddleware.Host(http)?.TenantId is not { } tenant || CustomerSessionCookie.Read(http.Request) is not { } session)
+            {
+                return Results.Redirect("/customer/sign-in");
+            }
+
+            CustomerCall<Vixly.Contracts.Operations.Rates.CustomerPricingDto> call = await api.GetPricingAsync(tenant, session, http, http.RequestAborted);
+
+            if (call.ErrorCode == "ops.customers.session_required")
+            {
+                CustomerSessionCookie.Delete(http.Response);
+                return Results.Redirect("/customer/sign-in");
+            }
+
+            return new RazorComponentResult<PricingPage>(new
+            {
+                Brand = await api.GetBrandAsync(tenant, http.RequestAborted),
+                Pricing = call.Value,
+                Error = call.Value is null ? CustomerPortalEndpoints.Describe(text, call) : null
+            });
+        });
+
         return endpoints;
     }
 

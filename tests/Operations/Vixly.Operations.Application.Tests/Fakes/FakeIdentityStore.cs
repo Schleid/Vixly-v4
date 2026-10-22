@@ -61,6 +61,12 @@ internal sealed class FakeIdentityStore : IOperationsUserRepository, IOperations
 
     public Task<bool> AnyAsync(CancellationToken cancellationToken) => Task.FromResult(Users.Count > 0);
 
+    public Task<IReadOnlyList<OperationsUser>> ListPartnerAgentsAsync(Guid warehouseId, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<OperationsUser>>(Users.Where(user => user.PartnerWarehouseId == warehouseId).ToList());
+
+    public Task<bool> IsStaffEmailAnywhereAsync(EmailAddress email, CancellationToken cancellationToken) =>
+        Task.FromResult(Users.Any(user => user.Email == email && user.Account.PasswordHash is not null && user.Account.Status != OperationsUserAccountStatus.Deactivated));
+
     public Task<(IReadOnlyList<OperationsUser> Items, int TotalCount)> ListAsync(string? search, int page, int pageSize, CancellationToken cancellationToken)
     {
         List<OperationsUser> matches = Users
@@ -78,6 +84,12 @@ internal sealed class FakeIdentityStore : IOperationsUserRepository, IOperations
 
     public Task<IReadOnlyList<OperationsUserSession>> ListOpenAsync(Guid userId, CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyList<OperationsUserSession>>(Sessions.Where(session => session.UserId == userId && !session.IsEnded).ToList());
+
+    public Task<(IReadOnlyList<OperationsUserSession> Items, int TotalCount)> ListActivityAsync(Guid? userId, int page, int pageSize, CancellationToken cancellationToken)
+    {
+        List<OperationsUserSession> matches = Sessions.Where(session => userId is null || session.UserId == userId).OrderByDescending(session => session.CreatedUtc).ToList();
+        return Task.FromResult<(IReadOnlyList<OperationsUserSession>, int)>((matches.Skip((page - 1) * pageSize).Take(pageSize).ToList(), matches.Count));
+    }
 
     Task<OperationsSignInChallenge?> IOperationsSignInChallengeRepository.FindByTokenHashAsync(string tokenHash, CancellationToken cancellationToken) =>
         Task.FromResult(Challenges.FirstOrDefault(challenge => challenge.TokenHash == tokenHash));

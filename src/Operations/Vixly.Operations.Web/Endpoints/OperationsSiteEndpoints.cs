@@ -3,6 +3,7 @@ using System.Text;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Vixly.Operations.Application.Site;
+using Vixly.Operations.Application.UseCases.Site.GetOperationsPublicPricing;
 using Vixly.Operations.Application.UseCases.Site.GetOperationsPublicSite;
 using Vixly.Operations.Application.UseCases.Site.GetOperationsSiteImage;
 using Vixly.Operations.Application.UseCases.Site.TrackOperationsShipmentPublicly;
@@ -44,19 +45,24 @@ public static class OperationsSiteEndpoints
             return Results.Redirect("/" + (OperationsSiteLanguages.IsSiteLanguage(language) ? language : OperationsSiteLanguages.All[0]));
         });
 
-        endpoints.MapGet("/" + Language, (HttpContext http, string language, bool? preview, GetOperationsPublicSiteUseCase useCase) =>
-            RenderAsync<SiteHomePage>(http, language, string.Empty, preview == true, useCase, null));
+        endpoints.MapGet("/" + Language, (HttpContext http, string language, bool? preview, GetOperationsPublicSiteUseCase useCase, GetOperationsPublicPricingUseCase pricing) =>
+            RenderAsync<SiteHomePage>(http, language, string.Empty, preview == true, useCase, pricing, null));
 
-        endpoints.MapGet("/" + Language + "/locations", (HttpContext http, string language, bool? preview, GetOperationsPublicSiteUseCase useCase) =>
-            RenderAsync<SiteLocationsPage>(http, language, "/locations", preview == true, useCase, null));
+        endpoints.MapGet("/" + Language + "/locations", (HttpContext http, string language, bool? preview, GetOperationsPublicSiteUseCase useCase, GetOperationsPublicPricingUseCase pricing) =>
+            RenderAsync<SiteLocationsPage>(http, language, "/locations", preview == true, useCase, pricing, null));
 
-        endpoints.MapGet("/" + Language + "/track", async (HttpContext http, string language, string? number, GetOperationsPublicSiteUseCase useCase, TrackOperationsShipmentPubliclyUseCase track) =>
+        // The prices the company publishes (owner, 2026-10-21); not found while it does not.
+        endpoints.MapGet("/" + Language + "/pricing", (HttpContext http, string language, bool? preview, GetOperationsPublicSiteUseCase useCase, GetOperationsPublicPricingUseCase pricing) =>
+            RenderAsync<SitePricingPage>(http, language, "/pricing", preview == true, useCase, pricing, null, true));
+
+        endpoints.MapGet("/" + Language + "/track", async (HttpContext http, string language, string? number, GetOperationsPublicSiteUseCase useCase, GetOperationsPublicPricingUseCase pricing,
+            TrackOperationsShipmentPubliclyUseCase track) =>
         {
             TrackOperationsShipmentPubliclyResponse? result = string.IsNullOrWhiteSpace(number)
                 ? null
                 : await track.ExecuteAsync(OperationsCurrentUser.Context(http), new TrackOperationsShipmentPubliclyRequest { Number = number.Trim() }, http.RequestAborted);
 
-            return await RenderAsync<SiteTrackPage>(http, language, "/track", false, useCase, new Dictionary<string, object?>
+            return await RenderAsync<SiteTrackPage>(http, language, "/track", false, useCase, pricing, new Dictionary<string, object?>
             {
                 ["Number"] = number?.Trim(),
                 ["Milestones"] = result is { Succeeded: true } ? result.Milestones : null,
@@ -89,14 +95,15 @@ public static class OperationsSiteEndpoints
             return Results.Text(body, "text/plain", Encoding.UTF8);
         });
 
-        endpoints.MapGet("/sitemap.xml", (HttpContext http) =>
+        endpoints.MapGet("/sitemap.xml", async (HttpContext http, GetOperationsPublicPricingUseCase pricing) =>
         {
+            GetOperationsPublicPricingResponse prices = await pricing.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsPublicPricingRequest(), http.RequestAborted);
             string origin = Origin(http);
             XNamespace ns = "http://www.sitemaps.org/schemas/sitemap/0.9";
             XNamespace xhtml = "http://www.w3.org/1999/xhtml";
             XElement urls = new(ns + "urlset", new XAttribute(XNamespace.Xmlns + "xhtml", xhtml));
 
-            foreach (string path in new[] { string.Empty, "/locations" })
+            foreach (string path in prices.Shown ? new[] { string.Empty, "/locations", "/pricing" } : new[] { string.Empty, "/locations" })
             {
                 foreach (string language in OperationsSiteLanguages.All)
                 {
@@ -113,7 +120,9 @@ public static class OperationsSiteEndpoints
         return endpoints;
     }
 
-    private static async Task<IResult> RenderAsync<TPage>(HttpContext http, string language, string path, bool preview, GetOperationsPublicSiteUseCase useCase, Dictionary<string, object?>? extra)
+    // The Pricing page reads the whole price list; every other page asks only whether the menu shows Pricing (review of 94e28f4).
+    private static async Task<IResult> RenderAsync<TPage>(HttpContext http, string language, string path, bool preview, GetOperationsPublicSiteUseCase useCase,
+        GetOperationsPublicPricingUseCase pricing, Dictionary<string, object?>? extra, bool pricingPage = false)
         where TPage : Microsoft.AspNetCore.Components.IComponent
     {
         GetOperationsPublicSiteResponse response = await useCase.ExecuteAsync(
@@ -124,9 +133,16 @@ public static class OperationsSiteEndpoints
             return Results.NotFound();
         }
 
+        GetOperationsPublicPricingResponse prices = await pricing.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsPublicPricingRequest { Full = pricingPage }, http.RequestAborted);
+
+        if (pricingPage && !prices.Shown)
+        {
+            return Results.NotFound();
+        }
+
         http.Response.Headers.CacheControl = response.Site.IsPreview ? "private, no-store" : "public, max-age=60";
         Dictionary<string, object?> parameters = extra ?? new Dictionary<string, object?>();
-        parameters["Page"] = new OperationsSitePage(response.Site, language, Origin(http), path);
+        parameters["Page"] = new OperationsSitePage(response.Site with { PricingShown = prices.Shown, Pricing = prices.Pricing }, language, Origin(http), path);
 
         return new RazorComponentResult<TPage>(parameters);
     }

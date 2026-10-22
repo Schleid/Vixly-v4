@@ -101,6 +101,35 @@ public sealed class OperationsParcel : OperationsEntity
         (StorageFreeDays, StorageFeePerDay) = (freeDays, feePerDay);
     }
 
+    // Slice 7 step 3 (R-7, R-14): the route it is on, and its delivery tries.
+    public Guid? RouteId { get; private set; }
+
+    public int DeliveryTries { get; private set; }
+
+    public void PutOnRoute(Guid routeId, DateTimeOffset utcNow)
+    {
+        if (RouteId is not null)
+        {
+            throw new DomainException(Vixly.Operations.Domain.Delivery.OperationsDeliveryErrors.OnAnotherRoute);
+        }
+
+        RouteId = routeId;
+        MarkAsModified(utcNow);
+    }
+
+    // Off its route: taken off while planned, delivered, or failed (one more try counted).
+    public void OffRoute(bool tried, DateTimeOffset utcNow)
+    {
+        RouteId = null;
+
+        if (tried)
+        {
+            DeliveryTries++;
+        }
+
+        MarkAsModified(utcNow);
+    }
+
     // Slice 7 step 2 (R-10): when it became ready for pickup at its destination; the destination's storage terms of that day, kept apart from the origin's (review);
     // how far its storage was billed.
     public DateTimeOffset? ReadyUtc { get; private set; }

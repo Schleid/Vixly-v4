@@ -119,6 +119,11 @@ IMPORTANT NOTES:
                         </p>
                     </form>
                     <script src="/js/ops-signature.js?v=20261020-1" defer></script>
+                    @* Slice 5F step 3 (P-3): or on the customer screen, where the customer reads and signs it themselves. *@
+                    @if (Screens.Count > 0)
+                    {
+                        <Vixly.Operations.Web.Components.Screens.ScreenSendPanel T="T" Screens="Screens" ShipmentId="Shipment.Id" Back="shipment" />
+                    }
                 }
             </div>
             @if (CanChangeInsurance)
@@ -186,6 +191,8 @@ IMPORTANT NOTES:
     [Parameter] public string? Error { get; set; }
 
     [Parameter] public string? Info { get; set; }
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Application.Screens.OperationsScreenRow> Screens { get; set; } = Array.Empty<Vixly.Operations.Application.Screens.OperationsScreenRow>();
 
     // The form's reference: the same parcel sent twice is entered once (ADR-0019).
     private readonly string Key = Guid.NewGuid().ToString("N");

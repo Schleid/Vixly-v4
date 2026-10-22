@@ -166,6 +166,10 @@ public sealed class CustomerOperationsApi
         CancellationToken cancellationToken) =>
         SendAsync<Vixly.Contracts.Operations.Rates.CustomerRatesDto>(HttpMethod.Post, "internal/v1/customers/me/rates", tenantId, session, body, http, cancellationToken);
 
+    // The Pricing page (owner, 2026-10-21). Read only.
+    public Task<CustomerCall<Vixly.Contracts.Operations.Rates.CustomerPricingDto>> GetPricingAsync(Guid tenantId, string session, HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<Vixly.Contracts.Operations.Rates.CustomerPricingDto>(HttpMethod.Get, "internal/v1/customers/me/pricing", tenantId, session, null, http, cancellationToken);
+
     // Slice 5D: the shipment estimate while the customer builds or changes a shipment, and on their shipment. Read only.
     public Task<CustomerCall<Vixly.Contracts.Operations.Rates.CustomerShipmentEstimateDto>> EstimateShipmentAsync(Guid tenantId, string session,
         Vixly.Contracts.Operations.Rates.CustomerShipmentEstimateBody body, HttpContext http, CancellationToken cancellationToken) =>
@@ -176,6 +180,17 @@ public sealed class CustomerOperationsApi
     // =====================================================
     public Task<CustomerCall<Vixly.Contracts.Operations.Billing.CustomerInvoicesDto>> ListInvoicesAsync(Guid tenantId, string session, HttpContext http, CancellationToken cancellationToken) =>
         SendAsync<Vixly.Contracts.Operations.Billing.CustomerInvoicesDto>(HttpMethod.Get, "internal/v1/customers/me/invoices", tenantId, session, null, http, cancellationToken);
+
+    // Slice 5F step 4: pay an invoice by card on Stripe's page, then follow it; Operations checks the ownership (S-3).
+    public Task<CustomerCall<Vixly.Contracts.Operations.Billing.CustomerCardStartDto>> StartCardPaymentAsync(Guid tenantId, string session, Guid invoiceId, string returnUrlPrefix,
+        HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<Vixly.Contracts.Operations.Billing.CustomerCardStartDto>(HttpMethod.Post, "internal/v1/customers/me/invoices/" + invoiceId + "/card", tenantId, session,
+            new Vixly.Contracts.Operations.Billing.CustomerCardStartBody(returnUrlPrefix), http, cancellationToken);
+
+    public Task<CustomerCall<Vixly.Contracts.Operations.Billing.CustomerCardPaymentDto>> GetCardPaymentAsync(Guid tenantId, string session, Guid chargeId, HttpContext http,
+        CancellationToken cancellationToken) =>
+        SendAsync<Vixly.Contracts.Operations.Billing.CustomerCardPaymentDto>(HttpMethod.Get, "internal/v1/customers/me/invoices/card/" + chargeId, tenantId, session, null, http,
+            cancellationToken);
 
     // The PDF of the customer's own invoice or approved credit note; Operations checks the ownership (S-3).
     public Task<(byte[] Content, string FileName)?> GetInvoiceDocumentAsync(Guid tenantId, string session, Guid invoiceId, Guid? creditNoteId, HttpContext http,

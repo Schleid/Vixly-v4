@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: CounterCustomerPage.razor
 
@@ -114,8 +114,10 @@ IMPORTANT NOTES:
                 </label>
                 <fieldset>
                     <legend>@T["ui.counter.delivery"]</legend>
-                    @if (DeliveryModes.HasFlag(OperationsDeliveryModes.Pickup)) { <label><input type="radio" name="delivery" value="pickup" checked="@(Entered?.Delivery != "home")" /> @T["ui.counter.pickup"]</label> }
-                    @if (DeliveryModes.HasFlag(OperationsDeliveryModes.HomeDelivery)) { <label><input type="radio" name="delivery" value="home" checked="@(Entered?.Delivery == "home")" /> @T["ui.counter.home"]</label> }
+                    <div class="ops-checkbox-group">
+                    @if (DeliveryModes.HasFlag(OperationsDeliveryModes.Pickup)) { <label class="ops-checkbox-label"><input type="radio" name="delivery" value="pickup" checked="@(Entered?.Delivery != "home")" /> <span>@T["ui.counter.pickup"]</span></label> }
+                    @if (DeliveryModes.HasFlag(OperationsDeliveryModes.HomeDelivery)) { <label class="ops-checkbox-label"><input type="radio" name="delivery" value="home" checked="@(Entered?.Delivery == "home")" /> <span>@T["ui.counter.home"]</span></label> }
+                    </div>
                 </fieldset>
                 <label>@T["ui.counter.service"]
                     <select name="service" required>
@@ -141,8 +143,11 @@ IMPORTANT NOTES:
                 }
                 <fieldset>
                     <legend>@T["ui.counter.options"]</legend>
-                    <label><input type="checkbox" name="consolidate" value="true" checked="@(Entered?.Consolidate ?? false)" /> @T["ui.counter.consolidate"]</label>
-                    <label><input type="checkbox" name="refrigerated" value="true" checked="@(Entered?.Refrigerated ?? false)" /> @T["ui.counter.refrigerated"]</label>
+                    <div class="ops-checkbox-group">
+                        <label class="ops-checkbox-label"><input type="checkbox" name="consolidate" value="true" checked="@(Entered?.Consolidate ?? false)" /> <span>@T["ui.counter.consolidate"]</span></label>
+                        <label class="ops-checkbox-label"><input type="checkbox" name="refrigerated" value="true" checked="@(Entered?.Refrigerated ?? false)" /> <span>@T["ui.counter.refrigerated"]</span></label>
+                        @if (AllowCollect) { <label class="ops-checkbox-label"><input type="checkbox" name="collect" value="true" checked="@(Entered?.Collect ?? false)" /> <span>@T["ui.counter.collect"]</span></label> }
+                    </div>
                 </fieldset>
                 @if (Insurance.Count > 0)
                 {
@@ -191,6 +196,8 @@ IMPORTANT NOTES:
     [Parameter] public DateTimeOffset UtcNow { get; set; }
 
     [Parameter] public OperationsDeliveryModes DeliveryModes { get; set; }
+
+    [Parameter] public bool AllowCollect { get; set; }
 
     [Parameter] public OperationsShipmentDraft? Entered { get; set; }
 

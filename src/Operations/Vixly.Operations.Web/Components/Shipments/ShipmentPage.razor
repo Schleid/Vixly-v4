@@ -156,7 +156,7 @@ IMPORTANT NOTES:
     {
         bool any = false;
 
-        foreach ((OperationsShipmentOptions option, string key) in new[] { (OperationsShipmentOptions.Consolidate, "consolidate"), (OperationsShipmentOptions.Refrigerated, "refrigerated"), (OperationsShipmentOptions.Insured, "insured") })
+        foreach ((OperationsShipmentOptions option, string key) in new[] { (OperationsShipmentOptions.Consolidate, "consolidate"), (OperationsShipmentOptions.Refrigerated, "refrigerated"), (OperationsShipmentOptions.Insured, "insured"), (OperationsShipmentOptions.FreightCollect, "freight_collect") })
         {
             if (Shipment.Options.HasFlag(option))
             {

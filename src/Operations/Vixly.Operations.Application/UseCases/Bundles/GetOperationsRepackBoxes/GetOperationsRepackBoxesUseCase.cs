@@ -80,7 +80,7 @@ public sealed class GetOperationsRepackBoxesUseCase
             OperationsShipment shipment = group.First().Shipment;
             OperationsRepackBox? box = boxes.GetValueOrDefault(shipment.Id);
             return new OperationsRepackShipmentRow(shipment.Id, shipment.Number, shipment.OriginWarehouseId, group.Count(), shipment.WayOr(settings.ConsolidationWay), shipment.ConsolidationWay is not null,
-                box?.Id, box?.Number, box?.Status, !unpaid.Contains(shipment.Id));
+                box?.Id, box?.Number, box?.Status, !unpaid.Contains(shipment.Id) || shipment.FreightCollect);
         }).OrderBy(row => row.Number, StringComparer.Ordinal).ToList();
 
         return GetOperationsRepackBoxesResponse.Success(rows, warehouses,

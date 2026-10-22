@@ -34,6 +34,12 @@ public static class OperationsRateLimits
 
     public const string Estimate = "estimate";
 
+    // Slice 5F step 4: Stripe's events to a company's webhook, per host (Stripe sends from many addresses).
+    public const string CardWebhook = "card-webhook";
+
+    // Slice 5F step 3: codes typed on a customer screen, per address.
+    public const string ScreenPair = "screen-pair";
+
     public const int StatusPagesPerMinute = 60;
 
     private static readonly string[] StatusPages =
@@ -60,6 +66,8 @@ public static class OperationsRateLimits
             options.AddPolicy(PasswordReset, http => RateLimitPartition.GetFixedWindowLimiter(Address(http), _ => Window(5, TimeSpan.FromHours(1))));
             options.AddPolicy(AccountLink, http => RateLimitPartition.GetFixedWindowLimiter(Address(http), _ => Window(10, TimeSpan.FromHours(1))));
             options.AddPolicy(Estimate, http => RateLimitPartition.GetFixedWindowLimiter(Address(http), _ => Window(240, TimeSpan.FromMinutes(1))));
+            options.AddPolicy(ScreenPair, http => RateLimitPartition.GetFixedWindowLimiter(Address(http), _ => Window(10, TimeSpan.FromMinutes(10))));
+            options.AddPolicy(CardWebhook, http => RateLimitPartition.GetFixedWindowLimiter(http.Request.Host.Host.ToLowerInvariant(), _ => Window(600, TimeSpan.FromMinutes(1))));
         });
     }
 

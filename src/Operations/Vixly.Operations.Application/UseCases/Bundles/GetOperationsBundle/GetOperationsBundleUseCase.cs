@@ -29,6 +29,8 @@ public sealed class GetOperationsBundleUseCase
 
     private readonly IOperationsBundleRepository _bundles;
 
+    private readonly OperationsBundleListing _listing;
+
     private readonly IOperationsTrackingRepository _tracking;
 
     private readonly IOperationsLocationRepository _locations;
@@ -42,6 +44,7 @@ public sealed class GetOperationsBundleUseCase
     public GetOperationsBundleUseCase(
         OperationsBundleDesk desk,
         IOperationsBundleRepository bundles,
+        OperationsBundleListing listing,
         IOperationsTrackingRepository tracking,
         IOperationsLocationRepository locations,
         OperationsBundleShipments shipments,
@@ -50,6 +53,7 @@ public sealed class GetOperationsBundleUseCase
     {
         _desk = desk ?? throw new ArgumentNullException(nameof(desk));
         _bundles = bundles ?? throw new ArgumentNullException(nameof(bundles));
+        _listing = listing ?? throw new ArgumentNullException(nameof(listing));
         _tracking = tracking ?? throw new ArgumentNullException(nameof(tracking));
         _locations = locations ?? throw new ArgumentNullException(nameof(locations));
         _shipments = shipments ?? throw new ArgumentNullException(nameof(shipments));
@@ -97,8 +101,17 @@ public sealed class GetOperationsBundleUseCase
         }
 
         OperationsWarehouse? destination = bundle.DestinationWarehouseId is { } destinationId ? await _locations.GetWarehouseAsync(destinationId, cancellationToken) : null;
+        bool manage = OperationsBundleDesk.Can(access!, OperationsPermissions.BundlesManage, warehouse);
+        IReadOnlyList<OperationsBundleItem> items = bundle.Status == OperationsBundleStatus.Voided ? Array.Empty<OperationsBundleItem>() : await _bundles.ListItemsAsync(bundle.Id, cancellationToken);
+        // One read of what the bundle could take (its own lines included) serves both the blocked lines and the choices (review of 94e28f4).
+        IReadOnlyList<OperationsBundleCandidate> takeable = bundle.IsOpen && (manage || items.Any(item => !item.IsScanned))
+            ? await _listing.CandidatesAsync(bundle, settings, cancellationToken, true)
+            : Array.Empty<OperationsBundleCandidate>();
+        IReadOnlyList<OperationsBundleListRow> list = await _listing.RowsAsync(bundle, settings, items, cancellationToken, takeable);
+        HashSet<Guid> listed = items.Select(item => item.ParcelId ?? item.BoxId!.Value).ToHashSet();
+        IReadOnlyList<OperationsBundleCandidate> candidates = manage ? takeable.Where(candidate => !listed.Contains(candidate.Id)).ToList() : Array.Empty<OperationsBundleCandidate>();
         return GetOperationsBundleResponse.Success(bundle, warehouse, destination, rows, lines, focus, OperationsBundleDesk.Can(access!, OperationsPermissions.BundlesManage, warehouse),
             OperationsBundleDesk.Can(access!, OperationsPermissions.BundlesFill, warehouse), settings.WeightUnit, settings.DimensionUnit,
-            bundle.TargetKg is { } target ? OperationsUnits.ToShownWeight(target, settings.WeightUnit) : null);
+            bundle.TargetKg is { } target ? OperationsUnits.ToShownWeight(target, settings.WeightUnit) : null, list, candidates);
     }
 }

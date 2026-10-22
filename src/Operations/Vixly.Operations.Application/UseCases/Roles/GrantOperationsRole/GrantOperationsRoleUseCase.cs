@@ -91,6 +91,11 @@ public sealed class GrantOperationsRoleUseCase
             return GrantOperationsRoleResponse.Failure(OperationsRoleErrors.OwnerProtected);
         }
 
+        if (user.IsPartnerAgent)
+        {
+            return GrantOperationsRoleResponse.Failure(OperationsRoleErrors.PartnerAgentNoRoles);
+        }
+
         if (!role.IsActive)
         {
             return GrantOperationsRoleResponse.Failure(OperationsRoleErrors.RoleInactive);

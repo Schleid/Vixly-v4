@@ -26,5 +26,9 @@ internal sealed class OperationsSignInChallengeConfiguration : IEntityTypeConfig
         builder.HasOne<OperationsUser>().WithMany().HasForeignKey(item => item.UserId).OnDelete(DeleteBehavior.Restrict);
         builder.HasIndex(item => item.TokenHash).IsUnique();
         builder.HasIndex(item => item.ExpiresUtc);
+        builder.Property(item => item.DeviceName).HasMaxLength(OperationsIdentityLimits.DeviceNameMaxLength);
+        builder.Property(item => item.DeviceNumber).HasMaxLength(OperationsIdentityLimits.DeviceNumberMaxLength).IsUnicode(false);
+        builder.Property(item => item.Country).HasMaxLength(2).IsFixedLength().IsUnicode(false);
+        builder.Ignore(item => item.Place);
     }
 }

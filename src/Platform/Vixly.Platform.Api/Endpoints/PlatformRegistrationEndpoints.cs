@@ -292,6 +292,7 @@ public static class PlatformRegistrationEndpoints
             PlatformPlanFeature.CustomDomain => "custom_domain",
             PlatformPlanFeature.WhiteLabelPortal => "white_label_portal",
             PlatformPlanFeature.AdvancedAnalytics => "advanced_analytics",
+            PlatformPlanFeature.PartnerAgents => "partner_agents",
             _ => "data_export"
         };
     }

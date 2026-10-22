@@ -31,6 +31,8 @@ internal sealed class OperationsPaymentRepository : IOperationsPaymentRepository
 
     public void Add(OperationsRefund refund) => _context.Refunds.Add(refund ?? throw new ArgumentNullException(nameof(refund)));
 
+    public void Remove(OperationsRefund refund) => _context.Refunds.Remove(refund ?? throw new ArgumentNullException(nameof(refund)));
+
     public Task<OperationsPayment?> GetPaymentAsync(Guid paymentId, CancellationToken cancellationToken) =>
         _context.Payments.FirstOrDefaultAsync(payment => payment.Id == paymentId, cancellationToken);
 
@@ -38,7 +40,7 @@ internal sealed class OperationsPaymentRepository : IOperationsPaymentRepository
         _context.Payments.AsNoTracking().FirstOrDefaultAsync(payment => payment.RequestKey == requestKey, cancellationToken);
 
     public Task<OperationsRefund?> FindRefundByKeyAsync(Guid requestKey, CancellationToken cancellationToken) =>
-        _context.Refunds.AsNoTracking().FirstOrDefaultAsync(refund => refund.RequestKey == requestKey, cancellationToken);
+        _context.Refunds.FirstOrDefaultAsync(refund => refund.RequestKey == requestKey, cancellationToken); // tracked: a pending card refund is settled from it
 
     public async Task<IReadOnlyList<OperationsPayment>> ListInvoicePaymentsAsync(Guid invoiceId, CancellationToken cancellationToken) =>
         await _context.Payments.AsNoTracking().Where(payment => payment.InvoiceId == invoiceId).OrderBy(payment => payment.TakenUtc).ToListAsync(cancellationToken);

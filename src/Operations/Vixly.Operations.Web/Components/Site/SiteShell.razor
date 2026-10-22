@@ -74,6 +74,7 @@ IMPORTANT NOTES:
         <nav class="site-nav" aria-label="@T["site.nav.label"]">
             <a href="@(Page.Home)#track">@T["site.nav.track"]</a>
             <a href="@(Page.Home)/locations">@T["site.nav.locations"]</a>
+            @if (Page.Site.PricingShown) { <a href="@(Page.Home)/pricing">@T["site.nav.pricing"]</a> }
             <a class="site-button site-button--ghost" href="/customer/sign-in">@T["site.nav.sign_in"]</a>
             <a class="site-button" href="/customer/sign-up">@T["site.nav.sign_up"]</a>
         </nav>

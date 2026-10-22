@@ -40,6 +40,10 @@ internal sealed class OperationsWarehouseConfiguration : IEntityTypeConfiguratio
         // Slice 4C: as a destination.
         builder.Ignore(item => item.IsDestination);
         builder.Ignore(item => item.IsOrigin);
+        builder.Ignore(item => item.HandlesMoney);
+        // The customers' mailbox (owner, 2026-10-21): one per company.
+        builder.Ignore(item => item.CanBeMailbox);
+        builder.HasIndex(item => new { item.TenantId, item.IsMailbox }).IsUnique().HasFilter("[IsMailbox] = 1").HasDatabaseName("IX_Warehouses_TenantId_Mailbox");
         builder.Ignore(item => item.HomeArea);
         builder.PrimitiveCollection<List<string>>("_homeArea").HasColumnName("HomeArea");
         builder.Property(item => item.OperatedBy).HasDefaultValue(OperationsDestinationOperator.Company).HasSentinel((OperationsDestinationOperator)0);

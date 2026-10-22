@@ -40,7 +40,9 @@ public static class OperationsTrackingProjection
                 continue;
             }
 
-            milestone = Advance(milestone, code.Milestone);
+            milestone = code.Rewinds && code.Milestone is { } back && milestone is { } now && !IsTerminal(now) && now < OperationsMilestone.Delivered
+                ? back
+                : Advance(milestone, code.Milestone);
             flags = (flags & ~code.Clears) | code.Sets;
 
             if (code.OpensHold)

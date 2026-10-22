@@ -55,4 +55,7 @@ public static class OperationsLocationErrors
     public static Error CodeTaken { get; } = Error.Create("ops.locations.code_taken");
 
     public static Error LabelTooLong { get; } = Error.Create("ops.locations.label_too_long", ("maxLength", OperationsLocationLimits.LabelMaxLength));
+
+    // Owner, 2026-10-21: the mailbox is an active warehouse that receives and accepts deliveries.
+    public static Error MailboxInvalid { get; } = Error.Create("ops.locations.mailbox_invalid");
 }

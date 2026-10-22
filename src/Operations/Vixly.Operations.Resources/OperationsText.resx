@@ -29,6 +29,49 @@ Thank you,
   <data name="email.customer.credit_statement.subject" xml:space="preserve">
     <value>{company}: your statement is ready</value>
   </data>
+  <data name="email.customer.email_not_allowed.body" xml:space="preserve">
+    <value>Hello {name},
+
+Someone tried to create a {company} customer account with this email. This email can't be used for a customer account. If it was you, sign up with your personal email:
+
+{link}
+
+If it wasn't you, you can ignore this email.</value>
+  </data>
+  <data name="email.customer.email_not_allowed.subject" xml:space="preserve">
+    <value>{company}: use another email to sign up</value>
+  </data>
+  <data name="email.customer.out_for_delivery.body" xml:space="preserve">
+    <value>Hello {name},
+
+Your shipment {shipment} is out for delivery today. Please make sure someone can receive it.
+
+You can follow it on your account:
+{link}
+
+Thank you,
+{company}</value>
+  </data>
+  <data name="email.customer.out_for_delivery.subject" xml:space="preserve">
+    <value>{company}: your shipment {shipment} is out for delivery</value>
+  </data>
+  <data name="email.customer.out_for_delivery_code.body" xml:space="preserve">
+    <value>Hello {name},
+
+Your shipment {shipment} is out for delivery today. Please make sure someone can receive it.
+
+Your delivery code is: {code}
+
+Give it to the driver at the door. Keep it to yourself: whoever has it may receive your shipment.
+
+{link}
+
+Thank you,
+{company}</value>
+  </data>
+  <data name="email.customer.out_for_delivery_code.subject" xml:space="preserve">
+    <value>{company}: your shipment {shipment} is out for delivery</value>
+  </data>
   <data name="email.customer.parcel_action_needed.body" xml:space="preserve">
     <value>Hello {name},
 
@@ -291,8 +334,14 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ops.auth.code_invalid" xml:space="preserve">
     <value>That code did not work. Try again.</value>
   </data>
+  <data name="ops.auth.country_needs_second_factor" xml:space="preserve">
+    <value>This device is signing in from another country than the one it was registered in. That needs your second step (an authenticator app or a recovery code), and your account has none yet. Sign in from your usual place to set one up, or ask an administrator.</value>
+  </data>
   <data name="ops.auth.link_invalid" xml:space="preserve">
     <value>This link is no longer valid. Ask for a new one.</value>
+  </data>
+  <data name="ops.auth.partner_agents_off" xml:space="preserve">
+    <value>Partner access is not available for this company right now. Contact the company.</value>
   </data>
   <data name="ops.auth.password_contains_email" xml:space="preserve">
     <value>The password must not contain your email address.</value>
@@ -399,6 +448,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ops.bundles.in_another_bundle" xml:space="preserve">
     <value>Refused: already in another bundle.</value>
   </data>
+  <data name="ops.bundles.item_scanned" xml:space="preserve">
+    <value>It is in the bundle already: take it out first.</value>
+  </data>
+  <data name="ops.bundles.items_missing" xml:space="preserve">
+    <value>Something on the list is not scanned yet: scan it, or take it off the list, before closing.</value>
+  </data>
   <data name="ops.bundles.kept_together" xml:space="preserve">
     <value>Refused: this consolidated shipment’s parcels travel together, and some are in another bundle.</value>
   </data>
@@ -407,6 +462,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ops.bundles.measurements_invalid" xml:space="preserve">
     <value>Enter the weight and the three sides, above zero.</value>
+  </data>
+  <data name="ops.bundles.not_available" xml:space="preserve">
+    <value>A chosen parcel or box can no longer go in this bundle.</value>
   </data>
   <data name="ops.bundles.not_consolidated" xml:space="preserve">
     <value>This shipment is not consolidated.</value>
@@ -420,6 +478,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ops.bundles.not_in_bundle" xml:space="preserve">
     <value>This is not in this bundle or box.</value>
   </data>
+  <data name="ops.bundles.not_on_list" xml:space="preserve">
+    <value>Refused: this bundle has a list and this is not on it.</value>
+  </data>
   <data name="ops.bundles.not_open" xml:space="preserve">
     <value>This bundle is not open.</value>
   </data>
@@ -428,6 +489,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ops.bundles.not_repacked" xml:space="preserve">
     <value>This shipment is not repacked: its parcels go into a bundle as they are.</value>
+  </data>
+  <data name="ops.bundles.nothing_chosen" xml:space="preserve">
+    <value>Choose at least one parcel or box.</value>
+  </data>
+  <data name="ops.bundles.on_another_list" xml:space="preserve">
+    <value>Refused: it is on another bundle’s list.</value>
   </data>
   <data name="ops.bundles.reason_required" xml:space="preserve">
     <value>Give a short reason.</value>
@@ -467,6 +534,36 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ops.bundles.wrong_warehouse" xml:space="preserve">
     <value>Refused: this parcel is at another warehouse.</value>
+  </data>
+  <data name="ops.cards.already_started" xml:space="preserve">
+    <value>A card payment for this invoice was just started. Open it or try again.</value>
+  </data>
+  <data name="ops.cards.charge_not_found" xml:space="preserve">
+    <value>This card payment was not found.</value>
+  </data>
+  <data name="ops.cards.keys_invalid" xml:space="preserve">
+    <value>Check the Stripe keys: a secret key (sk_ or rk_), its publishable key (pk_, same mode) and the webhook signing secret (whsec_), all accepted by Stripe.</value>
+  </data>
+  <data name="ops.cards.not_connected" xml:space="preserve">
+    <value>Cards are not taken: connect the company’s Stripe account in Settings → Payments.</value>
+  </data>
+  <data name="ops.cards.not_paid_yet" xml:space="preserve">
+    <value>Stripe has not confirmed this card payment yet.</value>
+  </data>
+  <data name="ops.cards.payments_open" xml:space="preserve">
+    <value>A card payment started on this Stripe account could not be closed at Stripe. Try again in a moment; nothing was changed.</value>
+  </data>
+  <data name="ops.cards.provider_refused" xml:space="preserve">
+    <value>Stripe refused the request. Check the account in Stripe and try again.</value>
+  </data>
+  <data name="ops.cards.provider_unavailable" xml:space="preserve">
+    <value>Stripe cannot be reached right now. Try again in a moment.</value>
+  </data>
+  <data name="ops.cards.reader_invalid" xml:space="preserve">
+    <value>Choose a card reader of this warehouse (its Stripe id starts with tmr_, once per company).</value>
+  </data>
+  <data name="ops.cards.refund_not_possible" xml:space="preserve">
+    <value>This card payment cannot be refunded through Stripe (no card payment for that amount, or Stripe refused).</value>
   </data>
   <data name="ops.charges.bands_invalid" xml:space="preserve">
     <value>Check the bands: the first starts at 0, each start once, each with an amount (and a base only for "base plus per unit").</value>
@@ -663,6 +760,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ops.customers.email_taken" xml:space="preserve">
     <value>Another customer already uses this email.</value>
   </data>
+  <data name="ops.customers.email_unavailable" xml:space="preserve">
+    <value>This email can't be used for a customer account. Sign up with your personal email.</value>
+  </data>
   <data name="ops.customers.language_invalid" xml:space="preserve">
     <value>Choose English, French or Spanish.</value>
   </data>
@@ -707,6 +807,60 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ops.customers.status_change_invalid" xml:space="preserve">
     <value>This status change is not possible.</value>
+  </data>
+  <data name="ops.delivery.cash_invalid" xml:space="preserve">
+    <value>The cash must be exactly what is owed; a difference when settling needs a note.</value>
+  </data>
+  <data name="ops.delivery.cash_not_paid_in" xml:space="preserve">
+    <value>Pay the cash collected in at the cashier first: an invoice of this route is still unpaid.</value>
+  </data>
+  <data name="ops.delivery.date_invalid" xml:space="preserve">
+    <value>Choose a day from yesterday to 30 days ahead.</value>
+  </data>
+  <data name="ops.delivery.driver_required" xml:space="preserve">
+    <value>Choose a driver who may drive from this warehouse, or name one for the run sheet.</value>
+  </data>
+  <data name="ops.delivery.empty" xml:space="preserve">
+    <value>Choose at least one shipment.</value>
+  </data>
+  <data name="ops.delivery.not_deliverable" xml:space="preserve">
+    <value>A shipment chosen cannot go out: it is no longer waiting here, or it must be paid first.</value>
+  </data>
+  <data name="ops.delivery.not_found" xml:space="preserve">
+    <value>This route or stop was not found.</value>
+  </data>
+  <data name="ops.delivery.not_out" xml:space="preserve">
+    <value>The route is not out for delivery.</value>
+  </data>
+  <data name="ops.delivery.not_planned" xml:space="preserve">
+    <value>Only a planned route can be changed or cancelled.</value>
+  </data>
+  <data name="ops.delivery.not_returned" xml:space="preserve">
+    <value>The route is not back yet: record every stop first.</value>
+  </data>
+  <data name="ops.delivery.not_your_route" xml:space="preserve">
+    <value>This is not your route.</value>
+  </data>
+  <data name="ops.delivery.on_another_route" xml:space="preserve">
+    <value>A parcel is already on another route.</value>
+  </data>
+  <data name="ops.delivery.reason_required" xml:space="preserve">
+    <value>Choose a reason; for Other, write a note (300 characters at most).</value>
+  </data>
+  <data name="ops.delivery.receiver_required" xml:space="preserve">
+    <value>Write the name of the person who received it.</value>
+  </data>
+  <data name="ops.delivery.settings_invalid" xml:space="preserve">
+    <value>Check the delivery settings: tries from 1 to 10.</value>
+  </data>
+  <data name="ops.delivery.stop_done" xml:space="preserve">
+    <value>This stop was already recorded.</value>
+  </data>
+  <data name="ops.delivery.stops_pending" xml:space="preserve">
+    <value>Some stops are not recorded yet.</value>
+  </data>
+  <data name="ops.delivery.too_many_stops" xml:space="preserve">
+    <value>A route has at most 80 stops.</value>
   </data>
   <data name="ops.destinations.area_invalid" xml:space="preserve">
     <value>Enter up to 100 communes, one per line, of up to 80 characters each, each once.</value>
@@ -1227,6 +1381,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ops.locations.label_too_long" xml:space="preserve">
     <value>Use at most {maxLength} characters for the label.</value>
   </data>
+  <data name="ops.locations.mailbox_invalid" xml:space="preserve">
+    <value>The customers’ mailbox must be an active warehouse that receives and accepts deliveries.</value>
+  </data>
   <data name="ops.locations.name_required" xml:space="preserve">
     <value>Enter the name.</value>
   </data>
@@ -1355,6 +1512,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ops.pickup.id_required" xml:space="preserve">
     <value>Choose the ID shown and type its last 4 letters or digits.</value>
+  </data>
+  <data name="ops.pickup.money_not_handled" xml:space="preserve">
+    <value>Payments are not taken here; the company settles what is owed.</value>
   </data>
   <data name="ops.pickup.not_found" xml:space="preserve">
     <value>This shipment has nothing at this warehouse.</value>
@@ -1506,6 +1666,27 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ops.roles.system_role_locked" xml:space="preserve">
     <value>The Administrator role cannot be changed.</value>
   </data>
+  <data name="ops.screens.code_invalid" xml:space="preserve">
+    <value>That code is not right or has expired. Ask the clerk for a new one.</value>
+  </data>
+  <data name="ops.screens.name_invalid" xml:space="preserve">
+    <value>Give the screen a name (up to 60 characters).</value>
+  </data>
+  <data name="ops.screens.not_found" xml:space="preserve">
+    <value>That customer screen is not at one of your counters.</value>
+  </data>
+  <data name="ops.screens.not_offered" xml:space="preserve">
+    <value>This way of paying is not available right now. Please ask the clerk.</value>
+  </data>
+  <data name="ops.screens.not_paired" xml:space="preserve">
+    <value>This screen is not paired. Ask a clerk for a code.</value>
+  </data>
+  <data name="ops.screens.signature_required" xml:space="preserve">
+    <value>Please sign in the box before tapping Sign.</value>
+  </data>
+  <data name="ops.screens.step_invalid" xml:space="preserve">
+    <value>The screen changed meanwhile. Please look at it again.</value>
+  </data>
   <data name="ops.services.days_invalid" xml:space="preserve">
     <value>Business days go from 1 to 365, the fewest first.</value>
   </data>
@@ -1541,6 +1722,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ops.shipments.booked" xml:space="preserve">
     <value>This shipment is final: it can no longer change.</value>
+  </data>
+  <data name="ops.shipments.collect_unavailable" xml:space="preserve">
+    <value>Paying at the destination is not offered.</value>
   </data>
   <data name="ops.shipments.collector_locked" xml:space="preserve">
     <value>Who may collect is named once the shipment is booked, until it is collected.</value>
@@ -1617,11 +1801,23 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ops.staff.email_taken" xml:space="preserve">
     <value>Someone on the staff already uses this email.</value>
   </data>
+  <data name="ops.staff.email_unavailable" xml:space="preserve">
+    <value>This email can't be used for a staff account. Use another email.</value>
+  </data>
   <data name="ops.staff.not_yourself" xml:space="preserve">
     <value>You cannot do this to your own account.</value>
   </data>
   <data name="ops.staff.owner_protected" xml:space="preserve">
     <value>The Owner’s account cannot be changed here.</value>
+  </data>
+  <data name="ops.staff.partner_agent_no_roles" xml:space="preserve">
+    <value>A partner agent has the partner’s access at its warehouse and no other role.</value>
+  </data>
+  <data name="ops.staff.partner_agents_off" xml:space="preserve">
+    <value>Partner agents are not part of the company’s plan.</value>
+  </data>
+  <data name="ops.staff.partner_warehouse_invalid" xml:space="preserve">
+    <value>Choose a warehouse run by a partner.</value>
   </data>
   <data name="ops.staff.password_wrong" xml:space="preserve">
     <value>The current password is not correct.</value>
@@ -1872,6 +2068,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="site.nav.locations" xml:space="preserve">
     <value>Locations</value>
   </data>
+  <data name="site.nav.pricing" xml:space="preserve">
+    <value>Pricing</value>
+  </data>
   <data name="site.nav.sign_in" xml:space="preserve">
     <value>Customer login</value>
   </data>
@@ -1886,6 +2085,42 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="site.preview.banner" xml:space="preserve">
     <value>Preview: visitors do not see these changes until you publish.</value>
+  </data>
+  <data name="site.pricing.any_destination" xml:space="preserve">
+    <value>any destination</value>
+  </data>
+  <data name="site.pricing.any_origin" xml:space="preserve">
+    <value>any of our locations</value>
+  </data>
+  <data name="site.pricing.consolidation_fee" xml:space="preserve">
+    <value>Consolidation fee</value>
+  </data>
+  <data name="site.pricing.intro" xml:space="preserve">
+    <value>Our prices by service and route. Sign up to see the price of your own package.</value>
+  </data>
+  <data name="site.pricing.minimum" xml:space="preserve">
+    <value>Minimum charge</value>
+  </data>
+  <data name="site.pricing.none" xml:space="preserve">
+    <value>No prices are in force right now. Contact us for a price.</value>
+  </data>
+  <data name="site.pricing.per_package" xml:space="preserve">
+    <value>Per package</value>
+  </data>
+  <data name="site.pricing.per_shipment" xml:space="preserve">
+    <value>Per shipment</value>
+  </data>
+  <data name="site.pricing.route" xml:space="preserve">
+    <value>From {origin} to {destination}</value>
+  </data>
+  <data name="site.pricing.service_fee" xml:space="preserve">
+    <value>Service fee</value>
+  </data>
+  <data name="site.pricing.since" xml:space="preserve">
+    <value>In force since {date}</value>
+  </data>
+  <data name="site.pricing.title" xml:space="preserve">
+    <value>Pricing</value>
   </data>
   <data name="site.service.air.text" xml:space="preserve">
     <value>Fast air shipping for your packages.</value>
@@ -2036,6 +2271,87 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.account.title" xml:space="preserve">
     <value>My account</value>
+  </data>
+  <data name="ui.activity.browser" xml:space="preserve">
+    <value>Browser</value>
+  </data>
+  <data name="ui.activity.count" xml:space="preserve">
+    <value>{count} sign-ins</value>
+  </data>
+  <data name="ui.activity.country" xml:space="preserve">
+    <value>Country</value>
+  </data>
+  <data name="ui.activity.country.tor" xml:space="preserve">
+    <value>Tor</value>
+  </data>
+  <data name="ui.activity.country.unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="ui.activity.country_changed" xml:space="preserve">
+    <value>Not the device's country, confirmed with the second step</value>
+  </data>
+  <data name="ui.activity.device" xml:space="preserve">
+    <value>Device</value>
+  </data>
+  <data name="ui.activity.ended.absolute_lifetime" xml:space="preserve">
+    <value>after 12 hours</value>
+  </data>
+  <data name="ui.activity.ended.account_restricted" xml:space="preserve">
+    <value>account restricted</value>
+  </data>
+  <data name="ui.activity.ended.country_changed" xml:space="preserve">
+    <value>used from another country</value>
+  </data>
+  <data name="ui.activity.ended.device_removed" xml:space="preserve">
+    <value>device removed</value>
+  </data>
+  <data name="ui.activity.ended.ended_by_administrator" xml:space="preserve">
+    <value>ended by an administrator</value>
+  </data>
+  <data name="ui.activity.ended.ended_by_user" xml:space="preserve">
+    <value>ended by the member</value>
+  </data>
+  <data name="ui.activity.ended.idle_timeout" xml:space="preserve">
+    <value>after 15 idle minutes</value>
+  </data>
+  <data name="ui.activity.ended.password_changed" xml:space="preserve">
+    <value>password changed</value>
+  </data>
+  <data name="ui.activity.ended.second_factor_reset" xml:space="preserve">
+    <value>second step reset</value>
+  </data>
+  <data name="ui.activity.ended.signed_out" xml:space="preserve">
+    <value>signed out</value>
+  </data>
+  <data name="ui.activity.everyone" xml:space="preserve">
+    <value>Everyone</value>
+  </data>
+  <data name="ui.activity.member" xml:space="preserve">
+    <value>Member</value>
+  </data>
+  <data name="ui.activity.no_device" xml:space="preserve">
+    <value>No registered device</value>
+  </data>
+  <data name="ui.activity.of" xml:space="preserve">
+    <value>Sign-ins of {name}</value>
+  </data>
+  <data name="ui.activity.refused_hint" xml:space="preserve">
+    <value>Refused sign-ins, wrong passwords and codes are in the history.</value>
+  </data>
+  <data name="ui.activity.refused_link" xml:space="preserve">
+    <value>See them</value>
+  </data>
+  <data name="ui.activity.signed_in" xml:space="preserve">
+    <value>Signed in</value>
+  </data>
+  <data name="ui.activity.signed_out" xml:space="preserve">
+    <value>Signed out</value>
+  </data>
+  <data name="ui.activity.still_signed_in" xml:space="preserve">
+    <value>Still signed in</value>
+  </data>
+  <data name="ui.activity.title" xml:space="preserve">
+    <value>Sign-in activity</value>
   </data>
   <data name="ui.app.name" xml:space="preserve">
     <value>Operations</value>
@@ -2559,6 +2875,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.bundles.done.created" xml:space="preserve">
     <value>Bundle opened. Print its label.</value>
   </data>
+  <data name="ui.bundles.done.listed" xml:space="preserve">
+    <value>Added to the list: scan each one at the station.</value>
+  </data>
   <data name="ui.bundles.done.voided" xml:space="preserve">
     <value>Bundle voided. Its parcels are ready to bundle again.</value>
   </data>
@@ -2608,7 +2927,49 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Length ({unit})</value>
   </data>
   <data name="ui.bundles.list" xml:space="preserve">
-    <value>Bundles</value>
+    <value>List</value>
+  </data>
+  <data name="ui.bundles.list_add" xml:space="preserve">
+    <value>Add to the list</value>
+  </data>
+  <data name="ui.bundles.list_add_button" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="ui.bundles.list_box" xml:space="preserve">
+    <value>box</value>
+  </data>
+  <data name="ui.bundles.list_box_parcels" xml:space="preserve">
+    <value>box of {count}</value>
+  </data>
+  <data name="ui.bundles.list_entered" xml:space="preserve">
+    <value>Entered: {count}</value>
+  </data>
+  <data name="ui.bundles.list_hint" xml:space="preserve">
+    <value>Parcels and closed boxes here that this bundle may take. Once it has a list, the station takes only what is on it, and the bundle closes once nothing is missing.</value>
+  </data>
+  <data name="ui.bundles.list_item" xml:space="preserve">
+    <value>Parcel or box</value>
+  </data>
+  <data name="ui.bundles.list_missing" xml:space="preserve">
+    <value>Missing: {count}</value>
+  </data>
+  <data name="ui.bundles.list_none" xml:space="preserve">
+    <value>No list: the station takes any parcel that fits. Add parcels below to build the bundle from here; the station then confirms each one.</value>
+  </data>
+  <data name="ui.bundles.list_remove" xml:space="preserve">
+    <value>Take off the list</value>
+  </data>
+  <data name="ui.bundles.list_scanned" xml:space="preserve">
+    <value>Scanned: {count}</value>
+  </data>
+  <data name="ui.bundles.list_state.blocked" xml:space="preserve">
+    <value>Can no longer go in: take it off the list</value>
+  </data>
+  <data name="ui.bundles.list_state.missing" xml:space="preserve">
+    <value>Missing</value>
+  </data>
+  <data name="ui.bundles.list_state.scanned" xml:space="preserve">
+    <value>Scanned</value>
   </data>
   <data name="ui.bundles.meter" xml:space="preserve">
     <value>{count} parcels · {filled}</value>
@@ -2747,6 +3108,123 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.bundles.width" xml:space="preserve">
     <value>Width ({unit})</value>
+  </data>
+  <data name="ui.cards.accepted" xml:space="preserve">
+    <value>Cards are accepted.</value>
+  </data>
+  <data name="ui.cards.account_unnamed" xml:space="preserve">
+    <value>Stripe account</value>
+  </data>
+  <data name="ui.cards.add_reader" xml:space="preserve">
+    <value>Add the reader</value>
+  </data>
+  <data name="ui.cards.back_to_invoice" xml:space="preserve">
+    <value>Back to the invoice</value>
+  </data>
+  <data name="ui.cards.cancel" xml:space="preserve">
+    <value>Cancel this card payment</value>
+  </data>
+  <data name="ui.cards.cancelled" xml:space="preserve">
+    <value>This card payment was not made (cancelled or expired).</value>
+  </data>
+  <data name="ui.cards.connect" xml:space="preserve">
+    <value>Connect Stripe</value>
+  </data>
+  <data name="ui.cards.disconnect" xml:space="preserve">
+    <value>Disconnect Stripe</value>
+  </data>
+  <data name="ui.cards.intro" xml:space="preserve">
+    <value>Cards are paid on Stripe’s secure page or on a Stripe card reader, into the company’s own Stripe account. Card numbers never pass through this system.</value>
+  </data>
+  <data name="ui.cards.key_hint" xml:space="preserve">
+    <value>secret key ending in {hint}</value>
+  </data>
+  <data name="ui.cards.live" xml:space="preserve">
+    <value>Live</value>
+  </data>
+  <data name="ui.cards.not_accepted" xml:space="preserve">
+    <value>Cards are not offered.</value>
+  </data>
+  <data name="ui.cards.not_connected" xml:space="preserve">
+    <value>No Stripe account is connected.</value>
+  </data>
+  <data name="ui.cards.on_reader" xml:space="preserve">
+    <value>Card on {reader}</value>
+  </data>
+  <data name="ui.cards.open_page" xml:space="preserve">
+    <value>Open the payment page on this screen</value>
+  </data>
+  <data name="ui.cards.paid" xml:space="preserve">
+    <value>Paid by card: Stripe confirmed it.</value>
+  </data>
+  <data name="ui.cards.paid_not_applied" xml:space="preserve">
+    <value>Stripe took the money, but the invoice no longer owed exactly that amount (it changed meanwhile). Nothing was recorded on it: refund the card in Stripe, then take the payment again.</value>
+  </data>
+  <data name="ui.cards.pay_hint" xml:space="preserve">
+    <value>The customer pays the full amount on Stripe’s secure page (a QR code for their phone) or on a card reader. It is recorded once Stripe confirms it.</value>
+  </data>
+  <data name="ui.cards.pay_title" xml:space="preserve">
+    <value>Pay by card</value>
+  </data>
+  <data name="ui.cards.payment_page" xml:space="preserve">
+    <value>Card: payment page (QR code)</value>
+  </data>
+  <data name="ui.cards.publishable_key" xml:space="preserve">
+    <value>Publishable key (pk_…)</value>
+  </data>
+  <data name="ui.cards.qr_alt" xml:space="preserve">
+    <value>QR code of the payment page</value>
+  </data>
+  <data name="ui.cards.reader_id" xml:space="preserve">
+    <value>Stripe reader id</value>
+  </data>
+  <data name="ui.cards.reader_label" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ui.cards.reader_warehouse" xml:space="preserve">
+    <value>Warehouse</value>
+  </data>
+  <data name="ui.cards.readers" xml:space="preserve">
+    <value>Card readers</value>
+  </data>
+  <data name="ui.cards.readers_hint" xml:space="preserve">
+    <value>Register each Stripe Terminal reader in Stripe first, then add it here with its id (tmr_…) and the warehouse where it sits.</value>
+  </data>
+  <data name="ui.cards.remove_reader" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ui.cards.replace" xml:space="preserve">
+    <value>Replace the Stripe keys</value>
+  </data>
+  <data name="ui.cards.secret_key" xml:space="preserve">
+    <value>Secret key (sk_… or restricted rk_…)</value>
+  </data>
+  <data name="ui.cards.see_payment" xml:space="preserve">
+    <value>Payment {number} and its receipt</value>
+  </data>
+  <data name="ui.cards.test" xml:space="preserve">
+    <value>Test mode</value>
+  </data>
+  <data name="ui.cards.title" xml:space="preserve">
+    <value>Cards (Stripe)</value>
+  </data>
+  <data name="ui.cards.turn_off" xml:space="preserve">
+    <value>Stop taking cards</value>
+  </data>
+  <data name="ui.cards.turn_on" xml:space="preserve">
+    <value>Take cards</value>
+  </data>
+  <data name="ui.cards.waiting_page" xml:space="preserve">
+    <value>The customer scans the code with their phone and pays on Stripe’s secure page. This page updates by itself.</value>
+  </data>
+  <data name="ui.cards.waiting_reader" xml:space="preserve">
+    <value>Waiting for the card on {reader}…</value>
+  </data>
+  <data name="ui.cards.webhook_hint" xml:space="preserve">
+    <value>In Stripe, add a webhook endpoint at {url} for the events checkout.session.completed, checkout.session.async_payment_succeeded, checkout.session.expired, payment_intent.succeeded and payment_intent.canceled, then paste its signing secret here.</value>
+  </data>
+  <data name="ui.cards.webhook_secret" xml:space="preserve">
+    <value>Webhook signing secret (whsec_…)</value>
   </data>
   <data name="ui.carriers.account" xml:space="preserve">
     <value>Account number</value>
@@ -3357,6 +3835,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.charges.not_in_use" xml:space="preserve">
     <value>not in use</value>
   </data>
+  <data name="ui.charges.published" xml:space="preserve">
+    <value>Publish on the public website</value>
+  </data>
+  <data name="ui.charges.published_hint" xml:space="preserve">
+    <value>Shown on your public website while public prices are on in the settings. A customer's own price list is never published.</value>
+  </data>
   <data name="ui.charges.route.any_destination" xml:space="preserve">
     <value>Any destination</value>
   </data>
@@ -3578,6 +4062,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.counter.code" xml:space="preserve">
     <value>Code</value>
+  </data>
+  <data name="ui.counter.collect" xml:space="preserve">
+    <value>Pay at the destination (freight collect)</value>
   </data>
   <data name="ui.counter.consolidate" xml:space="preserve">
     <value>Consolidate</value>
@@ -5094,11 +5581,365 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.declaration.weight" xml:space="preserve">
     <value>Weight</value>
   </data>
+  <data name="ui.delivery.add" xml:space="preserve">
+    <value>Add shipments waiting</value>
+  </data>
+  <data name="ui.delivery.add_button" xml:space="preserve">
+    <value>Add to the route</value>
+  </data>
+  <data name="ui.delivery.area" xml:space="preserve">
+    <value>Area</value>
+  </data>
+  <data name="ui.delivery.back" xml:space="preserve">
+    <value>Back to home delivery</value>
+  </data>
+  <data name="ui.delivery.bill" xml:space="preserve">
+    <value>Bill destination charges</value>
+  </data>
+  <data name="ui.delivery.bill_button" xml:space="preserve">
+    <value>Bill</value>
+  </data>
+  <data name="ui.delivery.bill_hint" xml:space="preserve">
+    <value>Customs duties and local taxes as received, and the company’s local fee. The customer pays before the shipment goes out.</value>
+  </data>
+  <data name="ui.delivery.bill_hint_cod" xml:space="preserve">
+    <value>Customs duties and local taxes as received, and the company’s local fee. The driver collects them at the door unless paid before.</value>
+  </data>
+  <data name="ui.delivery.cancel" xml:space="preserve">
+    <value>Cancel the route</value>
+  </data>
+  <data name="ui.delivery.cancel_button" xml:space="preserve">
+    <value>Cancel the route</value>
+  </data>
+  <data name="ui.delivery.cancel_reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="ui.delivery.cash" xml:space="preserve">
+    <value>Cash collected</value>
+  </data>
+  <data name="ui.delivery.cash_collected" xml:space="preserve">
+    <value>Cash collected ({currency})</value>
+  </data>
+  <data name="ui.delivery.cash_hint" xml:space="preserve">
+    <value>Collect exactly this amount. If the customer cannot pay, record the stop as not delivered: not paid.</value>
+  </data>
+  <data name="ui.delivery.choose" xml:space="preserve">
+    <value>Choose</value>
+  </data>
+  <data name="ui.delivery.cod_off_hint" xml:space="preserve">
+    <value>A shipment goes out once paid. The company may take cash on delivery under Delivery settings.</value>
+  </data>
+  <data name="ui.delivery.cod_on_hint" xml:space="preserve">
+    <value>Unpaid shipments may go out: the driver collects what is owed, paid in at the cashier when the route is settled.</value>
+  </data>
+  <data name="ui.delivery.code" xml:space="preserve">
+    <value>Delivery code</value>
+  </data>
+  <data name="ui.delivery.collect" xml:space="preserve">
+    <value>Collect {amount} {currency}</value>
+  </data>
+  <data name="ui.delivery.collected" xml:space="preserve">
+    <value>{amount} {currency} collected</value>
+  </data>
+  <data name="ui.delivery.date" xml:space="preserve">
+    <value>Day</value>
+  </data>
+  <data name="ui.delivery.delivered_button" xml:space="preserve">
+    <value>Record as delivered</value>
+  </data>
+  <data name="ui.delivery.delivered_line" xml:space="preserve">
+    <value>Received by {name} on {date}</value>
+  </data>
+  <data name="ui.delivery.done.billed" xml:space="preserve">
+    <value>Billed: the invoice is with the cashier.</value>
+  </data>
+  <data name="ui.delivery.done.cancelled" xml:space="preserve">
+    <value>Route cancelled: its shipments wait for another.</value>
+  </data>
+  <data name="ui.delivery.done.changed" xml:space="preserve">
+    <value>Route changed.</value>
+  </data>
+  <data name="ui.delivery.done.planned" xml:space="preserve">
+    <value>Route planned. Print the run sheet, then start it when the driver leaves.</value>
+  </data>
+  <data name="ui.delivery.done.recorded" xml:space="preserve">
+    <value>Stop recorded.</value>
+  </data>
+  <data name="ui.delivery.done.returned" xml:space="preserve">
+    <value>Marked as returned to the sender.</value>
+  </data>
+  <data name="ui.delivery.done.settled" xml:space="preserve">
+    <value>Route settled.</value>
+  </data>
+  <data name="ui.delivery.done.started" xml:space="preserve">
+    <value>Route started: its parcels are out for delivery.</value>
+  </data>
+  <data name="ui.delivery.down" xml:space="preserve">
+    <value>Down</value>
+  </data>
+  <data name="ui.delivery.driver" xml:space="preserve">
+    <value>Driver</value>
+  </data>
+  <data name="ui.delivery.driver_choose" xml:space="preserve">
+    <value>Choose a driver</value>
+  </data>
+  <data name="ui.delivery.driver_hint_sheet" xml:space="preserve">
+    <value>The driver writes each result on the run sheet; staff enter them when the driver is back.</value>
+  </data>
+  <data name="ui.delivery.driver_name" xml:space="preserve">
+    <value>Driver’s name</value>
+  </data>
+  <data name="ui.delivery.driver_named" xml:space="preserve">
+    <value>No account: name below</value>
+  </data>
+  <data name="ui.delivery.failed_button" xml:space="preserve">
+    <value>Record as not delivered</value>
+  </data>
+  <data name="ui.delivery.failed_line" xml:space="preserve">
+    <value>Not delivered: {reason}, {date}</value>
+  </data>
+  <data name="ui.delivery.failure" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="ui.delivery.failure.address_wrong" xml:space="preserve">
+    <value>Address wrong or not found</value>
+  </data>
+  <data name="ui.delivery.failure.no_access" xml:space="preserve">
+    <value>No access to the address</value>
+  </data>
+  <data name="ui.delivery.failure.not_home" xml:space="preserve">
+    <value>No one at home</value>
+  </data>
+  <data name="ui.delivery.failure.not_paid" xml:space="preserve">
+    <value>Not paid</value>
+  </data>
+  <data name="ui.delivery.failure.other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="ui.delivery.failure.refused" xml:space="preserve">
+    <value>Refused</value>
+  </data>
+  <data name="ui.delivery.failure_hint" xml:space="preserve">
+    <value>Each failure counts as a try. After the last, the parcel waits for pickup or goes back, as the company chose.</value>
+  </data>
+  <data name="ui.delivery.from_sheet" xml:space="preserve">
+    <value>on the run sheet</value>
+  </data>
+  <data name="ui.delivery.handed_in" xml:space="preserve">
+    <value>Cash handed in</value>
+  </data>
+  <data name="ui.delivery.handed_in_field" xml:space="preserve">
+    <value>Cash handed in ({currency})</value>
+  </data>
+  <data name="ui.delivery.no_drivers" xml:space="preserve">
+    <value>No one may drive from this warehouse yet: give a role with “Drive delivery routes” under Team.</value>
+  </data>
+  <data name="ui.delivery.no_routes" xml:space="preserve">
+    <value>No route yet.</value>
+  </data>
+  <data name="ui.delivery.no_stops" xml:space="preserve">
+    <value>No stop yet: add shipments waiting below.</value>
+  </data>
+  <data name="ui.delivery.none_waiting" xml:space="preserve">
+    <value>Nothing is waiting for home delivery here.</value>
+  </data>
+  <data name="ui.delivery.note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="ui.delivery.parcels_line" xml:space="preserve">
+    <value>{count} parcel(s)</value>
+  </data>
+  <data name="ui.delivery.pay_first" xml:space="preserve">
+    <value>To pay first</value>
+  </data>
+  <data name="ui.delivery.pay_in_first" xml:space="preserve">
+    <value>Pay in at the cashier first: each invoice collected for must be paid.</value>
+  </data>
+  <data name="ui.delivery.photo" xml:space="preserve">
+    <value>Photo of the delivery</value>
+  </data>
+  <data name="ui.delivery.plan" xml:space="preserve">
+    <value>Plan a route</value>
+  </data>
+  <data name="ui.delivery.plan_button" xml:space="preserve">
+    <value>Plan the route</value>
+  </data>
+  <data name="ui.delivery.print_sheet" xml:space="preserve">
+    <value>Print the run sheet</value>
+  </data>
+  <data name="ui.delivery.receiver" xml:space="preserve">
+    <value>Received by</value>
+  </data>
+  <data name="ui.delivery.record_delivered" xml:space="preserve">
+    <value>Delivered</value>
+  </data>
+  <data name="ui.delivery.record_failed" xml:space="preserve">
+    <value>Not delivered</value>
+  </data>
+  <data name="ui.delivery.remove" xml:space="preserve">
+    <value>Take off</value>
+  </data>
+  <data name="ui.delivery.return_action" xml:space="preserve">
+    <value>Sent back</value>
+  </data>
+  <data name="ui.delivery.returned_button" xml:space="preserve">
+    <value>Returned to sender</value>
+  </data>
+  <data name="ui.delivery.returns" xml:space="preserve">
+    <value>Going back to the sender</value>
+  </data>
+  <data name="ui.delivery.returns_hint" xml:space="preserve">
+    <value>These parcels failed their last delivery attempt. Mark each one when it leaves for its origin.</value>
+  </data>
+  <data name="ui.delivery.route" xml:space="preserve">
+    <value>Route</value>
+  </data>
+  <data name="ui.delivery.route_details" xml:space="preserve">
+    <value>Route</value>
+  </data>
+  <data name="ui.delivery.route_status.Cancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="ui.delivery.route_status.Out" xml:space="preserve">
+    <value>Out</value>
+  </data>
+  <data name="ui.delivery.route_status.Planned" xml:space="preserve">
+    <value>Planned</value>
+  </data>
+  <data name="ui.delivery.route_status.Returned" xml:space="preserve">
+    <value>Back, to settle</value>
+  </data>
+  <data name="ui.delivery.route_status.Settled" xml:space="preserve">
+    <value>Settled</value>
+  </data>
+  <data name="ui.delivery.route_title" xml:space="preserve">
+    <value>Route {number}</value>
+  </data>
+  <data name="ui.delivery.routes" xml:space="preserve">
+    <value>Routes</value>
+  </data>
+  <data name="ui.delivery.settle" xml:space="preserve">
+    <value>Settle the route</value>
+  </data>
+  <data name="ui.delivery.settle_button" xml:space="preserve">
+    <value>Settle</value>
+  </data>
+  <data name="ui.delivery.settle_collected" xml:space="preserve">
+    <value>Collected on the route: {amount} {currency}.</value>
+  </data>
+  <data name="ui.delivery.settle_hint" xml:space="preserve">
+    <value>Count the cash the driver hands in.</value>
+  </data>
+  <data name="ui.delivery.settle_note" xml:space="preserve">
+    <value>Note (needed when the amounts differ)</value>
+  </data>
+  <data name="ui.delivery.sheet_signed_hint" xml:space="preserve">
+    <value>The receiver signed the run sheet.</value>
+  </data>
+  <data name="ui.delivery.show" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="ui.delivery.start" xml:space="preserve">
+    <value>Start the route</value>
+  </data>
+  <data name="ui.delivery.start_hint" xml:space="preserve">
+    <value>When the driver leaves: the parcels are out for delivery and the customers are told.</value>
+  </data>
+  <data name="ui.delivery.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.delivery.stop_status.Delivered" xml:space="preserve">
+    <value>Delivered</value>
+  </data>
+  <data name="ui.delivery.stop_status.Failed" xml:space="preserve">
+    <value>Not delivered</value>
+  </data>
+  <data name="ui.delivery.stop_status.Pending" xml:space="preserve">
+    <value>To deliver</value>
+  </data>
+  <data name="ui.delivery.stops" xml:space="preserve">
+    <value>Stops</value>
+  </data>
+  <data name="ui.delivery.title" xml:space="preserve">
+    <value>Home delivery</value>
+  </data>
+  <data name="ui.delivery.tries" xml:space="preserve">
+    <value>Tries</value>
+  </data>
+  <data name="ui.delivery.up" xml:space="preserve">
+    <value>Up</value>
+  </data>
+  <data name="ui.delivery.waiting" xml:space="preserve">
+    <value>Waiting for delivery</value>
+  </data>
+  <data name="ui.delivery_settings.after.ReturnToOrigin" xml:space="preserve">
+    <value>Then the parcel goes back to its origin</value>
+  </data>
+  <data name="ui.delivery_settings.after.WaitForPickup" xml:space="preserve">
+    <value>Then the parcel waits for pickup at the warehouse (the customer is told)</value>
+  </data>
+  <data name="ui.delivery_settings.cash" xml:space="preserve">
+    <value>Take cash on delivery</value>
+  </data>
+  <data name="ui.delivery_settings.cash_hint" xml:space="preserve">
+    <value>Off: a shipment goes out only once paid. On: the driver collects what is owed, handed in at the cashier when the route is settled.</value>
+  </data>
+  <data name="ui.delivery_settings.emails" xml:space="preserve">
+    <value>Email customers when their shipment goes out for delivery</value>
+  </data>
+  <data name="ui.delivery_settings.failed" xml:space="preserve">
+    <value>Failed deliveries</value>
+  </data>
+  <data name="ui.delivery_settings.payment" xml:space="preserve">
+    <value>Payment</value>
+  </data>
+  <data name="ui.delivery_settings.proof.Code" xml:space="preserve">
+    <value>A delivery code, emailed when the route starts</value>
+  </data>
+  <data name="ui.delivery_settings.proof.Id" xml:space="preserve">
+    <value>The ID’s last 4 characters</value>
+  </data>
+  <data name="ui.delivery_settings.proof.Photo" xml:space="preserve">
+    <value>A photo of the delivery</value>
+  </data>
+  <data name="ui.delivery_settings.proof.Signature" xml:space="preserve">
+    <value>A signature</value>
+  </data>
+  <data name="ui.delivery_settings.proofs" xml:space="preserve">
+    <value>Proof at the door</value>
+  </data>
+  <data name="ui.delivery_settings.proofs_hint" xml:space="preserve">
+    <value>The receiver’s name is always asked. On the run sheet the receiver signs the paper; a photo needs the phone page.</value>
+  </data>
+  <data name="ui.delivery_settings.recording" xml:space="preserve">
+    <value>How drivers record their stops</value>
+  </data>
+  <data name="ui.delivery_settings.recording.Phone" xml:space="preserve">
+    <value>On a phone page, as they go (drivers sign in)</value>
+  </data>
+  <data name="ui.delivery_settings.recording.Sheet" xml:space="preserve">
+    <value>On the printed run sheet; staff enter the results afterwards</value>
+  </data>
+  <data name="ui.delivery_settings.title" xml:space="preserve">
+    <value>Delivery settings</value>
+  </data>
+  <data name="ui.delivery_settings.tries" xml:space="preserve">
+    <value>Tries before giving up</value>
+  </data>
   <data name="ui.devices.active" xml:space="preserve">
     <value>In use</value>
   </data>
   <data name="ui.devices.approve" xml:space="preserve">
     <value>Approve</value>
+  </data>
+  <data name="ui.devices.authorised_by" xml:space="preserve">
+    <value>Authorised by</value>
+  </data>
+  <data name="ui.devices.authorised_by_link" xml:space="preserve">
+    <value>the owner's email link</value>
+  </data>
+  <data name="ui.devices.browser" xml:space="preserve">
+    <value>Browser</value>
   </data>
   <data name="ui.devices.check.device_released" xml:space="preserve">
     <value>This computer was released and must be added again.</value>
@@ -5154,6 +5995,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.devices.kind" xml:space="preserve">
     <value>Kind</value>
   </data>
+  <data name="ui.devices.kind.desktop" xml:space="preserve">
+    <value>Desktop</value>
+  </data>
+  <data name="ui.devices.kind.laptop" xml:space="preserve">
+    <value>Laptop</value>
+  </data>
   <data name="ui.devices.kind.other" xml:space="preserve">
     <value>Other</value>
   </data>
@@ -5161,7 +6008,7 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Computer</value>
   </data>
   <data name="ui.devices.kind.phone" xml:space="preserve">
-    <value>Phone</value>
+    <value>Mobile</value>
   </data>
   <data name="ui.devices.kind.scanner" xml:space="preserve">
     <value>Scanner</value>
@@ -5171,6 +6018,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.devices.last_seen" xml:space="preserve">
     <value>Last seen</value>
+  </data>
+  <data name="ui.devices.licence" xml:space="preserve">
+    <value>Licence</value>
   </data>
   <data name="ui.devices.link_missing" xml:space="preserve">
     <value>The link is incomplete. Open it again from the email.</value>
@@ -5210,6 +6060,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.devices.recover.title" xml:space="preserve">
     <value>Enrol this computer</value>
+  </data>
+  <data name="ui.devices.registered" xml:space="preserve">
+    <value>Registered</value>
   </data>
   <data name="ui.devices.release" xml:space="preserve">
     <value>Stop this device</value>
@@ -5637,6 +6490,21 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.drawers.warehouse" xml:space="preserve">
     <value>Warehouse</value>
   </data>
+  <data name="ui.drive.back" xml:space="preserve">
+    <value>Back to my routes</value>
+  </data>
+  <data name="ui.drive.mine" xml:space="preserve">
+    <value>My routes</value>
+  </data>
+  <data name="ui.drive.none" xml:space="preserve">
+    <value>No route for you today.</value>
+  </data>
+  <data name="ui.drive.progress" xml:space="preserve">
+    <value>{done} of {count} stops</value>
+  </data>
+  <data name="ui.drive.title" xml:space="preserve">
+    <value>My routes</value>
+  </data>
   <data name="ui.editor.address" xml:space="preserve">
     <value>Address</value>
   </data>
@@ -5745,6 +6613,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.editor.destination.partner_email" xml:space="preserve">
     <value>Partner email</value>
   </data>
+  <data name="ui.editor.destination.partner_money" xml:space="preserve">
+    <value>The partner takes payments here</value>
+  </data>
+  <data name="ui.editor.destination.partner_money_hint" xml:space="preserve">
+    <value>Off: the partner’s agents see no amounts or invoices, and parcels are released or delivered only once paid. On: they take payments at the counter and cash on delivery.</value>
+  </data>
   <data name="ui.editor.destination.partner_name" xml:space="preserve">
     <value>Partner name</value>
   </data>
@@ -5783,6 +6657,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.editor.nav.account" xml:space="preserve">
     <value>My account</value>
+  </data>
+  <data name="ui.editor.nav.activity" xml:space="preserve">
+    <value>Sign-in activity</value>
   </data>
   <data name="ui.editor.nav.arrivals" xml:space="preserve">
     <value>Arrivals</value>
@@ -5823,11 +6700,20 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.editor.nav.customers" xml:space="preserve">
     <value>Customers</value>
   </data>
+  <data name="ui.editor.nav.delivery" xml:space="preserve">
+    <value>Home delivery</value>
+  </data>
+  <data name="ui.editor.nav.delivery_settings" xml:space="preserve">
+    <value>Delivery settings</value>
+  </data>
   <data name="ui.editor.nav.devices" xml:space="preserve">
     <value>Devices</value>
   </data>
   <data name="ui.editor.nav.dispatches" xml:space="preserve">
     <value>Dispatches</value>
+  </data>
+  <data name="ui.editor.nav.drive" xml:space="preserve">
+    <value>My routes</value>
   </data>
   <data name="ui.editor.nav.event_settings" xml:space="preserve">
     <value>Events settings</value>
@@ -6134,6 +7020,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.editor.warehouse.edit" xml:space="preserve">
     <value>Edit the warehouse</value>
+  </data>
+  <data name="ui.editor.warehouse.mailbox" xml:space="preserve">
+    <value>Customers’ mailbox</value>
+  </data>
+  <data name="ui.editor.warehouse.mailbox_hint" xml:space="preserve">
+    <value>Online purchases and pre-alerts come to this warehouse; customers see only its address. One per company: choosing it here takes it from the other. Customers may still drop packages off at any receiving warehouse.</value>
   </data>
   <data name="ui.editor.warehouse.manager" xml:space="preserve">
     <value>Manager</value>
@@ -7542,6 +8434,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.invoice.pdf.paid" xml:space="preserve">
     <value>Paid</value>
   </data>
+  <data name="ui.invoice.pdf.pay_at_destination" xml:space="preserve">
+    <value>Freight collect: to pay at the destination.</value>
+  </data>
   <data name="ui.invoice.pdf.pending" xml:space="preserve">
     <value>Awaiting confirmation</value>
   </data>
@@ -7911,6 +8806,60 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.legal.version" xml:space="preserve">
     <value>Version</value>
   </data>
+  <data name="ui.licences.back" xml:space="preserve">
+    <value>All licences</value>
+  </data>
+  <data name="ui.licences.decide" xml:space="preserve">
+    <value>Approve this device?</value>
+  </data>
+  <data name="ui.licences.device_id" xml:space="preserve">
+    <value>Device ID</value>
+  </data>
+  <data name="ui.licences.licence" xml:space="preserve">
+    <value>Licence</value>
+  </data>
+  <data name="ui.licences.name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ui.licences.release_title" xml:space="preserve">
+    <value>Release its licence</value>
+  </data>
+  <data name="ui.licences.scheduled" xml:space="preserve">
+    <value>From {date}, {seats} licences: release the devices over that number before then.</value>
+  </data>
+  <data name="ui.licences.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.licences.status.active" xml:space="preserve">
+    <value>Bound</value>
+  </data>
+  <data name="ui.licences.status.denied" xml:space="preserve">
+    <value>Denied</value>
+  </data>
+  <data name="ui.licences.status.expired" xml:space="preserve">
+    <value>Expired</value>
+  </data>
+  <data name="ui.licences.status.free" xml:space="preserve">
+    <value>Free</value>
+  </data>
+  <data name="ui.licences.status.pending" xml:space="preserve">
+    <value>Requested</value>
+  </data>
+  <data name="ui.licences.status.release_pending" xml:space="preserve">
+    <value>Release requested</value>
+  </data>
+  <data name="ui.licences.status.released" xml:space="preserve">
+    <value>Released</value>
+  </data>
+  <data name="ui.licences.status.revoked" xml:space="preserve">
+    <value>Revoked</value>
+  </data>
+  <data name="ui.licences.summary" xml:space="preserve">
+    <value>{inUse} of {seats} licences in use</value>
+  </data>
+  <data name="ui.licences.title" xml:space="preserve">
+    <value>Licences</value>
+  </data>
   <data name="ui.manifest.arrives" xml:space="preserve">
     <value>Arrives</value>
   </data>
@@ -8211,6 +9160,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.payments.method.BankTransfer" xml:space="preserve">
     <value>Bank transfer</value>
   </data>
+  <data name="ui.payments.method.Card" xml:space="preserve">
+    <value>Card</value>
+  </data>
   <data name="ui.payments.method.Cash" xml:space="preserve">
     <value>Cash</value>
   </data>
@@ -8255,6 +9207,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.payments.refund_button" xml:space="preserve">
     <value>Give back</value>
+  </data>
+  <data name="ui.payments.refund_finish" xml:space="preserve">
+    <value>Finish the refund</value>
+  </data>
+  <data name="ui.payments.refund_pending" xml:space="preserve">
+    <value>Not confirmed by Stripe yet.</value>
   </data>
   <data name="ui.payments.refund_title" xml:space="preserve">
     <value>Give money back (up to {amount})</value>
@@ -8429,6 +9387,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.permissions.ops.customs.record" xml:space="preserve">
     <value>Record customs at a warehouse that clears customs</value>
+  </data>
+  <data name="ui.permissions.ops.delivery.drive" xml:space="preserve">
+    <value>Drive delivery routes: see one’s own route and record its stops on the phone</value>
+  </data>
+  <data name="ui.permissions.ops.delivery.plan" xml:space="preserve">
+    <value>Plan delivery routes, enter run sheets and settle the cash collected</value>
   </data>
   <data name="ui.permissions.ops.devices.view" xml:space="preserve">
     <value>See the devices</value>
@@ -8657,6 +9621,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.pickup.invoice_kind.SupplyOrder" xml:space="preserve">
     <value>Supplies</value>
+  </data>
+  <data name="ui.pickup.money_elsewhere_due" xml:space="preserve">
+    <value>Payment is still owed. The company settles it; release once it is paid.</value>
+  </data>
+  <data name="ui.pickup.money_elsewhere_paid" xml:space="preserve">
+    <value>Nothing to pay here.</value>
   </data>
   <data name="ui.pickup.no_collector" xml:space="preserve">
     <value>No one named</value>
@@ -9099,6 +10069,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.receiving.carrier" xml:space="preserve">
     <value>Carrier</value>
   </data>
+  <data name="ui.receiving.clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
   <data name="ui.receiving.condition" xml:space="preserve">
     <value>Condition</value>
   </data>
@@ -9234,6 +10207,66 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.roles.title" xml:space="preserve">
     <value>Roles</value>
   </data>
+  <data name="ui.run_sheet.address" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="ui.run_sheet.cash_handed_in" xml:space="preserve">
+    <value>Cash handed in</value>
+  </data>
+  <data name="ui.run_sheet.collect" xml:space="preserve">
+    <value>To collect</value>
+  </data>
+  <data name="ui.run_sheet.driver" xml:space="preserve">
+    <value>Driver</value>
+  </data>
+  <data name="ui.run_sheet.driver_signature" xml:space="preserve">
+    <value>Driver’s signature</value>
+  </data>
+  <data name="ui.run_sheet.failed" xml:space="preserve">
+    <value>Not delivered: reason</value>
+  </data>
+  <data name="ui.run_sheet.nothing" xml:space="preserve">
+    <value>—</value>
+  </data>
+  <data name="ui.run_sheet.parcels" xml:space="preserve">
+    <value>Parcels</value>
+  </data>
+  <data name="ui.run_sheet.proof" xml:space="preserve">
+    <value>Proof asked</value>
+  </data>
+  <data name="ui.run_sheet.proof.code" xml:space="preserve">
+    <value>the delivery code</value>
+  </data>
+  <data name="ui.run_sheet.proof.id" xml:space="preserve">
+    <value>the ID’s last 4 characters</value>
+  </data>
+  <data name="ui.run_sheet.proof.name" xml:space="preserve">
+    <value>the receiver’s name</value>
+  </data>
+  <data name="ui.run_sheet.proof.photo" xml:space="preserve">
+    <value>a photo (phone page)</value>
+  </data>
+  <data name="ui.run_sheet.proof.signature" xml:space="preserve">
+    <value>a signature</value>
+  </data>
+  <data name="ui.run_sheet.reasons" xml:space="preserve">
+    <value>Reasons</value>
+  </data>
+  <data name="ui.run_sheet.received_by" xml:space="preserve">
+    <value>Received by (name, signature)</value>
+  </data>
+  <data name="ui.run_sheet.recipient" xml:space="preserve">
+    <value>Recipient</value>
+  </data>
+  <data name="ui.run_sheet.shipment" xml:space="preserve">
+    <value>Shipment</value>
+  </data>
+  <data name="ui.run_sheet.stop" xml:space="preserve">
+    <value>#</value>
+  </data>
+  <data name="ui.run_sheet.title" xml:space="preserve">
+    <value>Run sheet</value>
+  </data>
   <data name="ui.scan.barcode" xml:space="preserve">
     <value>Scan the carrier barcode</value>
   </data>
@@ -9330,6 +10363,231 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.scan.wait_sending" xml:space="preserve">
     <value>Scans are still being sent. Try again in a moment.</value>
   </data>
+  <data name="ui.screen.back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="ui.screen.card_here" xml:space="preserve">
+    <value>Pay on this screen</value>
+  </data>
+  <data name="ui.screen.card_how" xml:space="preserve">
+    <value>Scan the code with your phone to pay on Stripe’s secure page, or pay on this screen.</value>
+  </data>
+  <data name="ui.screen.card_qr_alt" xml:space="preserve">
+    <value>Code for Stripe’s payment page</value>
+  </data>
+  <data name="ui.screen.card_stopped" xml:space="preserve">
+    <value>This card payment was stopped. Go back to choose again.</value>
+  </data>
+  <data name="ui.screen.card_title" xml:space="preserve">
+    <value>Pay by card</value>
+  </data>
+  <data name="ui.screen.contents" xml:space="preserve">
+    <value>Contents</value>
+  </data>
+  <data name="ui.screen.declare" xml:space="preserve">
+    <value>I declare that the contents and values above are correct, and I accept the insurance choice shown.</value>
+  </data>
+  <data name="ui.screen.insured" xml:space="preserve">
+    <value>Insured with {name} for {value}; premium {premium}.</value>
+  </data>
+  <data name="ui.screen.invoice_title" xml:space="preserve">
+    <value>Your invoice for {number}</value>
+  </data>
+  <data name="ui.screen.not_insured" xml:space="preserve">
+    <value>Not insured.</value>
+  </data>
+  <data name="ui.screen.other_methods" xml:space="preserve">
+    <value>To pay in cash or another way, please tell the clerk.</value>
+  </data>
+  <data name="ui.screen.paid" xml:space="preserve">
+    <value>Paid. Thank you!</value>
+  </data>
+  <data name="ui.screen.paid_card" xml:space="preserve">
+    <value>Paid by card. Thank you!</value>
+  </data>
+  <data name="ui.screen.pair_button" xml:space="preserve">
+    <value>Pair</value>
+  </data>
+  <data name="ui.screen.pair_code" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="ui.screen.pair_how" xml:space="preserve">
+    <value>Type the code a clerk got under Customer screens.</value>
+  </data>
+  <data name="ui.screen.pair_title" xml:space="preserve">
+    <value>Pair this screen</value>
+  </data>
+  <data name="ui.screen.parcel" xml:space="preserve">
+    <value>Parcel</value>
+  </data>
+  <data name="ui.screen.pay_card" xml:space="preserve">
+    <value>Pay by card</value>
+  </data>
+  <data name="ui.screen.pay_zelle" xml:space="preserve">
+    <value>Pay with Zelle</value>
+  </data>
+  <data name="ui.screen.phone_done" xml:space="preserve">
+    <value>You can close this page. The screen at the counter shows when your payment is confirmed.</value>
+  </data>
+  <data name="ui.screen.sign_button" xml:space="preserve">
+    <value>Sign</value>
+  </data>
+  <data name="ui.screen.sign_clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="ui.screen.sign_here" xml:space="preserve">
+    <value>Sign here</value>
+  </data>
+  <data name="ui.screen.sign_title" xml:space="preserve">
+    <value>Your declaration for {number}</value>
+  </data>
+  <data name="ui.screen.thanks" xml:space="preserve">
+    <value>Thank you!</value>
+  </data>
+  <data name="ui.screen.to_pay" xml:space="preserve">
+    <value>To pay: {amount}</value>
+  </data>
+  <data name="ui.screen.total_value" xml:space="preserve">
+    <value>Total declared value: {amount}</value>
+  </data>
+  <data name="ui.screen.value" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="ui.screen.weight" xml:space="preserve">
+    <value>Weight</value>
+  </data>
+  <data name="ui.screen.welcome" xml:space="preserve">
+    <value>Welcome!</value>
+  </data>
+  <data name="ui.screen.zelle_accept" xml:space="preserve">
+    <value>I accept these terms</value>
+  </data>
+  <data name="ui.screen.zelle_amount" xml:space="preserve">
+    <value>Exact amount</value>
+  </data>
+  <data name="ui.screen.zelle_contact" xml:space="preserve">
+    <value>Email or phone</value>
+  </data>
+  <data name="ui.screen.zelle_memo" xml:space="preserve">
+    <value>Memo</value>
+  </data>
+  <data name="ui.screen.zelle_name" xml:space="preserve">
+    <value>Pay to</value>
+  </data>
+  <data name="ui.screen.zelle_qr_alt" xml:space="preserve">
+    <value>Zelle QR code</value>
+  </data>
+  <data name="ui.screen.zelle_tag" xml:space="preserve">
+    <value>Zelle tag</value>
+  </data>
+  <data name="ui.screen.zelle_terms_title" xml:space="preserve">
+    <value>Before you pay with Zelle</value>
+  </data>
+  <data name="ui.screen.zelle_then" xml:space="preserve">
+    <value>Pay in your bank’s app, then show the clerk your Zelle confirmation.</value>
+  </data>
+  <data name="ui.screen.zelle_title" xml:space="preserve">
+    <value>Pay with Zelle</value>
+  </data>
+  <data name="ui.screen.zelle_warning" xml:space="preserve">
+    <value>Write {number} in the Zelle memo. Your shipment stays on hold until the company sees your payment.</value>
+  </data>
+  <data name="ui.screens.add" xml:space="preserve">
+    <value>Add a screen</value>
+  </data>
+  <data name="ui.screens.add_button" xml:space="preserve">
+    <value>Add and get its code</value>
+  </data>
+  <data name="ui.screens.clear" xml:space="preserve">
+    <value>Clear · next customer</value>
+  </data>
+  <data name="ui.screens.code_how" xml:space="preserve">
+    <value>On the screen, open {url} and type:</value>
+  </data>
+  <data name="ui.screens.code_title" xml:space="preserve">
+    <value>Code for {name}</value>
+  </data>
+  <data name="ui.screens.code_until" xml:space="preserve">
+    <value>Valid once, until {time}. A new code stops the screen paired before.</value>
+  </data>
+  <data name="ui.screens.intro" xml:space="preserve">
+    <value>A tablet or touch screen at the counter where customers pay and sign themselves. Add it here, then open {url} on the tablet (in a browser where no one is signed in to the staff site) and type the code shown. A screen clears itself 20 minutes after something is sent to it.</value>
+  </data>
+  <data name="ui.screens.name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ui.screens.name_example" xml:space="preserve">
+    <value>Front desk tablet</value>
+  </data>
+  <data name="ui.screens.new_code" xml:space="preserve">
+    <value>New code</value>
+  </data>
+  <data name="ui.screens.none" xml:space="preserve">
+    <value>No customer screen yet.</value>
+  </data>
+  <data name="ui.screens.paired" xml:space="preserve">
+    <value>Paired</value>
+  </data>
+  <data name="ui.screens.panel_none" xml:space="preserve">
+    <value>No customer screen at this warehouse yet.</value>
+  </data>
+  <data name="ui.screens.panel_title" xml:space="preserve">
+    <value>Customer screen</value>
+  </data>
+  <data name="ui.screens.remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ui.screens.seen" xml:space="preserve">
+    <value>Paired · seen {time}</value>
+  </data>
+  <data name="ui.screens.send_invoice" xml:space="preserve">
+    <value>Send to pay</value>
+  </data>
+  <data name="ui.screens.send_sign" xml:space="preserve">
+    <value>Send to sign</value>
+  </data>
+  <data name="ui.screens.sent" xml:space="preserve">
+    <value>Sent to the customer screen.</value>
+  </data>
+  <data name="ui.screens.showing" xml:space="preserve">
+    <value>Showing</value>
+  </data>
+  <data name="ui.screens.state" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="ui.screens.step.Card" xml:space="preserve">
+    <value>Paying by card on Stripe</value>
+  </data>
+  <data name="ui.screens.step.Done" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="ui.screens.step.Idle" xml:space="preserve">
+    <value>Welcome</value>
+  </data>
+  <data name="ui.screens.step.Signature" xml:space="preserve">
+    <value>Declaration to sign</value>
+  </data>
+  <data name="ui.screens.step.Summary" xml:space="preserve">
+    <value>Invoice and ways to pay</value>
+  </data>
+  <data name="ui.screens.step.Zelle" xml:space="preserve">
+    <value>Zelle details (terms accepted)</value>
+  </data>
+  <data name="ui.screens.step.ZelleTerms" xml:space="preserve">
+    <value>Reading the Zelle terms</value>
+  </data>
+  <data name="ui.screens.title" xml:space="preserve">
+    <value>Customer screens</value>
+  </data>
+  <data name="ui.screens.waiting_code" xml:space="preserve">
+    <value>Waiting for its code</value>
+  </data>
+  <data name="ui.screens.warehouse" xml:space="preserve">
+    <value>Warehouse</value>
+  </data>
+  <data name="ui.screens.zelle_accepted" xml:space="preserve">
+    <value>Zelle terms accepted by the customer at {time}</value>
+  </data>
   <data name="ui.second_factor_reset.submit" xml:space="preserve">
     <value>Continue</value>
   </data>
@@ -9408,6 +10666,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.services.unit.in3_lb" xml:space="preserve">
     <value>in³ per lb</value>
   </data>
+  <data name="ui.session.country_changed" xml:space="preserve">
+    <value>You were signed out: this device is being used from another country than the one it was registered in. Sign in again; your second step confirms it.</value>
+  </data>
   <data name="ui.session.ended" xml:space="preserve">
     <value>Your session has ended. Sign in again to continue.</value>
   </data>
@@ -9421,7 +10682,7 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Stay signed in</value>
   </data>
   <data name="ui.settings.allow_collect" xml:space="preserve">
-    <value>Allow payment on pickup or delivery (Collect)</value>
+    <value>Allow senders to pay at the destination (freight collect): shipments travel unpaid and are handed over once paid</value>
   </data>
   <data name="ui.settings.allow_credit" xml:space="preserve">
     <value>Allow customer credit</value>
@@ -9504,6 +10765,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.settings.prefix_hint" xml:space="preserve">
     <value>Numbers look like {example}: the prefix, the year, then a number that restarts each year.</value>
   </data>
+  <data name="ui.settings.public_pricing" xml:space="preserve">
+    <value>Publish prices on the public website (the price lists marked to publish)</value>
+  </data>
   <data name="ui.settings.require_second_factor" xml:space="preserve">
     <value>Every staff member must use an authenticator app</value>
   </data>
@@ -9569,6 +10833,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.shipment.option.consolidate" xml:space="preserve">
     <value>Consolidate</value>
+  </data>
+  <data name="ui.shipment.option.freightcollect" xml:space="preserve">
+    <value>Freight collect</value>
   </data>
   <data name="ui.shipment.option.insured" xml:space="preserve">
     <value>Insured</value>
@@ -9657,6 +10924,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.shipment_doc.totals" xml:space="preserve">
     <value>Pieces: {pieces} · Weight: {weight}</value>
   </data>
+  <data name="ui.shipments.delivered" xml:space="preserve">
+    <value>Delivered on {date}.</value>
+  </data>
   <data name="ui.shipments_desk.all_warehouses" xml:space="preserve">
     <value>All warehouses</value>
   </data>
@@ -9743,6 +11013,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.shipments_desk.option.consolidate" xml:space="preserve">
     <value>Consolidated</value>
+  </data>
+  <data name="ui.shipments_desk.option.freight_collect" xml:space="preserve">
+    <value>Freight collect</value>
   </data>
   <data name="ui.shipments_desk.option.insured" xml:space="preserve">
     <value>Insured</value>
@@ -10041,6 +11314,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.staff.invite" xml:space="preserve">
     <value>Invite a person</value>
   </data>
+  <data name="ui.staff.invite_partner" xml:space="preserve">
+    <value>Invite a partner agent</value>
+  </data>
   <data name="ui.staff.invite_submit" xml:space="preserve">
     <value>Send the invitation</value>
   </data>
@@ -10055,6 +11331,15 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.staff.owner" xml:space="preserve">
     <value>Owner</value>
+  </data>
+  <data name="ui.staff.partner_agent" xml:space="preserve">
+    <value>Partner agent</value>
+  </data>
+  <data name="ui.staff.partner_agent_hint" xml:space="preserve">
+    <value>Works only at the partner’s warehouse: receives arrivals, records customs, releases parcels and delivers. Sees no prices, invoices or other customers, and takes payments only where the company allows it.</value>
+  </data>
+  <data name="ui.staff.partner_warehouse" xml:space="preserve">
+    <value>Partner’s warehouse</value>
   </data>
   <data name="ui.staff.reason" xml:space="preserve">
     <value>Reason</value>
@@ -10088,6 +11373,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.staff.search_submit" xml:space="preserve">
     <value>Search</value>
+  </data>
+  <data name="ui.staff.sign_ins" xml:space="preserve">
+    <value>Sign-ins</value>
   </data>
   <data name="ui.staff.status.active" xml:space="preserve">
     <value>Active</value>
@@ -10815,6 +12103,15 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.tracking.delayed" xml:space="preserve">
     <value>Delayed: {cause}{message}</value>
   </data>
+  <data name="ui.tracking.delivered" xml:space="preserve">
+    <value>Delivered</value>
+  </data>
+  <data name="ui.tracking.delivery_failed" xml:space="preserve">
+    <value>Delivery attempt failed: {failure}</value>
+  </data>
+  <data name="ui.tracking.delivery_returning" xml:space="preserve">
+    <value>Going back to the sender after the last delivery attempt</value>
+  </data>
   <data name="ui.tracking.departed_origin" xml:space="preserve">
     <value>Departed the origin ({mode})</value>
   </data>
@@ -10871,6 +12168,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.tracking.note" xml:space="preserve">
     <value>Note</value>
+  </data>
+  <data name="ui.tracking.out_for_delivery" xml:space="preserve">
+    <value>Out for delivery</value>
   </data>
   <data name="ui.tracking.packed" xml:space="preserve">
     <value>Packed in bundle {bundle}</value>

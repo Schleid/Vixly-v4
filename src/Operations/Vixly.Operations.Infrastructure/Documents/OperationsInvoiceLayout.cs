@@ -99,6 +99,12 @@ internal static class OperationsInvoiceLayout
                     });
                 });
 
+                // Freight collect: the sender pays at the destination (owner, 2026-10-21).
+                if (invoice.PayAtDestination && credit is null)
+                {
+                    column.Item().PaddingBottom(6).Text(Word("pay_at_destination")).SemiBold();
+                }
+
                 if (credit is null)
                 {
                     Lines(column, invoice, text, Money);

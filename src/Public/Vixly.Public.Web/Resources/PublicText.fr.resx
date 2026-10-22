@@ -1088,4 +1088,7 @@
     <value>Veuillez terminer la vérification de sécurité avant l’envoi.</value>
     <comment>needs-review</comment>
   </data>
+  <data name="public.plans.feature.partner_agents" xml:space="preserve">
+    <value>Agents partenaires</value>
+  </data>
 </root>

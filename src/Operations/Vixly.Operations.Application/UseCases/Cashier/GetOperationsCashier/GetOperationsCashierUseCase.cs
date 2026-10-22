@@ -70,14 +70,21 @@ public sealed class GetOperationsCashierUseCase
             {
                 customer = await _customers.GetAsync(invoice.CustomerId, cancellationToken);
             }
-            else
+            else if (!access.IsPartnerAgent)
             {
+                // A partner agent finds only by a number of its own warehouse: never another customer by phone or email (R-8).
                 matches = await _customers.FindForCounterAsync(find, 10, cancellationToken);
                 customer = matches.Count == 1 ? matches[0] : null;
             }
         }
 
         IReadOnlyList<OperationsInvoice> open = customer is null ? Array.Empty<OperationsInvoice>() : await _billing.ListOpenInvoicesAsync(customer.Id, ids, cancellationToken);
+
+        // A partner agent sees a customer only while something is owed at its warehouse (R-8).
+        if (access.IsPartnerAgent && open.Count == 0)
+        {
+            customer = null;
+        }
         return GetOperationsCashierResponse.Success(matches, customer, open, drawers, warehouses);
     }
 }

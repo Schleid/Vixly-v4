@@ -46,7 +46,8 @@ public static class OperationsInternalShipmentEndpoints
                     // Only the modes of the services the company offers the customer (review).
                     response.Liability.Where(item => response.Services.Count == 0 || response.Services.Any(service => Vixly.Operations.Domain.Charges.OperationsTransportModes.Of(service) == item.Mode))
                         .Select(item => new CustomerLiabilityDto(item.Mode.ToString(), item.Basis.ToString(), item.Amount,
-                        item.WeightUnit == Vixly.Operations.Domain.Settings.OperationsWeightUnit.Pound ? "lb" : "kg", item.Cap, item.CustomerText, response.CurrencyCode, item.CapPerShipment)).ToList()))
+                        item.WeightUnit == Vixly.Operations.Domain.Settings.OperationsWeightUnit.Pound ? "lb" : "kg", item.Cap, item.CustomerText, response.CurrencyCode, item.CapPerShipment)).ToList(),
+                    response.AllowCollect))
                 : OperationsApiErrors.Problem(http, response.Error!);
         });
 
@@ -177,5 +178,5 @@ public static class OperationsInternalShipmentEndpoints
     internal static OperationsShipmentDraft Draft(CustomerShipmentInstructionsBody? body) =>
         new(body?.Delivery, body?.BranchId, body?.Address?.Line1, body?.Address?.Line2, body?.Address?.City, body?.Address?.Region, body?.Address?.PostalCode, body?.Address?.CountryCode,
             body?.RecipientName, body?.RecipientPhone, body?.Consolidate ?? false, body?.Refrigerated ?? false, body?.Insured ?? false, body?.DestinationId,
-            body?.InsuranceAccepted ?? false, body?.Service, body?.ParcelCount, body?.InsurancePlanId);
+            body?.InsuranceAccepted ?? false, body?.Service, body?.ParcelCount, body?.InsurancePlanId, body?.Collect ?? false);
 }

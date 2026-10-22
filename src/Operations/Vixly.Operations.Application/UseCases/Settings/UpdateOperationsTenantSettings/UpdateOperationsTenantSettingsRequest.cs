@@ -24,6 +24,9 @@ public sealed class UpdateOperationsTenantSettingsRequest
 
     public bool AllowCollect { get; init; }
 
+    // Prices on the public website (owner, 2026-10-21).
+    public bool PublicPricing { get; init; }
+
     public bool AllowCredit { get; init; }
 
     public OperationsDeliveryModes DeliveryModes { get; init; }

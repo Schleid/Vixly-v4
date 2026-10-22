@@ -47,4 +47,7 @@ public sealed class SaveOperationsPriceListRequest
     public DateOnly? EffectiveFrom { get; init; }
 
     public bool Active { get; init; } = true;
+
+    // Shown on the public website when the company publishes its prices (owner, 2026-10-21); regular lists only.
+    public bool Published { get; init; }
 }

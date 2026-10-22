@@ -86,6 +86,12 @@ public sealed class CloseOperationsBundleUseCase
 
         Vixly.Operations.Domain.Settings.OperationsTenantSettings settings = await _settings.FindAsync(cancellationToken)
             ?? Vixly.Operations.Domain.Settings.OperationsTenantSettings.CreateDefault(context.RequiredTenantId, _timeProvider.GetUtcNow());
+        // Everything on the bundle's list scanned first (owner, 2026-10-21).
+        if (await _bundles.AnyMissingAsync(bundle.Id, cancellationToken))
+        {
+            return CloseOperationsBundleResponse.Failure(OperationsBundleErrors.ItemsMissing);
+        }
+
         // A kept-together shipment travels whole: closed with only part of it, the rest could never follow (review).
         foreach (Guid shipmentId in (await _bundles.ListBundleParcelsForUpdateAsync(bundle.Id, cancellationToken)).Where(parcel => parcel.ShipmentId is not null)
             .Select(parcel => parcel.ShipmentId!.Value).Distinct())

@@ -87,9 +87,10 @@ public static class OperationsCounterEndpoints
                 : await CustomerAsync(http, customerId, response.Error, draft, parcelCount, get, brand, errors);
         });
 
-        staff.MapGet("/shipments/{shipmentId:guid}", async (HttpContext http, Guid shipmentId, string? done, GetOperationsCounterShipmentUseCase get, GetOperationsSignInBrandUseCase brand,
-            OperationsErrorText errors, IStringLocalizer<OperationsText> text) =>
-            await ShipmentAsync(http, shipmentId, null, done is "created" or "added" or "booked" or "count" or "insurance" or "signed" ? text["ui.counter.done." + done].Value
+        staff.MapGet("/shipments/{shipmentId:guid}", async (HttpContext http, Guid shipmentId, string? done, string? screen, GetOperationsCounterShipmentUseCase get,
+            GetOperationsSignInBrandUseCase brand, OperationsErrorText errors, IStringLocalizer<OperationsText> text) =>
+            await ShipmentAsync(http, shipmentId, OperationsScreenEndpoints.Refusal(screen), screen == "sent" ? text["ui.screens.sent"].Value
+                : done is "created" or "added" or "booked" or "count" or "insurance" or "signed" ? text["ui.counter.done." + done].Value
                 : done is "supply" or "supply_short" or "line" ? text["ui.counter.supplies.done." + done].Value : null, null, get, brand, errors));
 
         staff.MapPost("/shipments/{shipmentId:guid}/parcels", async (HttpContext http, Guid shipmentId, [FromForm] string? weight, [FromForm] string? length, [FromForm] string? width,
@@ -255,7 +256,7 @@ public static class OperationsCounterEndpoints
             form["recipient"], form["recipientPhone"],
             form["consolidate"] == "true", form["refrigerated"] == "true", Guid.TryParse(form["insurance"], out Guid _) || form["insured"] == "true",
             Guid.TryParse(form["destination"], out Guid destination) ? destination : null,
-            form["insuranceAccepted"] == "true", form["service"].ToString(), null, Guid.TryParse(form["insurance"], out Guid product) ? product : null);
+            form["insuranceAccepted"] == "true", form["service"].ToString(), null, Guid.TryParse(form["insurance"], out Guid product) ? product : null, form["collect"] == "true");
 
     internal static async Task<IResult> CustomerAsync(HttpContext http, Guid customerId, Error? error, OperationsShipmentDraft? entered, int? enteredCount,
         GetOperationsCounterCustomerUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText errors)
@@ -283,6 +284,7 @@ public static class OperationsCounterEndpoints
             CurrencyCode = response.CurrencyCode,
             UtcNow = response.UtcNow,
             DeliveryModes = response.DeliveryModes,
+            response.AllowCollect,
             Entered = entered,
             EnteredCount = enteredCount,
             Orders = response.Orders,
@@ -323,6 +325,9 @@ public static class OperationsCounterEndpoints
             WeightUnit = response.WeightUnit,
             DimensionUnit = response.DimensionUnit,
             Entered = entered,
+            Screens = await OperationsScreenEndpoints.ScreensAtAsync(http,
+                http.RequestServices.GetRequiredService<Vixly.Operations.Application.UseCases.Screens.ListOperationsCustomerScreens.ListOperationsCustomerScreensUseCase>(),
+                shipment.OriginWarehouseId),
             Error = errors.Describe(error),
             Info = info
         });

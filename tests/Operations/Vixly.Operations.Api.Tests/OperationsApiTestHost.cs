@@ -40,6 +40,8 @@ internal sealed class OperationsApiTestHost : IAsyncDisposable
 
     public FakeCustomerMailer Mailer { get; }
 
+    public FakeCardGateway Cards { get; private init; } = new();
+
     public IServiceProvider Services => _app.Services;
 
     public HttpMessageHandler Handler() => _app.GetTestServer().CreateHandler();
@@ -54,6 +56,7 @@ internal sealed class OperationsApiTestHost : IAsyncDisposable
     {
         FakeCustomerMailer mailer = new();
         FakePlatformClient platform = new();
+        FakeCardGateway cards = new();
         CallerTokenSigner customer = new("customer");
         CallerTokenSigner other = new("edge");
         WebApplication app = OperationsApiHost.Build(
@@ -73,6 +76,8 @@ internal sealed class OperationsApiTestHost : IAsyncDisposable
                 builder.Services.AddSingleton<IOperationsPlatformClient>(platform);
                 builder.Services.RemoveAll<IOperationsCustomerMailer>();
                 builder.Services.AddSingleton<IOperationsCustomerMailer>(mailer);
+                builder.Services.RemoveAll<IOperationsCardGateway>();
+                builder.Services.AddSingleton<IOperationsCardGateway>(cards);
                 builder.Services.RemoveAll<IOperationsPlanFeatures>();
                 builder.Services.AddSingleton<IOperationsPlanFeatures>(new AllPlanFeatures());
                 builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
@@ -87,7 +92,7 @@ internal sealed class OperationsApiTestHost : IAsyncDisposable
 
         await app.StartAsync();
 
-        return new OperationsApiTestHost(app, platform, customer, other, mailer);
+        return new OperationsApiTestHost(app, platform, customer, other, mailer) { Cards = cards };
     }
 
     public HttpClient Client(string host = Host)

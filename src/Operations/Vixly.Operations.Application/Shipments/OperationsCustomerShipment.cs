@@ -46,6 +46,11 @@ public sealed record OperationsCustomerShipment(
 
     public DateTimeOffset? PickedUpUtc { get; init; }
 
+    // Slice 7 step 3: when it was delivered at its address.
+    public DateTimeOffset? DeliveredUtc { get; init; }
+
+    public bool Collect => Options.HasFlag(OperationsShipmentOptions.FreightCollect);
+
     public static OperationsCustomerShipment Of(OperationsShipment shipment, string? originName, string? branchName, int announced, int arrived)
     {
         ArgumentNullException.ThrowIfNull(shipment);
@@ -55,7 +60,8 @@ public sealed record OperationsCustomerShipment(
             shipment.DestinationWarehouseId, shipment.ServiceCode, shipment.OriginWarehouseId, shipment.ParcelCount, shipment.IsBooked, shipment.BookedTotal, shipment.BookedCurrencyCode,
             shipment.InsurancePlanId)
         {
-            CollectorName = shipment.CollectorName, CollectorPhone = shipment.CollectorPhone, PickedUpUtc = shipment.PickedUpUtc
+            CollectorName = shipment.CollectorName, CollectorPhone = shipment.CollectorPhone, PickedUpUtc = shipment.PickedUpUtc,
+            DeliveredUtc = shipment.DeliveredUtc
         };
     }
 }

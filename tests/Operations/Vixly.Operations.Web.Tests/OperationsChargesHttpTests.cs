@@ -181,7 +181,7 @@ public sealed partial class OperationsChargesHttpTests : IClassFixture<Operation
             Assert.Contains("href=\"/staff/quotes/list\"", listed, StringComparison.Ordinal);
             (HttpResponseMessage _, string all) = await owner.GetAsync("/staff/quotes/list");
             Assert.Contains(quote.Number, all, StringComparison.Ordinal);
-            Assert.Contains("Open (1)", all, StringComparison.Ordinal);
+            Assert.Matches("ops-status-chip__label\">Open</span>\\s*<span class=\"ops-status-chip__count\">1<", all);
             Assert.Contains("data-status=\"open\"", all, StringComparison.Ordinal);
             Assert.Contains(quote.Number, (await owner.GetAsync("/staff/quotes/list?search=" + quote.Number.ToLowerInvariant())).Html, StringComparison.Ordinal);
             Assert.DoesNotContain(quote.Number, (await owner.GetAsync("/staff/quotes/list?search=QT00000000")).Html, StringComparison.Ordinal);
@@ -191,7 +191,7 @@ public sealed partial class OperationsChargesHttpTests : IClassFixture<Operation
             (HttpResponseMessage _, string withdrawn) = await owner.GetAsync("/staff/quotes/list?state=withdrawn&done=withdrawn");
             Assert.Contains("The quote is withdrawn.", withdrawn, StringComparison.Ordinal);
             Assert.Contains(quote.Number, withdrawn, StringComparison.Ordinal);
-            Assert.Contains("Withdrawn (1)", withdrawn, StringComparison.Ordinal);
+            Assert.Matches("ops-status-chip__label\">Withdrawn</span>\\s*<span class=\"ops-status-chip__count\">1<", withdrawn);
             Assert.Equal("/staff/quotes", (await owner.PostAsync(withdraw, listed)).Response.Headers.Location?.OriginalString);
         }
 

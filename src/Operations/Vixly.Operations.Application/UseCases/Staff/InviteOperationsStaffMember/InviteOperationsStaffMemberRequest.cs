@@ -28,4 +28,7 @@ public sealed class InviteOperationsStaffMemberRequest
     public Guid? ScopeId { get; init; }
 
     public string PortalSlug { get; init; } = string.Empty;
+
+    // Slice 7 step 4 (R-8): a partner agent of this partner-operated warehouse instead of a role (RoleId and Scope are then ignored).
+    public Guid? PartnerWarehouseId { get; init; }
 }

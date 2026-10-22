@@ -59,7 +59,11 @@ internal sealed class IdentityTestKit
 
     public OperationsSignInSteps Steps { get; }
 
-    public BeginOperationsSignInUseCase Begin() => new(Store, Services, Steps, Audit, Store);
+    public FakeDevices Devices { get; } = new();
+
+    public FakePlanFeatures Features { get; } = new();
+
+    public BeginOperationsSignInUseCase Begin() => new(Store, Services, Steps, Audit, Store, Devices, new OperationsAccess(Store, new FakeRoleStore(), Store, Clock, new FakeSiteStore(), Features));
 
     public CompleteOperationsSignInWithAuthenticatorCodeUseCase Verify() => new(Steps, Services);
 
@@ -69,7 +73,9 @@ internal sealed class IdentityTestKit
 
     public CompleteOperationsSignInEnrolmentUseCase CompleteEnrolment() => new(Steps, Services, Services);
 
-    public AcceptOperationsInvitationUseCase Accept() => new(Store, Store, Services, Services, Steps, Audit, Store);
+    public FakeCustomerStore Customers { get; } = new();
+
+    public AcceptOperationsInvitationUseCase Accept() => new(Store, Store, Customers, Services, Services, Steps, Audit, Store, new OperationsAccess(Store, new FakeRoleStore(), Store, Clock, new FakeSiteStore(), Features));
 
     public SignOutOperationsUseCase SignOut() => new(Store, Audit, Store, Clock);
 

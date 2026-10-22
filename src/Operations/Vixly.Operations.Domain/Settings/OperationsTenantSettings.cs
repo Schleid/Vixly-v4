@@ -223,8 +223,18 @@ public sealed class OperationsTenantSettings : OperationsEntity
         Vixly.Operations.Domain.Billing.OperationsPaymentMethod.Other1 => OtherMethod1 is not null,
         Vixly.Operations.Domain.Billing.OperationsPaymentMethod.Other2 => OtherMethod2 is not null,
         Vixly.Operations.Domain.Billing.OperationsPaymentMethod.Other3 => OtherMethod3 is not null,
+        Vixly.Operations.Domain.Billing.OperationsPaymentMethod.Card => AcceptCard,
         _ => false
     };
+
+    // Slice 5F step 4: cards through the company's Stripe account; on only while the account is connected (the use case checks).
+    public bool AcceptCard { get; private set; }
+
+    public void ChangeCard(bool accept, DateTimeOffset utcNow)
+    {
+        AcceptCard = accept;
+        MarkAsModified(utcNow);
+    }
 
     // The company's own name of one of its other methods.
     public string? OtherName(Vixly.Operations.Domain.Billing.OperationsPaymentMethod method) => method switch
@@ -350,6 +360,41 @@ public sealed class OperationsTenantSettings : OperationsEntity
         MarkAsModified(utcNow);
     }
 
+    // Slice 7 step 3 (R-12 to R-15): how drivers record their stops, cash on delivery, the tries before the parcel waits or goes back, the proof at the door.
+    public Vixly.Operations.Domain.Delivery.OperationsDeliveryRecording DeliveryRecording { get; private set; } = Vixly.Operations.Domain.Delivery.OperationsDeliveryRecording.Phone;
+
+    public bool CashOnDelivery { get; private set; }
+
+    public int DeliveryTries { get; private set; } = 3;
+
+    public Vixly.Operations.Domain.Delivery.OperationsAfterFailedDelivery AfterFailedDelivery { get; private set; } = Vixly.Operations.Domain.Delivery.OperationsAfterFailedDelivery.WaitForPickup;
+
+    public Vixly.Operations.Domain.Delivery.OperationsDeliveryProofs DeliveryProofs { get; private set; } = Vixly.Operations.Domain.Delivery.OperationsDeliveryProofs.Default;
+
+    // The customer is emailed when their shipment goes out for delivery (always when a delivery code is asked: it carries the code).
+    public bool DeliveryEmails { get; private set; } = true;
+
+    public void ChangeDelivery(Vixly.Operations.Domain.Delivery.OperationsDeliveryRecording recording, bool cashOnDelivery, int tries,
+        Vixly.Operations.Domain.Delivery.OperationsAfterFailedDelivery afterFailed, Vixly.Operations.Domain.Delivery.OperationsDeliveryProofs proofs, bool emails, DateTimeOffset utcNow)
+    {
+        if (!Enum.IsDefined(recording) || !Enum.IsDefined(afterFailed) || tries is < 1 or > 10 || (proofs & ~Vixly.Operations.Domain.Delivery.OperationsDeliveryProofs.All) != 0)
+        {
+            throw new DomainException(Vixly.Operations.Domain.Delivery.OperationsDeliveryErrors.SettingsInvalid);
+        }
+
+        (DeliveryRecording, CashOnDelivery, DeliveryTries, AfterFailedDelivery, DeliveryProofs, DeliveryEmails) = (recording, cashOnDelivery, tries, afterFailed, proofs, emails);
+        MarkAsModified(utcNow);
+    }
+
+    // Prices on the public website (owner, 2026-10-21): the price lists marked to publish, while this is on. The customer portal always shows prices.
+    public bool PublicPricing { get; private set; }
+
+    public void ChangePublicPricing(bool published, DateTimeOffset utcNow)
+    {
+        PublicPricing = published;
+        MarkAsModified(utcNow);
+    }
+
     public void ChangePickupEmails(bool emails, DateTimeOffset utcNow)
     {
         PickupEmails = emails;
@@ -427,6 +472,7 @@ public sealed class OperationsTenantSettings : OperationsEntity
         OperationsNumberKind.Dispatch => DispatchPrefix,
         OperationsNumberKind.Quote => "QT",
         OperationsNumberKind.Certificate => "IC",
+        OperationsNumberKind.Route => "RT",
         _ => throw new ArgumentOutOfRangeException(nameof(kind))
     };
 

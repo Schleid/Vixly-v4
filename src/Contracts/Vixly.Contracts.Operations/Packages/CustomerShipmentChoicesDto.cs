@@ -16,4 +16,5 @@ public sealed record CustomerShipmentChoicesDto(IReadOnlyList<CustomerChoiceDto>
     IReadOnlyList<CustomerDestinationDto>? Destinations = null,
     IReadOnlyList<CustomerInsuranceTermsDto>? Insurance = null,
     IReadOnlyList<string>? Services = null,
-    IReadOnlyList<CustomerLiabilityDto>? Liability = null);
+    IReadOnlyList<CustomerLiabilityDto>? Liability = null,
+    bool AllowCollect = false);

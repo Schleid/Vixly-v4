@@ -65,6 +65,10 @@ internal sealed class OperationsParcelConfiguration : IEntityTypeConfiguration<O
         builder.Property(item => item.DestinationFeePerDay).HasPrecision(12, 2);
         builder.Ignore(item => item.OwesStorage);
 
+        // Slice 7 step 3: the route it is on.
+        builder.HasIndex(item => new { item.TenantId, item.RouteId }).HasFilter("[RouteId] IS NOT NULL");
+        builder.HasOne<Vixly.Operations.Domain.Delivery.OperationsDeliveryRoute>().WithMany().HasForeignKey(item => item.RouteId).OnDelete(DeleteBehavior.Restrict);
+
         // Slice 4D step 2: the labels to print of a warehouse.
         builder.HasIndex(item => new { item.TenantId, item.WarehouseId, item.ShippingLabelUtc });
         builder.HasIndex(item => new { item.TenantId, item.DeliveryId });

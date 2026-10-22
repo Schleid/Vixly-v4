@@ -166,7 +166,8 @@ public static class OperationsInternalPackageEndpoints
             shipment.CountryCode, shipment.RecipientName, shipment.RecipientPhone,
             shipment.Options.HasFlag(OperationsShipmentOptions.Consolidate), shipment.Options.HasFlag(OperationsShipmentOptions.Refrigerated), shipment.Options.HasFlag(OperationsShipmentOptions.Insured),
             shipment.Announced, shipment.Arrived, shipment.CreatedUtc, shipment.DestinationId, shipment.ServiceCode, shipment.OriginId, shipment.ParcelCount, shipment.Booked,
-            shipment.BookedTotal, shipment.BookedCurrency, shipment.InsurancePlanId, shipment.CollectorName, shipment.CollectorPhone, shipment.PickedUpUtc);
+            shipment.BookedTotal, shipment.BookedCurrency, shipment.InsurancePlanId, shipment.CollectorName, shipment.CollectorPhone, shipment.PickedUpUtc,
+            shipment.DeliveredUtc, shipment.Collect);
 
     internal static CustomerParcelDto Parcel(OperationsCustomerParcel parcel, OperationsWeightUnit weight, OperationsDimensionUnit dimension) =>
         new(parcel.ParcelId, parcel.Number, parcel.Carrier, parcel.CarrierTrackingNumber, parcel.DeclaredContents, parcel.DeclaredValue, parcel.CurrencyCode,

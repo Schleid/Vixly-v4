@@ -9,8 +9,11 @@ using Vixly.Operations.Application.UseCases.SignIn.CompleteOperationsSignInWithA
 using Vixly.Operations.Application.UseCases.SignIn.CompleteOperationsSignInWithRecoveryCode;
 using Vixly.Operations.Application.UseCases.SignIn.SignOutOperations;
 using Vixly.Operations.Domain.Branding;
+using Vixly.Operations.Domain.Customers;
 using Vixly.Operations.Domain.Identity;
 using Vixly.Shared.Kernel.Domain;
+using Vixly.Shared.Kernel.Localization;
+using Vixly.Shared.Kernel.ValueObjects;
 
 namespace Vixly.Operations.Application.Tests;
 
@@ -86,6 +89,50 @@ public sealed class OperationsSignInUseCaseTests
 
         _kit.Clock.Advance(TimeSpan.FromMinutes(15));
         Assert.True((await Begin(Password)).Succeeded);
+    }
+
+    // Owner, 2026-10-21: a device signing in from another country than its own is flagged and must confirm with a second factor.
+    [Fact]
+    public async Task Device_InAnotherCountry_IsFlagged_AndConfirmedWithTheCode()
+    {
+        _kit.Owner(withApp: true);
+        Guid device = _kit.Devices.Register("secret", "US");
+        _kit.Services.Country = "FR";
+
+        BeginOperationsSignInResponse begun = await _kit.Begin().ExecuteAsync(_kit.Context,
+            new BeginOperationsSignInRequest { Email = "grace@northwind.example", Password = Password, DeviceId = device, DeviceSecret = "secret" }, CancellationToken.None);
+        _kit.Clock.Advance(TimeSpan.FromSeconds(31));
+        CompleteOperationsSignInWithAuthenticatorCodeResponse verified = await Verify(begun.ChallengeToken, FakeCode);
+
+        Assert.True(verified.Succeeded);
+        Assert.Contains(_kit.Store.Audit, entry => entry.ActionCode == "ops.auth.country_changed");
+        OperationsUserSession session = Assert.Single(_kit.Store.Sessions);
+        Assert.Equal(device, session.DeviceId);
+        Assert.Equal("D-000001", session.DeviceNumber);
+        Assert.Equal("FR", session.Country);
+        Assert.True(session.CountryChanged);
+    }
+
+    // Staff who sign in with the password alone: at home, as usual; abroad, refused while they have no second factor to confirm with.
+    [Fact]
+    public async Task Device_InAnotherCountry_WithoutASecondFactor_IsRefused()
+    {
+        OperationsUser staff = OperationsUser.InviteStaff(_kit.TenantId, "Ada Lovelace", EmailAddress.Create("ada@northwind.example"), LanguageCode.En, _kit.Clock.GetUtcNow());
+        staff.AcceptInvitation(_kit.Services.Hash(Password), _kit.Clock.GetUtcNow());
+        _kit.Store.Users.Add(staff);
+        Guid device = _kit.Devices.Register("secret", "US");
+        BeginOperationsSignInRequest request = new() { Email = "ada@northwind.example", Password = Password, DeviceId = device, DeviceSecret = "secret" };
+
+        _kit.Services.Country = "FR";
+        BeginOperationsSignInResponse abroad = await _kit.Begin().ExecuteAsync(_kit.Context, request, CancellationToken.None);
+        _kit.Services.Country = "US";
+        BeginOperationsSignInResponse home = await _kit.Begin().ExecuteAsync(_kit.Context, request, CancellationToken.None);
+
+        Assert.Equal("ops.auth.country_needs_second_factor", abroad.Error!.Code);
+        Assert.NotEmpty(home.SessionToken);
+        OperationsUserSession session = Assert.Single(_kit.Store.Sessions);
+        Assert.Equal("Front desk", session.DeviceName);
+        Assert.False(session.CountryChanged);
     }
 
     [Fact]
@@ -180,6 +227,22 @@ public sealed class OperationsSignInUseCaseTests
         Assert.Empty(accepted.SessionToken);
         Assert.Equal("ops.auth.link_invalid", twice.Error!.Code);
         Assert.Empty(_kit.Store.Sessions);
+    }
+
+    // Review item 3: the Owner, named by the platform, is not refused when the email is also a customer's (staff members are, see the web tests).
+    [Fact]
+    public async Task Invitation_OfTheOwner_IsAcceptedEvenWithACustomerEmail()
+    {
+        OperationsCustomer customer = OperationsCustomer.SignUp(Guid.NewGuid(), "Grace", "Hopper", null, EmailAddress.Create("grace@northwind.example"), "+50937123456", LanguageCode.En,
+            "$2a$12$hash", _kit.Clock.GetUtcNow());
+        customer.ConfirmEmail("C00001", _kit.Clock.GetUtcNow());
+        _kit.Customers.Add(customer);
+        _kit.PlatformKnowsTheOwner();
+        await _kit.InvitationHandler().HandleAsync(_kit.InvitationMessage(), CancellationToken.None);
+
+        AcceptOperationsInvitationResponse accepted = await Accept(LinkToken(), Password);
+
+        Assert.True(accepted.Succeeded);
     }
 
     [Fact]

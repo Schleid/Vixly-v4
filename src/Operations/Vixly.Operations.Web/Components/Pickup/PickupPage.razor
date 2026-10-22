@@ -50,7 +50,12 @@ IMPORTANT NOTES:
     </section>
     <section class="ops-editor__panel" aria-labelledby="owed-title">
         <h2 id="owed-title">@T["ui.pickup.owed"]</h2>
-        @if (Invoices.Count == 0)
+        @if (!MoneyHandled)
+        {
+            @* Slice 7 step 4 (R-8): this partner does not handle money; the company settles what is owed. *@
+            <p>@T[PayFirst ? "ui.pickup.money_elsewhere_due" : "ui.pickup.money_elsewhere_paid"]</p>
+        }
+        else if (Invoices.Count == 0)
         {
             <p>@T["ui.pickup.no_invoice"]</p>
         }
@@ -78,7 +83,7 @@ IMPORTANT NOTES:
         {
             <p>@VixlyText.Format(T, "ui.pickup.storage_owed", new Dictionary<string, object> { ["amount"] = StorageOwed.ToString("N2", CultureInfo.CurrentCulture), ["currency"] = CurrencyCode })</p>
         }
-        @if (PayFirst)
+        @if (PayFirst && MoneyHandled)
         {
             <p class="ops-editor__hint">@T["ui.pickup.pay_first_hint"]</p>
         }
@@ -228,6 +233,8 @@ IMPORTANT NOTES:
     [Parameter] public bool CodeSent { get; set; }
 
     [Parameter] public bool PayFirst { get; set; }
+
+    [Parameter] public bool MoneyHandled { get; set; } = true;
 
     [Parameter] public string? Error { get; set; }
 

@@ -1,0 +1,192 @@
+﻿@*
+=========================================================
+FILE: CustomerScreenPage.razor
+
+PURPOSE:
+What the customer sees on the customer screen (Slice 5F step 3, P-2, P-3, P-9): welcome; the invoice and how to pay it here;
+the Zelle warning and terms, then the Zelle details; Stripe's card page; the declaration to sign; thank you.
+
+RESPONSIBILITIES:
+- Show the step the screen is on, in the customer's language
+- Post the customer's choice with the version they saw (a screen that changed meanwhile refuses it)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Cash and other methods a person records are never offered here (P-7): the customer tells the clerk
+- Card numbers never pass here: the card is paid on Stripe's page (P-4)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<ScreenShell Company="@Company" Version="@Version" Problem="@(ProblemCode is null ? null : T[ProblemCode].Value)">
+    @switch (Step)
+    {
+        case OperationsScreenStep.Summary when View?.Invoice is { } invoice:
+            <section class="ops-screen__panel" aria-labelledby="invoice-title" data-screen-step="summary">
+                <h1 id="invoice-title">@VixlyText.Format(T, "ui.screen.invoice_title", "number", invoice.Reference)</h1>
+                <InvoiceLines T="T" Invoice="invoice" />
+                @if (View.Settled)
+                {
+                    <p class="ops-screen__big" data-settled>@T["ui.screen.paid"]</p>
+                }
+                else
+                {
+                    <p class="ops-screen__big">@VixlyText.Format(T, "ui.screen.to_pay", "amount", OperationsInvoiceWords.Money(invoice.Owed, invoice.CurrencyCode))</p>
+                    <div class="ops-screen__choices">
+                        @if (View.CardOffered)
+                        {
+                            <ScreenActionButton Action="OperationsScreenAction.Card" Version="@Version" Label="@T["ui.screen.pay_card"]" />
+                        }
+                        @if (View.ZelleOffered)
+                        {
+                            <ScreenActionButton Action="OperationsScreenAction.Zelle" Version="@Version" Label="@T["ui.screen.pay_zelle"]" />
+                        }
+                    </div>
+                    <p class="ops-screen__hint">@T["ui.screen.other_methods"]</p>
+                }
+            </section>
+            break;
+
+        case OperationsScreenStep.ZelleTerms when View?.Invoice is { } invoice:
+            <section class="ops-screen__panel" aria-labelledby="terms-title" data-screen-step="zelle-terms">
+                <h1 id="terms-title">@T["ui.screen.zelle_terms_title"]</h1>
+                <p class="ops-screen__warning" role="note">@VixlyText.Format(T, "ui.screen.zelle_warning", "number", invoice.Reference)</p>
+                @if (View.ZelleTerms is { } terms)
+                {
+                    <div class="ops-screen__terms">@terms</div>
+                }
+                <div class="ops-screen__choices">
+                    <ScreenActionButton Action="OperationsScreenAction.AcceptZelle" Version="@Version" Label="@T["ui.screen.zelle_accept"]" />
+                    <ScreenActionButton Action="OperationsScreenAction.Back" Version="@Version" Label="@T["ui.screen.back"]" Secondary="true" />
+                </div>
+            </section>
+            break;
+
+        case OperationsScreenStep.Zelle when View?.Invoice is { } invoice:
+            <section class="ops-screen__panel" aria-labelledby="zelle-title" data-screen-step="zelle">
+                <h1 id="zelle-title">@T["ui.screen.zelle_title"]</h1>
+                @if (View.Settled)
+                {
+                    <p class="ops-screen__big" data-settled>@T["ui.screen.paid"]</p>
+                }
+                else
+                {
+                    <div class="ops-screen__zelle">
+                        @if (View.ZelleHasQr)
+                        {
+                            <img src="/screen/zelle-qr" alt="@T["ui.screen.zelle_qr_alt"]" width="260" height="260" />
+                        }
+                        <dl>
+                            @if (View.ZelleName is { } name) { <div><dt>@T["ui.screen.zelle_name"]</dt><dd>@name</dd></div> }
+                            @if (View.ZelleTag is { } tag) { <div><dt>@T["ui.screen.zelle_tag"]</dt><dd>@tag</dd></div> }
+                            @if (View.ZelleContact is { } contact) { <div><dt>@T["ui.screen.zelle_contact"]</dt><dd>@contact</dd></div> }
+                            <div><dt>@T["ui.screen.zelle_amount"]</dt><dd class="ops-screen__big">@OperationsInvoiceWords.Money(invoice.Owed, invoice.CurrencyCode)</dd></div>
+                            <div><dt>@T["ui.screen.zelle_memo"]</dt><dd class="ops-screen__big" data-memo>@invoice.Reference</dd></div>
+                        </dl>
+                    </div>
+                    <p class="ops-screen__warning" role="note">@VixlyText.Format(T, "ui.screen.zelle_warning", "number", invoice.Reference)</p>
+                    <p>@T["ui.screen.zelle_then"]</p>
+                }
+                <div class="ops-screen__choices">
+                    <ScreenActionButton Action="OperationsScreenAction.Back" Version="@Version" Label="@T["ui.screen.back"]" Secondary="true" />
+                </div>
+            </section>
+            break;
+
+        case OperationsScreenStep.Card:
+            <section class="ops-screen__panel" aria-labelledby="card-title" data-screen-step="card" data-card-status="@View?.CardStatus?.ToString().ToLowerInvariant()">
+                <h1 id="card-title">@T["ui.screen.card_title"]</h1>
+                @if (View?.CardStatus == OperationsCardChargeStatus.Paid || View?.Settled == true)
+                {
+                    <p class="ops-screen__big" data-settled>@T["ui.screen.paid_card"]</p>
+                }
+                else if (View?.CardStatus == OperationsCardChargeStatus.Started && View.CardPageUrl is { } url)
+                {
+                    <p>@T["ui.screen.card_how"]</p>
+                    @if (QrDataUri is not null)
+                    {
+                        <img src="@QrDataUri" alt="@T["ui.screen.card_qr_alt"]" width="260" height="260" />
+                    }
+                    <p><a class="vx-button vx-button--primary" href="@url" rel="noreferrer">@T["ui.screen.card_here"]</a></p>
+                }
+                else
+                {
+                    <p>@T["ui.screen.card_stopped"]</p>
+                }
+                <div class="ops-screen__choices">
+                    <ScreenActionButton Action="OperationsScreenAction.Back" Version="@Version" Label="@T["ui.screen.back"]" Secondary="true" />
+                </div>
+            </section>
+            break;
+
+        case OperationsScreenStep.Signature when View?.Declaration is { } declaration:
+            <section class="ops-screen__panel" aria-labelledby="sign-title" data-screen-step="signature">
+                <h1 id="sign-title">@VixlyText.Format(T, "ui.screen.sign_title", "number", declaration.ShipmentNumber)</h1>
+                <p>@declaration.Route · @declaration.Recipient</p>
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.screen.parcel"]</th><th scope="col">@T["ui.screen.contents"]</th><th scope="col">@T["ui.screen.weight"]</th><th scope="col" class="ops-editor__number">@T["ui.screen.value"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsDeclarationLine line in declaration.Lines)
+                        {
+                            <tr><td>@line.Number</td><td>@line.Contents</td><td>@line.Weight</td><td class="ops-editor__number">@OperationsInvoiceWords.Money(line.Value, declaration.CurrencyCode)</td></tr>
+                        }
+                    </tbody>
+                </table>
+                <p>@VixlyText.Format(T, "ui.screen.total_value", "amount", OperationsInvoiceWords.Money(declaration.TotalValue, declaration.CurrencyCode))</p>
+                @if (declaration.InsuranceName is { } insurance)
+                {
+                    <p data-insured>@VixlyText.Format(T, "ui.screen.insured", new Dictionary<string, object> { ["name"] = insurance, ["value"] = OperationsInvoiceWords.Money(declaration.InsuredValue ?? 0m, declaration.CurrencyCode), ["premium"] = OperationsInvoiceWords.Money(declaration.Premium ?? 0m, declaration.CurrencyCode) })</p>
+                }
+                else
+                {
+                    <p data-not-insured>@T["ui.screen.not_insured"]</p>
+                    @if (declaration.LiabilityText is { } liability)
+                    {
+                        <div class="ops-screen__terms">@liability</div>
+                    }
+                }
+                <p class="ops-screen__warning">@T["ui.screen.declare"]</p>
+                <form method="post" action="/screen/act" data-signature-pad class="ops-screen__form">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="action" value="Sign" />
+                    <input type="hidden" name="version" value="@Version" />
+                    <input type="hidden" name="signature" />
+                    <canvas width="720" height="220" class="ops-screen__pad" tabindex="0" aria-label="@T["ui.screen.sign_here"]"></canvas>
+                    <div class="ops-screen__choices">
+                        <button type="button" class="vx-button vx-button--secondary" data-signature-clear>@T["ui.screen.sign_clear"]</button>
+                        <button type="submit" class="vx-button vx-button--primary">@T["ui.screen.sign_button"]</button>
+                    </div>
+                </form>
+                <script src="/js/ops-signature.js?v=20261020-1" defer></script>
+            </section>
+            break;
+
+        case OperationsScreenStep.Done:
+            <section class="ops-screen__panel" data-screen-step="done">
+                <p class="ops-screen__big">@T["ui.screen.thanks"]</p>
+            </section>
+            break;
+
+        default:
+            <section class="ops-screen__panel" data-screen-step="idle">
+                <p class="ops-screen__big">@T["ui.screen.welcome"]</p>
+            </section>
+            break;
+    }
+</ScreenShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsScreenStep Step { get; set; }
+
+    [Parameter] public string Version { get; set; } = string.Empty;
+
+    [Parameter] public OperationsScreenView? View { get; set; }
+
+    // Stripe's page as a QR code, for the customer's own phone.
+    [Parameter] public string? QrDataUri { get; set; }
+
+    // An allowed refusal code, written here in the customer's language.
+    [Parameter] public string? ProblemCode { get; set; }
+}

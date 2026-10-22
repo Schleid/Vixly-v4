@@ -11,5 +11,6 @@
 //
 // IMPORTANT NOTES:
 // - Codes are Platform wire codes (device_pending, device_revoked, ...)
+// - Name, Number, Country: the device as registered, when allowed (owner, 2026-10-21: activity and the country check at sign-in).
 // =========================================================
-public sealed record OperationsDeviceCheck(bool Allowed, string? Code, string Access, string? NewSecret);
+public sealed record OperationsDeviceCheck(bool Allowed, string? Code, string Access, string? NewSecret, string? Name = null, string? Number = null, string? Country = null);

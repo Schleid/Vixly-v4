@@ -77,6 +77,52 @@ public static class CustomerInvoiceEndpoints
             return Results.File(document.Content, "application/pdf", document.FileName);
         });
 
+        // Slice 5F step 4: pay by card. The charge is made here, then its page sends the customer on to Stripe and Stripe sends them back to it.
+        portal.MapPost("/{invoiceId:guid}/card", async (HttpContext http, Guid invoiceId, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
+        {
+            if (CustomerTenantMiddleware.Host(http)?.TenantId is not { } tenant || CustomerSessionCookie.Read(http.Request) is not { } session)
+            {
+                return Results.Redirect("/customer/sign-in");
+            }
+
+            CustomerCall<CustomerCardStartDto> call = await api.StartCardPaymentAsync(tenant, session, invoiceId,
+                "https://" + http.Request.Host.Value + "/customer/invoices/card/", http, http.RequestAborted);
+
+            if (call.Value is { } started)
+            {
+                return Results.Redirect("/customer/invoices/card/" + started.ChargeId);
+            }
+
+            return new RazorComponentResult<CardPaymentPage>(new
+            {
+                Brand = await api.GetBrandAsync(tenant, http.RequestAborted),
+                Payment = (CustomerCardPaymentDto?)null,
+                Error = CustomerPortalEndpoints.Describe(text, call)
+            });
+        });
+
+        portal.MapGet("/card/{chargeId:guid}", async (HttpContext http, Guid chargeId, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
+        {
+            if (CustomerTenantMiddleware.Host(http)?.TenantId is not { } tenant || CustomerSessionCookie.Read(http.Request) is not { } session)
+            {
+                return Results.Redirect("/customer/sign-in");
+            }
+
+            CustomerCall<CustomerCardPaymentDto> call = await api.GetCardPaymentAsync(tenant, session, chargeId, http, http.RequestAborted);
+
+            if (call.Value is null && call.ErrorCode == "ops.cards.charge_not_found")
+            {
+                return Results.NotFound();
+            }
+
+            return new RazorComponentResult<CardPaymentPage>(new
+            {
+                Brand = await api.GetBrandAsync(tenant, http.RequestAborted),
+                Payment = call.Value,
+                Error = call.Value is null ? CustomerPortalEndpoints.Describe(text, call) : null
+            });
+        });
+
         // The monthly notice links here: the account is shown with the invoices.
         endpoints.MapGet("/account", () => Results.Redirect("/customer/invoices#account"));
 

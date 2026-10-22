@@ -140,7 +140,8 @@ public sealed class OperationsShipmentInstructions
             : throw new DomainException(OperationsShipmentErrors.RecipientPhoneInvalid);
 
     private static OperationsShipmentOptions Checked(OperationsShipmentOptions options) =>
-        (options & ~(OperationsShipmentOptions.Consolidate | OperationsShipmentOptions.Refrigerated | OperationsShipmentOptions.Insured)) == OperationsShipmentOptions.None
+        (options & ~(OperationsShipmentOptions.Consolidate | OperationsShipmentOptions.Refrigerated | OperationsShipmentOptions.Insured | OperationsShipmentOptions.FreightCollect))
+            == OperationsShipmentOptions.None
             ? options
             : throw new DomainException(OperationsShipmentErrors.DestinationInvalid);
 }

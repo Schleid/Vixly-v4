@@ -62,13 +62,15 @@ public sealed class ListOperationsDevicesUseCase
             return ListOperationsDevicesResponse.Failure(OperationsAccessErrors.PermissionRequired);
         }
 
-        OperationsPlatformCall<IReadOnlyList<OperationsDevice>> call = await _devices.ListAsync(_actors.For(context, user), cancellationToken);
+        OperationsPlatformActor actor = _actors.For(context, user);
+        OperationsPlatformCall<IReadOnlyList<OperationsDevice>> call = await _devices.ListAsync(actor, cancellationToken);
 
         if (!call.Succeeded)
         {
             return ListOperationsDevicesResponse.Failure(call.Error!);
         }
 
-        return ListOperationsDevicesResponse.Success(call.Value!);
+        OperationsPlatformCall<OperationsDeviceSeats> seats = await _devices.SeatsAsync(actor, cancellationToken);
+        return ListOperationsDevicesResponse.Success(call.Value!, seats.Succeeded ? seats.Value : null);
     }
 }

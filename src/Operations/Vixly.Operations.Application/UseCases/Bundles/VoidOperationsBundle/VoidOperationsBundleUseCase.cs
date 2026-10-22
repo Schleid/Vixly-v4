@@ -100,6 +100,12 @@ public sealed class VoidOperationsBundleUseCase
             box.TakeOut(utcNow);
         }
 
+        // Its list goes with it: its parcels and boxes may go on another (review).
+        foreach (OperationsBundleItem item in await _bundles.ListItemsAsync(bundle.Id, cancellationToken))
+        {
+            _bundles.Remove(item);
+        }
+
         foreach (OperationsParcel parcel in parcels)
         {
             parcel.Unpack(utcNow);

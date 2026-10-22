@@ -25,10 +25,33 @@ IMPORTANT NOTES:
     <section class="ops-editor__panel ops-cashier__summary" aria-labelledby="pay-title">
         <h2 id="pay-title">@invoice.Number · @invoice.Reference · @OperationsBillingRows.Customer(invoice)</h2>
         <InvoiceLines T="T" Invoice="invoice" />
+        @if (invoice.PayAtDestination) { <p class="ops-editor__hint">@T["ui.invoice.pdf.pay_at_destination"]</p> }
     </section>
     @if (invoice.Owed > 0m)
     {
     <BillAccountPanel Invoice="invoice" Account="Account" Position="Position" />
+    @if (CardOffered)
+    {
+        @* Slice 5F step 4: a card through the company's Stripe account; recorded only once Stripe says it is paid. *@
+        <section class="ops-editor__panel ops-cashier__card" aria-labelledby="card-title">
+            <h2 id="card-title">@T["ui.cards.pay_title"]</h2>
+            <p class="ops-editor__hint">@T["ui.cards.pay_hint"]</p>
+            <div class="ops-editor__inline">
+                <form method="post" action="/staff/cashier/invoices/@invoice.Id/card">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.cards.payment_page"]</button>
+                </form>
+                @foreach (OperationsCardReaderRow reader in CardReaders)
+                {
+                    <form method="post" action="/staff/cashier/invoices/@invoice.Id/card">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="reader" value="@reader.ReaderId" />
+                        <button type="submit" class="vx-button vx-button--secondary">@VixlyText.Format(T, "ui.cards.on_reader", "reader", reader.Label)</button>
+                    </form>
+                }
+            </div>
+        </section>
+    }
     <form method="post" action="/staff/cashier/invoices/@invoice.Id/pay" class="ops-editor__panel ops-editor__form ops-cashier__pay" aria-labelledby="tenders-title">
         <AntiforgeryToken />
         <input type="hidden" name="key" value="@Key" />
@@ -66,6 +89,11 @@ IMPORTANT NOTES:
     {
         <p class="ops-editor__notice">@T["ui.payments.state." + OperationsPaymentWords.State(invoice.PaymentState)]</p>
     }
+    @* Slice 5F step 3 (P-2): the customer pays on the customer screen: card on Stripe's page, or Zelle with its terms accepted there. *@
+    @if (invoice.Owed > 0m && Screens.Count > 0)
+    {
+        <Vixly.Operations.Web.Components.Screens.ScreenSendPanel T="T" Screens="Screens" InvoiceId="invoice.Id" Back="invoice" />
+    }
     <PaymentsList T="T" Payments="Payments" Refunds="Refunds" Others="Others" />
     }
 </EditorShell>
@@ -78,6 +106,10 @@ IMPORTANT NOTES:
     [Parameter] public OperationsTenantSettings? Settings { get; set; }
 
     [Parameter] public IReadOnlyList<OperationsPaymentMethod> Methods { get; set; } = Array.Empty<OperationsPaymentMethod>();
+
+    [Parameter] public bool CardOffered { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsCardReaderRow> CardReaders { get; set; } = Array.Empty<OperationsCardReaderRow>();
 
     [Parameter] public OperationsCashDrawer? Drawer { get; set; }
 
@@ -93,6 +125,8 @@ IMPORTANT NOTES:
     [Parameter] public string? Error { get; set; }
 
     [Parameter] public string? Info { get; set; }
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Application.Screens.OperationsScreenRow> Screens { get; set; } = Array.Empty<Vixly.Operations.Application.Screens.OperationsScreenRow>();
 
     private IReadOnlyDictionary<OperationsPaymentMethod, string> Others => Settings is null ? new Dictionary<OperationsPaymentMethod, string>() : OperationsPaymentNames.Others(Settings);
 

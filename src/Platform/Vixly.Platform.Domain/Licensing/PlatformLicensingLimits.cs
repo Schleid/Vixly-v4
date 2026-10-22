@@ -32,6 +32,11 @@ public static class PlatformLicensingLimits
 
     public const int NumberMaxLength = 12;
 
+    // Where a device was registered from (owner, 2026-10-21).
+    public const int IpMaxLength = 45;
+
+    public const int UserAgentMaxLength = 512;
+
     public const int LinkMaxTries = 5;
 
     public const int LinksPerHour = 3;

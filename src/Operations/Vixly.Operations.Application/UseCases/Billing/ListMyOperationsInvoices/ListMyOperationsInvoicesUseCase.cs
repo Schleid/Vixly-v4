@@ -26,10 +26,18 @@ public sealed class ListMyOperationsInvoicesUseCase
 
     private readonly IOperationsBillingRepository _billing;
 
+    private readonly IOperationsCardRepository _cards;
+
+    private readonly IOperationsSettingsRepository _settings;
+
     public ListMyOperationsInvoicesUseCase(
         OperationsCustomerAccounts accounts,
-        IOperationsBillingRepository billing)
+        IOperationsBillingRepository billing,
+        IOperationsCardRepository cards,
+        IOperationsSettingsRepository settings)
     {
+        _cards = cards ?? throw new ArgumentNullException(nameof(cards));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _accounts = accounts ?? throw new ArgumentNullException(nameof(accounts));
         _billing = billing ?? throw new ArgumentNullException(nameof(billing));
     }
@@ -49,6 +57,7 @@ public sealed class ListMyOperationsInvoicesUseCase
 
         IReadOnlyList<OperationsInvoice> invoices = await _billing.ListCustomerInvoicesAsync(signedIn.Customer.Id, 100, cancellationToken);
         return ListMyOperationsInvoicesResponse.Success(invoices,
-            await _billing.ListApprovedCreditNotesAsync(invoices.Select(invoice => invoice.Id).ToList(), cancellationToken));
+            await _billing.ListApprovedCreditNotesAsync(invoices.Select(invoice => invoice.Id).ToList(), cancellationToken),
+            Vixly.Operations.Application.Cards.OperationsCardDesk.Offered(await _settings.FindAsync(cancellationToken), await _cards.GetProviderAsync(cancellationToken) is not null));
     }
 }

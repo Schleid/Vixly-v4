@@ -97,6 +97,11 @@ internal sealed class PresenterTestKit :
         return Task.FromResult<PlatformUserDetail?>(null);
     }
 
+    public Task<PagedResult<PlatformSignInItem>> ListSignInsAsync(Guid? platformUserId, DateTimeOffset utcNow, PagedRequest page, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(new PagedResult<PlatformSignInItem>(Array.Empty<PlatformSignInItem>(), page, 0));
+    }
+
     public Task<PlatformUserActionFacts?> GetActionFactsAsync(Guid platformUserId, DateTimeOffset utcNow, CancellationToken cancellationToken)
     {
         return Task.FromResult<PlatformUserActionFacts?>(

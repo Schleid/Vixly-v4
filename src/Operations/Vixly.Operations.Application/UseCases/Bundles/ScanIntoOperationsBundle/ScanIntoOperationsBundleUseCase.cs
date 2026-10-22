@@ -101,23 +101,37 @@ public sealed class ScanIntoOperationsBundleUseCase
         string scan = (request.ScanKey == Guid.Empty ? Guid.NewGuid() : request.ScanKey).ToString("N");
         ScanIntoOperationsBundleResponse result;
 
+        OperationsBundleItem? listed;
+
         if (await _bundles.FindBoxByNumberAsync(code, cancellationToken) is { } box)
         {
-            result = await BoxAsync(bundle, box, settings, access!.User.Id, scan, cancellationToken);
+            (Error? offList, listed) = await ListedAsync(bundle, null, box.Id, box.BundleId == bundle.Id, cancellationToken);
+            result = offList is not null ? ScanIntoOperationsBundleResponse.Failure(offList) : await BoxAsync(bundle, box, settings, access!.User.Id, scan, cancellationToken);
         }
         else if (await _receiving.FindParcelByNumberAsync(code, cancellationToken) is { } found && await _tracking.GetParcelAsync(found.Id, cancellationToken) is { } parcel)
         {
-            result = await ParcelAsync(bundle, parcel, settings, access!.User.Id, scan, cancellationToken);
+            (Error? offList, listed) = await ListedAsync(bundle, parcel.Id, null, parcel.BundleId == bundle.Id, cancellationToken);
+            result = offList is not null ? ScanIntoOperationsBundleResponse.Failure(offList) : await ParcelAsync(bundle, parcel, settings, access!.User.Id, scan, cancellationToken);
         }
         else
         {
             return ScanIntoOperationsBundleResponse.Failure(OperationsBundleErrors.UnknownCode);
         }
 
+        // Scanned again while its line still shows missing (review): confirmed now.
+        if (result.Succeeded && result.Repeat && listed is { IsScanned: false } again)
+        {
+            again.Scanned(access!.User.Id, _timeProvider.GetUtcNow());
+            return await _unitOfWork.SaveChangesAsync(cancellationToken) ? result : ScanIntoOperationsBundleResponse.Failure(OperationsCommonErrors.ConcurrencyConflict);
+        }
+
         if (!result.Succeeded || result.Repeat)
         {
             return result;
         }
+
+        // On the list: confirmed by this scan (owner, 2026-10-21).
+        listed?.Scanned(access!.User.Id, _timeProvider.GetUtcNow());
 
         if (await _unitOfWork.SaveChangesAsync(cancellationToken))
         {
@@ -127,6 +141,31 @@ public sealed class ScanIntoOperationsBundleUseCase
         // Another scan at the same moment changed the bundle or the parcel: scanned again, it is either in already (a repeat) or checked afresh.
         _unitOfWork.DiscardChanges();
         return ScanIntoOperationsBundleResponse.Failure(OperationsCommonErrors.ConcurrencyConflict);
+    }
+
+    // The bundle's list (owner, 2026-10-21): a bundle with a list takes only what is on it; what is on another open bundle's list goes there.
+    private async Task<(Error? Refused, OperationsBundleItem? Listed)> ListedAsync(OperationsBundle bundle, Guid? parcelId, Guid? boxId, bool repeat, CancellationToken cancellationToken)
+    {
+        IReadOnlyList<OperationsBundleItem> open = await _bundles.ListOpenItemsAsync(parcelId is { } parcel ? new[] { parcel } : Array.Empty<Guid>(),
+            boxId is { } box ? new[] { box } : Array.Empty<Guid>(), cancellationToken);
+        OperationsBundleItem? listed = open.FirstOrDefault(item => item.BundleId == bundle.Id);
+
+        if (repeat)
+        {
+            return (null, listed);
+        }
+
+        if (listed is null && open.Any(item => item.BundleId != bundle.Id))
+        {
+            return (OperationsBundleErrors.OnAnotherList, null);
+        }
+
+        if (listed is null && await _bundles.HasListAsync(bundle.Id, cancellationToken))
+        {
+            return (OperationsBundleErrors.NotOnList, null);
+        }
+
+        return (null, listed);
     }
 
     private async Task<ScanIntoOperationsBundleResponse> ParcelAsync(OperationsBundle bundle, OperationsParcel parcel, Vixly.Operations.Domain.Settings.OperationsTenantSettings settings, Guid userId,

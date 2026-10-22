@@ -19,4 +19,7 @@ public interface IOperationsRequestMetadata
     string? UserAgent { get; }
 
     string? CorrelationId { get; }
+
+    // Owner, 2026-10-21: the country the request comes from (Cloudflare's), when a trusted proxy names it.
+    string? Country => null;
 }

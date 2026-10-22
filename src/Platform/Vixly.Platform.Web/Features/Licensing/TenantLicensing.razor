@@ -52,13 +52,13 @@ IMPORTANT NOTES:
                     }
                 </dd>
                 <dt>@T["ui.licensing.pending"]</dt>
-                <dd><a href="/devices?tenant=@TenantId&status=Pending">@summary.Counts.Pending</a></dd>
+                <dd>@summary.Counts.Pending</dd>
                 <dt>@T["ui.licensing.awaiting_review"]</dt>
-                <dd><a href="/devices?tenant=@TenantId&review=true">@summary.Counts.AwaitingReview</a></dd>
+                <dd>@summary.Counts.AwaitingReview</dd>
                 <dt>@T["ui.licensing.allowance"]</dt>
                 <dd>@VixlyText.Format(T, "ui.licensing.allowance_value", "count", summary.ReleaseAllowance)</dd>
             </dl>
-            <p><a href="/devices?tenant=@TenantId">@T["ui.licensing.all_devices"]</a></p>
+            <TenantLicenceList TenantId="@TenantId" Seats="@summary.SeatsBought" />
             @if (summary.Abilities.CanManage)
             {
                 @if (summary.FirstDeviceLinkAllowed)

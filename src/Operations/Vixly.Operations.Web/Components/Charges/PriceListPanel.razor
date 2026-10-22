@@ -28,6 +28,7 @@ IMPORTANT NOTES:
         <PriceVersionFields T="T" Mode="Row.Card.Mode" Version="@(Row.Card.VersionAt(UtcNow) ?? Row.Card.Versions.FirstOrDefault())" ItemTypes="ItemTypes" Currency="@Currency" Unit="@Unit" />
         <CustomsField T="T" Value="Row.Card.Customs" />
         <label><input type="checkbox" name="active" value="true" checked="@Row.Card.IsActive" /> @T["ui.charges.in_use"]</label>
+        @if (Row.Card.CustomerId is null) { <label><input type="checkbox" name="published" value="true" checked="@Row.Card.Published" /> @T["ui.charges.published"]</label> }
         <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
     </form>
 </details>

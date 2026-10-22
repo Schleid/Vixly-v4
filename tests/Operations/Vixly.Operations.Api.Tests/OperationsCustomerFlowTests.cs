@@ -11,8 +11,11 @@ using Vixly.Customer.Web.Operations;
 using Vixly.Operations.Application.Ports;
 using Vixly.Operations.Domain.Branding;
 using Vixly.Operations.Domain.Customers;
+using Vixly.Operations.Domain.Identity;
 using Vixly.Operations.Domain.Locations;
 using Vixly.Operations.Infrastructure.Persistence;
+using Vixly.Shared.Kernel.Localization;
+using Vixly.Shared.Kernel.ValueObjects;
 
 namespace Vixly.Operations.Api.Tests;
 
@@ -133,6 +136,33 @@ public sealed partial class OperationsCustomerFlowTests : IClassFixture<Operatio
         Assert.Contains("North Couriers", home, StringComparison.Ordinal);
         Assert.DoesNotContain("100 Calle Sol", home, StringComparison.Ordinal);
 
+        // One mailbox per company (owner, 2026-10-21): a second receiving warehouse shows nowhere until the company names it the mailbox; then only it shows.
+        await WithDatabaseAsync(_north, async context =>
+        {
+            OperationsBranch branch = await context.Branches.FirstAsync();
+            OperationsWarehouse fortLauderdale = OperationsWarehouse.Create(_north, branch.Id, new OperationsLocationDetails("FLL", "Fort Lauderdale",
+                OperationsPostalAddress.Create("500 SW 1st Ave", null, "Fort Lauderdale", "FL", "33301", "US"), null, null, null, true), OperationsWarehouseRoles.Receiving, true, DateTimeOffset.UtcNow);
+            context.Add(fortLauderdale);
+        });
+        Assert.DoesNotContain("500 SW 1st Ave", await ana.GetStringAsync("/customer/"), StringComparison.Ordinal);
+        await WithDatabaseAsync(_north, async context =>
+        {
+            OperationsWarehouse fortLauderdale = await context.Warehouses.SingleAsync(item => item.Code == "FLL");
+            fortLauderdale.SetMailbox(true, DateTimeOffset.UtcNow);
+
+            // Only an active receiving warehouse that accepts deliveries can be the mailbox; one that stops receiving stops being it.
+            fortLauderdale.Update(fortLauderdale.BranchId, new OperationsLocationDetails("FLL", "Fort Lauderdale", fortLauderdale.Address, null, null, null, true),
+                OperationsWarehouseRoles.Storage, false, OperationsLocationStatus.Active, DateTimeOffset.UtcNow);
+            Assert.False(fortLauderdale.IsMailbox);
+            Assert.Equal(OperationsLocationErrors.MailboxInvalid, Assert.Throws<Vixly.Shared.Kernel.Domain.DomainException>(() => fortLauderdale.SetMailbox(true, DateTimeOffset.UtcNow)).Error);
+            fortLauderdale.Update(fortLauderdale.BranchId, new OperationsLocationDetails("FLL", "Fort Lauderdale", fortLauderdale.Address, null, null, null, true),
+                OperationsWarehouseRoles.Receiving, true, OperationsLocationStatus.Active, DateTimeOffset.UtcNow);
+            fortLauderdale.SetMailbox(true, DateTimeOffset.UtcNow);
+        });
+        string moved = await ana.GetStringAsync("/customer/");
+        Assert.Contains("500 SW 1st Ave", moved, StringComparison.Ordinal);
+        Assert.DoesNotContain("8400 NW 25th St", moved, StringComparison.Ordinal);
+
         // The same link works once.
         string again = await Read(await ana.PostAsync("/customer/verify?token=" + Uri.EscapeDataString(token), "/customer/verify", new() { ["token"] = token }));
         Assert.Contains("This link has expired or was already used", again, StringComparison.Ordinal);
@@ -143,6 +173,34 @@ public sealed partial class OperationsCustomerFlowTests : IClassFixture<Operatio
         HttpResponseMessage signIn = await ana.PostAsync("/customer/sign-in", "/customer/sign-in", new() { ["email"] = "ana@example.com", ["password"] = Password });
         Assert.Equal("/customer/", signIn.Headers.Location?.OriginalString);
         Assert.Contains(code.Value, await ana.GetStringAsync("/customer/"), StringComparison.Ordinal);
+    }
+
+    // Review item 3: a work email at any company never opens a customer account; the screen answers as always, the email says why.
+    [SqlServerFact]
+    public async Task SignUp_WithAWorkEmailOfAnyCompany_OpensNoAccount()
+    {
+        await WithDatabaseAsync(_south, context =>
+        {
+            // Only a member who accepted the invitation holds the email; one never accepted blocks nobody (review).
+            OperationsUser wes = OperationsUser.InviteStaff(_south, "Wes Worker", EmailAddress.Create("wes@south-staff.example"), LanguageCode.En, DateTimeOffset.UtcNow);
+            wes.AcceptInvitation("$2a$12$hash", DateTimeOffset.UtcNow);
+            context.Add(wes);
+            context.Add(OperationsUser.InviteStaff(_south, "Ida Invited", EmailAddress.Create("ida@south-staff.example"), LanguageCode.En, DateTimeOffset.UtcNow));
+            return Task.CompletedTask;
+        });
+        Browser stranger = OpenBrowser(NorthSlug);
+        _api.Mailer.Sent.Clear();
+
+        HttpResponseMessage work = await stranger.PostAsync("/customer/sign-up", "/customer/sign-up", SignUpForm("wes@south-staff.example"));
+        HttpResponseMessage fresh = await stranger.PostAsync("/customer/sign-up", "/customer/sign-up", SignUpForm("wes.home@example.com"));
+        await stranger.PostAsync("/customer/sign-up", "/customer/sign-up", SignUpForm("ida@south-staff.example"));
+
+        Assert.Equal(fresh.Headers.Location, work.Headers.Location);
+        Assert.Equal(OperationsCustomerMailKind.EmailNotAllowed, _api.Mailer.Sent.Single(mail => mail.ToAddress == "wes@south-staff.example").Kind);
+        Assert.Equal(OperationsCustomerMailKind.Verification, _api.Mailer.Sent.Single(mail => mail.ToAddress == "wes.home@example.com").Kind);
+        Assert.Equal(OperationsCustomerMailKind.Verification, _api.Mailer.Sent.Single(mail => mail.ToAddress == "ida@south-staff.example").Kind);
+        await WithDatabaseAsync(_north, async context =>
+            Assert.False(await context.Set<OperationsCustomer>().IgnoreQueryFilters().AnyAsync(customer => customer.Email == EmailAddress.Create("wes@south-staff.example"))));
     }
 
     [SqlServerFact]

@@ -1,10 +1,12 @@
 ﻿using Vixly.Contracts.Operations.Billing;
 using Vixly.Contracts.Operations.Internal;
 using Vixly.Operations.Api.Internal;
+using Vixly.Operations.Application.UseCases.Billing.GetMyOperationsCardPayment;
 using Vixly.Operations.Application.UseCases.Billing.GetMyOperationsCreditAccount;
 using Vixly.Operations.Application.UseCases.Billing.GetMyOperationsCreditStatement;
 using Vixly.Operations.Application.UseCases.Billing.GetMyOperationsInvoiceDocument;
 using Vixly.Operations.Application.UseCases.Billing.ListMyOperationsInvoices;
+using Vixly.Operations.Application.UseCases.Billing.PayMyOperationsInvoiceByCard;
 using Vixly.Operations.Domain.Billing;
 
 namespace Vixly.Operations.Api.Endpoints;
@@ -52,7 +54,33 @@ public static class OperationsInternalInvoiceEndpoints
                         OperationsPaymentState.AwaitingCredit => "awaiting_credit",
                         _ => "unpaid"
                     }))
-                    .ToList()))
+                    .ToList(), response.CardOffered))
+                : OperationsApiErrors.Problem(http, response.Error!);
+        });
+
+        // Slice 5F step 4: pay an invoice by card on Stripe's page, then follow it.
+        invoices.MapPost("/{invoiceId:guid}/card", async (HttpContext http, Guid invoiceId, CustomerCardStartBody body, PayMyOperationsInvoiceByCardUseCase useCase,
+            CancellationToken cancellationToken) =>
+        {
+            PayMyOperationsInvoiceByCardResponse response = await useCase.ExecuteAsync(OperationsInternalPackageEndpoints.Context(http), new PayMyOperationsInvoiceByCardRequest
+            {
+                SessionToken = OperationsInternalPackageEndpoints.Session(http), InvoiceId = invoiceId, ReturnUrlPrefix = body?.ReturnUrlPrefix ?? string.Empty
+            }, cancellationToken);
+            return response.Succeeded ? Results.Ok(new CustomerCardStartDto(response.ChargeId)) : OperationsApiErrors.Problem(http, response.Error!);
+        });
+
+        invoices.MapGet("/card/{chargeId:guid}", async (HttpContext http, Guid chargeId, GetMyOperationsCardPaymentUseCase useCase, CancellationToken cancellationToken) =>
+        {
+            GetMyOperationsCardPaymentResponse response = await useCase.ExecuteAsync(OperationsInternalPackageEndpoints.Context(http),
+                new GetMyOperationsCardPaymentRequest { SessionToken = OperationsInternalPackageEndpoints.Session(http), ChargeId = chargeId }, cancellationToken);
+            return response.Succeeded
+                ? Results.Ok(new CustomerCardPaymentDto(response.InvoiceId, response.InvoiceNumber, response.Status switch
+                {
+                    OperationsCardChargeStatus.Paid => "paid",
+                    OperationsCardChargeStatus.PaidNotApplied => "paid_not_applied",
+                    OperationsCardChargeStatus.Cancelled => "cancelled",
+                    _ => "started"
+                }, response.Amount, response.CurrencyCode, response.PageUrl))
                 : OperationsApiErrors.Problem(http, response.Error!);
         });
 

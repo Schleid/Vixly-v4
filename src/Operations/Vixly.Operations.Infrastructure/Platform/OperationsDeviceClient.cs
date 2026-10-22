@@ -23,6 +23,8 @@ namespace Vixly.Operations.Infrastructure.Platform;
 // =========================================================
 public sealed class OperationsDeviceClient : IOperationsDeviceClient
 {
+    private const int MaxDevicePages = 20;
+
     private readonly OperationsPlatformSender _sender;
 
     public OperationsDeviceClient(OperationsPlatformSender sender)
@@ -36,10 +38,13 @@ public sealed class OperationsDeviceClient : IOperationsDeviceClient
         return Done(await SendAsync<object>(HttpMethod.Post, "internal/v1/tenant/devices/first-device-link", actor.TenantId, actor, null, cancellationToken));
     }
 
-    public async Task<OperationsPlatformCall<OperationsDeviceEnrolment>> CompleteLinkAsync(Guid tenantId, string token, string name, string kind, CancellationToken cancellationToken)
+    public async Task<OperationsPlatformCall<OperationsDeviceEnrolment>> CompleteLinkAsync(Guid tenantId, string token, string name, string kind, OperationsDeviceOrigin origin,
+        CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(origin);
         (PlatformDeviceEnrolmentInfo? value, Error? error) = await SendAsync<PlatformDeviceEnrolmentInfo>(
-            HttpMethod.Post, "internal/v1/device-links/complete", tenantId, null, new CompletePlatformDeviceLinkBody(token, name, kind, null, null), cancellationToken);
+            HttpMethod.Post, "internal/v1/device-links/complete", tenantId, null, new CompletePlatformDeviceLinkBody(token, name, kind, null, null, origin.Ip, origin.UserAgent, origin.Country),
+            cancellationToken);
         return Enrolment(value, error);
     }
 
@@ -47,7 +52,8 @@ public sealed class OperationsDeviceClient : IOperationsDeviceClient
     {
         ArgumentNullException.ThrowIfNull(actor);
         (PlatformDeviceEnrolmentInfo? value, Error? error) = await SendAsync<PlatformDeviceEnrolmentInfo>(
-            HttpMethod.Post, "internal/v1/tenant/devices", actor.TenantId, actor, new EnrolPlatformDeviceBody(name, kind, null), cancellationToken);
+            HttpMethod.Post, "internal/v1/tenant/devices", actor.TenantId, actor, new EnrolPlatformDeviceBody(name, kind, null, actor.ClientIp, actor.UserAgent, actor.Country),
+            cancellationToken);
         return Enrolment(value, error);
     }
 
@@ -56,28 +62,55 @@ public sealed class OperationsDeviceClient : IOperationsDeviceClient
         return Done(await SendAsync<object>(HttpMethod.Post, "internal/v1/device-links/second-factor-reset/complete", tenantId, null, new { token }, cancellationToken));
     }
 
-    public async Task<OperationsDeviceCheck> VerifyAsync(Guid tenantId, Guid deviceId, string secret, CancellationToken cancellationToken)
+    public async Task<OperationsDeviceCheck> VerifyAsync(Guid tenantId, Guid deviceId, string secret, bool rotate, string? country, CancellationToken cancellationToken)
     {
         (PlatformDeviceCheckInfo? value, Error? error) = await SendAsync<PlatformDeviceCheckInfo>(
-            HttpMethod.Post, $"internal/v1/tenant/devices/{deviceId:D}/verify", tenantId, null, new VerifyPlatformDeviceBody(secret, null, null), cancellationToken);
+            HttpMethod.Post, $"internal/v1/tenant/devices/{deviceId:D}/verify", tenantId, null, new VerifyPlatformDeviceBody(secret, null, null, rotate, country), cancellationToken);
 
         // A device of another tenant or one Platform never heard of is simply unknown.
         return value is not null
-            ? new OperationsDeviceCheck(value.Allowed, value.Code, value.Access, value.NewSecret)
+            ? new OperationsDeviceCheck(value.Allowed, value.Code, value.Access, value.NewSecret, value.Name, value.Number, value.Country)
             : new OperationsDeviceCheck(false, error?.Code == OperationsDeviceErrors.NotAllowed.Code ? "not_allowed" : "device_unknown", "none", null);
     }
 
     public async Task<OperationsPlatformCall<IReadOnlyList<OperationsDevice>>> ListAsync(OperationsPlatformActor actor, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(actor);
-        (PlatformPageInfo<PlatformDeviceInfo>? page, Error? error) = await SendAsync<PlatformPageInfo<PlatformDeviceInfo>>(
-            HttpMethod.Get, "internal/v1/tenant/devices?page=1&pageSize=100", actor.TenantId, actor, null, cancellationToken);
+        List<PlatformDeviceInfo> items = new();
 
-        return error is not null || page is null
-            ? OperationsPlatformCall<IReadOnlyList<OperationsDevice>>.Refused(error ?? OperationsDeviceErrors.Refused)
-            : OperationsPlatformCall<IReadOnlyList<OperationsDevice>>.Ok(page.Items
-                .Select(item => new OperationsDevice(item.DeviceId, item.Number, item.Name, item.Kind, item.Status, item.SeatHeld, item.RequestedByName, item.RequestedUtc, item.LastSeenUtc))
+        // Every page (owner, 2026-10-21: each licence and its device); at most MaxDevicePages of 100.
+        for (int number = 1; number <= MaxDevicePages; number++)
+        {
+            (PlatformPageInfo<PlatformDeviceInfo>? page, Error? error) = await SendAsync<PlatformPageInfo<PlatformDeviceInfo>>(
+                HttpMethod.Get, $"internal/v1/tenant/devices?page={number}&pageSize=100", actor.TenantId, actor, null, cancellationToken);
+
+            if (error is not null || page is null)
+            {
+                return OperationsPlatformCall<IReadOnlyList<OperationsDevice>>.Refused(error ?? OperationsDeviceErrors.Refused);
+            }
+
+            items.AddRange(page.Items);
+
+            if (page.Items.Count == 0 || number * page.PageSize >= page.TotalCount)
+            {
+                break;
+            }
+        }
+
+        return OperationsPlatformCall<IReadOnlyList<OperationsDevice>>.Ok(items
+                .Select(item => new OperationsDevice(item.DeviceId, item.Number, item.Name, item.Kind, item.Status, item.SeatHeld, item.RequestedByName, item.RequestedUtc, item.LastSeenUtc,
+                    item.Browser, item.ApprovedUtc, item.ApprovedByName))
                 .ToList());
+    }
+
+    public async Task<OperationsPlatformCall<OperationsDeviceSeats>> SeatsAsync(OperationsPlatformActor actor, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(actor);
+        (PlatformDeviceSeatsInfo? value, Error? error) = await SendAsync<PlatformDeviceSeatsInfo>(HttpMethod.Get, "internal/v1/tenant/devices/seats", actor.TenantId, actor, null, cancellationToken);
+
+        return error is null && value is not null
+            ? OperationsPlatformCall<OperationsDeviceSeats>.Ok(new OperationsDeviceSeats(value.Seats, value.InUse, value.ScheduledSeats, value.ScheduledUtc))
+            : OperationsPlatformCall<OperationsDeviceSeats>.Refused(error ?? OperationsDeviceErrors.Refused);
     }
 
     public async Task<OperationsPlatformCall<bool>> ApproveAsync(OperationsPlatformActor actor, Guid deviceId, CancellationToken cancellationToken)

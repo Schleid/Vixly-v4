@@ -21,7 +21,7 @@ namespace Vixly.Operations.Application.UseCases.Bundles.GetOperationsBundles;
 //
 // IMPORTANT NOTES:
 // - ops.bundles.manage or ops.bundles.fill, in the warehouses where the person holds one
-// - Ready: final, paid, clear parcels in no bundle; waiting: final but unpaid or held
+// - Ready: final, paid, on account or freight collect, clear parcels in no bundle; waiting: final but unpaid or held
 // =========================================================
 public sealed class GetOperationsBundlesUseCase
 {
@@ -73,7 +73,12 @@ public sealed class GetOperationsBundlesUseCase
         Vixly.Operations.Domain.Settings.OperationsTenantSettings settings = await _settings.FindAsync(cancellationToken)
             ?? Vixly.Operations.Domain.Settings.OperationsTenantSettings.CreateDefault(context.RequiredTenantId, _timeProvider.GetUtcNow());
         List<Guid> ids = warehouses.Select(warehouse => warehouse.Id).ToList();
-        IReadOnlyList<(OperationsParcel Parcel, OperationsShipment Shipment)> ready = await _bundles.ListReadyAsync(ids, 3000, cancellationToken);
+        // Already on an open bundle's list (owner, 2026-10-21): not ready for another.
+        IReadOnlyList<OperationsBundleItem> planned = await _bundles.ListPlannedAsync(ids, cancellationToken);
+        HashSet<Guid> plannedParcels = planned.Where(item => item.ParcelId is not null).Select(item => item.ParcelId!.Value).ToHashSet();
+        HashSet<Guid> plannedBoxes = planned.Where(item => item.BoxId is not null).Select(item => item.BoxId!.Value).ToHashSet();
+        IReadOnlyList<(OperationsParcel Parcel, OperationsShipment Shipment)> ready = (await _bundles.ListReadyAsync(ids, 3000, cancellationToken))
+            .Where(item => !plannedParcels.Contains(item.Parcel.Id) && !(item.Parcel.BoxId is { } inBox && plannedBoxes.Contains(inBox))).ToList();
         HashSet<Guid> unpaid = (await _billing.ListShipmentInvoicesAsync(ready.Select(item => item.Shipment.Id).Distinct().ToList(), cancellationToken))
             .Where(invoice => invoice.ShipmentId is not null).GroupBy(invoice => invoice.ShipmentId!.Value).Where(group => OperationsBundling.Unpaid(group)).Select(group => group.Key).ToHashSet();
 
@@ -81,7 +86,7 @@ public sealed class GetOperationsBundlesUseCase
         HashSet<Guid> closedBoxes = (await _bundles.ListBoxesAsync(ids, 1000, cancellationToken)).Where(box => box.Status == OperationsRepackBoxStatus.Closed && box.BundleId is null)
             .Select(box => box.Id).ToHashSet();
         bool Bundleable((OperationsParcel Parcel, OperationsShipment Shipment) item) =>
-            OperationsBundling.Ready(item.Parcel, item.Shipment) is null && !unpaid.Contains(item.Shipment.Id)
+            OperationsBundling.Ready(item.Parcel, item.Shipment) is null && (!unpaid.Contains(item.Shipment.Id) || item.Shipment.FreightCollect)
             && (!item.Shipment.Options.HasFlag(OperationsShipmentOptions.Consolidate) || item.Shipment.WayOr(settings.ConsolidationWay) != OperationsConsolidationWay.Repack
                 || (item.Parcel.BoxId is { } box && closedBoxes.Contains(box)));
 

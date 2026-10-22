@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Vixly.Platform.Application.Queries;
 using Vixly.Platform.Application.Security;
 using Vixly.Platform.Application.UseCases.Licensing.DecidePlatformSecondFactorReset;
 using Vixly.Platform.Application.UseCases.Licensing.GetPlatformTenantLicensing;

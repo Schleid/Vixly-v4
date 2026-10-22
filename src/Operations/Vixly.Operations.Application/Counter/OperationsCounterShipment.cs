@@ -34,4 +34,5 @@ public sealed record OperationsCounterShipment(
     bool CreatedAtCounter,
     bool Insured = false,
     Guid? InsurancePlanId = null,
-    DateTimeOffset? CustomerSignedUtc = null);
+    DateTimeOffset? CustomerSignedUtc = null,
+    Guid? OriginWarehouseId = null);

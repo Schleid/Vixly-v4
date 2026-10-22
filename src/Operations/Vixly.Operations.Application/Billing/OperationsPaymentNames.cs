@@ -18,7 +18,12 @@ namespace Vixly.Operations.Application.Billing;
 // =========================================================
 public static class OperationsPaymentNames
 {
+    // The methods typed in at the cashier: a card is never typed in (only Stripe records it, Slice 5F step 4).
     public static IReadOnlyList<OperationsPaymentMethod> Accepted(OperationsTenantSettings settings) =>
+        Enum.GetValues<OperationsPaymentMethod>().Where((settings ?? throw new ArgumentNullException(nameof(settings))).Accepts).Where(method => method != OperationsPaymentMethod.Card).ToList();
+
+    // The methods money is given back by: a card too, through Stripe.
+    public static IReadOnlyList<OperationsPaymentMethod> RefundedBy(OperationsTenantSettings settings) =>
         Enum.GetValues<OperationsPaymentMethod>().Where((settings ?? throw new ArgumentNullException(nameof(settings))).Accepts).ToList();
 
     public static IReadOnlyDictionary<OperationsPaymentMethod, string> Others(OperationsTenantSettings settings)

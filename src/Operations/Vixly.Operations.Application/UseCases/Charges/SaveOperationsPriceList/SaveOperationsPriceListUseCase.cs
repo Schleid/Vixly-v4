@@ -114,6 +114,7 @@ public sealed class SaveOperationsPriceListUseCase
 
                 card.ChangeCustoms(request.Customs, utcNow);
                 card.ChangeStatus(request.Active, utcNow);
+                card.ChangePublished(request.Published, utcNow);
             }
             else
             {
@@ -152,6 +153,7 @@ public sealed class SaveOperationsPriceListUseCase
                     return SaveOperationsPriceListResponse.Failure(OperationsChargeErrors.CardDuplicate);
                 }
 
+                card.ChangePublished(request.Published, utcNow);
                 _charges.Add(card);
                 action = "ops.charges.price_list_added";
             }
@@ -165,7 +167,7 @@ public sealed class SaveOperationsPriceListUseCase
         _audit.Record(access!.User.Id, action, nameof(OperationsRateCard), card.Id, after: new
         {
             service = card.ServiceCode, origin = card.OriginWarehouseId, destination = card.DestinationWarehouseId, customer = card.CustomerId, basis = card.Basis.ToString(),
-            customs = card.Customs.ToString(), active = card.IsActive, perPackage = latest?.PerPackage, perShipment = latest?.PerShipment,
+            customs = card.Customs.ToString(), active = card.IsActive, published = card.Published, perPackage = latest?.PerPackage, perShipment = latest?.PerShipment,
             effectiveFrom = latest?.EffectiveFromUtc, bands = latest?.Bands.Select(band => new { band.From, kind = band.Kind.ToString(), band.Amount, band.Base }),
             items = latest?.Items.Count, minimum = latest?.MinimumCharge, serviceFee = latest?.ServiceFee, consolidation = latest?.ConsolidationFee
         });

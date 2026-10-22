@@ -54,6 +54,9 @@ internal sealed class OperationsChargeRepository : IOperationsChargeRepository
         await _context.RateCards.AsNoTracking().OrderBy(card => card.ServiceCode).ThenBy(card => card.CustomerId).ThenBy(card => card.OriginWarehouseId).ThenBy(card => card.DestinationWarehouseId)
             .Take(OperationsChargeLimits.MaxCards).ToListAsync(cancellationToken);
 
+    public Task<bool> AnyPublishedAsync(CancellationToken cancellationToken) =>
+        _context.RateCards.AnyAsync(card => card.IsActive && card.Published && card.CustomerId == null, cancellationToken);
+
     public async Task<IReadOnlyList<OperationsRateCard>> ListCardsForAsync(Guid? customerId, CancellationToken cancellationToken) =>
         await _context.RateCards.AsNoTracking().Where(card => card.IsActive && (card.CustomerId == null || card.CustomerId == customerId))
             .Take(OperationsChargeLimits.MaxCards).ToListAsync(cancellationToken);

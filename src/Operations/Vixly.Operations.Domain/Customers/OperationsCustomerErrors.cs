@@ -40,5 +40,8 @@ public static class OperationsCustomerErrors
     // Slice 5C: only an active customer ships from the counter.
     public static Error NotActive { get; } = Error.Create("ops.customers.not_active");
 
+    // Review item 3: a work email (at any company) never becomes a customer email.
+    public static Error EmailUnavailable { get; } = Error.Create("ops.customers.email_unavailable");
+
     public static Error LinkInvalid { get; } = Error.Create("ops.customers.link_invalid");
 }

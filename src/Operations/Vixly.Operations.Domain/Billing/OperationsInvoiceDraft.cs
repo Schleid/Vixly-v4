@@ -28,4 +28,8 @@ public sealed record OperationsInvoiceDraft(
     string? TaxName,
     bool TaxPerKind,
     OperationsTaxRates Rates,
-    string? Note);
+    string? Note)
+{
+    // Freight collect: to pay at the destination (owner, 2026-10-21).
+    public bool PayAtDestination { get; init; }
+}

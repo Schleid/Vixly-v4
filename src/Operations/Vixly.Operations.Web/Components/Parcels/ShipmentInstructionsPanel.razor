@@ -34,7 +34,7 @@ IMPORTANT NOTES:
             <dt>@T["ui.shipment.options"]</dt>
             <dd>
                 @if (shipment.Options == OperationsShipmentOptions.None) { @T["ui.shipment.no_options"] }
-                @foreach (OperationsShipmentOptions option in new[] { OperationsShipmentOptions.Consolidate, OperationsShipmentOptions.Refrigerated, OperationsShipmentOptions.Insured }.Where(item => shipment.Options.HasFlag(item)))
+                @foreach (OperationsShipmentOptions option in new[] { OperationsShipmentOptions.Consolidate, OperationsShipmentOptions.Refrigerated, OperationsShipmentOptions.Insured, OperationsShipmentOptions.FreightCollect }.Where(item => shipment.Options.HasFlag(item)))
                 {
                     <span class="ops-editor__status" data-status="@option.ToString().ToLowerInvariant()">@T["ui.shipment.option." + option.ToString().ToLowerInvariant()]</span>
                 }

@@ -11,5 +11,7 @@
 //
 // IMPORTANT NOTES:
 // - From Platform; Operations keeps no device records
+// - Browser, ApprovedUtc, ApprovedByName (none and approved: the Owner's email link) for the company's list (owner, 2026-10-21).
 // =========================================================
-public sealed record OperationsDevice(Guid DeviceId, string Number, string Name, string Kind, string Status, bool SeatHeld, string? RequestedByName, DateTimeOffset RequestedUtc, DateTimeOffset? LastSeenUtc);
+public sealed record OperationsDevice(Guid DeviceId, string Number, string Name, string Kind, string Status, bool SeatHeld, string? RequestedByName, DateTimeOffset RequestedUtc, DateTimeOffset? LastSeenUtc,
+    string? Browser = null, DateTimeOffset? ApprovedUtc = null, string? ApprovedByName = null);

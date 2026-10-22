@@ -186,6 +186,20 @@ public sealed class OperationsShipment : OperationsEntity
         MarkAsModified(utcNow);
     }
 
+    // Slice 7 step 3 (R-7): delivered at its address, once every parcel is finished.
+    public DateTimeOffset? DeliveredUtc { get; private set; }
+
+    public void Delivered(DateTimeOffset utcNow)
+    {
+        if (DeliveredUtc is not null)
+        {
+            return;
+        }
+
+        DeliveredUtc = utcNow;
+        MarkAsModified(utcNow);
+    }
+
     // Slice 7 (R-1): the customer was told it is ready for pickup (once).
     public DateTimeOffset? PickupNotifiedUtc { get; private set; }
 
@@ -208,6 +222,9 @@ public sealed class OperationsShipment : OperationsEntity
     public const int MaxParcelCount = 99;
 
     public bool IsBooked => Status == OperationsShipmentStatus.Booked;
+
+    // Freight collect: paid at the destination by the sender's choice (owner, 2026-10-21).
+    public bool FreightCollect => Options.HasFlag(OperationsShipmentOptions.FreightCollect);
 
     // The parcel count: 1 to 99, never below the parcels already in it.
     public void DeclareParcelCount(int count, int entered, DateTimeOffset utcNow)

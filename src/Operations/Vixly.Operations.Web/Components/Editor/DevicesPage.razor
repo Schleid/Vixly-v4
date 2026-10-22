@@ -3,81 +3,116 @@
 FILE: DevicesPage.razor
 
 PURPOSE:
-The tenant's computers and devices: approve, deny, stop.
+The Licences tab of the company (owner, 2026-10-21): every
+licence, bound to a device or free, and the devices requested or
+ended.
 
 RESPONSIBILITIES:
-- Render the tenant's devices
+- Render the licences (number, device ID, name, type, browser,
+  status, registered, authorised by) and the free ones
+- Link each device to its page, where it is approved, denied or
+  released
 
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10); values come from the endpoint
-- Each action asks for a fresh authenticator code (step-up)
+- A lower number of licences waits for the renewal; the devices in use must be released first
 - Placeholder look: Frontend/UI designs the final experience
 =========================================================
 *@
-@inherits OperationsAllowedComponent
-@using Vixly.Operations.Domain.Access
+@using Vixly.Operations.Application.Ports
 @inject IStringLocalizer<OperationsText> T
 
-<EditorShell Title="@T["ui.devices.title"]" Company="@Company" Section="devices" Error="@Error" Info="@Info">
-    <p class="ops-editor__hint">@T["ui.devices.hint"]</p>
-    @foreach ((string title, IEnumerable<OperationsDevice> group) in Groups)
+<EditorShell Title="@T["ui.licences.title"]" Company="@Company" Section="company" Error="@Error" Info="@Info">
+    <CompanyTabs Current="licences" />
+    @if (Seats is { } seats)
     {
-        <section class="ops-editor__panel">
-            <h2>@title <span class="ops-section-count">@group.Count()</span></h2>
-            @if (!group.Any())
-            {
-                <p class="ops-editor__empty-message">@T["ui.editor.none"]</p>
-            }
-            <ul class="ops-editor__list">
-                @foreach (OperationsDevice device in group)
-                {
-                    <li class="ops-device-record">
-                        <strong>@device.Number · @device.Name</strong>
-                        <span class="ops-editor__status" data-status="@device.Status">@T["ui.devices.kind." + device.Kind]</span>
-                        @if (device.RequestedByName is not null) { <span>@T["ui.devices.requested_by"] @device.RequestedByName</span> }
-                        @if (device.LastSeenUtc is { } seen) { <span>@T["ui.devices.last_seen"] <time datetime="@seen.ToString("O")">@seen.ToLocalTime().ToString("g", System.Globalization.CultureInfo.CurrentCulture)</time></span> }
-                        @if (device.Status == "pending" && Can(OperationsPermissions.DevicesApprove))
-                        {
-                            <form method="post" action="/staff/devices/@device.DeviceId/decide" class="ops-editor__inline">
-                                <AntiforgeryToken />
-                                <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required placeholder="@T["ui.devices.code"]" aria-label="@T["ui.devices.code"]" />
-                                <button type="submit" name="approve" value="true" class="vx-button vx-button--primary">@T["ui.devices.approve"]</button>
-                                <button type="submit" name="approve" value="false" class="vx-button vx-button--secondary">@T["ui.devices.deny"]</button>
-                            </form>
-                        }
-                        else if (device.Status == "active" && Can(OperationsPermissions.DevicesRelease))
-                        {
-                            <form method="post" action="/staff/devices/@device.DeviceId/release" class="ops-editor__inline">
-                                <AntiforgeryToken />
-                                <select name="reason" aria-label="@T["ui.devices.reason"]">
-                                    @foreach (string reason in Vixly.Operations.Application.UseCases.Devices.ReleaseOperationsDevice.ReleaseOperationsDeviceUseCase.Reasons)
-                                    {
-                                        <option value="@reason">@T["ui.devices.reason." + reason]</option>
-                                    }
-                                </select>
-                                <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required placeholder="@T["ui.devices.code"]" aria-label="@T["ui.devices.code"]" />
-                                <button type="submit" class="vx-button vx-button--secondary">@T["ui.devices.release"]</button>
-                            </form>
-                        }
-                    </li>
-                }
-            </ul>
-        </section>
+        <p class="ops-licences__summary">@VixlyText.Format(T, "ui.licences.summary", new Dictionary<string, object> { ["inUse"] = seats.InUse, ["seats"] = seats.Seats })</p>
+        @if (seats.ScheduledSeats is { } scheduled && seats.ScheduledUtc is { } from)
+        {
+            <p class="ops-editor__hint">@VixlyText.Format(T, "ui.licences.scheduled", new Dictionary<string, object> { ["seats"] = scheduled, ["date"] = Day(from) })</p>
+        }
     }
+    <section class="ops-editor__panel">
+        <OperationsTableViewport Label="@T["ui.licences.title"]">
+        <table class="ops-editor__table ops-licences">
+            <thead>
+                <tr>
+                    <th scope="col">@T["ui.licences.licence"]</th>
+                    <th scope="col">@T["ui.licences.device_id"]</th>
+                    <th scope="col">@T["ui.licences.name"]</th>
+                    <th scope="col">@T["ui.devices.kind"]</th>
+                    <th scope="col">@T["ui.devices.browser"]</th>
+                    <th scope="col">@T["ui.licences.status"]</th>
+                    <th scope="col">@T["ui.devices.registered"]</th>
+                    <th scope="col">@T["ui.devices.authorised_by"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ((int? licence, OperationsDevice? device) in Rows)
+                {
+                    <tr data-status="@(device?.Status ?? "free")">
+                        <td>@(licence?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "-")</td>
+                        @if (device is null)
+                        {
+                            <td>-</td>
+                            <td colspan="5"><span class="ops-editor__status" data-status="free">@T["ui.licences.status.free"]</span></td>
+                            <td>-</td>
+                        }
+                        else
+                        {
+                            <td>@device.Number</td>
+                            <td><a href="/staff/devices/@device.DeviceId">@device.Name</a></td>
+                            <td>@T["ui.devices.kind." + device.Kind]</td>
+                            <td>@(device.Browser ?? "-")</td>
+                            <td><span class="ops-editor__status" data-status="@device.Status">@T["ui.licences.status." + device.Status]</span></td>
+                            <td>@Time(device.RequestedUtc)</td>
+                            <td>@Authorised(device)</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+        </OperationsTableViewport>
+    </section>
 </EditorShell>
 
 @code {
-    private IEnumerable<(string, IEnumerable<OperationsDevice>)> Groups => new[]
-    {
-        (T["ui.devices.pending"].Value, Devices.Where(device => device.Status == "pending")),
-        (T["ui.devices.active"].Value, Devices.Where(device => device.Status is "active" or "release_pending")),
-    };
-
     [Parameter] public string? Company { get; set; }
 
     [Parameter] public IReadOnlyList<OperationsDevice> Devices { get; set; } = Array.Empty<OperationsDevice>();
 
+    [Parameter] public OperationsDeviceSeats? Seats { get; set; }
+
     [Parameter] public string? Error { get; set; }
 
     [Parameter] public string? Info { get; set; }
+
+    // Bound licences first (oldest first), then the free ones, then the devices requested, then those that ended (newest first).
+    private IEnumerable<(int?, OperationsDevice?)> Rows
+    {
+        get
+        {
+            List<OperationsDevice> bound = Devices.Where(device => device.SeatHeld || device.Status is "active" or "release_pending")
+                .OrderBy(device => device.ApprovedUtc ?? device.RequestedUtc).ToList();
+            int seats = Math.Max(Seats?.Seats ?? bound.Count, bound.Count);
+
+            for (int index = 0; index < seats; index++)
+            {
+                yield return (index + 1, index < bound.Count ? bound[index] : null);
+            }
+
+            foreach (OperationsDevice device in Devices.Where(device => !bound.Contains(device)).OrderBy(device => device.Status == "pending" ? 0 : 1).ThenByDescending(device => device.RequestedUtc))
+            {
+                yield return (null, device);
+            }
+        }
+    }
+
+    private string Authorised(OperationsDevice device) => device.ApprovedUtc is { } approved
+        ? (device.ApprovedByName ?? T["ui.devices.authorised_by_link"].Value) + ", " + Time(approved)
+        : "-";
+
+    private static string Time(DateTimeOffset utc) => utc.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture) + " UTC";
+
+    private static string Day(DateTimeOffset utc) => utc.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
 }

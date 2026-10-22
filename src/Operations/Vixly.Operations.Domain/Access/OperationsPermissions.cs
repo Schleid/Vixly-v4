@@ -137,6 +137,11 @@ public static class OperationsPermissions
     // Slice 7 step 2 (R-5, R-9): the pickup counter at a destination: charges, proof, release; given per warehouse.
     public const string PickupRelease = "ops.pickup.release";
 
+    // Slice 7 step 3 (R-7, R-12): plan, start, record and settle delivery routes; drive one's own route; given per warehouse.
+    public const string DeliveryPlan = "ops.delivery.plan";
+
+    public const string DeliveryDrive = "ops.delivery.drive";
+
     public static IReadOnlyList<string> All { get; } = new[]
     {
         StaffView, StaffInvite, StaffEdit, StaffLock, StaffSuspend, StaffReactivate, StaffDeactivate, StaffResetSecondFactor, StaffEndSessions,
@@ -163,11 +168,18 @@ public static class OperationsPermissions
         DispatchesManage, CarriersManage,
         EventsView, EventsAdd,
         ArrivalsReceive, CustomsRecord,
-        PickupRelease
+        PickupRelease,
+        DeliveryPlan, DeliveryDrive
     };
 
     // Held only by the system roles; a tenant role can never include them.
     public static IReadOnlyList<string> SystemOnly { get; } = new[] { CompanyEditContacts, CompanyRequestChange, DevicesApprove, DevicesRelease };
+
+    // Slice 7 step 4 (R-8): a partner agent works at its own partner-operated warehouse only: receive, customs, release and deliver.
+    // Taking payments is added only where the company lets that partner handle money (a setting of the warehouse).
+    public static IReadOnlyList<string> PartnerAgent { get; } = new[] { ArrivalsReceive, CustomsRecord, PickupRelease, DeliveryPlan, DeliveryDrive };
+
+    public static IReadOnlyList<string> PartnerMoney { get; } = new[] { PaymentsTake };
 
     // The Administrator holds everything except the company change request (Owner only).
     public static IReadOnlyList<string> Administrator { get; } = All.Where(code => code != CompanyRequestChange).ToList();

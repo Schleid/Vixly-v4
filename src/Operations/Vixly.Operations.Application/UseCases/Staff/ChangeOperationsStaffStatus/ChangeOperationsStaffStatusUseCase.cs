@@ -32,6 +32,8 @@ public sealed class ChangeOperationsStaffStatusUseCase
 
     private readonly IOperationsUserRepository _users;
 
+    private readonly IOperationsCustomerRepository _customers;
+
     private readonly IOperationsSessionRepository _sessions;
 
     private readonly OperationsAuditTrail _audit;
@@ -43,6 +45,7 @@ public sealed class ChangeOperationsStaffStatusUseCase
     public ChangeOperationsStaffStatusUseCase(
         OperationsAccess access,
         IOperationsUserRepository users,
+        IOperationsCustomerRepository customers,
         IOperationsSessionRepository sessions,
         OperationsAuditTrail audit,
         IOperationsUnitOfWork unitOfWork,
@@ -50,6 +53,7 @@ public sealed class ChangeOperationsStaffStatusUseCase
     {
         _access = access ?? throw new ArgumentNullException(nameof(access));
         _users = users ?? throw new ArgumentNullException(nameof(users));
+        _customers = customers ?? throw new ArgumentNullException(nameof(customers));
         _sessions = sessions ?? throw new ArgumentNullException(nameof(sessions));
         _audit = audit ?? throw new ArgumentNullException(nameof(audit));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
@@ -100,6 +104,13 @@ public sealed class ChangeOperationsStaffStatusUseCase
         if (target.IsAdministrator && !access.IsOwner)
         {
             return ChangeOperationsStaffStatusResponse.Failure(OperationsAccessErrors.OwnerOnly);
+        }
+
+        // Review item 3: a former member whose email became a customer's elsewhere is not made active again.
+        if (request.Status == OperationsUserAccountStatus.Active && target.Account.Status == OperationsUserAccountStatus.Deactivated
+            && await _customers.IsCustomerEmailAnywhereAsync(target.Email, cancellationToken))
+        {
+            return ChangeOperationsStaffStatusResponse.Failure(OperationsStaffErrors.EmailUnavailable);
         }
 
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();

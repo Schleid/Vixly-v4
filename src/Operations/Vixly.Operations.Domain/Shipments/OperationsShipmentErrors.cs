@@ -73,4 +73,7 @@ public static class OperationsShipmentErrors
 
     // Slice 7 step 2 (R-6): who may collect is named once the shipment is booked, until it is collected.
     public static Error CollectorLocked { get; } = Error.Create("ops.shipments.collector_locked");
+
+    // Freight collect only when the company allows it (owner, 2026-10-21).
+    public static Error CollectUnavailable { get; } = Error.Create("ops.shipments.collect_unavailable");
 }

@@ -1,0 +1,67 @@
+﻿@*
+=========================================================
+FILE: SitePricingPage.razor
+
+PURPOSE:
+The prices the company publishes on its public website (owner, 2026-10-21).
+
+RESPONSIBILITIES:
+- Each published price list in force: the service, the route, the bands with their price per lb, kg or size, the items and the fees
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText; values come from the endpoint
+- Tenant surface: never says "Vixly"; the company's regular prices only, never a customer's
+=========================================================
+*@
+@using System.Globalization
+@using Vixly.Operations.Application.Charges
+@using Vixly.Operations.Domain.Charges
+@inject IStringLocalizer<OperationsText> T
+
+<SiteShell Page="@Page" Title="@(T["site.pricing.title"] + " | " + Page.Company)" Description="@Page.Text(T, "meta_description", "site.default.meta_description")">
+    <section class="site-section site-pricing" aria-labelledby="pricing-title">
+        <h1 id="pricing-title">@T["site.pricing.title"]</h1>
+        <p>@T["site.pricing.intro"]</p>
+        @if (Page.Site.Pricing is not { Lists.Count: > 0 })
+        {
+            <p>@T["site.pricing.none"]</p>
+        }
+        @if (Page.Site.Pricing is { } pricing)
+        {
+            @foreach (OperationsPriceListView list in pricing.Lists)
+            {
+                <article class="site-pricing__list">
+                    <h2>@(list.ServiceLabel ?? T["ui.services.name." + list.ServiceCode].Value)</h2>
+                    <p>@VixlyText.Format(T, "site.pricing.route", new Dictionary<string, object> { ["origin"] = list.Origin ?? T["site.pricing.any_origin"].Value, ["destination"] = list.Destination ?? T["site.pricing.any_destination"].Value })</p>
+                    <ul>
+                        @foreach (OperationsRateBand band in list.Bands)
+                        {
+                            <li>@VixlyText.Format(T, "ui.charges.band." + band.Kind, new Dictionary<string, object> { ["from"] = Number(band.From) + " " + Unit(list, pricing), ["amount"] = Money(band.Amount, pricing.CurrencyCode), ["base"] = Money(band.Base ?? 0m, pricing.CurrencyCode), ["unit"] = Unit(list, pricing) })</li>
+                        }
+                        @foreach (OperationsPriceItemView item in list.Items) { <li>@item.Name: @Money(item.Price, pricing.CurrencyCode)</li> }
+                        @if (list.PerPackage is { } perPackage) { <li>@T["site.pricing.per_package"]: @Money(perPackage, pricing.CurrencyCode)</li> }
+                        @if (list.PerShipment is { } perShipment) { <li>@T["site.pricing.per_shipment"]: @Money(perShipment, pricing.CurrencyCode)</li> }
+                        @if (list.MinimumCharge is { } minimum) { <li>@T["site.pricing.minimum"]: @Money(minimum, pricing.CurrencyCode)</li> }
+                        @if (list.ServiceFee is { } service) { <li>@T["site.pricing.service_fee"]: @Money(service, pricing.CurrencyCode)</li> }
+                        @if (list.ConsolidationFee is { } consolidation) { <li>@T["site.pricing.consolidation_fee"]: @Money(consolidation, pricing.CurrencyCode)</li> }
+                    </ul>
+                    <p class="site-pricing__since">@VixlyText.Format(T, "site.pricing.since", "date", list.EffectiveFrom.ToString("d", CultureInfo.CurrentCulture))</p>
+                </article>
+            }
+        }
+        <p><a class="site-button" href="/customer/sign-up">@T["site.nav.sign_up"]</a></p>
+    </section>
+</SiteShell>
+
+@code {
+    [Parameter, EditorRequired]
+    public OperationsSitePage Page { get; set; } = null!;
+
+    private static string Unit(OperationsPriceListView list, OperationsPricingView pricing) => list.Basis == OperationsRateBasis.Volume
+        ? (pricing.DimensionUnit == Vixly.Operations.Domain.Settings.OperationsDimensionUnit.Inch ? "ft³" : "m³")
+        : pricing.WeightUnit == Vixly.Operations.Domain.Settings.OperationsWeightUnit.Pound ? "lb" : "kg";
+
+    private static string Number(decimal value) => value.ToString("0.##", CultureInfo.CurrentCulture);
+
+    private static string Money(decimal value, string currency) => value.ToString("N2", CultureInfo.CurrentCulture) + " " + currency;
+}

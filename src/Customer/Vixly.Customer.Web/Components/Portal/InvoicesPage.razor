@@ -10,7 +10,7 @@ RESPONSIBILITIES:
 
 IMPORTANT NOTES:
 - Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
-- Paying comes with the company's payment options later
+- Paying by card (Slice 5F step 4): on Stripe's page, when the company takes cards
 =========================================================
 *@
 @using System.Globalization
@@ -42,7 +42,15 @@ IMPORTANT NOTES:
                             <td>@invoice.IssuedOn.ToString("d", CultureInfo.CurrentCulture)</td>
                             <td>@T["ui.invoices.kind." + invoice.Kind] @invoice.Reference</td>
                             <td>@Money(invoice.Total, invoice.CurrencyCode)</td>
-                            <td>@Money(Math.Max(invoice.Owed, 0m), invoice.CurrencyCode) <span class="customer-portal__status" data-status="@invoice.State">@T["ui.invoices.state." + invoice.State]</span></td>
+                            <td>@Money(Math.Max(invoice.Owed, 0m), invoice.CurrencyCode) <span class="customer-portal__status" data-status="@invoice.State">@T["ui.invoices.state." + invoice.State]</span>
+                                @if (invoices.CardOffered && invoice.Owed > 0m && !invoice.Voided && invoice.State is "unpaid" or "on_account")
+                                {
+                                    <form method="post" action="/customer/invoices/@invoice.InvoiceId/card" class="customer-portal__inline">
+                                        <AntiforgeryToken />
+                                        <button type="submit" class="vx-button vx-button--primary">@T["ui.invoices.pay_card"]</button>
+                                    </form>
+                                }
+                            </td>
                             <td>
                                 @foreach (CustomerCreditNoteDto note in invoice.CreditNotes)
                                 {

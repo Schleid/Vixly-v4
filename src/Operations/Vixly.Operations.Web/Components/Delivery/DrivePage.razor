@@ -1,0 +1,47 @@
+﻿@*
+=========================================================
+FILE: DrivePage.razor
+
+PURPOSE:
+A driver's own routes, from yesterday on (Slice 7 step 3, R-12).
+
+RESPONSIBILITIES:
+- List the routes, each linked to its stops
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.drive.title"]" Company="@Company" Section="drive" Error="@Error">
+    <section class="ops-editor__panel" aria-labelledby="mine-title">
+        <h2 id="mine-title">@T["ui.drive.mine"]</h2>
+        @if (Routes.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.drive.none"]</p></div>
+        }
+        else
+        {
+            <ul class="ops-editor__list">
+                @foreach (OperationsDeliveryRouteRow route in Routes)
+                {
+                    <li data-status="@OperationsDeliveryWords.Status(route.Status)">
+                        <a href="/staff/delivery/routes/@route.Id" class="ops-editor__code">@route.Number</a>
+                        · @route.ServiceDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)
+                        · <span class="ops-editor__status" data-status="@OperationsDeliveryWords.Status(route.Status)">@T["ui.delivery.route_status." + route.Status]</span>
+                        · @VixlyText.Format(T, "ui.drive.progress", new Dictionary<string, object> { ["done"] = route.Done, ["count"] = route.Stops })
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsDeliveryRouteRow> Routes { get; set; } = Array.Empty<OperationsDeliveryRouteRow>();
+
+    [Parameter] public string? Error { get; set; }
+}

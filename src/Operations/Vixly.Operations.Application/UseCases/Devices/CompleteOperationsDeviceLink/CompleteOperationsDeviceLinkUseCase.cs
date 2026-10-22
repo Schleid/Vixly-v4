@@ -30,14 +30,18 @@ public sealed class CompleteOperationsDeviceLinkUseCase
 
     private readonly IOperationsUnitOfWork _unitOfWork;
 
+    private readonly IOperationsRequestMetadata _request;
+
     public CompleteOperationsDeviceLinkUseCase(
         IOperationsDeviceClient devices,
         OperationsAuditTrail audit,
-        IOperationsUnitOfWork unitOfWork)
+        IOperationsUnitOfWork unitOfWork,
+        IOperationsRequestMetadata request)
     {
         _devices = devices ?? throw new ArgumentNullException(nameof(devices));
         _audit = audit ?? throw new ArgumentNullException(nameof(audit));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        _request = request ?? throw new ArgumentNullException(nameof(request));
     }
 
     public async Task<CompleteOperationsDeviceLinkResponse> ExecuteAsync(
@@ -65,7 +69,8 @@ public sealed class CompleteOperationsDeviceLinkUseCase
             return CompleteOperationsDeviceLinkResponse.Failure(OperationsDeviceErrors.LinkInvalid);
         }
 
-        OperationsPlatformCall<OperationsDeviceEnrolment> call = await _devices.CompleteLinkAsync(context.RequiredTenantId, request.Token.Trim(), name, request.Kind, cancellationToken);
+        OperationsPlatformCall<OperationsDeviceEnrolment> call = await _devices.CompleteLinkAsync(context.RequiredTenantId, request.Token.Trim(), name, request.Kind,
+            new OperationsDeviceOrigin(_request.ClientIp, _request.UserAgent, _request.Country), cancellationToken);
 
         if (!call.Succeeded)
         {

@@ -1,0 +1,189 @@
+﻿@*
+=========================================================
+FILE: DeliveryRoutePage.razor
+
+PURPOSE:
+A delivery route (Slice 7 step 3, R-7, R-12 to R-15): its stops in order, what to collect, how each went.
+
+RESPONSIBILITIES:
+- Planned: add shipments waiting, move or take off stops, start it, cancel it
+- Out: record each stop delivered (with the proof asked) or failed (with a reason); on the phone or from the run sheet
+- Back: settle the cash once it is paid in at the cashier
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<link rel="stylesheet" href="/css/ops-delivery.css?v=20261021-1" />
+
+<EditorShell Title="@VixlyText.Format(T, "ui.delivery.route_title", "number", Number)" Company="@Company" Section="@(Planner ? "delivery" : "drive")" Error="@Error" Info="@Info">
+    <section class="ops-editor__panel" aria-labelledby="route-title" data-status="@OperationsDeliveryWords.Status(Status)">
+        <h2 id="route-title">@T["ui.delivery.route_details"]</h2>
+        <dl class="ops-editor__facts">
+            <dt>@T["ui.delivery.status"]</dt><dd><span class="ops-editor__status" data-status="@OperationsDeliveryWords.Status(Status)">@T["ui.delivery.route_status." + Status]</span></dd>
+            <dt>@T["ui.delivery.date"]</dt><dd>@ServiceDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)</dd>
+            <dt>@T["ui.arrivals.warehouse"]</dt><dd>@WarehouseName</dd>
+            <dt>@T["ui.delivery.driver"]</dt><dd>@DriverName</dd>
+            <dt>@T["ui.delivery.cash"]</dt><dd>@OperationsDeliveryWords.Amount(CashCollected) @CurrencyCode</dd>
+            @if (CashHandedIn is { } handed) { <dt>@T["ui.delivery.handed_in"]</dt><dd>@OperationsDeliveryWords.Amount(handed) @CurrencyCode @(SettleNote is null ? null : " — " + SettleNote)</dd> }
+            @if (CancelReason is not null) { <dt>@T["ui.delivery.cancel_reason"]</dt><dd>@CancelReason</dd> }
+        </dl>
+        <p class="ops-editor__actions">
+            <a class="vx-button vx-button--secondary" href="/staff/delivery/routes/@RouteId/sheet" target="_blank" rel="noopener">@T["ui.delivery.print_sheet"]</a>
+            @if (Planner) { <a class="vx-button vx-button--secondary" href="/staff/delivery">@T["ui.delivery.back"]</a> } else { <a class="vx-button vx-button--secondary" href="/staff/drive">@T["ui.drive.back"]</a> }
+        </p>
+        @if (Status == OperationsRouteStatus.Planned)
+        {
+            <form method="post" action="/staff/delivery/routes/@RouteId/start" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <button type="submit" class="vx-button vx-button--primary" disabled="@(Stops.Count == 0)">@T["ui.delivery.start"]</button>
+            </form>
+            <p class="ops-editor__hint">@T["ui.delivery.start_hint"]</p>
+        }
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="stops-title">
+        <h2 id="stops-title">@T["ui.delivery.stops"]</h2>
+        @if (Stops.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.delivery.no_stops"]</p></div>
+        }
+        <ol class="ops-delivery__stops">
+            @foreach (OperationsDeliveryStopRow stop in Stops)
+            {
+                <li id="stop-@stop.Id.ToString("N")" class="ops-delivery__stop" data-status="@OperationsDeliveryWords.Status(stop.Status)">
+                    <h3><span class="ops-delivery__sequence">@stop.Sequence</span> <span class="ops-editor__code">@stop.Number</span> · @stop.RecipientName
+                        <span class="ops-editor__status" data-status="@OperationsDeliveryWords.Status(stop.Status)">@T["ui.delivery.stop_status." + stop.Status]</span></h3>
+                    <p>@stop.AddressLine</p>
+                    @if (stop.RecipientPhone is { } phone) { <p><a href="tel:@phone">@phone</a></p> }
+                    <p>@VixlyText.Format(T, "ui.delivery.parcels_line", "count", stop.Parcels)
+                        @if (stop.Status == OperationsStopStatus.Pending && stop.Due > 0m) { <strong> · @VixlyText.Format(T, "ui.delivery.collect", new Dictionary<string, object> { ["amount"] = OperationsDeliveryWords.Amount(stop.Due), ["currency"] = stop.CurrencyCode ?? CurrencyCode })</strong> }
+                        @if (stop.Blocked) { <span class="ops-editor__status" data-status="unpaid">@T["ui.delivery.pay_first"]</span> }
+                    </p>
+                    @if (stop.Status == OperationsStopStatus.Delivered)
+                    {
+                        <p>@VixlyText.Format(T, "ui.delivery.delivered_line", new Dictionary<string, object> { ["name"] = stop.ReceiverName ?? string.Empty, ["date"] = OperationsDispatchWords.Time(stop.DoneUtc, TimeZone) })
+                            @if (stop.IdKind is { } idKind) { <span> · @T["ui.pickup.id_kind." + idKind]</span> }
+                            @if (stop.Signed) { <span> · @T["ui.pickup.signed"]</span> }
+                            @if (stop.FromSheet) { <span> · @T["ui.delivery.from_sheet"]</span> }
+                            @if (stop.Photographed) { <span> · @T["ui.pickup.photographed"]</span> }
+                            @if (stop.CodeChecked) { <span> · @T["ui.pickup.code_checked"]</span> }
+                            @if (stop.CashCollected > 0m) { <span> · @VixlyText.Format(T, "ui.delivery.collected", new Dictionary<string, object> { ["amount"] = OperationsDeliveryWords.Amount(stop.CashCollected), ["currency"] = stop.CurrencyCode ?? CurrencyCode })</span> }
+                        </p>
+                    }
+                    else if (stop.Status == OperationsStopStatus.Failed)
+                    {
+                        <p>@VixlyText.Format(T, "ui.delivery.failed_line", new Dictionary<string, object> { ["reason"] = T["ui.delivery.failure." + stop.FailureReason].Value, ["date"] = OperationsDispatchWords.Time(stop.DoneUtc, TimeZone) })
+                            @if (stop.Note is not null) { <span> — @stop.Note</span> }
+                        </p>
+                    }
+                    @if (Planner && Status == OperationsRouteStatus.Planned)
+                    {
+                        <form method="post" action="/staff/delivery/routes/@RouteId/stops" class="ops-editor__inline">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="stop" value="@stop.Id" />
+                            <button type="submit" name="action" value="up" class="vx-button vx-button--secondary" disabled="@(stop.Sequence == 1)">@T["ui.delivery.up"]</button>
+                            <button type="submit" name="action" value="down" class="vx-button vx-button--secondary" disabled="@(stop.Sequence == Stops.Count)">@T["ui.delivery.down"]</button>
+                            <button type="submit" name="action" value="remove" class="vx-button vx-button--secondary">@T["ui.delivery.remove"]</button>
+                        </form>
+                    }
+                    @if (CanRecord && Status == OperationsRouteStatus.Out && stop.Status == OperationsStopStatus.Pending)
+                    {
+                        <DeliveryStopForms RouteId="@RouteId" Stop="@stop" Proofs="@Proofs" Sheet="@(Planner && Recording == OperationsDeliveryRecording.Sheet)" CurrencyCode="@CurrencyCode" />
+                    }
+                </li>
+            }
+        </ol>
+    </section>
+    @if (Planner && Status == OperationsRouteStatus.Planned && Waiting.Any(row => !row.Blocked))
+    {
+        <form method="post" action="/staff/delivery/routes/@RouteId/stops" class="ops-editor__panel ops-editor__form" aria-labelledby="add-title">
+            <AntiforgeryToken />
+            <input type="hidden" name="action" value="add" />
+            <h2 id="add-title">@T["ui.delivery.add"]</h2>
+            <fieldset>
+                <legend class="vx-visually-hidden">@T["ui.delivery.waiting"]</legend>
+                @foreach (OperationsDeliveryWaitingRow row in Waiting.Where(row => !row.Blocked))
+                {
+                    <label><input type="checkbox" name="shipments" value="@row.ShipmentId" /> <span class="ops-editor__code">@row.Number</span> · @row.RecipientName · @row.PostalCode @row.City</label>
+                }
+            </fieldset>
+            <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--secondary">@T["ui.delivery.add_button"]</button></p>
+        </form>
+    }
+    @if (Planner && Status == OperationsRouteStatus.Planned)
+    {
+        <form method="post" action="/staff/delivery/routes/@RouteId/cancel" class="ops-editor__panel ops-editor__form" aria-labelledby="cancel-title">
+            <AntiforgeryToken />
+            <h2 id="cancel-title">@T["ui.delivery.cancel"]</h2>
+            <label>@T["ui.delivery.cancel_reason"] <input name="reason" maxlength="@OperationsDeliveryRoute.NoteMaxLength" required /></label>
+            <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--secondary">@T["ui.delivery.cancel_button"]</button></p>
+        </form>
+    }
+    @if (Planner && Status == OperationsRouteStatus.Returned)
+    {
+        <form method="post" action="/staff/delivery/routes/@RouteId/settle" class="ops-editor__panel ops-editor__form" aria-labelledby="settle-title">
+            <AntiforgeryToken />
+            <h2 id="settle-title">@T["ui.delivery.settle"]</h2>
+            <p>@VixlyText.Format(T, "ui.delivery.settle_collected", new Dictionary<string, object> { ["amount"] = OperationsDeliveryWords.Amount(CashCollected), ["currency"] = CurrencyCode })</p>
+            @if (!CashPaidIn) { <p class="ops-editor__hint">@T["ui.delivery.pay_in_first"]</p> }
+            <label>@VixlyText.Format(T, "ui.delivery.handed_in_field", "currency", CurrencyCode) <input name="handedIn" type="number" step="0.01" min="0" value="@OperationsDeliveryWords.Amount(CashCollected)" required /></label>
+            <label>@T["ui.delivery.settle_note"] <input name="note" maxlength="@OperationsDeliveryRoute.NoteMaxLength" /></label>
+            <p class="ops-editor__hint">@T["ui.delivery.settle_hint"]</p>
+            <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary" disabled="@(!CashPaidIn)">@T["ui.delivery.settle_button"]</button></p>
+        </form>
+    }
+    @if (CanRecord && Status == OperationsRouteStatus.Out && Proofs.HasFlag(OperationsDeliveryProofs.Signature) && !(Planner && Recording == OperationsDeliveryRecording.Sheet))
+    {
+        <script src="/js/ops-signature.js?v=20261020-1" defer></script>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public Guid RouteId { get; set; }
+
+    [Parameter] public string Number { get; set; } = string.Empty;
+
+    [Parameter] public OperationsRouteStatus Status { get; set; }
+
+    [Parameter] public DateOnly ServiceDate { get; set; }
+
+    [Parameter] public string DriverName { get; set; } = string.Empty;
+
+    [Parameter] public string WarehouseName { get; set; } = string.Empty;
+
+    [Parameter] public string? TimeZone { get; set; }
+
+    [Parameter] public bool Planner { get; set; }
+
+    [Parameter] public bool CanRecord { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsDeliveryStopRow> Stops { get; set; } = Array.Empty<OperationsDeliveryStopRow>();
+
+    [Parameter] public IReadOnlyList<OperationsDeliveryWaitingRow> Waiting { get; set; } = Array.Empty<OperationsDeliveryWaitingRow>();
+
+    [Parameter] public decimal CashCollected { get; set; }
+
+    [Parameter] public decimal? CashHandedIn { get; set; }
+
+    [Parameter] public string? SettleNote { get; set; }
+
+    [Parameter] public string? CancelReason { get; set; }
+
+    [Parameter] public bool CashPaidIn { get; set; }
+
+    [Parameter] public OperationsDeliveryProofs Proofs { get; set; }
+
+    [Parameter] public OperationsDeliveryRecording Recording { get; set; }
+
+    [Parameter] public bool CashOnDelivery { get; set; }
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

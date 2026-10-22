@@ -69,6 +69,11 @@ public sealed class OperationsUser : OperationsEntity
 
     public int UnusedRecoveryCodeCount => _recoveryCodes.Count(code => !code.IsUsed);
 
+    // Slice 7 step 4 (R-8): a partner agent works for the partner running this warehouse, and only there.
+    public Guid? PartnerWarehouseId { get; private set; }
+
+    public bool IsPartnerAgent => PartnerWarehouseId is not null;
+
     // =====================================================
     // METHOD: INVITE OWNER
     // =====================================================
@@ -80,6 +85,14 @@ public sealed class OperationsUser : OperationsEntity
         return new OperationsUser(tenantId, OperationsIdentityText.RequiredName(fullName), email, preferredLanguage, false, utcNow);
     }
 
+    // Slice 7 step 4 (R-8): a partner's staff member, limited to the partner's warehouse; never given a role.
+    public static OperationsUser InvitePartnerAgent(Guid tenantId, string fullName, EmailAddress email, LanguageCode preferredLanguage, Guid warehouseId, DateTimeOffset utcNow)
+    {
+        OperationsUser user = InviteStaff(tenantId, fullName, email, preferredLanguage, utcNow);
+        user.PartnerWarehouseId = warehouseId == Guid.Empty ? throw new DomainException(Vixly.Operations.Domain.Access.OperationsRoleErrors.ScopeInvalid) : warehouseId;
+        return user;
+    }
+
     public void ChangePreferredLanguage(LanguageCode language, DateTimeOffset utcNow)
     {
         PreferredLanguage = language ?? throw new ArgumentNullException(nameof(language));
@@ -88,6 +101,11 @@ public sealed class OperationsUser : OperationsEntity
 
     public void SetAdministrator(bool isAdministrator, DateTimeOffset utcNow)
     {
+        if (isAdministrator && IsPartnerAgent)
+        {
+            throw new DomainException(Vixly.Operations.Domain.Access.OperationsRoleErrors.PartnerAgentNoRoles);
+        }
+
         IsAdministrator = isAdministrator;
         MarkAsModified(utcNow);
     }

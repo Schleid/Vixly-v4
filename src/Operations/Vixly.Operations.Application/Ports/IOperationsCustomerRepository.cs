@@ -33,6 +33,9 @@ public interface IOperationsCustomerRepository
 
     Task<OperationsCustomer?> FindByEmailAsync(EmailAddress email, CancellationToken cancellationToken);
 
+    // A confirmed customer email at any company (not only this one): such an email never becomes a work email (review item 3).
+    Task<bool> IsCustomerEmailAnywhereAsync(EmailAddress email, CancellationToken cancellationToken);
+
     Task<OperationsCustomerSession?> FindSessionAsync(string tokenHash, CancellationToken cancellationToken);
 
     Task<IReadOnlyList<OperationsCustomerSession>> ListOpenSessionsAsync(Guid customerId, CancellationToken cancellationToken);

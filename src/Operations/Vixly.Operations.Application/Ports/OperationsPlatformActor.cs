@@ -11,5 +11,6 @@
 //
 // IMPORTANT NOTES:
 // - Platform checks the role and step-up itself (Slice 7, D-K8)
+// - Country: where the person is (owner, 2026-10-21), sent with a device registration.
 // =========================================================
-public sealed record OperationsPlatformActor(Guid TenantId, Guid UserId, string Name, string Role, bool StepUp, string? ClientIp, string? UserAgent);
+public sealed record OperationsPlatformActor(Guid TenantId, Guid UserId, string Name, string Role, bool StepUp, string? ClientIp, string? UserAgent, string? Country = null);

@@ -188,7 +188,7 @@ public static class CustomerShipmentEndpoints
             form["consolidate"] == "true", form["refrigerated"] == "true", form["insured"] == "true" || Guid.TryParse(form["insurance"], out Guid _),
             Guid.TryParse(form["destination"], out Guid destination) ? destination : null, form["insuranceAccepted"] == "true", form["service"].ToString(),
             int.TryParse(form["parcelCount"], System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out int count) ? count : null,
-            Guid.TryParse(form["insurance"], out Guid product) ? product : null);
+            Guid.TryParse(form["insurance"], out Guid product) ? product : null, form["collect"] == "true");
 
     // Slice 4D: the ticked packages; anything unreadable is left out.
     private static List<Guid> Ids(Microsoft.Extensions.Primitives.StringValues values) =>
@@ -247,7 +247,8 @@ public static class CustomerShipmentEndpoints
             Choices = choices.Value,
             ShipmentId = shipmentId,
             Entered = entered ?? (current is null ? null : new CustomerShipmentInstructionsBody(current.Delivery, current.BranchId, current.Address, current.RecipientName, current.RecipientPhone,
-                current.Consolidate, current.Refrigerated, current.Insured, current.DestinationId, false, current.Service, current.ParcelCount, current.InsurancePlanId)),
+                current.Consolidate, current.Refrigerated, current.Insured, current.DestinationId, false, current.Service, current.ParcelCount, current.InsurancePlanId,
+                current.Collect)),
             UnplacedPreAlerts = CustomerPackagePlaces.UnplacedPreAlerts(packages, null),
             UnplacedParcels = CustomerPackagePlaces.UnplacedParcels(packages, null),
             Chosen = chosen,

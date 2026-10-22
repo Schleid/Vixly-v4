@@ -6,7 +6,7 @@
 | Date | 2026-10-20 |
 | Builds on | Slice 5C (final shipments, the counter), 5D (insurance, the estimate, the page to sign), 5E (supplies) |
 | Source | The owner, 2026-10-20 evening: "we keep a central cashier where payment is processed; we could also, using a tablet, have the clerk send the payment to the customer, who launches the payment… some companies may not want to hire a cashier" |
-| Status | **Agreed with the owner on 2026-10-20** (payments and the invoice rules); credit accounts (F-10) and the first provider (Stripe) answered. Step 1 (the invoice) is being built |
+| Status | **Agreed with the owner on 2026-10-20** (payments and the invoice rules); credit accounts (F-10) and the first provider (Stripe) answered. Steps 1, 2, 2b, 3 and 4 built |
 
 ## 1. What the owner said
 
@@ -128,6 +128,41 @@ The owner's answers of 2026-10-20 (F-10) with common accounts-receivable practic
 
 **Details settled while building** (2026-10-21): deciding a charge asks for the second check and a refusal needs a note; a charge paid at the cashier while waiting leaves the queue; an account opened during a month gets its first notice on the 1st of the next; the old *credit allowed* toggle is gone, and customers marked that way before are listed on *Credit accounts* for the credit department to open (they cannot be billed until then). Verification: [Slice 5F verification](SLICE-5F-VERIFICATION.md), section 8.
 
+## 5c. Steps 3 and 4: the owner's answers (2026-10-21, night)
+
+- **Next:** finish payments: the customer screen at the counter and Stripe cards, at the counter and on the portal.
+- **Connecting Stripe:** each company pastes its own Stripe keys in Settings → Payments (secret key, publishable key, webhook signing secret). Vixly keeps them protected with the server's key, never shows them again (only their last characters), and never logs them.
+- **A card at the counter, both ways:** Stripe's secure payment page (on the customer screen, or a QR code for the customer's own phone) **and** a Stripe Terminal card reader at the desk (tap or insert; the company registers its readers with Stripe and names them per warehouse).
+
+Built in this order: Stripe first (the cashier, the portal and refunds all use it), then the customer screen, which shows the same payment page.
+
+## 5d. Step 3 in detail: the customer screen (built 2026-10-22)
+
+| # | Decision |
+|---|---|
+| T-1 | **Adding a screen** (`/staff/screens`, for whoever serves at the counter or takes payments at that warehouse): a name and its warehouse; Vixly shows a **code** once (10 characters, valid 15 minutes, one use). On the tablet, the clerk opens `https://<company host>/screen` and types the code; the tablet then keeps its own secret in a cookie for 400 days and needs no sign-in or licence. *New code* pairs another tablet and stops the old one at once; *Remove* stops it too. Codes and secrets are kept only as hashes; codes typed are limited per address. |
+| T-2 | **Sending** (P-2): the cashier invoice has *Send to pay* and the counter shipment *Send to sign*, one button per screen of that warehouse, with what the screen shows now and *Clear · next customer*. One thing at a time: a new send replaces what was there. |
+| T-3 | **On the screen, in the customer's language:** welcome; the invoice's lines and totals, what is left to pay, and the methods the customer can use there: **card** (when cards are on) and **Zelle** (when Zelle is on). Cash and the other methods a person records are not offered: *To pay in cash or another way, please tell the clerk* (P-7). |
+| T-4 | **Zelle** (P-9): the strong warning (the number to write in the memo, the shipment held until the company sees the money) and the company's terms, which the customer accepts on the screen; only then the QR picture, the tag or email or phone, the name, the exact amount and the memo number in large type. The acceptance is kept (when, which screen, the clerk who sent it, the language) and **counts at the cashier** instead of the clerk's tick; the clerk's page shows it. |
+| T-5 | **Card:** Stripe's secure page for what is owed, as a QR code for the customer's phone and a *Pay on this screen* link; Stripe brings the customer back to the screen. The screen says paid once Stripe confirms it (it also asks Stripe while waiting). |
+| T-6 | **Signature** (P-3): the shipment's declaration (parcels, contents, values, the insurance chosen or *not insured* with the company's liability text) and *I declare...*; the customer signs on the screen. It is the shipment's own signature (as on the clerk's pad, Slice 5D), printed on the declaration PDF, with the clerk who sent it as the one present. Only while the shipment is open. |
+| T-7 | **The screen reloads itself** when the clerk sends something else, the customer pays, or it is removed; a choice made on a page that has changed meanwhile is refused (*The screen changed meanwhile*). |
+
+## 5e. Step 4 in detail: Stripe cards (built 2026-10-22)
+
+Points marked *industry standard* follow Stripe's own guidance for platforms whose customers bring their own account.
+
+| # | Decision |
+|---|---|
+| S-1 | **Settings → Payments → Cards:** the company pastes its Stripe **secret key** (or a restricted key), **publishable key** and **webhook signing secret**; Vixly checks the key with Stripe and shows the account's name. Keys are kept protected with the server's key and never shown again (only the last characters). The page gives the webhook address to add in Stripe (`https://<company host>/hooks/stripe`, the events `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.expired`, `payment_intent.succeeded` and `payment_intent.canceled`). *Accept cards* turns cards on or off; *Disconnect* removes the keys. |
+| S-2 | **Card data never passes through Vixly** (P-4): the customer pays on **Stripe's secure page** (Checkout) or on a **Stripe Terminal reader**; Vixly only learns *paid* and Stripe's payment reference. |
+| S-3 | **At the cashier:** *Card: payment page (QR code)* shows a QR code the customer scans with their own phone; *Card on <reader>* sends the amount to that reader (readers are named per warehouse in the settings with their `tmr_` id). The page refreshes itself and says *Paid* when Stripe says so. The whole amount owed is charged (F-4); one charge at a time per invoice; starting another cancels the earlier one at Stripe first. |
+| S-4 | **On the portal:** *Pay by card* on an invoice owed opens Stripe's page; back from Stripe, the portal says paid once Stripe confirms it. A customer only ever pays their own invoices. |
+| S-5 | **Paid only on Stripe's word:** the signed webhook (checked with the company's signing secret, refused when stale) or Vixly asking Stripe directly. Recorded once, as a card tender with Stripe's reference; test-mode payments never settle a live account and the reverse. A payment for an invoice already settled another way is kept as *paid, not applied* for finance to refund in Stripe. |
+| S-6 | **Cancel** expires the page or cancels the payment at Stripe first; if Stripe already took the money, the payment is recorded instead. Disconnecting or changing the account first closes what is still open on it, or refuses. |
+| S-7 | **Refunds by card** (F-7) go back through Stripe: kept first as *pending* (the amount is reserved), then Stripe is asked once (the refund is its own key). Stripe refusing removes it; Stripe not answering leaves it pending with *Finish the refund* on the invoice, which asks Stripe again with the same key (Stripe never refunds twice). |
+| S-8 | **Partner agents** never see or start card payments at a partner warehouse that does not handle money (Slice 7 step 4). |
+
 ## 6. Steps
 
 | Step | Content |
@@ -140,4 +175,4 @@ The owner's answers of 2026-10-20 (F-10) with common accounts-receivable practic
 
 ## 7. Not in this slice
 
-Payments on the customer portal (later) and reports. Credit accounts: see F-10.
+Reports. Paying a whole credit account at once on the portal (each invoice can be paid by card). Credit accounts: see F-10.

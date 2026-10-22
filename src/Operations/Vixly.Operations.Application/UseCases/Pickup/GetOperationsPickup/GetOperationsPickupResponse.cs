@@ -65,9 +65,12 @@ public sealed class GetOperationsPickupResponse
 
     public bool PayFirst { get; private init; }
 
-    public static GetOperationsPickupResponse Success(Guid shipmentId, string number, string customerName, string? customerPhone, string? recipientName, string? recipientPhone, string? collectorName, string? collectorPhone, OperationsArrivalPlace here, IReadOnlyList<OperationsPickupParcelRow> parcels, IReadOnlyList<OperationsPickupInvoiceRow> invoices, IReadOnlyList<OperationsPickupReleaseRow> releases, decimal storageOwed, string currencyCode, OperationsPickupProofs proofs, bool destinationCharges, bool canBill, bool codeSent, bool payFirst)
+    // Slice 7 step 4 (R-8): false for a partner agent whose partner does not handle money: no amounts, invoices or billing shown.
+    public bool MoneyHandled { get; private init; }
+
+    public static GetOperationsPickupResponse Success(Guid shipmentId, string number, string customerName, string? customerPhone, string? recipientName, string? recipientPhone, string? collectorName, string? collectorPhone, OperationsArrivalPlace here, IReadOnlyList<OperationsPickupParcelRow> parcels, IReadOnlyList<OperationsPickupInvoiceRow> invoices, IReadOnlyList<OperationsPickupReleaseRow> releases, decimal storageOwed, string currencyCode, OperationsPickupProofs proofs, bool destinationCharges, bool canBill, bool codeSent, bool payFirst, bool moneyHandled)
     {
-        return new GetOperationsPickupResponse { Succeeded = true, ShipmentId = shipmentId, Number = number, CustomerName = customerName, CustomerPhone = customerPhone, RecipientName = recipientName, RecipientPhone = recipientPhone, CollectorName = collectorName, CollectorPhone = collectorPhone, Here = here, Parcels = parcels, Invoices = invoices, Releases = releases, StorageOwed = storageOwed, CurrencyCode = currencyCode, Proofs = proofs, DestinationCharges = destinationCharges, CanBill = canBill, CodeSent = codeSent, PayFirst = payFirst };
+        return new GetOperationsPickupResponse { Succeeded = true, ShipmentId = shipmentId, Number = number, CustomerName = customerName, CustomerPhone = customerPhone, RecipientName = recipientName, RecipientPhone = recipientPhone, CollectorName = collectorName, CollectorPhone = collectorPhone, Here = here, Parcels = parcels, Invoices = invoices, Releases = releases, StorageOwed = storageOwed, CurrencyCode = currencyCode, Proofs = proofs, DestinationCharges = destinationCharges, CanBill = canBill, CodeSent = codeSent, PayFirst = payFirst, MoneyHandled = moneyHandled };
     }
 
     public static GetOperationsPickupResponse Failure(Error error)

@@ -30,9 +30,12 @@ public sealed class ListMyOperationsInvoicesResponse
 
     public IReadOnlyList<OperationsCreditNote> CreditNotes { get; private init; } = Array.Empty<OperationsCreditNote>();
 
-    public static ListMyOperationsInvoicesResponse Success(IReadOnlyList<OperationsInvoice> invoices, IReadOnlyList<OperationsCreditNote> creditNotes)
+    // Slice 5F step 4: the customer may pay by card on Stripe's page.
+    public bool CardOffered { get; private init; }
+
+    public static ListMyOperationsInvoicesResponse Success(IReadOnlyList<OperationsInvoice> invoices, IReadOnlyList<OperationsCreditNote> creditNotes, bool cardOffered = false)
     {
-        return new ListMyOperationsInvoicesResponse { Succeeded = true, Invoices = invoices, CreditNotes = creditNotes };
+        return new ListMyOperationsInvoicesResponse { Succeeded = true, Invoices = invoices, CreditNotes = creditNotes, CardOffered = cardOffered };
     }
 
     public static ListMyOperationsInvoicesResponse Failure(Error error)

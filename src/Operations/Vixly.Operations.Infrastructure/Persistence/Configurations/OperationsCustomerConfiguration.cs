@@ -37,6 +37,8 @@ internal sealed class OperationsCustomerConfiguration : IEntityTypeConfiguration
         builder.Property(item => item.PasswordHash).HasMaxLength(OperationsIdentityLimits.PasswordHashMaxLength).IsUnicode(false);
         builder.Ignore(item => item.FullName);
         builder.HasIndex(item => new { item.TenantId, item.Email }).IsUnique();
+        // Review item 3: the check across companies (a work email is never a customer email) looks up by email alone.
+        builder.HasIndex(item => item.Email).HasDatabaseName("IX_Customers_Email_AnyTenant");
         builder.HasIndex(item => new { item.TenantId, item.Code }).IsUnique().HasFilter("[Code] IS NOT NULL");
         builder.HasIndex(item => new { item.TenantId, item.LastName, item.FirstName });
         builder.HasIndex(item => new { item.TenantId, item.Phone });

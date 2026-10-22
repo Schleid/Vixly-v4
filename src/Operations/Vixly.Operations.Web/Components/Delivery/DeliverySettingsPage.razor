@@ -1,0 +1,75 @@
+﻿@*
+=========================================================
+FILE: DeliverySettingsPage.razor
+
+PURPOSE:
+Settings → Delivery (Slice 7 step 3, R-12 to R-15): how drivers record, cash on delivery, the tries, the proof at the door.
+
+RESPONSIBILITIES:
+- Show the company's choices; save them with ops.settings.edit
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.delivery_settings.title"]" Company="@Company" Section="delivery_settings" Error="@Error" Info="@Info">
+    <form method="post" action="/staff/settings/delivery" class="ops-editor__panel ops-editor__form">
+        <AntiforgeryToken />
+        <fieldset disabled="@(!CanEdit)">
+            <fieldset>
+                <legend>@T["ui.delivery_settings.recording"]</legend>
+                @foreach (OperationsDeliveryRecording way in Enum.GetValues<OperationsDeliveryRecording>())
+                {
+                    <label><input type="radio" name="recording" value="@way" checked="@(Recording == way)" /> @T["ui.delivery_settings.recording." + way]</label>
+                }
+            </fieldset>
+            <fieldset>
+                <legend>@T["ui.delivery_settings.payment"]</legend>
+                <label><input type="checkbox" name="cash" value="true" checked="@CashOnDelivery" /> @T["ui.delivery_settings.cash"]</label>
+                <p class="ops-editor__hint">@T["ui.delivery_settings.cash_hint"]</p>
+            </fieldset>
+            <fieldset>
+                <legend>@T["ui.delivery_settings.failed"]</legend>
+                <label>@T["ui.delivery_settings.tries"] <input name="tries" type="number" min="1" max="10" value="@Tries" required /></label>
+                @foreach (OperationsAfterFailedDelivery after in Enum.GetValues<OperationsAfterFailedDelivery>())
+                {
+                    <label><input type="radio" name="afterFailed" value="@after" checked="@(AfterFailed == after)" /> @T["ui.delivery_settings.after." + after]</label>
+                }
+            </fieldset>
+            <fieldset>
+                <legend>@T["ui.delivery_settings.proofs"]</legend>
+                @foreach (OperationsDeliveryProofs proof in new[] { OperationsDeliveryProofs.Signature, OperationsDeliveryProofs.Photo, OperationsDeliveryProofs.Id, OperationsDeliveryProofs.Code })
+                {
+                    <label><input type="checkbox" name="proofs" value="@proof" checked="@Proofs.HasFlag(proof)" /> @T["ui.delivery_settings.proof." + proof]</label>
+                }
+                <p class="ops-editor__hint">@T["ui.delivery_settings.proofs_hint"]</p>
+            </fieldset>
+            <label><input type="checkbox" name="emails" value="true" checked="@Emails" /> @T["ui.delivery_settings.emails"]</label>
+            <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></p>
+        </fieldset>
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsDeliveryRecording Recording { get; set; }
+
+    [Parameter] public bool CashOnDelivery { get; set; }
+
+    [Parameter] public int Tries { get; set; }
+
+    [Parameter] public OperationsAfterFailedDelivery AfterFailed { get; set; }
+
+    [Parameter] public OperationsDeliveryProofs Proofs { get; set; }
+
+    [Parameter] public bool Emails { get; set; }
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

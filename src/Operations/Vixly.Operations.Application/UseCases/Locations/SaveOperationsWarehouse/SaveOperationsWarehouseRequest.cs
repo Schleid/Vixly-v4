@@ -61,6 +61,12 @@ public sealed class SaveOperationsWarehouseRequest
     // Slice 7 (R-3): customs is cleared here: parcels wait for clearance before they are ready.
     public bool ClearsCustoms { get; init; }
 
+    // The customers' mailbox (owner, 2026-10-21): one per company; choosing it here takes it from the other warehouse.
+    public bool IsMailbox { get; init; }
+
+    // Slice 7 step 4 (R-8): the partner running it takes payments (counter, cash on delivery); off by default.
+    public bool PartnerHandlesMoney { get; init; }
+
     public IReadOnlyList<string>? HomeArea { get; init; }
 
     public Guid? HubWarehouseId { get; init; }

@@ -6696,7 +6696,7 @@ Thank you: we have received payment and full access to Vixly is restored for {co
     <value>Computer</value>
   </data>
   <data name="ui.device.kind.phone" xml:space="preserve">
-    <value>Phone</value>
+    <value>Mobile</value>
   </data>
   <data name="ui.device.kind.scanner" xml:space="preserve">
     <value>Scanner</value>
@@ -8175,5 +8175,110 @@ If no one at {company} asked for this, contact us right away at {support}.</valu
   </data>
   <data name="ui.error.back" xml:space="preserve">
     <value>Back to the console</value>
+  </data>
+  <data name="ui.devices.system" xml:space="preserve">
+    <value>Operating system</value>
+  </data>
+  <data name="ui.devices.browser" xml:space="preserve">
+    <value>Browser</value>
+  </data>
+  <data name="ui.devices.address" xml:space="preserve">
+    <value>IP address</value>
+  </data>
+  <data name="ui.device.approved_by_link" xml:space="preserve">
+    <value>The owner's email link</value>
+  </data>
+  <data name="ui.device.kind.desktop" xml:space="preserve">
+    <value>Desktop</value>
+  </data>
+  <data name="ui.device.kind.laptop" xml:space="preserve">
+    <value>Laptop</value>
+  </data>
+  <data name="ui.activity.title" xml:space="preserve">
+    <value>Sign-in activity</value>
+  </data>
+  <data name="ui.activity.filtered" xml:space="preserve">
+    <value>Showing one person's sign-ins.</value>
+  </data>
+  <data name="ui.activity.everyone" xml:space="preserve">
+    <value>Show everyone</value>
+  </data>
+  <data name="ui.activity.count" xml:space="preserve">
+    <value>{count} sign-ins</value>
+  </data>
+  <data name="ui.activity.who" xml:space="preserve">
+    <value>Who</value>
+  </data>
+  <data name="ui.activity.signed_in" xml:space="preserve">
+    <value>Signed in</value>
+  </data>
+  <data name="ui.activity.signed_out" xml:space="preserve">
+    <value>Signed out</value>
+  </data>
+  <data name="ui.activity.address" xml:space="preserve">
+    <value>IP address</value>
+  </data>
+  <data name="ui.activity.country" xml:space="preserve">
+    <value>Country</value>
+  </data>
+  <data name="ui.activity.browser" xml:space="preserve">
+    <value>Browser</value>
+  </data>
+  <data name="ui.activity.system" xml:space="preserve">
+    <value>Operating system</value>
+  </data>
+  <data name="ui.activity.empty" xml:space="preserve">
+    <value>No sign-ins yet.</value>
+  </data>
+  <data name="ui.activity.still_signed_in" xml:space="preserve">
+    <value>Still signed in</value>
+  </data>
+  <data name="ui.activity.ended.signed_out" xml:space="preserve">
+    <value>signed out</value>
+  </data>
+  <data name="ui.activity.ended.ended_by_user" xml:space="preserve">
+    <value>ended by the person</value>
+  </data>
+  <data name="ui.activity.ended.ended_by_administrator" xml:space="preserve">
+    <value>ended by an administrator</value>
+  </data>
+  <data name="ui.activity.ended.account_restricted" xml:space="preserve">
+    <value>account restricted</value>
+  </data>
+  <data name="ui.activity.ended.idle_timeout" xml:space="preserve">
+    <value>idle</value>
+  </data>
+  <data name="ui.activity.ended.absolute_lifetime" xml:space="preserve">
+    <value>session limit</value>
+  </data>
+  <data name="ui.activity.ended.password_changed" xml:space="preserve">
+    <value>password changed</value>
+  </data>
+  <data name="ui.activity.ended.second_factor_reset" xml:space="preserve">
+    <value>second step reset</value>
+  </data>
+  <data name="ui.activity.ended.step_up_failed" xml:space="preserve">
+    <value>confirmation failed</value>
+  </data>
+  <data name="ui.activity.country.tor" xml:space="preserve">
+    <value>Tor</value>
+  </data>
+  <data name="ui.activity.country.unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="ui.licences.title" xml:space="preserve">
+    <value>Licences</value>
+  </data>
+  <data name="ui.licences.licence" xml:space="preserve">
+    <value>Licence</value>
+  </data>
+  <data name="ui.licences.device_id" xml:space="preserve">
+    <value>Device ID</value>
+  </data>
+  <data name="ui.licences.free" xml:space="preserve">
+    <value>Free</value>
+  </data>
+  <data name="ui.plans.feature.partner_agents" xml:space="preserve">
+    <value>Partner agents</value>
   </data>
 </root>

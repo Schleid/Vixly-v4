@@ -62,6 +62,10 @@ IMPORTANT NOTES:
             <p class="ops-editor__hint">@T["ui.bundles.void_hint"]</p>
         </form>
     }
+    @if (List.Count > 0 || (CanManage && Bundle.IsOpen))
+    {
+        <BundleListPanel BundleId="@Bundle.Id" Open="@Bundle.IsOpen" CanManage="@CanManage" List="@List" Candidates="@Candidates" />
+    }
     @if (Shipments.Count > 0)
     {
         <BundleShipmentsPanel Title="@T["ui.bundles.shipments"]" Lines="@Shipments" />
@@ -93,6 +97,10 @@ IMPORTANT NOTES:
     [Parameter] public IReadOnlyList<OperationsBundleShipmentLine> Shipments { get; set; } = Array.Empty<OperationsBundleShipmentLine>();
 
     [Parameter] public bool CanManage { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsBundleListRow> List { get; set; } = Array.Empty<OperationsBundleListRow>();
+
+    [Parameter] public IReadOnlyList<OperationsBundleCandidate> Candidates { get; set; } = Array.Empty<OperationsBundleCandidate>();
 
     [Parameter] public bool CanFill { get; set; }
 

@@ -116,6 +116,33 @@ public sealed partial class OperationsCustomerHttpTests : IClassFixture<Operatio
         Assert.DoesNotContain("secret@example.com", refusedPage, StringComparison.Ordinal);
     }
 
+    // Review item 3: a confirmed customer email (at any company) is never a work email. The invitation goes as always (the company learns nothing);
+    // only the mailbox's owner, accepting it, is told.
+    [SqlServerFact]
+    public async Task StaffInvite_WithACustomerEmailOfAnyCompany_IsRefusedWhenAccepted()
+    {
+        Guid other = NewTenant("custelse", "Custelse");
+        await RegisteredCustomerAsync(other, "pat@custelse-buyer.example", "C00001");
+        NewTenant("hireco", "Hire Co");
+        using CookieClient owner = await OwnerAsync("hireco");
+
+        (HttpResponseMessage _, string people) = await owner.GetAsync("/staff/people");
+        string role = Regex.Match(people, "<option value=\"(?<id>[0-9a-f-]{36})\">[^<]+</option>").Groups["id"].Value;
+        (HttpResponseMessage invited, string _) = await owner.PostAsync("/staff/people/invite", people,
+            ("fullName", "Pat Buyer"), ("email", "pat@custelse-buyer.example"), ("language", "en"), ("roleId", role), ("scope", "tenant"));
+        Assert.Contains("?done=invited", invited.Headers.Location?.OriginalString, StringComparison.Ordinal);
+
+        string link = _host.Mailer.Invitations.Last().Link;
+        using CookieClient pat = _host.Browser("hireco.techcrafters.ltd");
+        (HttpResponseMessage _, string invitation) = await pat.GetAsync(new Uri(link).PathAndQuery);
+        (HttpResponseMessage accepted, string refused) = await pat.PostAsync("/invitation", invitation, ("token", Uri.UnescapeDataString(link.Split("token=")[1])), ("password", Password));
+
+        Assert.Null(accepted.Headers.Location);
+        Assert.Contains("This email can't be used for a staff account.", System.Net.WebUtility.HtmlDecode(refused), StringComparison.Ordinal);
+        Assert.DoesNotContain("Custelse", refused, StringComparison.Ordinal);
+        Assert.Null(pat.Cookie(OperationsCookies.Session));
+    }
+
     // A customer who signed up on the portal and confirmed the email.
     private async Task<Guid> RegisteredCustomerAsync(Guid tenant, string email, string code)
     {

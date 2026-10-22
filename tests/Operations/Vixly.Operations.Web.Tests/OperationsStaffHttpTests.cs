@@ -138,6 +138,89 @@ public sealed class OperationsStaffHttpTests : IClassFixture<OperationsWebDataba
         Assert.Contains("shown only once", codes, StringComparison.Ordinal);
     }
 
+    // Owner, 2026-10-21: the type and browser of a device; each sign-in with its device and country; another country than the device's is flagged.
+    [SqlServerFact]
+    public async Task Device_TypeAndBrowser_ThenASignInFromAnotherCountry_IsFlaggedInTheActivity()
+    {
+        Guid tenant = NewTenant("travelco", "Travel Co");
+        (CookieClient browser, string key) = await OwnerAsync(tenant, "travelco");
+        using CookieClient owner = browser;
+        owner.Header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0 Safari/537.36");
+        owner.Header("CF-IPCountry", "US");
+
+        (HttpResponseMessage _, string enrolPage) = await owner.GetAsync("/devices/enrol");
+        Assert.Contains("value=\"laptop\"", enrolPage, StringComparison.Ordinal);
+        Assert.DoesNotContain("value=\"scanner\"", enrolPage, StringComparison.Ordinal);
+        await owner.PostAsync("/devices/enrol", enrolPage, ("name", "Front desk laptop"), ("kind", "laptop"));
+        (HttpResponseMessage _, string devices) = await owner.GetAsync("/staff/devices");
+        Assert.Contains("Front desk laptop", devices, StringComparison.Ordinal);
+        Assert.Contains("of 5 licences in use", devices, StringComparison.Ordinal);
+        Assert.Contains("<td>D-0000", devices, StringComparison.Ordinal);
+        Assert.Contains(">Laptop<", devices, StringComparison.Ordinal);
+        Assert.Contains("<td>Chrome</td>", devices, StringComparison.Ordinal);
+        Assert.Contains("<td>Grace Hopper, ", devices, StringComparison.Ordinal);
+        Assert.Contains(">Free<", devices, StringComparison.Ordinal);
+
+        // Signed out, then in again from another country: the code is asked (as always for the Owner), and the sign-in is flagged.
+        (HttpResponseMessage _, string home) = await owner.GetAsync("/staff");
+        await owner.PostAsync("/staff/sign-out", home);
+        owner.Header("CF-IPCountry", "FR");
+        (HttpResponseMessage _, string signIn) = await owner.GetAsync("/staff");
+        (HttpResponseMessage password, string _) = await owner.PostAsync("/staff/sign-in", signIn, ("email", "grace@travelco.example"), ("password", Password));
+        Assert.StartsWith("/staff/sign-in/verify", password.Headers.Location?.OriginalString, StringComparison.Ordinal);
+        (HttpResponseMessage _, string verify) = await owner.GetAsync(password.Headers.Location!.OriginalString);
+        await owner.PostAsync("/staff/sign-in/verify", verify, ("code", Code(key, DateTime.UtcNow.AddSeconds(30))));
+
+        (HttpResponseMessage _, string activity) = await owner.GetAsync("/staff/activity");
+        Assert.Contains("Front desk laptop", activity, StringComparison.Ordinal);
+        Assert.Contains("data-flag=\"country\"", activity, StringComparison.Ordinal);
+        Assert.Contains("FR", activity, StringComparison.Ordinal);
+        Assert.Contains("signed out", activity, StringComparison.Ordinal);
+        Assert.Contains("Still signed in", activity, StringComparison.Ordinal);
+        (HttpResponseMessage _, string history) = await owner.GetAsync("/staff/audit?area=auth");
+        Assert.Contains("ops.auth.country_changed", history, StringComparison.Ordinal);
+
+        // Confirmed in France, not elsewhere: used from a third country, the session ends and the sign-in page says why.
+        owner.Header("CF-IPCountry", "DE");
+        (HttpResponseMessage moved, string _) = await owner.GetAsync("/staff/devices");
+        Assert.Equal("/staff?country=1", moved.Headers.Location?.OriginalString);
+        (HttpResponseMessage _, string why) = await owner.GetAsync("/staff?country=1");
+        Assert.Contains("used from another country", why, StringComparison.Ordinal);
+        Assert.NotNull(owner.Cookie(OperationsCookies.Device));
+    }
+
+    // Owner, 2026-10-21: signed in without the device (no flag), then the device's cookie from another country: the session ends.
+    [SqlServerFact]
+    public async Task SignIn_WithoutTheDevice_ThenItsCookieFromAnotherCountry_EndsTheSession()
+    {
+        Guid tenant = NewTenant("sneakco", "Sneak Co");
+        (CookieClient browser, string key) = await OwnerAsync(tenant, "sneakco");
+        using CookieClient owner = browser;
+        owner.Header("CF-IPCountry", "US");
+        (HttpResponseMessage _, string enrolPage) = await owner.GetAsync("/devices/enrol");
+        await owner.PostAsync("/devices/enrol", enrolPage, ("name", "Desk"), ("kind", "desktop"));
+        string deviceCookie = owner.Cookie(OperationsCookies.Device)!;
+
+        // No country header at all (not through Cloudflare) tells nothing: the session goes on.
+        owner.Header("CF-IPCountry", null);
+        Assert.Equal(HttpStatusCode.OK, (await owner.GetAsync("/staff/devices")).Response.StatusCode);
+
+        using CookieClient abroad = _host.Browser("sneakco.techcrafters.ltd");
+        abroad.Header("CF-IPCountry", "FR");
+        (HttpResponseMessage _, string signIn) = await abroad.GetAsync("/staff");
+        (HttpResponseMessage password, string _) = await abroad.PostAsync("/staff/sign-in", signIn, ("email", "grace@sneakco.example"), ("password", Password));
+        (HttpResponseMessage _, string verify) = await abroad.GetAsync(password.Headers.Location!.OriginalString);
+        await abroad.PostAsync("/staff/sign-in/verify", verify, ("code", Code(key, DateTime.UtcNow.AddSeconds(30))));
+        Assert.NotNull(abroad.Cookie(OperationsCookies.Session));
+
+        abroad.Cookies.Add(new Uri("https://sneakco.techcrafters.ltd/"), new System.Net.Cookie(OperationsCookies.Device, deviceCookie) { Secure = true, Path = "/" });
+        (HttpResponseMessage ended, string _) = await abroad.GetAsync("/staff/devices");
+
+        Assert.Equal("/staff?country=1", ended.Headers.Location?.OriginalString);
+        (HttpResponseMessage _, string activity) = await owner.GetAsync("/staff/activity");
+        Assert.Contains("used from another country", activity, StringComparison.Ordinal);
+    }
+
     [SqlServerFact]
     public async Task PostWithoutTheFormToken_IsRefused_EvenWithNoOtherField()
     {

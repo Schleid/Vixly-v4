@@ -36,4 +36,11 @@ public interface IPlatformUserQueries
         Guid platformUserId,
         DateTimeOffset utcNow,
         CancellationToken cancellationToken);
+
+    // Member activity (owner, 2026-10-21): sign-ins to Control, newest first, of one user or all.
+    Task<PagedResult<PlatformSignInItem>> ListSignInsAsync(
+        Guid? platformUserId,
+        DateTimeOffset utcNow,
+        PagedRequest page,
+        CancellationToken cancellationToken);
 }

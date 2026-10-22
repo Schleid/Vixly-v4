@@ -31,6 +31,8 @@ public sealed class SignUpOperationsCustomerUseCase
 {
     private readonly IOperationsCustomerRepository _customers;
 
+    private readonly IOperationsUserRepository _staff;
+
     private readonly OperationsCustomerAccounts _accounts;
 
     private readonly IOperationsPasswordHasher _hasher;
@@ -41,12 +43,14 @@ public sealed class SignUpOperationsCustomerUseCase
 
     public SignUpOperationsCustomerUseCase(
         IOperationsCustomerRepository customers,
+        IOperationsUserRepository staff,
         OperationsCustomerAccounts accounts,
         IOperationsPasswordHasher hasher,
         OperationsAuditTrail audit,
         IOperationsUnitOfWork unitOfWork)
     {
         _customers = customers ?? throw new ArgumentNullException(nameof(customers));
+        _staff = staff ?? throw new ArgumentNullException(nameof(staff));
         _accounts = accounts ?? throw new ArgumentNullException(nameof(accounts));
         _hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
         _audit = audit ?? throw new ArgumentNullException(nameof(audit));
@@ -101,6 +105,13 @@ public sealed class SignUpOperationsCustomerUseCase
                 await _accounts.SendAsync(existing, OperationsCustomerMailKind.AccountExists, _accounts.SignInLink(request.PortalSlug), cancellationToken);
             }
 
+            return SignUpOperationsCustomerResponse.Success();
+        }
+
+        // Review item 3: a work email (at any company) never opens a customer account. The same answer on screen; the email says why.
+        if (await _staff.IsStaffEmailAnywhereAsync(email, cancellationToken))
+        {
+            await _accounts.SendNotAllowedAsync(email, request.FirstName, language, request.PortalSlug, cancellationToken);
             return SignUpOperationsCustomerResponse.Success();
         }
 

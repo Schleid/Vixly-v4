@@ -21,5 +21,8 @@ public enum PlatformPlanFeature
     CustomDomain = 3,
     WhiteLabelPortal = 4,
     AdvancedAnalytics = 5,
-    DataExport = 6
+    DataExport = 6,
+
+    // Slice 7 step 4 (R-8, owner 2026-10-21): the company's partners sign in to their own destination warehouse.
+    PartnerAgents = 7
 }

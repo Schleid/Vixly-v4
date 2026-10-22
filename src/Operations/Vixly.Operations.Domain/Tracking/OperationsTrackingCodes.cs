@@ -111,6 +111,18 @@ public static class OperationsTrackingCodes
 
     public const string ReadyForPickup = "ops.tracking.ready_for_pickup";
 
+    // Slice 7 step 3 (R-7, R-12 to R-15): home delivery on a route.
+    public const string OutForDelivery = "ops.tracking.out_for_delivery";
+
+    public const string Delivered = "ops.tracking.delivered";
+
+    public const string DeliveryFailed = "ops.tracking.delivery_failed";
+
+    public const string DeliveryReturning = "ops.tracking.delivery_returning";
+
+    // The reasons a delivery fails (a fixed list: the customer sees it).
+    public static IReadOnlyList<string> DeliveryFailures { get; } = new[] { "not_home", "refused", "address_wrong", "no_access", "not_paid", "other" };
+
     // Slice 7 step 2 (R-5, R-9): collected at the pickup counter, after payment and with the company's proof.
     public const string PickedUp = "ops.tracking.picked_up";
 
@@ -162,7 +174,7 @@ public static class OperationsTrackingCodes
         Code(InspectionCompleted, OperationsTrackingVisibility.Customer, null, clears: Inspection, arguments: new[] { "result" }) with { Choices = Choice("result", InspectionResults), CustomerArguments = new[] { "result" } },
         Code(HoldOpened, OperationsTrackingVisibility.Customer, null, arguments: new[] { OperationsTrackingCode.ReasonArgument }) with { Choices = Choice(OperationsTrackingCode.ReasonArgument, HoldReasonNames), CustomerArguments = new[] { OperationsTrackingCode.ReasonArgument } },
         Code(HoldReleased, OperationsTrackingVisibility.Customer, null, arguments: new[] { OperationsTrackingCode.ReasonArgument }) with { Choices = Choice(OperationsTrackingCode.ReasonArgument, HoldReasonNames), CustomerArguments = new[] { OperationsTrackingCode.ReasonArgument } },
-        Code(ReturnedToSender, OperationsTrackingVisibility.Customer, OperationsMilestone.ReturnedToSender),
+        Code(ReturnedToSender, OperationsTrackingVisibility.Customer, OperationsMilestone.ReturnedToSender, clears: OperationsParcelFlags.ReturnPending),
         Code(Disposed, OperationsTrackingVisibility.Customer, OperationsMilestone.Disposed),
         Code(Auctioned, OperationsTrackingVisibility.Customer, OperationsMilestone.Disposed),
         Code(Cancelled, OperationsTrackingVisibility.Customer, OperationsMilestone.Cancelled),
@@ -187,6 +199,13 @@ public static class OperationsTrackingCodes
         Code(CustomsHeld, OperationsTrackingVisibility.Customer, null, sets: OperationsParcelFlags.CustomsHeld) with { OptionalArguments = new[] { "message" }, CustomerArguments = new[] { "message" } },
         Code(ReadyForPickup, OperationsTrackingVisibility.Customer, OperationsMilestone.ReadyForPickup, arguments: new[] { "place" }) with { CustomerArguments = new[] { "place" } },
         Code(PickedUp, OperationsTrackingVisibility.Customer, OperationsMilestone.Delivered, arguments: new[] { "place" }) with { CustomerArguments = new[] { "place" } },
+        Code(OutForDelivery, OperationsTrackingVisibility.Customer, OperationsMilestone.OutForDelivery),
+        Code(Delivered, OperationsTrackingVisibility.Customer, OperationsMilestone.Delivered),
+        Code(DeliveryFailed, OperationsTrackingVisibility.Customer, OperationsMilestone.ArrivedDestinationWarehouse, arguments: new[] { "failure" }) with
+        {
+            Rewinds = true, CustomerArguments = new[] { "failure" }, Choices = Choice("failure", DeliveryFailures)
+        },
+        Code(DeliveryReturning, OperationsTrackingVisibility.Customer, null, sets: OperationsParcelFlags.ReturnPending),
         Code(BundleArrived, OperationsTrackingVisibility.Internal, null, arguments: new[] { "warehouse" }),
         Code(BundleOpened, OperationsTrackingVisibility.Internal, null, arguments: new[] { "warehouse" }),
         Code(DispatchReceived, OperationsTrackingVisibility.Internal, null, arguments: new[] { "warehouse" }),

@@ -28,6 +28,8 @@ IMPORTANT NOTES:
     <label>@T["ui.editor.destination.partner_name"] <input name="partnerName" value="@Form.PartnerName" maxlength="@OperationsLocationLimits.NameMaxLength" /></label>
     <label>@T["ui.editor.destination.partner_phone"] <input name="partnerPhone" type="tel" value="@Form.PartnerPhone" maxlength="@OperationsLocationLimits.PhoneMaxLength" /></label>
     <label>@T["ui.editor.destination.partner_email"] <input name="partnerEmail" type="email" value="@Form.PartnerEmail" maxlength="@OperationsLocationLimits.EmailMaxLength" /></label>
+    <label><input type="checkbox" name="partnerHandlesMoney" value="true" checked="@Form.PartnerHandlesMoney" /> @T["ui.editor.destination.partner_money"]</label>
+    <p class="ops-editor__hint">@T["ui.editor.destination.partner_money_hint"]</p>
     <label>@T["ui.editor.destination.hub"]
         <select name="hub">
             <option value="">@T["ui.editor.destination.no_hub"]</option>

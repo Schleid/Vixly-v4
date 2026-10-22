@@ -149,7 +149,7 @@ public sealed class OperationsSettingsUseCaseTests
         return _kit.Context.WithUser(user.Id, session.Id);
     }
 
-    private OperationsAccess Access() => new(_kit.Store, _roles, _kit.Store, _kit.Clock);
+    private OperationsAccess Access() => new(_kit.Store, _roles, _kit.Store, _kit.Clock, new FakeSiteStore(), new FakePlanFeatures());
 
     private Task<BeginOperationsSignInResponse> Begin(string email) =>
         _kit.Begin().ExecuteAsync(_kit.Context, new BeginOperationsSignInRequest { Email = email, Password = "a long enough password" }, CancellationToken.None);

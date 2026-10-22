@@ -110,7 +110,7 @@ public sealed class VerifyPlatformDeviceUseCase
                 return VerifyPlatformDeviceResponse.Success(Refuse("proof_invalid"));
             }
 
-            if (result == PlatformDeviceSecretCheck.ValidRotate)
+            if (result == PlatformDeviceSecretCheck.ValidRotate && request.Rotate)
             {
                 PlatformSecret rotated = _licensing.NewSecret();
                 device.RotateSecret(rotated.Hash, utcNow);
@@ -118,7 +118,7 @@ public sealed class VerifyPlatformDeviceUseCase
             }
         }
 
-        bool touched = device.Touch(utcNow);
+        bool touched = device.Touch(utcNow) | device.KeepCountry(request.Country, utcNow);
         PlatformSubscriptionAccess access = await _licensing.AccessAsync(device.PlatformTenantId, cancellationToken);
 
         if (access == PlatformSubscriptionAccess.None)
@@ -131,7 +131,12 @@ public sealed class VerifyPlatformDeviceUseCase
             return VerifyPlatformDeviceResponse.Failure(PlatformCommonErrors.ConcurrencyConflict);
         }
 
-        return VerifyPlatformDeviceResponse.Success(new PlatformDeviceCheck(true, null, access, newSecret));
+        return VerifyPlatformDeviceResponse.Success(new PlatformDeviceCheck(true, null, access, newSecret)
+        {
+            Name = device.Name,
+            Number = device.Number,
+            Country = device.RegisteredCountry
+        });
     }
 
     private static PlatformDeviceCheck Refuse(string reason)

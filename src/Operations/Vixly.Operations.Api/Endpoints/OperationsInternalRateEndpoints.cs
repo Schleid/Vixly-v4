@@ -2,6 +2,7 @@
 using Vixly.Contracts.Operations.Rates;
 using Vixly.Operations.Api.Internal;
 using Vixly.Operations.Application.Charges;
+using Vixly.Operations.Application.UseCases.Charges.GetMyOperationsPricing;
 using Vixly.Operations.Application.UseCases.Charges.GetMyOperationsRates;
 using Vixly.Operations.Domain.Charges;
 
@@ -97,6 +98,27 @@ public static class OperationsInternalRateEndpoints
                     (estimate.Rates?.Bands ?? Array.Empty<Vixly.Operations.Domain.Charges.OperationsRateBand>()).Select(band => new CustomerRateBandDto(band.Kind.ToString(), band.From, band.Amount, band.Base)).ToList(),
                     estimate.WhatIf.Select(option => new CustomerEstimateOptionDto(option.Kind, option.PlanId, option.Name, option.Change, option.Total, option.Current)).ToList(),
                     estimate.SupplyLines.Select(line => new CustomerEstimateSupplyDto(line.Code, line.Name, line.Quantity, line.UnitPrice, line.DiscountPercent, line.Amount)).ToList()));
+        });
+
+        // The Pricing page (owner, 2026-10-21): the regular prices and the customer's own.
+        rates.MapGet("/pricing", async (HttpContext http, GetMyOperationsPricingUseCase useCase, CancellationToken cancellationToken) =>
+        {
+            GetMyOperationsPricingResponse response = await useCase.ExecuteAsync(OperationsInternalPackageEndpoints.Context(http), new GetMyOperationsPricingRequest
+            {
+                SessionToken = OperationsInternalPackageEndpoints.Session(http)
+            }, cancellationToken);
+
+            if (!response.Succeeded || response.Pricing is not { } pricing)
+            {
+                return OperationsApiErrors.Problem(http, response.Error ?? Vixly.Operations.Domain.Common.OperationsCommonErrors.NotFound);
+            }
+
+            return Results.Ok(new CustomerPricingDto(pricing.Lists.Select(list => new CustomerPriceListDto(list.ServiceCode, list.ServiceLabel, list.Origin, list.Destination, list.Own,
+                    list.Basis.ToString(), list.Mode.ToString(), list.EffectiveFrom,
+                    list.Bands.Select(band => new CustomerRateBandDto(band.Kind.ToString(), band.From, band.Amount, band.Base)).ToList(),
+                    list.Items.Select(item => new CustomerPriceItemDto(item.Name, item.Price)).ToList(), list.MinimumCharge, list.ServiceFee, list.ConsolidationFee, list.PerPackage,
+                    list.PerShipment)).ToList(),
+                OperationsInternalPackageEndpoints.Weight(pricing.WeightUnit), OperationsInternalPackageEndpoints.Length(pricing.DimensionUnit), pricing.CurrencyCode));
         });
 
         return endpoints;

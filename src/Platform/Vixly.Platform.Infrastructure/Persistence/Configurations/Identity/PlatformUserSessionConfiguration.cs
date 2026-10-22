@@ -32,6 +32,7 @@ internal sealed class PlatformUserSessionConfiguration : IEntityTypeConfiguratio
             .IsRequired();
         builder.Property(session => session.IpAddress).HasMaxLength(PlatformIdentityLimits.IpAddressMaxLength).IsUnicode(false);
         builder.Property(session => session.UserAgent).HasMaxLength(PlatformIdentityLimits.UserAgentMaxLength);
+        builder.Property(session => session.Country).HasMaxLength(2).IsFixedLength().IsUnicode(false);
         builder.Ignore(session => session.IsEnded);
 
         builder.HasOne<PlatformUser>()
@@ -41,5 +42,6 @@ internal sealed class PlatformUserSessionConfiguration : IEntityTypeConfiguratio
 
         builder.HasIndex(session => session.TokenHash).IsUnique();
         builder.HasIndex(session => new { session.PlatformUserId, session.EndedUtc });
+        builder.HasIndex(session => session.CreatedUtc);
     }
 }

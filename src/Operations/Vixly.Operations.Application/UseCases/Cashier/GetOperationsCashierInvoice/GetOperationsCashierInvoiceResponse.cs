@@ -46,13 +46,18 @@ public sealed class GetOperationsCashierInvoiceResponse
 
     public OperationsCreditPosition? Position { get; private init; }
 
+    // Slice 5F step 4: a card through Stripe is offered (account connected, cards on), with the readers of the invoice's warehouse.
+    public bool CardOffered { get; private init; }
+
+    public IReadOnlyList<Vixly.Operations.Application.Cards.OperationsCardReaderRow> CardReaders { get; private init; } = Array.Empty<Vixly.Operations.Application.Cards.OperationsCardReaderRow>();
+
     public static GetOperationsCashierInvoiceResponse Success(OperationsInvoice invoice, Vixly.Operations.Domain.Settings.OperationsTenantSettings settings, IReadOnlyList<OperationsPaymentMethod> methods, OperationsCashDrawer? drawer, IReadOnlyList<OperationsPayment> payments, IReadOnlyList<OperationsRefund> refunds, bool canRefund,
-        OperationsCreditAccount? account = null, OperationsCreditPosition? position = null)
+        OperationsCreditAccount? account = null, OperationsCreditPosition? position = null, bool cardOffered = false, IReadOnlyList<Vixly.Operations.Application.Cards.OperationsCardReaderRow>? readers = null)
     {
         return new GetOperationsCashierInvoiceResponse
         {
             Succeeded = true, Invoice = invoice, Settings = settings, Methods = methods, Drawer = drawer, Payments = payments, Refunds = refunds, CanRefund = canRefund, Account = account,
-            Position = position
+            Position = position, CardOffered = cardOffered, CardReaders = readers ?? Array.Empty<Vixly.Operations.Application.Cards.OperationsCardReaderRow>()
         };
     }
 

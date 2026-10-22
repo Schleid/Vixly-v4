@@ -42,6 +42,8 @@ IMPORTANT NOTES:
                 <label><input type="checkbox" name="roles" value="@role" checked="@Form.Roles.HasFlag(role)" /> @T["ui.editor.role." + role.ToString().ToLowerInvariant()]</label>
             }
             <label><input type="checkbox" name="acceptingDeliveries" value="true" checked="@Form.AcceptingDeliveries" /> @T["ui.editor.warehouse.accepting"]</label>
+            <label><input type="checkbox" name="mailbox" value="true" checked="@Form.IsMailbox" /> @T["ui.editor.warehouse.mailbox"]</label>
+            <p class="ops-editor__hint">@T["ui.editor.warehouse.mailbox_hint"]</p>
         </fieldset>
         <label>@T["ui.editor.warehouse.manager"]
             <select name="manager">

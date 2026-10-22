@@ -37,6 +37,10 @@ public sealed class TakeOperationsPaymentUseCase
 
     private readonly IOperationsSettingsRepository _settings;
 
+    private readonly IOperationsScreenRepository _screens;
+
+    private readonly IOperationsSecretGenerator _secrets;
+
     private readonly OperationsNumbering _numbering;
 
     private readonly OperationsAuditTrail _audit;
@@ -50,6 +54,8 @@ public sealed class TakeOperationsPaymentUseCase
         IOperationsBillingRepository billing,
         IOperationsPaymentRepository payments,
         IOperationsSettingsRepository settings,
+        IOperationsScreenRepository screens,
+        IOperationsSecretGenerator secrets,
         OperationsNumbering numbering,
         OperationsAuditTrail audit,
         IOperationsUnitOfWork unitOfWork,
@@ -59,6 +65,8 @@ public sealed class TakeOperationsPaymentUseCase
         _billing = billing ?? throw new ArgumentNullException(nameof(billing));
         _payments = payments ?? throw new ArgumentNullException(nameof(payments));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _screens = screens ?? throw new ArgumentNullException(nameof(screens));
+        _secrets = secrets ?? throw new ArgumentNullException(nameof(secrets));
         _numbering = numbering ?? throw new ArgumentNullException(nameof(numbering));
         _audit = audit ?? throw new ArgumentNullException(nameof(audit));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
@@ -101,10 +109,16 @@ public sealed class TakeOperationsPaymentUseCase
         Guid key = request.RequestKey == Guid.Empty ? Guid.NewGuid() : request.RequestKey;
         OperationsPayment payment;
 
+        // Slice 5F step 3 (P-9): the customer's own acceptance on the customer screen counts; the clerk's tick stays for counters without one.
+        bool zelleTermsAccepted = request.ZelleTermsAccepted
+            || (request.Tenders.Any(tender => tender.Method == OperationsPaymentMethod.Zelle)
+                && await _screens.ZelleAcceptedAsync(invoice.Id, _secrets.HashToken(settings.ZelleTerms(invoice.Language) ?? string.Empty),
+                    utcNow - Vixly.Operations.Domain.Screens.OperationsScreenRecord.ZelleTermsLifetime, cancellationToken) is not null);
+
         try
         {
             payment = OperationsPayment.Take(invoice.TenantId, invoice, await _numbering.NextAsync(OperationsNumberKind.Payment, cancellationToken), request.Tenders, drawer,
-                request.ZelleTermsAccepted, access.User.Id, key, utcNow);
+                zelleTermsAccepted, access.User.Id, key, utcNow);
         }
         catch (DomainException exception)
         {

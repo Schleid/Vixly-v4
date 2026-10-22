@@ -60,6 +60,8 @@ internal sealed class OperationsWebTestHost : IAsyncDisposable
 
     public FakeInspectionDraw Draw { get; private init; } = new();
 
+    public FakeCardGateway Cards { get; private init; } = new();
+
     public static async Task<OperationsWebTestHost> StartAsync(string? connectionString = null)
     {
         FakePlatformClient platform = new();
@@ -70,6 +72,7 @@ internal sealed class OperationsWebTestHost : IAsyncDisposable
         FakePlanFeatures features = new();
         FakeCustomerMailer customerMailer = new();
         FakeInspectionDraw draw = new();
+        FakeCardGateway cards = new();
         WebApplication app = OperationsWebHost.Build(
             new[]
             {
@@ -83,6 +86,7 @@ internal sealed class OperationsWebTestHost : IAsyncDisposable
             {
                 builder.WebHost.UseTestServer();
                 builder.Services.AddSingleton<IDataProtectionProvider>(new EphemeralDataProtectionProvider());
+                builder.Services.AddTransient<Microsoft.AspNetCore.Hosting.IStartupFilter, CloudflarePeerStartupFilter>();
                 builder.Services.RemoveAll<IOperationsPlatformClient>();
                 builder.Services.AddSingleton<IOperationsPlatformClient>(platform);
                 builder.Services.RemoveAll<IOperationsLegalClient>();
@@ -99,13 +103,15 @@ internal sealed class OperationsWebTestHost : IAsyncDisposable
                 builder.Services.AddSingleton<IOperationsCustomerMailer>(customerMailer);
                 builder.Services.RemoveAll<Vixly.Operations.Application.Receiving.OperationsInspectionDraw>();
                 builder.Services.AddSingleton<Vixly.Operations.Application.Receiving.OperationsInspectionDraw>(draw);
+                builder.Services.RemoveAll<IOperationsCardGateway>();
+                builder.Services.AddSingleton<IOperationsCardGateway>(cards);
                 builder.Services.RemoveAll<IHostedService>();
                 builder.Services.AddScoped<OperationsDemoStaffSeeder>();
             });
 
         await app.StartAsync();
 
-        return new OperationsWebTestHost(app, platform, mailer, devices, legal, company, features) { CustomerMailer = customerMailer, Draw = draw };
+        return new OperationsWebTestHost(app, platform, mailer, devices, legal, company, features) { CustomerMailer = customerMailer, Draw = draw, Cards = cards };
     }
 
     public HttpClient Client(string host)

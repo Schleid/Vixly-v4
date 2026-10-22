@@ -1232,6 +1232,12 @@ namespace Vixly.Platform.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Country")
+                        .HasMaxLength(2)
+                        .IsUnicode(false)
+                        .HasColumnType("char(2)")
+                        .IsFixedLength();
+
                     b.Property<DateTimeOffset>("CreatedUtc")
                         .HasColumnType("datetimeoffset");
 
@@ -1276,6 +1282,8 @@ namespace Vixly.Platform.Infrastructure.Persistence.Migrations
                         .HasColumnType("nvarchar(512)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedUtc");
 
                     b.HasIndex("TokenHash")
                         .IsUnique();
@@ -1544,6 +1552,10 @@ namespace Vixly.Platform.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ApprovedByName")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
                     b.Property<DateTimeOffset?>("ApprovedUtc")
                         .HasColumnType("datetimeoffset");
 
@@ -1597,6 +1609,21 @@ namespace Vixly.Platform.Infrastructure.Persistence.Migrations
 
                     b.Property<int?>("Reason")
                         .HasColumnType("int");
+
+                    b.Property<string>("RegisteredCountry")
+                        .HasMaxLength(2)
+                        .IsUnicode(false)
+                        .HasColumnType("char(2)")
+                        .IsFixedLength();
+
+                    b.Property<string>("RegisteredIp")
+                        .HasMaxLength(45)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(45)");
+
+                    b.Property<string>("RegisteredUserAgent")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
 
                     b.Property<DateTimeOffset?>("ReleaseRequestedUtc")
                         .HasColumnType("datetimeoffset");

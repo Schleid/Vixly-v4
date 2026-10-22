@@ -79,6 +79,8 @@ public static class OperationsWebHost
 
         WebApplication app = builder.Build();
 
+        // Before the forwarded headers: the country is read only from a trusted proxy (owner, 2026-10-21).
+        app.UseVixlyClientCountry();
         app.UseForwardedHeaders();
         app.UseOperationsDevelopmentCustomerProxy();
         app.UseVixlySecurityHeaders();
@@ -138,11 +140,14 @@ public static class OperationsWebHost
         app.MapOperationsSupplyEndpoints();
         app.MapOperationsInvoiceEndpoints();
         app.MapOperationsCashierEndpoints();
+        app.MapOperationsCardEndpoints();
+        app.MapOperationsScreenEndpoints();
         app.MapOperationsBundleEndpoints();
         app.MapOperationsDispatchEndpoints();
         app.MapOperationsEventEndpoints();
         app.MapOperationsArrivalEndpoints();
         app.MapOperationsPickupEndpoints();
+        app.MapOperationsDeliveryEndpoints();
         app.MapOperationsCreditEndpoints();
         app.MapOperationsSupplyStockEndpoints();
         app.MapOperationsPrinterEndpoints();

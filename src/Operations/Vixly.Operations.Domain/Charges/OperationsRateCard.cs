@@ -118,6 +118,15 @@ public sealed class OperationsRateCard : OperationsEntity
         MarkAsModified(utcNow);
     }
 
+    // Shown on the company's public website when the company publishes its prices (owner, 2026-10-21); the company's standard prices only.
+    public bool Published { get; private set; }
+
+    public void ChangePublished(bool published, DateTimeOffset utcNow)
+    {
+        Published = published && CustomerId is null;
+        MarkAsModified(utcNow);
+    }
+
     public OperationsPriceVersion? VersionAt(DateTimeOffset at) => OperationsVersions.At(_versions, at);
 
     private static Guid? Optional(Guid? id) => id == Guid.Empty ? null : id;

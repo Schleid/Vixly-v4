@@ -50,6 +50,9 @@ internal sealed class FakeChargeStore : IOperationsChargeRepository
 
     public Task<IReadOnlyList<OperationsRateCard>> ListCardsAsync(CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<OperationsRateCard>>(Cards.ToList());
 
+    public Task<bool> AnyPublishedAsync(CancellationToken cancellationToken) =>
+        Task.FromResult(Cards.Any(card => card.IsActive && card.Published && card.CustomerId is null));
+
     public Task<IReadOnlyList<OperationsRateCard>> ListCardsForAsync(Guid? customerId, CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyList<OperationsRateCard>>(Cards.Where(card => card.IsActive && (card.CustomerId is null || card.CustomerId == customerId)).ToList());
 

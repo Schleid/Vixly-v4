@@ -77,7 +77,8 @@ public sealed class CompletePlatformDeviceLinkUseCase
 
         try
         {
-            (device, requested) = PlatformDevice.Enrol(tenant.Id, seats.NextNumber(utcNow), request.Name, request.Kind, keyed ? request.PublicKey : null, secret?.Hash, PlatformDeviceActor.System, utcNow);
+            (device, requested) = PlatformDevice.Enrol(tenant.Id, seats.NextNumber(utcNow), request.Name, request.Kind, keyed ? request.PublicKey : null, secret?.Hash, PlatformDeviceActor.System, utcNow,
+                request.Origin);
             _licensing.Store.AddDevice(device);
             _licensing.Store.AddEvents(new[] { requested });
 

@@ -8887,7 +8887,7 @@ Merci : nous avons reçu le paiement et l’accès complet à Vixly est rétabli
     <comment>needs-review</comment>
   </data>
   <data name="ui.device.kind.phone" xml:space="preserve">
-    <value>Téléphone</value>
+    <value>Mobile</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.device.kind.scanner" xml:space="preserve">
@@ -10764,5 +10764,110 @@ Si personne chez {company} ne l’a demandé, contactez-nous immédiatement à {
   </data>
   <data name="ui.error.back" xml:space="preserve">
     <value>Retour à la console</value>
+  </data>
+  <data name="ui.devices.system" xml:space="preserve">
+    <value>Système d’exploitation</value>
+  </data>
+  <data name="ui.devices.browser" xml:space="preserve">
+    <value>Navigateur</value>
+  </data>
+  <data name="ui.devices.address" xml:space="preserve">
+    <value>Adresse IP</value>
+  </data>
+  <data name="ui.device.approved_by_link" xml:space="preserve">
+    <value>Le lien envoyé par e-mail au propriétaire</value>
+  </data>
+  <data name="ui.device.kind.desktop" xml:space="preserve">
+    <value>Ordinateur de bureau</value>
+  </data>
+  <data name="ui.device.kind.laptop" xml:space="preserve">
+    <value>Ordinateur portable</value>
+  </data>
+  <data name="ui.activity.title" xml:space="preserve">
+    <value>Activité de connexion</value>
+  </data>
+  <data name="ui.activity.filtered" xml:space="preserve">
+    <value>Connexions d'une seule personne.</value>
+  </data>
+  <data name="ui.activity.everyone" xml:space="preserve">
+    <value>Afficher tout le monde</value>
+  </data>
+  <data name="ui.activity.count" xml:space="preserve">
+    <value>{count} connexions</value>
+  </data>
+  <data name="ui.activity.who" xml:space="preserve">
+    <value>Qui</value>
+  </data>
+  <data name="ui.activity.signed_in" xml:space="preserve">
+    <value>Connecté</value>
+  </data>
+  <data name="ui.activity.signed_out" xml:space="preserve">
+    <value>Déconnecté</value>
+  </data>
+  <data name="ui.activity.address" xml:space="preserve">
+    <value>Adresse IP</value>
+  </data>
+  <data name="ui.activity.country" xml:space="preserve">
+    <value>Pays</value>
+  </data>
+  <data name="ui.activity.browser" xml:space="preserve">
+    <value>Navigateur</value>
+  </data>
+  <data name="ui.activity.system" xml:space="preserve">
+    <value>Système d’exploitation</value>
+  </data>
+  <data name="ui.activity.empty" xml:space="preserve">
+    <value>Aucune connexion pour l'instant.</value>
+  </data>
+  <data name="ui.activity.still_signed_in" xml:space="preserve">
+    <value>Toujours connecté</value>
+  </data>
+  <data name="ui.activity.ended.signed_out" xml:space="preserve">
+    <value>déconnexion</value>
+  </data>
+  <data name="ui.activity.ended.ended_by_user" xml:space="preserve">
+    <value>terminée par la personne</value>
+  </data>
+  <data name="ui.activity.ended.ended_by_administrator" xml:space="preserve">
+    <value>terminée par un administrateur</value>
+  </data>
+  <data name="ui.activity.ended.account_restricted" xml:space="preserve">
+    <value>compte restreint</value>
+  </data>
+  <data name="ui.activity.ended.idle_timeout" xml:space="preserve">
+    <value>inactivité</value>
+  </data>
+  <data name="ui.activity.ended.absolute_lifetime" xml:space="preserve">
+    <value>durée maximale</value>
+  </data>
+  <data name="ui.activity.ended.password_changed" xml:space="preserve">
+    <value>mot de passe changé</value>
+  </data>
+  <data name="ui.activity.ended.second_factor_reset" xml:space="preserve">
+    <value>deuxième étape réinitialisée</value>
+  </data>
+  <data name="ui.activity.ended.step_up_failed" xml:space="preserve">
+    <value>confirmation échouée</value>
+  </data>
+  <data name="ui.activity.country.tor" xml:space="preserve">
+    <value>Tor</value>
+  </data>
+  <data name="ui.activity.country.unknown" xml:space="preserve">
+    <value>Inconnu</value>
+  </data>
+  <data name="ui.licences.title" xml:space="preserve">
+    <value>Licences</value>
+  </data>
+  <data name="ui.licences.licence" xml:space="preserve">
+    <value>Licence</value>
+  </data>
+  <data name="ui.licences.device_id" xml:space="preserve">
+    <value>ID de l’appareil</value>
+  </data>
+  <data name="ui.licences.free" xml:space="preserve">
+    <value>Libre</value>
+  </data>
+  <data name="ui.plans.feature.partner_agents" xml:space="preserve">
+    <value>Agents partenaires</value>
   </data>
 </root>

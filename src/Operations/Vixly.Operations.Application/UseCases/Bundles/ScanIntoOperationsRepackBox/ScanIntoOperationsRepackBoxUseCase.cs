@@ -112,6 +112,12 @@ public sealed class ScanIntoOperationsRepackBoxUseCase
             return ScanIntoOperationsRepackBoxResponse.Failure(notReady);
         }
 
+        // On a bundle's list (review): it goes into that bundle loose, or off the list first.
+        if ((await _bundles.ListOpenItemsAsync(new[] { parcel.Id }, Array.Empty<Guid>(), cancellationToken)).Count > 0)
+        {
+            return ScanIntoOperationsRepackBoxResponse.Failure(OperationsBundleErrors.OnAnotherList);
+        }
+
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();
 
         try

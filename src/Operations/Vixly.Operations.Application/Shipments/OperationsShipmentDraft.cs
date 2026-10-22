@@ -30,4 +30,5 @@ public sealed record OperationsShipmentDraft(
     bool InsuranceAccepted = false,
     string? Service = null,
     int? ParcelCount = null,
-    Guid? InsurancePlanId = null);
+    Guid? InsurancePlanId = null,
+    bool Collect = false);

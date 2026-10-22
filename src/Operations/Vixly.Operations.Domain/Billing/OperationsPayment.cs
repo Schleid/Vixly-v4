@@ -47,7 +47,8 @@ public sealed class OperationsPayment : OperationsEntity
     // The drawer its cash went into.
     public Guid? DrawerId { get; private set; }
 
-    public Guid TakenByUserId { get; private set; }
+    // None for a card paid by the customer on the portal (Slice 5F step 4).
+    public Guid? TakenByUserId { get; private set; }
 
     public DateTimeOffset TakenUtc { get; private set; }
 
@@ -70,6 +71,40 @@ public sealed class OperationsPayment : OperationsEntity
 
     public decimal Cash => _tenders.Where(tender => tender.Method == OperationsPaymentMethod.Cash).Sum(tender => tender.Amount);
 
+    // Slice 5F step 4: a card payment Stripe confirmed for exactly what the invoice owes; its reference is Stripe's payment (pi_...).
+    public static OperationsPayment TakeByCard(Guid tenantId, OperationsInvoice invoice, string number, decimal amount, string paymentIntentId, Guid? takenBy, Guid requestKey,
+        DateTimeOffset utcNow)
+    {
+        ArgumentNullException.ThrowIfNull(invoice);
+        invoice.EnsureIssued();
+
+        if (invoice.Owed <= 0m || amount != invoice.Owed)
+        {
+            throw new DomainException(OperationsPaymentErrors.NotInFull);
+        }
+
+        if (string.IsNullOrWhiteSpace(paymentIntentId) || paymentIntentId.Length > 60)
+        {
+            throw new DomainException(OperationsCardErrors.ChargeNotFound);
+        }
+
+        OperationsPayment payment = new(tenantId, utcNow)
+        {
+            Number = number,
+            InvoiceId = invoice.Id,
+            CustomerId = invoice.CustomerId,
+            WarehouseId = invoice.WarehouseId,
+            TakenByUserId = takenBy,
+            TakenUtc = utcNow,
+            CurrencyCode = invoice.CurrencyCode,
+            RequestKey = requestKey,
+            Total = amount
+        };
+        payment._tenders.Add(new OperationsPaymentTender(OperationsPaymentMethod.Card, amount, null, paymentIntentId));
+        invoice.Paid(amount, 0m, utcNow);
+        return payment;
+    }
+
     public static OperationsPayment Take(Guid tenantId, OperationsInvoice invoice, string number, IReadOnlyList<OperationsTenderDraft> drafts, OperationsCashDrawer? drawer,
         bool zelleTermsAccepted, Guid takenBy, Guid requestKey, DateTimeOffset utcNow)
     {
@@ -85,7 +120,9 @@ public sealed class OperationsPayment : OperationsEntity
 
         List<OperationsTenderDraft> parts = drafts.Where(draft => draft.Amount != 0m).ToList();
 
-        if (parts.Count is 0 or > MaxTenders || parts.Any(draft => !Enum.IsDefined(draft.Method) || draft.Amount < 0m || decimal.Round(draft.Amount, 2) != draft.Amount))
+        // A card is never typed in: it is recorded only on Stripe's word (TakeByCard).
+        if (parts.Count is 0 or > MaxTenders || parts.Any(draft => !Enum.IsDefined(draft.Method) || draft.Method == OperationsPaymentMethod.Card || draft.Amount < 0m
+            || decimal.Round(draft.Amount, 2) != draft.Amount))
         {
             throw new DomainException(OperationsPaymentErrors.AmountInvalid);
         }

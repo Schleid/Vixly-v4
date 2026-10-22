@@ -17,6 +17,7 @@ namespace Vixly.Operations.Application.Tests;
 // - A person can give only what they hold, where they hold it
 // - Only the Owner gives the Administrator role
 // - The role Platform sees: owner, admin or staff
+// - A partner agent (Slice 7 step 4): its warehouse only, the partner's rights only, money only where allowed, nothing while partner access is off
 //
 // IMPORTANT NOTES:
 // - No database
@@ -106,6 +107,34 @@ public sealed class OperationsAccessViewTests
         staff.SetAdministrator(true, Now);
 
         Assert.Equal("admin", new OperationsAccessView(staff, Array.Empty<(OperationsRoleGrant, OperationsRole)>()).PlatformRole);
+    }
+
+    [Fact]
+    public void PartnerAgent_HoldsThePartnersRights_AtItsWarehouseOnly_MoneyWhereAllowed()
+    {
+        OperationsUser paul = OperationsUser.InvitePartnerAgent(Tenant, "Paul Partner", EmailAddress.Create("paul@capois.example"), LanguageCode.En, PortWarehouse, Now);
+        (OperationsRoleGrant, OperationsRole)[] grants = { Grant(Manager, OperationsRoleScope.Tenant, null) };
+
+        // Grants never count for a partner agent; the partner's rights at its warehouse only.
+        OperationsAccessView open = new(paul, grants, new OperationsPartnerScope(PortWarehouse, true, false));
+        Assert.True(open.CoversWarehouse(OperationsPermissions.PickupRelease, PortWarehouse, PortAuPrince));
+        Assert.True(open.CoversWarehouse(OperationsPermissions.ArrivalsReceive, PortWarehouse, PortAuPrince));
+        Assert.False(open.CoversWarehouse(OperationsPermissions.PickupRelease, MiamiWarehouse, Miami));
+        Assert.False(open.CoversWarehouse(OperationsPermissions.WarehousesView, PortWarehouse, PortAuPrince));
+        Assert.False(open.CoversWarehouse(OperationsPermissions.PaymentsTake, PortWarehouse, PortAuPrince));
+        Assert.False(open.HasTenantWide(OperationsPermissions.PickupRelease));
+        Assert.False(open.Has(OperationsPermissions.CustomersView));
+        Assert.False(open.CanGrant(Viewer, OperationsRoleScope.Warehouse, PortWarehouse, PortAuPrince));
+
+        // Money where the company lets the partner handle it.
+        OperationsAccessView money = new(paul, grants, new OperationsPartnerScope(PortWarehouse, true, true));
+        Assert.True(money.CoversWarehouse(OperationsPermissions.PaymentsTake, PortWarehouse, PortAuPrince));
+        Assert.False(money.CoversWarehouse(OperationsPermissions.PaymentsRefund, PortWarehouse, PortAuPrince));
+
+        // Off (not in the plan, Platform silent, no longer a partner's warehouse), or no scope given: nothing.
+        Assert.False(new OperationsAccessView(paul, grants, new OperationsPartnerScope(PortWarehouse, false, true)).Has(OperationsPermissions.PickupRelease));
+        Assert.False(new OperationsAccessView(paul, grants).Has(OperationsPermissions.PickupRelease));
+        Assert.Throws<Vixly.Shared.Kernel.Domain.DomainException>(() => paul.SetAdministrator(true, Now));
     }
 
     private static (OperationsRoleGrant, OperationsRole) Grant(OperationsRole role, OperationsRoleScope scope, Guid? scopeId) =>

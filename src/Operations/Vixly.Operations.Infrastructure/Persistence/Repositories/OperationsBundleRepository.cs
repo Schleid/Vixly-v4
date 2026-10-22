@@ -95,4 +95,58 @@ internal sealed class OperationsBundleRepository : IOperationsBundleRepository
 
     public async Task<IReadOnlyList<OperationsRepackBox>> ListBundleBoxesForUpdateAsync(Guid bundleId, CancellationToken cancellationToken) =>
         await _context.RepackBoxes.Where(box => box.BundleId == bundleId).ToListAsync(cancellationToken);
+
+    public void Add(OperationsBundleItem item) => _context.BundleItems.Add(item ?? throw new ArgumentNullException(nameof(item)));
+
+    public void Remove(OperationsBundleItem item) => _context.BundleItems.Remove(item ?? throw new ArgumentNullException(nameof(item)));
+
+    public Task<bool> HasListAsync(Guid bundleId, CancellationToken cancellationToken) => _context.BundleItems.AnyAsync(item => item.BundleId == bundleId, cancellationToken);
+
+    public Task<bool> AnyMissingAsync(Guid bundleId, CancellationToken cancellationToken) =>
+        _context.BundleItems.AnyAsync(item => item.BundleId == bundleId && item.ScannedUtc == null, cancellationToken);
+
+    public async Task<IReadOnlyList<OperationsBundleItem>> ListItemsAsync(Guid bundleId, CancellationToken cancellationToken) =>
+        await _context.BundleItems.Where(item => item.BundleId == bundleId).OrderBy(item => item.CreatedUtc).Take(2000).ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<OperationsBundleItem>> ListOpenItemsAsync(IReadOnlyCollection<Guid> parcelIds, IReadOnlyCollection<Guid> boxIds, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(parcelIds);
+        ArgumentNullException.ThrowIfNull(boxIds);
+
+        if (parcelIds.Count == 0 && boxIds.Count == 0)
+        {
+            return Array.Empty<OperationsBundleItem>();
+        }
+
+        return await _context.BundleItems
+            .Where(item => ((item.ParcelId != null && parcelIds.Contains(item.ParcelId.Value)) || (item.BoxId != null && boxIds.Contains(item.BoxId.Value)))
+                && _context.Bundles.Any(bundle => bundle.Id == item.BundleId && bundle.Status == OperationsBundleStatus.Open))
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyDictionary<Guid, (string Number, string? ShipmentNumber)>> NameItemsAsync(IReadOnlyCollection<OperationsBundleItem> items, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        List<Guid> parcelIds = items.Where(item => item.ParcelId is not null).Select(item => item.ParcelId!.Value).ToList();
+        List<Guid> boxIds = items.Where(item => item.BoxId is not null).Select(item => item.BoxId!.Value).ToList();
+        List<Guid> shipmentIds = items.Select(item => item.ShipmentId).Distinct().ToList();
+        Dictionary<Guid, string?> parcels = parcelIds.Count == 0 ? new() : await _context.Parcels.AsNoTracking().Where(parcel => parcelIds.Contains(parcel.Id))
+            .ToDictionaryAsync(parcel => parcel.Id, parcel => parcel.Number, cancellationToken);
+        Dictionary<Guid, string> boxes = boxIds.Count == 0 ? new() : await _context.RepackBoxes.AsNoTracking().Where(box => boxIds.Contains(box.Id))
+            .ToDictionaryAsync(box => box.Id, box => box.Number, cancellationToken);
+        Dictionary<Guid, string?> shipments = await _context.Shipments.AsNoTracking().Where(shipment => shipmentIds.Contains(shipment.Id))
+            .ToDictionaryAsync(shipment => shipment.Id, shipment => shipment.Number, cancellationToken);
+        return items.ToDictionary(item => item.Id, item => (
+            item.ParcelId is { } parcel ? parcels.GetValueOrDefault(parcel) ?? string.Empty : item.BoxId is { } box ? boxes.GetValueOrDefault(box) ?? string.Empty : string.Empty,
+            shipments.GetValueOrDefault(item.ShipmentId)));
+    }
+
+    public async Task<IReadOnlyList<OperationsBundleItem>> ListPlannedAsync(IReadOnlyCollection<Guid> warehouseIds, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(warehouseIds);
+        return await _context.BundleItems.AsNoTracking()
+            .Where(item => item.ScannedUtc == null
+                && _context.Bundles.Any(bundle => bundle.Id == item.BundleId && bundle.Status == OperationsBundleStatus.Open && warehouseIds.Contains(bundle.WarehouseId)))
+            .Take(5000).ToListAsync(cancellationToken);
+    }
 }

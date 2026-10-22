@@ -17,6 +17,21 @@
   <data name="ops.auth.password_too_short" xml:space="preserve">
     <value>Use al menos {minLength} caracteres.</value>
   </data>
+  <data name="ops.cards.already_started" xml:space="preserve">
+    <value>Se acaba de iniciar un pago para esta factura. Abra sus facturas e inténtelo de nuevo.</value>
+  </data>
+  <data name="ops.cards.charge_not_found" xml:space="preserve">
+    <value>No se encontró este pago.</value>
+  </data>
+  <data name="ops.cards.not_connected" xml:space="preserve">
+    <value>El pago con tarjeta no está disponible en este momento.</value>
+  </data>
+  <data name="ops.cards.provider_refused" xml:space="preserve">
+    <value>No se pudo iniciar el pago. Inténtelo más tarde o pague en el mostrador.</value>
+  </data>
+  <data name="ops.cards.provider_unavailable" xml:space="preserve">
+    <value>No se puede contactar con el servicio de pago en este momento. Inténtelo de nuevo en un momento.</value>
+  </data>
   <data name="ops.charges.country_invalid" xml:space="preserve">
     <value>Elija un destino de la lista.</value>
   </data>
@@ -143,6 +158,9 @@
   <data name="ops.locations.region_too_long" xml:space="preserve">
     <value>El departamento es demasiado largo ({maxLength} caracteres como máximo).</value>
   </data>
+  <data name="ops.payments.nothing_owed" xml:space="preserve">
+    <value>No se debe nada en esta factura.</value>
+  </data>
   <data name="ops.receiving.carrier_invalid" xml:space="preserve">
     <value>Escriba el transportista.</value>
   </data>
@@ -175,6 +193,9 @@
   </data>
   <data name="ops.shipments.booked" xml:space="preserve">
     <value>Este envío está finalizado: ya no puede cambiar.</value>
+  </data>
+  <data name="ops.shipments.collect_unavailable" xml:space="preserve">
+    <value>El pago en destino no se ofrece.</value>
   </data>
   <data name="ops.shipments.collector_locked" xml:space="preserve">
     <value>Quién puede recoger se indica una vez reservado el envío, hasta que se recoja.</value>
@@ -281,6 +302,27 @@
   <data name="ui.app.name" xml:space="preserve">
     <value>Portal de clientes</value>
   </data>
+  <data name="ui.card.back" xml:space="preserve">
+    <value>Volver a mis facturas</value>
+  </data>
+  <data name="ui.card.cancelled" xml:space="preserve">
+    <value>Este pago no se realizó. Puede intentarlo de nuevo desde sus facturas.</value>
+  </data>
+  <data name="ui.card.continue" xml:space="preserve">
+    <value>Continuar a la página de pago segura</value>
+  </data>
+  <data name="ui.card.continue_hint" xml:space="preserve">
+    <value>Usted paga en la página segura de nuestro proveedor de pagos y luego vuelve aquí. Su número de tarjeta nunca pasa por este sitio.</value>
+  </data>
+  <data name="ui.card.paid" xml:space="preserve">
+    <value>Gracias: su pago está confirmado.</value>
+  </data>
+  <data name="ui.card.paid_not_applied" xml:space="preserve">
+    <value>Su tarjeta fue cobrada, pero la factura había cambiado mientras tanto. Le haremos un reembolso; contáctenos si tiene alguna pregunta.</value>
+  </data>
+  <data name="ui.card.title" xml:space="preserve">
+    <value>Pago con tarjeta</value>
+  </data>
   <data name="ui.credit.available" xml:space="preserve">
     <value>Disponible</value>
   </data>
@@ -316,6 +358,24 @@
   </data>
   <data name="ui.credit.title" xml:space="preserve">
     <value>Su cuenta de crédito</value>
+  </data>
+  <data name="ui.delivery.failure.address_wrong" xml:space="preserve">
+    <value>Dirección incorrecta o no encontrada</value>
+  </data>
+  <data name="ui.delivery.failure.no_access" xml:space="preserve">
+    <value>Sin acceso a la dirección</value>
+  </data>
+  <data name="ui.delivery.failure.not_home" xml:space="preserve">
+    <value>Nadie en casa</value>
+  </data>
+  <data name="ui.delivery.failure.not_paid" xml:space="preserve">
+    <value>No pagado</value>
+  </data>
+  <data name="ui.delivery.failure.other" xml:space="preserve">
+    <value>Otro</value>
+  </data>
+  <data name="ui.delivery.failure.refused" xml:space="preserve">
+    <value>Rechazado</value>
   </data>
   <data name="ui.done.saved" xml:space="preserve">
     <value>Sus cambios se han guardado.</value>
@@ -656,6 +716,9 @@
   <data name="ui.invoices.owed" xml:space="preserve">
     <value>Por pagar</value>
   </data>
+  <data name="ui.invoices.pay_card" xml:space="preserve">
+    <value>Pagar con tarjeta</value>
+  </data>
   <data name="ui.invoices.state.awaiting" xml:space="preserve">
     <value>esperando confirmación</value>
   </data>
@@ -769,6 +832,9 @@
   </data>
   <data name="ui.nav.packages" xml:space="preserve">
     <value>Mis paquetes</value>
+  </data>
+  <data name="ui.nav.pricing" xml:space="preserve">
+    <value>Precios</value>
   </data>
   <data name="ui.nav.profile" xml:space="preserve">
     <value>Mi perfil</value>
@@ -916,6 +982,48 @@
   </data>
   <data name="ui.prealert.warehouse" xml:space="preserve">
     <value>Enviado a nuestro almacén</value>
+  </data>
+  <data name="ui.pricing.any_destination" xml:space="preserve">
+    <value>cualquier destino</value>
+  </data>
+  <data name="ui.pricing.any_origin" xml:space="preserve">
+    <value>cualquiera de nuestras sedes</value>
+  </data>
+  <data name="ui.pricing.calculator" xml:space="preserve">
+    <value>Calcular el precio de mi paquete</value>
+  </data>
+  <data name="ui.pricing.consolidation_fee" xml:space="preserve">
+    <value>Cargo por consolidación</value>
+  </data>
+  <data name="ui.pricing.intro" xml:space="preserve">
+    <value>Los precios que aplicamos, por servicio y ruta. Sus propios precios, si los tiene, aparecen primero. Para el precio de un paquete, use la calculadora.</value>
+  </data>
+  <data name="ui.pricing.minimum" xml:space="preserve">
+    <value>Cargo mínimo</value>
+  </data>
+  <data name="ui.pricing.none" xml:space="preserve">
+    <value>Aún no hay precios disponibles.</value>
+  </data>
+  <data name="ui.pricing.own" xml:space="preserve">
+    <value>Sus precios</value>
+  </data>
+  <data name="ui.pricing.per_package" xml:space="preserve">
+    <value>Por paquete</value>
+  </data>
+  <data name="ui.pricing.per_shipment" xml:space="preserve">
+    <value>Por envío</value>
+  </data>
+  <data name="ui.pricing.route" xml:space="preserve">
+    <value>De {origin} a {destination}</value>
+  </data>
+  <data name="ui.pricing.service_fee" xml:space="preserve">
+    <value>Cargo por servicio</value>
+  </data>
+  <data name="ui.pricing.since" xml:space="preserve">
+    <value>Vigente desde el {date}</value>
+  </data>
+  <data name="ui.pricing.title" xml:space="preserve">
+    <value>Precios</value>
   </data>
   <data name="ui.profile.change_password" xml:space="preserve">
     <value>Cambiar la contraseña</value>
@@ -1076,6 +1184,15 @@
   <data name="ui.shipments.city" xml:space="preserve">
     <value>Ciudad</value>
   </data>
+  <data name="ui.shipments.collect" xml:space="preserve">
+    <value>Pagar en destino (flete por cobrar)</value>
+  </data>
+  <data name="ui.shipments.collect_hint" xml:space="preserve">
+    <value>Su envío viaja sin pagar; se entrega una vez pagado en destino.</value>
+  </data>
+  <data name="ui.shipments.collect_notice" xml:space="preserve">
+    <value>A pagar en destino: se entrega una vez pagado.</value>
+  </data>
   <data name="ui.shipments.collector_hint" xml:space="preserve">
     <value>Además del destinatario, puede indicar a una persona. Presenta una identificación en el mostrador, como el destinatario. Deje ambos vacíos para no indicar a nadie.</value>
   </data>
@@ -1111,6 +1228,9 @@
   </data>
   <data name="ui.shipments.deliver_to_hint" xml:space="preserve">
     <value>Nuestro destino donde lo recoge, o desde donde se entrega en su dirección.</value>
+  </data>
+  <data name="ui.shipments.delivered" xml:space="preserve">
+    <value>Entregado el {date}.</value>
   </data>
   <data name="ui.shipments.destination" xml:space="preserve">
     <value>Destino</value>
@@ -1457,6 +1577,15 @@
   <data name="ui.tracking.delayed" xml:space="preserve">
     <value>Retrasado: {cause}{message}</value>
   </data>
+  <data name="ui.tracking.delivered" xml:space="preserve">
+    <value>Entregado</value>
+  </data>
+  <data name="ui.tracking.delivery_failed" xml:space="preserve">
+    <value>Intento de entrega fallido: {failure}</value>
+  </data>
+  <data name="ui.tracking.delivery_returning" xml:space="preserve">
+    <value>Regresa al remitente tras el último intento de entrega</value>
+  </data>
   <data name="ui.tracking.departed_origin" xml:space="preserve">
     <value>Salió del origen por vía {mode}</value>
   </data>
@@ -1492,6 +1621,9 @@
   </data>
   <data name="ui.tracking.mode.ocean" xml:space="preserve">
     <value>marítima</value>
+  </data>
+  <data name="ui.tracking.out_for_delivery" xml:space="preserve">
+    <value>En reparto</value>
   </data>
   <data name="ui.tracking.packed" xml:space="preserve">
     <value>Embalado para la salida</value>

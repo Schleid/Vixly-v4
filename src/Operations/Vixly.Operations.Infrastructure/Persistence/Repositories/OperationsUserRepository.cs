@@ -48,6 +48,20 @@ internal sealed class OperationsUserRepository : IOperationsUserRepository
         return _context.Users.AnyAsync(cancellationToken);
     }
 
+    // Slice 7 step 4 (R-8): this company's partner agents of one warehouse (the tenant filter applies).
+    public async Task<IReadOnlyList<OperationsUser>> ListPartnerAgentsAsync(Guid warehouseId, CancellationToken cancellationToken) =>
+        await _context.Users.Where(user => user.PartnerWarehouseId == warehouseId).OrderBy(user => user.FullName).Take(200).ToListAsync(cancellationToken);
+
+    // Across companies on purpose (one of two reviewed cross-tenant reads, design note item 3); only a yes or a no leaves this method.
+    // Only a member who accepted the invitation and is not deactivated holds the email: an invitation never sent on blocks nobody.
+
+    public Task<bool> IsStaffEmailAnywhereAsync(EmailAddress email, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(email);
+        return _context.Users.IgnoreQueryFilters().AnyAsync(user => user.Email == email && user.Account.PasswordHash != null
+            && user.Account.Status != OperationsUserAccountStatus.Deactivated, cancellationToken);
+    }
+
     public async Task<(IReadOnlyList<OperationsUser> Items, int TotalCount)> ListAsync(string? search, int page, int pageSize, CancellationToken cancellationToken)
     {
         IQueryable<OperationsUser> query = _context.Users;

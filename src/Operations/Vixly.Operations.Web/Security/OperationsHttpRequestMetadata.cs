@@ -1,4 +1,5 @@
 ﻿using Vixly.Operations.Application.Ports;
+using Vixly.Shared.Hosting;
 
 namespace Vixly.Operations.Web.Security;
 
@@ -28,4 +29,6 @@ public sealed class OperationsHttpRequestMetadata : IOperationsRequestMetadata
     public string? UserAgent => _http.HttpContext?.Request.Headers.UserAgent.ToString();
 
     public string? CorrelationId => _http.HttpContext?.TraceIdentifier;
+
+    public string? Country => VixlyClientCountry.Of(_http.HttpContext);
 }

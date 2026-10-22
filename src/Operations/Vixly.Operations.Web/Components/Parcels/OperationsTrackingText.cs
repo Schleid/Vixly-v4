@@ -76,6 +76,7 @@ public static class OperationsTrackingText
             "result" => "ui.inspection.result." + value,
             "why" => "ui.inspection.reason." + value,
             "mode" => "ui.dispatch.mode." + value,
+            "failure" => "ui.delivery.failure." + value,
             _ => null
         };
 

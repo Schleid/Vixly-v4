@@ -24,6 +24,20 @@ namespace Vixly.Operations.Domain.Tests;
 // =========================================================
 public sealed class OperationsIdentityDomainTests
 {
+    // Owner, 2026-10-21; review: once a device has a country, any other code is a change, unknown (XX) and Tor (T1) included; no header and no country of its own tell nothing.
+    [Theory]
+    [InlineData("US", "US", false)]
+    [InlineData("US", "FR", true)]
+    [InlineData("US", "T1", true)]
+    [InlineData("US", "XX", true)]
+    [InlineData("US", null, false)]
+    [InlineData(null, "FR", false)]
+    public void SignInPlace_ChangesCountry_OnlyAgainstTheDevicesOwn(string? registered, string? now, bool changed)
+    {
+        Assert.Equal(changed, new OperationsSignInPlace(Guid.NewGuid(), "Desk", "D-000001", registered, now).CountryChanged);
+        Assert.False(OperationsSignInPlace.Nowhere(now).CountryChanged);
+    }
+
     private static readonly DateTimeOffset Now = new(2026, 10, 18, 12, 0, 0, TimeSpan.Zero);
 
     private static readonly Guid Tenant = Guid.NewGuid();

@@ -232,6 +232,7 @@ public static class OperationsPickupEndpoints
             response.CanBill,
             response.CodeSent,
             response.PayFirst,
+            response.MoneyHandled,
             Error = errors.Describe(error ?? response.Error),
             Info = info
         });

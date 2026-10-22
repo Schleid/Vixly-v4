@@ -38,12 +38,14 @@ IMPORTANT NOTES:
                 </label>
             }
             <PackageFields T="T" Entered="Entered" />
-            @if (Shipments.Count > 0)
+            @* Pre-alerts always go to the mailbox (owner, 2026-10-21): only shipments leaving from it. *@
+            @{ IReadOnlyList<CustomerShipmentDto> fromMailbox = Shipments.Where(shipment => shipment.OriginId is { } origin && choices.Origins.Any(item => item.Id == origin)).ToList(); }
+            @if (fromMailbox.Count > 0)
             {
                 <label>@T["ui.prealert.shipment"]
                     <select name="shipment">
                         <option value="">@T["ui.packages.move.none"]</option>
-                        @foreach (CustomerShipmentDto shipment in Shipments)
+                        @foreach (CustomerShipmentDto shipment in fromMailbox)
                         {
                             <option value="@shipment.ShipmentId" selected="@(shipment.ShipmentId == Entered?.ShipmentId)">@shipment.Origin → @(shipment.Delivery == "pickup" ? shipment.BranchName : shipment.Address?.City + ", " + shipment.CountryCode) · @shipment.RecipientName</option>
                         }
@@ -62,7 +64,7 @@ IMPORTANT NOTES:
 
     [Parameter] public CustomerShipmentChoicesDto? Choices { get; set; }
 
-    // The customer's open shipments with instructions (from any of its warehouses; Operations refuses one from another warehouse).
+    // The customer's open shipments with instructions; only those leaving from the mailbox are offered (Operations refuses the others).
     [Parameter] public IReadOnlyList<CustomerShipmentDto> Shipments { get; set; } = Array.Empty<CustomerShipmentDto>();
 
     [Parameter] public CustomerPreAlertBody? Entered { get; set; }

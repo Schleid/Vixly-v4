@@ -766,3 +766,25 @@
         margin-left: 0;
     }
 }
+
+/* Counter Invoice Note */
+.ops-counter__invoice {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 0.75rem !important;
+    background: var(--vx-color-surface) !important;
+    border: 1px solid var(--vx-color-border) !important;
+    border-left: 4px solid var(--vx-color-primary) !important;
+    border-radius: 0.5rem !important;
+    padding: 0.65rem 0.85rem !important;
+    margin: 0.75rem 0 !important;
+    font-size: 0.875rem !important;
+}
+.ops-counter__invoice .vx-button {
+    height: 32px !important;
+    padding: 0 0.75rem !important;
+    font-size: 0.8125rem !important;
+    margin: 0 !important;
+}
+

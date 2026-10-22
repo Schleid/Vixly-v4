@@ -36,6 +36,8 @@ IMPORTANT NOTES:
                     <AntiforgeryToken />
                     <input type="hidden" name="mode" value="@Mode" />
                     <input type="hidden" name="active" value="true" />
+                    <label><input type="checkbox" name="published" value="true" /> @T["ui.charges.published"]</label>
+                    <p class="ops-editor__hint">@T["ui.charges.published_hint"]</p>
                     <label>@T["ui.charges.card.service"]
                         <select name="service" required>
                             @foreach (string serviceCode in ModeServices) { <option value="@serviceCode">@T["ui.services.name." + serviceCode]</option> }

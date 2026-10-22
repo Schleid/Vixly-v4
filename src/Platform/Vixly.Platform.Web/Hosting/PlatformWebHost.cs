@@ -89,6 +89,8 @@ public static class PlatformWebHost
 
         WebApplication app = builder.Build();
 
+        // Before the forwarded headers: the country is read only from a trusted proxy (owner, 2026-10-21).
+        app.UseVixlyClientCountry();
         app.UseForwardedHeaders();
         app.UseVixlySecurityHeaders();
 

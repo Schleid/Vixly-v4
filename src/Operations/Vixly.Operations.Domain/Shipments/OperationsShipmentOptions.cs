@@ -18,5 +18,8 @@ public enum OperationsShipmentOptions
     None = 0,
     Consolidate = 1,
     Refrigerated = 2,
-    Insured = 4
+    Insured = 4,
+
+    // Freight collect (owner, 2026-10-21): the sender pays at the destination. It moves unpaid; it is handed over once paid.
+    FreightCollect = 8
 }

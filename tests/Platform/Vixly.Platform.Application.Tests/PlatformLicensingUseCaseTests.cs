@@ -3,6 +3,7 @@ using System.Text;
 using Vixly.Platform.Application.Licensing;
 using Vixly.Platform.Application.Messaging;
 using Vixly.Platform.Application.Security;
+using Vixly.Platform.Application.UseCases.Licensing;
 using Vixly.Platform.Application.UseCases.Licensing.ApprovePlatformDevice;
 using Vixly.Platform.Application.UseCases.Licensing.CompletePlatformDeviceLink;
 using Vixly.Platform.Application.UseCases.Licensing.CreatePlatformDeviceChallenge;
@@ -14,7 +15,7 @@ using Vixly.Platform.Application.UseCases.Licensing.ReleasePlatformDevice;
 using Vixly.Platform.Application.UseCases.Licensing.RequestPlatformFirstDeviceLink;
 using Vixly.Platform.Application.UseCases.Licensing.StartPlatformOwnerRecovery;
 using Vixly.Platform.Application.UseCases.Licensing.VerifyPlatformDevice;
-using Vixly.Platform.Application.UseCases.Licensing;
+using Vixly.Platform.Application.UseCases.TenantAccount.GetTenantDeviceSeats;
 using Vixly.Platform.Domain.Licensing;
 using Vixly.Platform.Domain.Subscriptions;
 using Vixly.Platform.Domain.Tenants;
@@ -83,6 +84,23 @@ public sealed class PlatformLicensingUseCaseTests
         PlatformDeviceEnrolment waiting = await EnrolAsync(unpaid.Id);
         _kit.Kit.Tenants.Clock.Advance(TimeSpan.FromDays(30));
         Assert.Equal("platform.licensing.access_not_full", await ApproveAsync(unpaid.Id, waiting.DeviceId));
+    }
+
+    // Owner, 2026-10-21: the Licences tab counts the licences bought and in use.
+    [Fact]
+    public async Task Seats_CountWhatIsBoughtAndInUse()
+    {
+        (PlatformTenant tenant, _) = _kit.Tenant(licences: 3);
+        PlatformDeviceEnrolment first = await EnrolAsync(tenant.Id);
+        await EnrolAsync(tenant.Id);
+        Assert.Null(await ApproveAsync(tenant.Id, first.DeviceId));
+
+        GetTenantDeviceSeatsResponse seats = await new GetTenantDeviceSeatsUseCase(_kit.Administration()).ExecuteAsync(
+            LicensingTestKit.Caller(tenant.Id), new GetTenantDeviceSeatsRequest(), CancellationToken.None);
+
+        Assert.Equal(3, seats.Seats);
+        Assert.Equal(1, seats.InUse);
+        Assert.Null(seats.ScheduledSeats);
     }
 
     [Fact]

@@ -603,6 +603,9 @@ internal sealed class QuestPdfOperationsLabelRenderer : IOperationsLabelRenderer
     public byte[] RenderShipperLetter(Vixly.Operations.Application.Dispatch.OperationsShipperLetter letter) =>
         OperationsWaybillLayout.RenderShipperLetter(letter ?? throw new ArgumentNullException(nameof(letter)), _text);
 
+    public byte[] RenderRunSheet(Vixly.Operations.Application.Delivery.OperationsRunSheet sheet) =>
+        OperationsRunSheetLayout.Render(sheet ?? throw new ArgumentNullException(nameof(sheet)), _text);
+
     public byte[] RenderCreditStatement(Vixly.Operations.Application.Billing.OperationsCreditStatement statement) =>
         OperationsCreditStatementLayout.Render(statement ?? throw new ArgumentNullException(nameof(statement)), _text);
 

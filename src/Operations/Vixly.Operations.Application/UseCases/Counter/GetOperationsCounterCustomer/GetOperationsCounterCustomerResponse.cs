@@ -51,12 +51,15 @@ public sealed class GetOperationsCounterCustomerResponse
 
     public Vixly.Operations.Domain.Settings.OperationsDeliveryModes DeliveryModes { get; private init; }
 
+    // Freight collect offered (owner, 2026-10-21).
+    public bool AllowCollect { get; private init; }
+
     // Where the customer stands (owner, 2026-10-20).
     public OperationsCounterStanding? Standing { get; private init; }
 
-    public static GetOperationsCounterCustomerResponse Success(OperationsCounterCustomer? customer, IReadOnlyList<OperationsCounterShipment> shipments, IReadOnlyList<OperationsChoice> origins, IReadOnlyList<OperationsWarehouse> destinations, IReadOnlyList<string> services, IReadOnlyList<Vixly.Operations.Domain.Charges.OperationsInsurancePlan> insurance, Vixly.Operations.Domain.Settings.OperationsDeliveryModes deliveryModes, OperationsCounterStanding? standing = null, string currencyCode = "", DateTimeOffset utcNow = default, IReadOnlyList<Vixly.Operations.Domain.Supplies.OperationsSupplySale>? orders = null)
+    public static GetOperationsCounterCustomerResponse Success(OperationsCounterCustomer? customer, IReadOnlyList<OperationsCounterShipment> shipments, IReadOnlyList<OperationsChoice> origins, IReadOnlyList<OperationsWarehouse> destinations, IReadOnlyList<string> services, IReadOnlyList<Vixly.Operations.Domain.Charges.OperationsInsurancePlan> insurance, Vixly.Operations.Domain.Settings.OperationsDeliveryModes deliveryModes, OperationsCounterStanding? standing = null, string currencyCode = "", DateTimeOffset utcNow = default, IReadOnlyList<Vixly.Operations.Domain.Supplies.OperationsSupplySale>? orders = null, bool allowCollect = false)
     {
-        return new GetOperationsCounterCustomerResponse { Orders = orders ?? Array.Empty<Vixly.Operations.Domain.Supplies.OperationsSupplySale>(), Succeeded = true, Standing = standing, Customer = customer, Shipments = shipments, Origins = origins, Destinations = destinations, Services = services, Insurance = insurance, DeliveryModes = deliveryModes, CurrencyCode = currencyCode, UtcNow = utcNow };
+        return new GetOperationsCounterCustomerResponse { Orders = orders ?? Array.Empty<Vixly.Operations.Domain.Supplies.OperationsSupplySale>(), Succeeded = true, Standing = standing, Customer = customer, Shipments = shipments, Origins = origins, Destinations = destinations, Services = services, Insurance = insurance, DeliveryModes = deliveryModes, CurrencyCode = currencyCode, UtcNow = utcNow, AllowCollect = allowCollect };
     }
 
     public static GetOperationsCounterCustomerResponse Failure(Error error)

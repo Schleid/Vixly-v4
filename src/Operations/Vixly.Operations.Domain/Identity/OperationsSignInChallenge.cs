@@ -47,6 +47,29 @@ public sealed class OperationsSignInChallenge : OperationsEntity
 
     public DateTimeOffset? CompletedUtc { get; private set; }
 
+    // Owner, 2026-10-21: where the sign-in happened (member activity; a country other than the device's is flagged).
+    public Guid? DeviceId { get; private set; }
+
+    public string? DeviceName { get; private set; }
+
+    public string? DeviceNumber { get; private set; }
+
+    public string? Country { get; private set; }
+
+    public bool CountryChanged { get; private set; }
+
+    public void At(OperationsSignInPlace place)
+    {
+        ArgumentNullException.ThrowIfNull(place);
+        DeviceId = place.DeviceId;
+        DeviceName = place.DeviceName;
+        DeviceNumber = place.DeviceNumber;
+        Country = place.Country;
+        CountryChanged = place.CountryChanged;
+    }
+
+    public OperationsSignInPlace Place => OperationsSignInPlace.Kept(DeviceId, DeviceName, DeviceNumber, Country, CountryChanged);
+
     public static OperationsSignInChallenge Issue(Guid tenantId, Guid userId, string tokenHash, OperationsSignInStage stage, DateTimeOffset utcNow)
     {
         if (userId == Guid.Empty)

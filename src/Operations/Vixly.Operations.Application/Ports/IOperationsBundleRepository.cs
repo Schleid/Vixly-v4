@@ -23,6 +23,27 @@ public interface IOperationsBundleRepository
 
     void Add(OperationsRepackBox box);
 
+    // The bundle's list (owner, 2026-10-21).
+    void Add(OperationsBundleItem item);
+
+    void Remove(OperationsBundleItem item);
+
+    Task<bool> HasListAsync(Guid bundleId, CancellationToken cancellationToken);
+
+    Task<bool> AnyMissingAsync(Guid bundleId, CancellationToken cancellationToken);
+
+    // Tracked.
+    Task<IReadOnlyList<OperationsBundleItem>> ListItemsAsync(Guid bundleId, CancellationToken cancellationToken);
+
+    // Tracked: the list lines of open bundles holding these parcels or boxes.
+    Task<IReadOnlyList<OperationsBundleItem>> ListOpenItemsAsync(IReadOnlyCollection<Guid> parcelIds, IReadOnlyCollection<Guid> boxIds, CancellationToken cancellationToken);
+
+    // The parcels and boxes on the lists of open bundles at these warehouses, not scanned yet.
+    // Each line's parcel or box number and its shipment's number.
+    Task<IReadOnlyDictionary<Guid, (string Number, string? ShipmentNumber)>> NameItemsAsync(IReadOnlyCollection<OperationsBundleItem> items, CancellationToken cancellationToken);
+
+    Task<IReadOnlyList<OperationsBundleItem>> ListPlannedAsync(IReadOnlyCollection<Guid> warehouseIds, CancellationToken cancellationToken);
+
     // Tracked.
     Task<OperationsBundle?> GetBundleAsync(Guid bundleId, CancellationToken cancellationToken);
 

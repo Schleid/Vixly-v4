@@ -1,0 +1,82 @@
+﻿@*
+=========================================================
+FILE: SignInActivity.razor
+
+PURPOSE:
+Member activity (owner, 2026-10-21): each sign-in to Control,
+when it ended, the address, country, browser and system.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- The person and page live in the URL (UI-3); times are UTC
+=========================================================
+*@
+@inherits PlatformPresenterComponent<SignInActivityPresenter>
+@using Vixly.Platform.Application.Queries
+@using Vixly.Shared.Kernel.Clients
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+@if (UserId is not null)
+{
+    <VxMessage Type="VxMessageType.Info">@T["ui.activity.filtered"] <a href="/activity">@T["ui.activity.everyone"]</a></VxMessage>
+}
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else
+{
+    <VxDataTable Items="Presenter.State.SignIns" IsLoading="@(!Presenter.State.Loaded)" Caption="@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.activity.count", "count", Presenter.State.TotalCount) : null)">
+        <HeaderContent>
+            <th scope="col">@T["ui.activity.who"]</th>
+            <th scope="col">@T["ui.activity.signed_in"]</th>
+            <th scope="col">@T["ui.activity.signed_out"]</th>
+            <th scope="col">@T["ui.activity.address"]</th>
+            <th scope="col">@T["ui.activity.country"]</th>
+            <th scope="col">@T["ui.activity.browser"]</th>
+            <th scope="col">@T["ui.activity.system"]</th>
+        </HeaderContent>
+        <RowTemplate Context="signIn">
+            <td><a href="/activity?user=@signIn.PlatformUserId">@signIn.UserName</a></td>
+            <td>@PlatformDisplay.Utc(T, signIn.SignedInUtc)</td>
+            <td>
+                @if (signIn.SignedOutUtc is { } signedOut)
+                {
+                    @PlatformDisplay.Utc(T, signedOut) <span class="vx-hint">@T["ui.activity.ended." + signIn.Ended]</span>
+                }
+                else
+                {
+                    <VxStatusBadge Status="VxBadgeStatus.Active" Text="@T["ui.activity.still_signed_in"]" />
+                }
+            </td>
+            <td>@(signIn.IpAddress ?? "-")</td>
+            <td>@(signIn.Country switch { null => "-", "T1" => T["ui.activity.country.tor"].Value, "XX" => T["ui.activity.country.unknown"].Value, string code => code })</td>
+            <td>@(VixlyUserAgents.Browser(signIn.UserAgent) ?? "-")</td>
+            <td>@(VixlyUserAgents.System(signIn.UserAgent) ?? "-")</td>
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.activity.empty"]" />
+        </EmptyContent>
+    </VxDataTable>
+    @if (Presenter.State.Loaded && Presenter.State.SignIns.Count > 0)
+    {
+        <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="GoToPage" />
+    }
+}
+
+@code {
+    [Parameter]
+    public Guid? UserId { get; set; }
+
+    [Parameter]
+    public int Page { get; set; } = 1;
+
+    protected override Task OnParametersSetAsync() => Presenter.LoadAsync(UserId, Page);
+
+    private void GoToPage(int page) => Navigation.NavigateTo("/activity?" + (UserId is { } user ? "user=" + user + "&" : string.Empty) + "page=" + page);
+}

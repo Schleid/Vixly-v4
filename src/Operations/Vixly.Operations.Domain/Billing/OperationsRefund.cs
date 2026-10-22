@@ -102,4 +102,36 @@ public sealed class OperationsRefund : OperationsEntity
 
         return refund;
     }
+
+    // Slice 5F step 4 (review): a card refund is kept first as pending, then Stripe gives the card back and its refund (re_...) settles it.
+    public bool Pending { get; private set; }
+
+    public void AwaitCard()
+    {
+        Pending = Method == OperationsPaymentMethod.Card && Reference is null ? true : throw new DomainException(OperationsCardErrors.RefundNotPossible);
+    }
+
+    public void ByCard(string stripeRefundId)
+    {
+        if (Method != OperationsPaymentMethod.Card || string.IsNullOrWhiteSpace(stripeRefundId) || stripeRefundId.Length > 60)
+        {
+            throw new DomainException(OperationsCardErrors.RefundNotPossible);
+        }
+
+        (Reference, Pending) = (stripeRefundId, false);
+    }
+
+    // Stripe refused: nothing went back to the card, so the invoice owes the refund again (the caller removes this record).
+    public void CardRefused(OperationsInvoice invoice, DateTimeOffset utcNow)
+    {
+        ArgumentNullException.ThrowIfNull(invoice);
+
+        if (!Pending || invoice.Id != InvoiceId)
+        {
+            throw new DomainException(OperationsCardErrors.RefundNotPossible);
+        }
+
+        invoice.Refunded(-Amount, utcNow);
+        Pending = false;
+    }
 }

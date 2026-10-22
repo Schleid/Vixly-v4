@@ -36,6 +36,9 @@ internal sealed class FakeIdentityServices : IOperationsPasswordHasher, IOperati
 
     public string? CorrelationId => "trace";
 
+    // Cloudflare's country for the request, when a test sets one (owner, 2026-10-21).
+    public string? Country { get; set; }
+
     public string Hash(string password) => "h:" + password;
 
     public OperationsPasswordCheck Verify(string password, string passwordHash) =>

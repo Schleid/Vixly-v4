@@ -89,6 +89,11 @@ public sealed class BillOperationsPickupUseCase
             return BillOperationsPickupResponse.Failure(OperationsPickupErrors.NotFound);
         }
 
+        if (!access!.HandlesMoneyAt(here))
+        {
+            return BillOperationsPickupResponse.Failure(OperationsPickupErrors.MoneyNotHandled);
+        }
+
         // A double click finds the bill the first click made (review); a later visit may bill again (new storage, new charges).
         if (request.RequestKey is { } key && view.Shipment.DestinationBillKey == key && view.DestinationInvoice is { } billed)
         {

@@ -10,14 +10,14 @@ namespace Vixly.Operations.Infrastructure.Platform;
 // FILE: OperationsPlanFeaturesClient.cs
 //
 // PURPOSE:
-// Reads the branding features of a tenant's plan from Platform's entitlements (W-4).
+// Reads the branding features and partner agents of a tenant's plan from Platform's entitlements (W-4, Slice 7 step 4).
 //
 // RESPONSIBILITIES:
 // - Keep each answer 5 minutes per tenant
-// - Answer "everything" when Platform cannot be reached, so the site never breaks
+// - Answer the branding features when Platform cannot be reached, so the site never breaks; partner agents stay off (R-8)
 //
 // IMPORTANT NOTES:
-// - A plan change shows on the site within 5 minutes
+// - A plan change shows on the site, and for partner agents, within 5 minutes
 // =========================================================
 public sealed class OperationsPlanFeaturesClient : IOperationsPlanFeatures
 {
@@ -51,19 +51,22 @@ public sealed class OperationsPlanFeaturesClient : IOperationsPlanFeatures
 
             if (info is null)
             {
-                return OperationsPlanFeatures.All;
+                return OperationsPlanFeatures.Unknown;
             }
 
             OperationsPlanFeatures features = new(
                 info.Features.Contains(OperationsPlanFeatures.Theme, StringComparer.Ordinal),
-                info.Features.Contains(OperationsPlanFeatures.Content, StringComparer.Ordinal));
+                info.Features.Contains(OperationsPlanFeatures.Content, StringComparer.Ordinal))
+            {
+                PartnerAgents = info.Features.Contains(OperationsPlanFeatures.Partners, StringComparer.Ordinal)
+            };
             _cache.Set(key, features, Lifetime);
             return features;
         }
         catch (OperationsPlatformUnavailableException exception)
         {
-            _logger.LogWarning(exception, "Plan features could not be read; the site shows the tenant's own choices.");
-            return OperationsPlanFeatures.All;
+            _logger.LogWarning(exception, "Plan features could not be read; the site shows the tenant's own choices and partner agents are refused.");
+            return OperationsPlanFeatures.Unknown;
         }
     }
 }

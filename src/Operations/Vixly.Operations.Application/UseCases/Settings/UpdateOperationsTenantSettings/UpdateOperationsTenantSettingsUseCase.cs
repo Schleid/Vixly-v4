@@ -93,6 +93,7 @@ public sealed class UpdateOperationsTenantSettingsUseCase
             // Slice 5F: the currency is fixed once an invoice exists.
             settings.ChangeCurrency(request.CurrencyCode, anyInvoice, utcNow);
             settings.ChangeWork(request.WeightUnit, request.DimensionUnit, request.AllowCollect, request.AllowCredit, request.DeliveryModes, utcNow);
+            settings.ChangePublicPricing(request.PublicPricing, utcNow);
             settings.ChangePrefixes(request.ShipmentPrefix, request.ReceivingPrefix, request.InvoicePrefix, request.PaymentPrefix, request.CustomerPrefix ?? settings.CustomerPrefix, request.ParcelPrefix ?? settings.ParcelPrefix,
                 request.SupplyOrderPrefix ?? settings.SupplyOrderPrefix, request.CreditNotePrefix ?? settings.CreditNotePrefix, request.BundlePrefix ?? settings.BundlePrefix,
                 request.BoxPrefix ?? settings.BoxPrefix, request.DispatchPrefix ?? settings.DispatchPrefix, utcNow);
@@ -127,6 +128,7 @@ public sealed class UpdateOperationsTenantSettingsUseCase
         dimension = settings.DimensionUnit.ToString(),
         collect = settings.AllowCollect,
         credit = settings.AllowCredit,
+        publicPricing = settings.PublicPricing,
         delivery = settings.DeliveryModes.ToString(),
         secondFactorForAll = settings.RequireSecondFactorForAllStaff,
         prefixes = new[] { settings.ShipmentPrefix, settings.ReceivingPrefix, settings.InvoicePrefix, settings.PaymentPrefix, settings.CustomerPrefix, settings.ParcelPrefix, settings.SupplyOrderPrefix, settings.CreditNotePrefix,

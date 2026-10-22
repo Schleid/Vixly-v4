@@ -91,7 +91,7 @@ public sealed class OperationsInvoicing
         string route = (origin?.Name ?? string.Empty) + " → "
             + (shipment.DestinationWarehouseId is { } to && warehouses.FirstOrDefault(warehouse => warehouse.Id == to) is { } destination ? destination.Name : shipment.DestinationCountryCode ?? string.Empty);
         return await IssueAsync(OperationsInvoiceKind.Shipment, customer, origin, shipment.Id, supplies?.Id, shipment.Number ?? string.Empty, route, shipment.ServiceCode, currencyCode, lines,
-            utcNow, cancellationToken);
+            utcNow, cancellationToken, shipment.FreightCollect);
     }
 
     // Slice 7 step 2 (R-4, R-10): a shipment's destination charges and storage, billed at the pickup counter of the warehouse; in the shipment invoice's currency.
@@ -144,7 +144,7 @@ public sealed class OperationsInvoicing
     }
 
     private async Task<OperationsInvoice?> IssueAsync(OperationsInvoiceKind kind, OperationsCustomer customer, OperationsWarehouse? warehouse, Guid? shipmentId, Guid? saleId, string reference,
-        string? route, string? serviceCode, string currencyCode, IReadOnlyList<OperationsInvoiceLine> lines, DateTimeOffset utcNow, CancellationToken cancellationToken)
+        string? route, string? serviceCode, string currencyCode, IReadOnlyList<OperationsInvoiceLine> lines, DateTimeOffset utcNow, CancellationToken cancellationToken, bool payAtDestination = false)
     {
         if (lines.Count == 0 || warehouse is null)
         {
@@ -156,7 +156,7 @@ public sealed class OperationsInvoicing
         OperationsInvoiceParty party = new((await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty, settings.TaxNumber, warehouse.Name, customer.Code,
             customer.FirstName + " " + customer.LastName, customer.CompanyName, customer.Phone, customer.Email.Value);
         OperationsInvoiceDraft draft = new(kind, customer.Id, warehouse.Id, shipmentId, saleId, reference, route, serviceCode, currencyCode, language, party, lines, settings.TaxName,
-            settings.TaxPerKind, settings.TaxRates, settings.InvoiceNote(language));
+            settings.TaxPerKind, settings.TaxRates, settings.InvoiceNote(language)) { PayAtDestination = payAtDestination };
         OperationsInvoice invoice = OperationsInvoice.Issue(customer.TenantId, await _numbering.NextAsync(OperationsNumberKind.Invoice, cancellationToken), draft,
             OperationsTimeZones.Today(utcNow, settings.TimeZone), utcNow);
         _billing.Add(invoice);

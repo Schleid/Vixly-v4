@@ -105,7 +105,8 @@ public sealed partial class OperationsInspectionHttpTests : IClassFixture<Operat
         Assert.Contains("Declaration names: Lithium batteries", queue, StringComparison.Ordinal);
         Assert.Contains("Set aside by staff: Box rattles", queue, StringComparison.Ordinal);
         Assert.DoesNotContain(glasses, queue, StringComparison.Ordinal);
-        Assert.Contains("2 waiting", queue, StringComparison.Ordinal);
+        Assert.Contains(batteries, queue, StringComparison.Ordinal);
+        Assert.Contains(books, queue, StringComparison.Ordinal);
 
         // Scanning the ID label opens its inspection; the page says what the list asks and that the declaration names it.
         string work = (await owner.GetAsync("/staff/inspection/queue?code=" + batteries)).Response.Headers.Location!.OriginalString;

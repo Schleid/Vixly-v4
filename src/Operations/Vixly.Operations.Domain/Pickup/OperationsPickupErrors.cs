@@ -47,4 +47,7 @@ public static class OperationsPickupErrors
     public static Error CodeWait { get; } = Error.Create("ops.pickup.code_wait");
 
     public static Error SettingsInvalid { get; } = Error.Create("ops.pickup.settings_invalid");
+
+    // Slice 7 step 4 (R-8): a partner agent whose partner does not handle money neither bills nor takes payments.
+    public static Error MoneyNotHandled { get; } = Error.Create("ops.pickup.money_not_handled");
 }

@@ -3,6 +3,8 @@ using Vixly.Operations.Domain.Branding;
 using Vixly.Operations.Domain.Customers;
 using Vixly.Operations.Domain.Identity;
 using Vixly.Operations.Domain.Locations;
+using Vixly.Shared.Kernel.Localization;
+using Vixly.Shared.Kernel.ValueObjects;
 
 namespace Vixly.Operations.Application.Customers;
 
@@ -176,6 +178,17 @@ public sealed class OperationsCustomerAccounts
         ArgumentNullException.ThrowIfNull(worded);
         string company = (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty;
         await _mailer.SendAsync(new OperationsCustomerMail(kind, customer.Email.Value, customer.FullName, customer.PreferredLanguage, company, link) { Extra = extra, Worded = worded },
+            cancellationToken);
+    }
+
+    // Review item 3: no account exists for a work email, so the mail goes to the address as typed, worded in the language chosen.
+    public async Task SendNotAllowedAsync(EmailAddress email, string? name, LanguageCode language, string portalSlug, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(email);
+        ArgumentNullException.ThrowIfNull(language);
+        string company = (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty;
+        string toName = string.IsNullOrWhiteSpace(name) ? email.Value : name.Trim();
+        await _mailer.SendAsync(new OperationsCustomerMail(OperationsCustomerMailKind.EmailNotAllowed, email.Value, toName, language, company, _links.Page(portalSlug, "/customer/sign-up")),
             cancellationToken);
     }
 

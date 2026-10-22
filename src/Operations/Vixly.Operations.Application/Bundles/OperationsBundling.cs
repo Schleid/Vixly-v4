@@ -55,13 +55,19 @@ public sealed class OperationsBundling
     }
 
     // Still to pay, waiting for finance or for the credit department: held from bundling (F-3). Charged to a credit account, it is released (K-4); a voided invoice asks nothing.
+    // May leave the origin: freight collect, or nothing unpaid (paid or billed on account) (owner, 2026-10-21).
+    public static bool MayLeave(OperationsShipment shipment, IEnumerable<Vixly.Operations.Domain.Billing.OperationsInvoice> invoices) =>
+        (shipment ?? throw new ArgumentNullException(nameof(shipment))).FreightCollect || !Unpaid(invoices);
+
     public static bool Unpaid(IEnumerable<Vixly.Operations.Domain.Billing.OperationsInvoice> invoices) =>
         invoices.Any(invoice => invoice.PaymentState is OperationsPaymentState.Unpaid or OperationsPaymentState.AwaitingConfirmation or OperationsPaymentState.AwaitingCredit);
 
+    // May move: paid, billed on account, or freight collect (owner, 2026-10-21: collect stops the hand-over at the destination, never the movement).
     public async Task<bool> PaidAsync(OperationsShipment shipment, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(shipment);
-        return !Unpaid(await _billing.ListShipmentInvoicesAsync(new[] { shipment.Id }, cancellationToken));
+
+        return shipment.FreightCollect || MayLeave(shipment, await _billing.ListShipmentInvoicesAsync(new[] { shipment.Id }, cancellationToken));
     }
 
     public static decimal VolumeCm3(OperationsParcel parcel) => (parcel.LengthCm ?? 0m) * (parcel.WidthCm ?? 0m) * (parcel.HeightCm ?? 0m);

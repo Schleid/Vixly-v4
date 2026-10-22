@@ -93,7 +93,7 @@ public sealed class OperationsWarehouseScopeTests
     public async Task ScopedGrant_GivesNoCompanyPowers()
     {
         OperationsAuthorizationContext lead = Staff(OperationsRoleScope.Warehouse, _a.Id, OperationsPermissions.StaffView, OperationsPermissions.StaffSuspend, OperationsPermissions.RolesGrant, OperationsPermissions.WarehousesView);
-        OperationsAccess access = new(_kit.Store, _roles, _kit.Store, _kit.Clock);
+        OperationsAccess access = new(_kit.Store, _roles, _kit.Store, _kit.Clock, _site, new FakePlanFeatures());
 
         foreach (string permission in new[] { OperationsPermissions.StaffView, OperationsPermissions.StaffSuspend, OperationsPermissions.RolesGrant })
         {
@@ -123,7 +123,7 @@ public sealed class OperationsWarehouseScopeTests
         return _kit.Context.WithUser(user.Id, Guid.NewGuid());
     }
 
-    private OperationsOwnerCheck Check() => new(_kit.Store, new OperationsAccess(_kit.Store, _roles, _kit.Store, _kit.Clock));
+    private OperationsOwnerCheck Check() => new(_kit.Store, new OperationsAccess(_kit.Store, _roles, _kit.Store, _kit.Clock, _site, new FakePlanFeatures()));
 
     private Task<ListOperationsLocationsResponse> List(OperationsAuthorizationContext context) =>
         new ListOperationsLocationsUseCase(_site, Check(), _kit.Store).ExecuteAsync(context, new ListOperationsLocationsRequest(), CancellationToken.None);

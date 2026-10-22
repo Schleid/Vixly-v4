@@ -281,6 +281,9 @@ public sealed class OperationsBundle : OperationsEntity
     }
 
     // An empty open bundle, or a closed one until it is on a manifest (D-8, owner A-4); its parcels go back to ready to bundle.
+    // The list changed (owner, 2026-10-21, review): a scan or a close at the same moment is refused by the row version, never misses the change.
+    public void ListChanged(DateTimeOffset utcNow) => MarkAsModified(utcNow);
+
     public void Void(string? reason, Guid userId, DateTimeOffset utcNow)
     {
         string? why = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();

@@ -1,0 +1,77 @@
+﻿@*
+=========================================================
+FILE: PricingPage.razor
+
+PURPOSE:
+The company's prices on the customer portal (owner, 2026-10-21): the customer's own prices first, then the regular prices.
+
+RESPONSIBILITIES:
+- Each price list in force: the service, the route, the bands with their price per lb, kg or size, the items and the fees
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10)
+- Tenant surface: never says "Vixly"; never another customer's prices
+=========================================================
+*@
+@using System.Globalization
+@using Vixly.Contracts.Operations.Customers
+@using Vixly.Contracts.Operations.Rates
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.pricing.title"]" SignedIn="true" Error="@Error" ReturnHere="/customer/pricing">
+    <p class="customer-portal__notice" role="note">@T["ui.pricing.intro"]</p>
+    @if (Pricing is { } pricing)
+    {
+        @if (pricing.Lists.Count == 0)
+        {
+            <p class="customer-portal__hint">@T["ui.pricing.none"]</p>
+        }
+        @foreach (CustomerPriceListDto list in pricing.Lists)
+        {
+            <section class="customer-portal__panel customer-pricing" aria-label="@Title(list)">
+                <h2>@Title(list)@if (list.Own) { <span class="customer-portal__status" data-status="own">@T["ui.pricing.own"]</span> }</h2>
+                <p class="customer-portal__hint">@VixlyText.Format(T, "ui.pricing.route", new Dictionary<string, object> { ["origin"] = list.Origin ?? T["ui.pricing.any_origin"].Value, ["destination"] = list.Destination ?? T["ui.pricing.any_destination"].Value })</p>
+                @if (list.Bands.Count > 0)
+                {
+                    <ul class="customer-pricing__bands">
+                        @foreach (CustomerRateBandDto band in list.Bands)
+                        {
+                            <li>@VixlyText.Format(T, "ui.estimate.band." + band.Kind, new Dictionary<string, object> { ["from"] = Number(band.From) + " " + Unit(list, pricing), ["amount"] = Money(band.Amount, pricing.CurrencyCode), ["base"] = Money(band.Base ?? 0m, pricing.CurrencyCode), ["unit"] = Unit(list, pricing) })</li>
+                        }
+                    </ul>
+                }
+                @if (list.Items.Count > 0)
+                {
+                    <ul class="customer-pricing__items">
+                        @foreach (CustomerPriceItemDto item in list.Items) { <li>@item.Name: @Money(item.Price, pricing.CurrencyCode)</li> }
+                    </ul>
+                }
+                <ul class="customer-pricing__fees">
+                    @if (list.PerPackage is { } perPackage) { <li>@T["ui.pricing.per_package"]: @Money(perPackage, pricing.CurrencyCode)</li> }
+                    @if (list.PerShipment is { } perShipment) { <li>@T["ui.pricing.per_shipment"]: @Money(perShipment, pricing.CurrencyCode)</li> }
+                    @if (list.MinimumCharge is { } minimum) { <li>@T["ui.pricing.minimum"]: @Money(minimum, pricing.CurrencyCode)</li> }
+                    @if (list.ServiceFee is { } service) { <li>@T["ui.pricing.service_fee"]: @Money(service, pricing.CurrencyCode)</li> }
+                    @if (list.ConsolidationFee is { } consolidation) { <li>@T["ui.pricing.consolidation_fee"]: @Money(consolidation, pricing.CurrencyCode)</li> }
+                </ul>
+                <p class="customer-portal__hint">@VixlyText.Format(T, "ui.pricing.since", "date", list.EffectiveFrom.ToString("d", CultureInfo.CurrentCulture))</p>
+            </section>
+        }
+        <p><a class="vx-button vx-button--secondary" href="/customer/rates">@T["ui.pricing.calculator"]</a></p>
+    }
+</CustomerShell>
+
+@code {
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public CustomerPricingDto? Pricing { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    private string Title(CustomerPriceListDto list) => list.ServiceLabel ?? (T["ui.rates.service." + list.ServiceCode] is { ResourceNotFound: false } name ? name.Value : list.ServiceCode);
+
+    private static string Unit(CustomerPriceListDto list, CustomerPricingDto pricing) => list.Basis == "Volume" ? (pricing.DimensionUnit == "in" ? "ft³" : "m³") : pricing.WeightUnit;
+
+    private static string Number(decimal value) => value.ToString("0.##", CultureInfo.CurrentCulture);
+
+    private static string Money(decimal value, string currency) => value.ToString("N2", CultureInfo.CurrentCulture) + " " + currency;
+}

@@ -46,7 +46,7 @@ public static class OperationsChargesEndpoints
 
         // [FromForm] turns on the antiforgery check; the band rows and item prices are read from the same form.
         staff.MapPost("/charges/cards", async (HttpContext http, [FromForm] Guid? card, [FromForm] string? service, [FromForm] string? origin, [FromForm] string? destination,
-            [FromForm] string? customer, [FromForm] string? customs, [FromForm] string? mode, [FromForm] string? active, SaveOperationsPriceListUseCase save,
+            [FromForm] string? customer, [FromForm] string? customs, [FromForm] string? mode, [FromForm] string? active, [FromForm] string? published, SaveOperationsPriceListUseCase save,
             GetOperationsChargesSetupUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
         {
             OperationsTransportMode tab = Mode(mode);
@@ -78,7 +78,8 @@ public static class OperationsChargesEndpoints
                 PerPackage = prices.PerPackage,
                 PerShipment = prices.PerShipment,
                 EffectiveFrom = prices.EffectiveFrom,
-                Active = active == "true"
+                Active = active == "true",
+                Published = published == "true"
             }, http.RequestAborted);
             return response.Succeeded ? Saved(tab) : await ChargesAsync(http, tab, response.Error, null, get, brand, errors);
         });

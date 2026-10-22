@@ -15,16 +15,17 @@ Events.PlatformTermsAcceptedEvent: tenantId:Guid, documentId:Guid, version:strin
 Internal.Billing.PlatformBillingDocumentInfo: kind:string, documentId:Guid, number:string, invoiceId:Guid, invoiceNumber:string, language:string, createdUtc:DateTimeOffset, fileUrl:string
 Internal.Billing.PlatformInvoiceInfo: invoiceId:Guid, number:string, kind:string, status:string, currencyCode:string, total:decimal, balance:decimal, paidTotal:decimal, issuedUtc:DateTimeOffset, dueUtc:DateTimeOffset, overdue:bool, creditPending:bool
 Internal.Billing.PlatformPayLinkInfo: url:string, expiresUtc:DateTimeOffset
-Internal.Devices.CompletePlatformDeviceLinkBody: token:string, name:string?, kind:string, publicKey:string?, replaceDeviceId:Guid?
+Internal.Devices.CompletePlatformDeviceLinkBody: token:string, name:string?, kind:string, publicKey:string?, replaceDeviceId:Guid?, ip:string?, userAgent:string?, country:string?
 Internal.Devices.CompletePlatformSecondFactorResetBody: token:string
-Internal.Devices.EnrolPlatformDeviceBody: name:string?, kind:string, publicKey:string?
+Internal.Devices.EnrolPlatformDeviceBody: name:string?, kind:string, publicKey:string?, ip:string?, userAgent:string?, country:string?
 Internal.Devices.PlatformDeviceChallengeInfo: challenge:string
-Internal.Devices.PlatformDeviceCheckInfo: allowed:bool, code:string?, access:string, newSecret:string?
+Internal.Devices.PlatformDeviceCheckInfo: allowed:bool, code:string?, access:string, newSecret:string?, name:string?, number:string?, country:string?
 Internal.Devices.PlatformDeviceEnrolmentInfo: deviceId:Guid, number:string, status:string, secret:string?
-Internal.Devices.PlatformDeviceInfo: deviceId:Guid, number:string, name:string, kind:string, proof:string, status:string, seatHeld:bool, reason:string?, requestedByName:string?, requestedUtc:DateTimeOffset, approvedUtc:DateTimeOffset?, releaseRequestedUtc:DateTimeOffset?, endedUtc:DateTimeOffset?, lastSeenUtc:DateTimeOffset?, idle:bool
+Internal.Devices.PlatformDeviceInfo: deviceId:Guid, number:string, name:string, kind:string, proof:string, status:string, seatHeld:bool, reason:string?, requestedByName:string?, requestedUtc:DateTimeOffset, approvedUtc:DateTimeOffset?, releaseRequestedUtc:DateTimeOffset?, endedUtc:DateTimeOffset?, lastSeenUtc:DateTimeOffset?, idle:bool, browser:string?, approvedByName:string?
 Internal.Devices.PlatformDeviceReleaseInfo: status:string, awaitsReview:bool
+Internal.Devices.PlatformDeviceSeatsInfo: seats:int, inUse:int, scheduledSeats:int?, scheduledUtc:DateTimeOffset?
 Internal.Devices.ReleasePlatformDeviceBody: reason:string
-Internal.Devices.VerifyPlatformDeviceBody: secret:string?, challenge:string?, signature:string?
+Internal.Devices.VerifyPlatformDeviceBody: secret:string?, challenge:string?, signature:string?, rotate:bool?, country:string?
 Internal.Entitlements.PlatformEntitlementsBatchBody: tenantIds:IReadOnlyList<Guid>
 Internal.Entitlements.PlatformEntitlementsBatchInfo: items:IReadOnlyList<PlatformEntitlementsInfo>
 Internal.Entitlements.PlatformEntitlementsInfo: tenantId:Guid, status:string?, access:string, features:IReadOnlyList<string>, limits:IReadOnlyDictionary<string,int>, nonPayment:PlatformNonPaymentPartInfo?, legal:PlatformEntitlementsLegalInfo?

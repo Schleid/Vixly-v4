@@ -1,0 +1,56 @@
+﻿@*
+=========================================================
+FILE: ScreenShell.razor
+
+PURPOSE:
+The full HTML document of the customer screen (Slice 5F step 3): large type, the company's name, nothing of the staff pages.
+
+RESPONSIBILITIES:
+- Render the document around a screen page
+- Reload the page when what the screen shows changes (ops-screen.js asks for the version every few seconds)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10), in the customer's language
+- Tenant surface: the company's name, never "Vixly"
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex" />
+    <title>@Company</title>
+    <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-theme.css" />
+    <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-primitives.css" />
+    <link rel="stylesheet" href="/css/ops-screen.css?v=20261022-1" />
+    @if (Version is not null)
+    {
+        <script src="/js/ops-screen.js?v=20261022-1" defer></script>
+        <noscript><meta http-equiv="refresh" content="5" /></noscript>
+    }
+</head>
+<body class="ops-screen" data-screen-version="@Version">
+    <header class="ops-screen__top"><span class="ops-screen__company">@Company</span></header>
+    <main class="ops-screen__main">
+        @if (Problem is not null)
+        {
+            <p class="ops-screen__problem" role="alert">@Problem</p>
+        }
+        @ChildContent
+    </main>
+</body>
+</html>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    // What the page shows; the script reloads it when the screen's version differs. Null on the pairing page.
+    [Parameter] public string? Version { get; set; }
+
+    [Parameter] public string? Problem { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

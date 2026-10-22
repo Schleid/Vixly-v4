@@ -102,9 +102,12 @@ public sealed class OperationsOnboardingHttpTests : IClassFixture<OperationsWebD
         Assert.Equal("/devices/waiting", (await laptop.GetAsync("/staff")).Response.Headers.Location?.OriginalString);
 
         // Approval needs a fresh authenticator code.
-        (HttpResponseMessage _, string devices) = await owner.GetAsync("/staff/devices");
-        Assert.Contains("Waiting for approval", devices, StringComparison.Ordinal);
-        string pending = Regex.Match(devices, "/staff/devices/(?<id>[0-9a-f-]{36})/decide").Groups["id"].Value;
+        // The Licences tab lists the request; its page approves it (owner, 2026-10-21).
+        (HttpResponseMessage _, string licences) = await owner.GetAsync("/staff/devices");
+        Assert.Contains("Requested", licences, StringComparison.Ordinal);
+        string pending = Regex.Match(licences, "data-status=\"pending\">[\\s\\S]*?/staff/devices/(?<id>[0-9a-f-]{36})\"").Groups["id"].Value;
+        (HttpResponseMessage _, string devices) = await owner.GetAsync("/staff/devices/" + pending);
+        Assert.Contains("/staff/devices/" + pending + "/decide", devices, StringComparison.Ordinal);
         (HttpResponseMessage _, string noCode) = await owner.PostAsync($"/staff/devices/{pending}/decide", devices, ("approve", "true"), ("code", "000000"));
         Assert.Contains("That code did not work. Try again.", noCode, StringComparison.Ordinal);
         (HttpResponseMessage approved, string _) = await owner.PostAsync($"/staff/devices/{pending}/decide", devices, ("approve", "true"), ("code", Code(key, DateTime.UtcNow.AddSeconds(30))));
@@ -128,8 +131,10 @@ public sealed class OperationsOnboardingHttpTests : IClassFixture<OperationsWebD
         using CookieClient owner = browser;
         await EnrolAsync(owner);
 
-        (HttpResponseMessage _, string devices) = await owner.GetAsync("/staff/devices");
-        string active = Regex.Match(devices, "/staff/devices/(?<id>[0-9a-f-]{36})/release").Groups["id"].Value;
+        (HttpResponseMessage _, string licences) = await owner.GetAsync("/staff/devices");
+        string active = Regex.Match(licences, "data-status=\"active\">[\\s\\S]*?/staff/devices/(?<id>[0-9a-f-]{36})\"").Groups["id"].Value;
+        (HttpResponseMessage _, string devices) = await owner.GetAsync("/staff/devices/" + active);
+        Assert.Contains("/staff/devices/" + active + "/release", devices, StringComparison.Ordinal);
         (HttpResponseMessage released, string _) = await owner.PostAsync($"/staff/devices/{active}/release", devices, ("reason", "lost_or_stolen"), ("code", Code(key, DateTime.UtcNow.AddSeconds(30))));
         Assert.Equal("/staff/devices?done=1", released.Headers.Location?.OriginalString);
         Assert.Equal("released", _host.Devices.StatusOf(Guid.Parse(active)));

@@ -126,7 +126,18 @@ public sealed class SaveOperationsWarehouseUseCase
 
             warehouse.ChangeOperation(request.TimeZone, request.ManagerUserId, utcNow);
             warehouse.ChangeDestination(new OperationsDestinationTerms(request.DeliversHome, request.HubWarehouseId, request.OperatedBy, request.PartnerName, request.PartnerPhone,
-                request.PartnerEmail, request.HomeArea) { ClearsCustoms = request.ClearsCustoms }, utcNow);
+                request.PartnerEmail, request.HomeArea) { ClearsCustoms = request.ClearsCustoms, PartnerHandlesMoney = request.PartnerHandlesMoney }, utcNow);
+
+            // One mailbox per company (owner, 2026-10-21): naming this one takes it from the other.
+            if (request.IsMailbox && !warehouse.IsMailbox)
+            {
+                foreach (OperationsWarehouse other in (await _locations.ListWarehousesAsync(cancellationToken)).Where(item => item.IsMailbox && item.Id != warehouse.Id))
+                {
+                    other.SetMailbox(false, utcNow);
+                }
+            }
+
+            warehouse.SetMailbox(request.IsMailbox, utcNow);
 
             // Added once every rule passed.
             if (created)
@@ -140,7 +151,7 @@ public sealed class SaveOperationsWarehouseUseCase
         }
 
         _audit.Record(context.UserId, request.WarehouseId is null ? "ops.locations.warehouse_created" : "ops.locations.warehouse_changed", nameof(OperationsWarehouse), warehouse.Id,
-            after: new { code = warehouse.Code, country = warehouse.Address.CountryCode, roles = warehouse.Roles.ToString(), status = warehouse.Status.ToString(), site = warehouse.ShowOnSite });
+            after: new { code = warehouse.Code, country = warehouse.Address.CountryCode, roles = warehouse.Roles.ToString(), status = warehouse.Status.ToString(), site = warehouse.ShowOnSite, mailbox = warehouse.IsMailbox });
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken)
             ? SaveOperationsWarehouseResponse.Success(warehouse.Id)

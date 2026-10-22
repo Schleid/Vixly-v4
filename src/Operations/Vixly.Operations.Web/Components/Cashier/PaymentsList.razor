@@ -29,7 +29,21 @@ IMPORTANT NOTES:
         }
         @foreach (OperationsRefund refund in Refunds)
         {
-            <li data-refund>@refund.Number · @T["ui.payments.refund"] · @OperationsPaymentWords.Method(T, refund.Method, Others) -@refund.Amount.ToString("N2", CultureInfo.CurrentCulture) · @refund.Reason</li>
+            <li data-refund>@refund.Number · @T["ui.payments.refund"] · @OperationsPaymentWords.Method(T, refund.Method, Others) -@refund.Amount.ToString("N2", CultureInfo.CurrentCulture) · @refund.Reason
+                @if (refund.Pending)
+                {
+                    @* Second review of 5F step 4: a card refund Stripe has not confirmed is sent again with its own key; Stripe makes it once. *@
+                    <form method="post" action="/staff/invoices/@refund.InvoiceId/refunds" data-refund-pending>
+                        <AntiforgeryToken />
+                        <input type="hidden" name="key" value="@refund.RequestKey.ToString("N")" />
+                        <input type="hidden" name="method" value="@refund.Method" />
+                        <input type="hidden" name="amount" value="@refund.Amount.ToString("0.00", CultureInfo.InvariantCulture)" />
+                        <input type="hidden" name="reason" value="@refund.Reason" />
+                        <strong>@T["ui.payments.refund_pending"]</strong>
+                        <button type="submit" class="vx-button vx-button--secondary">@T["ui.payments.refund_finish"]</button>
+                    </form>
+                }
+            </li>
         }
     </ul>
 </section>

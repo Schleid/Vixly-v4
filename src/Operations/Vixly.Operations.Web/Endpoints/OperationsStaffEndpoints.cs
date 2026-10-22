@@ -84,6 +84,24 @@ public static class OperationsStaffEndpoints
                 : StepUp(response.Error, "/staff/people") ?? await pages.ListAsync(http, null, 1, response.Error, null);
         });
 
+        // Slice 7 step 4 (R-8): a partner agent for a partner-operated warehouse.
+        staff.MapPost("/people/invite-partner", async (HttpContext http, [FromForm] string? fullName, [FromForm] string? email, [FromForm] string? language, [FromForm] Guid warehouseId,
+            InviteOperationsStaffMemberUseCase useCase, StaffPages pages) =>
+        {
+            InviteOperationsStaffMemberResponse response = await Unavailable(() => useCase.ExecuteAsync(OperationsCurrentUser.Context(http), new InviteOperationsStaffMemberRequest
+            {
+                FullName = fullName ?? string.Empty,
+                Email = email ?? string.Empty,
+                Language = language ?? "en",
+                PartnerWarehouseId = warehouseId,
+                PortalSlug = OperationsTenantMiddleware.Host(http)?.CanonicalSlug ?? string.Empty
+            }, http.RequestAborted));
+
+            return response.Succeeded
+                ? Results.Redirect("/staff/people/" + response.UserId + "?done=invited")
+                : StepUp(response.Error, "/staff/people") ?? await pages.ListAsync(http, null, 1, response.Error, null);
+        });
+
         staff.MapGet("/people/{userId:guid}", async (HttpContext http, Guid userId, string? done, StaffPages pages) =>
             await pages.MemberAsync(http, userId, null, Done(pages, done)));
 

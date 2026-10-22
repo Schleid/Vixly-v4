@@ -43,5 +43,8 @@ public enum OperationsNumberKind
     Box = 12,
 
     // Slice 6B: a dispatch (DSP by default).
-    Dispatch = 13
+    Dispatch = 13,
+
+    // Slice 7 step 3: a delivery route (RT).
+    Route = 14
 }

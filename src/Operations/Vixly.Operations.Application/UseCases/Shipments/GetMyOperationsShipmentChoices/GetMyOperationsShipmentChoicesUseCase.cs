@@ -66,7 +66,8 @@ public sealed class GetMyOperationsShipmentChoicesUseCase
         return GetMyOperationsShipmentChoicesResponse.Success(await _intake.OriginsAsync(signedIn.Customer, cancellationToken), branches,
             modes.HasFlag(OperationsDeliveryModes.Pickup), modes.HasFlag(OperationsDeliveryModes.HomeDelivery), signedIn.Customer.FullName, signedIn.Customer.Phone,
             await _intake.DestinationCountriesAsync(cancellationToken), await _intake.DestinationsAsync(cancellationToken), await _intake.InsuranceAsync(cancellationToken),
-            _timeProvider.GetUtcNow(), await _intake.CurrencyAsync(cancellationToken), await _intake.ServicesAsync(signedIn.Customer.Id, cancellationToken))
+            _timeProvider.GetUtcNow(), await _intake.CurrencyAsync(cancellationToken), await _intake.ServicesAsync(signedIn.Customer.Id, cancellationToken),
+            await _intake.AllowCollectAsync(cancellationToken))
             .WithLiability(await _liability.ListAsync(cancellationToken));
     }
 }

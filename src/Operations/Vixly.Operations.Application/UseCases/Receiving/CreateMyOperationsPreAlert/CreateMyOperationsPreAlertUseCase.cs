@@ -70,11 +70,11 @@ public sealed class CreateMyOperationsPreAlertUseCase
             return CreateMyOperationsPreAlertResponse.Failure(OperationsShipmentErrors.NotFound);
         }
 
-        // The warehouse: the shipment's origin, or one where the customer has a mailbox address (the only one when it is left out).
+        // The warehouse: the company's mailbox (owner, 2026-10-21), also for a shipment, which must leave from it.
         IReadOnlyList<OperationsChoice> origins = await _intake.OriginsAsync(signedIn.Customer, cancellationToken);
         Guid? warehouseId = shipment?.OriginWarehouseId ?? request.WarehouseId ?? (origins.Count == 1 ? origins[0].Id : null);
 
-        if (warehouseId is not { } warehouse || (shipment is null && !origins.Any(origin => origin.Id == warehouse)))
+        if (warehouseId is not { } warehouse || !origins.Any(origin => origin.Id == warehouse))
         {
             return CreateMyOperationsPreAlertResponse.Failure(OperationsShipmentErrors.OriginInvalid);
         }

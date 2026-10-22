@@ -34,6 +34,17 @@ internal sealed class CookieClient : IDisposable
 
     public string? Cookie(string name) => Cookies.GetCookies(_base)[name]?.Value;
 
+    // Sent with every later request (a browser's user agent, Cloudflare's country); none removes it.
+    public void Header(string name, string? value)
+    {
+        _client.DefaultRequestHeaders.Remove(name);
+
+        if (value is not null)
+        {
+            _client.DefaultRequestHeaders.TryAddWithoutValidation(name, value);
+        }
+    }
+
     public async Task<(HttpResponseMessage Response, string Html)> GetAsync(string path)
     {
         HttpResponseMessage response = await _client.GetAsync(path);

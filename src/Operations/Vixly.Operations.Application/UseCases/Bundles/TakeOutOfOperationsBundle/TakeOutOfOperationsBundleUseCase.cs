@@ -107,6 +107,13 @@ public sealed class TakeOutOfOperationsBundleUseCase
             return TakeOutOfOperationsBundleResponse.Failure(exception.Error);
         }
 
+        // On the bundle's list: missing again (owner, 2026-10-21).
+        foreach (OperationsBundleItem item in (await _bundles.ListOpenItemsAsync(leaving.Select(parcel => parcel.Id).ToList(), box is null ? Array.Empty<Guid>() : new[] { box.Id },
+            cancellationToken)).Where(item => item.BundleId == bundle.Id))
+        {
+            item.Unscanned(utcNow);
+        }
+
         foreach (OperationsParcel parcel in leaving)
         {
             parcel.Unpack(utcNow);

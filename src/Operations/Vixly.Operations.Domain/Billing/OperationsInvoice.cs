@@ -40,7 +40,7 @@ public sealed class OperationsInvoice : OperationsEntity
         Number = number;
         (Kind, CustomerId, WarehouseId, ShipmentId, SupplySaleId) = (draft.Kind, draft.CustomerId, draft.WarehouseId, draft.ShipmentId, draft.SupplySaleId);
         (Reference, Route, ServiceCode, CurrencyCode, Language, Party) = (draft.Reference, draft.Route, draft.ServiceCode, draft.CurrencyCode, draft.Language, draft.Party);
-        (TaxName, TaxPerKind, Note) = (draft.TaxName, draft.TaxPerKind, draft.Note);
+        (TaxName, TaxPerKind, Note, PayAtDestination) = (draft.TaxName, draft.TaxPerKind, draft.Note, draft.PayAtDestination);
         (IssuedOn, IssuedUtc, Status) = (issuedOn, utcNow, OperationsInvoiceStatus.Issued);
         _lines.AddRange(draft.Lines);
 
@@ -92,6 +92,9 @@ public sealed class OperationsInvoice : OperationsEntity
     public bool TaxPerKind { get; private set; }
 
     public string? Note { get; private set; }
+
+    // Freight collect: to pay at the destination; the shipment moves unpaid (owner, 2026-10-21).
+    public bool PayAtDestination { get; private set; }
 
     public DateOnly IssuedOn { get; private set; }
 

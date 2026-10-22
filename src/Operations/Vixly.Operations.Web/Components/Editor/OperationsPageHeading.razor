@@ -16,12 +16,12 @@ IMPORTANT NOTES: No workflow behavior or synthetic operational data.
 
     public static string Scene(string section) => section switch
     {
-        "receiving" or "locations" or "inspection_queue" or "bundles" or "dispatches" or "arrivals" or "pickup" => "warehouse",
+        "receiving" or "locations" or "inspection_queue" or "bundles" or "dispatches" or "arrivals" or "pickup" or "delivery" or "drive" => "warehouse",
         "parcels" or "shipments" or "events" => "parcel",
         "customers" or "staff" or "account" or "company" => "people",
         "charges" or "quotes" or "billing" or "audit" or "invoices" or "cashier" or "verify" or "credit" => "document",
         "roles" or "holds" or "devices" or "legal" => "security",
-        "settings" or "services" or "site" or "inspection_setup" or "invoice_settings" or "payment_settings" or "bundle_settings" or "credit_settings" or "carriers" or "event_settings" or "pickup_settings" => "settings",
+        "settings" or "services" or "site" or "inspection_setup" or "invoice_settings" or "payment_settings" or "bundle_settings" or "credit_settings" or "carriers" or "event_settings" or "pickup_settings" or "delivery_settings" => "settings",
         _ => "network"
     };
 }

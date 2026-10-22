@@ -26,13 +26,18 @@ IMPORTANT NOTES:
         <p>@Member.Email · @T["ui.staff.status." + Member.Status.ToString().ToLowerInvariant()] @(Member.StatusReason is null ? null : "· " + Member.StatusReason)</p>
         <p>@T[Member.HasSecondFactor ? "ui.staff.has_second_factor" : "ui.staff.no_second_factor"]</p>
         @if (Member.IsOwner) { <p><strong>@T["ui.staff.owner"]</strong></p> }
-        <p><a href="/staff/audit?actor=@Member.UserId">@T["ui.staff.activity"]</a></p>
+        <p><a href="/staff/audit?actor=@Member.UserId">@T["ui.staff.activity"]</a> · <a href="/staff/activity?member=@Member.UserId">@T["ui.staff.sign_ins"]</a></p>
     </section>
     </aside>
     <div class="ops-record-workflows">
     <section class="ops-editor__panel">
         <h2>@T["ui.staff.roles"]</h2>
-        @if (Member.Grants.Count == 0) { <p class="ops-editor__empty-message">@T["ui.editor.none"]</p> }
+        @if (Member.PartnerWarehouse is { } partnerAt)
+        {
+            <p><strong>@T["ui.staff.partner_agent"]</strong> <span>@partnerAt</span></p>
+            <p class="ops-editor__hint">@T["ui.staff.partner_agent_hint"]</p>
+        }
+        else if (Member.Grants.Count == 0) { <p class="ops-editor__empty-message">@T["ui.editor.none"]</p> }
         <ul class="ops-editor__list">
             @foreach (OperationsStaffGrant grant in Member.Grants)
             {
@@ -49,7 +54,7 @@ IMPORTANT NOTES:
                 </li>
             }
         </ul>
-        @if (!Member.IsOwner && Can(OperationsPermissions.RolesGrant))
+        @if (!Member.IsOwner && Member.PartnerWarehouse is null && Can(OperationsPermissions.RolesGrant))
         {
             <form method="post" action="/staff/people/@Member.UserId/grant" class="ops-editor__inline">
                 <AntiforgeryToken />

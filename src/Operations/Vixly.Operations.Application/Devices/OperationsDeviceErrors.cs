@@ -36,7 +36,11 @@ public static class OperationsDeviceErrors
 
     public static Error Refused { get; } = Error.Create("ops.devices.refused");
 
-    public static IReadOnlyList<string> Kinds { get; } = new[] { "pc", "phone", "tablet", "scanner", "other" };
+    // Every type Platform knows (devices registered before 2026-10-21 keep theirs).
+    public static IReadOnlyList<string> Kinds { get; } = new[] { "pc", "phone", "tablet", "scanner", "other", "desktop", "laptop" };
+
+    // Owner, 2026-10-21: a new device is a desktop, a laptop or a mobile (phone); the type may serve security later.
+    public static IReadOnlyList<string> Offered { get; } = new[] { "desktop", "laptop", "phone" };
 
     public const int NameMaxLength = 60;
 }

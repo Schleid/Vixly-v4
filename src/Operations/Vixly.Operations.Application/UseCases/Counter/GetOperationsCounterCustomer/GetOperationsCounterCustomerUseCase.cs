@@ -73,6 +73,7 @@ public sealed class GetOperationsCounterCustomerUseCase
         return GetOperationsCounterCustomerResponse.Success(OperationsCounterCustomer.Of(customer), await _desk.ShipmentsAsync(customer.Id, counters, cancellationToken), origins,
             await _intake.DestinationsAsync(cancellationToken), await _intake.ServicesAsync(customer.Id, cancellationToken), await _intake.InsuranceAsync(cancellationToken),
             await _intake.DeliveryModesAsync(cancellationToken), await _desk.StandingAsync(customer, cancellationToken), await _intake.CurrencyAsync(cancellationToken), _intake.UtcNow,
-            (await _supplies.ListCustomerOrdersAsync(customer.Id, 20, cancellationToken)).Where(order => counters.Any(counter => counter.Id == order.WarehouseId)).Take(10).ToList());
+            (await _supplies.ListCustomerOrdersAsync(customer.Id, 20, cancellationToken)).Where(order => counters.Any(counter => counter.Id == order.WarehouseId)).Take(10).ToList(),
+            await _intake.AllowCollectAsync(cancellationToken));
     }
 }

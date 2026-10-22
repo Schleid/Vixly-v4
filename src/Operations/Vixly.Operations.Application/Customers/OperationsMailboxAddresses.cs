@@ -10,14 +10,22 @@ namespace Vixly.Operations.Application.Customers;
 // Works out a customer's mailbox addresses from the receiving warehouses (Slice 2, D-C2).
 //
 // RESPONSIBILITIES:
-// - One address per active receiving warehouse that accepts deliveries
+// - One address: the company's mailbox warehouse (owner, 2026-10-21), never one per warehouse
 //
 // IMPORTANT NOTES:
-// - Computed, never stored: a new warehouse appears for every customer at once
+// - Computed, never stored: a new mailbox shows for every customer at once
+// - Counter drop-offs still happen at any receiving warehouse (owner, 2026-10-21)
 // - No code yet (unconfirmed email): no address
 // =========================================================
 public static class OperationsMailboxAddresses
 {
+    // The customers' mailbox: the warehouse named as such, else the oldest one that could be (never none while one could be).
+    public static OperationsWarehouse? Mailbox(IEnumerable<OperationsWarehouse> warehouses)
+    {
+        List<OperationsWarehouse> eligible = (warehouses ?? throw new ArgumentNullException(nameof(warehouses))).Where(warehouse => warehouse.CanBeMailbox).ToList();
+        return eligible.FirstOrDefault(warehouse => warehouse.IsMailbox) ?? eligible.OrderBy(warehouse => warehouse.CreatedUtc).ThenBy(warehouse => warehouse.Code, StringComparer.Ordinal).FirstOrDefault();
+    }
+
     public static IReadOnlyList<OperationsMailboxAddress> For(OperationsCustomer customer, IEnumerable<OperationsWarehouse> warehouses)
     {
         ArgumentNullException.ThrowIfNull(customer);
@@ -28,9 +36,8 @@ public static class OperationsMailboxAddresses
             return Array.Empty<OperationsMailboxAddress>();
         }
 
-        return warehouses
-            .Where(warehouse => warehouse.Status == OperationsLocationStatus.Active && warehouse.AcceptingDeliveries && warehouse.Roles.HasFlag(OperationsWarehouseRoles.Receiving))
-            .OrderBy(warehouse => warehouse.Name, StringComparer.CurrentCulture)
+        // One mailbox per company (owner, 2026-10-21): the warehouse named as the mailbox, or the first one that could be.
+        return (Mailbox(warehouses) is { } mailbox ? new[] { mailbox } : Array.Empty<OperationsWarehouse>())
             .Select(warehouse => new OperationsMailboxAddress(
                 warehouse.Id,
                 warehouse.Name,

@@ -72,6 +72,10 @@ IMPORTANT NOTES:
         }
     </form>
     }
+    @if (Card is { Succeeded: true } card)
+    {
+        <CardSettingsPanel Card="card" WebhookUrl="@WebhookUrl" />
+    }
 </EditorShell>
 
 @code {
@@ -80,6 +84,11 @@ IMPORTANT NOTES:
     [Parameter] public OperationsTenantSettings? Settings { get; set; }
 
     [Parameter] public bool CanEdit { get; set; }
+
+    // Slice 5F step 4: the company's Stripe account and readers.
+    [Parameter] public GetOperationsCardSettingsResponse? Card { get; set; }
+
+    [Parameter] public string WebhookUrl { get; set; } = string.Empty;
 
     [Parameter] public string? Error { get; set; }
 

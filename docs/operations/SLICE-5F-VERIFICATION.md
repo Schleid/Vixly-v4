@@ -146,3 +146,87 @@ New: the account rules (limit, terms, hold and close), the charge (released, sti
 ### Styling
 
 New screens in the [UI styling inventory](UI-STYLING-INVENTORY.md) as *Needs styling*: Credit accounts, Credit account, Charges to approve, Credit settings; the cashier invoice, the customer record and the portal invoices noted.
+
+## 9. Step 4: Stripe cards (S-1 to S-8)
+
+### What was built
+
+- **Settings → Payments → Cards** (`#cards`): the company's Stripe keys (secret or restricted, publishable, webhook signing secret), checked with Stripe, kept protected and shown only by their last characters; the webhook address to add in Stripe; *Accept cards*; readers named per warehouse; *Disconnect*. Connecting and disconnecting ask for the second check.
+- **At the cashier:** *Card: payment page (QR code)* and *Card on <reader>*; the card payment page (`/staff/cashier/card/{id}`) with the QR code or the reader's state, refreshing itself until Stripe says paid; *Cancel*.
+- **On the portal:** *Pay by card* on an invoice owed, Stripe's page, back to the portal's card page that says paid once Stripe confirms.
+- **The webhook** (`POST /hooks/stripe` on the company's own address): signature checked with that company's secret, stale events refused, rate limited per host, 64 KB at most; a payment recorded once, as a card tender with Stripe's reference.
+- **Refunds by card** through Stripe, pending until Stripe confirms, with *Finish the refund* when Stripe did not answer.
+
+### Database
+
+**CardProviders** (one per company: protected keys, key hint, live or test, account name), **CardReaders** (warehouse, label, Stripe id), **CardCharges** (invoice, channel, amount, Stripe page and payment, live or test, state; one started charge per invoice by a filtered unique index); **Refunds** gain `Pending`. One migration, `CardPayments`.
+
+### Independent review and fixes
+
+Two passes. Fixed:
+
+| # | Finding | Fix |
+|---|---|---|
+| 1 | A cancelled charge could still be paid on Stripe's page and never be recorded | Cancel expires the page or cancels the payment at Stripe first; already paid there, the payment is recorded; a late payment on a cancelled charge is still recorded |
+| 2 | A card refund made at Stripe could be lost if the save after it failed, or made twice | Kept as *pending* before Stripe is asked, Stripe's idempotency key is the refund; refused, it is removed; unanswered or not saved, *Finish the refund* asks Stripe again with the same key |
+| 3 | The webhook answered 200 when recording failed, so Stripe stopped retrying | It answers 400 and Stripe retries |
+| 4 | Disconnecting or changing the account left open charges payable on an account no longer read | Open charges are closed at Stripe first, or the change is refused (*a card payment could not be closed*) |
+| 5 | Test and live payments were not told apart | Each charge keeps its mode; a payment from the other mode is audited and never applied |
+| 6 | Cancel could close a charge locally while Stripe was still processing it | Closed only when Stripe confirms it paid or over |
+| 7 | Whole-unit currencies (JPY and others) could be charged or refunded with cents | Refused |
+| 8 | A partner agent could refund, see or cancel card payments where the partner does not handle money | Refused |
+| 9 | Stripe refunds were looked up without tracking, so a pending one could not be settled | Tracked |
+
+Left as is (for the owner): a payment arriving for an invoice already settled another way is kept as *paid, not applied* and refunded in Stripe's dashboard; a charge started in the same instant as a disconnect could stay open on the old account; the restricted key's permissions and the webhook secret are not tested with Stripe when pasted (a wrong secret shows as payments not confirmed); the return address is the company's own host.
+
+### Tests
+
+All suites pass: domain 256, application 97, infrastructure 69, web 111, API 33, customer web 40, customer infrastructure 1, architecture 13 693, platform domain 308, application 236, infrastructure 63, web 43, API 21, public web 23.
+
+New: `OperationsStripeGatewayTests` (signature and age, amounts in the smallest unit, the idempotency key, refusals and outages told without the key); `Cards_ConnectStripe_PayOnThePageOrAReader_OnlyOnStripesWord` (web: keys refused then kept and never shown, a reader, the QR page, the webhook refused unsigned or wrongly signed and recorded once, a reader payment found by asking Stripe, a card refund with Stripe silent then finished once, a page paid before its cancel recorded as paid, disconnecting closes an open page, cards turned off); `Customer_PaysTheirInvoiceByCard_OnStripesPage_NeverAnothersInvoice` (API); the pending refund rules (domain).
+
+### Styling
+
+New in the [UI styling inventory](UI-STYLING-INVENTORY.md) as *Needs styling*: the card payment page (staff) and the portal card page; *Changed*: the payment settings (card panel) and the cashier invoice (card panel, pending refund).
+
+## 10. Step 3: the customer screen (T-1 to T-7)
+
+### What was built
+
+- **Customer screens** (`/staff/screens`, linked from the cashier): add a screen to a warehouse with a name and get its one-use code (10 characters, 15 minutes); the list with each screen's state (waiting for its code, paired and last seen) and what it shows; *New code* (the old tablet stops at once); *Remove*.
+- **The screen** (`/screen` on the company's own address): the code typed once, then a secret in a host-only cookie for 400 days; no sign-in, no licence. It shows welcome, the invoice with *Pay by card* and *Pay with Zelle* (never cash), the Zelle warning and terms, then the Zelle details and QR picture, Stripe's page as a QR code and a link, the declaration to sign, and thank you, in the customer's language. It reloads itself when what it shows changes.
+- **The clerk's side:** *Send to pay* on the cashier invoice and *Send to sign* on the counter shipment, one per screen of that warehouse, with what the screen shows now and *Clear · next customer*; the Zelle acceptance shown while the screen is on that invoice.
+- **At the cashier:** a Zelle payment needs no tick from the clerk when the customer accepted the same terms on a screen for that invoice in the last 4 hours.
+- **The signature** on the screen is the shipment's own (Slice 5D): on the declaration PDF, with the clerk who sent it as the one present.
+
+### Database
+
+**CustomerScreens** (warehouse, name, secret and pairing code as hashes with filtered unique indexes, code expiry, what it shows, who sent it, when last seen) and **ScreenRecords** (the customer's Zelle acceptances: invoice, screen, clerk, language, a hash of the terms read). One migration, `CustomerScreens`.
+
+### Independent review and fixes
+
+No high finding left. Fixed:
+
+| # | Finding | Fix |
+|---|---|---|
+| 1 | A declaration changed after it was sent could be signed from the page shown before | The screen's version includes the shipment; a signature from an older page is refused and the screen reloads |
+| 2 | *Pay by card* on the screen cancelled a card-reader or portal payment already started | Refused while one is started; only a payment page for the same amount is shown again |
+| 3 | A Zelle acceptance counted for that invoice forever, whatever the terms became | It counts for 4 hours and only for the terms the customer read |
+| 4 | Waiting for a card, every poll asked Stripe, and its save was tied to the screen's own | Stripe is asked when the page opens and about once a minute; the screen is saved apart |
+| 5 | The last customer's invoice or declaration stayed on the screen for the next one | Paid: thank you, then clear after a minute; anything sent clears after 20 minutes |
+| 6 | Paying on one's own phone from the QR code ended on the pairing form | A thank-you page |
+| 7 | An invoice with nothing owed or voided could be sent | Refused |
+| 8 | Some refusals showed no message, or in the browser's language | Allowed and written in the customer's language; *es-MX* and the like read as *es* |
+| 9 | The signature size differed between the address and the rule | One limit (200 KB) |
+
+Left as is (for the owner): rights are checked when the clerk sends, not again while the customer acts (bounded by the 20 minutes); after *Back* from the card, Stripe's page stays payable from the customer's phone (a payment then is recorded, or refunded if the invoice was paid another way); the guidance tells the company to pair the tablet in a browser where no one is signed in to the staff site.
+
+### Tests
+
+All suites pass: domain 259, application 97, infrastructure 69, web 112, API 33, customer web 40, customer infrastructure 1, architecture 13 823, platform domain 308, application 236, infrastructure 63, web 43, API 21, public web 23.
+
+New: the screen rules (pairing once with an expiring code, a new code stops the old screen, steps only from where they are offered, terms before the Zelle details, tidying itself) (domain); `CustomerScreen_PairedByCode_PaysAndSigns_OnlyWhatTheClerkSent` (web: the code shown once and kept as a hash, a wrong code and a used code refused, an unpaired browser gets nothing, the invoice sent and shown with card and Zelle and never cash, the version, an old choice refused, the QR picture only after the terms, the cashier's Zelle payment counting the customer's acceptance, the screen saying paid, a second invoice paid by card on Stripe's page with the screen's return address, the thank-you on a phone, the declaration signed, a signature from a page shown before a change refused, clear and remove).
+
+### Styling
+
+New in the [UI styling inventory](UI-STYLING-INVENTORY.md) as *Needs styling*: Customer screens (staff), the screen send panel, and the customer screen pages (pairing, welcome, invoice, Zelle terms, Zelle, card, declaration, thank you).

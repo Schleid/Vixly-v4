@@ -46,7 +46,8 @@ public sealed class OperationsStaffDirectory
                 grants.Where(grant => grant.UserId == user.Id && grant.IsActive && roles.ContainsKey(grant.RoleId))
                     .Select(grant => new OperationsStaffGrant(grant.Id, grant.RoleId, roles[grant.RoleId].Name, roles[grant.RoleId].IsAdministrator, grant.Scope, grant.ScopeId,
                         grant.ScopeId is { } scope && places.TryGetValue(scope, out string? name) ? name : null, grant.GrantedUtc))
-                    .ToList()))
+                    .ToList(),
+                user.PartnerWarehouseId is { } partner ? places.GetValueOrDefault(partner, string.Empty) : null))
             .ToList();
     }
 }

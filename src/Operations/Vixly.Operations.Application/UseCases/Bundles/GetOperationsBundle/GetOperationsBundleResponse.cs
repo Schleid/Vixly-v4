@@ -49,9 +49,14 @@ public sealed class GetOperationsBundleResponse
 
     public decimal? Target { get; private init; }
 
-    public static GetOperationsBundleResponse Success(OperationsBundle bundle, OperationsWarehouse warehouse, OperationsWarehouse? destination, IReadOnlyList<OperationsBundleParcelRow> parcels, IReadOnlyList<OperationsBundleShipmentLine> shipments, OperationsBundleShipmentLine? focus, bool canManage, bool canFill, Vixly.Operations.Domain.Settings.OperationsWeightUnit weightUnit, Vixly.Operations.Domain.Settings.OperationsDimensionUnit dimensionUnit, decimal? target)
+    // The bundle's list (owner, 2026-10-21): its lines, and what may be added from the computer.
+    public IReadOnlyList<OperationsBundleListRow> List { get; private init; } = Array.Empty<OperationsBundleListRow>();
+
+    public IReadOnlyList<OperationsBundleCandidate> Candidates { get; private init; } = Array.Empty<OperationsBundleCandidate>();
+
+    public static GetOperationsBundleResponse Success(OperationsBundle bundle, OperationsWarehouse warehouse, OperationsWarehouse? destination, IReadOnlyList<OperationsBundleParcelRow> parcels, IReadOnlyList<OperationsBundleShipmentLine> shipments, OperationsBundleShipmentLine? focus, bool canManage, bool canFill, Vixly.Operations.Domain.Settings.OperationsWeightUnit weightUnit, Vixly.Operations.Domain.Settings.OperationsDimensionUnit dimensionUnit, decimal? target, IReadOnlyList<OperationsBundleListRow>? list = null, IReadOnlyList<OperationsBundleCandidate>? candidates = null)
     {
-        return new GetOperationsBundleResponse { Succeeded = true, Bundle = bundle, Warehouse = warehouse, Destination = destination, Parcels = parcels, Shipments = shipments, Focus = focus, CanManage = canManage, CanFill = canFill, WeightUnit = weightUnit, DimensionUnit = dimensionUnit, Target = target };
+        return new GetOperationsBundleResponse { Succeeded = true, Bundle = bundle, Warehouse = warehouse, Destination = destination, Parcels = parcels, Shipments = shipments, Focus = focus, CanManage = canManage, CanFill = canFill, WeightUnit = weightUnit, DimensionUnit = dimensionUnit, Target = target , List = list ?? Array.Empty<OperationsBundleListRow>(), Candidates = candidates ?? Array.Empty<OperationsBundleCandidate>() };
     }
 
     public static GetOperationsBundleResponse Failure(Error error)

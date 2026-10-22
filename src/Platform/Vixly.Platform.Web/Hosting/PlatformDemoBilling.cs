@@ -85,6 +85,22 @@ public sealed class PlatformDemoBilling
         {
             PlatformSubscription? subscription = await _subscriptions.GetCurrentAsync(item.PlatformTenantId, cancellationToken);
 
+            // Awaiting its first payment (seeded without the outbox, so no invoice was ever issued): the Operations demo companies are paid,
+            // the others get their first-period invoice, as the billing handler would issue it (owner's report, 2026-10-21).
+            if (subscription is { Status: PlatformSubscriptionStatus.PendingPayment, PeriodStartUtc: null })
+            {
+                if (PlatformDemoTenants.OperationsSlugs.Contains(item.Slug))
+                {
+                    _subscriptions.AddEvents(new[] { subscription.RecordOfflinePayment("Bank transfer received (demo).", actor, now) });
+                    await SaveAsync(cancellationToken);
+                }
+                else
+                {
+                    issued += await FirstPeriodAsync(item, subscription, cancellationToken) ? 1 : 0;
+                    continue;
+                }
+            }
+
             if (subscription is not { Status: PlatformSubscriptionStatus.Active or PlatformSubscriptionStatus.PastDue or PlatformSubscriptionStatus.PendingPayment, PeriodStartUtc: { } start }
                 || await _tenantRecords.GetAsync(item.PlatformTenantId, cancellationToken) is not { } tenant
                 || await _plans.GetAsync(subscription.PlatformPlanId, cancellationToken) is not { } plan
@@ -134,6 +150,48 @@ public sealed class PlatformDemoBilling
         }
 
         return $"Demo billing: issued {issued} invoice(s), {paid} paid in full.";
+    }
+
+    private async Task<bool> FirstPeriodAsync(PlatformTenantListItem item, PlatformSubscription subscription, CancellationToken cancellationToken)
+    {
+        string sourceKey = "demo-first:" + subscription.Id.ToString("N", CultureInfo.InvariantCulture);
+
+        if (await _billing.Invoices.SourceBilledAsync(sourceKey, cancellationToken) || await _billing.Invoices.FindOpenFirstPeriodAsync(item.PlatformTenantId, cancellationToken) is not null
+            || await _tenantRecords.GetAsync(item.PlatformTenantId, cancellationToken) is not { } tenant
+            || await _plans.GetAsync(subscription.PlatformPlanId, cancellationToken) is not { } plan
+            || plan.Versions.FirstOrDefault(version => version.Id == subscription.PlanVersionId) is not { } version)
+        {
+            return false;
+        }
+
+        Dictionary<string, string> arguments = new(StringComparer.Ordinal)
+        {
+            ["plan"] = plan.NameIn(tenant.DefaultLanguage),
+            ["term"] = subscription.Term.ToString(),
+            ["licences"] = subscription.Licences.ToString(CultureInfo.InvariantCulture)
+        };
+        List<PlatformInvoiceDraftLine> lines = new()
+        {
+            new PlatformInvoiceDraftLine(PlatformInvoiceLineKind.PlanPeriod, "ui.invoice_line.plan_period", arguments, subscription.Licences, version.PricePerLicence(subscription.Term))
+        };
+
+        if (!subscription.SetupFeeCharged && subscription.SetupFeeFor(version) is > 0m and decimal fee)
+        {
+            lines.Add(new PlatformInvoiceDraftLine(PlatformInvoiceLineKind.SetupFee, "ui.invoice_line.setup_fee",
+                new Dictionary<string, string>(StringComparer.Ordinal) { ["plan"] = plan.NameIn(tenant.DefaultLanguage) }, 1m, fee));
+        }
+
+        try
+        {
+            await _issuer.IssueAsync(tenant, subscription.Id, PlatformInvoiceKind.FirstPeriod, sourceKey, version.CurrencyCode, null, null, lines, cancellationToken);
+            await SaveAsync(cancellationToken);
+            return true;
+        }
+        catch (DomainException)
+        {
+            _unitOfWork.DiscardChanges();
+            return false;
+        }
     }
 
     private async Task AddProfileAndRatesAsync(Guid actor, DateTimeOffset now, CancellationToken cancellationToken)

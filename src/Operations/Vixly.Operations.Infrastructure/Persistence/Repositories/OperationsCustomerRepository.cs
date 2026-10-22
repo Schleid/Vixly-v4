@@ -54,6 +54,12 @@ internal sealed class OperationsCustomerRepository : IOperationsCustomerReposito
     public Task<OperationsCustomer?> FindByEmailAsync(EmailAddress email, CancellationToken cancellationToken) =>
         _context.Customers.FirstOrDefaultAsync(customer => customer.Email == email, cancellationToken);
 
+    // Across companies on purpose (one of two reviewed cross-tenant reads, design note item 3); only a yes or a no leaves this method.
+    // Only a confirmed account that is not closed holds the email: an unconfirmed sign-up blocks nobody.
+    public Task<bool> IsCustomerEmailAnywhereAsync(EmailAddress email, CancellationToken cancellationToken) =>
+        _context.Customers.IgnoreQueryFilters().AnyAsync(customer => customer.Email == email && customer.EmailVerifiedUtc != null
+            && customer.Status != OperationsCustomerStatus.Closed, cancellationToken);
+
     public Task<OperationsCustomerSession?> FindSessionAsync(string tokenHash, CancellationToken cancellationToken) =>
         _context.CustomerSessions.FirstOrDefaultAsync(session => session.TokenHash == tokenHash, cancellationToken);
 

@@ -104,5 +104,6 @@ public sealed class OperationsCounterDesk
             shipment.CreatedAtCounter,
             shipment.Options.HasFlag(OperationsShipmentOptions.Insured),
             shipment.InsurancePlanId,
-            shipment.CustomerSignedUtc);
+            shipment.CustomerSignedUtc,
+            shipment.OriginWarehouseId);
 }

@@ -46,5 +46,12 @@ public enum OperationsCustomerMailKind
     // Slice 7 step 2 (R-5, R-10): the pickup code, and the reminders of a shipment waiting at its destination.
     PickupCode = 19,
     PickupReminder = 20,
-    PickupFinalNotice = 21
+    PickupFinalNotice = 21,
+
+    // Slice 7 step 3 (R-7, R-15): out for delivery today, with the delivery code when the company asks for one.
+    OutForDelivery = 22,
+    OutForDeliveryCode = 23,
+
+    // Review item 3: a work email tried to open a customer account.
+    EmailNotAllowed = 24
 }

@@ -57,5 +57,8 @@ public interface IOperationsLabelRenderer
 
     byte[] RenderShipperLetter(Vixly.Operations.Application.Dispatch.OperationsShipperLetter letter);
 
+    // Slice 7 step 3: a delivery route's run sheet, on Letter paper.
+    byte[] RenderRunSheet(Vixly.Operations.Application.Delivery.OperationsRunSheet sheet);
+
     byte[] RenderSupplyLabels(Vixly.Operations.Application.Supplies.OperationsSupplyLabel label, int count);
 }

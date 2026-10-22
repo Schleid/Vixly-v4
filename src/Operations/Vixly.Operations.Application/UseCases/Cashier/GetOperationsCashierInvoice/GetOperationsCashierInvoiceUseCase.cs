@@ -38,6 +38,8 @@ public sealed class GetOperationsCashierInvoiceUseCase
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly IOperationsCardRepository _cards;
+
     public GetOperationsCashierInvoiceUseCase(
         OperationsBillingDesk desk,
         IOperationsBillingRepository billing,
@@ -45,8 +47,10 @@ public sealed class GetOperationsCashierInvoiceUseCase
         IOperationsSettingsRepository settings,
         IOperationsCreditRepository credit,
         OperationsCreditBook book,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IOperationsCardRepository cards)
     {
+        _cards = cards ?? throw new ArgumentNullException(nameof(cards));
         _desk = desk ?? throw new ArgumentNullException(nameof(desk));
         _billing = billing ?? throw new ArgumentNullException(nameof(billing));
         _payments = payments ?? throw new ArgumentNullException(nameof(payments));
@@ -83,6 +87,9 @@ public sealed class GetOperationsCashierInvoiceUseCase
         return GetOperationsCashierInvoiceResponse.Success(invoice, settings, OperationsPaymentNames.Accepted(settings),
             await _payments.FindOpenDrawerAsync(access!.User.Id, invoice.WarehouseId, cancellationToken),
             await _payments.ListInvoicePaymentsAsync(invoice.Id, cancellationToken), await _payments.ListInvoiceRefundsAsync(invoice.Id, cancellationToken),
-            invoice.Refundable > 0m && access.CoversWarehouse(OperationsPermissions.PaymentsRefund, at.Id, at.BranchId), account, position);
+            invoice.Refundable > 0m && access.CoversWarehouse(OperationsPermissions.PaymentsRefund, at.Id, at.BranchId), account, position,
+            settings.Accepts(OperationsPaymentMethod.Card) && access.HandlesMoneyAt(at) && await _cards.GetProviderAsync(cancellationToken) is not null,
+            (await _cards.ListReadersAsync(cancellationToken)).Where(reader => reader.WarehouseId == at.Id)
+                .Select(reader => new Vixly.Operations.Application.Cards.OperationsCardReaderRow(reader.Id, reader.Label, reader.StripeReaderId, at.Id, at.Name)).ToList());
     }
 }

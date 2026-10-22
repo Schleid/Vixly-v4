@@ -23,7 +23,7 @@ IMPORTANT NOTES:
 <div class="vx-field">
     <label for="device-kind" class="vx-label">@T["ui.devices.kind"]</label>
     <select id="device-kind" name="kind" class="vx-input">
-        @foreach (string kind in Vixly.Operations.Application.Devices.OperationsDeviceErrors.Kinds)
+        @foreach (string kind in Vixly.Operations.Application.Devices.OperationsDeviceErrors.Offered)
         {
             <option value="@kind">@T["ui.devices.kind." + kind]</option>
         }

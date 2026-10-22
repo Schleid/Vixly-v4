@@ -23,5 +23,8 @@ public enum OperationsPaymentMethod
     // The company's own named methods (MonCash, Natcash...).
     Other1 = 5,
     Other2 = 6,
-    Other3 = 7
+    Other3 = 7,
+
+    // Slice 5F step 4: a card through the company's Stripe account, recorded only once Stripe says it is paid.
+    Card = 8
 }

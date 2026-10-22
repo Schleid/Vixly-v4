@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Vixly.Operations.Application.Settings;
 using Vixly.Operations.Application.UseCases.Audit.ListOperationsAuditEntries;
+using Vixly.Operations.Application.UseCases.Audit.ListOperationsMemberActivity;
 using Vixly.Operations.Application.UseCases.Settings.GetOperationsTenantSettings;
 using Vixly.Operations.Application.UseCases.Settings.ListOperationsShippingServices;
 using Vixly.Operations.Application.UseCases.Settings.SaveOperationsShippingServices;
@@ -43,7 +44,7 @@ public static class OperationsSettingsEndpoints
             await PageAsync(http, get, brand, text, null, done is null ? null : texts["ui.staff.done.saved"].Value));
 
         staff.MapPost("/settings", async (HttpContext http, [FromForm] string? currencyCode, [FromForm] string? weightUnit, [FromForm] string? dimensionUnit,
-            [FromForm] bool? allowCollect, [FromForm] bool? allowCredit, [FromForm] bool? pickup, [FromForm] bool? homeDelivery, [FromForm] bool? requireSecondFactor,
+            [FromForm] bool? allowCollect, [FromForm] bool? allowCredit, [FromForm] bool? publicPricing, [FromForm] bool? pickup, [FromForm] bool? homeDelivery, [FromForm] bool? requireSecondFactor,
             [FromForm] string? shipmentPrefix, [FromForm] string? receivingPrefix, [FromForm] string? invoicePrefix, [FromForm] string? paymentPrefix, [FromForm] string? customerPrefix, [FromForm] string? parcelPrefix, [FromForm] string? supplyOrderPrefix,
             [FromForm] string? creditNotePrefix, [FromForm] string? bundlePrefix, [FromForm] string? boxPrefix, [FromForm] string? dispatchPrefix,
             [FromForm] string? timeZone, UpdateOperationsTenantSettingsUseCase update, GetOperationsTenantSettingsUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
@@ -55,6 +56,7 @@ public static class OperationsSettingsEndpoints
                 DimensionUnit = Enum.TryParse(dimensionUnit, false, out OperationsDimensionUnit dimension) ? dimension : 0,
                 AllowCollect = allowCollect == true,
                 AllowCredit = allowCredit == true,
+                PublicPricing = publicPricing == true,
                 DeliveryModes = (pickup == true ? OperationsDeliveryModes.Pickup : 0) | (homeDelivery == true ? OperationsDeliveryModes.HomeDelivery : 0),
                 RequireSecondFactorForAllStaff = requireSecondFactor == true,
                 ShipmentPrefix = shipmentPrefix ?? string.Empty,
@@ -95,6 +97,32 @@ public static class OperationsSettingsEndpoints
 
             SaveOperationsShippingServicesResponse response = await save.ExecuteAsync(OperationsCurrentUser.Context(http), new SaveOperationsShippingServicesRequest { Services = rows }, http.RequestAborted);
             return response.Succeeded ? Results.Redirect("/staff/services?done=1") : await ServicesPageAsync(http, list, brand, text, response.Error, null);
+        });
+
+        // Member activity (owner, 2026-10-21): sign-ins and sign-outs, with device, browser and country.
+        staff.MapGet("/activity", async (HttpContext http, Guid? member, int? page, ListOperationsMemberActivityUseCase list, GetOperationsStaffMemberUseCase people,
+            GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
+        {
+            int current = Math.Clamp(page ?? 1, 1, 100_000);
+            ListOperationsMemberActivityResponse response = await list.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new ListOperationsMemberActivityRequest { UserId = member, Page = current }, http.RequestAborted);
+            string? memberName = member is { } id && response.Succeeded
+                ? (await people.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsStaffMemberRequest { UserId = id }, http.RequestAborted)).Member?.FullName
+                : null;
+            GetOperationsSignInBrandResponse company = await brand.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsSignInBrandRequest(), http.RequestAborted);
+            http.Response.Headers.CacheControl = "no-store";
+
+            return new RazorComponentResult<ActivityPage>(new
+            {
+                Company = company.DisplayName,
+                Lines = response.Lines,
+                TotalCount = response.TotalCount,
+                Page = current,
+                PageSize = ListOperationsMemberActivityUseCase.PageSize,
+                MemberId = member,
+                MemberName = memberName,
+                Error = text.Describe(response.Error)
+            });
         });
 
         staff.MapGet("/audit", async (HttpContext http, Guid? actor, string? area, string? from, string? to, int? page,

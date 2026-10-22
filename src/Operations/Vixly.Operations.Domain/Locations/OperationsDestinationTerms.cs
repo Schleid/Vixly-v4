@@ -23,4 +23,7 @@ public sealed record OperationsDestinationTerms(
 {
     // Slice 7 (R-3): the destination records customs (in customs, cleared, held) before parcels are released.
     public bool ClearsCustoms { get; init; }
+
+    // Slice 7 step 4 (R-8): a partner-operated destination may take payments; ignored for the company's own.
+    public bool PartnerHandlesMoney { get; init; }
 }

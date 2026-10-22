@@ -51,6 +51,10 @@ IMPORTANT NOTES:
         {
             <BundleShipmentsPanel Title="@T["ui.bundles.last_scan"]" Id="last-scan" Lines="@(new[] { Focus })" />
         }
+        @if (List.Count > 0)
+        {
+            <BundleListPanel BundleId="@Bundle.Id" Open="@Bundle.IsOpen" List="@List" />
+        }
         <section class="ops-editor__panel" aria-labelledby="scanned-title">
             <h2 id="scanned-title">@T["ui.bundles.scanned"]</h2>
             @if (Parcels.Count == 0)
@@ -74,6 +78,8 @@ IMPORTANT NOTES:
     [Parameter] public IReadOnlyList<OperationsBundleParcelRow> Parcels { get; set; } = Array.Empty<OperationsBundleParcelRow>();
 
     [Parameter] public OperationsBundleShipmentLine? Focus { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsBundleListRow> List { get; set; } = Array.Empty<OperationsBundleListRow>();
 
     [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
 

@@ -80,21 +80,23 @@ public sealed class GetOperationsPickupUseCase
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();
         OperationsShipment shipment = view.Shipment;
         Vixly.Operations.Domain.Customers.OperationsCustomer? customer = await _customers.GetAsync(shipment.CustomerId, cancellationToken);
-        decimal storage = settings.DestinationStorage ? view.StorageOwed(utcNow) : 0m;
+        // A partner agent whose partner does not handle money sees no amounts or invoices (R-8); the release still waits for payment.
+        bool money = access!.HandlesMoneyAt(here);
+        decimal storage = money && settings.DestinationStorage ? view.StorageOwed(utcNow) : 0m;
         IReadOnlyDictionary<Guid, OperationsWarehouse> codes = warehouses.ToDictionary(item => item.Id);
         string currency = view.Invoices.FirstOrDefault()?.CurrencyCode ?? settings.CurrencyCode;
         return GetOperationsPickupResponse.Success(shipment.Id, shipment.Number ?? string.Empty, customer is null ? string.Empty : customer.FirstName + " " + customer.LastName, customer?.Phone,
             shipment.RecipientName, shipment.RecipientPhone, shipment.CollectorName, shipment.CollectorPhone,
             new OperationsArrivalPlace(here.Id, here.Code, here.Name, here.ClearsCustoms) { TimeZone = here.TimeZone },
             view.Parcels.Select(parcel => new OperationsPickupParcelRow(parcel.Id, parcel.Number ?? string.Empty, parcel.Milestone, parcel.WarehouseId == here.Id,
-                OperationsPickupDesk.IsReady(parcel, here), parcel.Flags.HasFlag(OperationsParcelFlags.CustomsHeld), settings.DestinationStorage && OperationsPickupDesk.IsReady(parcel, here)
+                OperationsPickupDesk.IsReady(parcel, here), parcel.Flags.HasFlag(OperationsParcelFlags.CustomsHeld), money && settings.DestinationStorage && OperationsPickupDesk.IsReady(parcel, here)
                     ? parcel.UnbilledStorage(utcNow) : 0m)).ToList(),
-            view.Invoices.Select(invoice => new OperationsPickupInvoiceRow(invoice.Id, invoice.Number, invoice.Kind, invoice.Total, invoice.Owed, invoice.PaymentState, invoice.CurrencyCode)).ToList(),
+            view.Invoices.Where(_ => money).Select(invoice => new OperationsPickupInvoiceRow(invoice.Id, invoice.Number, invoice.Kind, invoice.Total, invoice.Owed, invoice.PaymentState, invoice.CurrencyCode)).ToList(),
             view.Releases.Select(release => new OperationsPickupReleaseRow(release.Id, release.Collector, release.CollectorName, release.IdKind, release.IdLast, release.SignatureKey is not null,
                 release.PhotoKey is not null, release.CodeChecked, release.ParcelCount, release.CreatedUtc, codes.TryGetValue(release.WarehouseId, out OperationsWarehouse? at) ? at.Code : string.Empty))
                 .ToList(),
             storage, currency, settings.PickupProofs, settings.DestinationCharges,
-            view.Ready.Count > 0 && (settings.DestinationCharges || storage > 0m), shipment.PickupCodeProtected is not null,
-            OperationsBundling.Unpaid(view.Invoices));
+            money && view.Ready.Count > 0 && (settings.DestinationCharges || storage > 0m), shipment.PickupCodeProtected is not null,
+            OperationsBundling.Unpaid(view.Invoices) || (!money && settings.DestinationStorage && view.StorageOwed(utcNow) > 0m), money);
     }
 }

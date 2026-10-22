@@ -31,6 +31,6 @@ public sealed class OperationsActors
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(user);
 
-        return new OperationsPlatformActor(context.RequiredTenantId, user.Id, user.FullName, user.IsOwner ? "owner" : user.IsAdministrator ? "admin" : "staff", stepUp, _request.ClientIp, _request.UserAgent);
+        return new OperationsPlatformActor(context.RequiredTenantId, user.Id, user.FullName, user.IsOwner ? "owner" : user.IsAdministrator ? "admin" : "staff", stepUp, _request.ClientIp, _request.UserAgent, _request.Country);
     }
 }

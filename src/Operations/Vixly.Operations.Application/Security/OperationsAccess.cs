@@ -1,6 +1,7 @@
 ﻿using Vixly.Operations.Application.Ports;
 using Vixly.Operations.Domain.Access;
 using Vixly.Operations.Domain.Identity;
+using Vixly.Operations.Domain.Locations;
 using Vixly.Shared.Kernel.Errors;
 
 namespace Vixly.Operations.Application.Security;
@@ -19,6 +20,7 @@ namespace Vixly.Operations.Application.Security;
 // IMPORTANT NOTES:
 // - Only active accounts act; inactive roles grant nothing
 // - Step-up: the session confirmed a second factor within 5 minutes
+// - A partner agent (Slice 7 step 4, R-8) holds no role: the partner's access at its warehouse, while the plan includes it
 // =========================================================
 public sealed class OperationsAccess
 {
@@ -30,8 +32,15 @@ public sealed class OperationsAccess
 
     private readonly TimeProvider _timeProvider;
 
-    public OperationsAccess(IOperationsUserRepository users, IOperationsRoleRepository roles, IOperationsSessionRepository sessions, TimeProvider timeProvider)
+    private readonly IOperationsLocationRepository _locations;
+
+    private readonly IOperationsPlanFeatures _features;
+
+    public OperationsAccess(IOperationsUserRepository users, IOperationsRoleRepository roles, IOperationsSessionRepository sessions, TimeProvider timeProvider,
+        IOperationsLocationRepository locations, IOperationsPlanFeatures features)
     {
+        _locations = locations ?? throw new ArgumentNullException(nameof(locations));
+        _features = features ?? throw new ArgumentNullException(nameof(features));
         _users = users ?? throw new ArgumentNullException(nameof(users));
         _roles = roles ?? throw new ArgumentNullException(nameof(roles));
         _sessions = sessions ?? throw new ArgumentNullException(nameof(sessions));
@@ -47,6 +56,11 @@ public sealed class OperationsAccess
         if (user is null || !user.Account.IsActive)
         {
             return null;
+        }
+
+        if (user.PartnerWarehouseId is { } partnerWarehouseId)
+        {
+            return new OperationsAccessView(user, Array.Empty<(OperationsRoleGrant, OperationsRole)>(), await PartnerScopeAsync(context, partnerWarehouseId, cancellationToken));
         }
 
         IReadOnlyList<OperationsRoleGrant> grants = (await _roles.ListGrantsAsync(user.Id, cancellationToken)).Where(grant => grant.IsActive).ToList();
@@ -78,6 +92,20 @@ public sealed class OperationsAccess
 
         // A user without a second factor can never step up: they enrol one first (design section 3).
         return stepUp && (!view.User.HasSecondFactor || !await IsFreshAsync(context, cancellationToken)) ? (view, OperationsAccessErrors.StepUpRequired) : (view, null);
+    }
+
+    // Open only while the plan includes partner agents (fails closed: no answer from Platform, no access) and the warehouse is run by a partner.
+    public async Task<OperationsPartnerScope> PartnerScopeAsync(OperationsAuthorizationContext context, Guid warehouseId, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        if (context.TenantId is not { } tenantId || !(await _features.GetAsync(tenantId, cancellationToken)).PartnerAgents
+            || await _locations.GetWarehouseAsync(warehouseId, cancellationToken) is not { OperatedBy: OperationsDestinationOperator.Partner, Status: OperationsLocationStatus.Active } warehouse)
+        {
+            return new OperationsPartnerScope(warehouseId, false, false);
+        }
+
+        return new OperationsPartnerScope(warehouseId, true, warehouse.PartnerHandlesMoney);
     }
 
     public async Task<bool> IsFreshAsync(OperationsAuthorizationContext context, CancellationToken cancellationToken)

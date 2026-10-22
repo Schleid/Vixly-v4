@@ -161,6 +161,17 @@ public sealed class OperationsDbContext : DbContext, IDataProtectionKeyContext
 
     public DbSet<Vixly.Operations.Domain.Billing.OperationsRefund> Refunds => Set<Vixly.Operations.Domain.Billing.OperationsRefund>();
 
+    // Slice 5F step 4: the company's Stripe account, its card readers, and card charges.
+    public DbSet<Vixly.Operations.Domain.Billing.OperationsCardProvider> CardProviders => Set<Vixly.Operations.Domain.Billing.OperationsCardProvider>();
+
+    public DbSet<Vixly.Operations.Domain.Billing.OperationsCardReader> CardReaders => Set<Vixly.Operations.Domain.Billing.OperationsCardReader>();
+
+    public DbSet<Vixly.Operations.Domain.Billing.OperationsCardCharge> CardCharges => Set<Vixly.Operations.Domain.Billing.OperationsCardCharge>();
+
+    public DbSet<Vixly.Operations.Domain.Screens.OperationsCustomerScreen> CustomerScreens => Set<Vixly.Operations.Domain.Screens.OperationsCustomerScreen>();
+
+    public DbSet<Vixly.Operations.Domain.Screens.OperationsScreenRecord> ScreenRecords => Set<Vixly.Operations.Domain.Screens.OperationsScreenRecord>();
+
     // Slice 5F step 2b: customers' credit accounts.
     public DbSet<Vixly.Operations.Domain.Billing.OperationsCreditAccount> CreditAccounts => Set<Vixly.Operations.Domain.Billing.OperationsCreditAccount>();
 
@@ -168,6 +179,9 @@ public sealed class OperationsDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<Vixly.Operations.Domain.Bundles.OperationsBundle> Bundles => Set<Vixly.Operations.Domain.Bundles.OperationsBundle>();
 
     public DbSet<Vixly.Operations.Domain.Bundles.OperationsRepackBox> RepackBoxes => Set<Vixly.Operations.Domain.Bundles.OperationsRepackBox>();
+
+    // A bundle's list, confirmed by scans (owner, 2026-10-21).
+    public DbSet<Vixly.Operations.Domain.Bundles.OperationsBundleItem> BundleItems => Set<Vixly.Operations.Domain.Bundles.OperationsBundleItem>();
 
     // Slice 6B: carriers, their rates and dispatches.
     public DbSet<Vixly.Operations.Domain.Dispatch.OperationsCarrier> Carriers => Set<Vixly.Operations.Domain.Dispatch.OperationsCarrier>();
@@ -180,6 +194,11 @@ public sealed class OperationsDbContext : DbContext, IDataProtectionKeyContext
 
     // Slice 7 step 2: releases at the pickup counter.
     public DbSet<Vixly.Operations.Domain.Pickup.OperationsPickupRelease> PickupReleases => Set<Vixly.Operations.Domain.Pickup.OperationsPickupRelease>();
+
+    // Slice 7 step 3: home delivery.
+    public DbSet<Vixly.Operations.Domain.Delivery.OperationsDeliveryRoute> DeliveryRoutes => Set<Vixly.Operations.Domain.Delivery.OperationsDeliveryRoute>();
+
+    public DbSet<Vixly.Operations.Domain.Delivery.OperationsDeliveryStop> DeliveryStops => Set<Vixly.Operations.Domain.Delivery.OperationsDeliveryStop>();
 
     // Slice 7: what did not match at a destination.
     public DbSet<Vixly.Operations.Domain.Arrivals.OperationsArrivalDiscrepancy> ArrivalDiscrepancies => Set<Vixly.Operations.Domain.Arrivals.OperationsArrivalDiscrepancy>();

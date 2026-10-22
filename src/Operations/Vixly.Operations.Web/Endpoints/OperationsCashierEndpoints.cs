@@ -68,9 +68,10 @@ public static class OperationsCashierEndpoints
             });
         });
 
-        staff.MapGet("/cashier/invoices/{invoiceId:guid}", async (HttpContext http, Guid invoiceId, string? done, GetOperationsCashierInvoiceUseCase get, GetOperationsSignInBrandUseCase brand,
-            OperationsErrorText errors, IStringLocalizer<OperationsText> texts) =>
-            await InvoiceAsync(http, invoiceId, null, get, brand, errors, done is "billed" or "awaiting_credit" ? texts["ui.credit.done." + done].Value : null));
+        staff.MapGet("/cashier/invoices/{invoiceId:guid}", async (HttpContext http, Guid invoiceId, string? done, string? card, string? screen, GetOperationsCashierInvoiceUseCase get,
+            GetOperationsSignInBrandUseCase brand, OperationsErrorText errors, IStringLocalizer<OperationsText> texts) =>
+            await InvoiceAsync(http, invoiceId, OperationsCardEndpoints.Refusal(card) ?? OperationsScreenEndpoints.Refusal(screen), get, brand, errors,
+                screen == "sent" ? texts["ui.screens.sent"].Value : done is "billed" or "awaiting_credit" ? texts["ui.credit.done." + done].Value : null));
 
         // Slice 5F step 2b (K-3): billed to the customer's credit account.
         staff.MapPost("/cashier/invoices/{invoiceId:guid}/bill-account", async (HttpContext http, Guid invoiceId, BillOperationsAccountUseCase bill, GetOperationsCashierInvoiceUseCase get,
@@ -208,9 +209,9 @@ public static class OperationsCashierEndpoints
             return Results.Redirect("/staff/invoices/" + invoiceId + "?done=" + (response.Succeeded ? "refunded" : "refund_refused&why=" + Uri.EscapeDataString(response.Error?.Code ?? string.Empty)));
         });
 
-        staff.MapGet("/settings/payments", async (HttpContext http, string? done, GetOperationsPaymentSettingsUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText errors,
-            IStringLocalizer<OperationsText> text) =>
-            await SettingsAsync(http, null, done is null ? null : text["ui.staff.done.saved"].Value, get, brand, errors));
+        staff.MapGet("/settings/payments", async (HttpContext http, string? done, string? card, GetOperationsPaymentSettingsUseCase get, GetOperationsSignInBrandUseCase brand,
+            OperationsErrorText errors, IStringLocalizer<OperationsText> text) =>
+            await SettingsAsync(http, OperationsCardEndpoints.Refusal(card), done is null ? null : text["ui.staff.done.saved"].Value, get, brand, errors));
 
         staff.MapPost("/settings/payments", async (HttpContext http, SaveOperationsPaymentSettingsUseCase save, GetOperationsPaymentSettingsUseCase get, GetOperationsSignInBrandUseCase brand,
             OperationsErrorText errors) =>
@@ -291,11 +292,16 @@ public static class OperationsCashierEndpoints
             Invoice = response.Succeeded ? response.Invoice : null,
             Settings = response.Succeeded ? response.Settings : null,
             Methods = response.Methods,
+            CardOffered = response.CardOffered,
+            CardReaders = response.CardReaders,
             Drawer = response.Drawer,
             Payments = response.Payments,
             Refunds = response.Refunds,
             Account = response.Account,
             Position = response.Position,
+            Screens = await OperationsScreenEndpoints.ScreensAtAsync(http,
+                http.RequestServices.GetRequiredService<Vixly.Operations.Application.UseCases.Screens.ListOperationsCustomerScreens.ListOperationsCustomerScreensUseCase>(),
+                response.Succeeded ? response.Invoice?.WarehouseId : null),
             Error = errors.Describe(error ?? response.Error),
             Info = info
         });
@@ -350,11 +356,16 @@ public static class OperationsCashierEndpoints
         OperationsErrorText errors)
     {
         GetOperationsPaymentSettingsResponse response = await get.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsPaymentSettingsRequest(), http.RequestAborted);
+        Vixly.Operations.Application.UseCases.Cashier.GetOperationsCardSettings.GetOperationsCardSettingsResponse card = await http.RequestServices
+            .GetRequiredService<Vixly.Operations.Application.UseCases.Cashier.GetOperationsCardSettings.GetOperationsCardSettingsUseCase>()
+            .ExecuteAsync(OperationsCurrentUser.Context(http), new Vixly.Operations.Application.UseCases.Cashier.GetOperationsCardSettings.GetOperationsCardSettingsRequest(), http.RequestAborted);
         return OperationsStaffResults.Page<PaymentSettingsPage>(http, new
         {
             Company = await OperationsStaffResults.CompanyAsync(http, brand),
             Settings = response.Succeeded ? response.Settings : null,
             CanEdit = response.CanEdit,
+            Card = card,
+            WebhookUrl = OperationsCardEndpoints.WebhookUrl(http),
             Error = errors.Describe(error ?? response.Error),
             Info = info
         });

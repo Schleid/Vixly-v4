@@ -32,6 +32,7 @@ public sealed class SmtpOperationsCustomerMailer : IOperationsCustomerMailer
         {
             OperationsCustomerMailKind.Verification => "verification",
             OperationsCustomerMailKind.AccountExists => "account_exists",
+            OperationsCustomerMailKind.EmailNotAllowed => "email_not_allowed",
             OperationsCustomerMailKind.ParcelReceived => "parcel_received",
             OperationsCustomerMailKind.ParcelActionNeeded => "parcel_action_needed",
             OperationsCustomerMailKind.ParcelReminder => "parcel_reminder",
@@ -44,6 +45,8 @@ public sealed class SmtpOperationsCustomerMailer : IOperationsCustomerMailer
             OperationsCustomerMailKind.PickupCode => "pickup_code",
             OperationsCustomerMailKind.PickupReminder => "pickup_reminder",
             OperationsCustomerMailKind.PickupFinalNotice => "pickup_final_notice",
+            OperationsCustomerMailKind.OutForDelivery => "out_for_delivery",
+            OperationsCustomerMailKind.OutForDeliveryCode => "out_for_delivery_code",
             _ => "password_reset"
         };
         Dictionary<string, object> values = new(StringComparer.Ordinal)

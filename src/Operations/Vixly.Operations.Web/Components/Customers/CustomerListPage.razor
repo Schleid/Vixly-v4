@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: CustomerListPage.razor
 
@@ -12,24 +12,26 @@ RESPONSIBILITIES:
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10); the endpoint loads the data
 - Static forms with antiforgery and the form guard (ADR-0019)
-- Placeholder look: Frontend/UI designs the final experience
+- Density: compact 32px controls, 36px table rows
 =========================================================
 *@
 @inject IStringLocalizer<OperationsText> T
-@inject IStringLocalizer<OperationsWorkbenchText> L
 
 <EditorShell Title="@T["ui.customers.title"]" Company="@Company" Section="customers" Error="@Error" Info="@Info">
-    <div class="ops-editor__page-intro"><p class="ops-editor__hint">@T["ui.customers.self_service"]</p></div>
-    <form method="get" action="/staff/customers" class="ops-editor__inline ops-editor__search">
-        <input name="search" value="@Search" placeholder="@T["ui.customers.search"]" aria-label="@T["ui.customers.search"]" maxlength="100" />
-        <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.search_submit"]</button>
+    <form method="get" action="/staff/customers" class="ops-list-bar" role="search">
+        <input name="search" value="@Search" placeholder="@T["ui.customers.search"]" aria-label="@T["ui.customers.search"]" maxlength="100" autocomplete="off" autofocus />
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.search_submit"]</button>
+        @if (!string.IsNullOrWhiteSpace(Search))
+        {
+            <a href="/staff/customers" class="vx-button vx-button--secondary">@T["ui.customers.clear"]</a>
+        }
     </form>
     <section class="ops-editor__panel">
         @if (Customers.Count == 0)
         {
             <div class="ops-editor__empty">
                 <h2>@T["ui.customers.none"]</h2>
-                @if (!string.IsNullOrWhiteSpace(Search)) { <a href="/staff/customers">@L["clear_search"]</a> }
+                @if (!string.IsNullOrWhiteSpace(Search)) { <p><a href="/staff/customers" class="vx-button vx-button--secondary">@T["ui.customers.clear"]</a></p> }
             </div>
         }
         else
@@ -41,28 +43,26 @@ IMPORTANT NOTES:
                         @foreach (OperationsCustomerProfile customer in Customers)
                         {
                             <tr>
-                                <td class="ops-editor__identity-cell"><a href="/staff/customers/@customer.CustomerId">@customer.FullName</a>@if (!string.IsNullOrWhiteSpace(customer.CompanyName)) { <small>@customer.CompanyName</small> }</td>
+                                <td class="ops-editor__identity-cell"><a href="/staff/customers/@customer.CustomerId">@customer.FullName</a>@if (!string.IsNullOrWhiteSpace(customer.CompanyName)) { <small> · @customer.CompanyName</small> }</td>
                                 <td class="ops-editor__code">@(customer.Code ?? T["ui.customers.no_code"])</td>
-                                <td>@customer.Email</td><td class="ops-editor__code">@customer.Phone</td>
+                                <td>@customer.Email</td>
+                                <td class="ops-editor__code">@customer.Phone</td>
                                 <td><span class="ops-editor__status" data-status="@customer.Status.ToString().ToLowerInvariant()">@T["ui.customers.status." + customer.Status.ToString().ToLowerInvariant()]</span></td>
-                                <td>@(customer.CreditAllowed ? T["ui.customers.credit_on"] : T["ui.customers.credit_off"])</td>
+                                <td><span class="ops-editor__status" data-status="@(customer.CreditAllowed ? "active" : "neutral")">@(customer.CreditAllowed ? T["ui.customers.credit_on"] : T["ui.customers.credit_off"])</span></td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </OperationsTableViewport>
+            @if (TotalCount > PageSize)
+            {
+                <nav class="ops-list-pager" aria-label="@T["ui.customers.pages"]">
+                    @if (Page > 1) { <a href="@PageLink(Page - 1)" class="ops-list-pager__link">@T["ui.customers.previous"]</a> }
+                    <span class="ops-list-pager__info">@Page / @((TotalCount + PageSize - 1) / PageSize) · @VixlyText.Format(T, "ui.customers.count", "count", TotalCount)</span>
+                    @if (Page * PageSize < TotalCount) { <a href="@PageLink(Page + 1)" class="ops-list-pager__link">@T["ui.customers.next"]</a> }
+                </nav>
+            }
         }
-        <p class="ops-editor__list-footer">@VixlyText.Format(T, "ui.customers.count", "count", TotalCount)</p>
-        <nav class="ops-editor__inline" aria-label="@T["ui.customers.pages"]">
-            @if (Page > 1)
-            {
-                <a href="@PageLink(Page - 1)">@T["ui.customers.previous"]</a>
-            }
-            @if (Page * PageSize < TotalCount)
-            {
-                <a href="@PageLink(Page + 1)">@T["ui.customers.next"]</a>
-            }
-        </nav>
     </section>
 </EditorShell>
 

@@ -23,4 +23,7 @@ public interface IOperationsSessionRepository
     Task<OperationsUserSession?> GetAsync(Guid sessionId, CancellationToken cancellationToken);
 
     Task<IReadOnlyList<OperationsUserSession>> ListOpenAsync(Guid userId, CancellationToken cancellationToken);
+
+    // Member activity (owner, 2026-10-21): the company's sign-ins, newest first, of one member or all.
+    Task<(IReadOnlyList<OperationsUserSession> Items, int TotalCount)> ListActivityAsync(Guid? userId, int page, int pageSize, CancellationToken cancellationToken);
 }

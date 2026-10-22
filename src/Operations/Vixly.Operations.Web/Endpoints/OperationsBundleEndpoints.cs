@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Vixly.Operations.Application.UseCases.Bundles.GetOperationsBundles;
+using Vixly.Operations.Application.UseCases.Bundles.AddToOperationsBundleList;
+using Vixly.Operations.Application.UseCases.Bundles.RemoveFromOperationsBundleList;
 using Vixly.Operations.Application.UseCases.Bundles.CreateOperationsBundle;
 using Vixly.Operations.Application.UseCases.Bundles.GetOperationsBundle;
 using Vixly.Operations.Application.UseCases.Bundles.FindOperationsBundleCode;
@@ -75,7 +77,30 @@ public static class OperationsBundleEndpoints
 
         staff.MapGet("/bundles/{bundleId:guid}", async (HttpContext http, Guid bundleId, string? done, GetOperationsBundleUseCase get, GetOperationsSignInBrandUseCase brand,
             OperationsErrorText errors, IStringLocalizer<OperationsText> texts) =>
-            await BundleAsync(http, bundleId, null, done is "created" or "closed" ? texts["ui.bundles.done." + done].Value : null, get, brand, errors));
+            await BundleAsync(http, bundleId, null, done is "created" or "closed" or "listed" ? texts["ui.bundles.done." + done].Value : null, get, brand, errors));
+
+        // The bundle's list from the computer (owner, 2026-10-21).
+        staff.MapPost("/bundles/{bundleId:guid}/list", async (HttpContext http, Guid bundleId, AddToOperationsBundleListUseCase add, GetOperationsBundleUseCase get,
+            GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
+        {
+            IFormCollection form = await http.Request.ReadFormAsync(http.RequestAborted);
+            AddToOperationsBundleListResponse response = await add.ExecuteAsync(OperationsCurrentUser.Context(http), new AddToOperationsBundleListRequest
+            {
+                BundleId = bundleId,
+                Ids = form["items"].Select(value => Guid.TryParse(value, out Guid id) ? id : Guid.Empty).Where(id => id != Guid.Empty).Distinct().Take(500).ToList()
+            }, http.RequestAborted);
+            return response.Succeeded ? Results.Redirect("/staff/bundles/" + bundleId + "?done=listed") : await BundleAsync(http, bundleId, response.Error, null, get, brand, errors);
+        });
+
+        staff.MapPost("/bundles/{bundleId:guid}/list/{itemId:guid}/remove", async (HttpContext http, Guid bundleId, Guid itemId, RemoveFromOperationsBundleListUseCase remove,
+            GetOperationsBundleUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
+        {
+            RemoveFromOperationsBundleListResponse response = await remove.ExecuteAsync(OperationsCurrentUser.Context(http), new RemoveFromOperationsBundleListRequest
+            {
+                BundleId = bundleId, ItemId = itemId
+            }, http.RequestAborted);
+            return response.Succeeded ? Results.Redirect("/staff/bundles/" + bundleId) : await BundleAsync(http, bundleId, response.Error, null, get, brand, errors);
+        });
 
         staff.MapPost("/bundles/{bundleId:guid}/close", async (HttpContext http, Guid bundleId, [FromForm] string? weight, [FromForm] string? length, [FromForm] string? width,
             [FromForm] string? height, CloseOperationsBundleUseCase close, GetOperationsBundleUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
@@ -308,6 +333,8 @@ public static class OperationsBundleEndpoints
             response.CanFill,
             response.WeightUnit,
             response.DimensionUnit,
+            response.List,
+            response.Candidates,
             Error = errors.Describe(error),
             Info = info
         });
@@ -331,6 +358,7 @@ public static class OperationsBundleEndpoints
             response.Parcels,
             response.Focus,
             response.WeightUnit,
+            response.List,
             Error = errors.Describe(error),
             Info = info
         });

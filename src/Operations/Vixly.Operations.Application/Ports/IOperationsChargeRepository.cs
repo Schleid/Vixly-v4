@@ -41,6 +41,9 @@ public interface IOperationsChargeRepository
     Task<IReadOnlyList<OperationsRateCard>> ListCardsAsync(CancellationToken cancellationToken);
 
     // In use, the company's standard cards and the customer's own (none when no customer).
+    // Review of 94e28f4: the website's menu asks only whether a regular list is published, not for the prices.
+    Task<bool> AnyPublishedAsync(CancellationToken cancellationToken);
+
     Task<IReadOnlyList<OperationsRateCard>> ListCardsForAsync(Guid? customerId, CancellationToken cancellationToken);
 
     Task<OperationsChargeExtra?> GetExtraAsync(Guid extraId, CancellationToken cancellationToken);

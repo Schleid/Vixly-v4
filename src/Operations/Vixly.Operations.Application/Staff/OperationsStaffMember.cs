@@ -24,4 +24,5 @@ public sealed record OperationsStaffMember(
     bool IsAdministrator,
     bool HasSecondFactor,
     DateTimeOffset? LastSignInUtc,
-    IReadOnlyList<OperationsStaffGrant> Grants);
+    IReadOnlyList<OperationsStaffGrant> Grants,
+    string? PartnerWarehouse = null);

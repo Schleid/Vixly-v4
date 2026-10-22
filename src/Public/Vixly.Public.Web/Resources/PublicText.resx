@@ -817,4 +817,7 @@
   <data name="public.bot_check.required" xml:space="preserve">
     <value>Please complete the security check before sending.</value>
   </data>
+  <data name="public.plans.feature.partner_agents" xml:space="preserve">
+    <value>Partner agents</value>
+  </data>
 </root>

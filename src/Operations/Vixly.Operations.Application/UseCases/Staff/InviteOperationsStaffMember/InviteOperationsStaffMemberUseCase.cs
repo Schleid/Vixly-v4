@@ -8,6 +8,7 @@ using Vixly.Operations.Domain.Access;
 using Vixly.Operations.Domain.Branding;
 using Vixly.Operations.Domain.Common;
 using Vixly.Operations.Domain.Identity;
+using Vixly.Operations.Domain.Locations;
 using Vixly.Shared.Kernel.Domain;
 using Vixly.Shared.Kernel.Errors;
 using Vixly.Shared.Kernel.Localization;
@@ -28,6 +29,7 @@ namespace Vixly.Operations.Application.UseCases.Staff.InviteOperationsStaffMembe
 // - Needs ops.staff.invite and ops.roles.grant, and the inviter must hold everything the role gives in that scope
 // - Only the Owner gives the Administrator role
 // - The email is the same setup email as the Owner's (password, then the second factor when the role needs one)
+// - A partner agent (Slice 7 step 4, R-8) is invited for a partner-operated warehouse, only while the plan includes partner agents
 // =========================================================
 public sealed class InviteOperationsStaffMemberUseCase
 {
@@ -108,6 +110,10 @@ public sealed class InviteOperationsStaffMemberUseCase
             return InviteOperationsStaffMemberResponse.Failure(OperationsStaffErrors.EmailTaken);
         }
 
+        if (request.PartnerWarehouseId is { } partnerWarehouseId)
+        {
+            return await InvitePartnerAgentAsync(context, request, access!, email!, language!, partnerWarehouseId, cancellationToken);
+        }
         OperationsRole? role = await _roles.GetAsync(request.RoleId, cancellationToken);
         Guid? branchOfWarehouse = request.Scope == OperationsRoleScope.Warehouse && request.ScopeId is { } warehouseId
             ? (await _locations.GetWarehouseAsync(warehouseId, cancellationToken))?.BranchId
@@ -149,7 +155,58 @@ public sealed class InviteOperationsStaffMemberUseCase
         }
 
         _audit.Record(access.User.Id, "ops.staff.invited", nameof(OperationsUser), user.Id, arguments: new { role = role.Id, scope = request.Scope.ToString() });
+        return await SaveAndSendAsync(request, user, secret, cancellationToken);
+    }
 
+    // A partner agent: the company's right to invite and give roles, a warehouse run by a partner, and the plan's partner agents (fails closed).
+    private async Task<InviteOperationsStaffMemberResponse> InvitePartnerAgentAsync(OperationsAuthorizationContext context, InviteOperationsStaffMemberRequest request,
+        OperationsAccessView access, EmailAddress email, LanguageCode language, Guid warehouseId, CancellationToken cancellationToken)
+    {
+        if (!access.HasTenantWide(OperationsPermissions.RolesGrant))
+        {
+            return InviteOperationsStaffMemberResponse.Failure(OperationsAccessErrors.PermissionRequired);
+        }
+
+        if (await _locations.GetWarehouseAsync(warehouseId, cancellationToken) is not { OperatedBy: OperationsDestinationOperator.Partner, Status: OperationsLocationStatus.Active } warehouse)
+        {
+            return InviteOperationsStaffMemberResponse.Failure(OperationsStaffErrors.PartnerWarehouseInvalid);
+        }
+
+        // Only what the inviter holds there, as for any role (review): the partner's rights, and payments where the partner handles money.
+        IEnumerable<string> gives = warehouse.PartnerHandlesMoney ? OperationsPermissions.PartnerAgent.Concat(OperationsPermissions.PartnerMoney) : OperationsPermissions.PartnerAgent;
+
+        if (!gives.All(permission => access.CoversWarehouse(permission, warehouse.Id, warehouse.BranchId)))
+        {
+            return InviteOperationsStaffMemberResponse.Failure(OperationsAccessErrors.PermissionRequired);
+        }
+
+        if (!(await _access.PartnerScopeAsync(context, warehouseId, cancellationToken)).Open)
+        {
+            return InviteOperationsStaffMemberResponse.Failure(OperationsStaffErrors.PartnerAgentsOff);
+        }
+
+        OperationsUser user;
+        OperationsSecret secret = _secrets.NewToken();
+
+        try
+        {
+            DateTimeOffset utcNow = _timeProvider.GetUtcNow();
+            user = OperationsUser.InvitePartnerAgent(context.RequiredTenantId, request.FullName, email, language, warehouseId, utcNow);
+            _users.Add(user);
+            _tokens.Add(OperationsAccountToken.Issue(context.RequiredTenantId, user.Id, OperationsAccountTokenPurpose.Invitation, secret.Hash, utcNow));
+        }
+        catch (DomainException exception)
+        {
+            return InviteOperationsStaffMemberResponse.Failure(exception.Error);
+        }
+
+        _audit.Record(access.User.Id, "ops.staff.partner_invited", nameof(OperationsUser), user.Id, arguments: new { warehouse = warehouseId });
+        return await SaveAndSendAsync(request, user, secret, cancellationToken);
+    }
+
+    private async Task<InviteOperationsStaffMemberResponse> SaveAndSendAsync(InviteOperationsStaffMemberRequest request, OperationsUser user, OperationsSecret secret,
+        CancellationToken cancellationToken)
+    {
         if (!await _unitOfWork.SaveChangesAsync(cancellationToken))
         {
             return InviteOperationsStaffMemberResponse.Failure(OperationsCommonErrors.ConcurrencyConflict);

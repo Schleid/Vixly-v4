@@ -101,6 +101,12 @@ public static class OperationsDeviceEndpoints
             await DevicesPageAsync(http, useCase, await CompanyAsync(http, brand), text, null, done is null ? null : texts["ui.devices.done"].Value))
             .RequireAuthorization();
 
+        // One device of the company, with its licence and the actions the person may take (owner, 2026-10-21).
+        endpoints.MapGet("/staff/devices/{deviceId:guid}", async (HttpContext http, Guid deviceId, ListOperationsDevicesUseCase useCase, GetOperationsSignInBrandUseCase brand,
+            OperationsErrorText text) =>
+            await DevicePageAsync(http, deviceId, useCase, await CompanyAsync(http, brand), text, null))
+            .RequireAuthorization();
+
         endpoints.MapPost("/staff/devices/{deviceId:guid}/decide", async (HttpContext http, Guid deviceId, [FromForm] bool approve, [FromForm] string? code,
             DecideOperationsDeviceUseCase decide, ListOperationsDevicesUseCase list, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
         {
@@ -109,7 +115,7 @@ public static class OperationsDeviceEndpoints
 
             return response.Succeeded
                 ? Results.Redirect("/staff/devices?done=1")
-                : await DevicesPageAsync(http, list, await CompanyAsync(http, brand), text, response.Error, null);
+                : await DevicePageAsync(http, deviceId, list, await CompanyAsync(http, brand), text, response.Error);
         }).RequireAuthorization().RequireRateLimiting(OperationsRateLimits.SecondFactor);
 
         endpoints.MapPost("/staff/devices/{deviceId:guid}/release", async (HttpContext http, Guid deviceId, [FromForm] string? reason, [FromForm] string? code,
@@ -120,7 +126,7 @@ public static class OperationsDeviceEndpoints
 
             return response.Succeeded
                 ? Results.Redirect("/staff/devices?done=1")
-                : await DevicesPageAsync(http, list, await CompanyAsync(http, brand), text, response.Error, null);
+                : await DevicePageAsync(http, deviceId, list, await CompanyAsync(http, brand), text, response.Error);
         }).RequireAuthorization().RequireRateLimiting(OperationsRateLimits.SecondFactor);
 
         return endpoints;
@@ -148,10 +154,29 @@ public static class OperationsDeviceEndpoints
         {
             Company = company,
             Devices = devices.Devices,
+            Seats = devices.Seats,
             Error = text.Describe(error ?? devices.Error),
             Info = info
         });
     }
+
+    private static async Task<IResult> DevicePageAsync(HttpContext http, Guid deviceId, ListOperationsDevicesUseCase useCase, string? company, OperationsErrorText text, Error? error)
+    {
+        ListOperationsDevicesResponse devices = await Unavailable(() => useCase.ExecuteAsync(OperationsCurrentUser.Context(http), new ListOperationsDevicesRequest(), http.RequestAborted));
+        http.Response.Headers.CacheControl = "no-store";
+
+        if (!devices.Succeeded)
+        {
+            return await DevicesListAsync(http, devices, company, text);
+        }
+
+        return devices.Devices.FirstOrDefault(device => device.DeviceId == deviceId) is { } found
+            ? Page<DeviceDetailPage>(new { Company = company, Device = found, Error = text.Describe(error) })
+            : Results.Redirect("/staff/devices");
+    }
+
+    private static Task<IResult> DevicesListAsync(HttpContext http, ListOperationsDevicesResponse devices, string? company, OperationsErrorText text) =>
+        Task.FromResult<IResult>(Page<DevicesPage>(new { Company = company, Devices = devices.Devices, Seats = devices.Seats, Error = text.Describe(devices.Error), Info = (string?)null }));
 
     private static IResult LinkPage(string? company, bool recovery, string? error) =>
         Page<DeviceLinkPage>(new { Company = company, Recovery = recovery, Error = error });

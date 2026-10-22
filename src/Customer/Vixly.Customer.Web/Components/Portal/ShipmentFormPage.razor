@@ -76,6 +76,12 @@ IMPORTANT NOTES:
                 <legend>@T["ui.shipments.options"]</legend>
                 <label><input type="checkbox" name="consolidate" value="true" checked="@(Entered?.Consolidate ?? false)" /> @T["ui.shipments.consolidate"]</label>
                 <label><input type="checkbox" name="refrigerated" value="true" checked="@(Entered?.Refrigerated ?? false)" /> @T["ui.shipments.refrigerated"]</label>
+                @if (choices.AllowCollect || Entered?.Collect == true)
+                {
+                    @* Freight collect (owner, 2026-10-21): the sender pays at the destination. *@
+                    <label><input type="checkbox" name="collect" value="true" checked="@(Entered?.Collect ?? false)" /> @T["ui.shipments.collect"]</label>
+                    <p class="customer-portal__hint">@T["ui.shipments.collect_hint"]</p>
+                }
                 @* Slice 5B: what the company owes when the customer does not insure, per mode. *@
                 @foreach (Vixly.Contracts.Operations.Packages.CustomerLiabilityDto liability in choices.Liability ?? Array.Empty<Vixly.Contracts.Operations.Packages.CustomerLiabilityDto>())
                 {

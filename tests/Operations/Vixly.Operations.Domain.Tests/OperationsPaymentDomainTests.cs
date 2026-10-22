@@ -126,7 +126,21 @@ public sealed class OperationsPaymentDomainTests
             OperationsRefund.Give(Tenant, invoice, "PAY2", OperationsPaymentMethod.Cash, 10.01m, "Overcharged", null, drawer, Cashier, Guid.NewGuid(), Now)).Error);
         Assert.Equal(OperationsPaymentErrors.ReasonRequired, Assert.Throws<DomainException>(() =>
             OperationsRefund.Give(Tenant, invoice, "PAY2", OperationsPaymentMethod.Cash, 10m, " ", null, drawer, Cashier, Guid.NewGuid(), Now)).Error);
-        OperationsRefund.Give(Tenant, invoice, "PAY2", OperationsPaymentMethod.Cash, 10m, "Overcharged", null, drawer, Cashier, Guid.NewGuid(), Now);
-        Assert.Equal((0m, 0m, 10m, 130m), (invoice.Owed, invoice.Refundable, drawer.CashOut, drawer.Expected));
+        // Review of 5F step 4: a card refund is kept pending first; Stripe refusing gives the amount back to what can be refunded.
+        OperationsRefund card = OperationsRefund.Give(Tenant, invoice, "PAY3", OperationsPaymentMethod.Card, 4m, "Overcharged", null, null, Cashier, Guid.NewGuid(), Now);
+        card.AwaitCard();
+        Assert.True(card.Pending);
+        Assert.Equal(6m, invoice.Refundable);
+        card.CardRefused(invoice, Now);
+        Assert.Equal((false, 10m), (card.Pending, invoice.Refundable));
+        Assert.Equal(OperationsCardErrors.RefundNotPossible, Assert.Throws<DomainException>(() => card.CardRefused(invoice, Now)).Error);
+
+        OperationsRefund settled = OperationsRefund.Give(Tenant, invoice, "PAY4", OperationsPaymentMethod.Card, 4m, "Overcharged", null, null, Cashier, Guid.NewGuid(), Now);
+        settled.AwaitCard();
+        settled.ByCard("re_test_1");
+        Assert.Equal((false, "re_test_1"), (settled.Pending, settled.Reference));
+
+        OperationsRefund.Give(Tenant, invoice, "PAY2", OperationsPaymentMethod.Cash, 6m, "Overcharged", null, drawer, Cashier, Guid.NewGuid(), Now);
+        Assert.Equal((0m, 0m, 6m, 134m), (invoice.Owed, invoice.Refundable, drawer.CashOut, drawer.Expected));
     }
 }

@@ -45,4 +45,18 @@ internal sealed class OperationsSessionRepository : IOperationsSessionRepository
     {
         return await _context.UserSessions.Where(session => session.UserId == userId && session.EndedUtc == null).ToListAsync(cancellationToken);
     }
+
+    public async Task<(IReadOnlyList<OperationsUserSession> Items, int TotalCount)> ListActivityAsync(Guid? userId, int page, int pageSize, CancellationToken cancellationToken)
+    {
+        IQueryable<OperationsUserSession> query = _context.UserSessions.AsNoTracking();
+
+        if (userId is { } id)
+        {
+            query = query.Where(session => session.UserId == id);
+        }
+
+        int total = await query.CountAsync(cancellationToken);
+        List<OperationsUserSession> items = await query.OrderByDescending(session => session.CreatedUtc).Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+        return (items, total);
+    }
 }

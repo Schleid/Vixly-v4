@@ -44,7 +44,7 @@ public static class OperationsAuthEndpoints
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        endpoints.MapGet("/staff", async (HttpContext http, string? reset, string? device, string? idle, string? ended, GetOperationsSignInBrandUseCase brand, IStringLocalizer<OperationsText> text,
+        endpoints.MapGet("/staff", async (HttpContext http, string? reset, string? device, string? idle, string? ended, string? country, GetOperationsSignInBrandUseCase brand, IStringLocalizer<OperationsText> text,
             Vixly.Operations.Application.UseCases.Settings.GetOperationsSetupChecklist.GetOperationsSetupChecklistUseCase checklist,
             Vixly.Operations.Application.UseCases.Supplies.ListOperationsLowSupplies.ListOperationsLowSuppliesUseCase lowSupplies) =>
             OperationsCurrentUser.IsSignedIn(http)
@@ -63,7 +63,8 @@ public static class OperationsAuthEndpoints
                     Company = await CompanyAsync(http, brand),
                     ReturnUrl = "/staff",
                     Info = reset is not null ? text["ui.reset.done"].Value : device is not null ? text["ui.devices.ready"].Value
-                        : idle is not null ? text["ui.session.signed_out_idle"].Value : ended is not null ? text["ui.session.ended"].Value : null
+                        : idle is not null ? text["ui.session.signed_out_idle"].Value : ended is not null ? text["ui.session.ended"].Value
+                        : country is not null ? text["ui.session.country_changed"].Value : null
                 }));
 
         endpoints.MapGet("/setup", async (HttpContext http, string? link, GetOperationsSignInBrandUseCase brand, IStringLocalizer<OperationsText> text) =>
@@ -80,8 +81,10 @@ public static class OperationsAuthEndpoints
         endpoints.MapPost("/staff/sign-in", async (HttpContext http, [FromForm] string email, [FromForm] string password, [FromForm] string? returnUrl,
             BeginOperationsSignInUseCase useCase, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
         {
-            BeginOperationsSignInResponse response = await useCase.ExecuteAsync(
-                OperationsCurrentUser.Context(http), new BeginOperationsSignInRequest { Email = email, Password = password }, http.RequestAborted);
+            // The device cookie tells where the sign-in happens (owner, 2026-10-21); checked there without rotating its secret.
+            (Guid DeviceId, string Secret)? device = OperationsDeviceCookie.Read(http.Request);
+            BeginOperationsSignInResponse response = await useCase.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new BeginOperationsSignInRequest { Email = email, Password = password, DeviceId = device?.DeviceId, DeviceSecret = device?.Secret }, http.RequestAborted);
 
             if (!response.Succeeded)
             {

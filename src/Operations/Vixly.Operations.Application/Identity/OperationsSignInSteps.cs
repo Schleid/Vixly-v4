@@ -64,6 +64,9 @@ public sealed class OperationsSignInSteps
 
     public DateTimeOffset UtcNow => _timeProvider.GetUtcNow();
 
+    // The country the request comes from (Cloudflare's), when known.
+    public string? Country => _metadata.Country;
+
     // The Owner and Administrators always need a second factor; other staff when the tenant requires it for all (D-O2).
     public async Task<bool> NeedsSecondFactorAsync(OperationsUser user, CancellationToken cancellationToken)
     {
@@ -72,14 +75,16 @@ public sealed class OperationsSignInSteps
         return user.RequiresSecondFactor || (await _settings.FindAsync(cancellationToken))?.RequireSecondFactorForAllStaff == true;
     }
 
-    public string IssueChallenge(OperationsAuthorizationContext context, OperationsUser user, DateTimeOffset utcNow)
+    public string IssueChallenge(OperationsAuthorizationContext context, OperationsUser user, DateTimeOffset utcNow, OperationsSignInPlace? place = null)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(user);
 
         OperationsSecret secret = _secrets.NewToken();
         OperationsSignInStage stage = user.HasSecondFactor ? OperationsSignInStage.SecondFactor : OperationsSignInStage.Enrolment;
-        _challenges.Add(OperationsSignInChallenge.Issue(context.RequiredTenantId, user.Id, secret.Hash, stage, utcNow));
+        OperationsSignInChallenge challenge = OperationsSignInChallenge.Issue(context.RequiredTenantId, user.Id, secret.Hash, stage, utcNow);
+        challenge.At(place ?? OperationsSignInPlace.Nowhere(Country));
+        _challenges.Add(challenge);
 
         return secret.Value;
     }
@@ -118,10 +123,11 @@ public sealed class OperationsSignInSteps
         ArgumentNullException.ThrowIfNull(challenge);
 
         challenge.Complete(UtcNow);
-        return StartSessionAsync(context, user, method, cancellationToken);
+        return StartSessionAsync(context, user, method, cancellationToken, challenge.Place);
     }
 
-    public async Task<OperationsIssuedSession?> StartSessionAsync(OperationsAuthorizationContext context, OperationsUser user, string method, CancellationToken cancellationToken)
+    public async Task<OperationsIssuedSession?> StartSessionAsync(OperationsAuthorizationContext context, OperationsUser user, string method, CancellationToken cancellationToken,
+        OperationsSignInPlace? place = null)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(user);
@@ -129,9 +135,12 @@ public sealed class OperationsSignInSteps
         DateTimeOffset utcNow = UtcNow;
         OperationsSecret token = _secrets.NewToken();
         OperationsUserSession session = OperationsUserSession.Start(context.RequiredTenantId, user.Id, token.Hash, _metadata.ClientIp, _metadata.UserAgent, context.IsSettingUp, utcNow);
+        OperationsSignInPlace where = place ?? OperationsSignInPlace.Nowhere(Country);
+        session.At(where);
         user.RecordSuccessfulSignIn(utcNow);
         _sessions.Add(session);
-        _audit.Record(user.Id, "ops.auth.signed_in", nameof(OperationsUser), user.Id, arguments: new { method, setup = context.IsSettingUp });
+        _audit.Record(user.Id, "ops.auth.signed_in", nameof(OperationsUser), user.Id,
+            arguments: new { method, setup = context.IsSettingUp, device = where.DeviceNumber, country = where.Country, countryChanged = where.CountryChanged });
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken)
             ? new OperationsIssuedSession(session.Id, token.Value, session.ExpiresUtc)
