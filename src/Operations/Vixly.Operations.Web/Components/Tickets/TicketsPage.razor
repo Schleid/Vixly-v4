@@ -16,7 +16,7 @@
                 @foreach (OperationsWarehouse wh in Warehouses) { <option value="@wh.Id" selected="@(wh.Id == Warehouse)">@wh.Code · @wh.Name</option> }
             </select>
         }
-        <button type="submit" class="vx-button vx-button--secondary">@T["ui.tickets.filter"]</button>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.tickets.filter"]</button>
         <a href="/staff/tickets" class="vx-button vx-button--subtle">@T["ui.parcels.view.all"]</a>
     </form>
     <section class="ops-editor__panel">

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: DeliverySettingsPage.razor
 
@@ -15,7 +15,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.delivery_settings.title"]" Company="@Company" Section="delivery_settings" Error="@Error" Info="@Info">
-    <form method="post" action="/staff/settings/delivery" class="ops-editor__form">
+    <form method="post" action="/staff/settings/delivery" class="ops-settings-form">
         <AntiforgeryToken />
         <section class="ops-editor__panel ops-setting-card" aria-labelledby="delivery-recording-title">
             <h3 id="delivery-recording-title">@T["ui.delivery_settings.recording"]</h3>

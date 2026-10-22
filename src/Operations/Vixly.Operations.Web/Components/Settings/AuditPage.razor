@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: AuditPage.razor
 
@@ -33,7 +33,7 @@ IMPORTANT NOTES:
         </select>
         <label>@T["ui.audit.from"] <input type="date" name="from" value="@From" /></label>
         <label>@T["ui.audit.to"] <input type="date" name="to" value="@To" /></label>
-        <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.search_submit"]</button>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.search_submit"]</button>
     </form>
     <section class="ops-editor__panel">
         @if (Lines.Count == 0) { <p class="ops-editor__empty-message">@T["ui.editor.none"]</p> }

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: InvoicesPage.razor
 
@@ -28,7 +28,7 @@ IMPORTANT NOTES:
                 <option value="@filter" selected="@(filter == Filter)">@T["ui.invoices.filter." + filter]</option>
             }
         </select>
-        <button type="submit" class="vx-button vx-button--secondary">@T["ui.invoices.find"]</button>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.invoices.find"]</button>
         @if (!string.IsNullOrEmpty(Text) || Filter != OperationsInvoiceFilter.All)
         {
             <a href="/staff/invoices" class="vx-button vx-button--secondary">@T["ui.customers.clear"]</a>

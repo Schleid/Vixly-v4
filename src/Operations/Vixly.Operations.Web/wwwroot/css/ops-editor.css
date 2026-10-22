@@ -445,8 +445,14 @@ body.ops-editor { padding-left:16rem; background:var(--vx-color-app); }
     align-items: start;
     width: 100%;
 }
-.ops-editor__form > :is(h2, h3, fieldset, .ops-editor__form-full, .ops-editor__hint, table, .ops-editor__table, .ops-editor__table-viewport) {
+.ops-editor__form > :is(h2, h3, fieldset, section, .ops-editor__form-full, .ops-editor__hint, table, .ops-editor__table, .ops-editor__table-viewport, .ops-charges-duo, .ops-charges-trio, .ops-setting-card) {
     grid-column: 1 / -1 !important;
+}
+.ops-settings-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
 }
 .ops-editor__form label {
     display: flex;
@@ -1334,22 +1340,24 @@ tr[data-low="true"] td:first-child {
 
 /* Native file upload styling */
 .ops-file-input {
-    height: auto !important;
-    min-height: auto !important;
-    padding: 0.35rem 0.5rem !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 0.35rem 0.65rem !important;
     font-size: 0.8125rem !important;
-    border: 1px dashed var(--vx-color-border-control) !important;
+    border: 1.5px dashed var(--vx-color-border-control) !important;
     border-radius: 0.35rem !important;
     background: var(--vx-color-surface-sunken) !important;
     cursor: pointer;
     box-sizing: border-box !important;
     width: 100%;
-    max-width: 22rem;
+    max-width: 24rem;
 }
 .ops-file-input::file-selector-button {
-    height: 26px;
+    height: 28px;
     padding: 0 0.75rem;
-    margin-inline-end: 0.5rem;
+    margin-inline-end: 0.65rem;
     font-size: 0.75rem;
     font-weight: 600;
     border-radius: 0.25rem;
@@ -1357,6 +1365,8 @@ tr[data-low="true"] td:first-child {
     background: var(--vx-color-surface);
     color: var(--vx-color-text);
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
 }
 .ops-file-input::file-selector-button:hover {
     background: var(--vx-color-surface-hover);

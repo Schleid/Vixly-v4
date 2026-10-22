@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: StaffListPage.razor
 
@@ -21,7 +21,7 @@ IMPORTANT NOTES:
     <div class="ops-editor__page-intro"><p class="ops-editor__hint">@L["staff_intro"]</p>@if (CanInvite) { <a href="#invite-person" data-open-panel class="vx-button vx-button--primary">@T["ui.staff.invite"]</a> }</div>
     <form method="get" action="/staff/people" class="ops-editor__inline ops-editor__search">
         <input name="search" value="@Search" placeholder="@T["ui.staff.search"]" aria-label="@T["ui.staff.search"]" />
-        <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.search_submit"]</button>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.search_submit"]</button>
     </form>
     <section class="ops-editor__panel">
         @if (Members.Count == 0)

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: SupplyStockSettingsPanel.razor
 
@@ -15,7 +15,7 @@ IMPORTANT NOTES:
 - ops.charges.configure
 =========================================================
 *@
-<form method="post" action="/staff/supplies/settings" class="ops-editor__form" aria-labelledby="supplies-settings">
+<form method="post" action="/staff/supplies/settings" class="ops-settings-form" aria-labelledby="supplies-settings">
     <AntiforgeryToken />
     <div class="ops-charges-duo">
         <section class="ops-editor__panel ops-setting-card" aria-labelledby="supplies-stock-title">
@@ -51,7 +51,7 @@ IMPORTANT NOTES:
                     <span>@T["ui.supplies.settings.discounts_allowed"]</span>
                 </label>
             </div>
-            <div class="ops-charges-duo" style="margin-bottom: 0.75rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
                 <div>
                     <label>
                         <span class="ops-label-text">@T["ui.supplies.settings.discount_line"]</span>

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: PickupSettingsPage.razor
 
@@ -16,7 +16,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.pickup_settings.title"]" Company="@Company" Section="pickup_settings" Error="@Error" Info="@Info">
-    <form method="post" action="/staff/settings/pickup" class="ops-editor__form">
+    <form method="post" action="/staff/settings/pickup" class="ops-settings-form">
         <AntiforgeryToken />
         <section class="ops-editor__panel ops-setting-card" aria-labelledby="pickup-proofs-title">
             <h3 id="pickup-proofs-title">@T["ui.pickup_settings.proofs"]</h3>

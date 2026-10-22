@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: PaymentSettingsPage.razor
 
@@ -19,7 +19,7 @@ IMPORTANT NOTES:
 <EditorShell Title="@T["ui.payment_settings.title"]" Company="@Company" Section="payment_settings" Error="@Error" Info="@Info">
     @if (Settings is { } settings)
     {
-    <form method="post" action="/staff/settings/payments" enctype="multipart/form-data" class="ops-editor__form" style="margin-bottom: 2.5rem;">
+    <form method="post" action="/staff/settings/payments" enctype="multipart/form-data" class="ops-settings-form" style="margin-bottom: 2rem;">
         <AntiforgeryToken />
         <fieldset class="ops-editor__panel ops-setting-card" disabled="@(!CanEdit)">
             <legend>@T["ui.payment_settings.methods"]</legend>
@@ -66,13 +66,13 @@ IMPORTANT NOTES:
                 <div><label><span class="ops-label-text">@T["ui.payment_settings.terms_es"]</span><textarea name="termsEs" rows="3" maxlength="2000">@settings.ZelleTermsEs</textarea></label></div>
             </div>
             <p class="ops-editor__hint">@T["ui.payment_settings.zelle_hint"]</p>
+            @if (CanEdit)
+            {
+                <div style="margin-top: 1rem; display: flex; justify-content: flex-start;">
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.payment_settings.save"]</button>
+                </div>
+            }
         </fieldset>
-        @if (CanEdit)
-        {
-            <div style="margin-top: 1.25rem; margin-bottom: 2.5rem; display: flex; justify-content: flex-start;">
-                <button type="submit" class="vx-button vx-button--primary">@T["ui.payment_settings.save"]</button>
-            </div>
-        }
     </form>
     }
     @if (Card is { Succeeded: true } card)

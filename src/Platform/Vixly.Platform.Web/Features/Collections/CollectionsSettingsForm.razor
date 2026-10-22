@@ -145,30 +145,32 @@ IMPORTANT NOTES:
                         </div>
                     </VxCard>
 
-                    <VxCard Title="@T["ui.collections_settings.extensions"]">
-                        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-                            <div class="vx-field-compact">
-                                <label for="collections-ext-days">@T["ui.collections_settings.extension_days"]</label>
-                                <div class="vx-input-group-unit">
-                                    <input id="collections-ext-days" type="number" min="1" max="60" @bind="_input.ExtensionMaxDays" />
-                                    <span class="vx-input-group-unit__suffix">days</span>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <VxCard Title="@T["ui.collections_settings.extensions"]">
+                            <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                                <div class="vx-field-compact">
+                                    <label for="collections-ext-days">@T["ui.collections_settings.extension_days"]</label>
+                                    <div class="vx-input-group-unit">
+                                        <input id="collections-ext-days" type="number" min="1" max="60" @bind="_input.ExtensionMaxDays" />
+                                        <span class="vx-input-group-unit__suffix">days</span>
+                                    </div>
+                                </div>
+                                <div class="vx-field-compact">
+                                    <label for="collections-ext-count">@T["ui.collections_settings.extensions_per_case"]</label>
+                                    <input id="collections-ext-count" type="number" min="0" max="10" @bind="_input.ExtensionsPerCase" aria-describedby="collections-ext-count-help" />
+                                    <p id="collections-ext-count-help" class="vx-hint">@T["ui.collections_settings.extensions_per_case_help"]</p>
                                 </div>
                             </div>
-                            <div class="vx-field-compact">
-                                <label for="collections-ext-count">@T["ui.collections_settings.extensions_per_case"]</label>
-                                <input id="collections-ext-count" type="number" min="0" max="10" @bind="_input.ExtensionsPerCase" aria-describedby="collections-ext-count-help" />
-                                <p id="collections-ext-count-help" class="vx-hint">@T["ui.collections_settings.extensions_per_case_help"]</p>
+                        </VxCard>
+                        @if (settings.CanEdit)
+                        {
+                            <div class="vx-actions" style="margin-top: 0; display: flex; justify-content: flex-start;">
+                                <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.collections_settings.save"]</VxButton>
                             </div>
-                        </div>
-                    </VxCard>
+                        }
+                    </div>
                 </div>
             </fieldset>
-            @if (settings.CanEdit)
-            {
-                <div class="vx-actions" style="margin-top: 0.5rem;">
-                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.collections_settings.save"]</VxButton>
-                </div>
-            }
         </form>
         @if (Presenter.State.StepUpPending)
         {

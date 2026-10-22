@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: TenantLicensing.razor
 
@@ -69,18 +69,22 @@ IMPORTANT NOTES:
                 }
                 <h3>@T["ui.licensing.support_title"]</h3>
                 <p class="vx-hint">@T["ui.licensing.support_help"]</p>
-                <div class="vx-field">
-                    <label for="support-identity">@T["ui.licensing.identity_check"]</label>
-                    <textarea id="support-identity" @bind="_identityCheck" maxlength="@PlatformLicensingLimits.SupportTextMaxLength" rows="2" placeholder="@T["ui.licensing.identity_check_hint"]"></textarea>
+                <div class="vx-form-grid-2" style="margin-bottom: 0.75rem;">
+                    <div class="vx-field-compact">
+                        <label for="support-identity">@T["ui.licensing.identity_check"]</label>
+                        <textarea id="support-identity" @bind="_identityCheck" maxlength="@PlatformLicensingLimits.SupportTextMaxLength" rows="2" placeholder="@T["ui.licensing.identity_check_hint"]" style="resize: vertical;"></textarea>
+                    </div>
+                    <div class="vx-field-compact">
+                        <label for="support-reason">@T["ui.licensing.support_reason"]</label>
+                        <textarea id="support-reason" @bind="_reason" maxlength="@PlatformLicensingLimits.SupportTextMaxLength" rows="2" style="resize: vertical;"></textarea>
+                    </div>
                 </div>
-                <div class="vx-field">
-                    <label for="support-reason">@T["ui.licensing.support_reason"]</label>
-                    <textarea id="support-reason" @bind="_reason" maxlength="@PlatformLicensingLimits.SupportTextMaxLength" rows="2"></textarea>
-                </div>
-                <div class="vx-field">
-                    <label for="support-replace">@T["ui.licensing.replace_device"]</label>
-                    <select id="support-replace" @bind="_replace">
-                        <option value="">@T["ui.licensing.replace_none"]</option>
+                <div class="vx-field-compact" style="max-width: 32rem; margin-bottom: 1rem;">
+                    <label for="support-replace">
+                        <strong>@T["ui.licensing.replace_device"]</strong>
+                    </label>
+                    <select id="support-replace" @bind="_replace" style="height: 38px; font-weight: 500;">
+                        <option value="">— @T["ui.licensing.replace_none"] —</option>
                         @foreach (PlatformDeviceOption device in summary.ActiveDevices)
                         {
                             <option value="@device.DeviceId">@device.Number · @device.Name</option>
