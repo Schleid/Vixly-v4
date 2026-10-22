@@ -133,24 +133,45 @@ IMPORTANT NOTES:
                     </tbody>
                 </table>
                 <p>@VixlyText.Format(T, "ui.screen.total_value", "amount", OperationsInvoiceWords.Money(declaration.TotalValue, declaration.CurrencyCode))</p>
-                @if (declaration.InsuranceName is { } insurance)
-                {
-                    <p data-insured>@VixlyText.Format(T, "ui.screen.insured", new Dictionary<string, object> { ["name"] = insurance, ["value"] = OperationsInvoiceWords.Money(declaration.InsuredValue ?? 0m, declaration.CurrencyCode), ["premium"] = OperationsInvoiceWords.Money(declaration.Premium ?? 0m, declaration.CurrencyCode) })</p>
-                }
-                else
-                {
-                    <p data-not-insured>@T["ui.screen.not_insured"]</p>
-                    @if (declaration.LiabilityText is { } liability)
+                <p>@T["ui.declaration.declare"]</p>
+                @* The insurance agreement as on the page to sign (Slice 5D, D-8): the product, its cover, and the policy's own words, read before signing. *@
+                <section class="ops-screen__insurance" aria-labelledby="insurance-title" data-insurance>
+                    <h2 id="insurance-title">@T["ui.declaration.insurance"]</h2>
+                    @if (declaration.InsuranceName is { } insurance)
                     {
-                        <div class="ops-screen__terms">@liability</div>
+                        <p data-insured>@VixlyText.Format(T, "ui.screen.insured", new Dictionary<string, object> { ["name"] = insurance, ["value"] = OperationsInvoiceWords.Money(declaration.InsuredValue ?? 0m, declaration.CurrencyCode), ["premium"] = OperationsInvoiceWords.Money(declaration.Premium ?? 0m, declaration.CurrencyCode) })</p>
+                        @if (declaration.Coverage is { } coverage)
+                        {
+                            <ul>
+                                <li>@VixlyText.Format(T, "ui.insurance_choice.covers", "risks", string.Join(", ", Enum.GetValues<Vixly.Operations.Domain.Charges.OperationsInsuredRisks>().Where(risk => risk != Vixly.Operations.Domain.Charges.OperationsInsuredRisks.None && coverage.Risks.HasFlag(risk)).Select(risk => T["ui.insurance.risk." + risk].Value)))</li>
+                                <li>@(coverage.Cover == Vixly.Operations.Domain.Charges.OperationsInsuranceCover.Insurer && coverage.InsurerName is { } insurer ? VixlyText.Format(T, "ui.insurance_choice.insurer", "insurer", insurer) : T["ui.insurance_choice.own"].Value)</li>
+                                @if (coverage.DeductibleAmount is > 0 and { } deductible)
+                                {
+                                    <li>@VixlyText.Format(T, "ui.insurance_choice.deductible", "amount", OperationsInvoiceWords.Money(deductible, declaration.CurrencyCode))</li>
+                                }
+                                <li>@VixlyText.Format(T, "ui.insurance_choice.claim_days", new Dictionary<string, object> { ["damage"] = coverage.DamageClaimDays, ["loss"] = coverage.LossClaimDays })</li>
+                            </ul>
+                            @if (coverage.Terms(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName) is { } policy)
+                            {
+                                <div class="ops-screen__terms" data-policy>@policy</div>
+                            }
+                        }
                     }
-                }
-                <p class="ops-screen__warning">@T["ui.screen.declare"]</p>
+                    else
+                    {
+                        <p data-not-insured>@T["ui.screen.not_insured"]</p>
+                        @if (declaration.LiabilityText is { } liability)
+                        {
+                            <div class="ops-screen__terms">@liability</div>
+                        }
+                    }
+                </section>
                 <form method="post" action="/screen/act" data-signature-pad class="ops-screen__form">
                     <AntiforgeryToken />
                     <input type="hidden" name="action" value="Sign" />
                     <input type="hidden" name="version" value="@Version" />
                     <input type="hidden" name="signature" />
+                    <label class="ops-screen__accept"><input type="checkbox" name="accept" value="true" required /> @(declaration.InsuranceName is null ? T["ui.screen.accept_declaration"] : T["ui.screen.accept_insured"])</label>
                     <canvas width="720" height="220" class="ops-screen__pad" tabindex="0" aria-label="@T["ui.screen.sign_here"]"></canvas>
                     <div class="ops-screen__choices">
                         <button type="button" class="vx-button vx-button--secondary" data-signature-clear>@T["ui.screen.sign_clear"]</button>

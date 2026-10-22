@@ -25,22 +25,23 @@ IMPORTANT NOTES:
     else
     {
         <p>@(PrintedUtc is { } printed ? VixlyText.Format(T, "ui.shipping_label.printed", "date", printed.ToString("yyyy-MM-dd HH:mm")) : T["ui.shipping_label.never"].Value)</p>
-        @if (Printers.Count > 0)
-        {
-            <form method="post" action="/staff/parcels/@ParcelId/shipping-label" class="ops-editor__inline">
-                <AntiforgeryToken />
-                <label>@T["ui.parcels.print_on"]
-                    <select name="printer">
+        <div class="ops-inline-action-bar" style="margin-top: 0.5rem; padding: 0;">
+            @if (Printers.Count > 0)
+            {
+                <form method="post" action="/staff/parcels/@ParcelId/shipping-label" style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0;">
+                    <AntiforgeryToken />
+                    <label for="shipping-printer-select" class="ops-inline-action-bar__label">@T["ui.parcels.print_on"]</label>
+                    <select id="shipping-printer-select" name="printer" class="ops-inline-action-bar__select">
                         @foreach (Vixly.Operations.Domain.Printing.OperationsLabelPrinter printer in Printers) { <option value="@printer.Id">@printer.Name</option> }
                     </select>
-                </label>
-                <button type="submit" class="vx-button vx-button--primary">@T["ui.shipping_label.print"]</button>
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.shipping_label.print"]</button>
+                </form>
+            }
+            <form method="post" action="/staff/parcels/@ParcelId/shipping-label/pdf" style="display: inline-flex; align-items: center; margin: 0;">
+                <AntiforgeryToken />
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.shipping_label.download"]</button>
             </form>
-        }
-        <form method="post" action="/staff/parcels/@ParcelId/shipping-label/pdf" class="ops-editor__inline">
-            <AntiforgeryToken />
-            <button type="submit" class="vx-button vx-button--secondary">@T["ui.shipping_label.download"]</button>
-        </form>
+        </div>
     }
 </section>
 

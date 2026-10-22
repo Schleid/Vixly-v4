@@ -1,4 +1,4 @@
-@*
+﻿@*
 =========================================================
 FILE: ShipmentPage.razor
 
@@ -17,58 +17,60 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@(Shipment.Number ?? T["ui.shipments_desk.shipment"].Value)" Company="@Company" Section="shipments" Error="@Error" Info="@Info">
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <a href="/staff/shipments" class="vx-button vx-button--secondary">@T["ui.shipments_desk.back"]</a>
+            @if (!Shipment.IsWaiting && Shipment.Status != OperationsShipmentStatus.Cancelled && Parcels.Count > 0)
+            {
+                <a class="vx-button vx-button--secondary" href="/staff/shipments/@Shipment.Id/documents/packing-list" target="_blank" rel="noopener">@T["ui.shipments_desk.packing_list"]</a>
+                <a class="vx-button vx-button--secondary" href="/staff/shipments/@Shipment.Id/documents/commercial-invoice" target="_blank" rel="noopener">@T["ui.shipments_desk.commercial_invoice"]</a>
+            }
+            @if (Shipment.Options.HasFlag(OperationsShipmentOptions.Insured))
+            {
+                <a class="vx-button vx-button--secondary" href="/staff/shipments/@Shipment.Id/certificate" target="_blank" rel="noopener">@T["ui.shipments_desk.certificate"]</a>
+            }
+        </div>
+        <div class="ops-list-bar__actions">
+            <span class="ops-editor__status" data-status="@Shipment.Status">@T["ui.shipments_desk.status." + Shipment.Status]</span>
+        </div>
+    </div>
     <div class="ops-compact-tabs" data-section-tabs="shipment" data-tabs-label="@T["ui.shipments_desk.shipment"]">
-    <p><a href="/staff/shipments">@T["ui.shipments_desk.back"]</a></p>
     <section class="ops-editor__panel" data-tab-label="@T["ui.customers.details"]">
-        <dl class="ops-editor__details">
-            <dt>@T["ui.customers.code"]</dt><dd>@CustomerCode @(CustomerName is null ? null : "· " + CustomerName)</dd>
-            <dt>@T["ui.shipments_desk.origin"]</dt><dd>@Origin?.Code · @Origin?.Name</dd>
+        <dl class="ops-facts-grid">
+            <div class="ops-fact-cell"><dt>@T["ui.customers.code"]</dt><dd>@CustomerCode @(CustomerName is null ? null : "· " + CustomerName)</dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.origin"]</dt><dd>@Origin?.Code · @Origin?.Name</dd></div>
             @if (Shipment.IsWaiting)
             {
-                <dt>@T["ui.shipments_desk.destination"]</dt><dd>@T["ui.shipments_desk.waiting_hint"]</dd>
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.destination"]</dt><dd>@T["ui.shipments_desk.waiting_hint"]</dd></div>
             }
             else
             {
-                <dt>@T["ui.shipments_desk.destination"]</dt>
-                <dd>@(Shipment.DeliveryAddress is { } address ? T["ui.shipments_desk.home"].Value + ": " + address.Line1 + ", " + address.City + ", " + address.CountryCode : T["ui.shipments_desk.pickup"].Value + ": " + DestinationName + ", " + Shipment.DestinationCountryCode)</dd>
-                <dt>@T["ui.shipments_desk.recipient"]</dt><dd>@Shipment.RecipientName · @Shipment.RecipientPhone</dd>
-                <dt>@T["ui.shipments_desk.service"]</dt><dd>@(Shipment.ServiceCode is { } code ? T["ui.services.name." + code].Value : T["ui.shipments_desk.no_service"].Value)</dd>
-                <dt>@T["ui.shipments_desk.options"]</dt><dd>@string.Join(", ", Options())</dd>
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.destination"]</dt><dd>@(Shipment.DeliveryAddress is { } address ? T["ui.shipments_desk.home"].Value + ": " + address.Line1 + ", " + address.City + ", " + address.CountryCode : T["ui.shipments_desk.pickup"].Value + ": " + DestinationName + ", " + Shipment.DestinationCountryCode)</dd></div>
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.recipient"]</dt><dd>@Shipment.RecipientName · @Shipment.RecipientPhone</dd></div>
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.service"]</dt><dd>@(Shipment.ServiceCode is { } code ? T["ui.services.name." + code].Value : T["ui.shipments_desk.no_service"].Value)</dd></div>
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.options"]</dt><dd>@string.Join(", ", Options())</dd></div>
             }
-            <dt>@T["ui.shipments_desk.status"]</dt><dd>@T["ui.shipments_desk.status." + Shipment.Status]</dd>
+            <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.status"]</dt><dd><span class="ops-editor__status" data-status="@Shipment.Status">@T["ui.shipments_desk.status." + Shipment.Status]</span></dd></div>
             @if (Shipment.ParcelCount is { } declared)
             {
-                <dt>@T["ui.shipments_desk.parcel_count"]</dt>
-                <dd>@VixlyText.Format(T, "ui.shipments_desk.parcels_of", new Dictionary<string, object> { ["entered"] = Parcels.Count, ["count"] = declared })</dd>
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.parcel_count"]</dt><dd>@VixlyText.Format(T, "ui.shipments_desk.parcels_of", new Dictionary<string, object> { ["entered"] = Parcels.Count, ["count"] = declared })</dd></div>
             }
             @if (Shipment.BookedTotal is { } total)
             {
-                <dt>@T["ui.shipments_desk.amount_final"]</dt><dd>@total.ToString("N2", System.Globalization.CultureInfo.CurrentCulture) @Shipment.BookedCurrencyCode</dd>
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.amount_final"]</dt><dd class="ops-editor__number">@total.ToString("N2", System.Globalization.CultureInfo.CurrentCulture) @Shipment.BookedCurrencyCode</dd></div>
             }
         </dl>
-        @if (!Shipment.IsWaiting && Shipment.Status != OperationsShipmentStatus.Cancelled && (Parcels.Count > 0 || Shipment.Options.HasFlag(OperationsShipmentOptions.Insured)))
-        {
-            <p>
-                @if (Parcels.Count > 0)
-                {
-                    <a href="/staff/shipments/@Shipment.Id/documents/packing-list">@T["ui.shipments_desk.packing_list"]</a>
-                    <span> · </span><a href="/staff/shipments/@Shipment.Id/documents/commercial-invoice">@T["ui.shipments_desk.commercial_invoice"]</a>
-                }
-                @if (Shipment.Options.HasFlag(OperationsShipmentOptions.Insured)) { <span> · </span><a href="/staff/shipments/@Shipment.Id/certificate">@T["ui.shipments_desk.certificate"]</a> }
-            </p>
-        }
     </section>
     @if (CanChangeService && Services.Count > 0)
     {
-        <form method="post" action="/staff/shipments/@Shipment.Id/service" class="ops-editor__panel ops-editor__inline-field ops-panel--restricted">
+        <form method="post" action="/staff/shipments/@Shipment.Id/service" class="ops-editor__panel ops-panel--restricted ops-inline-action-bar">
             <AntiforgeryToken />
-            <label>@T["ui.shipments_desk.change_service"]
-                <select name="service" required>
-                    @foreach (string offered in Services) { <option value="@offered" selected="@(offered == Shipment.ServiceCode)">@T["ui.services.name." + offered]</option> }
-                </select>
-            </label>
+            <label for="change-service-select" class="ops-inline-action-bar__label">@T["ui.shipments_desk.change_service"]</label>
+            <select id="change-service-select" name="service" required class="ops-inline-action-bar__select">
+                @foreach (string offered in Services) { <option value="@offered" selected="@(offered == Shipment.ServiceCode)">@T["ui.services.name." + offered]</option> }
+            </select>
             <button type="submit" class="vx-button vx-button--primary">@T["ui.shipments_desk.save_service"]</button>
-            <p class="ops-editor__hint">@T["ui.shipments_desk.change_service_hint"]</p>
+            <span class="ops-editor__hint">@T["ui.shipments_desk.change_service_hint"]</span>
         </form>
     }
     <section class="ops-editor__panel">

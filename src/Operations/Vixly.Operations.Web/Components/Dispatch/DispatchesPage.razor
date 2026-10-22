@@ -1,4 +1,4 @@
-@*
+﻿@*
 =========================================================
 FILE: DispatchesPage.razor
 
@@ -17,14 +17,16 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.dispatch.title"]" Company="@Company" Section="dispatches" Error="@Error" Info="@Info">
-    <div class="ops-list-bar" style="justify-content: space-between;">
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
             <a class="vx-button @(!All ? "vx-button--primary" : "vx-button--secondary")" href="/staff/dispatches">@T["ui.dispatch.view.open"]</a>
             <a class="vx-button @(All ? "vx-button--primary" : "vx-button--secondary")" href="/staff/dispatches?view=all">@T["ui.dispatch.view.all"]</a>
         </div>
         @if (FreeBundles.Values.Any(count => count > 0))
         {
-            <span class="ops-editor__hint" style="margin: 0;">@string.Join(" · ", Warehouses.Where(warehouse => FreeBundles.GetValueOrDefault(warehouse.Id) > 0).Select(warehouse => VixlyText.Format(T, "ui.dispatch.free_bundles", new Dictionary<string, object> { ["warehouse"] = warehouse.Code, ["count"] = FreeBundles[warehouse.Id] })))</span>
+            <div class="ops-list-bar__actions">
+                <span class="ops-editor__hint" style="margin: 0;">@string.Join(" · ", Warehouses.Where(warehouse => FreeBundles.GetValueOrDefault(warehouse.Id) > 0).Select(warehouse => VixlyText.Format(T, "ui.dispatch.free_bundles", new Dictionary<string, object> { ["warehouse"] = warehouse.Code, ["count"] = FreeBundles[warehouse.Id] })))</span>
+            </div>
         }
     </div>
     <section class="ops-editor__panel" aria-labelledby="dispatches-title">
@@ -59,14 +61,15 @@ IMPORTANT NOTES:
     </section>
     @if (Services.Count > 0 && Destinations.Count > 0)
     {
-        <section class="ops-editor__panel" aria-labelledby="new-title">
+        <section class="ops-editor__panel ops-setting-card" aria-labelledby="new-title">
             <h2 id="new-title">@T["ui.dispatch.new"]</h2>
             <form method="post" action="/staff/dispatches" class="ops-editor__form">
                 <AntiforgeryToken />
                 <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
                 <div class="ops-charges-duo">
                     <div>
-                        <label>@T["ui.dispatch.from"]
+                        <label>
+                            <span class="ops-label-text">@T["ui.dispatch.from"]</span>
                             <select name="warehouse">
                                 @foreach (OperationsWarehouse warehouse in Warehouses)
                                 {
@@ -76,7 +79,8 @@ IMPORTANT NOTES:
                         </label>
                     </div>
                     <div>
-                        <label>@T["ui.dispatch.destination"]
+                        <label>
+                            <span class="ops-label-text">@T["ui.dispatch.destination"]</span>
                             <select name="destination">
                                 @foreach (OperationsWarehouse destination in Destinations)
                                 {
@@ -88,7 +92,8 @@ IMPORTANT NOTES:
                 </div>
                 <div class="ops-charges-duo">
                     <div>
-                        <label>@T["ui.dispatch.service"]
+                        <label>
+                            <span class="ops-label-text">@T["ui.dispatch.service"]</span>
                             <select name="service">
                                 @foreach (string service in Services)
                                 {
@@ -98,11 +103,19 @@ IMPORTANT NOTES:
                         </label>
                     </div>
                     <div>
-                        <label>@VixlyText.Format(T, "ui.dispatch.cutoff_in", "zone", OperationsDispatchWords.Zone(TimeZone)) <input type="datetime-local" name="cutoff" style="height: 32px;" /></label>
+                        <label>
+                            <span class="ops-label-text">@VixlyText.Format(T, "ui.dispatch.cutoff_in", "zone", OperationsDispatchWords.Zone(TimeZone))</span>
+                            <input type="datetime-local" name="cutoff" style="height: 32px;" />
+                        </label>
                     </div>
                 </div>
-                <label>@T["ui.dispatch.notes"] <textarea name="notes" rows="2" maxlength="@OperationsDispatch.NotesMaxLength"></textarea></label>
-                <div class="ops-editor__inline-field" style="align-items: center; justify-content: space-between; margin-top: 0.75rem;">
+                <div style="margin-top: 0.5rem;">
+                    <label>
+                        <span class="ops-label-text" style="min-height: auto; margin-bottom: 0.35rem;">@T["ui.dispatch.notes"]</span>
+                        <textarea name="notes" rows="2" maxlength="@OperationsDispatch.NotesMaxLength" style="width: 100%; box-sizing: border-box;"></textarea>
+                    </label>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 1rem;">
                     <button type="submit" class="vx-button vx-button--primary">@T["ui.dispatch.create"]</button>
                     <span class="ops-editor__hint" style="margin: 0;">@T["ui.dispatch.new_hint"]</span>
                 </div>
@@ -114,19 +127,19 @@ IMPORTANT NOTES:
 @code {
     [Parameter] public string? Company { get; set; }
 
+    [Parameter] public IReadOnlyList<OperationsDispatch> Dispatches { get; set; } = Array.Empty<OperationsDispatch>();
+
     [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
 
     [Parameter] public IReadOnlyList<OperationsWarehouse> Destinations { get; set; } = Array.Empty<OperationsWarehouse>();
-
-    [Parameter] public IReadOnlyList<OperationsDispatch> Dispatches { get; set; } = Array.Empty<OperationsDispatch>();
 
     [Parameter] public IReadOnlyList<string> Services { get; set; } = Array.Empty<string>();
 
     [Parameter] public IReadOnlyDictionary<Guid, int> FreeBundles { get; set; } = new Dictionary<Guid, int>();
 
-    [Parameter] public string? TimeZone { get; set; }
-
     [Parameter] public bool All { get; set; }
+
+    [Parameter] public string? TimeZone { get; set; }
 
     [Parameter] public string? Error { get; set; }
 

@@ -2645,6 +2645,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         Guid warehouse = await WarehouseAsync(tenant);
         (Guid ana, string _) = await CustomerAsync(tenant, "ana.screen@example.com");
         Guid destination;
+        Guid policy;
 
         await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
         {
@@ -2659,8 +2660,15 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             context.Add(Vixly.Operations.Domain.Charges.OperationsRateCard.Create(tenant, "air_standard", null, null, null, Vixly.Operations.Domain.Charges.OperationsCustomsPolicy.TransportOnly,
                 new Vixly.Operations.Domain.Charges.OperationsRatePrices(new[] { new Vixly.Operations.Domain.Charges.OperationsRateBand(0, Vixly.Operations.Domain.Charges.OperationsBandKind.PerUnit, 3m) },
                     Array.Empty<Vixly.Operations.Domain.Charges.OperationsRateItem>(), null, null, null), null, now));
+            // Slice 5F step 3: an insurance product with its policy's own words, read and signed on the screen.
+            Vixly.Operations.Domain.Charges.OperationsInsurancePlan insured = Vixly.Operations.Domain.Charges.OperationsInsurancePlan.Create(tenant, Vixly.Operations.Domain.Charges.OperationsTransportMode.Air,
+                new Vixly.Operations.Domain.Charges.OperationsInsuranceTerms(Vixly.Operations.Domain.Charges.OperationsInsuranceMethod.Percent, 2m, 5m,
+                    Array.Empty<Vixly.Operations.Domain.Charges.OperationsInsuranceBand>(), null,
+                    Vixly.Operations.Domain.Charges.OperationsInsuranceCoverage.Defaults with { TermsEn = "Claims are paid within 30 days of proof of loss." }), null, now, "Full value");
+            context.Add(insured);
             await context.SaveChangesAsync();
             destination = pickup.Id;
+            policy = insured.Id;
         }
 
         // The company takes Zelle (with its QR picture and terms) and cards.
@@ -2784,7 +2792,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         (HttpResponseMessage _, string customerPage) = await owner.GetAsync(customerPath);
         (HttpResponseMessage open, string _) = await owner.PostAsync(customerPath + "/shipments", customerPage, ("key", FormKey(customerPage, customerPath + "/shipments")),
             ("origin", warehouse.ToString()), ("destination", destination.ToString()), ("delivery", "pickup"), ("service", "air_standard"), ("parcelCount", "2"),
-            ("recipient", "Jean Baptiste"), ("recipientPhone", "+50937000000"));
+            ("recipient", "Jean Baptiste"), ("recipientPhone", "+50937000000"), ("insurance", policy.ToString()), ("insuranceAccepted", "true"));
         string openPath = Regex.Match(open.Headers.Location?.OriginalString ?? string.Empty, "^(?<path>/staff/counter/shipments/[0-9a-f-]{36})").Groups["path"].Value;
         Guid openShipment = Guid.Parse(openPath[^36..]);
         (HttpResponseMessage _, string openPage) = await owner.GetAsync(openPath);
@@ -2796,16 +2804,22 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         (string declaration, string signVersion) = await ScreenAsync();
         Assert.Contains("data-screen-step=\"signature\"", declaration, StringComparison.Ordinal);
         Assert.Contains("Shoes", declaration, StringComparison.Ordinal);
-        Assert.Contains("problem=ops.screens.signature_required", (await ActAsync(declaration, "Sign", signVersion)).Response.Headers.Location?.OriginalString, StringComparison.Ordinal);
+        Assert.Contains("data-insured", declaration, StringComparison.Ordinal);
+        Assert.Contains("Claims are paid within 30 days of proof of loss.", declaration, StringComparison.Ordinal);
+        Assert.Contains("name=\"accept\"", declaration, StringComparison.Ordinal);
+        Assert.Contains("problem=ops.screens.signature_required", (await ActAsync(declaration, "Sign", signVersion, ("accept", "true"))).Response.Headers.Location?.OriginalString,
+            StringComparison.Ordinal);
+        Assert.Contains("problem=ops.screens.accept_required", (await ActAsync(declaration, "Sign", signVersion,
+            ("signature", "data:image/png;base64," + Convert.ToBase64String(Png())))).Response.Headers.Location?.OriginalString, StringComparison.Ordinal);
 
         // Review: the shipment changed after the customer read it (here, signed on the clerk's pad): the old page's signature is refused.
         string drawn = "data:image/png;base64," + Convert.ToBase64String(Png());
         (HttpResponseMessage _, string padPage) = await owner.GetAsync(openPath);
         await owner.PostAsync(openPath + "/signature", padPage, ("signature", drawn));
-        Assert.Contains("problem=ops.screens.step_invalid", (await ActAsync(declaration, "Sign", signVersion, ("signature", drawn))).Response.Headers.Location?.OriginalString,
+        Assert.Contains("problem=ops.screens.step_invalid", (await ActAsync(declaration, "Sign", signVersion, ("signature", drawn), ("accept", "true"))).Response.Headers.Location?.OriginalString,
             StringComparison.Ordinal);
         (declaration, signVersion) = await ScreenAsync();
-        Assert.Equal("/screen", (await ActAsync(declaration, "Sign", signVersion, ("signature", drawn))).Response.Headers.Location?.OriginalString);
+        Assert.Equal("/screen", (await ActAsync(declaration, "Sign", signVersion, ("signature", drawn), ("accept", "true"))).Response.Headers.Location?.OriginalString);
         Assert.Contains("data-screen-step=\"done\"", (await ScreenAsync()).Html, StringComparison.Ordinal);
 
         await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())

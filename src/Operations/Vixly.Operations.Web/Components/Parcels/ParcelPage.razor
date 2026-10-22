@@ -18,7 +18,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@(Parcel.Number ?? string.Empty)" Company="@Company" Section="parcels" Error="@Error" Info="@Info">
-    <div class="ops-list-bar__actions" style="margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
         <div style="display: flex; gap: 0.5rem; align-items: center;">
             <a href="/staff/parcels" class="vx-button vx-button--secondary">@T["ui.parcels.back"]</a>
             <a class="vx-button vx-button--secondary" href="/staff/parcels/@Parcel.ParcelId/label" target="_blank" rel="noopener">@T["ui.parcels.print_label"]</a>
@@ -26,7 +26,9 @@ IMPORTANT NOTES:
     
         @if (CanCheck)
         {
-            <a class="vx-button vx-button--primary" href="/staff/inspection/@Parcel.ParcelId">@T["ui.inspection.title"]</a>
+            <div class="ops-list-bar__actions">
+                <a class="vx-button vx-button--primary" href="/staff/inspection/@Parcel.ParcelId">@T["ui.inspection.title"]</a>
+            </div>
         }
     </div>
     <div class="ops-record-layout" data-editable="@((CanAssign || CanPutAway) ? "true" : "false")">
@@ -69,16 +71,15 @@ IMPORTANT NOTES:
         Printers="Printers.Where(printer => printer.Media == Vixly.Operations.Domain.Printing.OperationsLabelMedia.ShippingLabel).ToList()" />
     @if (Printers.Any(printer => printer.Media == Vixly.Operations.Domain.Printing.OperationsLabelMedia.IdLabel))
     {
-        <form method="post" action="/staff/parcels/@Parcel.ParcelId/print" class="ops-editor__panel ops-editor__inline-field">
+        <form method="post" action="/staff/parcels/@Parcel.ParcelId/print" class="ops-editor__panel ops-inline-action-bar">
             <AntiforgeryToken />
-            <label>@T["ui.parcels.print_on"]
-                <select name="printer">
+            <label for="parcel-printer-select" class="ops-inline-action-bar__label">@T["ui.parcels.print_on"]</label>
+            <select id="parcel-printer-select" name="printer" class="ops-inline-action-bar__select">
                     @foreach (Vixly.Operations.Domain.Printing.OperationsLabelPrinter printer in Printers.Where(printer => printer.Media == Vixly.Operations.Domain.Printing.OperationsLabelMedia.IdLabel))
                     {
                         <option value="@printer.Id">@printer.Name</option>
                     }
-                </select>
-            </label>
+            </select>
             <button type="submit" class="vx-button vx-button--secondary">@T["ui.parcels.print_label"]</button>
         </form>
     }

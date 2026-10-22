@@ -1,4 +1,4 @@
-@*
+﻿@*
 =========================================================
 FILE: SupplyPriceFields.razor
 
@@ -15,10 +15,16 @@ IMPORTANT NOTES:
 *@
 <div class="ops-charges-duo">
     <div>
-        <label>@VixlyText.Format(T, "ui.supplies.price", "currency", Currency) <input name="price" value="@Form.Price" inputmode="decimal" required autocomplete="off" /></label>
+        <label>
+            <span class="ops-label-text">@VixlyText.Format(T, "ui.supplies.price", "currency", Currency)</span>
+            <input name="price" value="@Form.Price" inputmode="decimal" required autocomplete="off" />
+        </label>
     </div>
     <div>
-        <label>@T["ui.charges.effective"] <input name="effective" type="date" value="@Form.Effective" /></label>
+        <label>
+            <span class="ops-label-text">@T["ui.charges.effective"]</span>
+            <input name="effective" type="date" value="@Form.Effective" />
+        </label>
         <p class="ops-editor__hint">@T["ui.charges.effective_hint"]</p>
     </div>
 </div>

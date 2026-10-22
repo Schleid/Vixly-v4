@@ -21,7 +21,7 @@ IMPORTANT NOTES:
         </div>
     }
     <form method="get" action="/staff/invoices" class="ops-list-bar" role="search">
-        <input name="q" value="@Text" maxlength="80" placeholder="@T["ui.invoices.search"]" class="ops-editor__search-input" autofocus />
+        <input name="q" value="@Text" maxlength="80" placeholder="@T["ui.invoices.search"]" class="ops-editor__search-input" autofocus style="width: 16rem;" />
         <select name="state" aria-label="@T["ui.invoices.state"]">
             @foreach (OperationsInvoiceFilter filter in Enum.GetValues<OperationsInvoiceFilter>())
             {

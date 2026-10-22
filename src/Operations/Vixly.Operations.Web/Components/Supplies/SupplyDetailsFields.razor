@@ -1,4 +1,4 @@
-@*
+﻿@*
 =========================================================
 FILE: SupplyDetailsFields.razor
 
@@ -15,11 +15,15 @@ IMPORTANT NOTES:
 *@
 <div class="ops-charges-trio">
     <div>
-        <label>@T["ui.supplies.code"] <input name="code" value="@Form.Code" maxlength="@OperationsSupplyLimits.CodeMaxLength" required autocomplete="off" class="ops-editor__code" /></label>
+        <label>
+            <span class="ops-label-text">@T["ui.supplies.code"]</span>
+            <input name="code" value="@Form.Code" maxlength="@OperationsSupplyLimits.CodeMaxLength" required autocomplete="off" class="ops-editor__code" />
+        </label>
         <p class="ops-editor__hint">@T["ui.supplies.code_hint"]</p>
     </div>
     <div>
-        <label>@T["ui.supplies.category"]
+        <label>
+            <span class="ops-label-text">@T["ui.supplies.category"]</span>
             <select name="category" required>
                 @foreach (OperationsSupplyCategory category in Enum.GetValues<OperationsSupplyCategory>())
                 {
@@ -29,19 +33,31 @@ IMPORTANT NOTES:
         </label>
     </div>
     <div>
-        <label>@T["ui.supplies.unit"] <input name="unit" value="@Form.Unit" maxlength="@OperationsSupplyLimits.UnitMaxLength" placeholder="@T["ui.supplies.unit_each"]" /></label>
+        <label>
+            <span class="ops-label-text">@T["ui.supplies.unit"]</span>
+            <input name="unit" value="@Form.Unit" maxlength="@OperationsSupplyLimits.UnitMaxLength" placeholder="@T["ui.supplies.unit_each"]" />
+        </label>
     </div>
 </div>
 
 <div class="ops-charges-trio">
     <div>
-        <label>@T["ui.supplies.name_en"] <input name="name_en" value="@Form.NameEn" maxlength="@OperationsSupplyLimits.NameMaxLength" required /></label>
+        <label>
+            <span class="ops-label-text">@T["ui.supplies.name_en"]</span>
+            <input name="name_en" value="@Form.NameEn" maxlength="@OperationsSupplyLimits.NameMaxLength" required />
+        </label>
     </div>
     <div>
-        <label>@T["ui.supplies.name_fr"] <input name="name_fr" value="@Form.NameFr" maxlength="@OperationsSupplyLimits.NameMaxLength" /></label>
+        <label>
+            <span class="ops-label-text">@T["ui.supplies.name_fr"]</span>
+            <input name="name_fr" value="@Form.NameFr" maxlength="@OperationsSupplyLimits.NameMaxLength" />
+        </label>
     </div>
     <div>
-        <label>@T["ui.supplies.name_es"] <input name="name_es" value="@Form.NameEs" maxlength="@OperationsSupplyLimits.NameMaxLength" /></label>
+        <label>
+            <span class="ops-label-text">@T["ui.supplies.name_es"]</span>
+            <input name="name_es" value="@Form.NameEs" maxlength="@OperationsSupplyLimits.NameMaxLength" />
+        </label>
     </div>
 </div>
 

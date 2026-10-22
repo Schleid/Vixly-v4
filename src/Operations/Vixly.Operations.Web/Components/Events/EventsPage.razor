@@ -1,4 +1,4 @@
-@*
+﻿@*
 =========================================================
 FILE: EventsPage.razor
 
@@ -18,7 +18,8 @@ IMPORTANT NOTES:
 <EditorShell Title="@T["ui.events.title"]" Company="@Company" Section="events" Error="@Error" Info="@Info">
     <form method="post" action="/staff/events" class="ops-list-bar" role="search" aria-labelledby="events-search">
         <AntiforgeryToken />
-        <label style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0; font-weight: 600;"><span id="events-search">@T["ui.events.number"]</span> <input name="query" value="@Query" maxlength="64" autocomplete="off" autofocus required style="height: 32px; min-height: 32px; width: 20rem;" /></label>
+        <label for="events-query"><span id="events-search">@T["ui.events.number"]</span></label>
+        <input id="events-query" name="query" value="@Query" maxlength="64" autocomplete="off" autofocus required style="width: 16rem;" />
         <button type="submit" class="vx-button vx-button--primary">@T["ui.events.find"]</button>
         <span class="ops-editor__hint" style="margin: 0; margin-inline-start: 0.5rem;">@T["ui.events.search_hint"]</span>
     </form>

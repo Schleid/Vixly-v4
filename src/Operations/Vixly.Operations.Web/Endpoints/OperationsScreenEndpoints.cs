@@ -167,6 +167,7 @@ public static class OperationsScreenEndpoints
                 Action = Enum.TryParse(form["action"].ToString(), false, out OperationsScreenAction action) && Enum.IsDefined(action) ? action : OperationsScreenAction.None,
                 Version = form["version"].ToString(),
                 Signature = signature,
+                Accepted = form["accept"].ToString() == "true",
                 ReturnUrl = "https://" + http.Request.Host.Value + "/screen?from=stripe"
             }, http.RequestAborted);
             return Results.Redirect(response.Succeeded ? "/screen" : "/screen?problem=" + Uri.EscapeDataString(response.Error?.Code ?? string.Empty));
@@ -208,7 +209,7 @@ public static class OperationsScreenEndpoints
     public static Error? Refusal(string? code) => new[]
     {
         OperationsScreenErrors.NotFound, OperationsScreenErrors.StepInvalid, OperationsScreenErrors.NotPaired, OperationsScreenErrors.CodeInvalid,
-        OperationsScreenErrors.SignatureRequired, OperationsScreenErrors.NotOffered, OperationsCardErrors.ProviderUnavailable, OperationsCardErrors.ProviderRefused,
+        OperationsScreenErrors.SignatureRequired, OperationsScreenErrors.AcceptRequired, OperationsScreenErrors.NotOffered, OperationsCardErrors.ProviderUnavailable, OperationsCardErrors.ProviderRefused,
         OperationsCardErrors.AlreadyStarted, OperationsCardErrors.NotConnected, OperationsPaymentErrors.NothingOwed, OperationsCommonErrors.ConcurrencyConflict,
         Vixly.Operations.Domain.Receiving.OperationsReceivingErrors.ShipmentNotOpen
     }.FirstOrDefault(error => error.Code == code);

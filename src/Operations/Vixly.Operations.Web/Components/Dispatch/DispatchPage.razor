@@ -19,27 +19,34 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@VixlyText.Format(T, "ui.dispatch.dispatch_title", "number", Dispatch.Number)" Company="@Company" Section="dispatches" Error="@Error" Info="@Info">
-    <p class="ops-editor__actions">
-        <a href="/staff/dispatches">@T["ui.dispatch.back"]</a>
-        @if (Dispatch.Status != OperationsDispatchStatus.Cancelled) { <a class="vx-button vx-button--secondary" href="/staff/dispatches/@Dispatch.Id/manifest" target="_blank" rel="noopener">@T["ui.dispatch.manifest"]</a> }
-        @if (Dispatch.Status is not (OperationsDispatchStatus.Cancelled or OperationsDispatchStatus.Planned)) { <a class="vx-button vx-button--secondary" href="/staff/dispatches/@Dispatch.Id/sli" target="_blank" rel="noopener">@T["ui.dispatch.sli"]</a> }
-        @if (Shipments.Count > 0 && Dispatch.TravelsByAir) { <a class="vx-button vx-button--secondary" href="/staff/dispatches/@Dispatch.Id/hawb" target="_blank" rel="noopener">@T["ui.dispatch.hawb_all"]</a> }
-    </p>
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <a href="/staff/dispatches" class="vx-button vx-button--secondary">@T["ui.dispatch.back"]</a>
+            @if (Dispatch.Status != OperationsDispatchStatus.Cancelled) { <a class="vx-button vx-button--secondary" href="/staff/dispatches/@Dispatch.Id/manifest" target="_blank" rel="noopener">@T["ui.dispatch.manifest"]</a> }
+            @if (Dispatch.Status is not (OperationsDispatchStatus.Cancelled or OperationsDispatchStatus.Planned)) { <a class="vx-button vx-button--secondary" href="/staff/dispatches/@Dispatch.Id/sli" target="_blank" rel="noopener">@T["ui.dispatch.sli"]</a> }
+            @if (Shipments.Count > 0 && Dispatch.TravelsByAir) { <a class="vx-button vx-button--secondary" href="/staff/dispatches/@Dispatch.Id/hawb" target="_blank" rel="noopener">@T["ui.dispatch.hawb_all"]</a> }
+        </div>
+        <div class="ops-list-bar__actions">
+            <span class="ops-editor__status" data-status="@Dispatch.Status.ToString().ToLowerInvariant()">@T["ui.dispatch.status." + Dispatch.Status]</span>
+        </div>
+    </div>
+
     <section class="ops-editor__panel" aria-labelledby="dispatch-title">
         <h2 id="dispatch-title">@Warehouse.Code &gt; @OperationsBundleWords.Destination(T, Dispatch.DestinationWarehouseId, Dispatch.DestinationCountryCode, Destination is null ? Array.Empty<OperationsWarehouse>() : new[] { Destination })</h2>
-        <dl class="ops-editor__facts">
-            <dt>@T["ui.dispatch.state"]</dt><dd><span class="ops-editor__status" data-status="@Dispatch.Status.ToString().ToLowerInvariant()">@T["ui.dispatch.status." + Dispatch.Status]</span></dd>
-            <dt>@T["ui.dispatch.service"]</dt><dd>@T["ui.services.name." + Dispatch.ServiceCode]</dd>
-            @if (Dispatch.CutoffUtc is not null) { <dt>@T["ui.dispatch.cutoff"]</dt><dd>@OperationsDispatchWords.Time(Dispatch.CutoffUtc, TimeZone)</dd> }
-            <dt>@T["ui.dispatch.bundles"]</dt><dd>@Bundles.Count · @VixlyText.Format(T, "ui.dispatch.pieces", "count", Bundles.Sum(bundle => bundle.ParcelCount)) · @OperationsBundleWords.Weight(Bundles.Sum(bundle => bundle.WeightKg ?? 0m), WeightUnit)</dd>
-            @if (Dispatch.ClosedUtc is not null) { <dt>@T["ui.dispatch.closed_at"]</dt><dd>@OperationsDispatchWords.Time(Dispatch.ClosedUtc, TimeZone)</dd> }
-            @if (Dispatch.DepartedUtc is not null) { <dt>@T["ui.dispatch.departed_at"]</dt><dd>@OperationsDispatchWords.Time(Dispatch.DepartedUtc, TimeZone)</dd> }
-            @if (Dispatch.ArrivedUtc is not null) { <dt>@T["ui.dispatch.arrived_at"]</dt><dd>@OperationsDispatchWords.Time(Dispatch.ArrivedUtc, TimeZone)</dd> }
-            @if (Dispatch.Notes is { } notes) { <dt>@T["ui.dispatch.notes"]</dt><dd>@notes</dd> }
-            @if (Dispatch.CancelReason is { } reason) { <dt>@T["ui.dispatch.cancel_reason"]</dt><dd>@reason</dd> }
+        <dl class="ops-facts-grid">
+            <div class="ops-fact-cell"><dt>@T["ui.dispatch.state"]</dt><dd><span class="ops-editor__status" data-status="@Dispatch.Status.ToString().ToLowerInvariant()">@T["ui.dispatch.status." + Dispatch.Status]</span></dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.dispatch.service"]</dt><dd>@T["ui.services.name." + Dispatch.ServiceCode]</dd></div>
+            @if (Dispatch.CutoffUtc is not null) { <div class="ops-fact-cell"><dt>@T["ui.dispatch.cutoff"]</dt><dd>@OperationsDispatchWords.Time(Dispatch.CutoffUtc, TimeZone)</dd></div> }
+            <div class="ops-fact-cell"><dt>@T["ui.dispatch.bundles"]</dt><dd>@Bundles.Count · @VixlyText.Format(T, "ui.dispatch.pieces", "count", Bundles.Sum(bundle => bundle.ParcelCount)) · @OperationsBundleWords.Weight(Bundles.Sum(bundle => bundle.WeightKg ?? 0m), WeightUnit)</dd></div>
+            @if (Dispatch.ClosedUtc is not null) { <div class="ops-fact-cell"><dt>@T["ui.dispatch.closed_at"]</dt><dd>@OperationsDispatchWords.Time(Dispatch.ClosedUtc, TimeZone)</dd></div> }
+            @if (Dispatch.DepartedUtc is not null) { <div class="ops-fact-cell"><dt>@T["ui.dispatch.departed_at"]</dt><dd>@OperationsDispatchWords.Time(Dispatch.DepartedUtc, TimeZone)</dd></div> }
+            @if (Dispatch.ArrivedUtc is not null) { <div class="ops-fact-cell"><dt>@T["ui.dispatch.arrived_at"]</dt><dd>@OperationsDispatchWords.Time(Dispatch.ArrivedUtc, TimeZone)</dd></div> }
+            @if (Dispatch.Notes is { } notes) { <div class="ops-fact-cell"><dt>@T["ui.dispatch.notes"]</dt><dd>@notes</dd></div> }
+            @if (Dispatch.CancelReason is { } reason) { <div class="ops-fact-cell"><dt>@T["ui.dispatch.cancel_reason"]</dt><dd>@reason</dd></div> }
         </dl>
-        <p class="ops-editor__hint">@VixlyText.Format(T, "ui.dispatch.times_in", "zone", OperationsDispatchWords.Zone(TimeZone))</p>
+        <p class="ops-editor__hint" style="margin-top: 0.75rem;">@VixlyText.Format(T, "ui.dispatch.times_in", "zone", OperationsDispatchWords.Zone(TimeZone))</p>
     </section>
+
     <section class="ops-editor__panel" aria-labelledby="bundles-title">
         <h2 id="bundles-title">@T["ui.dispatch.bundles"]</h2>
         @if (Bundles.Count == 0)
@@ -77,9 +84,10 @@ IMPORTANT NOTES:
         }
         @if (Dispatch.Status == OperationsDispatchStatus.Planned)
         {
-            <form method="post" action="/staff/dispatches/@Dispatch.Id/bundles" class="ops-editor__form">
+            <form method="post" action="/staff/dispatches/@Dispatch.Id/bundles" class="ops-inline-action-bar" style="margin: 0.75rem 0; padding: 0.5rem 0;">
                 <AntiforgeryToken />
-                <label>@T["ui.dispatch.scan_bundle"] <input name="number" autocomplete="off" autofocus maxlength="40" /></label>
+                <label for="dispatch-scan-input" class="ops-inline-action-bar__label">@T["ui.dispatch.scan_bundle"]</label>
+                <input id="dispatch-scan-input" name="number" autocomplete="off" autofocus maxlength="40" class="ops-inline-action-bar__select" style="width: 16rem;" />
                 <button type="submit" class="vx-button vx-button--primary">@T["ui.dispatch.add_bundle"]</button>
             </form>
             @if (Candidates.Count > 0)
@@ -105,8 +113,10 @@ IMPORTANT NOTES:
             }
         }
     </section>
+
     <DispatchLegsPanel Dispatch="@Dispatch" Carriers="@Carriers" TimeZone="@TimeZone" />
     <DispatchPapersPanel Dispatch="@Dispatch" Shipments="@Shipments" WeightUnit="@WeightUnit" />
+
     @if (Dispatch.Status == OperationsDispatchStatus.Planned)
     {
         <form method="post" action="/staff/dispatches/@Dispatch.Id/close" class="ops-editor__panel ops-editor__form" aria-labelledby="close-title">
@@ -118,12 +128,15 @@ IMPORTANT NOTES:
     }
     @if (Dispatch.Status is OperationsDispatchStatus.Planned or OperationsDispatchStatus.Closed)
     {
-        <form method="post" action="/staff/dispatches/@Dispatch.Id/cancel" class="ops-editor__panel ops-editor__form" aria-labelledby="cancel-title">
+        <form method="post" action="/staff/dispatches/@Dispatch.Id/cancel" class="ops-editor__panel ops-panel--restricted" aria-labelledby="cancel-title">
             <AntiforgeryToken />
             <h2 id="cancel-title">@T["ui.dispatch.cancel"]</h2>
-            <label>@T["ui.dispatch.cancel_reason"] <input name="reason" maxlength="300" required /></label>
-            <button type="submit" class="vx-button vx-button--secondary">@T["ui.dispatch.cancel_button"]</button>
-            <p class="ops-editor__hint">@T["ui.dispatch.cancel_hint"]</p>
+            <div class="ops-inline-action-bar" style="padding: 0; margin-top: 0.5rem;">
+                <label for="dispatch-cancel-reason" class="ops-inline-action-bar__label">@T["ui.dispatch.cancel_reason"]</label>
+                <input id="dispatch-cancel-reason" name="reason" maxlength="300" required class="ops-inline-action-bar__select" style="width: 20rem;" />
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.dispatch.cancel_button"]</button>
+            </div>
+            <p class="ops-editor__hint" style="margin-top: 0.5rem;">@T["ui.dispatch.cancel_hint"]</p>
         </form>
     }
 </EditorShell>
