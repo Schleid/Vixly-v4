@@ -1,4 +1,4 @@
-﻿namespace Vixly.Operations.Web.Site;
+namespace Vixly.Operations.Web.Site;
 
 // =========================================================
 // FILE: OperationsPhoneDisplay.cs
@@ -15,20 +15,37 @@
 // =========================================================
 public static class OperationsPhoneDisplay
 {
-    public static string Format(string phone)
+    public static string Format(string? phone)
     {
-        ArgumentNullException.ThrowIfNull(phone);
-
-        if (phone.Length == 12 && phone.StartsWith("+1", StringComparison.Ordinal))
+        if (string.IsNullOrWhiteSpace(phone))
         {
-            return $"+1 {phone[2..5]}-{phone[5..8]}-{phone[8..]}";
+            return string.Empty;
         }
 
-        if (phone.Length == 12 && phone.StartsWith("+509", StringComparison.Ordinal))
+        string raw = phone.Trim();
+        bool hasPlus = raw.StartsWith('+');
+        string digits = string.Concat(raw.Where(char.IsAsciiDigit));
+
+        if (digits.Length == 10)
         {
-            return $"+509 {phone[4..8]}-{phone[8..]}";
+            return hasPlus ? $"+1 ({digits[..3]}) {digits[3..6]}-{digits[6..]}" : $"({digits[..3]}) {digits[3..6]}-{digits[6..]}";
         }
 
-        return phone;
+        if (digits.Length == 11 && digits.StartsWith('1'))
+        {
+            return $"+1 ({digits[1..4]}) {digits[4..7]}-{digits[7..]}";
+        }
+
+        if (digits.Length == 8)
+        {
+            return $"{digits[..4]}-{digits[4..]}";
+        }
+
+        if (digits.Length == 11 && digits.StartsWith("509", StringComparison.Ordinal))
+        {
+            return $"+509 {digits[3..7]}-{digits[7..]}";
+        }
+
+        return raw;
     }
 }

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: WorkspacePage.razor
 
@@ -6,7 +6,7 @@ PURPOSE:
 The signed-in Operations workspace and real setup tasks.
 
 RESPONSIBILITIES:
-- Render task shortcuts and the current setup checklist
+- Render the operational cockpit, counters of what waits, task shortcuts and setup checklist
 
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10); values come from the endpoint
@@ -18,11 +18,67 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsWorkbenchText> L
 
 <EditorShell Title="@T["ui.editor.nav.workspace"]" Company="@Company" Section="workspace">
-    <section class="ops-workspace__welcome">
-        <div><p class="ops-editor__eyebrow">@L["workspace_intro"]</p><h2>@Company</h2><p>@L["workspace_body"]</p></div>
-        <VxWorkspaceArt Kind="network" />
-        <p class="ops-workspace__user">@T["ui.signed_in_as"] <strong>@Name</strong></p>
+    <section class="ops-workspace-hub" aria-labelledby="hub-company">
+        <div class="ops-workspace-hub__header">
+            <div>
+                <span class="ops-workspace-hub__badge">● @(Company ?? L["workspace_intro"]) · OPERATIONAL</span>
+                <h1 id="hub-company" class="ops-workspace-hub__title">@Company</h1>
+            </div>
+            <div class="ops-workspace-hub__meta">
+                <span class="ops-workspace-hub__user">@T["ui.signed_in_as"] <strong>@Name</strong></span>
+                <a href="/staff/account" class="vx-button vx-button--secondary vx-button--sm">@T["ui.editor.nav.account"]</a>
+            </div>
+        </div>
+        <div class="ops-workspace-hub__actions" role="toolbar" aria-label="@L["workspace_tasks"]">
+            <a href="/staff/counter" class="ops-workspace-hub__action" accesskey="n" title="Alt+N">
+                <span class="ops-workspace-hub__icon">⚡</span>
+                <div class="ops-workspace-hub__action-info">
+                    <strong>@T["ui.editor.nav.counter"]</strong>
+                    <span class="ops-workspace-hub__action-hint">@T["ui.cashier.next"] (Alt+N)</span>
+                </div>
+            </a>
+            <a href="/staff/receiving" class="ops-workspace-hub__action">
+                <span class="ops-workspace-hub__icon">📦</span>
+                <div class="ops-workspace-hub__action-info">
+                    <strong>@T["ui.editor.nav.receiving"]</strong>
+                    <span class="ops-workspace-hub__action-hint">@T["ui.editor.nav.dock"]</span>
+                </div>
+            </a>
+            <a href="/staff/dispatches" class="ops-workspace-hub__action">
+                <span class="ops-workspace-hub__icon">🚚</span>
+                <div class="ops-workspace-hub__action-info">
+                    <strong>@T["ui.editor.nav.dispatch"]</strong>
+                    <span class="ops-workspace-hub__action-hint">@T["ui.editor.nav.bundles"]</span>
+                </div>
+            </a>
+            <a href="/staff/cashier" class="ops-workspace-hub__action">
+                <span class="ops-workspace-hub__icon">💵</span>
+                <div class="ops-workspace-hub__action-info">
+                    <strong>@T["ui.editor.nav.cashier"]</strong>
+                    <span class="ops-workspace-hub__action-hint">@T["ui.editor.nav.invoices"]</span>
+                </div>
+            </a>
+            <a href="/staff/events" class="ops-workspace-hub__action">
+                <span class="ops-workspace-hub__icon">🔎</span>
+                <div class="ops-workspace-hub__action-info">
+                    <strong>@T["ui.editor.nav.events"]</strong>
+                    <span class="ops-workspace-hub__action-hint">@T["ui.events.find"]</span>
+                </div>
+            </a>
+        </div>
     </section>
+    @if (Counters.Count > 0)
+    {
+        <section class="ops-editor__panel ops-workspace__counters" aria-labelledby="counters-title" data-counters>
+            <h2 id="counters-title">@T["ui.dashboard.title"]</h2>
+            <ul class="ops-workspace__counter-list">
+                @foreach (Vixly.Operations.Application.Dashboard.OperationsDashboardCounter counter in Counters)
+                {
+                    <li data-counter="@counter.Key" data-attention="@(counter.Count > 0 ? "true" : "false")"><a href="@counter.Link"><strong>@counter.Count.ToString("N0", System.Globalization.CultureInfo.CurrentCulture)</strong> <span>@T["ui.dashboard." + counter.Key]</span></a></li>
+                }
+            </ul>
+        </section>
+    }
     @if (Checklist.Count > 0 && Checklist.Any(item => !item.Done))
     {
         <section class="ops-editor__panel" aria-labelledby="setup-checklist">
@@ -38,9 +94,7 @@ IMPORTANT NOTES:
         </section>
     }
     <h2 class="ops-workspace__section-title">@L["workspace_tasks"]</h2>
-    @* Same items and order as the menu, and only what the person's role allows (OperationsNavigation). *@
     <OperationsTaskLinks />
-    @* Slice 5E (S-8): supplies at or below their reorder level in the warehouses this person keeps the stock of. *@
     @if (LowSupplies.Count > 0)
     {
         <section class="ops-editor__panel" aria-labelledby="low-supplies" data-low-supplies>
@@ -61,6 +115,9 @@ IMPORTANT NOTES:
 
     [Parameter]
     public string Name { get; set; } = string.Empty;
+
+    [Parameter]
+    public IReadOnlyList<Vixly.Operations.Application.Dashboard.OperationsDashboardCounter> Counters { get; set; } = Array.Empty<Vixly.Operations.Application.Dashboard.OperationsDashboardCounter>();
 
     [Parameter]
     public IReadOnlyList<Vixly.Operations.Application.Settings.OperationsSetupItem> Checklist { get; set; } = Array.Empty<Vixly.Operations.Application.Settings.OperationsSetupItem>();

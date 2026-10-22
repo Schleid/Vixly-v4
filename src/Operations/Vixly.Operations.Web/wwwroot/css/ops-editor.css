@@ -1458,3 +1458,325 @@ tr[data-low="true"] td:first-child {
     line-height: 1.3;
 }
 
+/* =========================================================
+   WORKSPACE OPERATIONAL HUB & SHORTCUT COCKPIT
+   ========================================================= */
+.ops-workspace-hub {
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.6rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.ops-workspace-hub__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--vx-color-border);
+}
+.ops-workspace-hub__badge {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--vx-color-primary);
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 0.2rem;
+}
+.ops-workspace-hub__title {
+    font-size: 1.5rem;
+    font-weight: 750;
+    letter-spacing: -0.03em;
+    margin: 0;
+    color: var(--vx-color-text);
+    line-height: 1.2;
+}
+.ops-workspace-hub__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.8125rem;
+}
+.ops-workspace-hub__user {
+    color: var(--vx-color-text-muted);
+}
+.ops-workspace-hub__user strong {
+    color: var(--vx-color-text);
+    margin-left: 0.25rem;
+}
+.ops-workspace-hub__actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0.75rem;
+}
+.ops-workspace-hub__action {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.45rem;
+    background: var(--vx-color-surface-sunken);
+    text-decoration: none;
+    color: var(--vx-color-text);
+    transition: all 140ms ease;
+}
+.ops-workspace-hub__action:hover {
+    border-color: var(--vx-color-primary);
+    background: var(--vx-color-surface);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+.ops-workspace-hub__icon {
+    font-size: 1.35rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.ops-workspace-hub__action-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.ops-workspace-hub__action-info strong {
+    font-size: 0.8125rem;
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ops-workspace-hub__action-hint {
+    font-size: 0.6875rem;
+    color: var(--vx-color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* =========================================================
+   ARRIVAL & RECORD HEADER ALIGNMENTS
+   ========================================================= */
+.ops-field--inline {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    margin: 0 !important;
+}
+.ops-field--inline .ops-label-text {
+    min-height: auto !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+}
+.ops-record-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+.ops-record-header__identity {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+.ops-record-header__identity h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+.ops-record-header__back .vx-button {
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 0.75rem;
+}
+.ops-record-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Phone number links */
+.ops-phone-link {
+    color: var(--vx-color-text);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px dotted var(--vx-color-border-control);
+    transition: color 140ms ease, border-color 140ms ease;
+}
+.ops-phone-link:hover {
+    color: var(--vx-color-primary);
+    border-bottom-color: var(--vx-color-primary);
+}
+
+/* =========================================================
+   REPORTS STYLING (PAGE, GRID, CHARTS, FILTERS)
+   ========================================================= */
+.ops-report__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 0.75rem;
+}
+.ops-report__list li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.45rem;
+    background: var(--vx-color-surface-sunken);
+    transition: all 140ms ease;
+}
+.ops-report__list li:hover {
+    border-color: var(--vx-color-primary);
+    background: var(--vx-color-surface);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+.ops-report__list li a {
+    font-weight: 650;
+    font-size: 0.875rem;
+    color: var(--vx-color-primary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.ops-report__list li a::after {
+    content: "→";
+    font-size: 1rem;
+    margin-left: 0.5rem;
+}
+.ops-report__list li .ops-editor__hint {
+    margin: 0;
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+
+/* Report Filters Bar */
+[data-report-filters] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    padding: 0.85rem 1rem;
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.45rem;
+    margin-bottom: 1rem;
+}
+[data-report-filters] label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8125rem;
+    font-weight: 550;
+    color: var(--vx-color-text-muted);
+    margin: 0;
+}
+[data-report-filters] input,
+[data-report-filters] select {
+    height: 32px !important;
+    min-height: 32px !important;
+    font-size: 0.8125rem !important;
+    padding: 0 0.5rem !important;
+    border-radius: 0.35rem;
+}
+
+/* Report Export Action Badges */
+[data-report-files] {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.75rem 0 1.25rem;
+}
+[data-report-files] .vx-button {
+    height: 30px !important;
+    min-height: 30px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600;
+    padding: 0 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* Report Chart Styling */
+.ops-report__chart {
+    margin: 1.25rem 0;
+    padding: 1.25rem;
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.ops-report__chart svg {
+    width: 100%;
+    max-height: 220px;
+    overflow: visible;
+}
+.ops-report__line {
+    stroke: var(--vx-color-primary) !important;
+    stroke-width: 2.5;
+}
+.ops-report__dot {
+    fill: var(--vx-color-primary) !important;
+    transition: r 120ms ease;
+}
+.ops-report__dot:hover {
+    r: 5;
+}
+.ops-report__bar {
+    fill: var(--vx-color-primary) !important;
+    opacity: 0.85;
+    rx: 3px;
+    transition: opacity 120ms ease;
+}
+.ops-report__bar:hover {
+    opacity: 1;
+}
+.ops-report__chart figcaption {
+    font-size: 0.75rem;
+    font-weight: 650;
+    color: var(--vx-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+}
+
+/* Report Table Totals & Previous */
+[data-report-total] {
+    font-weight: 700;
+    background: var(--vx-color-surface-sunken);
+    border-top: 2px solid var(--vx-color-border);
+}
+[data-report-total] th,
+[data-report-total] td {
+    font-weight: 700 !important;
+    color: var(--vx-color-text) !important;
+}
+[data-report-previous] {
+    font-size: 0.75rem;
+    color: var(--vx-color-text-muted);
+    background: var(--vx-color-surface-sunken);
+}
+[data-change] {
+    font-size: 0.6875rem;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.25rem;
+    margin-left: 0.35rem;
+    font-weight: 600;
+}
+

@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    OPERATIONS LOGISTICS GATEWAY & STAFF AUTHENTICATION (ops-login.css)
    ========================================================================== */
 
@@ -733,4 +733,121 @@ html[data-theme="dark"] .ops-login__icon-moon { display: block; }
     .ops-login__tiles {
         grid-template-columns: 1fr;
     }
+}
+
+/* --------------------------------------------------------------------------
+   MFA & Security Checkpoint Box (ops-mfa-box)
+   -------------------------------------------------------------------------- */
+.ops-mfa-box {
+    width: 100%;
+    max-width: 26rem;
+    margin: auto;
+    padding: 2.25rem 2rem;
+    background: var(--ops-login-card-bg);
+    border: 1px solid var(--ops-login-card-border);
+    border-radius: 1rem;
+    box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    position: relative;
+    z-index: 10;
+}
+
+.ops-mfa-box__header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ops-mfa-box__icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--ops-login-tile-bg);
+    border: 1px solid var(--ops-login-tile-border);
+    color: var(--ops-login-primary);
+    margin-bottom: 0.25rem;
+}
+
+.ops-mfa-box__title {
+    font-size: 1.5rem;
+    font-weight: 750;
+    letter-spacing: -0.035em;
+    margin: 0;
+    color: var(--ops-login-text);
+}
+
+.ops-mfa-box__subtitle {
+    font-size: 0.8125rem;
+    color: var(--ops-login-text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.ops-mfa-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.ops-mfa-code-input {
+    width: 100%;
+    height: 60px !important;
+    min-height: 60px !important;
+    text-align: center;
+    font-family: var(--vx-font-mono, monospace);
+    font-size: 1.85rem !important;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    padding: 0.5rem !important;
+    border-radius: 0.5rem !important;
+    border: 1.5px solid var(--ops-login-input-border) !important;
+    background: var(--ops-login-input-bg) !important;
+    color: var(--ops-login-text) !important;
+    font-variant-numeric: tabular-nums;
+    transition: all 150ms ease;
+}
+
+.ops-mfa-code-input:focus {
+    border-color: var(--ops-login-primary) !important;
+    box-shadow: 0 0 0 3px var(--ops-login-primary-glow) !important;
+    outline: none !important;
+}
+
+.ops-mfa-box__footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ops-login-card-border);
+}
+
+.ops-mfa-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--ops-login-primary);
+    text-decoration: none;
+    padding: 0.4rem 0.2rem;
+    transition: color 140ms ease;
+}
+
+.ops-mfa-link:hover {
+    text-decoration: underline;
+}
+
+.ops-mfa-link--muted {
+    color: var(--ops-login-text-muted);
+    font-weight: 500;
+}
+
+.ops-mfa-link--muted:hover {
+    color: var(--ops-login-text);
 }

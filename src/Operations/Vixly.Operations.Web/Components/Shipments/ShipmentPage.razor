@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: ShipmentPage.razor
 
@@ -46,7 +46,7 @@ IMPORTANT NOTES:
             else
             {
                 <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.destination"]</dt><dd>@(Shipment.DeliveryAddress is { } address ? T["ui.shipments_desk.home"].Value + ": " + address.Line1 + ", " + address.City + ", " + address.CountryCode : T["ui.shipments_desk.pickup"].Value + ": " + DestinationName + ", " + Shipment.DestinationCountryCode)</dd></div>
-                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.recipient"]</dt><dd>@Shipment.RecipientName · @Shipment.RecipientPhone</dd></div>
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.recipient"]</dt><dd>@Shipment.RecipientName · <a href="tel:@Shipment.RecipientPhone" class="ops-phone-link">@OperationsPhoneDisplay.Format(Shipment.RecipientPhone)</a></dd></div>
                 <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.service"]</dt><dd>@(Shipment.ServiceCode is { } code ? T["ui.services.name." + code].Value : T["ui.shipments_desk.no_service"].Value)</dd></div>
                 <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.options"]</dt><dd>@string.Join(", ", Options())</dd></div>
             }
@@ -117,6 +117,10 @@ IMPORTANT NOTES:
             </ul>
         </section>
     }
+    @if (Profit is { } profit)
+    {
+        <Vixly.Operations.Web.Components.Payables.ShipmentProfitPanel T="T" Profit="profit" CurrencyCode="@(Settings?.CurrencyCode ?? OperationsTenantSettings.DefaultCurrency)" />
+    }
     </div>
 </EditorShell>
 
@@ -142,6 +146,9 @@ IMPORTANT NOTES:
     [Parameter] public bool CanChangeService { get; set; }
 
     [Parameter] public OperationsTenantSettings? Settings { get; set; }
+
+    // Slice 8: shown only to whoever may see costs.
+    [Parameter] public Vixly.Operations.Application.Payables.OperationsShipmentProfit? Profit { get; set; }
 
     [Parameter] public string? Error { get; set; }
 
