@@ -1,0 +1,40 @@
+﻿@*
+=========================================================
+FILE: TenantSettingsFields.razor
+
+PURPOSE:
+The tenant settings staff may still change: language and time zone (B12).
+
+IMPORTANT NOTES:
+- Company legal details are not here: they change only through an approved request
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@inject IStringLocalizer<PlatformText> T
+
+<fieldset class="vx-fieldset">
+    <legend>@T["ui.tenants.settings"]</legend>
+    <label for="@($"{Prefix}-language")">@T["ui.tenants.language"]</label>
+    <select id="@($"{Prefix}-language")" @bind="Model.Language">
+        @foreach (string language in VixlyCultures.Supported.Select(culture => culture.TwoLetterISOLanguageName))
+        {
+            <option value="@language">@T["ui.language." + language]</option>
+        }
+    </select>
+    <label for="@($"{Prefix}-zone")">@T["ui.tenants.time_zone"]</label>
+    <input id="@($"{Prefix}-zone")" list="@($"{Prefix}-zones")" @bind="Model.TimeZone" maxlength="64" autocomplete="off" />
+    <datalist id="@($"{Prefix}-zones")">
+        @foreach (string zone in PlatformDisplay.TimeZoneIds)
+        {
+            <option value="@zone"></option>
+        }
+    </datalist>
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired]
+    public TenantFormModel Model { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public string Prefix { get; set; } = string.Empty;
+}

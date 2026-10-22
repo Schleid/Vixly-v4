@@ -1,0 +1,9 @@
+{
+  "name": "Scan",
+  "short_name": "Scan",
+  "start_url": "/staff/scan",
+  "scope": "/staff/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a"
+}

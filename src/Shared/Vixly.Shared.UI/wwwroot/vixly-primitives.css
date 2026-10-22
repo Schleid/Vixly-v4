@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    FILE: vixly-primitives.css
    PURPOSE: Styles for the parts of the Vixly.Shared.UI
    primitives that no stylesheet covered yet (card header and
@@ -19,29 +19,62 @@
     justify-content: center;
     gap: var(--vx-space-2);
     box-sizing: border-box;
-    min-height: var(--vx-control-min);
-    padding: var(--vx-space-3) var(--vx-space-5);
+    height: 32px;
+    min-height: 32px;
+    padding: 0 0.85rem;
+    font-size: 0.8125rem;
     border: var(--vx-border-width) solid var(--vx-color-border-control);
     border-radius: var(--vx-radius-sm);
     background: var(--vx-color-surface);
     color: var(--vx-color-text);
     font: inherit;
     font-weight: 600;
-    line-height: 1.4;
+    line-height: 1;
+    vertical-align: middle;
     text-align: center;
     text-decoration: none;
     cursor: pointer;
     transition: background var(--vx-transition-fast), border-color var(--vx-transition-fast);
 }
 :where(.vx-button:hover:not(:disabled)) { background: var(--vx-color-surface-sunken); }
-.vx-button--primary { background: var(--vx-color-link); border-color: var(--vx-color-link); color: var(--vx-color-surface); }
-.vx-button--primary:hover:not(:disabled) { background: var(--vx-color-link); border-color: var(--vx-color-text-muted); }
+.vx-button--primary { background: var(--vx-color-link); border-color: var(--vx-color-link); color: #ffffff !important; }
+.vx-button--primary:hover:not(:disabled) { background: var(--vx-color-primary-hover, #1d4ed8); border-color: var(--vx-color-primary-hover, #1d4ed8); color: #ffffff !important; }
+.vx-button--secondary { background: var(--vx-color-surface-sunken); border-color: var(--vx-color-border-control); color: var(--vx-color-text); }
+.vx-button--secondary:hover:not(:disabled) { background: var(--vx-color-surface); border-color: var(--vx-color-primary); color: var(--vx-color-text); }
+.vx-button--danger { background: var(--vx-color-danger-bg); border-color: var(--vx-color-danger); color: var(--vx-color-danger); }
+.vx-button--danger:hover:not(:disabled) { background: var(--vx-color-danger); border-color: var(--vx-color-danger); color: #ffffff !important; }
+
 :where(.vx-button:focus-visible) { outline: var(--vx-focus-width) solid var(--vx-color-focus); outline-offset: var(--vx-space-1); }
 :where(.vx-button:disabled) { cursor: not-allowed; opacity: 0.6; }
+/* Button Density Variants */
+/* Comfortable density variant (sign-in, customer portal per Brief §4) */
+.vx-button--comfortable,
+[data-density="comfortable"] .vx-button,
+body.customer-portal .vx-button,
+.vx-auth__terminal .vx-button {
+    height: 40px;
+    min-height: 40px;
+    padding: 0 1.25rem;
+    font-size: 0.875rem;
+}
+
+/* Compact table row button (36px row per Brief §4) */
+.vx-button--sm,
+.ops-editor__table .vx-button,
+.vx-table .vx-button {
+    height: 28px;
+    min-height: 28px;
+    padding: 0 0.55rem;
+    font-size: 0.75rem;
+    line-height: 1;
+}
 :where(.vx-card) { background: var(--vx-color-surface); border: var(--vx-border-width) solid var(--vx-color-border); border-radius: var(--vx-radius-lg); box-shadow: var(--vx-shadow-1); }
 :where(.vx-message) { padding: var(--vx-space-4); border: var(--vx-border-width) solid var(--vx-color-info); border-radius: var(--vx-radius-md); background: var(--vx-color-info-bg); color: var(--vx-color-info); }
 :where(.vx-message--error) { background: var(--vx-color-danger-bg); border-color: var(--vx-color-danger); color: var(--vx-color-danger); }
-.vx-input { box-sizing: border-box; width: 100%; min-width: 0; min-height: var(--vx-control-min); }
+.vx-input { box-sizing: border-box; width: 100%; min-width: 0; height: 32px; min-height: 32px; padding: 0.25rem 0.5rem; font-size: 0.8125rem; border: 1px solid var(--vx-color-border-control); border-radius: var(--vx-radius-sm); background: var(--vx-color-surface); color: var(--vx-color-text); }
+[data-density="comfortable"] .vx-input,
+body.customer-portal .vx-input,
+.vx-auth__terminal .vx-input { height: 40px; min-height: 40px; font-size: 0.875rem; }
 textarea.vx-input { resize: vertical; }
 
 /* ---------- Button ---------- */
@@ -354,3 +387,62 @@ div.vx-message {
         animation: none;
     }
 }
+
+/* Enterprise workbench: semantic density, surfaces and status vocabulary. */
+.vx-metric { min-width: 0; padding: var(--vx-space-5); border: var(--vx-border-width) solid var(--vx-color-border); border-radius: var(--vx-radius-workbench); background: var(--vx-color-surface); box-shadow: var(--vx-shadow-1); }
+.vx-metric p { margin: 0; }
+.vx-metric__label { font-size: var(--vx-font-size-md); color: var(--vx-color-text-muted); font-weight: 500; }
+.vx-metric__row { display: flex; align-items: center; justify-content: space-between; gap: var(--vx-space-4); margin-block: var(--vx-space-3); }
+.vx-metric__value { font-size: var(--vx-font-size-3xl); line-height: var(--vx-leading-heading); font-variant-numeric: tabular-nums; letter-spacing: var(--vx-tracking-heading); color: var(--vx-color-text); }
+.vx-metric__chart { display: block; width: 30%; color: var(--vx-color-link); }
+.vx-metric__chart svg { display: block; height: var(--vx-metric-chart-height); width: 100%; overflow: visible; }
+.vx-metric__detail { color: var(--vx-color-text-muted); font-size: var(--vx-font-size-xs); }
+.vx-metric__delta { font-weight: 600; color: var(--vx-color-text); }
+.vx-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--vx-space-4); }
+.vx-lifecycle { display: flex; flex-wrap: wrap; list-style: none; margin: 0; padding: var(--vx-space-5); gap: var(--vx-space-4); background: var(--vx-color-surface); border: var(--vx-border-width) solid var(--vx-color-border); border-radius: var(--vx-radius-workbench); }
+.vx-lifecycle li { flex: 1; display: flex; align-items: center; gap: var(--vx-space-2); color: var(--vx-color-text-muted); font-size: var(--vx-font-size-md); }
+.vx-lifecycle__number { display: inline-grid; place-items: center; flex-shrink: 0; width: var(--vx-space-8); height: var(--vx-space-8); border: var(--vx-border-width) solid var(--vx-color-border-control); border-radius: var(--vx-radius-full); font-variant-numeric: tabular-nums; }
+.vx-lifecycle__complete .vx-lifecycle__number { color: var(--vx-color-success); background: var(--vx-color-success-bg); border-color: var(--vx-color-status-success-border); }
+.vx-lifecycle .vx-lifecycle__current { font-weight: 600; color: var(--vx-color-link); }
+.vx-lifecycle__current .vx-lifecycle__number { background: var(--vx-color-info-bg); border-color: var(--vx-color-link); }
+.vx-badge { display: inline-flex; align-items: center; gap: var(--vx-space-1); padding: var(--vx-space-1) var(--vx-space-2); border: var(--vx-border-width) solid; border-radius: var(--vx-radius-full); font-size: var(--vx-font-size-xs); font-weight: 600; line-height: 1.25; white-space: nowrap; }
+.vx-badge--active { color: var(--vx-color-status-completed); background: var(--vx-color-status-completed-bg); border-color: var(--vx-color-status-success-border); }
+.vx-badge--invited { color: var(--vx-color-status-received); background: var(--vx-color-status-received-bg); border-color: var(--vx-color-status-info-border); }
+.vx-badge--suspended { color: var(--vx-color-status-staged); background: var(--vx-color-status-staged-bg); border-color: var(--vx-color-status-warning-border); }
+.vx-badge--locked { color: var(--vx-color-status-exception); background: var(--vx-color-status-exception-bg); border-color: var(--vx-color-status-danger-border); }
+.vx-badge--progress { color: var(--vx-color-progress); background: var(--vx-color-progress-bg); border-color: var(--vx-color-progress-border); }
+.vx-badge--deactivated { color: var(--vx-color-inactive); background: var(--vx-color-inactive-bg); border-color: var(--vx-color-inactive-border); }
+.vx-table-container { overflow: auto; border: var(--vx-border-width) solid var(--vx-color-border); border-radius: var(--vx-radius-workbench); background: var(--vx-color-surface); }
+.vx-table { border-collapse: separate; border-spacing: 0; width: 100%; color: var(--vx-color-text); font-size: var(--vx-font-size-md); }
+.vx-table caption { padding: var(--vx-space-3) var(--vx-space-4); text-align: start; color: var(--vx-color-text-muted); }
+.vx-table th, .vx-table td { padding: var(--vx-density-cell-y) var(--vx-space-4); text-align: start; border-bottom: var(--vx-border-width) solid var(--vx-color-border); }
+.vx-table th { position: sticky; top: 0; z-index: 2; background: var(--vx-color-surface-sunken); font-weight: 600; color: var(--vx-color-text-muted); white-space: nowrap; }
+.vx-table tbody tr:last-child td { border-bottom: 0; }
+.vx-table tbody tr:hover td { background: var(--vx-color-primary-soft); }
+.vx-table__number { font-family: var(--vx-font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vx-table .vx-table__actions { position: sticky; inset-inline-end: 0; background: var(--vx-color-surface); border-inline-start: var(--vx-border-width) solid var(--vx-color-border); }
+.vx-table th.vx-table__actions { z-index: 3; background: var(--vx-color-surface-sunken); }
+.vx-table-scroll { max-height: var(--vx-table-viewport); overflow: auto; }
+.vx-table-scroll .vx-table { min-width: var(--vx-table-min-width); }
+.vx-table input[type="checkbox"] { accent-color: var(--vx-color-link); width: var(--vx-space-4); height: var(--vx-space-4); }
+.vx-table-scroll:focus-visible { outline: var(--vx-focus-width) solid var(--vx-color-focus); outline-offset: var(--vx-space-1); }
+@media (max-width: 1024px) { .vx-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+    .vx-metric-grid { grid-template-columns: minmax(0, 1fr); }
+    .vx-lifecycle { flex-direction: column; }
+    .vx-table button, .vx-table input[type="checkbox"] { min-height: var(--vx-control-min); }
+}
+
+.vx-badge--inactive { color: var(--vx-color-inactive); background: var(--vx-color-inactive-bg); border-color: var(--vx-color-inactive-border); }
+.vx-badge--primary { color: var(--vx-color-link); background: var(--vx-color-primary-soft); border-color: var(--vx-color-status-info-border); }
+
+/* Compact desktop action cells; handheld targets remain comfortable. */
+.vx-table .vx-button { min-height: 0; padding: var(--vx-space-1) var(--vx-space-2); font-size: var(--vx-font-size-sm); line-height: 1.3; }
+@media (max-width: 640px) { .vx-table .vx-button { min-height: var(--vx-control-min); } }
+
+@media (min-width: 641px) {
+    .vx-table .vx-button { padding-block: 0; }
+    .vx-table .vx-badge { padding-block: 0; line-height: 1.5; }
+}
+
+.vx-metric__detail { display: flex; align-items: center; flex-wrap: wrap; gap: var(--vx-space-2); }

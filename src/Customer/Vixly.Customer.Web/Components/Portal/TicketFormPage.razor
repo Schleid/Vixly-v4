@@ -1,0 +1,63 @@
+﻿@*
+=========================================================
+FILE: TicketFormPage.razor
+
+PURPOSE:
+Open a ticket: a package the carrier delivered that is not in the account (Slice 4D step 4, A-6).
+
+RESPONSIBILITIES:
+- What the customer knows: carrier, tracking number, store and order, delivery day, contents
+- The carrier's proof of delivery (PDF, PNG or JPEG, up to 10 MB), optional
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- Operations checks the warehouse, the sizes and the proof's type by its bytes
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Customers
+@using Vixly.Contracts.Operations.Packages
+@using Vixly.Contracts.Operations.Tickets
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.tickets.new"]" SignedIn="true" Error="@Error" ReturnHere="/customer/tickets">
+    @if (Tickets is { } tickets)
+    {
+        <form method="post" action="/customer/tickets/new" enctype="multipart/form-data" class="customer-portal__form customer-ticket-form">
+            <AntiforgeryToken />
+            <p>@T["ui.tickets.form_intro"]</p>
+            @if (tickets.Warehouses.Count == 0)
+            {
+                <p class="customer-portal__notice">@T["ui.shipments.no_mailbox"]</p>
+            }
+            else if (tickets.Warehouses.Count > 1)
+            {
+                <label>@T["ui.prealert.warehouse"]
+                    <select name="warehouse" required>
+                        @foreach (CustomerChoiceDto origin in tickets.Warehouses) { <option value="@origin.Id" selected="@(origin.Id == Entered?.WarehouseId)">@origin.Name · @origin.Detail</option> }
+                    </select>
+                </label>
+            }
+            <label>@T["ui.prealert.carrier"] <input name="carrier" required maxlength="40" value="@Entered?.Carrier" autocomplete="off" /></label>
+            <label>@T["ui.prealert.tracking"] <input name="tracking" required maxlength="60" value="@Entered?.TrackingNumber" autocomplete="off" autocapitalize="characters" spellcheck="false" /></label>
+            <label>@T["ui.prealert.store"] <input name="store" maxlength="100" value="@Entered?.Store" /></label>
+            <label>@T["ui.tickets.order"] <input name="order" maxlength="60" value="@Entered?.OrderNumber" autocomplete="off" /></label>
+            <label>@T["ui.tickets.delivered"] <input name="delivered" type="date" value="@Entered?.DeliveredOn?.ToString("yyyy-MM-dd")" /></label>
+            <label>@T["ui.prealert.contents"] <textarea name="contents" required maxlength="300" rows="3">@Entered?.Contents</textarea></label>
+            <label>@T["ui.tickets.proof"] <input name="proof" type="file" accept="application/pdf,image/png,image/jpeg" /></label>
+            <p class="customer-portal__hint">@T["ui.tickets.proof_hint"]</p>
+            <label>@T["ui.tickets.message"] <textarea name="message" maxlength="1000" rows="4">@Entered?.Message</textarea></label>
+            @if (tickets.Warehouses.Count > 0) { <button type="submit" class="vx-button vx-button--primary">@T["ui.tickets.submit"]</button> }
+            <p><a href="/customer/tickets">@T["ui.tickets.back"]</a></p>
+        </form>
+    }
+</CustomerShell>
+
+@code {
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public CustomerTicketsDto? Tickets { get; set; }
+
+    [Parameter] public CustomerTicketBody? Entered { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+}

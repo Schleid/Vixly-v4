@@ -20,4 +20,7 @@ public static class PlatformRegistrationFlowErrors
 {
     public static Error BotCheckFailed { get; } =
         Error.Create("platform.registrations.bot_check_failed");
+
+    public static Error InvitationRequired { get; } =
+        Error.Create("platform.registrations.invitation_required");
 }

@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Vixly.Operations.Application.Security;
+using Vixly.Operations.Domain.Common;
 using Vixly.Platform.Application.Security;
 using Vixly.Platform.Domain.Identity;
 using Vixly.Shared.Kernel.Domain;
@@ -42,8 +44,26 @@ public sealed class ResourceRulesTests
             typeof(PlatformSecurityErrors).Assembly,
             typeof(PlatformUserAuthorityLevel).Assembly
         }),
-        ("shared", "src/Shared/Vixly.Shared.Localization/SharedText", new[] { typeof(DomainException).Assembly })
+        ("shared", "src/Shared/Vixly.Shared.Localization/SharedText", new[] { typeof(DomainException).Assembly }),
+        ("public", "src/Public/Vixly.Public.Web/Resources/PublicText", Array.Empty<Assembly>()),
+        ("ops", "src/Operations/Vixly.Operations.Resources/OperationsText", new[]
+        {
+            typeof(OperationsInternalErrors).Assembly,
+            typeof(OperationsEntity).Assembly
+        }),
+        ("customer", "src/Customer/Vixly.Customer.Resources/CustomerText", Array.Empty<Assembly>())
     };
+
+    [Theory]
+    [InlineData("src/Operations/Vixly.Operations.Resources/OperationsText")]
+    [InlineData("src/Customer/Vixly.Customer.Resources/CustomerText")]
+    public void TenantTexts_NeverSayVixly(string basePath)
+    {
+        foreach (string? language in new[] { null, "fr", "es" })
+        {
+            Assert.All(Read(basePath, language), entry => Assert.DoesNotContain("Vixly", entry.Value, StringComparison.OrdinalIgnoreCase));
+        }
+    }
 
     public static TheoryData<string> ResourceSets()
     {

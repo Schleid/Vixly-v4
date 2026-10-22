@@ -1,0 +1,94 @@
+﻿@*
+=========================================================
+FILE: LocationsPage.razor
+
+PURPOSE:
+The branches, warehouses and contacts per country of the tenant.
+
+RESPONSIBILITIES:
+- Render the branches, warehouses and contacts per country of the tenant
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); owner only (the use cases refuse others)
+- Static forms with antiforgery and the form guard (ADR-0019); placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+@inherits OperationsAllowedComponent
+@using Vixly.Operations.Domain.Access
+
+<EditorShell Title="@T["ui.editor.locations.title"]" Company="@Company" Section="locations" Error="@Error" Info="@Info">
+    <div class="ops-location-layout ops-compact-tabs" data-section-tabs="locations" data-tabs-label="@T["ui.editor.locations.title"]">
+    <section class="ops-editor__panel" aria-labelledby="branches-title">
+        <h2 id="branches-title">@T["ui.editor.branches"]</h2>
+        @if (Can(OperationsPermissions.BranchesManage)) { <p><a class="vx-button vx-button--primary" href="/staff/locations/branch">@T["ui.editor.branch.add"]</a></p> }
+        @if (Branches.Count == 0) { <p class="ops-editor__empty-message">@T["ui.editor.none"]</p> }
+        <ul class="ops-editor__list">
+            @foreach (OperationsBranch branch in Branches)
+            {
+                <li>
+                    <a href="/staff/locations/branch/@branch.Id">@branch.Code · @branch.Name</a>
+                    <span>@OperationsCountries.Flag(branch.Address.CountryCode) @branch.Address.City</span>
+                    <span class="ops-editor__status" data-status="@branch.Status.ToString().ToLowerInvariant()">@T["ui.editor.status." + branch.Status.ToString().ToLowerInvariant()]</span>
+                    @if (branch.ShowOnSite) { <span>@T["ui.editor.on_site"]</span> }
+                </li>
+            }
+        </ul>
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="warehouses-title">
+        <h2 id="warehouses-title">@T["ui.editor.warehouses"]</h2>
+        @if (Branches.Count > 0 && Can(OperationsPermissions.WarehousesManage)) { <p><a class="vx-button vx-button--primary" href="/staff/locations/warehouse">@T["ui.editor.warehouse.add"]</a></p> }
+        @if (Warehouses.Count == 0) { <p class="ops-editor__empty-message">@T["ui.editor.none"]</p> }
+        <ul class="ops-editor__list">
+            @foreach (OperationsWarehouse warehouse in Warehouses)
+            {
+                <li>
+                    <a href="/staff/locations/warehouse/@warehouse.Id">@warehouse.Code · @warehouse.Name</a>
+                    <span>@OperationsCountries.Flag(warehouse.Address.CountryCode) @warehouse.Address.City</span>
+                    @if (Can(OperationsPermissions.WarehousesManage)) { <a href="/staff/locations/warehouse/@warehouse.Id/storage">@T["ui.storage.link"]</a> }
+                    @if (Can(OperationsPermissions.PrintersManage)) { <a href="/staff/locations/warehouse/@warehouse.Id/printers">@T["ui.printers.link"]</a> }
+                    <span class="ops-editor__status" data-status="@warehouse.Status.ToString().ToLowerInvariant()">@T["ui.editor.status." + warehouse.Status.ToString().ToLowerInvariant()]</span>
+                    @if (warehouse.ShowOnSite) { <span>@T["ui.editor.on_site"]</span> }
+                </li>
+            }
+        </ul>
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="contacts-title">
+        <h2 id="contacts-title">@T["ui.editor.contacts"]</h2>
+        @if (Can(OperationsPermissions.BranchesManage)) { <p><a class="vx-button vx-button--primary" href="/staff/locations/contact">@T["ui.editor.contact.add"]</a></p> }
+        @if (Contacts.Count == 0) { <p class="ops-editor__empty-message">@T["ui.editor.none"]</p> }
+        <ul class="ops-editor__list">
+            @foreach (OperationsCountryContact contact in Contacts)
+            {
+                <li>
+                    <a href="/staff/locations/contact/@contact.Id">@OperationsCountries.Flag(contact.CountryCode) @OperationsCountries.Name(T, contact.CountryCode)</a>
+                    <span>@string.Join(" · ", contact.Phones)</span>
+                    @if (Can(OperationsPermissions.BranchesManage))
+                    {
+                        <form method="post" action="/staff/locations/contact/@contact.Id/remove">
+                            <AntiforgeryToken />
+                            <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.remove"]</button>
+                        </form>
+                    }
+                </li>
+            }
+        </ul>
+    </section>
+    </div>
+</EditorShell>
+
+@code {
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsBranch> Branches { get; set; } = Array.Empty<OperationsBranch>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<OperationsCountryContact> Contacts { get; set; } = Array.Empty<OperationsCountryContact>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

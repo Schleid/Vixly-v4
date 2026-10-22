@@ -1,0 +1,77 @@
+﻿@*
+=========================================================
+FILE: CardPaymentPage.razor
+
+PURPOSE:
+A card payment at the cashier (Slice 5F step 4): Stripe's payment page
+as a QR code for the customer's phone (or opened on the customer
+screen), or a card reader waiting for the card; then paid or not.
+
+RESPONSIBILITIES:
+- Show the invoice, the amount and where the payment stands
+- While it waits: the QR code and the page's link, or the reader's name; Cancel
+- Paid: the payment and its receipt; paid but not applied: what to do
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Refreshes itself every 4 seconds while it waits; "paid" comes only from Stripe
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.cards.pay_title"]" Company="@Company" Section="cashier">
+    @if (Charge.Status == OperationsCardChargeStatus.Started)
+    {
+        <meta http-equiv="refresh" content="4" />
+    }
+    <p><a href="/staff/cashier/invoices/@Charge.InvoiceId">@T["ui.cards.back_to_invoice"]</a></p>
+    <section class="ops-editor__panel" aria-labelledby="charge-title" data-card-status="@Charge.Status.ToString().ToLowerInvariant()">
+        <h2 id="charge-title">@Charge.InvoiceNumber · @Charge.Amount.ToString("N2", CultureInfo.CurrentCulture) @Charge.CurrencyCode</h2>
+        @switch (Charge.Status)
+        {
+            case OperationsCardChargeStatus.Started:
+                @if (Charge.Channel == OperationsCardChannel.Reader)
+                {
+                    <p>@VixlyText.Format(T, "ui.cards.waiting_reader", "reader", Charge.ReaderLabel ?? string.Empty)</p>
+                }
+                else
+                {
+                    <p>@T["ui.cards.waiting_page"]</p>
+                    @if (QrDataUri is not null)
+                    {
+                        <img src="@QrDataUri" alt="@T["ui.cards.qr_alt"]" width="240" height="240" />
+                    }
+                    @if (Charge.PageUrl is { } url)
+                    {
+                        <p><a href="@url" rel="noopener noreferrer">@T["ui.cards.open_page"]</a></p>
+                    }
+                }
+                <form method="post" action="/staff/cashier/card/@Charge.ChargeId/cancel" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--subtle">@T["ui.cards.cancel"]</button>
+                </form>
+                break;
+            case OperationsCardChargeStatus.Paid:
+                <p class="ops-editor__notice" role="status">@T["ui.cards.paid"]</p>
+                @if (Charge.PaymentId is { } paymentId)
+                {
+                    <p><a href="/staff/cashier/payments/@paymentId">@VixlyText.Format(T, "ui.cards.see_payment", "number", Charge.PaymentNumber ?? string.Empty)</a></p>
+                }
+                break;
+            case OperationsCardChargeStatus.PaidNotApplied:
+                <p class="ops-editor__alert" role="alert">@T["ui.cards.paid_not_applied"]</p>
+                break;
+            default:
+                <p>@T["ui.cards.cancelled"]</p>
+                break;
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public GetOperationsCardPaymentResponse Charge { get; set; } = null!;
+
+    [Parameter] public string? QrDataUri { get; set; }
+}

@@ -1,0 +1,34 @@
+﻿@*
+=========================================================
+FILE: VerifyPage.razor
+
+PURPOSE:
+The email confirmation page: one button, so link scanners never use the link.
+
+RESPONSIBILITIES:
+- Render the email confirmation page: one button, so link scanners never use the link
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019)
+- Placeholder look: Frontend/UI designs the final experience; never says "Vixly"
+=========================================================
+*@
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.verify.title"]" Error="@Error" ReturnHere="/customer/sign-in">
+    <form method="post" action="/customer/verify" class="customer-portal__form">
+        <AntiforgeryToken />
+        <input type="hidden" name="token" value="@Token" />
+        <p>@T["ui.verify.body"]</p>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.verify.submit"]</button>
+    </form>
+</CustomerShell>
+
+@code {
+    [Parameter] public Vixly.Contracts.Operations.Customers.CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public string Token { get; set; } = string.Empty;
+
+    [Parameter] public string? Error { get; set; }
+}

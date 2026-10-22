@@ -71,6 +71,12 @@ public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
 
     public DbSet<PlatformPublishedEvent> PublishedEvents => Set<PlatformPublishedEvent>();
 
+    public DbSet<Vixly.Platform.Domain.Sales.PlatformSalesLead> SalesLeads => Set<Vixly.Platform.Domain.Sales.PlatformSalesLead>();
+
+    public DbSet<Vixly.Platform.Domain.Tenants.PlatformTenantChangeRequest> TenantChangeRequests => Set<Vixly.Platform.Domain.Tenants.PlatformTenantChangeRequest>();
+
+    public DbSet<Vixly.Platform.Domain.Tenants.PlatformTenantChangeProof> TenantChangeProofs => Set<Vixly.Platform.Domain.Tenants.PlatformTenantChangeProof>();
+
     public DbSet<PlatformPlan> Plans => Set<PlatformPlan>();
 
     public DbSet<PlatformSubscription> Subscriptions => Set<PlatformSubscription>();
@@ -124,6 +130,8 @@ public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<Vixly.Platform.Domain.Licensing.PlatformDeviceChallenge> DeviceChallenges => Set<Vixly.Platform.Domain.Licensing.PlatformDeviceChallenge>();
 
     public DbSet<Vixly.Platform.Domain.Licensing.PlatformDeviceLink> DeviceLinks => Set<Vixly.Platform.Domain.Licensing.PlatformDeviceLink>();
+
+    public DbSet<Vixly.Platform.Domain.Licensing.PlatformOwnerSupportRequest> OwnerSupportRequests => Set<Vixly.Platform.Domain.Licensing.PlatformOwnerSupportRequest>();
 
     public DbSet<Vixly.Platform.Domain.Licensing.PlatformDeviceEvent> DeviceEvents => Set<Vixly.Platform.Domain.Licensing.PlatformDeviceEvent>();
 

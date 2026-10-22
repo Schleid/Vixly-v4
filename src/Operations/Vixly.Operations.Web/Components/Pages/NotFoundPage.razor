@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: NotFoundPage.razor
+
+PURPOSE:
+The page for a host name that is no tenant, or a path that is no page (404).
+
+RESPONSIBILITIES:
+- Show the page for a host name that is no tenant (404)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Tenant surface: never says "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+- Never sets the status itself: the tenant check or the router sets 404 (a 404 set while rendering empties the page)
+=========================================================
+*@
+@page "/not-found"
+@inject IStringLocalizer<OperationsText> T
+
+<PageTitle>@T["ui.tenant.not_found.title"]</PageTitle>
+<h1>@T["ui.tenant.not_found.title"]</h1>
+<p>@T["ui.tenant.not_found.body"]</p>

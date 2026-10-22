@@ -143,10 +143,11 @@ public sealed class PlatformSignInSteps
             _metadata.ClientIp,
             _metadata.UserAgent,
             utcNow);
+        session.From(_metadata.Country);
 
         user.RecordSuccessfulSignIn(utcNow);
         _sessions.Add(session);
-        _audit.Record(user.Id, "platform.auth.signed_in", null, nameof(PlatformUser), user.Id, arguments: new { method });
+        _audit.Record(user.Id, "platform.auth.signed_in", null, nameof(PlatformUser), user.Id, arguments: new { method, country = session.Country });
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken)
             ? new PlatformIssuedSession(session.Id, token.Value, session.ExpiresUtc)

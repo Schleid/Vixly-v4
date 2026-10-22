@@ -1,0 +1,80 @@
+﻿@*
+=========================================================
+FILE: PriceVersionFields.razor
+
+PURPOSE:
+The prices of a version of a price list: any number of bands, the item prices (ocean), the flat prices (ground), the fees and the day it starts (Slice 4B and 4C).
+
+RESPONSIBILITIES:
+- Show the bands of the version given (or one empty band from 0) and one empty row; "Add a band" (ops-bands.js) adds as many rows as needed
+- Ocean: one price per item type; ground: a flat price per package and per shipment; the minimum, service and consolidation fees; the effective day
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Bands: from (in the company's unit), flat, per unit, or base plus per unit above the start
+=========================================================
+*@
+<table class="ops-editor__table">
+    <caption>@VixlyText.Format(T, "ui.charges.bands.caption", "unit", Unit)</caption>
+    <thead><tr><th>@T["ui.charges.bands.from"]</th><th>@T["ui.charges.bands.kind"]</th><th>@T["ui.charges.bands.amount"] (@Currency)</th><th>@T["ui.charges.bands.base"] (@Currency)</th></tr></thead>
+    <tbody id="@_bandsId">
+        @for (int row = 0; row < Rows.Count + 1; row++)
+        {
+            OperationsRateBand? band = row < Rows.Count ? Rows[row] : null;
+            <tr data-band>
+                <td><input name="band_from_@row" inputmode="decimal" size="6" value="@(band is null ? (row == 0 && Mode != OperationsTransportMode.Ground ? "0" : null) : OperationsChargeWords.Number(band.From))" aria-label="@T["ui.charges.bands.from"] @(row + 1)" /></td>
+                <td>
+                    <select name="band_kind_@row" aria-label="@T["ui.charges.bands.kind"] @(row + 1)">
+                        @foreach (OperationsBandKind kind in Enum.GetValues<OperationsBandKind>())
+                        {
+                            <option value="@kind" selected="@(band?.Kind == kind)">@VixlyText.Format(T, "ui.charges.bands.kind." + kind, "unit", Unit)</option>
+                        }
+                    </select>
+                </td>
+                <td><input name="band_amount_@row" inputmode="decimal" size="8" value="@OperationsChargeWords.Number(band?.Amount)" aria-label="@T["ui.charges.bands.amount"] @(row + 1)" /></td>
+                <td><input name="band_base_@row" inputmode="decimal" size="8" value="@OperationsChargeWords.Number(band?.Base)" aria-label="@T["ui.charges.bands.base"] @(row + 1)" /></td>
+            </tr>
+        }
+    </tbody>
+</table>
+<button type="button" class="vx-button vx-button--secondary" data-add-band="@_bandsId" hidden>@T["ui.charges.bands.add"]</button>
+<p class="ops-editor__hint">@T[Mode == OperationsTransportMode.Ground ? "ui.charges.bands.hint_ground" : "ui.charges.bands.hint"]</p>
+@if (Mode == OperationsTransportMode.Ground)
+{
+    <label>@T["ui.charges.flat.per_package"] (@Currency) <input name="per_package" inputmode="decimal" value="@OperationsChargeWords.Number(Version?.PerPackage)" /></label>
+    <label>@T["ui.charges.flat.per_shipment"] (@Currency) <input name="per_shipment" inputmode="decimal" value="@OperationsChargeWords.Number(Version?.PerShipment)" /></label>
+}
+@if (Mode == OperationsTransportMode.Ocean && ItemTypes.Count > 0)
+{
+    <fieldset>
+        <legend>@VixlyText.Format(T, "ui.charges.items.legend", "currency", Currency)</legend>
+        @foreach (OperationsItemType type in ItemTypes)
+        {
+            <label>@type.Name <input name="item_@type.Id" inputmode="decimal" size="8" value="@OperationsChargeWords.Number(Version?.PriceOf(type.Id))" /></label>
+        }
+    </fieldset>
+}
+<label>@T["ui.charges.card.minimum"] (@Currency) <input name="minimum" inputmode="decimal" value="@OperationsChargeWords.Number(Version?.MinimumCharge)" /></label>
+<label>@T["ui.charges.card.service_fee"] (@Currency) <input name="service_fee" inputmode="decimal" value="@OperationsChargeWords.Number(Version?.ServiceFee)" /></label>
+<label>@T["ui.charges.card.consolidation_fee"] (@Currency) <input name="consolidation_fee" inputmode="decimal" value="@OperationsChargeWords.Number(Version?.ConsolidationFee)" /></label>
+<label>@T["ui.charges.effective"] <input name="effective" type="date" /></label>
+<p class="ops-editor__hint">@T["ui.charges.effective_hint"]</p>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public OperationsTransportMode Mode { get; set; }
+
+    [Parameter] public OperationsPriceVersion? Version { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsItemType> ItemTypes { get; set; } = Array.Empty<OperationsItemType>();
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+
+    [Parameter] public string Unit { get; set; } = string.Empty;
+
+    // One table per form on the page: its own id for the "Add a band" button.
+    private readonly string _bandsId = "bands-" + Guid.NewGuid().ToString("N")[..12];
+
+    private IReadOnlyList<OperationsRateBand> Rows => Version?.Bands ?? Array.Empty<OperationsRateBand>();
+}

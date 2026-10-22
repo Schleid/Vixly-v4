@@ -92,6 +92,8 @@ public static class PlatformPermissions
 
     public const string TenantsBan = "platform.tenants.ban";
 
+    public const string TenantsReviewChanges = "platform.tenants.review_changes";
+
     public const string PlansView = "platform.plans.view";
 
     public const string PlansManage = "platform.plans.manage";
@@ -160,6 +162,10 @@ public static class PlatformPermissions
 
     public const string LegalRecordAcceptance = "platform.legal.record_acceptance";
 
+    public const string LeadsView = "platform.leads.view";
+
+    public const string LeadsManage = "platform.leads.manage";
+
     public static IReadOnlyList<string> Catalogue { get; } = new[]
     {
         UsersView,
@@ -195,6 +201,7 @@ public static class PlatformPermissions
         TenantsReactivate,
         TenantsDeactivate,
         TenantsBan,
+        TenantsReviewChanges,
         PlansView,
         PlansManage,
         PlansPublish,
@@ -228,7 +235,9 @@ public static class PlatformPermissions
         LegalManage,
         LegalPublish,
         LegalRemind,
-        LegalRecordAcceptance
+        LegalRecordAcceptance,
+        LeadsView,
+        LeadsManage
     };
 
     public static IReadOnlyCollection<string> All { get; } = new HashSet<string>(Catalogue, StringComparer.Ordinal);

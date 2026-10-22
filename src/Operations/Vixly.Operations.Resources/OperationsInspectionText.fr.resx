@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <data name="inspection_eyebrow" xml:space="preserve"><value>Inspection des colis</value><comment>needs-review</comment></data>
+  <data name="inspection_ready" xml:space="preserve"><value>Prêt pour le prochain colis</value><comment>needs-review</comment></data>
+  <data name="inspection_intro" xml:space="preserve"><value>Ouvrez un colis pour consulter ses détails et enregistrer son inspection.</value><comment>needs-review</comment></data>
+  <data name="inspection_scan_hint" xml:space="preserve"><value>Scannez l'étiquette du colis ou saisissez son numéro, puis appuyez sur Entrée.</value><comment>needs-review</comment></data>
+  <data name="inspection_condition" xml:space="preserve"><value>Vérifiez l'état du colis et les exigences d'inspection.</value><comment>needs-review</comment></data>
+  <data name="inspection_measurements" xml:space="preserve"><value>Enregistrez le poids et les dimensions dans les unités de votre entreprise.</value><comment>needs-review</comment></data>
+  <data name="inspection_photos" xml:space="preserve"><value>Photographiez le colis, son étiquette et les dommages visibles.</value><comment>needs-review</comment></data>
+</root>

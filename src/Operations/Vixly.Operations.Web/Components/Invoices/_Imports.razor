@@ -1,0 +1,21 @@
+﻿@*
+=========================================================
+FILE: _Imports.razor
+
+PURPOSE:
+Namespaces for the invoice pages (Slice 5F).
+
+RESPONSIBILITIES:
+- List the namespaces
+
+IMPORTANT NOTES:
+- Markup only; OperationsInvoice is the company's own invoice, not the platform's
+=========================================================
+*@
+@using System.Globalization
+@using Vixly.Operations.Application.Billing
+@using Vixly.Operations.Domain.Billing
+@using Vixly.Operations.Domain.Settings
+@using Vixly.Operations.Web.Components.Charges
+@using Vixly.Operations.Web.Components.Cashier
+@using OperationsInvoice = Vixly.Operations.Domain.Billing.OperationsInvoice

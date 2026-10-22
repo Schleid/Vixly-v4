@@ -278,6 +278,16 @@ internal sealed class FakePlatformStore :
         return Task.FromResult(new PagedResult<PlatformUserListItem>(items.Skip(page.Skip).Take(page.PageSize).ToList(), page, items.Count));
     }
 
+    public Task<PagedResult<PlatformSignInItem>> ListSignInsAsync(Guid? platformUserId, DateTimeOffset utcNow, PagedRequest page, CancellationToken cancellationToken)
+    {
+        List<PlatformSignInItem> items = Sessions.Where(session => platformUserId is null || session.PlatformUserId == platformUserId)
+            .OrderByDescending(session => session.CreatedUtc)
+            .Select(session => new PlatformSignInItem(session.Id, session.PlatformUserId, string.Empty, session.CreatedUtc, session.EndedUtc, null, session.IpAddress, session.UserAgent,
+                session.Country))
+            .ToList();
+        return Task.FromResult(new PagedResult<PlatformSignInItem>(items.Skip(page.Skip).Take(page.PageSize).ToList(), page, items.Count));
+    }
+
     public Task<PlatformUserActionFacts?> GetActionFactsAsync(Guid platformUserId, DateTimeOffset utcNow, CancellationToken cancellationToken)
     {
         PlatformUser? user = Users.FirstOrDefault(candidate => candidate.Id == platformUserId);

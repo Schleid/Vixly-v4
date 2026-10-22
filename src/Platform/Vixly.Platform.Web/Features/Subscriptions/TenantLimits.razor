@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: TenantLimits.razor
 
@@ -10,8 +10,7 @@ set it; set or remove an override with a reason and step-up
 IMPORTANT NOTES:
 - Feature component (ADR-0001): behaviour lives in the
   presenter; this file holds markup and UI glue only
-- Text comes from PlatformText (UI-10); placeholder look until
-  the Frontend/UI team designs it
+- Text comes from PlatformText (UI-10)
 - An override without an end date stays until removed
 =========================================================
 *@
@@ -74,15 +73,21 @@ IMPORTANT NOTES:
     </VxDataTable>
     @if (Presenter.State.Editing is { } kind)
     {
-        <form class="vx-form" @onsubmit="ApplyAsync">
-            <p>@VixlyText.Format(T, "ui.subscriptions.override_for", "limit", T[SubscriptionDisplay.LimitKey(kind)].Value)</p>
-            <label for="override-value">@T["ui.subscriptions.override_value"]</label>
-            <input id="override-value" type="number" min="0" @bind="_value" required />
-            <label for="override-ends">@T["ui.subscriptions.override_ends"]</label>
-            <input id="override-ends" type="date" @bind="_endsOn" aria-describedby="override-ends-help" />
-            <p id="override-ends-help" class="vx-hint">@T["ui.subscriptions.override_ends_help"]</p>
-            <label for="override-reason">@T["ui.tenants.reason"]</label>
-            <textarea id="override-reason" @bind="_reason" maxlength="500" required></textarea>
+        <form class="vx-form vx-limit-override-form" @onsubmit="ApplyAsync">
+            <p class="vx-hint">@VixlyText.Format(T, "ui.subscriptions.override_for", "limit", T[SubscriptionDisplay.LimitKey(kind)].Value)</p>
+            <div class="vx-field" style="max-width: 14rem;">
+                <label for="override-value" class="vx-label">@T["ui.subscriptions.override_value"]</label>
+                <input id="override-value" type="number" min="0" class="vx-input" @bind="_value" required />
+            </div>
+            <div class="vx-field" style="max-width: 16rem;">
+                <label for="override-ends" class="vx-label">@T["ui.subscriptions.override_ends"]</label>
+                <input id="override-ends" type="date" class="vx-input" @bind="_endsOn" aria-describedby="override-ends-help" />
+                <span id="override-ends-help" class="vx-hint">@T["ui.subscriptions.override_ends_help"]</span>
+            </div>
+            <div class="vx-field" style="max-width: 30rem;">
+                <label for="override-reason" class="vx-label">@T["ui.tenants.reason"]</label>
+                <textarea id="override-reason" class="vx-input" @bind="_reason" rows="3" maxlength="500" required></textarea>
+            </div>
             <div class="vx-actions">
                 <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.subscriptions.set_override"]</VxButton>
                 <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
@@ -91,8 +96,8 @@ IMPORTANT NOTES:
     }
     else if (Presenter.State.Removing is not null)
     {
-        <form class="vx-form" @onsubmit="ApplyAsync">
-            <p>@T["ui.subscriptions.remove_override_help"]</p>
+        <form class="vx-form vx-limit-override-form" @onsubmit="ApplyAsync">
+            <p class="vx-hint">@T["ui.subscriptions.remove_override_help"]</p>
             <div class="vx-actions">
                 <VxButton Variant="VxButtonVariant.Danger" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.subscriptions.remove_override"]</VxButton>
                 <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>

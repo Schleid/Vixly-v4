@@ -113,9 +113,16 @@ public sealed class ProjectDependencyRulesTests
             return reference => reference == "Vixly.Contracts.Platform" || reference == Kernel;
         }
 
+        // The dock print program runs on a warehouse computer and only speaks the Operations contracts (Slice 3B).
+        if (project == "Vixly.PrintAgent")
+        {
+            return reference => reference == "Vixly.Contracts.Operations";
+        }
+
         if (project == "Vixly.Public.Web")
         {
-            return reference => reference == "Vixly.Contracts.Platform" || reference == SharedUi;
+            return reference => reference == "Vixly.Contracts.Platform" || reference == SharedUi
+                || reference == Localization || reference == Hosting;
         }
 
         string[] parts = project.Split('.');

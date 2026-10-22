@@ -1,0 +1,147 @@
+﻿@*
+=========================================================
+FILE: DispatchesPage.razor
+
+PURPOSE:
+The dispatch desk (Slice 6B, D-2): the dispatches of a person's warehouses, and a new one.
+
+RESPONSIBILITIES:
+- List the open dispatches (or all) with their route, service, bundles and state
+- Plan a new dispatch from a warehouse to a destination by a service
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Closed bundles not yet on a dispatch are counted per warehouse
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.dispatch.title"]" Company="@Company" Section="dispatches" Error="@Error" Info="@Info">
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <a class="vx-button @(!All ? "vx-button--primary" : "vx-button--secondary")" href="/staff/dispatches">@T["ui.dispatch.view.open"]</a>
+            <a class="vx-button @(All ? "vx-button--primary" : "vx-button--secondary")" href="/staff/dispatches?view=all">@T["ui.dispatch.view.all"]</a>
+        </div>
+        @if (FreeBundles.Values.Any(count => count > 0))
+        {
+            <div class="ops-list-bar__actions">
+                <span class="ops-editor__hint" style="margin: 0;">@string.Join(" · ", Warehouses.Where(warehouse => FreeBundles.GetValueOrDefault(warehouse.Id) > 0).Select(warehouse => VixlyText.Format(T, "ui.dispatch.free_bundles", new Dictionary<string, object> { ["warehouse"] = warehouse.Code, ["count"] = FreeBundles[warehouse.Id] })))</span>
+            </div>
+        }
+    </div>
+    <section class="ops-editor__panel" aria-labelledby="dispatches-title">
+        <h2 id="dispatches-title">@T["ui.dispatch.list"]</h2>
+        @if (Dispatches.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.dispatch.none"]</p></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.dispatch.list"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.dispatch.number"]</th><th scope="col">@T["ui.dispatch.from"]</th><th scope="col">@T["ui.dispatch.destination"]</th><th scope="col">@T["ui.dispatch.service"]</th><th scope="col">@T["ui.dispatch.cutoff"]</th><th scope="col">@T["ui.dispatch.state"]</th><th scope="col" class="ops-editor__number">@T["ui.dispatch.bundles"]</th><th scope="col" class="ops-editor__number">@T["ui.dispatch.legs"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsDispatch dispatch in Dispatches)
+                        {
+                            <tr data-status="@dispatch.Status">
+                                <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/dispatches/@dispatch.Id">@dispatch.Number</a></td>
+                                <td>@(Warehouses.FirstOrDefault(warehouse => warehouse.Id == dispatch.WarehouseId)?.Code)</td>
+                                <td>@OperationsBundleWords.Destination(T, dispatch.DestinationWarehouseId, dispatch.DestinationCountryCode, Destinations)</td>
+                                <td>@T["ui.services.name." + dispatch.ServiceCode]</td>
+                                <td>@OperationsDispatchWords.Time(dispatch.CutoffUtc, TimeZone)</td>
+                                <td><span class="ops-editor__status" data-status="@dispatch.Status.ToString().ToLowerInvariant()">@T["ui.dispatch.status." + dispatch.Status]</span></td>
+                                <td class="ops-editor__number">@dispatch.BundleCount</td>
+                                <td class="ops-editor__number">@dispatch.Legs.Count</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+    </section>
+    @if (Services.Count > 0 && Destinations.Count > 0)
+    {
+        <section class="ops-editor__panel ops-setting-card" aria-labelledby="new-title">
+            <h2 id="new-title">@T["ui.dispatch.new"]</h2>
+            <form method="post" action="/staff/dispatches" class="ops-editor__form">
+                <AntiforgeryToken />
+                <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+                <div class="ops-charges-duo">
+                    <div>
+                        <label>
+                            <span class="ops-label-text">@T["ui.dispatch.from"]</span>
+                            <select name="warehouse">
+                                @foreach (OperationsWarehouse warehouse in Warehouses)
+                                {
+                                    <option value="@warehouse.Id">@warehouse.Code · @warehouse.Name</option>
+                                }
+                            </select>
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <span class="ops-label-text">@T["ui.dispatch.destination"]</span>
+                            <select name="destination">
+                                @foreach (OperationsWarehouse destination in Destinations)
+                                {
+                                    <option value="@OperationsBundleWords.DestinationValue(destination.Id, destination.Address.CountryCode)">@destination.Code · @destination.Name</option>
+                                }
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div class="ops-charges-duo">
+                    <div>
+                        <label>
+                            <span class="ops-label-text">@T["ui.dispatch.service"]</span>
+                            <select name="service">
+                                @foreach (string service in Services)
+                                {
+                                    <option value="@service">@T["ui.services.name." + service]</option>
+                                }
+                            </select>
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <span class="ops-label-text">@VixlyText.Format(T, "ui.dispatch.cutoff_in", "zone", OperationsDispatchWords.Zone(TimeZone))</span>
+                            <input type="datetime-local" name="cutoff" style="height: 32px;" />
+                        </label>
+                    </div>
+                </div>
+                <div style="margin-top: 0.5rem;">
+                    <label>
+                        <span class="ops-label-text" style="min-height: auto; margin-bottom: 0.35rem;">@T["ui.dispatch.notes"]</span>
+                        <textarea name="notes" rows="2" maxlength="@OperationsDispatch.NotesMaxLength" style="width: 100%; box-sizing: border-box;"></textarea>
+                    </label>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 1rem;">
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.dispatch.create"]</button>
+                    <span class="ops-editor__hint" style="margin: 0;">@T["ui.dispatch.new_hint"]</span>
+                </div>
+            </form>
+        </section>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsDispatch> Dispatches { get; set; } = Array.Empty<OperationsDispatch>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Destinations { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<string> Services { get; set; } = Array.Empty<string>();
+
+    [Parameter] public IReadOnlyDictionary<Guid, int> FreeBundles { get; set; } = new Dictionary<Guid, int>();
+
+    [Parameter] public bool All { get; set; }
+
+    [Parameter] public string? TimeZone { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

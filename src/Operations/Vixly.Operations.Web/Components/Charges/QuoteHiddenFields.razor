@@ -1,0 +1,43 @@
+﻿@*
+=========================================================
+FILE: QuoteHiddenFields.razor
+
+PURPOSE:
+The typed quote again, as hidden fields, so saving prices exactly what was shown (Slice 4).
+
+RESPONSIBILITIES:
+- Repeat every field of the quote form
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The service is the one being saved
+=========================================================
+*@
+<input type="hidden" name="customer" value="@Form.Customer" />
+<input type="hidden" name="origin" value="@Form.Origin" />
+<input type="hidden" name="destination" value="@Form.Destination" />
+<input type="hidden" name="delivery" value="@Form.Delivery" />
+<input type="hidden" name="service" value="@Service" />
+@if (Form.Consolidated) { <input type="hidden" name="consolidated" value="true" /> }
+@if (Form.Insured) { <input type="hidden" name="insured" value="true" /> }
+@for (int row = 0; row < OperationsQuoteForm.Rows; row++)
+{
+    int number = row + 1;
+    <input type="hidden" name="weight_@number" value="@Form.Weights[row]" />
+    <input type="hidden" name="length_@number" value="@Form.Lengths[row]" />
+    <input type="hidden" name="width_@number" value="@Form.Widths[row]" />
+    <input type="hidden" name="height_@number" value="@Form.Heights[row]" />
+    <input type="hidden" name="value_@number" value="@Form.Values[row]" />
+    <input type="hidden" name="item_@number" value="@Form.Items[row]" />
+    <input type="hidden" name="contents_@number" value="@Form.Contents[row]" />
+}
+@foreach (KeyValuePair<Guid, int> quantity in Form.Quantities)
+{
+    <input type="hidden" name="extra_@quantity.Key" value="@quantity.Value" />
+}
+
+@code {
+    [Parameter, EditorRequired] public OperationsQuoteForm Form { get; set; } = null!;
+
+    [Parameter, EditorRequired] public string Service { get; set; } = string.Empty;
+}

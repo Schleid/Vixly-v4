@@ -16,7 +16,9 @@
 //   (PlatformMail__Password), never from a file (S-11)
 // - When PickupDirectory is set, emails are written there as
 //   .eml files instead of being sent: development only
-// - The sender identity differs from V3's (ADR-0010 M-1)
+// - Every plane sends from noreply@vixly.ltd (staging: noreply.staging@vixly.ltd, its own
+//   account for the provider's sending cap) through V3's mail server (owner, 2026-10-20);
+//   white-label companies will send from their own address later
 // =========================================================
 public sealed class PlatformMailOptions
 {

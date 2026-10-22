@@ -1,0 +1,41 @@
+﻿@*
+=========================================================
+FILE: AddressFields.razor
+
+PURPOSE:
+The postal address fields of a location form.
+
+RESPONSIBILITIES:
+- Render the postal address fields of a location form
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); owner only (the use cases refuse others)
+- Static forms with antiforgery and the form guard (ADR-0019); placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<fieldset>
+    <legend>@T["ui.editor.address"]</legend>
+    <label>@T["ui.editor.address.line1"] <input name="line1" value="@Line1" maxlength="@OperationsLocationLimits.AddressLineMaxLength" required /></label>
+    <label>@T["ui.editor.address.line2"] <input name="line2" value="@Line2" maxlength="@OperationsLocationLimits.AddressLineMaxLength" /></label>
+    <label>@T["ui.editor.address.city"] <input name="city" value="@City" maxlength="@OperationsLocationLimits.CityMaxLength" required /></label>
+    <label>@T["ui.editor.address.region"] <input name="region" value="@Region" maxlength="@OperationsLocationLimits.RegionMaxLength" /></label>
+    <label>@T["ui.editor.address.postal_code"] <input name="postalCode" value="@PostalCode" maxlength="@OperationsLocationLimits.PostalCodeMaxLength" /></label>
+    <CountrySelect Name="countryCode" Value="@CountryCode" />
+</fieldset>
+
+@code {
+    [Parameter] public string? Line1 { get; set; }
+
+    [Parameter] public string? Line2 { get; set; }
+
+    [Parameter] public string? City { get; set; }
+
+    [Parameter] public string? Region { get; set; }
+
+    [Parameter] public string? PostalCode { get; set; }
+
+    [Parameter] public string? CountryCode { get; set; }
+}

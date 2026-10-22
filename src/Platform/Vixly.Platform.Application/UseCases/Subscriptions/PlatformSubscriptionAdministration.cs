@@ -82,6 +82,8 @@ public sealed class PlatformSubscriptionAdministration
 
     public IPlatformLimitOverrideRepository Overrides => _overrides;
 
+    public PlatformOutboxWriter Outbox => _outbox;
+
     // Read-only periods come from Collections settings (Slice 6, D-C4, D-C5); defaults until the row exists.
     public async Task<PlatformSubscriptionAccessRules> AccessRulesAsync(CancellationToken cancellationToken)
     {

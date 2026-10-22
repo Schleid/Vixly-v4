@@ -35,9 +35,11 @@ public static class PlatformTenantEventCodes
 
     public const string SlugCorrected = "platform.tenant_history.slug_corrected";
 
+    public const string CompanyChanged = "platform.tenant_history.company_changed";
+
     public static IReadOnlyList<string> All { get; } = new[]
     {
         CreatedByStaff, CreatedFromRegistration, TermsAccepted, Activated, Suspended,
-        Reactivated, Deactivated, Banned, SlugCorrected
+        Reactivated, Deactivated, Banned, SlugCorrected, CompanyChanged
     };
 }

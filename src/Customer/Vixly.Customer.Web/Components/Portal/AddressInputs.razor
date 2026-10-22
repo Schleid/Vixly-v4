@@ -1,0 +1,46 @@
+﻿@*
+=========================================================
+FILE: AddressInputs.razor
+
+PURPOSE:
+The address of a home delivery (Slice 3C; shared by the destination fields of Slice 4C).
+
+RESPONSIBILITIES:
+- Street, city, region, postal code and one of the countries given
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Packages
+
+<label>@T["ui.shipments.line1"] <input name="line1" value="@Entered?.Address?.Line1" maxlength="200" autocomplete="address-line1" /></label>
+<label>@T["ui.shipments.line2"] <input name="line2" value="@Entered?.Address?.Line2" maxlength="200" autocomplete="address-line2" /></label>
+<label>@T["ui.shipments.city"] <input name="city" value="@Entered?.Address?.City" maxlength="100" autocomplete="address-level2" /></label>
+<label>@T["ui.shipments.region"] <input name="region" value="@Entered?.Address?.Region" maxlength="100" autocomplete="address-level1" /></label>
+<label>@T["ui.shipments.postal_code"] <input name="postalCode" value="@Entered?.Address?.PostalCode" maxlength="20" autocomplete="postal-code" /></label>
+<label>@T["ui.shipments.country"]
+    <select name="country">
+        @foreach (string country in Countries) { <option value="@country" selected="@(country == Entered?.Address?.CountryCode)">@Name(country)</option> }
+    </select>
+</label>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<CustomerText> T { get; set; } = null!;
+
+    [Parameter] public CustomerShipmentInstructionsBody? Entered { get; set; }
+
+    [Parameter] public IReadOnlyList<string> Countries { get; set; } = Array.Empty<string>();
+
+    private static string Name(string code)
+    {
+        try
+        {
+            return new System.Globalization.RegionInfo(code).NativeName;
+        }
+        catch (ArgumentException)
+        {
+            return code;
+        }
+    }
+}

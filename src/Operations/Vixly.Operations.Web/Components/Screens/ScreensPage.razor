@@ -1,0 +1,102 @@
+﻿@*
+=========================================================
+FILE: ScreensPage.razor
+
+PURPOSE:
+Customer screens (Slice 5F step 3, P-2): the tablets at the counters that customers use to pay and sign.
+
+RESPONSIBILITIES:
+- Add a screen to a warehouse and show the code to type on it, once
+- List the screens with their state; a new code for a screen; remove one
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The code is shown only in the answer to the form that made it, never in an address
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.screens.title"]" Company="@Company" Section="cashier" Error="@Error" Info="@Info">
+    <p class="ops-editor__hint">@VixlyText.Format(T, "ui.screens.intro", "url", ScreenUrl)</p>
+    @if (Code is not null)
+    {
+        <section class="ops-editor__panel" aria-labelledby="code-title" data-screen-code>
+            <h2 id="code-title">@VixlyText.Format(T, "ui.screens.code_title", "name", CodeFor ?? string.Empty)</h2>
+            <p>@VixlyText.Format(T, "ui.screens.code_how", "url", ScreenUrl)</p>
+            <p class="ops-screen-code" data-code>@Code</p>
+            <p class="ops-editor__hint">@VixlyText.Format(T, "ui.screens.code_until", "time", (CodeExpiresUtc ?? DateTimeOffset.UtcNow).ToLocalTime().ToString("t", CultureInfo.CurrentCulture))</p>
+        </section>
+    }
+    @if (Warehouses.Count > 0)
+    {
+        <form method="post" action="/staff/screens" class="ops-list-bar" aria-labelledby="add-title">
+            <AntiforgeryToken />
+            <strong id="add-title" style="font-size: 0.8125rem;">@T["ui.screens.add"]:</strong>
+            <label style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0;">@T["ui.screens.warehouse"]
+                <select name="warehouse">
+                    @foreach (OperationsWarehouse warehouse in Warehouses)
+                    {
+                        <option value="@warehouse.Id">@warehouse.Code · @warehouse.Name</option>
+                    }
+                </select>
+            </label>
+            <label style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0;">@T["ui.screens.name"] <input name="name" maxlength="60" size="20" required placeholder="@T["ui.screens.name_example"]" /></label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.screens.add_button"]</button>
+        </form>
+    }
+    @if (Screens.Count == 0)
+    {
+        <div class="ops-editor__empty"><p>@T["ui.screens.none"]</p></div>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.screens.title"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col">@T["ui.screens.name"]</th><th scope="col">@T["ui.screens.warehouse"]</th><th scope="col">@T["ui.screens.state"]</th><th scope="col">@T["ui.screens.showing"]</th><th scope="col"></th></tr></thead>
+                <tbody>
+                    @foreach (OperationsScreenRow screen in Screens)
+                    {
+                        <tr data-screen="@screen.ScreenId" data-paired="@screen.Paired">
+                            <td>@screen.Name</td>
+                            <td>@screen.WarehouseName</td>
+                            <td>@(screen.Paired ? screen.LastSeenUtc is { } seen ? VixlyText.Format(T, "ui.screens.seen", "time", seen.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)) : T["ui.screens.paired"].Value : T["ui.screens.waiting_code"].Value)</td>
+                            <td>@T["ui.screens.step." + screen.Step]</td>
+                            <td>
+                                <form method="post" action="/staff/screens/@screen.ScreenId/code" style="display: inline;">
+                                    <AntiforgeryToken />
+                                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.screens.new_code"]</button>
+                                </form>
+                                <form method="post" action="/staff/screens/@screen.ScreenId/remove" style="display: inline;">
+                                    <AntiforgeryToken />
+                                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.screens.remove"]</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsScreenRow> Screens { get; set; } = Array.Empty<OperationsScreenRow>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    // This company's screen address, to open on the tablet.
+    [Parameter] public string ScreenUrl { get; set; } = string.Empty;
+
+    // Only in the answer to the form that made it.
+    [Parameter] public string? Code { get; set; }
+
+    [Parameter] public string? CodeFor { get; set; }
+
+    [Parameter] public DateTimeOffset? CodeExpiresUtc { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

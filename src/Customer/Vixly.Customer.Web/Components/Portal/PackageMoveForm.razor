@@ -1,0 +1,53 @@
+﻿@*
+=========================================================
+FILE: PackageMoveForm.razor
+
+PURPOSE:
+Puts one of the customer's packages into one of its shipments, moves it to another, or takes it out (Slice 4D; owner, 2026-10-19).
+
+RESPONSIBILITIES:
+- A select of the customer's open shipments from the package's warehouse, and "not in a shipment"
+- Posts to /customer/packages/move, back to the page it came from
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- Operations checks the package, the shipment and the warehouse again
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Packages
+@inject IStringLocalizer<CustomerText> T
+
+<form method="post" action="/customer/packages/move" class="customer-portal__inline customer-package-move">
+    <AntiforgeryToken />
+    @if (PreAlertId is { } preAlert) { <input type="hidden" name="preAlert" value="@preAlert" /> }
+    @if (ParcelId is { } parcel) { <input type="hidden" name="parcel" value="@parcel" /> }
+    <input type="hidden" name="back" value="@Back" />
+    <label>@T["ui.packages.move.label"]
+        <select name="shipment">
+            <option value="" selected="@(Current is null)">@T["ui.packages.move.none"]</option>
+            @foreach (CustomerShipmentDto shipment in Choices)
+            {
+                <option value="@shipment.ShipmentId" selected="@(shipment.ShipmentId == Current)">@Name(shipment)</option>
+            }
+        </select>
+    </label>
+    <button type="submit" class="vx-button vx-button--secondary">@T["ui.packages.move.submit"]</button>
+</form>
+
+@code {
+    [Parameter] public Guid? PreAlertId { get; set; }
+
+    [Parameter] public Guid? ParcelId { get; set; }
+
+    // The shipment the package is in now (none: not in one of the customer's shipments).
+    [Parameter] public Guid? Current { get; set; }
+
+    // The customer's open shipments with instructions, from the package's warehouse.
+    [Parameter] public IReadOnlyList<CustomerShipmentDto> Choices { get; set; } = Array.Empty<CustomerShipmentDto>();
+
+    [Parameter] public string Back { get; set; } = "/customer/packages";
+
+    private string Name(CustomerShipmentDto shipment) =>
+        (shipment.Delivery == "pickup" ? shipment.BranchName : shipment.Address?.City + ", " + shipment.CountryCode) + " · " + shipment.RecipientName
+        + " · " + shipment.CreatedUtc.ToString("yyyy-MM-dd");
+}

@@ -1,0 +1,104 @@
+﻿@*
+=========================================================
+FILE: ChargesPage.razor
+
+PURPOSE:
+The company's prices, one transport mode at a time: Air, Ocean, Ground (Slice 4; routes and modes, Slice 4C).
+
+RESPONSIBILITIES:
+- Tabs per mode; on each, only its price lists, extras and insurance (owner: on Air, nothing about ocean)
+- Add a price list for a service of the mode on a route (origin and destination warehouses, or any) and a customer; item types on Ocean only
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Company-wide (ops.charges.configure); lists, types and extras are taken out of use, never deleted
+- Without the permission: only the refusal
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.charges.title"]" Company="@Company" Section="charges" Error="@Error" Info="@Info">
+    @if (!Denied)
+    {
+        <ChargesTabs T="T" Mode="Mode" />
+        <p class="ops-editor__hint">@OperationsChargeWords.Text(T, "ui.charges.intro." + Mode, ("currency", Currency), ("weight", OperationsChargeWords.Weight(WeightUnit)), ("volume", OperationsChargeWords.Volume(DimensionUnit)))</p>
+        @if (Destinations.Count == 0) { <p class="ops-editor__notice">@T["ui.charges.no_destinations"] <a href="/staff/locations">@T["ui.editor.nav.locations"]</a></p> }
+        <section class="ops-editor__panel" aria-labelledby="cards-title">
+            <h2 id="cards-title">@T["ui.charges.cards.title." + Mode]</h2>
+            @if (!Lists.Any()) { <p>@T["ui.charges.cards.none"]</p> }
+            @foreach (OperationsRateCardRow row in Lists)
+            {
+                <PriceListPanel T="T" Row="row" ItemTypes="ItemTypes" UtcNow="UtcNow" Currency="@Currency" Unit="@Unit" />
+            }
+            <details open="@(!Lists.Any())">
+                <summary>@T["ui.charges.cards.add"]</summary>
+                <form method="post" action="/staff/charges/cards" class="ops-editor__form">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="mode" value="@Mode" />
+                    <input type="hidden" name="active" value="true" />
+                    <label><input type="checkbox" name="published" value="true" /> @T["ui.charges.published"]</label>
+                    <p class="ops-editor__hint">@T["ui.charges.published_hint"]</p>
+                    <label>@T["ui.charges.card.service"]
+                        <select name="service" required>
+                            @foreach (string serviceCode in ModeServices) { <option value="@serviceCode">@T["ui.services.name." + serviceCode]</option> }
+                        </select>
+                    </label>
+                    <RouteFields T="T" Origins="Origins" Destinations="Destinations" />
+                    <label>@T["ui.charges.card.customer"] <input name="customer" maxlength="20" placeholder="C00042" autocapitalize="characters" /></label>
+                    <p class="ops-editor__hint">@T["ui.charges.card.for_hint"]</p>
+                    <CustomsField T="T" />
+                    <PriceVersionFields T="T" Mode="Mode" ItemTypes="ItemTypes" Currency="@Currency" Unit="@Unit" />
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.charges.cards.add"]</button>
+                </form>
+            </details>
+        </section>
+        @if (Mode == OperationsTransportMode.Ocean) { <ItemTypesPanel T="T" ItemTypes="ItemTypes" /> }
+        <ExtrasPanel T="T" Mode="Mode" Extras="ModeExtras" Services="ModeServices" Origins="Origins" Destinations="Destinations" UtcNow="UtcNow" Currency="@Currency" />
+        <InsuranceProductsPanel T="T" Mode="Mode" Products="@Insurance.Where(plan => plan.Mode == Mode).ToList()" UtcNow="UtcNow" Currency="@Currency" Unit="@Unit" />
+        <script src="/js/ops-bands.js" defer></script>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsTransportMode Mode { get; set; } = OperationsTransportMode.Air;
+
+    [Parameter] public IReadOnlyList<OperationsRateCardRow> Cards { get; set; } = Array.Empty<OperationsRateCardRow>();
+
+    [Parameter] public IReadOnlyList<OperationsChargeExtra> Extras { get; set; } = Array.Empty<OperationsChargeExtra>();
+
+    [Parameter] public IReadOnlyList<OperationsInsurancePlan> Insurance { get; set; } = Array.Empty<OperationsInsurancePlan>();
+
+    [Parameter] public IReadOnlyList<string> Services { get; set; } = Array.Empty<string>();
+
+    [Parameter] public IReadOnlyList<OperationsItemType> ItemTypes { get; set; } = Array.Empty<OperationsItemType>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Origins { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Destinations { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+
+    [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
+
+    [Parameter] public OperationsDimensionUnit DimensionUnit { get; set; }
+
+    [Parameter] public DateTimeOffset UtcNow { get; set; }
+
+    // Without the permission: only the refusal, nothing of the page (owner: "what I am not allowed, I do not need to see").
+    [Parameter] public bool Denied { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private IEnumerable<OperationsRateCardRow> Lists => Cards.Where(row => row.Card.Mode == Mode);
+
+    private IReadOnlyList<string> ModeServices => Services.Where(code => OperationsTransportModes.Of(code) == Mode).ToList();
+
+    // Extras of this mode and those for every mode.
+    private IReadOnlyList<OperationsChargeExtra> ModeExtras => Extras.Where(extra => extra.Mode is null || extra.Mode == Mode).ToList();
+
+    private string Unit => Mode == OperationsTransportMode.Ocean ? OperationsChargeWords.Volume(DimensionUnit) : OperationsChargeWords.Weight(WeightUnit);
+}

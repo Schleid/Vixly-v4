@@ -1,0 +1,17 @@
+﻿@*
+=========================================================
+FILE: HomePage.razor
+
+PURPOSE:
+The home page in each language.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+=========================================================
+*@
+@page "/en"
+@page "/fr"
+@page "/es"
+@attribute [OutputCache(Duration = 600)]
+<PageHead TitleKey="public.home.title" DescriptionKey="public.home.description" Page="" />
+<HomeOverview />

@@ -1,0 +1,33 @@
+﻿@*
+=========================================================
+FILE: StatusFields.razor
+
+PURPOSE:
+The status and "show on the site" fields of a location form.
+
+RESPONSIBILITIES:
+- Render the status and "show on the site" fields of a location form
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); owner only (the use cases refuse others)
+- Static forms with antiforgery and the form guard (ADR-0019); placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<label>@T["ui.editor.status"]
+    <select name="status">
+        @foreach (OperationsLocationStatus status in Enum.GetValues<OperationsLocationStatus>())
+        {
+            <option value="@status" selected="@(status == Status)">@T["ui.editor.status." + status.ToString().ToLowerInvariant()]</option>
+        }
+    </select>
+</label>
+<label><input type="checkbox" name="showOnSite" value="true" checked="@ShowOnSite" /> @T["ui.editor.show_on_site"]</label>
+
+@code {
+    [Parameter] public OperationsLocationStatus Status { get; set; }
+
+    [Parameter] public bool ShowOnSite { get; set; }
+}

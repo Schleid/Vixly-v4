@@ -1,0 +1,168 @@
+@*
+=========================================================
+FILE: EventTimelinePage.razor
+
+PURPOSE:
+One subject's history in the events workspace (Slice 6C, E-1 to E-7).
+
+RESPONSIBILITIES:
+- Show the subject, its parcels for a shipment, bundle or dispatch, and its events newest first with filters and pages
+- Record a note, a delay or an exception; void one recorded by hand
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Times where the company works
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@VixlyText.Format(T, "ui.events.subject_title", new Dictionary<string, object> { ["kind"] = T["ui.events.kind." + Subject.Kind].Value, ["number"] = Subject.Number })" Company="@Company" Section="events" Error="@Error" Info="@Info">
+    <p class="ops-editor__actions">
+        <a href="/staff/events">@T["ui.events.back"]</a>
+        <a class="vx-button vx-button--secondary" href="@Link">@T["ui.events.open_subject"]</a>
+    </p>
+    <section class="ops-editor__panel" aria-labelledby="subject-title">
+        <h2 id="subject-title">@T["ui.events.kind." + Subject.Kind] @Subject.Number</h2>
+        <dl class="ops-editor__facts">
+            @if (Subject.Milestone is { } milestone) { <dt>@T["ui.events.milestone"]</dt><dd>@T["ui.milestone." + milestone]</dd> }
+            @if (Subject.Status is { } status) { <dt>@T["ui.events.state"]</dt><dd>@status</dd> }
+        </dl>
+        @if (Parcels.Count > 0)
+        {
+            <details>
+                <summary>@VixlyText.Format(T, "ui.events.parcels", "count", Parcels.Count)</summary>
+                <ul class="ops-editor__list">
+                    @foreach (OperationsParcel parcel in Parcels)
+                    {
+                        <li><a href="/staff/events/Parcel/@parcel.Id" class="ops-editor__code">@(parcel.Number ?? parcel.CarrierTrackingNumber)</a> @(parcel.Milestone is { } reached ? T["ui.milestone." + reached].Value : string.Empty)</li>
+                    }
+                </ul>
+            </details>
+        }
+    </section>
+    @if (CanAdd)
+    {
+        <form method="post" action="/staff/events/@Subject.Kind/@Subject.Id" class="ops-editor__panel ops-editor__form" aria-labelledby="add-title">
+            <AntiforgeryToken />
+            <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+            <h2 id="add-title">@T["ui.events.add"]</h2>
+            <fieldset style="margin-bottom: 0.75rem; padding: 0.5rem 0.75rem; border: 1px solid var(--vx-color-border); border-radius: 0.5rem;">
+                <legend style="font-size: 0.8125rem; font-weight: 600; padding: 0 0.25rem;">@T["ui.events.what"]</legend>
+                <div class="ops-checkbox-group">
+                    @foreach (OperationsEventKind kind in Enum.GetValues<OperationsEventKind>())
+                    {
+                        <label class="ops-checkbox-label"><input type="radio" name="eventKind" value="@kind" checked="@(kind == OperationsEventKind.Note)" required /> <span>@T["ui.events.event_kind." + kind]</span></label>
+                    }
+                </div>
+            </fieldset>
+            <div class="ops-charges-duo">
+                <div>
+                    <label>@T["ui.events.cause"]
+                        <select name="cause">
+                            <option value="">@T["ui.events.cause_none"]</option>
+                            <optgroup label="@T["ui.events.event_kind.Delay"]">
+                                @foreach (OperationsEventCause cause in DelayCauses) { <option value="@cause.Code">@CauseText(cause)</option> }
+                            </optgroup>
+                            <optgroup label="@T["ui.events.event_kind.Exception"]">
+                                @foreach (OperationsEventCause cause in ExceptionCauses) { <option value="@cause.Code">@CauseText(cause)</option> }
+                            </optgroup>
+                        </select>
+                    </label>
+                </div>
+                <div>
+                    <label>@VixlyText.Format(T, "ui.events.at", "zone", OperationsDispatchWords.Zone(TimeZone)) <input type="datetime-local" name="at" style="height: 32px;" /></label>
+                </div>
+            </div>
+            <label>@T["ui.events.message"] <input name="message" maxlength="140" /></label>
+            <label>@T["ui.events.note"] <textarea name="note" rows="2" maxlength="500"></textarea></label>
+            <div class="ops-editor__inline-field" style="align-items: center; justify-content: space-between; margin-top: 0.75rem;">
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.events.record"]</button>
+                <span class="ops-editor__hint" style="margin: 0;">@T[Subject.Kind == OperationsTrackingSubject.Parcel ? "ui.events.add_hint" : "ui.events.add_hint_all"]</span>
+            </div>
+        </form>
+    }
+    <section class="ops-editor__panel" aria-labelledby="history-title">
+        <h2 id="history-title">@T["ui.events.history"]</h2>
+        <p class="ops-editor__tabs">
+            @foreach (string filter in new[] { "all", "customer", "manual", "voided" })
+            {
+                <a href="/staff/events/@Subject.Kind/@Subject.Id?filter=@filter" aria-current="@(filter == Filter ? "page" : null)">@T["ui.events.filter." + filter]</a>
+            }
+        </p>
+        @if (Lines.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.events.none"]</p></div>
+        }
+        else
+        {
+            <ol class="ops-parcel-history">
+                @foreach (OperationsTrackingLine line in Lines)
+                {
+                    <li data-voided="@(line.Voided ? "true" : "false")" data-customer="@(OperationsTrackingCodes.Find(line.Code)?.Visibility == OperationsTrackingVisibility.Customer ? "true" : "false")">
+                        <time datetime="@line.OccurredUtc.ToString("O")">@OperationsDispatchWords.Time(line.OccurredUtc, TimeZone)</time>
+                        <span>@OperationsTrackingText.Describe(T, line)</span>
+                        @if (OperationsTrackingCodes.Find(line.Code)?.Visibility == OperationsTrackingVisibility.Customer) { <small>@T["ui.events.customer_sees"]</small> }
+                        @if (line.Voided) { <small>@T["ui.tracking.voided"]</small> }
+                        @if (line.Note is not null) { <small>@line.Note</small> }
+                        @if (CanAdd && !line.Voided && line.VoidsEventId is null && OperationsTrackingCodes.ManualCodes.Contains(line.Code) && !line.Arguments.ContainsKey("source"))
+                        {
+                            <form method="post" action="/staff/events/void/@line.EventId" class="ops-editor__inline">
+                                <AntiforgeryToken />
+                                <label>@T["ui.events.void_reason"] <input name="reason" maxlength="500" required /></label>
+                                <button type="submit" class="vx-button vx-button--secondary">@T["ui.events.void"]</button>
+                            </form>
+                        }
+                    </li>
+                }
+            </ol>
+            @if (Pages > 1)
+            {
+                <p class="ops-editor__pager">
+                    @for (int number = 1; number <= Pages; number++)
+                    {
+                        <a href="/staff/events/@Subject.Kind/@Subject.Id?filter=@(Filter)&amp;page=@(number)" aria-current="@(number == Page ? "page" : null)">@number</a>
+                    }
+                </p>
+            }
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsEventSubject Subject { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsTrackingLine> Lines { get; set; } = Array.Empty<OperationsTrackingLine>();
+
+    [Parameter] public int Pages { get; set; } = 1;
+
+    [Parameter] public int Page { get; set; } = 1;
+
+    [Parameter] public string Filter { get; set; } = "all";
+
+    [Parameter] public IReadOnlyList<OperationsParcel> Parcels { get; set; } = Array.Empty<OperationsParcel>();
+
+    [Parameter] public bool CanAdd { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsEventCause> DelayCauses { get; set; } = Array.Empty<OperationsEventCause>();
+
+    [Parameter] public IReadOnlyList<OperationsEventCause> ExceptionCauses { get; set; } = Array.Empty<OperationsEventCause>();
+
+    [Parameter] public string? TimeZone { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private string Link => Subject.Kind switch
+    {
+        OperationsTrackingSubject.Parcel => "/staff/parcels/" + Subject.Id,
+        OperationsTrackingSubject.Shipment => "/staff/shipments/" + Subject.Id,
+        OperationsTrackingSubject.Bundle => "/staff/bundles/" + Subject.Id,
+        _ => "/staff/dispatches/" + Subject.Id
+    };
+
+    private string CauseText(OperationsEventCause cause) =>
+        cause.IsStandard ? T["ui.event_reason." + cause.Code].Value : OperationsTrackingText.Label(cause.TextEn, cause.TextFr, cause.TextEs);
+}

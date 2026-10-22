@@ -71,10 +71,15 @@ public static class PlatformApiHost
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             return Task.CompletedTask;
         }));
+
+        app.UseVixlyClientDisconnects();
         app.Use((context, next) =>
         {
             // Provider webhooks carry whole payment objects: 64 KB there, the API limit elsewhere (Slice 5).
-            long maxBody = context.Request.Path.StartsWithSegments("/payments/webhook") ? 64 * 1024 : api.MaxRequestBodyBytes;
+            // A company change carries a proof of up to 10 MB in base64: 15 MB there (B12).
+            long maxBody = context.Request.Path.StartsWithSegments("/payments/webhook") ? 64 * 1024
+                : context.Request.Path.StartsWithSegments("/internal/v1/tenant/company-change") ? 15 * 1024 * 1024
+                : api.MaxRequestBodyBytes;
 
             if (context.Features.Get<IHttpMaxRequestBodySizeFeature>() is { IsReadOnly: false } limit)
             {
@@ -98,6 +103,7 @@ public static class PlatformApiHost
             options.RequestCultureProviders = new List<IRequestCultureProvider> { new AcceptLanguageHeaderRequestCultureProvider() };
         });
         app.UseCors();
+        app.UsePlatformPublicCaller();
         app.UsePlatformInternalAuthentication();
         app.UseRateLimiter();
 
@@ -105,6 +111,7 @@ public static class PlatformApiHost
         app.MapPlatformRegistrationEndpoints();
         app.MapPlatformPaymentEndpoints();
         app.MapPlatformLegalEndpoints();
+        app.MapPlatformLeadEndpoints();
         app.MapPlatformSimulatedCheckout(app.Environment);
         app.MapPlatformInternalEndpoints();
 

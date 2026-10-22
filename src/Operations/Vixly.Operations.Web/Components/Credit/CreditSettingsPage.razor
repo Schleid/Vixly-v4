@@ -1,0 +1,56 @@
+@*
+=========================================================
+FILE: CreditSettingsPage.razor
+
+PURPOSE:
+Settings → Credit (Slice 5F step 2b, K-2): the company's terms, what a charge above a limit does, the monthly statement.
+
+RESPONSIBILITIES:
+- Edit the three settings
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Credit itself is switched on or off in Settings
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.credit_settings.title"]" Company="@Company" Section="credit_settings" Error="@Error" Info="@Info">
+    <form method="post" action="/staff/settings/credit" class="ops-editor__panel ops-editor__form">
+        <AntiforgeryToken />
+        <fieldset disabled="@(!CanEdit)">
+            @if (!Settings.AllowCredit) { <p class="ops-editor__notice">@T["ui.credit.off"]</p> }
+            <div style="margin: 0.75rem 0;">
+                <label style="margin-bottom: 0.25rem;">@T["ui.credit_settings.terms"] <input name="terms" inputmode="numeric" size="4" value="@Settings.CreditTermsDays" required style="width: 6rem;" /></label>
+            </div>
+            <fieldset style="margin: 0.75rem 0; padding: 0.75rem; border: 1px solid var(--vx-color-border); border-radius: 0.5rem;">
+                <legend style="font-size: 0.8125rem; font-weight: 600; padding: 0 0.25rem;">@T["ui.credit_settings.over_limit"]</legend>
+                <div class="ops-checkbox-group">
+                    @foreach (OperationsCreditOverLimit rule in Enum.GetValues<OperationsCreditOverLimit>())
+                    {
+                        <label class="ops-checkbox-label"><input type="radio" name="overLimit" value="@rule" checked="@(rule == Settings.CreditOverLimit)" required /> <span>@T["ui.credit_settings.over_limit." + rule]</span></label>
+                    }
+                </div>
+            </fieldset>
+            <div class="ops-checkbox-group" style="margin: 0.75rem 0;">
+                <label class="ops-checkbox-label"><input type="checkbox" name="statements" value="true" checked="@Settings.CreditStatements" /> <span>@T["ui.credit_settings.statements"]</span></label>
+            </div>
+        </fieldset>
+        @if (CanEdit)
+        {
+            <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></p>
+        }
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsTenantSettings Settings { get; set; } = null!;
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

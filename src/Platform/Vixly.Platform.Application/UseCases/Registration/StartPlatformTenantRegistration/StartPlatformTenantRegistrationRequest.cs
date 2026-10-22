@@ -37,4 +37,6 @@ public sealed class StartPlatformTenantRegistrationRequest
     public string PrivacyVersion { get; init; } = string.Empty;
 
     public string? BotToken { get; init; }
+
+    public string? OfferToken { get; init; }
 }

@@ -1,0 +1,128 @@
+@*
+=========================================================
+FILE: InspectionCheckForm.razor
+
+PURPOSE:
+One parcel at the inspection station: who it is for, its shipment, and the check form (Slice 3B).
+
+RESPONSIBILITIES:
+- Show the customer and the other parcels of the shipment
+- Record condition, weight, size and photos
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Weight and size in the company's units; the scale and dimensioner plug into the same fields later
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<div class="ops-record-layout" data-editable="true">
+    <aside class="ops-record-rail">
+        <section class="ops-editor__panel ops-record-summary" aria-labelledby="check-parcel">
+            <h2 id="check-parcel">@Parcel.Number</h2>
+            <p class="ops-inspection__customer">@(Parcel.CustomerCode ?? T["ui.hold.Unidentified"].Value)</p>
+            <dl>
+                @if (Parcel.CustomerName is not null) { <dt>@T["ui.staff.name"]</dt><dd>@Parcel.CustomerName</dd> }
+                @if (CustomerPhone is not null) { <dt>@T["ui.customers.phone"]</dt><dd>@CustomerPhone</dd> }
+                <dt>@T["ui.parcels.tracking"]</dt><dd class="ops-editor__code">@Parcel.CarrierTrackingNumber</dd>
+                <dt>@T["ui.parcels.contents"]</dt><dd>@(Parcel.DeclaredContents ?? T["ui.parcels.not_declared"].Value)</dd>
+                @if (Parcel.HoldReasons != OperationsHoldReasons.None) { <dt>@T["ui.parcels.holds"]</dt><dd>@string.Join(", ", Enum.GetValues<OperationsHoldReasons>().Where(reason => reason != OperationsHoldReasons.None && Parcel.HoldReasons.HasFlag(reason)).Select(reason => T["ui.hold." + reason].Value))</dd> }
+                @if (Parcel.Flags.HasFlag(OperationsParcelFlags.InspectionPending)) { <dt>@T["ui.inspection.compliance"]</dt><dd>@T["ui.inspection.selected"]</dd> }
+            </dl>
+            <p><a href="/staff/parcels/@Parcel.ParcelId">@T["ui.parcels.open"]</a></p>
+        </section>
+        <ShipmentInstructionsPanel T="T" Shipment="Shipment" />
+        <section class="ops-editor__panel" aria-labelledby="check-shipment">
+            <h2 id="check-shipment">@T["ui.inspection.shipment"]</h2>
+            @if (ShipmentParcels.Count == 0)
+            {
+                <p>@T["ui.inspection.shipment_alone"]</p>
+            }
+            else
+            {
+                <ul>
+                    @foreach (OperationsParcelSummary other in ShipmentParcels)
+                    {
+                        <li><a href="/staff/inspection/@other.ParcelId">@other.Number</a> @(other.Flags.HasFlag(OperationsParcelFlags.AwaitingCheck) ? "· " + T["ui.inspection.waiting"].Value : null)</li>
+                    }
+                </ul>
+            }
+        </section>
+    </aside>
+    <div class="ops-record-workflows">
+        <form method="post" action="/staff/inspection/@Parcel.ParcelId" enctype="multipart/form-data" class="ops-editor__panel ops-editor__form" aria-labelledby="check-title">
+            <AntiforgeryToken />
+            <input type="hidden" name="key" value="@CommandKey" />
+            @if (ShippingPrinters.Count > 0)
+            {
+                <label>@T["ui.shipping_label.station_printer"]
+                    <select name="shippingPrinter">
+                        @foreach (Vixly.Operations.Domain.Printing.OperationsLabelPrinter printer in ShippingPrinters) { <option value="@printer.Id">@printer.Name</option> }
+                    </select>
+                </label>
+            }
+            <h2 id="check-title">@(Parcel.Flags.HasFlag(OperationsParcelFlags.AwaitingCheck) ? T["ui.inspection.check"] : T["ui.inspection.recheck"])</h2>
+            <label>@T["ui.receiving.condition"]
+                <select name="condition">
+                    @foreach (string condition in OperationsTrackingCodes.Conditions)
+                    {
+                        <option value="@condition" selected="@(condition == (Condition ?? "intact"))">@T["ui.receiving.condition." + condition]</option>
+                    }
+                </select>
+            </label>
+            <fieldset class="ops-inspection__measurements">
+                <legend>@T["ui.receiving.measurements"]</legend>
+                <label>@VixlyText.Format(T, "ui.receiving.weight", "unit", WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg") <input name="weight" type="number" inputmode="decimal" min="0.001" step="0.001" required value="@Shown(Parcel.WeightKg, true)" /></label>
+                <label>@VixlyText.Format(T, "ui.receiving.length", "unit", LengthSymbol) <input name="length" type="number" inputmode="decimal" min="0.1" step="0.1" required value="@Shown(Parcel.LengthCm, false)" /></label>
+                <label>@VixlyText.Format(T, "ui.receiving.width", "unit", LengthSymbol) <input name="width" type="number" inputmode="decimal" min="0.1" step="0.1" required value="@Shown(Parcel.WidthCm, false)" /></label>
+                <label>@VixlyText.Format(T, "ui.receiving.height", "unit", LengthSymbol) <input name="height" type="number" inputmode="decimal" min="0.1" step="0.1" required value="@Shown(Parcel.HeightCm, false)" /></label>
+            </fieldset>
+            <fieldset class="ops-inspection__photos">
+                <legend>@T["ui.receiving.photos"]</legend>
+                <p class="ops-editor__hint">@T["ui.inspection.photos_hint"]</p>
+                <label>@T["ui.receiving.photo.package"] <input name="photo_package" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" /></label>
+                <label>@T["ui.receiving.photo.label"] <input name="photo_label" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" /></label>
+                <label>@T["ui.receiving.photo.damage"] <input name="photo_damage" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" multiple /></label>
+            </fieldset>
+            @if (!Parcel.Flags.HasFlag(OperationsParcelFlags.InspectionPending))
+            {
+                <fieldset>
+                    <legend>@T["ui.inspection.compliance"]</legend>
+                    <label><input type="checkbox" name="flag" value="true" /> @T["ui.inspection.flag"]</label>
+                    <label>@T["ui.inspection.flag_reason"] <input name="flagReason" maxlength="200" /></label>
+                </fieldset>
+            }
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.inspection.save"]</button>
+        </form>
+    </div>
+</div>
+
+@code {
+    private string LengthSymbol => DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm";
+
+    private string? Shown(decimal? value, bool weight) => value switch
+    {
+        null => null,
+        { } kg when weight => OperationsUnits.ToShownWeight(kg, WeightUnit).ToString("0.###", System.Globalization.CultureInfo.InvariantCulture),
+        { } cm => OperationsUnits.ToShownLength(cm, DimensionUnit).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture)
+    };
+
+    [Parameter, EditorRequired] public OperationsParcelSummary Parcel { get; set; } = null!;
+
+    [Parameter] public string? CustomerPhone { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsParcelSummary> ShipmentParcels { get; set; } = Array.Empty<OperationsParcelSummary>();
+
+    [Parameter] public Vixly.Operations.Application.Shipments.OperationsCustomerShipment? Shipment { get; set; }
+
+    [Parameter] public string? Condition { get; set; }
+
+    [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
+
+    [Parameter] public OperationsDimensionUnit DimensionUnit { get; set; }
+
+    [Parameter] public string CommandKey { get; set; } = string.Empty;
+
+    // Slice 4D step 2: a cleared parcel's shipping label prints here at once.
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Printing.OperationsLabelPrinter> ShippingPrinters { get; set; } = Array.Empty<Vixly.Operations.Domain.Printing.OperationsLabelPrinter>();
+}

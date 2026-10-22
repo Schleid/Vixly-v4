@@ -75,6 +75,15 @@ public sealed class PlatformUserSession : AuditableEntity
 
     public bool IsEnded => EndedUtc is not null;
 
+    // Owner, 2026-10-21: the country the sign-in came from (Cloudflare's two-letter code), for member activity.
+    public string? Country { get; private set; }
+
+    public void From(string? country)
+    {
+        string? code = country?.Trim().ToUpperInvariant();
+        Country = code is { Length: 2 } && code.All(char.IsAsciiLetterOrDigit) ? code : null;
+    }
+
     // =====================================================
     // METHOD: START
     // =====================================================

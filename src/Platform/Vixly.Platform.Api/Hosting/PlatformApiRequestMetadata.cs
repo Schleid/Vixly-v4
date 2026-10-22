@@ -24,7 +24,7 @@ internal sealed class PlatformApiRequestMetadata : IPlatformRequestMetadata
         _accessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
     }
 
-    public string? ClientIp => _accessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
+    public string? ClientIp => Vixly.Platform.Api.Internal.PlatformClientAddress.Of(_accessor.HttpContext);
 
     public string? UserAgent => _accessor.HttpContext?.Request.Headers.UserAgent.ToString();
 

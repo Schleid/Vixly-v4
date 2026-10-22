@@ -1,0 +1,53 @@
+﻿@*
+=========================================================
+FILE: DestinationFields.razor
+
+PURPOSE:
+A warehouse as a destination of the company's routes: who runs it, its hub, home delivery and the communes it delivers to (Slice 4C).
+
+RESPONSIBILITIES:
+- Operated by the company or a partner (name and contact)
+- Served through a hub; home delivery from here, in its area
+- Pickup is the pickup-point role above
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<fieldset>
+    <legend>@T["ui.editor.destination"]</legend>
+    <p class="ops-editor__hint">@T["ui.editor.destination_hint"]</p>
+    <label>@T["ui.editor.destination.operated_by"]
+        <select name="operatedBy">
+            <option value="Company" selected="@(Form.OperatedBy != OperationsDestinationOperator.Partner)">@T["ui.editor.destination.operated_by.Company"]</option>
+            <option value="Partner" selected="@(Form.OperatedBy == OperationsDestinationOperator.Partner)">@T["ui.editor.destination.operated_by.Partner"]</option>
+        </select>
+    </label>
+    <label>@T["ui.editor.destination.partner_name"] <input name="partnerName" value="@Form.PartnerName" maxlength="@OperationsLocationLimits.NameMaxLength" /></label>
+    <label>@T["ui.editor.destination.partner_phone"] <input name="partnerPhone" type="tel" value="@Form.PartnerPhone" maxlength="@OperationsLocationLimits.PhoneMaxLength" /></label>
+    <label>@T["ui.editor.destination.partner_email"] <input name="partnerEmail" type="email" value="@Form.PartnerEmail" maxlength="@OperationsLocationLimits.EmailMaxLength" /></label>
+    <label><input type="checkbox" name="partnerHandlesMoney" value="true" checked="@Form.PartnerHandlesMoney" /> @T["ui.editor.destination.partner_money"]</label>
+    <p class="ops-editor__hint">@T["ui.editor.destination.partner_money_hint"]</p>
+    <label>@T["ui.editor.destination.hub"]
+        <select name="hub">
+            <option value="">@T["ui.editor.destination.no_hub"]</option>
+            @* The current hub stays chosen even when it no longer qualifies; the save then says why. *@
+            @if (Form.HubWarehouseId is { } keptHub && !Hubs.Any(hub => hub.Id == keptHub)) { <option value="@keptHub" selected>@T["ui.editor.destination.hub_kept"]</option> }
+            @foreach (OperationsWarehouse hub in Hubs) { <option value="@hub.Id" selected="@(hub.Id == Form.HubWarehouseId)">@hub.Name · @hub.Address.City, @hub.Address.CountryCode</option> }
+        </select>
+    </label>
+    <p class="ops-editor__hint">@T["ui.editor.destination.hub_hint"]</p>
+    <label><input type="checkbox" name="deliversHome" value="true" checked="@Form.DeliversHome" /> @T["ui.editor.destination.delivers_home"]</label>
+    <label>@T["ui.editor.destination.home_area"] <textarea name="homeArea" rows="3">@string.Join(Environment.NewLine, Form.HomeArea ?? Array.Empty<string>())</textarea></label>
+    <p class="ops-editor__hint">@T["ui.editor.destination.home_area_hint"]</p>
+    <label><input type="checkbox" name="clearsCustoms" value="true" checked="@Form.ClearsCustoms" /> @T["ui.editor.destination.clears_customs"]</label>
+    <p class="ops-editor__hint">@T["ui.editor.destination.clears_customs_hint"]</p>
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired] public SaveOperationsWarehouseRequest Form { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Hubs { get; set; } = Array.Empty<OperationsWarehouse>();
+}

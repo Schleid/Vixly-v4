@@ -1,0 +1,1658 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  
+  <data name="ops.auth.password_contains_email" xml:space="preserve">
+    <value>La contraseña no debe contener su dirección de correo electrónico.</value>
+  </data>
+  <data name="ops.auth.password_too_common" xml:space="preserve">
+    <value>Esta contraseña es demasiado común. Elija otra.</value>
+  </data>
+  <data name="ops.auth.password_too_long" xml:space="preserve">
+    <value>Use como máximo {maxLength} caracteres.</value>
+  </data>
+  <data name="ops.auth.password_too_short" xml:space="preserve">
+    <value>Use al menos {minLength} caracteres.</value>
+  </data>
+  <data name="ops.cards.already_started" xml:space="preserve">
+    <value>Se acaba de iniciar un pago para esta factura. Abra sus facturas e inténtelo de nuevo.</value>
+  </data>
+  <data name="ops.cards.charge_not_found" xml:space="preserve">
+    <value>No se encontró este pago.</value>
+  </data>
+  <data name="ops.cards.not_connected" xml:space="preserve">
+    <value>El pago con tarjeta no está disponible en este momento.</value>
+  </data>
+  <data name="ops.cards.provider_refused" xml:space="preserve">
+    <value>No se pudo iniciar el pago. Inténtelo más tarde o pague en el mostrador.</value>
+  </data>
+  <data name="ops.cards.provider_unavailable" xml:space="preserve">
+    <value>No se puede contactar con el servicio de pago en este momento. Inténtelo de nuevo en un momento.</value>
+  </data>
+  <data name="ops.charges.country_invalid" xml:space="preserve">
+    <value>Elija un destino de la lista.</value>
+  </data>
+  <data name="ops.charges.not_priced" xml:space="preserve">
+    <value>Aún no tenemos precio en línea para este destino. Contáctenos para una cotización.</value>
+  </data>
+  <data name="ops.charges.pieces_invalid" xml:space="preserve">
+    <value>Escriba un peso mayor que cero; las medidas y el valor no pueden ser negativos.</value>
+  </data>
+  <data name="ops.charges.route_invalid" xml:space="preserve">
+    <value>Elija de la lista desde dónde y hacia dónde se envía.</value>
+  </data>
+  <data name="ops.common.concurrency_conflict" xml:space="preserve">
+    <value>Alguien cambió esto al mismo tiempo. Ábralo de nuevo e inténtelo otra vez.</value>
+  </data>
+  <data name="ops.customers.company_too_long" xml:space="preserve">
+    <value>El nombre de la empresa es demasiado largo.</value>
+  </data>
+  <data name="ops.customers.email_invalid" xml:space="preserve">
+    <value>Escriba una dirección de correo válida.</value>
+  </data>
+  <data name="ops.customers.email_taken" xml:space="preserve">
+    <value>Otro cliente ya usa este correo.</value>
+  </data>
+  <data name="ops.customers.language_invalid" xml:space="preserve">
+    <value>Elija inglés, francés o español.</value>
+  </data>
+  <data name="ops.customers.link_invalid" xml:space="preserve">
+    <value>Este enlace venció o ya se usó. Pida uno nuevo.</value>
+  </data>
+  <data name="ops.customers.name_invalid" xml:space="preserve">
+    <value>Los nombres no pueden contener &lt; &gt;, @ ni una dirección web.</value>
+  </data>
+  <data name="ops.customers.name_required" xml:space="preserve">
+    <value>Escriba su nombre y apellido.</value>
+  </data>
+  <data name="ops.customers.name_too_long" xml:space="preserve">
+    <value>El nombre es demasiado largo.</value>
+  </data>
+  <data name="ops.customers.not_verified" xml:space="preserve">
+    <value>Confirme primero su correo: abra el enlace que le enviamos o pida uno nuevo.</value>
+  </data>
+  <data name="ops.customers.password_wrong" xml:space="preserve">
+    <value>La contraseña actual no es correcta.</value>
+  </data>
+  <data name="ops.customers.phone_invalid" xml:space="preserve">
+    <value>Escriba el teléfono con el código del país, por ejemplo +509 3712 3456.</value>
+  </data>
+  <data name="ops.customers.session_ended" xml:space="preserve">
+    <value>Su sesión terminó. Inicie sesión de nuevo.</value>
+  </data>
+  <data name="ops.customers.session_required" xml:space="preserve">
+    <value>Inicie sesión para continuar.</value>
+  </data>
+  <data name="ops.customers.sign_in_failed" xml:space="preserve">
+    <value>El correo o la contraseña no son correctos, o la cuenta está bloqueada unos minutos.</value>
+  </data>
+  <data name="ops.holds.answer_not_found" xml:space="preserve">
+    <value>No se encontró esta respuesta.</value>
+  </data>
+  <data name="ops.holds.answer_not_open" xml:space="preserve">
+    <value>Esta respuesta ya fue revisada.</value>
+  </data>
+  <data name="ops.holds.approver_not_allowed" xml:space="preserve">
+    <value>Solo el propietario o un administrador lo decide.</value>
+  </data>
+  <data name="ops.holds.choice_invalid" xml:space="preserve">
+    <value>Elija qué hacer con el paquete.</value>
+  </data>
+  <data name="ops.holds.contents_required" xml:space="preserve">
+    <value>Escriba el contenido del paquete.</value>
+  </data>
+  <data name="ops.holds.days_invalid" xml:space="preserve">
+    <value>Escriba un número de días de 30 a 180.</value>
+  </data>
+  <data name="ops.holds.decision_invalid" xml:space="preserve">
+    <value>Elija una decisión.</value>
+  </data>
+  <data name="ops.holds.document_invalid" xml:space="preserve">
+    <value>El archivo debe ser PDF, PNG o JPEG de hasta 10 MB.</value>
+  </data>
+  <data name="ops.holds.document_required" xml:space="preserve">
+    <value>Agregue el documento: un archivo PDF, PNG o JPEG.</value>
+  </data>
+  <data name="ops.holds.not_answerable" xml:space="preserve">
+    <value>Esta retención no se puede responder en línea. Contáctenos.</value>
+  </data>
+  <data name="ops.holds.not_unclaimed" xml:space="preserve">
+    <value>Este paquete no está sin reclamar (ya no espera o no lo suficiente).</value>
+  </data>
+  <data name="ops.holds.review_note_required" xml:space="preserve">
+    <value>Escriba lo que aún falta: el cliente lo leerá.</value>
+  </data>
+  <data name="ops.holds.text_invalid" xml:space="preserve">
+    <value>Este texto es demasiado largo o contiene caracteres no permitidos.</value>
+  </data>
+  <data name="ops.holds.value_invalid" xml:space="preserve">
+    <value>Escriba un valor de 0 a 1.000.000.</value>
+  </data>
+  <data name="ops.invoices.credit_not_found" xml:space="preserve">
+    <value>No se encontró esta nota de crédito.</value>
+  </data>
+  <data name="ops.invoices.invoice_not_found" xml:space="preserve">
+    <value>No se encontró esta factura.</value>
+  </data>
+  <data name="ops.locations.address_required" xml:space="preserve">
+    <value>Escriba la dirección.</value>
+  </data>
+  <data name="ops.locations.address_too_long" xml:space="preserve">
+    <value>La dirección es demasiado larga ({maxLength} caracteres como máximo).</value>
+  </data>
+  <data name="ops.locations.city_required" xml:space="preserve">
+    <value>Escriba la ciudad.</value>
+  </data>
+  <data name="ops.locations.city_too_long" xml:space="preserve">
+    <value>La ciudad es demasiado larga ({maxLength} caracteres como máximo).</value>
+  </data>
+  <data name="ops.locations.country_invalid" xml:space="preserve">
+    <value>Elija un país.</value>
+  </data>
+  <data name="ops.locations.postal_code_too_long" xml:space="preserve">
+    <value>El código postal es demasiado largo ({maxLength} caracteres como máximo).</value>
+  </data>
+  <data name="ops.locations.region_too_long" xml:space="preserve">
+    <value>El departamento es demasiado largo ({maxLength} caracteres como máximo).</value>
+  </data>
+  <data name="ops.payments.nothing_owed" xml:space="preserve">
+    <value>No se debe nada en esta factura.</value>
+  </data>
+  <data name="ops.receiving.carrier_invalid" xml:space="preserve">
+    <value>Escriba el transportista.</value>
+  </data>
+  <data name="ops.receiving.expected_date_invalid" xml:space="preserve">
+    <value>Elija una fecha prevista dentro del próximo año.</value>
+  </data>
+  <data name="ops.receiving.parcel_not_found" xml:space="preserve">
+    <value>No se encontró este paquete.</value>
+  </data>
+  <data name="ops.receiving.pre_alert_duplicate" xml:space="preserve">
+    <value>Este número de rastreo ya fue avisado.</value>
+  </data>
+  <data name="ops.receiving.pre_alert_not_found" xml:space="preserve">
+    <value>No se encontró este aviso.</value>
+  </data>
+  <data name="ops.receiving.pre_alert_not_open" xml:space="preserve">
+    <value>Este paquete ya se recibió o se retiró.</value>
+  </data>
+  <data name="ops.receiving.shipment_not_open" xml:space="preserve">
+    <value>Este envío ya no se puede cambiar.</value>
+  </data>
+  <data name="ops.receiving.text_too_long" xml:space="preserve">
+    <value>Un texto es demasiado largo o contiene &lt; &gt;, caracteres de control o una dirección web.</value>
+  </data>
+  <data name="ops.receiving.tracking_number_invalid" xml:space="preserve">
+    <value>Escriba un número de rastreo de 5 a 40 letras y dígitos.</value>
+  </data>
+  <data name="ops.receiving.value_invalid" xml:space="preserve">
+    <value>Escriba un valor de 0 a 1.000.000.</value>
+  </data>
+  <data name="ops.shipments.booked" xml:space="preserve">
+    <value>Este envío está finalizado: ya no puede cambiar.</value>
+  </data>
+  <data name="ops.shipments.collect_unavailable" xml:space="preserve">
+    <value>El pago en destino no se ofrece.</value>
+  </data>
+  <data name="ops.shipments.collector_locked" xml:space="preserve">
+    <value>Quién puede recoger se indica una vez reservado el envío, hasta que se recoja.</value>
+  </data>
+  <data name="ops.shipments.delivery_mode_unavailable" xml:space="preserve">
+    <value>Esta entrega no se ofrece allí. Elija recogida en sucursal o entrega en una dirección.</value>
+  </data>
+  <data name="ops.shipments.destination_invalid" xml:space="preserve">
+    <value>Elija el destino del envío.</value>
+  </data>
+  <data name="ops.shipments.has_parcels" xml:space="preserve">
+    <value>Un paquete de este envío ya llegó, así que no se puede cancelar.</value>
+  </data>
+  <data name="ops.shipments.instructions_required" xml:space="preserve">
+    <value>Indique el destino de este envío antes de anunciar paquetes en él.</value>
+  </data>
+  <data name="ops.shipments.insurance_choice_required" xml:space="preserve">
+    <value>Elija uno de los productos de seguro para este servicio.</value>
+  </data>
+  <data name="ops.shipments.insurance_terms_required" xml:space="preserve">
+    <value>Acepte las condiciones del seguro para asegurar el envío.</value>
+  </data>
+  <data name="ops.shipments.not_found" xml:space="preserve">
+    <value>No se encontró este envío.</value>
+  </data>
+  <data name="ops.shipments.origin_invalid" xml:space="preserve">
+    <value>Elija el casillero al que se envían los paquetes.</value>
+  </data>
+  <data name="ops.shipments.parcel_count_below" xml:space="preserve">
+    <value>La cantidad no puede ser menor que los paquetes ya incluidos en el envío.</value>
+  </data>
+  <data name="ops.shipments.parcel_count_invalid" xml:space="preserve">
+    <value>Indique cuántos paquetes viajan en este envío, de 1 a 99.</value>
+  </data>
+  <data name="ops.shipments.parcel_elsewhere" xml:space="preserve">
+    <value>Este paquete está en, o anunciado para, otro de nuestros almacenes. Póngalo en un envío desde ese almacén.</value>
+  </data>
+  <data name="ops.shipments.recipient_invalid" xml:space="preserve">
+    <value>Escriba el nombre del destinatario.</value>
+  </data>
+  <data name="ops.shipments.recipient_phone_invalid" xml:space="preserve">
+    <value>Escriba el teléfono del destinatario con el código del país, por ejemplo +509 3712 3456.</value>
+  </data>
+  <data name="ops.shipments.service_invalid" xml:space="preserve">
+    <value>Elija un servicio de la lista.</value>
+  </data>
+  <data name="ops.shipments.waiting" xml:space="preserve">
+    <value>Estos paquetes esperan un envío: ponga cada uno en uno de sus envíos, o cree uno.</value>
+  </data>
+  <data name="ops.tickets.another_open" xml:space="preserve">
+    <value>Tiene otro reporte abierto sobre este paquete; escriba allí.</value>
+  </data>
+  <data name="ops.tickets.details_invalid" xml:space="preserve">
+    <value>Indique la transportista, el número de rastreo y el contenido; la fecha de entrega no puede ser futura ni de hace más de un año.</value>
+  </data>
+  <data name="ops.tickets.message_invalid" xml:space="preserve">
+    <value>Escriba un mensaje de hasta 1.000 caracteres.</value>
+  </data>
+  <data name="ops.tickets.not_found" xml:space="preserve">
+    <value>No se encontró ese ticket.</value>
+  </data>
+  <data name="ops.tickets.proof_invalid" xml:space="preserve">
+    <value>La prueba de entrega debe ser un archivo PDF, PNG o JPEG de hasta 10 MB.</value>
+  </data>
+  <data name="ops.tickets.too_many_messages" xml:space="preserve">
+    <value>Este ticket tiene demasiados mensajes; abra uno nuevo.</value>
+  </data>
+  <data name="ui.answers.choice.dispose" xml:space="preserve">
+    <value>Desecharlo</value>
+  </data>
+  <data name="ui.answers.choice.return" xml:space="preserve">
+    <value>Devolverlo al remitente</value>
+  </data>
+  <data name="ui.answers.choice.ship_as_is" xml:space="preserve">
+    <value>Enviarlo tal como está</value>
+  </data>
+  <data name="ui.answers.damaged" xml:space="preserve">
+    <value>¿Qué hacemos con el paquete dañado?</value>
+  </data>
+  <data name="ui.answers.declined" xml:space="preserve">
+    <value>Su última respuesta no fue suficiente:</value>
+  </data>
+  <data name="ui.answers.document" xml:space="preserve">
+    <value>Documento</value>
+  </data>
+  <data name="ui.answers.fee_later" xml:space="preserve">
+    <value>Hay una tarifa para este paquete; la pagará con su factura.</value>
+  </data>
+  <data name="ui.answers.file_hint" xml:space="preserve">
+    <value>PDF, PNG o JPEG, hasta 10 MB.</value>
+  </data>
+  <data name="ui.answers.invoice" xml:space="preserve">
+    <value>Factura o recibo (opcional)</value>
+  </data>
+  <data name="ui.answers.note" xml:space="preserve">
+    <value>Mensaje (opcional)</value>
+  </data>
+  <data name="ui.answers.send" xml:space="preserve">
+    <value>Enviar mi respuesta</value>
+  </data>
+  <data name="ui.answers.waiting" xml:space="preserve">
+    <value>Recibimos su respuesta. Nuestro equipo la está revisando.</value>
+  </data>
+  <data name="ui.app.name" xml:space="preserve">
+    <value>Portal de clientes</value>
+  </data>
+  <data name="ui.card.back" xml:space="preserve">
+    <value>Volver a mis facturas</value>
+  </data>
+  <data name="ui.card.cancelled" xml:space="preserve">
+    <value>Este pago no se realizó. Puede intentarlo de nuevo desde sus facturas.</value>
+  </data>
+  <data name="ui.card.continue" xml:space="preserve">
+    <value>Continuar a la página de pago segura</value>
+  </data>
+  <data name="ui.card.continue_hint" xml:space="preserve">
+    <value>Usted paga en la página segura de nuestro proveedor de pagos y luego vuelve aquí. Su número de tarjeta nunca pasa por este sitio.</value>
+  </data>
+  <data name="ui.card.paid" xml:space="preserve">
+    <value>Gracias: su pago está confirmado.</value>
+  </data>
+  <data name="ui.card.paid_not_applied" xml:space="preserve">
+    <value>Su tarjeta fue cobrada, pero la factura había cambiado mientras tanto. Le haremos un reembolso; contáctenos si tiene alguna pregunta.</value>
+  </data>
+  <data name="ui.card.title" xml:space="preserve">
+    <value>Pago con tarjeta</value>
+  </data>
+  <data name="ui.credit.available" xml:space="preserve">
+    <value>Disponible</value>
+  </data>
+  <data name="ui.credit.awaiting" xml:space="preserve">
+    <value>Esperando aprobación</value>
+  </data>
+  <data name="ui.credit.due" xml:space="preserve">
+    <value>Vence</value>
+  </data>
+  <data name="ui.credit.items" xml:space="preserve">
+    <value>Partidas abiertas</value>
+  </data>
+  <data name="ui.credit.overdue" xml:space="preserve">
+    <value>Vencido</value>
+  </data>
+  <data name="ui.credit.owed" xml:space="preserve">
+    <value>Adeudado</value>
+  </data>
+  <data name="ui.credit.state.active" xml:space="preserve">
+    <value>Activa</value>
+  </data>
+  <data name="ui.credit.state.closed" xml:space="preserve">
+    <value>Cerrada</value>
+  </data>
+  <data name="ui.credit.state.onhold" xml:space="preserve">
+    <value>Suspendida</value>
+  </data>
+  <data name="ui.credit.statement" xml:space="preserve">
+    <value>Descargar el estado de cuenta (PDF)</value>
+  </data>
+  <data name="ui.credit.terms" xml:space="preserve">
+    <value>Límite {limit} · pagar en {days} días</value>
+  </data>
+  <data name="ui.credit.title" xml:space="preserve">
+    <value>Su cuenta de crédito</value>
+  </data>
+  <data name="ui.delivery.failure.address_wrong" xml:space="preserve">
+    <value>Dirección incorrecta o no encontrada</value>
+  </data>
+  <data name="ui.delivery.failure.no_access" xml:space="preserve">
+    <value>Sin acceso a la dirección</value>
+  </data>
+  <data name="ui.delivery.failure.not_home" xml:space="preserve">
+    <value>Nadie en casa</value>
+  </data>
+  <data name="ui.delivery.failure.not_paid" xml:space="preserve">
+    <value>No pagado</value>
+  </data>
+  <data name="ui.delivery.failure.other" xml:space="preserve">
+    <value>Otro</value>
+  </data>
+  <data name="ui.delivery.failure.refused" xml:space="preserve">
+    <value>Rechazado</value>
+  </data>
+  <data name="ui.done.saved" xml:space="preserve">
+    <value>Sus cambios se han guardado.</value>
+  </data>
+  <data name="ui.done.welcome" xml:space="preserve">
+    <value>Su correo está confirmado. ¡Bienvenido!</value>
+  </data>
+  <data name="ui.error.back" xml:space="preserve">
+    <value>Volver a mi cuenta</value>
+  </data>
+  <data name="ui.error.body" xml:space="preserve">
+    <value>No funcionó. Vuelva atrás e inténtelo de nuevo; si vuelve a ocurrir, contáctenos.</value>
+  </data>
+  <data name="ui.error.bot" xml:space="preserve">
+    <value>No pudimos confirmar que es una persona. Inténtelo de nuevo.</value>
+  </data>
+  <data name="ui.error.general" xml:space="preserve">
+    <value>Algo salió mal. Revise el formulario e inténtelo de nuevo.</value>
+  </data>
+  <data name="ui.error.title" xml:space="preserve">
+    <value>Algo salió mal</value>
+  </data>
+  <data name="ui.error.unavailable" xml:space="preserve">
+    <value>El servicio no está disponible en este momento. Inténtelo de nuevo en unos minutos.</value>
+  </data>
+  <data name="ui.estimate.band.BasePlusPerUnit" xml:space="preserve">
+    <value>desde {from}: {base} + {amount} / {unit} por encima de {from}</value>
+  </data>
+  <data name="ui.estimate.band.Flat" xml:space="preserve">
+    <value>desde {from}: {amount}</value>
+  </data>
+  <data name="ui.estimate.band.PerUnit" xml:space="preserve">
+    <value>desde {from}: {amount} / {unit}</value>
+  </data>
+  <data name="ui.estimate.choose" xml:space="preserve">
+    <value>Elija el destino y el servicio para ver la estimación.</value>
+  </data>
+  <data name="ui.estimate.expected_value" xml:space="preserve">
+    <value>Valor que piensa declarar (opcional, para la estimación)</value>
+  </data>
+  <data name="ui.estimate.minimum" xml:space="preserve">
+    <value>Mínimo por envío: {amount}</value>
+  </data>
+  <data name="ui.estimate.not_possible" xml:space="preserve">
+    <value>no es posible para este valor</value>
+  </data>
+  <data name="ui.estimate.option.consolidate" xml:space="preserve">
+    <value>Consolidado</value>
+  </data>
+  <data name="ui.estimate.option.none" xml:space="preserve">
+    <value>Sin seguro</value>
+  </data>
+  <data name="ui.estimate.option.product" xml:space="preserve">
+    <value>Con {name}</value>
+  </data>
+  <data name="ui.estimate.option.separate" xml:space="preserve">
+    <value>No consolidado</value>
+  </data>
+  <data name="ui.estimate.parcel" xml:space="preserve">
+    <value>Paquete {number}</value>
+  </data>
+  <data name="ui.estimate.title" xml:space="preserve">
+    <value>Estimación del envío</value>
+  </data>
+  <data name="ui.estimate.what_if" xml:space="preserve">
+    <value>Y si</value>
+  </data>
+  <data name="ui.event_reason.address_problem" xml:space="preserve">
+    <value>Problema con la dirección</value>
+  </data>
+  <data name="ui.event_reason.capacity" xml:space="preserve">
+    <value>Sin espacio en la salida prevista</value>
+  </data>
+  <data name="ui.event_reason.carrier_delay" xml:space="preserve">
+    <value>Retraso del transportista</value>
+  </data>
+  <data name="ui.event_reason.customs_hold" xml:space="preserve">
+    <value>Retenido por la aduana</value>
+  </data>
+  <data name="ui.event_reason.customs_inspection" xml:space="preserve">
+    <value>Inspección de aduana</value>
+  </data>
+  <data name="ui.event_reason.damaged" xml:space="preserve">
+    <value>Paquete dañado</value>
+  </data>
+  <data name="ui.event_reason.documents_missing" xml:space="preserve">
+    <value>Faltan documentos</value>
+  </data>
+  <data name="ui.event_reason.documents_pending" xml:space="preserve">
+    <value>En espera de documentos</value>
+  </data>
+  <data name="ui.event_reason.flight_rebooked" xml:space="preserve">
+    <value>Vuelo reprogramado por la aerolínea</value>
+  </data>
+  <data name="ui.event_reason.holiday" xml:space="preserve">
+    <value>Día festivo</value>
+  </data>
+  <data name="ui.event_reason.missed_connection" xml:space="preserve">
+    <value>Conexión perdida</value>
+  </data>
+  <data name="ui.event_reason.missing_in_transit" xml:space="preserve">
+    <value>Extraviado en tránsito</value>
+  </data>
+  <data name="ui.event_reason.recipient_unreachable" xml:space="preserve">
+    <value>No se pudo contactar al destinatario</value>
+  </data>
+  <data name="ui.event_reason.refused" xml:space="preserve">
+    <value>Rechazado por el destinatario</value>
+  </data>
+  <data name="ui.event_reason.security_check" xml:space="preserve">
+    <value>Control de seguridad</value>
+  </data>
+  <data name="ui.event_reason.weather" xml:space="preserve">
+    <value>Mal tiempo</value>
+  </data>
+  <data name="ui.field.company" xml:space="preserve">
+    <value>Empresa (opcional)</value>
+  </data>
+  <data name="ui.field.current_password" xml:space="preserve">
+    <value>Contraseña actual</value>
+  </data>
+  <data name="ui.field.email" xml:space="preserve">
+    <value>Correo electrónico</value>
+  </data>
+  <data name="ui.field.first_name" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="ui.field.language" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="ui.field.last_name" xml:space="preserve">
+    <value>Apellido</value>
+  </data>
+  <data name="ui.field.new_password" xml:space="preserve">
+    <value>Nueva contraseña (12 caracteres o más)</value>
+  </data>
+  <data name="ui.field.password" xml:space="preserve">
+    <value>Contraseña</value>
+  </data>
+  <data name="ui.field.phone" xml:space="preserve">
+    <value>Teléfono, con el código del país (por ejemplo +509 3712 3456)</value>
+  </data>
+  <data name="ui.forgot.link" xml:space="preserve">
+    <value>¿Olvidó su contraseña?</value>
+  </data>
+  <data name="ui.forgot.sent.body" xml:space="preserve">
+    <value>Si una cuenta usa este correo, le enviamos un enlace para elegir una nueva contraseña. El enlace es válido durante 60 minutos.</value>
+  </data>
+  <data name="ui.forgot.sent.title" xml:space="preserve">
+    <value>Revise su correo</value>
+  </data>
+  <data name="ui.forgot.submit" xml:space="preserve">
+    <value>Enviar el enlace</value>
+  </data>
+  <data name="ui.forgot.subtitle" xml:space="preserve">
+    <value>Escriba el correo de su cuenta. Le enviaremos un enlace para elegir una nueva contraseña.</value>
+  </data>
+  <data name="ui.forgot.title" xml:space="preserve">
+    <value>Olvidó su contraseña</value>
+  </data>
+  <data name="ui.hold.AwaitingCustomerInformation" xml:space="preserve">
+    <value>Indíquenos el contenido y su valor</value>
+  </data>
+  <data name="ui.hold.AwaitingShipment" xml:space="preserve">
+    <value>Póngalo en uno de sus envíos</value>
+  </data>
+  <data name="ui.hold.Damaged" xml:space="preserve">
+    <value>El paquete llegó dañado</value>
+  </data>
+  <data name="ui.hold.InspectionDocuments" xml:space="preserve">
+    <value>Se requiere un documento</value>
+  </data>
+  <data name="ui.hold.InspectionFee" xml:space="preserve">
+    <value>Hay un cargo pendiente</value>
+  </data>
+  <data name="ui.hold.InspectionPermit" xml:space="preserve">
+    <value>Se requiere un permiso</value>
+  </data>
+  <data name="ui.hold.InspectionValue" xml:space="preserve">
+    <value>Confirme el valor</value>
+  </data>
+  <data name="ui.hold.Other" xml:space="preserve">
+    <value>Por favor contáctenos</value>
+  </data>
+  <data name="ui.hold.Refused" xml:space="preserve">
+    <value>No podemos enviar este artículo</value>
+  </data>
+  <data name="ui.hold.Unidentified" xml:space="preserve">
+    <value>Necesitamos confirmar que este paquete es suyo</value>
+  </data>
+  <data name="ui.home.body" xml:space="preserve">
+    <value>El registro y el inicio de sesión llegan en la próxima versión.</value>
+  </data>
+  <data name="ui.home.hello" xml:space="preserve">
+    <value>Hola {name}</value>
+  </data>
+  <data name="ui.home.title" xml:space="preserve">
+    <value>Portal de clientes</value>
+  </data>
+  <data name="ui.inspection.held" xml:space="preserve">
+    <value>retenido hasta su respuesta</value>
+  </data>
+  <data name="ui.inspection.passed" xml:space="preserve">
+    <value>aprobado</value>
+  </data>
+  <data name="ui.inspection.passed_with_notes" xml:space="preserve">
+    <value>aprobado con observaciones</value>
+  </data>
+  <data name="ui.inspection.refused_disposed" xml:space="preserve">
+    <value>rechazado y desechado</value>
+  </data>
+  <data name="ui.inspection.refused_returned" xml:space="preserve">
+    <value>rechazado, devuelto al remitente</value>
+  </data>
+  <data name="ui.inspection.repacked" xml:space="preserve">
+    <value>reembalado</value>
+  </data>
+  <data name="ui.insurance.by_company" xml:space="preserve">
+    <value>Nosotros mismos pagamos los siniestros.</value>
+  </data>
+  <data name="ui.insurance.by_insurer" xml:space="preserve">
+    <value>Asegurado con {insurer} (póliza {policy}).</value>
+  </data>
+  <data name="ui.insurance.claims" xml:space="preserve">
+    <value>Reclame un daño dentro de los {damage} días posteriores a la entrega y una pérdida dentro de {loss} días, con: {proof}.</value>
+  </data>
+  <data name="ui.insurance.covers" xml:space="preserve">
+    <value>Cubre:</value>
+  </data>
+  <data name="ui.insurance.deductible_amount" xml:space="preserve">
+    <value>deducible de {amount}</value>
+  </data>
+  <data name="ui.insurance.deductible_percent" xml:space="preserve">
+    <value>deducible del {percent} %</value>
+  </data>
+  <data name="ui.insurance.exclusion.CashAndDocuments" xml:space="preserve">
+    <value>Efectivo y documentos negociables</value>
+  </data>
+  <data name="ui.insurance.exclusion.CustomsSeizure" xml:space="preserve">
+    <value>Incautación aduanera</value>
+  </data>
+  <data name="ui.insurance.exclusion.FragileNotPackedByUs" xml:space="preserve">
+    <value>Artículos frágiles no embalados por nosotros</value>
+  </data>
+  <data name="ui.insurance.exclusion.HazardousGoods" xml:space="preserve">
+    <value>Mercancías peligrosas</value>
+  </data>
+  <data name="ui.insurance.exclusion.ImproperPacking" xml:space="preserve">
+    <value>Pérdidas por embalaje inadecuado</value>
+  </data>
+  <data name="ui.insurance.exclusion.JewelryAndPreciousMetals" xml:space="preserve">
+    <value>Joyas y metales preciosos</value>
+  </data>
+  <data name="ui.insurance.exclusion.LiveAnimals" xml:space="preserve">
+    <value>Animales vivos</value>
+  </data>
+  <data name="ui.insurance.exclusion.Perishables" xml:space="preserve">
+    <value>Productos perecederos</value>
+  </data>
+  <data name="ui.insurance.exclusion.UsedElectronicsWithoutProof" xml:space="preserve">
+    <value>Electrónica usada sin prueba de su estado</value>
+  </data>
+  <data name="ui.insurance.filed_by.Company" xml:space="preserve">
+    <value>La empresa, por el cliente</value>
+  </data>
+  <data name="ui.insurance.filed_by.Customer" xml:space="preserve">
+    <value>El cliente</value>
+  </data>
+  <data name="ui.insurance.maximums" xml:space="preserve">
+    <value>Máximo pagado: {item} por artículo, {shipment} por envío.</value>
+  </data>
+  <data name="ui.insurance.not_covered" xml:space="preserve">
+    <value>No cubierto:</value>
+  </data>
+  <data name="ui.insurance.payout.DeclaredValue" xml:space="preserve">
+    <value>El valor declarado</value>
+  </data>
+  <data name="ui.insurance.payout.LowerOfDeclaredAndInvoice" xml:space="preserve">
+    <value>El menor entre el valor declarado y la factura</value>
+  </data>
+  <data name="ui.insurance.price_bands" xml:space="preserve">
+    <value>Precio: un importe fijo según el valor declarado.</value>
+  </data>
+  <data name="ui.insurance.price_percent" xml:space="preserve">
+    <value>Precio: {percent} % del valor declarado, como mínimo {minimum}.</value>
+  </data>
+  <data name="ui.insurance.proof.Invoice" xml:space="preserve">
+    <value>Factura</value>
+  </data>
+  <data name="ui.insurance.proof.NotedAtRelease" xml:space="preserve">
+    <value>Daño anotado en la entrega</value>
+  </data>
+  <data name="ui.insurance.proof.Photos" xml:space="preserve">
+    <value>Fotos</value>
+  </data>
+  <data name="ui.insurance.risk.Damage" xml:space="preserve">
+    <value>Daño</value>
+  </data>
+  <data name="ui.insurance.risk.Loss" xml:space="preserve">
+    <value>Pérdida</value>
+  </data>
+  <data name="ui.insurance.risk.Theft" xml:space="preserve">
+    <value>Robo</value>
+  </data>
+  <data name="ui.insurance.title.Air" xml:space="preserve">
+    <value>Condiciones del seguro aéreo</value>
+  </data>
+  <data name="ui.insurance.title.Ground" xml:space="preserve">
+    <value>Condiciones del seguro terrestre</value>
+  </data>
+  <data name="ui.insurance.title.Ocean" xml:space="preserve">
+    <value>Condiciones del seguro marítimo</value>
+  </data>
+  <data name="ui.invoices.credit_notes" xml:space="preserve">
+    <value>Notas de crédito</value>
+  </data>
+  <data name="ui.invoices.date" xml:space="preserve">
+    <value>Fecha</value>
+  </data>
+  <data name="ui.invoices.for" xml:space="preserve">
+    <value>Para</value>
+  </data>
+  <data name="ui.invoices.kind.destination" xml:space="preserve">
+    <value>En destino</value>
+  </data>
+  <data name="ui.invoices.kind.order" xml:space="preserve">
+    <value>Pedido de suministros</value>
+  </data>
+  <data name="ui.invoices.kind.shipment" xml:space="preserve">
+    <value>Envío</value>
+  </data>
+  <data name="ui.invoices.none" xml:space="preserve">
+    <value>Aún no tiene facturas.</value>
+  </data>
+  <data name="ui.invoices.number" xml:space="preserve">
+    <value>Número</value>
+  </data>
+  <data name="ui.invoices.owed" xml:space="preserve">
+    <value>Por pagar</value>
+  </data>
+  <data name="ui.invoices.pay_card" xml:space="preserve">
+    <value>Pagar con tarjeta</value>
+  </data>
+  <data name="ui.invoices.state.awaiting" xml:space="preserve">
+    <value>esperando confirmación</value>
+  </data>
+  <data name="ui.invoices.state.awaiting_credit" xml:space="preserve">
+    <value>Esperando aprobación</value>
+  </data>
+  <data name="ui.invoices.state.on_account" xml:space="preserve">
+    <value>En su cuenta</value>
+  </data>
+  <data name="ui.invoices.state.paid" xml:space="preserve">
+    <value>pagada</value>
+  </data>
+  <data name="ui.invoices.state.unpaid" xml:space="preserve">
+    <value>sin pagar</value>
+  </data>
+  <data name="ui.invoices.state.voided" xml:space="preserve">
+    <value>anulada</value>
+  </data>
+  <data name="ui.invoices.title" xml:space="preserve">
+    <value>Facturas</value>
+  </data>
+  <data name="ui.invoices.total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="ui.invoices.voided" xml:space="preserve">
+    <value>anulada</value>
+  </data>
+  <data name="ui.language" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="ui.link.invalid.title" xml:space="preserve">
+    <value>Este enlace no se puede usar</value>
+  </data>
+  <data name="ui.mailbox.code" xml:space="preserve">
+    <value>Su código de cliente: {code}</value>
+  </data>
+  <data name="ui.mailbox.hint" xml:space="preserve">
+    <value>Use esta dirección, con su nombre y su código en la primera línea, cuando compre en línea. Allí recibimos sus paquetes.</value>
+  </data>
+  <data name="ui.mailbox.none" xml:space="preserve">
+    <value>Su dirección de casillero aún no está lista. Contáctenos.</value>
+  </data>
+  <data name="ui.mailbox.title" xml:space="preserve">
+    <value>Su dirección de casillero</value>
+  </data>
+  <data name="ui.milestone.ArrivedDestinationCountry" xml:space="preserve">
+    <value>Llegó al país de destino</value>
+  </data>
+  <data name="ui.milestone.ArrivedDestinationWarehouse" xml:space="preserve">
+    <value>En el almacén de destino</value>
+  </data>
+  <data name="ui.milestone.AwaitingPayment" xml:space="preserve">
+    <value>Esperando pago</value>
+  </data>
+  <data name="ui.milestone.Booked" xml:space="preserve">
+    <value>Registrado</value>
+  </data>
+  <data name="ui.milestone.Cancelled" xml:space="preserve">
+    <value>Cancelado</value>
+  </data>
+  <data name="ui.milestone.Consolidated" xml:space="preserve">
+    <value>Preparado para envío</value>
+  </data>
+  <data name="ui.milestone.CustomsCleared" xml:space="preserve">
+    <value>Liberado de aduana</value>
+  </data>
+  <data name="ui.milestone.Delivered" xml:space="preserve">
+    <value>Entregado</value>
+  </data>
+  <data name="ui.milestone.DepartedOrigin" xml:space="preserve">
+    <value>Salió</value>
+  </data>
+  <data name="ui.milestone.Disposed" xml:space="preserve">
+    <value>Desechado</value>
+  </data>
+  <data name="ui.milestone.InCustoms" xml:space="preserve">
+    <value>En aduana</value>
+  </data>
+  <data name="ui.milestone.InTransit" xml:space="preserve">
+    <value>En tránsito</value>
+  </data>
+  <data name="ui.milestone.Manifested" xml:space="preserve">
+    <value>Preparado para envío</value>
+  </data>
+  <data name="ui.milestone.OutForDelivery" xml:space="preserve">
+    <value>En reparto</value>
+  </data>
+  <data name="ui.milestone.PreAlerted" xml:space="preserve">
+    <value>Anunciado</value>
+  </data>
+  <data name="ui.milestone.ReadyForPickup" xml:space="preserve">
+    <value>Listo para retirar</value>
+  </data>
+  <data name="ui.milestone.ReceivedAtOrigin" xml:space="preserve">
+    <value>En nuestro almacén</value>
+  </data>
+  <data name="ui.milestone.Released" xml:space="preserve">
+    <value>Listo para enviar</value>
+  </data>
+  <data name="ui.milestone.ReturnedToSender" xml:space="preserve">
+    <value>Devuelto al remitente</value>
+  </data>
+  <data name="ui.nav" xml:space="preserve">
+    <value>Cuenta</value>
+  </data>
+  <data name="ui.nav.home" xml:space="preserve">
+    <value>Mi casillero</value>
+  </data>
+  <data name="ui.nav.invoices" xml:space="preserve">
+    <value>Facturas</value>
+  </data>
+  <data name="ui.nav.packages" xml:space="preserve">
+    <value>Mis paquetes</value>
+  </data>
+  <data name="ui.nav.pricing" xml:space="preserve">
+    <value>Precios</value>
+  </data>
+  <data name="ui.nav.profile" xml:space="preserve">
+    <value>Mi perfil</value>
+  </data>
+  <data name="ui.nav.rates" xml:space="preserve">
+    <value>Tarifas</value>
+  </data>
+  <data name="ui.nav.tickets" xml:space="preserve">
+    <value>Paquetes perdidos</value>
+  </data>
+  <data name="ui.packages.action_needed" xml:space="preserve">
+    <value>Lo que necesitamos de usted:</value>
+  </data>
+  <data name="ui.packages.back" xml:space="preserve">
+    <value>Volver a mis paquetes</value>
+  </data>
+  <data name="ui.packages.done.added" xml:space="preserve">
+    <value>Gracias. Le asignaremos el paquete cuando llegue.</value>
+  </data>
+  <data name="ui.packages.done.answered" xml:space="preserve">
+    <value>Gracias: se envió su respuesta.</value>
+  </data>
+  <data name="ui.packages.done.matched" xml:space="preserve">
+    <value>Este paquete ya había llegado: su descripción ya figura en él.</value>
+  </data>
+  <data name="ui.packages.done.moved" xml:space="preserve">
+    <value>Hecho. El paquete está donde lo eligió.</value>
+  </data>
+  <data name="ui.packages.done.withdrawn" xml:space="preserve">
+    <value>El aviso se retiró.</value>
+  </data>
+  <data name="ui.packages.expected" xml:space="preserve">
+    <value>Avisados, aún no recibidos</value>
+  </data>
+  <data name="ui.packages.fee" xml:space="preserve">
+    <value>Tarifa: {amount} {currency}</value>
+  </data>
+  <data name="ui.packages.history" xml:space="preserve">
+    <value>Historial</value>
+  </data>
+  <data name="ui.packages.move.label" xml:space="preserve">
+    <value>Envío</value>
+  </data>
+  <data name="ui.packages.move.none" xml:space="preserve">
+    <value>Aún en ningún envío</value>
+  </data>
+  <data name="ui.packages.move.submit" xml:space="preserve">
+    <value>Cambiar</value>
+  </data>
+  <data name="ui.packages.new" xml:space="preserve">
+    <value>Avisar de un paquete</value>
+  </data>
+  <data name="ui.packages.none" xml:space="preserve">
+    <value>Aún no hay paquetes.</value>
+  </data>
+  <data name="ui.packages.none_expected" xml:space="preserve">
+    <value>Nada avisado. Avísenos de un paquete antes de que llegue y se le asigna enseguida.</value>
+  </data>
+  <data name="ui.packages.not_in_shipment" xml:space="preserve">
+    <value>Aún en ningún envío</value>
+  </data>
+  <data name="ui.packages.photo.contents" xml:space="preserve">
+    <value>Foto del contenido</value>
+  </data>
+  <data name="ui.packages.photo.damage" xml:space="preserve">
+    <value>Foto del daño</value>
+  </data>
+  <data name="ui.packages.photo.label" xml:space="preserve">
+    <value>Foto de la etiqueta</value>
+  </data>
+  <data name="ui.packages.photo.package" xml:space="preserve">
+    <value>Foto del paquete</value>
+  </data>
+  <data name="ui.packages.photos" xml:space="preserve">
+    <value>Fotos</value>
+  </data>
+  <data name="ui.packages.put_in" xml:space="preserve">
+    <value>Ponerlo en este envío</value>
+  </data>
+  <data name="ui.packages.receipt" xml:space="preserve">
+    <value>Recibo de almacén</value>
+  </data>
+  <data name="ui.packages.received" xml:space="preserve">
+    <value>En nuestro almacén y en camino</value>
+  </data>
+  <data name="ui.packages.size" xml:space="preserve">
+    <value>Medidas</value>
+  </data>
+  <data name="ui.packages.status" xml:space="preserve">
+    <value>Estado</value>
+  </data>
+  <data name="ui.packages.storage_fee" xml:space="preserve">
+    <value>Almacenaje: {amount} {currency} hasta ahora por esperar en nuestro almacén, se cobra con su envío.</value>
+  </data>
+  <data name="ui.packages.take_out" xml:space="preserve">
+    <value>Sacarlo</value>
+  </data>
+  <data name="ui.packages.title" xml:space="preserve">
+    <value>Mis paquetes</value>
+  </data>
+  <data name="ui.packages.warehouse" xml:space="preserve">
+    <value>Almacén</value>
+  </data>
+  <data name="ui.packages.weight" xml:space="preserve">
+    <value>Peso</value>
+  </data>
+  <data name="ui.packages.withdraw" xml:space="preserve">
+    <value>Retirar</value>
+  </data>
+  <data name="ui.prealert.carrier" xml:space="preserve">
+    <value>Transportista</value>
+  </data>
+  <data name="ui.prealert.contents" xml:space="preserve">
+    <value>Contenido</value>
+  </data>
+  <data name="ui.prealert.expected" xml:space="preserve">
+    <value>Previsto para</value>
+  </data>
+  <data name="ui.prealert.intro" xml:space="preserve">
+    <value>Díganos qué compró y su número de rastreo. Su descripción y el valor viajan con el paquete.</value>
+  </data>
+  <data name="ui.prealert.new" xml:space="preserve">
+    <value>Anunciar un paquete</value>
+  </data>
+  <data name="ui.prealert.shipment" xml:space="preserve">
+    <value>Ponerlo en un envío (opcional)</value>
+  </data>
+  <data name="ui.prealert.shipment_hint" xml:space="preserve">
+    <value>También puede elegir su envío más tarde, desde sus paquetes.</value>
+  </data>
+  <data name="ui.prealert.store" xml:space="preserve">
+    <value>Tienda</value>
+  </data>
+  <data name="ui.prealert.submit" xml:space="preserve">
+    <value>Avisar</value>
+  </data>
+  <data name="ui.prealert.title" xml:space="preserve">
+    <value>Avisar de un paquete</value>
+  </data>
+  <data name="ui.prealert.tracking" xml:space="preserve">
+    <value>Número de rastreo</value>
+  </data>
+  <data name="ui.prealert.value" xml:space="preserve">
+    <value>Valor</value>
+  </data>
+  <data name="ui.prealert.warehouse" xml:space="preserve">
+    <value>Enviado a nuestro almacén</value>
+  </data>
+  <data name="ui.pricing.any_destination" xml:space="preserve">
+    <value>cualquier destino</value>
+  </data>
+  <data name="ui.pricing.any_origin" xml:space="preserve">
+    <value>cualquiera de nuestras sedes</value>
+  </data>
+  <data name="ui.pricing.calculator" xml:space="preserve">
+    <value>Calcular el precio de mi paquete</value>
+  </data>
+  <data name="ui.pricing.consolidation_fee" xml:space="preserve">
+    <value>Cargo por consolidación</value>
+  </data>
+  <data name="ui.pricing.intro" xml:space="preserve">
+    <value>Los precios que aplicamos, por servicio y ruta. Sus propios precios, si los tiene, aparecen primero. Para el precio de un paquete, use la calculadora.</value>
+  </data>
+  <data name="ui.pricing.minimum" xml:space="preserve">
+    <value>Cargo mínimo</value>
+  </data>
+  <data name="ui.pricing.none" xml:space="preserve">
+    <value>Aún no hay precios disponibles.</value>
+  </data>
+  <data name="ui.pricing.own" xml:space="preserve">
+    <value>Sus precios</value>
+  </data>
+  <data name="ui.pricing.per_package" xml:space="preserve">
+    <value>Por paquete</value>
+  </data>
+  <data name="ui.pricing.per_shipment" xml:space="preserve">
+    <value>Por envío</value>
+  </data>
+  <data name="ui.pricing.route" xml:space="preserve">
+    <value>De {origin} a {destination}</value>
+  </data>
+  <data name="ui.pricing.service_fee" xml:space="preserve">
+    <value>Cargo por servicio</value>
+  </data>
+  <data name="ui.pricing.since" xml:space="preserve">
+    <value>Vigente desde el {date}</value>
+  </data>
+  <data name="ui.pricing.title" xml:space="preserve">
+    <value>Precios</value>
+  </data>
+  <data name="ui.profile.change_password" xml:space="preserve">
+    <value>Cambiar la contraseña</value>
+  </data>
+  <data name="ui.profile.password" xml:space="preserve">
+    <value>Contraseña</value>
+  </data>
+  <data name="ui.profile.title" xml:space="preserve">
+    <value>Mi perfil</value>
+  </data>
+  <data name="ui.rates.back_to_shipment" xml:space="preserve">
+    <value>Volver al envío</value>
+  </data>
+  <data name="ui.rates.calculate" xml:space="preserve">
+    <value>Estimar</value>
+  </data>
+  <data name="ui.rates.consolidated" xml:space="preserve">
+    <value>Consolidar con mis otros paquetes</value>
+  </data>
+  <data name="ui.rates.estimate" xml:space="preserve">
+    <value>estimación</value>
+  </data>
+  <data name="ui.rates.estimate_note" xml:space="preserve">
+    <value>Estimación: el monto final se fija cuando sus paquetes se miden en nuestro almacén.</value>
+  </data>
+  <data name="ui.rates.estimate_shipment" xml:space="preserve">
+    <value>Estimar los cargos</value>
+  </data>
+  <data name="ui.rates.from" xml:space="preserve">
+    <value>Desde</value>
+  </data>
+  <data name="ui.rates.height" xml:space="preserve">
+    <value>Alto</value>
+  </data>
+  <data name="ui.rates.home_delivery" xml:space="preserve">
+    <value>Entregado en mi dirección</value>
+  </data>
+  <data name="ui.rates.insurance_refused" xml:space="preserve">
+    <value>Este valor no se puede asegurar en línea. Contáctenos.</value>
+  </data>
+  <data name="ui.rates.insured" xml:space="preserve">
+    <value>Asegurarlo</value>
+  </data>
+  <data name="ui.rates.length" xml:space="preserve">
+    <value>Largo</value>
+  </data>
+  <data name="ui.rates.line.Consolidation" xml:space="preserve">
+    <value>Consolidación</value>
+  </data>
+  <data name="ui.rates.line.Extra" xml:space="preserve">
+    <value>Cargo adicional</value>
+  </data>
+  <data name="ui.rates.line.Freight" xml:space="preserve">
+    <value>Flete, paquete</value>
+  </data>
+  <data name="ui.rates.line.Insurance" xml:space="preserve">
+    <value>Seguro</value>
+  </data>
+  <data name="ui.rates.line.Item" xml:space="preserve">
+    <value>Artículo, paquete</value>
+  </data>
+  <data name="ui.rates.line.Minimum" xml:space="preserve">
+    <value>Ajuste al cargo mínimo</value>
+  </data>
+  <data name="ui.rates.line.Preferred" xml:space="preserve">
+    <value>Su precio preferente</value>
+  </data>
+  <data name="ui.rates.line.ServiceFee" xml:space="preserve">
+    <value>Cargo de servicio</value>
+  </data>
+  <data name="ui.rates.line.ShipmentFreight" xml:space="preserve">
+    <value>Flete, envío</value>
+  </data>
+  <data name="ui.rates.line.SmallPackage" xml:space="preserve">
+    <value>Paquete pequeño</value>
+  </data>
+  <data name="ui.rates.line.piece" xml:space="preserve">
+    <value>{name}</value>
+  </data>
+  <data name="ui.rates.quotes" xml:space="preserve">
+    <value>Sus cotizaciones</value>
+  </data>
+  <data name="ui.rates.service.air_express" xml:space="preserve">
+    <value>Aéreo exprés</value>
+  </data>
+  <data name="ui.rates.service.air_standard" xml:space="preserve">
+    <value>Aéreo estándar</value>
+  </data>
+  <data name="ui.rates.service.ground" xml:space="preserve">
+    <value>Terrestre</value>
+  </data>
+  <data name="ui.rates.service.ocean_consolidated" xml:space="preserve">
+    <value>Marítimo, consolidado</value>
+  </data>
+  <data name="ui.rates.service.ocean_full_container" xml:space="preserve">
+    <value>Marítimo, contenedor completo</value>
+  </data>
+  <data name="ui.rates.shipment_destination" xml:space="preserve">
+    <value>Estimación para {destination}</value>
+  </data>
+  <data name="ui.rates.shipment_none" xml:space="preserve">
+    <value>Aún no hay estimación: la damos cuando un paquete se mide y se conoce el destino.</value>
+  </data>
+  <data name="ui.rates.size" xml:space="preserve">
+    <value>Medidas en {unit} (opcional)</value>
+  </data>
+  <data name="ui.rates.title" xml:space="preserve">
+    <value>Tarifas y estimaciones</value>
+  </data>
+  <data name="ui.rates.to" xml:space="preserve">
+    <value>Hasta</value>
+  </data>
+  <data name="ui.rates.total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="ui.rates.unmeasured" xml:space="preserve">
+    <value>{count} paquete(s) de este envío aún no se midieron y no están en la estimación.</value>
+  </data>
+  <data name="ui.rates.valid_until" xml:space="preserve">
+    <value>válida hasta el {date}</value>
+  </data>
+  <data name="ui.rates.value" xml:space="preserve">
+    <value>Valor declarado</value>
+  </data>
+  <data name="ui.rates.weight" xml:space="preserve">
+    <value>Peso</value>
+  </data>
+  <data name="ui.rates.width" xml:space="preserve">
+    <value>Ancho</value>
+  </data>
+  <data name="ui.reset.submit" xml:space="preserve">
+    <value>Guardar la contraseña</value>
+  </data>
+  <data name="ui.reset.title" xml:space="preserve">
+    <value>Elija una nueva contraseña</value>
+  </data>
+  <data name="ui.save" xml:space="preserve">
+    <value>Guardar</value>
+  </data>
+  <data name="ui.shipments.add_package" xml:space="preserve">
+    <value>Anunciar otro paquete en este envío</value>
+  </data>
+  <data name="ui.shipments.amount" xml:space="preserve">
+    <value>Importe</value>
+  </data>
+  <data name="ui.shipments.booked_notice" xml:space="preserve">
+    <value>Todos sus paquetes están recibidos: este envío está finalizado y su importe está fijado.</value>
+  </data>
+  <data name="ui.shipments.branch" xml:space="preserve">
+    <value>Sucursal</value>
+  </data>
+  <data name="ui.shipments.cancel" xml:space="preserve">
+    <value>Cancelar este envío</value>
+  </data>
+  <data name="ui.shipments.certificate" xml:space="preserve">
+    <value>Certificado de seguro (PDF)</value>
+  </data>
+  <data name="ui.shipments.city" xml:space="preserve">
+    <value>Ciudad</value>
+  </data>
+  <data name="ui.shipments.collect" xml:space="preserve">
+    <value>Pagar en destino (flete por cobrar)</value>
+  </data>
+  <data name="ui.shipments.collect_hint" xml:space="preserve">
+    <value>Su envío viaja sin pagar; se entrega una vez pagado en destino.</value>
+  </data>
+  <data name="ui.shipments.collect_notice" xml:space="preserve">
+    <value>A pagar en destino: se entrega una vez pagado.</value>
+  </data>
+  <data name="ui.shipments.collector_hint" xml:space="preserve">
+    <value>Además del destinatario, puede indicar a una persona. Presenta una identificación en el mostrador, como el destinatario. Deje ambos vacíos para no indicar a nadie.</value>
+  </data>
+  <data name="ui.shipments.collector_name" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="ui.shipments.collector_phone" xml:space="preserve">
+    <value>Teléfono, con el código del país</value>
+  </data>
+  <data name="ui.shipments.collector_save" xml:space="preserve">
+    <value>Guardar</value>
+  </data>
+  <data name="ui.shipments.collector_title" xml:space="preserve">
+    <value>Quién puede recogerlo</value>
+  </data>
+  <data name="ui.shipments.commercial_invoice" xml:space="preserve">
+    <value>Factura comercial proforma (PDF)</value>
+  </data>
+  <data name="ui.shipments.consolidate" xml:space="preserve">
+    <value>Consolidar: esperar todos mis paquetes y enviarlos juntos</value>
+  </data>
+  <data name="ui.shipments.country" xml:space="preserve">
+    <value>País</value>
+  </data>
+  <data name="ui.shipments.counts" xml:space="preserve">
+    <value>{expected} esperados · {arrived} recibidos</value>
+  </data>
+  <data name="ui.shipments.create" xml:space="preserve">
+    <value>Crear el envío</value>
+  </data>
+  <data name="ui.shipments.deliver_to" xml:space="preserve">
+    <value>Entregar en</value>
+  </data>
+  <data name="ui.shipments.deliver_to_hint" xml:space="preserve">
+    <value>Nuestro destino donde lo recoge, o desde donde se entrega en su dirección.</value>
+  </data>
+  <data name="ui.shipments.delivered" xml:space="preserve">
+    <value>Entregado el {date}.</value>
+  </data>
+  <data name="ui.shipments.destination" xml:space="preserve">
+    <value>Destino</value>
+  </data>
+  <data name="ui.shipments.done.added" xml:space="preserve">
+    <value>El paquete fue anunciado.</value>
+  </data>
+  <data name="ui.shipments.done.cancelled" xml:space="preserve">
+    <value>El envío fue cancelado.</value>
+  </data>
+  <data name="ui.shipments.done.changed" xml:space="preserve">
+    <value>El envío fue modificado.</value>
+  </data>
+  <data name="ui.shipments.done.collector" xml:space="preserve">
+    <value>Guardado: el mostrador le pedirá una identificación.</value>
+  </data>
+  <data name="ui.shipments.done.created" xml:space="preserve">
+    <value>Su envío fue creado. Agréguele paquetes abajo.</value>
+  </data>
+  <data name="ui.shipments.done.matched" xml:space="preserve">
+    <value>Su paquete ya había llegado: ahora está en este envío.</value>
+  </data>
+  <data name="ui.shipments.done.moved" xml:space="preserve">
+    <value>Hecho. Los paquetes del envío se actualizaron.</value>
+  </data>
+  <data name="ui.shipments.edit" xml:space="preserve">
+    <value>Cambiar el destino</value>
+  </data>
+  <data name="ui.shipments.home" xml:space="preserve">
+    <value>Entregar en una dirección</value>
+  </data>
+  <data name="ui.shipments.insurance_accept" xml:space="preserve">
+    <value>Acepto las condiciones del seguro</value>
+  </data>
+  <data name="ui.shipments.insurance_choose" xml:space="preserve">
+    <value>Seguro</value>
+  </data>
+  <data name="ui.shipments.insurance_none" xml:space="preserve">
+    <value>Sin seguro</value>
+  </data>
+  <data name="ui.shipments.insurance_withdrawn" xml:space="preserve">
+    <value>El seguro elegido para este envío ya no se ofrece. Elija otro, o ningún seguro.</value>
+  </data>
+  <data name="ui.shipments.insured" xml:space="preserve">
+    <value>Asegurarlo</value>
+  </data>
+  <data name="ui.shipments.intro" xml:space="preserve">
+    <value>Díganos a dónde va el envío, quién lo recibe y el servicio. Ponga en él paquetes que anunció, o ninguno.</value>
+  </data>
+  <data name="ui.shipments.liability.DeclaredValueUpToCap" xml:space="preserve">
+    <value>pagamos el valor declarado, hasta {cap} {currency} por paquete.</value>
+  </data>
+  <data name="ui.shipments.liability.DeclaredValueUpToCap_shipment" xml:space="preserve">
+    <value>pagamos el valor declarado, hasta {cap} {currency} por envío.</value>
+  </data>
+  <data name="ui.shipments.liability.None" xml:space="preserve">
+    <value>no pagamos nada por pérdida o daño más allá del seguro que compre.</value>
+  </data>
+  <data name="ui.shipments.liability.PerParcel" xml:space="preserve">
+    <value>pagamos hasta {amount} {currency} por paquete perdido o dañado.</value>
+  </data>
+  <data name="ui.shipments.liability.PerWeight" xml:space="preserve">
+    <value>pagamos hasta {amount} {currency} por {unit} perdido o dañado (como máximo {cap} por paquete).</value>
+  </data>
+  <data name="ui.shipments.liability.PerWeight_nocap" xml:space="preserve">
+    <value>pagamos hasta {amount} {currency} por {unit} perdido o dañado.</value>
+  </data>
+  <data name="ui.shipments.liability.PerWeight_shipment" xml:space="preserve">
+    <value>pagamos hasta {amount} {currency} por {unit} perdido o dañado (como máximo {cap} por envío).</value>
+  </data>
+  <data name="ui.shipments.line1" xml:space="preserve">
+    <value>Dirección</value>
+  </data>
+  <data name="ui.shipments.line2" xml:space="preserve">
+    <value>Dirección (más)</value>
+  </data>
+  <data name="ui.shipments.list" xml:space="preserve">
+    <value>Mis envíos</value>
+  </data>
+  <data name="ui.shipments.mode.Air" xml:space="preserve">
+    <value>Por avión, si no se asegura</value>
+  </data>
+  <data name="ui.shipments.mode.Ground" xml:space="preserve">
+    <value>Por carretera, si no se asegura</value>
+  </data>
+  <data name="ui.shipments.mode.Ocean" xml:space="preserve">
+    <value>Por mar, si no se asegura</value>
+  </data>
+  <data name="ui.shipments.needs_instructions" xml:space="preserve">
+    <value>Estos paquetes llegaron pero no están en ninguno de sus envíos. Ponga cada uno en uno de sus envíos, o cree uno.</value>
+  </data>
+  <data name="ui.shipments.needs_instructions_short" xml:space="preserve">
+    <value>Paquetes esperando un envío</value>
+  </data>
+  <data name="ui.shipments.new" xml:space="preserve">
+    <value>Nuevo envío</value>
+  </data>
+  <data name="ui.shipments.new_package" xml:space="preserve">
+    <value>Un paquete nuevo en él (opcional)</value>
+  </data>
+  <data name="ui.shipments.no_mailbox" xml:space="preserve">
+    <value>Aún no tiene dirección de casillero. Contáctenos para obtener una.</value>
+  </data>
+  <data name="ui.shipments.no_options" xml:space="preserve">
+    <value>Ninguna</value>
+  </data>
+  <data name="ui.shipments.none" xml:space="preserve">
+    <value>Aún no hay envíos. Cree uno para anunciar sus paquetes.</value>
+  </data>
+  <data name="ui.shipments.options" xml:space="preserve">
+    <value>Opciones</value>
+  </data>
+  <data name="ui.shipments.origin" xml:space="preserve">
+    <value>Enviado a mi casillero en</value>
+  </data>
+  <data name="ui.shipments.packages_hint" xml:space="preserve">
+    <value>Puede crear un envío sin paquetes, para mercancía que nos trae, y agregar paquetes más tarde.</value>
+  </data>
+  <data name="ui.shipments.packages_to_add" xml:space="preserve">
+    <value>Paquetes para poner en él</value>
+  </data>
+  <data name="ui.shipments.packing_list" xml:space="preserve">
+    <value>Lista de empaque (PDF)</value>
+  </data>
+  <data name="ui.shipments.parcel_count" xml:space="preserve">
+    <value>Número de paquetes</value>
+  </data>
+  <data name="ui.shipments.parcel_count_hint" xml:space="preserve">
+    <value>Cuántas cajas viajan en este envío. Si llegan más o menos, cámbielo aquí.</value>
+  </data>
+  <data name="ui.shipments.parcels_of" xml:space="preserve">
+    <value>{entered} de {count} recibidos</value>
+  </data>
+  <data name="ui.shipments.picked_up" xml:space="preserve">
+    <value>Recogido el {date}.</value>
+  </data>
+  <data name="ui.shipments.pickup" xml:space="preserve">
+    <value>Lo recojo en una sucursal</value>
+  </data>
+  <data name="ui.shipments.pickup_at" xml:space="preserve">
+    <value>Retiro en</value>
+  </data>
+  <data name="ui.shipments.pickup_there" xml:space="preserve">
+    <value>Lo recojo allí</value>
+  </data>
+  <data name="ui.shipments.postal_code" xml:space="preserve">
+    <value>Código postal</value>
+  </data>
+  <data name="ui.shipments.put_in" xml:space="preserve">
+    <value>Sus paquetes en ningún envío</value>
+  </data>
+  <data name="ui.shipments.recipient" xml:space="preserve">
+    <value>Destinatario</value>
+  </data>
+  <data name="ui.shipments.recipient_phone" xml:space="preserve">
+    <value>Teléfono del destinatario (con el código del país, por ejemplo +509)</value>
+  </data>
+  <data name="ui.shipments.recipient_title" xml:space="preserve">
+    <value>Quién lo recibe</value>
+  </data>
+  <data name="ui.shipments.refrigerated" xml:space="preserve">
+    <value>Mantener refrigerado</value>
+  </data>
+  <data name="ui.shipments.region" xml:space="preserve">
+    <value>Departamento o estado</value>
+  </data>
+  <data name="ui.shipments.save" xml:space="preserve">
+    <value>Guardar</value>
+  </data>
+  <data name="ui.shipments.service" xml:space="preserve">
+    <value>Servicio</value>
+  </data>
+  <data name="ui.shipments.service_any" xml:space="preserve">
+    <value>Dejar que la empresa elija</value>
+  </data>
+  <data name="ui.shipments.title" xml:space="preserve">
+    <value>Envío</value>
+  </data>
+  <data name="ui.shipments.where" xml:space="preserve">
+    <value>A dónde va</value>
+  </data>
+  <data name="ui.sign_in.link" xml:space="preserve">
+    <value>Iniciar sesión</value>
+  </data>
+  <data name="ui.sign_in.no_account" xml:space="preserve">
+    <value>¿Aún no tiene cuenta?</value>
+  </data>
+  <data name="ui.sign_in.submit" xml:space="preserve">
+    <value>Iniciar sesión</value>
+  </data>
+  <data name="ui.sign_in.title" xml:space="preserve">
+    <value>Iniciar sesión</value>
+  </data>
+  <data name="ui.sign_out" xml:space="preserve">
+    <value>Cerrar sesión</value>
+  </data>
+  <data name="ui.sign_up.have_account" xml:space="preserve">
+    <value>¿Ya tiene una cuenta?</value>
+  </data>
+  <data name="ui.sign_up.link" xml:space="preserve">
+    <value>Crear una cuenta</value>
+  </data>
+  <data name="ui.sign_up.sent.body" xml:space="preserve">
+    <value>Enviamos un enlace a su correo. Ábralo en las próximas 24 horas para confirmar su cuenta. Si ya tiene una cuenta, el correo explica cómo iniciar sesión.</value>
+  </data>
+  <data name="ui.sign_up.sent.title" xml:space="preserve">
+    <value>Revise su correo</value>
+  </data>
+  <data name="ui.sign_up.submit" xml:space="preserve">
+    <value>Crear mi cuenta</value>
+  </data>
+  <data name="ui.sign_up.subtitle" xml:space="preserve">
+    <value>Obtenga su propia dirección de casillero y envíe sus compras en línea con nosotros.</value>
+  </data>
+  <data name="ui.sign_up.title" xml:space="preserve">
+    <value>Cree su cuenta</value>
+  </data>
+  <data name="ui.tenant.not_available.body" xml:space="preserve">
+    <value>Este servicio no está disponible por el momento. Póngase en contacto directamente con la empresa.</value>
+  </data>
+  <data name="ui.tenant.not_available.title" xml:space="preserve">
+    <value>Servicio no disponible</value>
+  </data>
+  <data name="ui.tenant.not_found.body" xml:space="preserve">
+    <value>No hay ningún servicio en esta dirección. Revise la dirección e inténtelo de nuevo.</value>
+  </data>
+  <data name="ui.tenant.not_found.title" xml:space="preserve">
+    <value>Página no encontrada</value>
+  </data>
+  <data name="ui.tenant.unavailable.body" xml:space="preserve">
+    <value>No pudimos cargar esta página. Inténtelo de nuevo en unos minutos.</value>
+  </data>
+  <data name="ui.tenant.unavailable.title" xml:space="preserve">
+    <value>Inténtelo de nuevo</value>
+  </data>
+  <data name="ui.tickets.back" xml:space="preserve">
+    <value>Volver a paquetes perdidos</value>
+  </data>
+  <data name="ui.tickets.delivered" xml:space="preserve">
+    <value>Entregado el</value>
+  </data>
+  <data name="ui.tickets.done.opened" xml:space="preserve">
+    <value>Gracias. Nuestro equipo buscará su paquete y le escribirá aquí.</value>
+  </data>
+  <data name="ui.tickets.done.sent" xml:space="preserve">
+    <value>Su mensaje se envió.</value>
+  </data>
+  <data name="ui.tickets.form_intro" xml:space="preserve">
+    <value>Indíquenos lo que muestran la transportista y la tienda. Una foto o PDF de la prueba de entrega nos ayuda a encontrarlo más rápido.</value>
+  </data>
+  <data name="ui.tickets.found" xml:space="preserve">
+    <value>Encontramos su paquete.</value>
+  </data>
+  <data name="ui.tickets.from_staff" xml:space="preserve">
+    <value>Nuestro equipo:</value>
+  </data>
+  <data name="ui.tickets.from_you" xml:space="preserve">
+    <value>Usted:</value>
+  </data>
+  <data name="ui.tickets.intro" xml:space="preserve">
+    <value>¿La transportista dice que entregó un paquete pero no está en su cuenta? Cuéntenos lo que sabe y nuestro equipo lo buscará.</value>
+  </data>
+  <data name="ui.tickets.message" xml:space="preserve">
+    <value>Algo más que debamos saber</value>
+  </data>
+  <data name="ui.tickets.messages" xml:space="preserve">
+    <value>Mensajes</value>
+  </data>
+  <data name="ui.tickets.new" xml:space="preserve">
+    <value>Reportar un paquete perdido</value>
+  </data>
+  <data name="ui.tickets.none" xml:space="preserve">
+    <value>No ha reportado ningún paquete perdido.</value>
+  </data>
+  <data name="ui.tickets.open_package" xml:space="preserve">
+    <value>Abrirlo</value>
+  </data>
+  <data name="ui.tickets.opened" xml:space="preserve">
+    <value>Reportado</value>
+  </data>
+  <data name="ui.tickets.order" xml:space="preserve">
+    <value>Número de pedido</value>
+  </data>
+  <data name="ui.tickets.proof" xml:space="preserve">
+    <value>Prueba de entrega</value>
+  </data>
+  <data name="ui.tickets.proof_hint" xml:space="preserve">
+    <value>PDF, PNG o JPEG, hasta 10 MB.</value>
+  </data>
+  <data name="ui.tickets.proof_none" xml:space="preserve">
+    <value>No enviada</value>
+  </data>
+  <data name="ui.tickets.proof_sent" xml:space="preserve">
+    <value>Enviada</value>
+  </data>
+  <data name="ui.tickets.reply" xml:space="preserve">
+    <value>Escríbanos</value>
+  </data>
+  <data name="ui.tickets.send" xml:space="preserve">
+    <value>Enviar</value>
+  </data>
+  <data name="ui.tickets.status" xml:space="preserve">
+    <value>Estado</value>
+  </data>
+  <data name="ui.tickets.status.Answered" xml:space="preserve">
+    <value>Le respondimos</value>
+  </data>
+  <data name="ui.tickets.status.Open" xml:space="preserve">
+    <value>Lo estamos buscando</value>
+  </data>
+  <data name="ui.tickets.status.Resolved" xml:space="preserve">
+    <value>Resuelto</value>
+  </data>
+  <data name="ui.tickets.submit" xml:space="preserve">
+    <value>Enviar el reporte</value>
+  </data>
+  <data name="ui.tickets.ticket" xml:space="preserve">
+    <value>Paquete perdido</value>
+  </data>
+  <data name="ui.tickets.title" xml:space="preserve">
+    <value>Paquetes perdidos</value>
+  </data>
+  <data name="ui.tracking.arrived_destination_country" xml:space="preserve">
+    <value>Llegó al país de destino ({country})</value>
+  </data>
+  <data name="ui.tracking.arrived_destination_warehouse" xml:space="preserve">
+    <value>Llegó a {place}</value>
+  </data>
+  <data name="ui.tracking.auctioned" xml:space="preserve">
+    <value>Vendido en subasta</value>
+  </data>
+  <data name="ui.tracking.booked" xml:space="preserve">
+    <value>Envío finalizado: todos los paquetes recibidos, importe fijado</value>
+  </data>
+  <data name="ui.tracking.cancelled" xml:space="preserve">
+    <value>Cancelado</value>
+  </data>
+  <data name="ui.tracking.customs_cleared" xml:space="preserve">
+    <value>Despachado por la aduana</value>
+  </data>
+  <data name="ui.tracking.customs_held" xml:space="preserve">
+    <value>Retenido por la aduana{message}</value>
+  </data>
+  <data name="ui.tracking.delayed" xml:space="preserve">
+    <value>Retrasado: {cause}{message}</value>
+  </data>
+  <data name="ui.tracking.delivered" xml:space="preserve">
+    <value>Entregado</value>
+  </data>
+  <data name="ui.tracking.delivery_failed" xml:space="preserve">
+    <value>Intento de entrega fallido: {failure}</value>
+  </data>
+  <data name="ui.tracking.delivery_returning" xml:space="preserve">
+    <value>Regresa al remitente tras el último intento de entrega</value>
+  </data>
+  <data name="ui.tracking.departed_origin" xml:space="preserve">
+    <value>Salió del origen por vía {mode}</value>
+  </data>
+  <data name="ui.tracking.disposed" xml:space="preserve">
+    <value>Desechado</value>
+  </data>
+  <data name="ui.tracking.exception" xml:space="preserve">
+    <value>Incidencia: {cause}{message}</value>
+  </data>
+  <data name="ui.tracking.hold_opened" xml:space="preserve">
+    <value>Retenido: {reason}</value>
+  </data>
+  <data name="ui.tracking.hold_released" xml:space="preserve">
+    <value>Ya no está retenido</value>
+  </data>
+  <data name="ui.tracking.in_customs" xml:space="preserve">
+    <value>En aduana</value>
+  </data>
+  <data name="ui.tracking.in_transit" xml:space="preserve">
+    <value>En tránsito en {place}</value>
+  </data>
+  <data name="ui.tracking.inspection_completed" xml:space="preserve">
+    <value>Inspeccionado: {result}</value>
+  </data>
+  <data name="ui.tracking.manifested" xml:space="preserve">
+    <value>Manifestado para la salida</value>
+  </data>
+  <data name="ui.tracking.mode.air" xml:space="preserve">
+    <value>aérea</value>
+  </data>
+  <data name="ui.tracking.mode.ground" xml:space="preserve">
+    <value>terrestre</value>
+  </data>
+  <data name="ui.tracking.mode.ocean" xml:space="preserve">
+    <value>marítima</value>
+  </data>
+  <data name="ui.tracking.out_for_delivery" xml:space="preserve">
+    <value>En reparto</value>
+  </data>
+  <data name="ui.tracking.packed" xml:space="preserve">
+    <value>Embalado para la salida</value>
+  </data>
+  <data name="ui.tracking.picked_up" xml:space="preserve">
+    <value>Recogido en {place}</value>
+  </data>
+  <data name="ui.tracking.pre_alerted" xml:space="preserve">
+    <value>Nos avisó que este paquete viene en camino</value>
+  </data>
+  <data name="ui.tracking.ready_for_pickup" xml:space="preserve">
+    <value>Listo para recoger en {place}</value>
+  </data>
+  <data name="ui.tracking.received_at_origin" xml:space="preserve">
+    <value>Recibido en nuestro almacén</value>
+  </data>
+  <data name="ui.tracking.returned_to_sender" xml:space="preserve">
+    <value>Devuelto al remitente</value>
+  </data>
+  <data name="ui.verify.body" xml:space="preserve">
+    <value>Confirme su correo para activar su cuenta y obtener su dirección de casillero.</value>
+  </data>
+  <data name="ui.verify.resend" xml:space="preserve">
+    <value>Enviarme un nuevo enlace de confirmación</value>
+  </data>
+  <data name="ui.verify.submit" xml:space="preserve">
+    <value>Confirmar mi correo</value>
+  </data>
+  <data name="ui.verify.title" xml:space="preserve">
+    <value>Confirme su correo</value>
+  </data>
+</root>

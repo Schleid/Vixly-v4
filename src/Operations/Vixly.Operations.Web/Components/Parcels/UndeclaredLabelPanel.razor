@@ -1,0 +1,41 @@
+﻿@*
+=========================================================
+FILE: UndeclaredLabelPanel.razor
+
+PURPOSE:
+What the label of an undeclared package shows, recorded by the clerk, and the customer it points to (Slice 4D step 3, design section 6).
+
+RESPONSIBILITIES:
+- Record the name and mailbox code written on the label, and the sender
+- When the code is a customer's, name that customer for staff to check before assigning
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Never assigns by itself: a clerk checks, then assigns with "the mailbox code on the label"
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<form method="post" action="/staff/parcels/@Parcel.ParcelId/label-text" class="ops-editor__panel ops-panel--restricted">
+    <AntiforgeryToken />
+    <h2>@T["ui.undeclared.label_title"]</h2>
+    <p class="ops-editor__hint">@T["ui.undeclared.label_hint"]</p>
+    <label>@T["ui.undeclared.label_name"] <input name="name" value="@Parcel.LabelName" maxlength="100" autocomplete="off" /></label>
+    <label>@T["ui.undeclared.label_code"] <input name="code" value="@Parcel.LabelCode" maxlength="20" autocomplete="off" autocapitalize="characters" /></label>
+    <label>@T["ui.undeclared.label_sender"] <input name="sender" value="@Parcel.LabelSender" maxlength="100" autocomplete="off" /></label>
+    <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
+    @if (Customer is { } customer)
+    {
+        <p class="ops-editor__notice">@(Named ? VixlyText.Format(T, "ui.undeclared.label_points_to", new Dictionary<string, object> { ["code"] = customer.Code ?? string.Empty, ["name"] = customer.FullName })
+            : VixlyText.Format(T, "ui.undeclared.label_matches", "code", customer.Code ?? string.Empty))</p>
+    }
+</form>
+
+@code {
+    [Parameter, EditorRequired] public OperationsParcelSummary Parcel { get; set; } = null!;
+
+    [Parameter] public Vixly.Operations.Domain.Customers.OperationsCustomer? Customer { get; set; }
+
+    // The customer's name only for staff who may see customers.
+    [Parameter] public bool Named { get; set; }
+}

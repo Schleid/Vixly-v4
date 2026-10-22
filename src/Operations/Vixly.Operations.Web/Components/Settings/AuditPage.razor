@@ -1,0 +1,100 @@
+﻿@*
+=========================================================
+FILE: AuditPage.razor
+
+PURPOSE:
+The audit log: who did what, when, newest first.
+
+RESPONSIBILITIES:
+- Render the filters, the entries and the paging
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- A GET form: filters are in the address, so a filtered view can be shared
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@using Vixly.Operations.Application.Audit
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.audit.title"]" Company="@Company" Section="audit" Error="@Error">
+    <form method="get" action="/staff/audit" class="ops-editor__inline ops-editor__search">
+        @if (ActorUserId is not null)
+        {
+            <input type="hidden" name="actor" value="@ActorUserId" />
+            <span>@VixlyText.Format(T, "ui.audit.by", "name", ActorName ?? string.Empty)</span>
+        }
+        <select name="area" aria-label="@T["ui.audit.area"]">
+            <option value="">@T["ui.audit.all_areas"]</option>
+            @foreach (string area in Areas)
+            {
+                <option value="@area" selected="@(area == Area)">@T["ui.audit.area." + area]</option>
+            }
+        </select>
+        <label>@T["ui.audit.from"] <input type="date" name="from" value="@From" /></label>
+        <label>@T["ui.audit.to"] <input type="date" name="to" value="@To" /></label>
+        <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.search_submit"]</button>
+    </form>
+    <section class="ops-editor__panel">
+        @if (Lines.Count == 0) { <p class="ops-editor__empty-message">@T["ui.editor.none"]</p> }
+        @if (Lines.Count > 0)
+        {
+        <OperationsTableViewport Label="@T["ui.audit.title"]">
+        <table class="ops-editor__table">
+            <thead>
+                <tr><th scope="col">@T["ui.audit.when"]</th><th scope="col">@T["ui.audit.who"]</th><th scope="col">@T["ui.audit.what"]</th><th scope="col">@T["ui.audit.details"]</th></tr>
+            </thead>
+            <tbody>
+                @foreach (OperationsAuditLine line in Lines)
+                {
+                    <tr>
+                        <td>@line.OccurredUtc.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture) UTC</td>
+                        <td>@(line.ActorName ?? T["ui.audit.system"])</td>
+                        <td><code>@line.ActionCode</code></td>
+                        <td>@line.Reason <span class="ops-editor__hint">@line.IpAddress</span> <span class="ops-editor__hint">@line.Details</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        </OperationsTableViewport>
+        }
+        <p>@VixlyText.Format(T, "ui.audit.count", "count", TotalCount)</p>
+        <p class="ops-editor__actions">
+            @if (Page > 1) { <a href="@PageLink(Page - 1)">@T["ui.audit.newer"]</a> }
+            @if (Page * PageSize < TotalCount) { <a href="@PageLink(Page + 1)">@T["ui.audit.older"]</a> }
+        </p>
+    </section>
+</EditorShell>
+
+@code {
+    public static readonly string[] Areas = { "auth", "account", "staff", "roles", "devices", "site", "locations", "services", "customers", "receiving", "parcels", "storage", "printers", "settings", "company", "legal", "setup" };
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsAuditLine> Lines { get; set; } = Array.Empty<OperationsAuditLine>();
+
+    [Parameter] public int TotalCount { get; set; }
+
+    [Parameter] public int Page { get; set; } = 1;
+
+    [Parameter] public int PageSize { get; set; } = 50;
+
+    [Parameter] public Guid? ActorUserId { get; set; }
+
+    [Parameter] public string? ActorName { get; set; }
+
+    [Parameter] public string? Area { get; set; }
+
+    [Parameter] public string? From { get; set; }
+
+    [Parameter] public string? To { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    private string PageLink(int page) =>
+        "/staff/audit?page=" + page
+        + (ActorUserId is null ? null : "&actor=" + ActorUserId)
+        + (string.IsNullOrEmpty(Area) ? null : "&area=" + Uri.EscapeDataString(Area))
+        + (string.IsNullOrEmpty(From) ? null : "&from=" + From)
+        + (string.IsNullOrEmpty(To) ? null : "&to=" + To);
+}

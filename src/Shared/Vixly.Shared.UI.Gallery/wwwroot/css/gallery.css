@@ -1,4 +1,4 @@
-/* Gallery Styling */
+﻿/* Gallery Styling */
 .gallery-app {
     display: flex;
     flex-direction: column;
@@ -148,3 +148,50 @@
     border-radius: var(--vx-radius-sm);
     border: 1px solid var(--vx-color-border);
 }
+
+/* Dense component workbench fixtures; Shared.UI owns the reusable visuals. */
+.wb-stack { display: grid; gap: var(--vx-space-5); margin-block: var(--vx-space-6); }
+.wb-panel { background: var(--vx-color-surface); border: var(--vx-border-width) solid var(--vx-color-border); border-radius: var(--vx-radius-workbench); min-width: 0; box-shadow: var(--vx-shadow-1); }
+.wb-panel__header { display: flex; align-items: center; justify-content: space-between; gap: var(--vx-space-3); padding: var(--vx-space-4) var(--vx-space-5); border-bottom: var(--vx-border-width) solid var(--vx-color-border); }
+.wb-panel__header h2 { margin: 0; font-size: var(--vx-font-size-lg); }
+.wb-panel .vx-table-container { border: 0; border-radius: 0; overflow: visible; }
+.wb-panel .vx-pager { padding: var(--vx-space-3) var(--vx-space-4); margin: 0; border-top: var(--vx-border-width) solid var(--vx-color-border); }
+.wb-filters { display: flex; align-items: end; flex-wrap: wrap; gap: var(--vx-space-3); padding: var(--vx-space-4); }
+.wb-filters label { display: grid; gap: var(--vx-space-1); font-size: var(--vx-font-size-sm); color: var(--vx-color-text-muted); }
+.wb-search { flex: 1; min-width: var(--vx-grid-step-min); }
+.wb-notice { padding: var(--vx-space-3) var(--vx-space-4); border-inline-start: var(--vx-focus-width) solid var(--vx-color-link); background: var(--vx-color-info-bg); color: var(--vx-color-info); font-size: var(--vx-font-size-md); }
+.wb-meta { color: var(--vx-color-text-muted); font-size: var(--vx-font-size-sm); }
+.wb-language { display: flex; gap: var(--vx-space-4); }
+.wb-language a { color: var(--vx-color-link); }
+.wb-split { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: var(--vx-space-4); }
+.wb-feed { padding: 0; margin: 0; list-style: none; }
+.wb-feed li { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: var(--vx-space-3); padding: var(--vx-space-3) var(--vx-space-4); border-bottom: var(--vx-border-width) solid var(--vx-color-border); font-size: var(--vx-font-size-md); }
+.wb-feed li:last-child { border: 0; }
+.wb-dispatch summary { padding: var(--vx-space-4); cursor: pointer; font-weight: 600; }
+.wb-tabs { border: 0; border-bottom: var(--vx-border-width) solid var(--vx-color-border); padding: 0 var(--vx-space-4); margin: 0; display: flex; flex-wrap: wrap; gap: var(--vx-space-4); }
+.wb-tabs__item { position: relative; cursor: pointer; }
+.wb-tabs__item input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.wb-tabs__item span { display: block; padding: var(--vx-space-4) 0; font-size: var(--vx-font-size-md); color: var(--vx-color-text-muted); border-bottom: var(--vx-focus-width) solid transparent; }
+.wb-tabs__item input:checked + span { color: var(--vx-color-link); border-color: var(--vx-color-link); font-weight: 600; }
+.wb-tabs__item input:focus-visible + span { outline: var(--vx-focus-width) solid var(--vx-color-focus); outline-offset: var(--vx-space-1); }
+.wb-detail { padding: var(--vx-space-5); }
+.wb-facts { display: flex; flex-wrap: wrap; gap: var(--vx-space-8); margin: 0 0 var(--vx-space-5); }
+.wb-facts dt { font-size: var(--vx-font-size-sm); color: var(--vx-color-text-muted); }
+.wb-facts dd { margin: var(--vx-space-2) 0 0; font-weight: 600; }
+@media (max-width: 1024px) { .gallery-sidebar { width: auto; } }
+@media (max-width: 640px) {
+    .gallery-body { flex-direction: column; }
+    .gallery-sidebar { padding: var(--vx-space-4); }
+    .gallery-main { padding: var(--vx-space-4); min-width: 0; }
+    .gallery-header { flex-wrap: wrap; gap: var(--vx-space-4); }
+    .wb-split { grid-template-columns: minmax(0, 1fr); }
+    .wb-filters label { width: 100%; }
+}
+
+.gallery-main h1:focus { outline: none; }
+.wb-stack h2 { font-size: var(--vx-font-size-xl); }
+
+.gallery-toolbar { flex-wrap: wrap; max-width: 100%; }
+.gallery-toolbar__item { flex-wrap: wrap; }
+@media (max-width: 640px) { .gallery-toolbar { gap: var(--vx-space-3); } }
+.wb-search kbd { font-family: var(--vx-font-mono); font-size: var(--vx-font-size-xs); }

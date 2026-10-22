@@ -1,0 +1,124 @@
+@*
+=========================================================
+FILE: IncomingPage.razor
+
+PURPOSE:
+The incoming packages: every pre-alert of the warehouses the staff member may see (Slice 4D, A-7).
+
+RESPONSIBILITIES:
+- Views with their counts: expected, past their expected day, received, all
+- Filters: warehouse, expected from and to, carrier, tracking number or customer code; export to CSV
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); the use case limits the list to covered warehouses
+=========================================================
+*@
+@using Vixly.Operations.Web.Endpoints
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.incoming.title"]" Company="@Company" Section="parcels" Error="@Error">
+    <nav class="ops-status-chips" aria-label="@T["ui.incoming.views"]">
+        @foreach ((OperationsIncomingView view, int? count) in Views())
+        {
+            <a href="@Link(view, 1)" class="ops-status-chip" aria-current="@(view == Query.View ? "page" : null)">
+                <span>@T["ui.incoming.view." + view]</span>
+                @if (count is { } shown)
+                {
+                    <span class="ops-status-chip__count">@shown</span>
+                }
+            </a>
+        }
+    </nav>
+    <form method="get" action="/staff/parcels/incoming" class="ops-list-bar" role="search">
+        <input type="hidden" name="view" value="@Query.View" />
+        <input name="search" value="@Query.Search" placeholder="@T["ui.incoming.search"]" aria-label="@T["ui.incoming.search"]" maxlength="60" autocomplete="off" autofocus />
+        <input name="carrier" value="@Query.Carrier" placeholder="@T["ui.incoming.carrier"]" aria-label="@T["ui.incoming.carrier"]" maxlength="40" />
+        @if (Warehouses.Count > 1)
+        {
+            <select name="warehouse" aria-label="@T["ui.receiving.warehouse"]">
+                <option value="">@T["ui.parcels.all_warehouses"]</option>
+                @foreach (OperationsWarehouse warehouse in Warehouses) { <option value="@warehouse.Id" selected="@(warehouse.Id == Query.WarehouseId)">@warehouse.Code</option> }
+            </select>
+        }
+        <label class="ops-list-bar__date"><span>@T["ui.incoming.from"]</span><input name="from" type="date" value="@Query.From?.ToString("yyyy-MM-dd")" /></label>
+        <label class="ops-list-bar__date"><span>@T["ui.incoming.to"]</span><input name="to" type="date" value="@Query.To?.ToString("yyyy-MM-dd")" /></label>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.search_submit"]</button>
+        <a class="vx-button vx-button--secondary" href="@Export">@T["ui.incoming.export"]</a>
+    </form>
+    <section class="ops-editor__panel">
+        @if (Rows.Count == 0)
+        {
+            <div class="ops-editor__empty"><h2>@T["ui.incoming.none"]</h2></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.incoming.title"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.parcels.tracking"]</th><th scope="col">@T["ui.customers.code"]</th><th scope="col">@T["ui.incoming.contents"]</th><th scope="col">@T["ui.incoming.expected"]</th><th scope="col">@T["ui.parcels.warehouse"]</th><th scope="col">@T["ui.incoming.status"]</th><th scope="col">@T["ui.incoming.shipment"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsIncomingRow row in Rows)
+                        {
+                            <tr data-overdue="@(Overdue(row) ? "true" : "false")">
+                                <td class="ops-editor__identity-cell ops-editor__code">@row.TrackingNumber <small>@row.Carrier</small></td>
+                                <td class="ops-editor__code">@row.CustomerCode <small>@row.CustomerName</small></td>
+                                <td>@row.Contents @if (!string.IsNullOrWhiteSpace(row.Store)) { <small>@row.Store</small> }</td>
+                                <td>@row.ExpectedDate?.ToString("yyyy-MM-dd") @if (Overdue(row)) { <small>@T["ui.incoming.view.Overdue"]</small> }</td>
+                                <td class="ops-editor__code">@(row.WarehouseId is { } id ? Warehouses.FirstOrDefault(warehouse => warehouse.Id == id)?.Code : null)</td>
+                                <td>
+                                    @if (row.ParcelId is { } parcel) { <a href="/staff/parcels/@parcel">@row.ParcelNumber</a> }
+                                    else { @T["ui.incoming.status." + row.Status] }
+                                </td>
+                                <td>@(row.InShipment ? T["ui.incoming.in_shipment"] : T["ui.incoming.no_shipment"])</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+        <div class="ops-list-pager">
+            <span class="ops-editor__hint">@VixlyText.Format(T, "ui.incoming.count", "count", TotalCount)</span>
+            @if (Query.Page > 1) { <a class="vx-button vx-button--secondary" href="@Link(Query.View, Query.Page - 1)">@T["ui.customers.previous"]</a> }
+            @if (Query.Page * PageSize < TotalCount) { <a class="vx-button vx-button--secondary" href="@Link(Query.View, Query.Page + 1)">@T["ui.customers.next"]</a> }
+        </div>
+    </section>
+</EditorShell>
+
+@code {
+    private const int PageSize = Vixly.Operations.Application.UseCases.Receiving.ListOperationsIncoming.ListOperationsIncomingUseCase.PageSize;
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsIncomingQuery Query { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsIncomingRow> Rows { get; set; } = Array.Empty<OperationsIncomingRow>();
+
+    [Parameter] public int TotalCount { get; set; }
+
+    [Parameter] public OperationsIncomingCounts Counts { get; set; } = new(0, 0, 0);
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public DateOnly Today { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    private bool Overdue(OperationsIncomingRow row) => row.Status == OperationsPreAlertStatus.Open && row.ExpectedDate < Today;
+
+    private IEnumerable<(OperationsIncomingView View, int? Count)> Views()
+    {
+        yield return (OperationsIncomingView.Expected, Counts.Expected);
+        yield return (OperationsIncomingView.Overdue, Counts.Overdue);
+        yield return (OperationsIncomingView.Received, Counts.Received);
+        yield return (OperationsIncomingView.All, null);
+    }
+
+    private string Filters => (Query.WarehouseId is { } warehouse ? "&warehouse=" + warehouse : null)
+        + (Query.From is { } from ? "&from=" + from.ToString("yyyy-MM-dd") : null)
+        + (Query.To is { } to ? "&to=" + to.ToString("yyyy-MM-dd") : null)
+        + (string.IsNullOrWhiteSpace(Query.Carrier) ? null : "&carrier=" + Uri.EscapeDataString(Query.Carrier))
+        + (string.IsNullOrWhiteSpace(Query.Search) ? null : "&search=" + Uri.EscapeDataString(Query.Search));
+
+    private string Link(OperationsIncomingView view, int page) => "/staff/parcels/incoming?view=" + view + "&page=" + page + Filters;
+
+    private string Export => "/staff/parcels/incoming/export?view=" + Query.View + Filters;
+}

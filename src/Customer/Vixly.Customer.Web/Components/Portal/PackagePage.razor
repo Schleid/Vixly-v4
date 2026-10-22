@@ -1,0 +1,103 @@
+@* PackagePage.razor: One customer package - details, photos and history (Slice 3B, ADR-0021). *@
+@using Vixly.Contracts.Operations.Customers
+@using Vixly.Contracts.Operations.Packages
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@(Detail.Parcel.Number ?? T["ui.packages.title"].Value)" SignedIn="true" Error="@Error" Info="@Info" ReturnHere="/customer/packages">
+    <div class="customer-portal__actions customer-portal__actions--top">
+        <a href="/customer/packages" class="vx-button vx-button--secondary">← @T["ui.packages.back"]</a>
+    </div>
+    @foreach (string hold in Detail.Parcel.Holds)
+    {
+        <p class="customer-portal__notice" role="status">@T["ui.hold." + hold]</p>
+    }
+    @if (Detail.StorageFee > 0)
+    {
+        <p class="customer-portal__notice">@VixlyText.Format(T, "ui.packages.storage_fee", new Dictionary<string, object> { ["amount"] = Detail.StorageFee.ToString("0.00"), ["currency"] = Detail.Currency ?? string.Empty })</p>
+    }
+    @if (Detail.ActionNeeded is { } action)
+    {
+        <p class="customer-portal__notice" role="status"><strong>@T["ui.packages.action_needed"]</strong> @action @(Detail.Fee is { } fee ? VixlyText.Format(T, "ui.packages.fee", new Dictionary<string, object> { ["amount"] = fee.ToString("0.00"), ["currency"] = Detail.FeeCurrency ?? string.Empty }) : null)</p>
+    }
+    <HoldAnswerForms T="T" Detail="Detail" />
+    <dl class="customer-portal__details customer-package-details">
+        <dt>@T["ui.prealert.tracking"]</dt><dd>@Detail.Parcel.TrackingNumber</dd>
+        @if (!string.IsNullOrWhiteSpace(Detail.Parcel.Carrier)) { <dt>@T["ui.prealert.carrier"]</dt><dd>@Detail.Parcel.Carrier</dd> }
+        <dt>@T["ui.packages.status"]</dt><dd>@(Detail.Parcel.Milestone is { } milestone ? T["ui.milestone." + milestone].Value : null)</dd>
+        @if (Detail.Parcel.Warehouse is not null) { <dt>@T["ui.packages.warehouse"]</dt><dd>@Detail.Parcel.Warehouse</dd> }
+        @if (Detail.ReceiptNumber is not null) { <dt>@T["ui.packages.receipt"]</dt><dd>@Detail.ReceiptNumber</dd> }
+        @if (Detail.Parcel.Weight is { } weight) { <dt>@T["ui.packages.weight"]</dt><dd>@weight.ToString("0.###") @Detail.WeightUnit</dd> }
+        @if (Detail.Parcel.Length is { } length && Detail.Parcel.Width is { } width && Detail.Parcel.Height is { } height) { <dt>@T["ui.packages.size"]</dt><dd>@length.ToString("0.#") × @width.ToString("0.#") × @height.ToString("0.#") @Detail.DimensionUnit</dd> }
+        @if (!string.IsNullOrWhiteSpace(Detail.Parcel.Contents)) { <dt>@T["ui.prealert.contents"]</dt><dd>@Detail.Parcel.Contents</dd> }
+        @if (Detail.Parcel.DeclaredValue is { } value) { <dt>@T["ui.prealert.value"]</dt><dd>@value.ToString("0.00") @Detail.Parcel.CurrencyCode</dd> }
+    </dl>
+    @if (Detail.Photos.Count > 0)
+    {
+        <section aria-labelledby="photos-title">
+            <h2 id="photos-title">@T["ui.packages.photos"]</h2>
+            <ul class="customer-portal__photos">
+                @foreach (CustomerParcelPhotoDto photo in Detail.Photos)
+                {
+                    <li><a href="/customer/packages/@Detail.Parcel.ParcelId/photos/@photo.PhotoId" target="_blank" rel="noopener"><img src="/customer/packages/@Detail.Parcel.ParcelId/photos/@photo.PhotoId" alt="@T["ui.packages.photo." + photo.Kind]" loading="lazy" width="160" /></a></li>
+                }
+            </ul>
+        </section>
+    }
+    <section aria-labelledby="history-title">
+        <h2 id="history-title">@T["ui.packages.history"]</h2>
+        <ol class="customer-portal__history">
+            @foreach (CustomerTrackingLineDto line in Detail.History.Reverse())
+            {
+                <li><time datetime="@line.OccurredUtc.ToString("O")">@line.OccurredUtc.ToString("yyyy-MM-dd HH:mm")</time> <span>@Describe(line)</span></li>
+            }
+        </ol>
+    </section>
+</CustomerShell>
+
+@code {
+    private string Describe(CustomerTrackingLineDto line)
+    {
+        Dictionary<string, object> values = line.Arguments.ToDictionary(pair => pair.Key, pair => (object)(pair.Key switch
+        {
+            "reason" when !T["ui.hold." + pair.Value].ResourceNotFound => T["ui.hold." + pair.Value].Value,
+            "result" when !T["ui.inspection." + pair.Value].ResourceNotFound => T["ui.inspection." + pair.Value].Value,
+            "mode" when !T["ui.tracking.mode." + pair.Value].ResourceNotFound => T["ui.tracking.mode." + pair.Value].Value,
+            "failure" when !T["ui.delivery.failure." + pair.Value].ResourceNotFound => T["ui.delivery.failure." + pair.Value].Value,
+            "country" => Country(pair.Value),
+            _ => pair.Value
+        }), StringComparer.Ordinal);
+
+        // Slice 6C: a delay's or an exception's cause in the customer's language (the company's own words kept on the event), and the company's line.
+        if (line.Arguments.TryGetValue("cause", out string? cause))
+        {
+            string language = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            values["cause"] = line.Arguments.TryGetValue("label_" + language, out string? own) || line.Arguments.TryGetValue("label_en", out own) ? own : T["ui.event_reason." + cause].Value;
+            values["message"] = line.Arguments.TryGetValue("message", out string? message) ? " — " + message : string.Empty;
+        }
+        else
+        {
+            // Slice 7: customs held, with the company's line or none.
+            values["message"] = line.Arguments.TryGetValue("message", out string? message) ? " — " + message : string.Empty;
+        }
+
+        return VixlyText.Format(T, "ui.tracking." + (line.Code.StartsWith("ops.tracking.", StringComparison.Ordinal) ? line.Code["ops.tracking.".Length..] : line.Code), values);
+    }
+
+    // Slice 6B: the destination country's name in the reader's language, the code when unknown.
+    private static string Country(string code)
+    {
+        try
+        {
+            return new System.Globalization.RegionInfo(code).DisplayName;
+        }
+        catch (ArgumentException)
+        {
+            return code;
+        }
+    }
+
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+    [Parameter, EditorRequired] public CustomerParcelDetailDto Detail { get; set; } = null!;
+    [Parameter] public string? Info { get; set; }
+    [Parameter] public string? Error { get; set; }
+}

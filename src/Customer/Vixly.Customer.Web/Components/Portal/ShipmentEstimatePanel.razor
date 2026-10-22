@@ -1,0 +1,109 @@
+@*
+=========================================================
+FILE: ShipmentEstimatePanel.razor
+
+PURPOSE:
+The shipment estimate beside the customer's shipment form and on their shipment (Slice 5D: the same panel as the counter).
+
+RESPONSIBILITIES:
+- The shipment's own charges, each parcel once measured, the total
+- While no parcel is in: the service's rates and minimum, and the insurance on the value the customer expects
+- What if: each insurance product, no insurance, consolidation the other way
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- Always an estimate, titled only "Shipment estimate" (owner, 2026-10-20)
+- Rendered alone by the portal's estimate endpoint, so the page refreshes it as the customer types
+=========================================================
+*@
+@using System.Globalization
+@using Vixly.Contracts.Operations.Rates
+@inject IStringLocalizer<CustomerText> T
+
+<link rel="stylesheet" href="css/customer-estimate.css?v=20261020-2" />
+<aside class="customer-portal__estimate" id="shipment-estimate" aria-labelledby="estimate-title" aria-live="polite">
+    <h2 id="estimate-title">@T["ui.estimate.title"] <span class="customer-portal__estimate-live" aria-hidden="true">● LIVE</span></h2>
+    @if (Estimate is not { Priced: true } estimate)
+    {
+        <div class="customer-portal__estimate-body">
+            <p class="customer-portal__hint">@T["ui.estimate.choose"]</p>
+        </div>
+    }
+    else
+    {
+        string unit = estimate.Basis == "Volume" ? Volume(estimate.DimensionUnit) : estimate.WeightUnit;
+        <div class="customer-portal__estimate-body">
+            <table class="customer-portal__estimate-lines">
+                <tbody>
+                    @foreach (CustomerChargeLineDto line in estimate.Shipment)
+                    {
+                        <tr><th scope="row">@(line.Label ?? T["ui.rates.line." + line.Kind].Value)</th><td>@Money(line.Amount, estimate.Currency)</td></tr>
+                    }
+                    @foreach (CustomerRateBandDto band in estimate.Bands)
+                    {
+                        <tr class="customer-portal__estimate-rate"><th scope="row" colspan="2">@Band(band, unit, estimate.Currency)</th></tr>
+                    }
+                    @if (estimate.MinimumCharge is { } minimum)
+                    {
+                        <tr class="customer-portal__estimate-rate"><th scope="row" colspan="2">@VixlyText.Format(T, "ui.estimate.minimum", "amount", Money(minimum, estimate.Currency))</th></tr>
+                    }
+                    @foreach (CustomerEstimateSupplyDto supply in estimate.Supplies ?? Array.Empty<CustomerEstimateSupplyDto>())
+                    {
+                        <tr class="customer-portal__estimate-supply">
+                            <th scope="row">@supply.Quantity × @supply.Name@if (supply.DiscountPercent > 0m) { <small> · −@supply.DiscountPercent.ToString("0.##", CultureInfo.CurrentCulture)%</small> }</th>
+                            <td>@Money(supply.Amount, estimate.Currency)</td>
+                        </tr>
+                    }
+                    @foreach (CustomerEstimateParcelDto parcel in estimate.Parcels)
+                    {
+                        <tr>
+                            <th scope="row">@(parcel.Label ?? VixlyText.Format(T, "ui.estimate.parcel", "number", parcel.Number))
+                                <small>@Number(parcel.Weight) @estimate.WeightUnit · @Number(parcel.Length) × @Number(parcel.Width) × @Number(parcel.Height) @estimate.DimensionUnit</small></th>
+                            <td>@Money(parcel.Amount, estimate.Currency)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="customer-portal__estimate-total-card">
+                <span class="customer-portal__estimate-total-label">@T["ui.rates.total"]</span>
+                <span class="customer-portal__estimate-total-val">@Money(estimate.Total, estimate.Currency)</span>
+            </div>
+            @if (estimate.WhatIf.Count > 1)
+            {
+                <h3>@T["ui.estimate.what_if"]</h3>
+                <ul class="customer-portal__what-if">
+                    @foreach (CustomerEstimateOptionDto option in estimate.WhatIf)
+                    {
+                        <li data-current="@(option.Current ? "true" : null)">
+                            <span>@Name(option)</span>
+                            <span>@(option.Total is { } total ? Money(total, estimate.Currency) + (option.Change is { } change && change != 0m ? " (" + (change > 0 ? "+" : "−") + Money(Math.Abs(change), estimate.Currency) + ")" : null) : T["ui.estimate.not_possible"].Value)</span>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    }
+</aside>
+
+@code {
+    [Parameter] public CustomerShipmentEstimateDto? Estimate { get; set; }
+
+    private static string Number(decimal value) => value.ToString("0.##", CultureInfo.CurrentCulture);
+
+    private static string Money(decimal value, string currency) => value.ToString("N2", CultureInfo.CurrentCulture) + " " + currency;
+
+    private static string Volume(string unit) => unit == "in" ? "ft³" : "m³";
+
+    private string Band(CustomerRateBandDto band, string unit, string currency) => VixlyText.Format(T, "ui.estimate.band." + band.Kind, new Dictionary<string, object>
+    {
+        ["from"] = Number(band.From), ["amount"] = Money(band.Amount, currency), ["base"] = Money(band.Base ?? 0m, currency), ["unit"] = unit
+    });
+
+    private string Name(CustomerEstimateOptionDto option) => option.Kind switch
+    {
+        "none" => T["ui.estimate.option.none"].Value,
+        "consolidate" => T["ui.estimate.option.consolidate"].Value,
+        "separate" => T["ui.estimate.option.separate"].Value,
+        _ => VixlyText.Format(T, "ui.estimate.option.product", "name", option.Name ?? string.Empty)
+    };
+}

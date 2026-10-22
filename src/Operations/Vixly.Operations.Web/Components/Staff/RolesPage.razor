@@ -1,0 +1,62 @@
+﻿@*
+=========================================================
+FILE: RolesPage.razor
+
+PURPOSE:
+The roles of the tenant.
+
+RESPONSIBILITIES:
+- Render the roles of the tenant
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019); sensitive actions ask for step-up first
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inherits OperationsAllowedComponent
+@using Vixly.Operations.Domain.Access
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.roles.title"]" Company="@Company" Section="roles" Error="@Error" Info="@Info">
+    @if (Can(OperationsPermissions.RolesCreate)) { <p><a class="vx-button vx-button--primary" href="/staff/roles/new">@T["ui.roles.add"]</a></p> }
+    <section class="ops-editor__panel">
+        <ul class="ops-editor__list">
+            @foreach (OperationsRoleSummary role in Roles)
+            {
+                <li>
+                    @if (role.IsAdministrator)
+                    {
+                        <strong>@T["ui.roles.administrator"]</strong>
+                        <span>@T["ui.roles.administrator_hint"]</span>
+                    }
+                    else
+                    {
+                        <a href="/staff/roles/@role.RoleId"><strong>@role.Name</strong></a>
+                        <span>@VixlyText.Format(T, "ui.roles.permission_count", "count", role.Permissions.Count)</span>
+                    }
+                    <span>@VixlyText.Format(T, "ui.roles.holders", "count", role.Holders)</span>
+                    @if (!role.IsActive) { <span class="ops-editor__status" data-status="inactive">@T["ui.roles.inactive"]</span> }
+                    @if (!role.IsAdministrator && Can(OperationsPermissions.RolesEdit))
+                    {
+                        <form method="post" action="/staff/roles/@role.RoleId/active" class="ops-editor__inline">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="active" value="@(role.IsActive ? "false" : "true")" />
+                            <button type="submit" class="vx-button vx-button--secondary">@T[role.IsActive ? "ui.roles.deactivate" : "ui.roles.reactivate"]</button>
+                        </form>
+                    }
+                </li>
+            }
+        </ul>
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsRoleSummary> Roles { get; set; } = Array.Empty<OperationsRoleSummary>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

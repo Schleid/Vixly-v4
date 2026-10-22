@@ -58,10 +58,30 @@ public sealed class StartPlatformOwnerRecoveryUseCase
             return StartPlatformOwnerRecoveryResponse.Failure(PlatformLicensingErrors.TooManyLinks);
         }
 
+        if (request.ReplaceDeviceId is Guid replaceId
+            && (await _licensing.Store.GetDeviceAsync(replaceId, cancellationToken) is not { } replaced || replaced.PlatformTenantId != tenant.Id || !replaced.HoldsSeat))
+        {
+            return StartPlatformOwnerRecoveryResponse.Failure(PlatformLicensingErrors.DeviceNotFound);
+        }
+
+        PlatformOwnerSupportRequest support;
+
+        try
+        {
+            support = PlatformOwnerSupportRequest.StartDeviceRecovery(tenant.Id, request.Reason, request.IdentityCheck, request.ReplaceDeviceId, context.PlatformUserId, _licensing.UtcNow);
+        }
+        catch (DomainException exception)
+        {
+            return StartPlatformOwnerRecoveryResponse.Failure(exception.Error);
+        }
+
+        _licensing.Store.AddSupportRequest(support);
         _licensing.Store.AddEvents(new[] { PlatformDeviceEvent.Record(tenant.Id, null, PlatformDeviceEventCodes.LinkSent, PlatformDeviceActor.Staff(context.PlatformUserId), _licensing.UtcNow,
             arguments: new Dictionary<string, string>(StringComparer.Ordinal) { ["kind"] = nameof(PlatformDeviceLinkKind.OwnerRecovery) }) });
-        _licensing.Notice(tenant.Id, PlatformLicensingNoticeKind.RecoveryLink);
-        _licensing.Audit(context.PlatformUserId, "platform.licensing.owner_recovery_started", PlatformPermissions.LicensingManage, nameof(PlatformTenant), tenant.Id);
+        _licensing.Notice(tenant.Id, PlatformLicensingNoticeKind.RecoveryLink, supportRequestId: support.Id, supportKind: PlatformOwnerSupportKind.DeviceRecovery);
+        _licensing.Notice(tenant.Id, PlatformLicensingNoticeKind.OwnerSupportStarted, supportRequestId: support.Id, supportKind: PlatformOwnerSupportKind.DeviceRecovery);
+        _licensing.Audit(context.PlatformUserId, "platform.licensing.owner_recovery_started", PlatformPermissions.LicensingManage, nameof(PlatformTenant), tenant.Id,
+            new { request = support.Id, identityCheck = support.IdentityCheck, replaceDevice = support.ReplaceDeviceId }, support.Reason);
 
         return await _licensing.SaveAsync(cancellationToken)
             ? StartPlatformOwnerRecoveryResponse.Success()

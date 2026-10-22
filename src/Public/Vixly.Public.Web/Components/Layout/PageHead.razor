@@ -1,0 +1,51 @@
+﻿@*
+=========================================================
+FILE: PageHead.razor
+
+PURPOSE:
+Title, description, canonical address and language alternates of a page (SEO).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Pages with tokens or forms for one visitor are noindex
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+@inject IOptions<PublicSiteOptions> Site
+@inject NavigationManager Navigation
+
+<PageTitle>@T[TitleKey] · @T["public.brand"]</PageTitle>
+<HeadContent>
+    <meta name="description" content="@T[DescriptionKey ?? "public.meta.description"]" />
+    @if (Indexed && Page is not null)
+    {
+        <link rel="canonical" href="@Absolute(PublicLanguage.Page(PublicLanguage.Current, Page))" />
+        @foreach (string language in PublicLanguage.Codes)
+        {
+            <link rel="alternate" hreflang="@language" href="@Absolute(PublicLanguage.Page(language, Page))" />
+        }
+        <link rel="alternate" hreflang="x-default" href="@Absolute(PublicLanguage.Page("en", Page))" />
+    }
+    else
+    {
+        <meta name="robots" content="noindex, nofollow" />
+    }
+</HeadContent>
+
+@code {
+    [Parameter, EditorRequired]
+    public string TitleKey { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? DescriptionKey { get; set; }
+
+    // The page address without the language: "" for home, "plans" for plans.
+    [Parameter]
+    public string? Page { get; set; }
+
+    [Parameter]
+    public bool Indexed { get; set; } = true;
+
+    private string Absolute(string path) => Site.Value.CanonicalBaseUrl.TrimEnd('/') + path;
+}

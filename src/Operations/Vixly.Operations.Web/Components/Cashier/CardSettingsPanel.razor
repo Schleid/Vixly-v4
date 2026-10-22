@@ -1,0 +1,108 @@
+﻿@*
+=========================================================
+FILE: CardSettingsPanel.razor
+
+PURPOSE:
+Settings → Payments, cards (Slice 5F step 4; owner 2026-10-21): the
+company's own Stripe account, cards on or off, and its card readers.
+
+RESPONSIBILITIES:
+- Connect (or replace) the Stripe keys; disconnect
+- Turn cards on or off
+- Add and remove Stripe Terminal readers per warehouse
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The keys are never shown back: only the secret key's last 4 characters
+- Connecting and disconnecting ask for a fresh second factor (the use cases)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<section class="ops-editor__panel" id="cards" aria-labelledby="cards-title">
+    <h2 id="cards-title">@T["ui.cards.title"]</h2>
+    <p class="ops-editor__hint">@T["ui.cards.intro"]</p>
+    @if (Card.Connected)
+    {
+        <p data-card="connected"><strong>@(string.IsNullOrEmpty(Card.AccountName) ? T["ui.cards.account_unnamed"].Value : Card.AccountName)</strong>
+            · <span class="ops-editor__status" data-status="@(Card.Live ? "live" : "test")">@T[Card.Live ? "ui.cards.live" : "ui.cards.test"]</span>
+            · @VixlyText.Format(T, "ui.cards.key_hint", "hint", Card.KeyHint ?? string.Empty)</p>
+        @if (Card.CanEdit)
+        {
+            <form method="post" action="/staff/settings/payments/card/accept" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <input type="hidden" name="accept" value="@(Card.AcceptCard ? "false" : "true")" />
+                <span>@T[Card.AcceptCard ? "ui.cards.accepted" : "ui.cards.not_accepted"]</span>
+                <button type="submit" class="vx-button vx-button--secondary">@T[Card.AcceptCard ? "ui.cards.turn_off" : "ui.cards.turn_on"]</button>
+            </form>
+            <form method="post" action="/staff/settings/payments/card/disconnect" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <button type="submit" class="vx-button vx-button--subtle">@T["ui.cards.disconnect"]</button>
+            </form>
+        }
+    }
+    else
+    {
+        <p>@T["ui.cards.not_connected"]</p>
+    }
+    @if (Card.CanEdit)
+    {
+        <form method="post" action="/staff/settings/payments/card/connect" class="ops-editor__form" autocomplete="off">
+            <AntiforgeryToken />
+            <h3>@T[Card.Connected ? "ui.cards.replace" : "ui.cards.connect"]</h3>
+            <label>@T["ui.cards.secret_key"] <input type="password" name="secretKey" maxlength="255" required autocomplete="off" spellcheck="false" /></label>
+            <label>@T["ui.cards.publishable_key"] <input name="publishableKey" maxlength="255" required autocomplete="off" spellcheck="false" /></label>
+            <label>@T["ui.cards.webhook_secret"] <input type="password" name="webhookSecret" maxlength="255" required autocomplete="off" spellcheck="false" /></label>
+            <p class="ops-editor__hint">@VixlyText.Format(T, "ui.cards.webhook_hint", "url", WebhookUrl)</p>
+            <button type="submit" class="vx-button vx-button--primary">@T[Card.Connected ? "ui.cards.replace" : "ui.cards.connect"]</button>
+        </form>
+    }
+    <h3>@T["ui.cards.readers"]</h3>
+    <p class="ops-editor__hint">@T["ui.cards.readers_hint"]</p>
+    @if (Card.Readers.Count == 0)
+    {
+        <p class="ops-editor__empty-message">@T["ui.editor.none"]</p>
+    }
+    else
+    {
+        <ul class="ops-editor__list">
+            @foreach (OperationsCardReaderRow reader in Card.Readers)
+            {
+                <li data-reader="@reader.StripeReaderId"><strong>@reader.Label</strong> · @reader.WarehouseName · <span class="ops-editor__code">@reader.StripeReaderId</span>
+                    @if (Card.CanEdit)
+                    {
+                        <form method="post" action="/staff/settings/payments/card/readers" class="ops-editor__inline">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="remove" value="@reader.ReaderId" />
+                            <button type="submit" class="vx-button vx-button--subtle">@T["ui.cards.remove_reader"]</button>
+                        </form>
+                    }
+                </li>
+            }
+        </ul>
+    }
+    @if (Card.CanEdit && Card.Warehouses.Count > 0)
+    {
+        <form method="post" action="/staff/settings/payments/card/readers" class="ops-editor__inline">
+            <AntiforgeryToken />
+            <label>@T["ui.cards.reader_warehouse"]
+                <select name="warehouse">
+                    @foreach (Vixly.Operations.Application.Shipments.OperationsChoice warehouse in Card.Warehouses)
+                    {
+                        <option value="@warehouse.Id">@warehouse.Name</option>
+                    }
+                </select>
+            </label>
+            <label>@T["ui.cards.reader_label"] <input name="label" maxlength="60" required /></label>
+            <label>@T["ui.cards.reader_id"] <input name="reader" maxlength="64" required placeholder="tmr_..." spellcheck="false" /></label>
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.cards.add_reader"]</button>
+        </form>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public GetOperationsCardSettingsResponse Card { get; set; } = null!;
+
+    // Where the company tells Stripe to send its events (this company's own address).
+    [Parameter, EditorRequired] public string WebhookUrl { get; set; } = string.Empty;
+}

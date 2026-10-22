@@ -1,0 +1,87 @@
+@*
+=========================================================
+FILE: CustomerListPage.razor
+
+PURPOSE:
+The tenant's customers: search and list (Slice 2).
+
+RESPONSIBILITIES:
+- Search by name, email, phone or code; 25 per page
+- Customers register themselves on the portal; staff never enter their details (owner, 2026-10-18)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); the endpoint loads the data
+- Static forms with antiforgery and the form guard (ADR-0019)
+- Density: compact 32px controls, 36px table rows
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.customers.title"]" Company="@Company" Section="customers" Error="@Error" Info="@Info">
+    <form method="get" action="/staff/customers" class="ops-list-bar" role="search">
+        <input name="search" value="@Search" placeholder="@T["ui.customers.search"]" aria-label="@T["ui.customers.search"]" maxlength="100" autocomplete="off" autofocus />
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.search_submit"]</button>
+        @if (!string.IsNullOrWhiteSpace(Search))
+        {
+            <a href="/staff/customers" class="vx-button vx-button--secondary">@T["ui.customers.clear"]</a>
+        }
+    </form>
+    <section class="ops-editor__panel">
+        @if (Customers.Count == 0)
+        {
+            <div class="ops-editor__empty">
+                <h2>@T["ui.customers.none"]</h2>
+                @if (!string.IsNullOrWhiteSpace(Search)) { <p><a href="/staff/customers" class="vx-button vx-button--secondary">@T["ui.customers.clear"]</a></p> }
+            </div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.customers.title"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.staff.name"]</th><th scope="col">@T["ui.customers.code"]</th><th scope="col">@T["ui.editor.email"]</th><th scope="col">@T["ui.customers.phone"]</th><th scope="col">@T["ui.customers.status"]</th><th scope="col">@T["ui.customers.credit"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsCustomerProfile customer in Customers)
+                        {
+                            <tr>
+                                <td class="ops-editor__identity-cell"><a href="/staff/customers/@customer.CustomerId">@customer.FullName</a>@if (!string.IsNullOrWhiteSpace(customer.CompanyName)) { <small> · @customer.CompanyName</small> }</td>
+                                <td class="ops-editor__code">@(customer.Code ?? T["ui.customers.no_code"])</td>
+                                <td>@customer.Email</td>
+                                <td class="ops-editor__code">@customer.Phone</td>
+                                <td><span class="ops-editor__status" data-status="@customer.Status.ToString().ToLowerInvariant()">@T["ui.customers.status." + customer.Status.ToString().ToLowerInvariant()]</span></td>
+                                <td><span class="ops-editor__status" data-status="@(customer.CreditAllowed ? "active" : "neutral")">@(customer.CreditAllowed ? T["ui.customers.credit_on"] : T["ui.customers.credit_off"])</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+            @if (TotalCount > PageSize)
+            {
+                <nav class="ops-list-pager" aria-label="@T["ui.customers.pages"]">
+                    @if (Page > 1) { <a href="@PageLink(Page - 1)" class="ops-list-pager__link">@T["ui.customers.previous"]</a> }
+                    <span class="ops-list-pager__info">@Page / @((TotalCount + PageSize - 1) / PageSize) · @VixlyText.Format(T, "ui.customers.count", "count", TotalCount)</span>
+                    @if (Page * PageSize < TotalCount) { <a href="@PageLink(Page + 1)" class="ops-list-pager__link">@T["ui.customers.next"]</a> }
+                </nav>
+            }
+        }
+    </section>
+</EditorShell>
+
+@code {
+    public const int PageSize = 25;
+
+    private string PageLink(int page) => "/staff/customers?page=" + page + (string.IsNullOrWhiteSpace(Search) ? null : "&search=" + Uri.EscapeDataString(Search));
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public string? Search { get; set; }
+
+    [Parameter] public int Page { get; set; } = 1;
+
+    [Parameter] public IReadOnlyList<OperationsCustomerProfile> Customers { get; set; } = Array.Empty<OperationsCustomerProfile>();
+
+    [Parameter] public int TotalCount { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

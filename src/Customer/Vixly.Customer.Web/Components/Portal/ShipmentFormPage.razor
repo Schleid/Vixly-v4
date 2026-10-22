@@ -1,0 +1,173 @@
+@*
+=========================================================
+FILE: ShipmentFormPage.razor
+
+PURPOSE:
+Create a shipment, or change where an open one goes (owner, 2026-10-18; Slice 4D, owner, 2026-10-19).
+
+RESPONSIBILITIES:
+- The mailbox warehouse it ships from (new shipments only, when the customer has several)
+- Where it goes (ShipmentDestinationFields): the destination warehouse with pickup or home delivery (Slice 4C), or a destination branch
+- The insurance terms the customer accepts when insuring (Slice 4C)
+- The recipient's name and phone; consolidation, refrigeration and insurance
+- The service, from those the company prices for the customer (Slice 4D)
+- For a new shipment: the customer's packages in no shipment yet to put in it, or none (goods it drops off)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- No script: both destination kinds are shown and the chosen one is used; Operations checks everything again
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Customers
+@using Vixly.Contracts.Operations.Packages
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@(ShipmentId is null ? T["ui.shipments.new"] : T["ui.shipments.edit"])" SignedIn="true" Error="@Error" ReturnHere="@Here">
+    @if (Choices is { } choices)
+    {
+        <div class="customer-portal__with-estimate">
+        <form method="post" action="@Here" class="customer-portal__form customer-shipment-form" data-estimate="/customer/packages/shipments/estimate">
+            <AntiforgeryToken />
+            @if (ShipmentId is null) { <input type="hidden" name="key" value="@Key" /> }
+            @if (ShipmentId is { } estimateShipment) { <input type="hidden" name="estimateShipment" value="@estimateShipment" /> }
+            
+            @if (ShipmentId is null)
+            {
+                @if (choices.Origins.Count == 0)
+                {
+                    <p class="customer-portal__notice">@T["ui.shipments.no_mailbox"]</p>
+                }
+                else if (choices.Origins.Count == 1)
+                {
+                    <input type="hidden" name="origin" value="@choices.Origins[0].Id" />
+                }
+                else
+                {
+                    <label>@T["ui.shipments.origin"]
+                        <select name="origin" required>
+                            @foreach (CustomerChoiceDto origin in choices.Origins) { <option value="@origin.Id">@origin.Name &middot; @origin.Detail</option> }
+                        </select>
+                    </label>
+                }
+            }
+            <ShipmentDestinationFields Choices="choices" Entered="Entered" />
+            @if ((choices.Services?.Count ?? 0) > 0)
+            {
+                <label>@T["ui.shipments.service"]
+                    <select name="service">
+                        <option value="">@T["ui.shipments.service_any"]</option>
+                        @foreach (string service in choices.Services!) { <option value="@service" selected="@(service == Entered?.Service)">@T["ui.rates.service." + service]</option> }
+                    </select>
+                </label>
+            }
+            @* Slice 5C: how many parcels travel in it; the customer corrects it when more or fewer arrive. *@
+            <label>@T["ui.shipments.parcel_count"]
+                <input name="parcelCount" type="number" inputmode="numeric" min="1" max="99" step="1" required value="@(Entered?.ParcelCount?.ToString(System.Globalization.CultureInfo.InvariantCulture))" />
+            </label>
+            <p class="customer-portal__hint">@T["ui.shipments.parcel_count_hint"]</p>
+            @* Slice 5D: for the estimate only; never saved. *@
+            <label>@T["ui.estimate.expected_value"] <input name="expectedValue" inputmode="decimal" autocomplete="off" /></label>
+            <fieldset>
+                <legend>@T["ui.shipments.recipient_title"]</legend>
+                <label>@T["ui.shipments.recipient"] <input name="recipient" value="@(Entered?.RecipientName ?? choices.RecipientName)" maxlength="100" required autocomplete="name" /></label>
+                <label>@T["ui.shipments.recipient_phone"] <input name="recipientPhone" type="tel" value="@(Entered?.RecipientPhone ?? choices.RecipientPhone)" maxlength="20" required autocomplete="tel" /></label>
+            </fieldset>
+            <fieldset>
+                <legend>@T["ui.shipments.options"]</legend>
+                <label><input type="checkbox" name="consolidate" value="true" checked="@(Entered?.Consolidate ?? false)" /> @T["ui.shipments.consolidate"]</label>
+                <label><input type="checkbox" name="refrigerated" value="true" checked="@(Entered?.Refrigerated ?? false)" /> @T["ui.shipments.refrigerated"]</label>
+                @if (choices.AllowCollect || Entered?.Collect == true)
+                {
+                    @* Freight collect (owner, 2026-10-21): the sender pays at the destination. *@
+                    <label><input type="checkbox" name="collect" value="true" checked="@(Entered?.Collect ?? false)" /> @T["ui.shipments.collect"]</label>
+                    <p class="customer-portal__hint">@T["ui.shipments.collect_hint"]</p>
+                }
+                @* Slice 5B: what the company owes when the customer does not insure, per mode. *@
+                @foreach (Vixly.Contracts.Operations.Packages.CustomerLiabilityDto liability in choices.Liability ?? Array.Empty<Vixly.Contracts.Operations.Packages.CustomerLiabilityDto>())
+                {
+                    <p class="customer-portal__hint customer-portal__terms-text">@T["ui.shipments.mode." + liability.Mode]: @Liability(liability)</p>
+                }
+                @if ((choices.Insurance?.Count ?? 0) > 0)
+                {
+                    @* Slice 5D: the customer chooses one of the company's insurance products, or none. *@
+                    <InsuranceProductChoice Products="choices.Insurance!" Selected="@(Entered?.Insured == true ? Entered.InsurancePlanId : null)" Accepted="@(Entered?.InsuranceAccepted ?? false)" />
+                }
+                else
+                {
+                    <label><input type="checkbox" name="insured" value="true" checked="@(Entered?.Insured ?? false)" /> @T["ui.shipments.insured"]</label>
+                }
+            </fieldset>
+            @if (ShipmentId is null && (UnplacedPreAlerts.Count > 0 || UnplacedParcels.Count > 0))
+            {
+                <fieldset>
+                    <legend>@T["ui.shipments.packages_to_add"]</legend>
+                    @foreach (CustomerParcelDto parcel in UnplacedParcels)
+                    {
+                        <label><input type="checkbox" name="parcels" value="@parcel.ParcelId" checked="@Chosen.Contains(parcel.ParcelId)" /> @parcel.Number &middot; @parcel.TrackingNumber &middot; @parcel.Warehouse</label>
+                    }
+                    @foreach (CustomerPreAlertDto preAlert in UnplacedPreAlerts)
+                    {
+                        <label><input type="checkbox" name="preAlerts" value="@preAlert.PreAlertId" checked="@Chosen.Contains(preAlert.PreAlertId)" /> @preAlert.TrackingNumber &middot; @preAlert.Carrier &middot; @preAlert.Contents @(choices.Origins.Count > 1 ? "&middot; " + choices.Origins.FirstOrDefault(origin => origin.Id == preAlert.WarehouseId)?.Name : null)</label>
+                    }
+                </fieldset>
+            }
+            @if (ShipmentId is null)
+            {
+                <fieldset>
+                    <legend>@T["ui.shipments.new_package"]</legend>
+                    <PackageFields T="T" Entered="Package" Required="false" />
+                </fieldset>
+                <p class="customer-portal__hint">@T["ui.shipments.packages_hint"]</p>
+            }
+            <div class="customer-portal__actions">
+                <button type="submit" class="vx-button vx-button--primary">@(ShipmentId is null ? T["ui.shipments.create"] : T["ui.shipments.save"])</button>
+                <a class="vx-button vx-button--secondary" href="@(ShipmentId is null ? "/customer/packages" : "/customer/packages/shipments/" + ShipmentId)">@T["ui.packages.back"]</a>
+            </div>
+        </form>
+        @* Kept in view and centred in the window as the customer scrolls (owner, 2026-10-20). *@
+        <div class="customer-portal__estimate-side"><ShipmentEstimatePanel /></div>
+        <script src="js/customer-estimate-side.js?v=20261020-1" defer></script>
+        </div>
+        <script src="js/customer-estimate.js?v=20261020-1" defer></script>
+    }
+</CustomerShell>
+
+@code {
+    // The company's words when it gave them; else its terms in plain words.
+    // A cap is per parcel, or per shipment for figures from the company's cover (Slice 4C); the company's own words keep their line breaks (CSS).
+    private string Liability(Vixly.Contracts.Operations.Packages.CustomerLiabilityDto liability) => liability.Text is { Length: > 0 } words ? words : liability.Basis switch
+    {
+        "PerWeight" => VixlyText.Format(T, liability.Cap is null ? "ui.shipments.liability.PerWeight_nocap" : liability.CapPerShipment ? "ui.shipments.liability.PerWeight_shipment" : "ui.shipments.liability.PerWeight", new Dictionary<string, object>
+        {
+            ["amount"] = (liability.Amount ?? 0m).ToString("0.##"), ["currency"] = liability.Currency, ["unit"] = liability.Unit,
+            ["cap"] = (liability.Cap ?? 0m).ToString("0.##") + " " + liability.Currency
+        }),
+        "PerParcel" => VixlyText.Format(T, "ui.shipments.liability.PerParcel", new Dictionary<string, object> { ["amount"] = (liability.Amount ?? 0m).ToString("0.##"), ["currency"] = liability.Currency }),
+        "DeclaredValueUpToCap" => VixlyText.Format(T, liability.CapPerShipment ? "ui.shipments.liability.DeclaredValueUpToCap_shipment" : "ui.shipments.liability.DeclaredValueUpToCap", new Dictionary<string, object> { ["cap"] = (liability.Cap ?? 0m).ToString("0.##"), ["currency"] = liability.Currency }),
+        _ => T["ui.shipments.liability.None"].Value
+    };
+
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public CustomerShipmentChoicesDto? Choices { get; set; }
+
+    [Parameter] public Guid? ShipmentId { get; set; }
+
+    [Parameter] public CustomerShipmentInstructionsBody? Entered { get; set; }
+
+    // Slice 4D: the customer's packages in no shipment yet, and those it ticked.
+    [Parameter] public IReadOnlyList<CustomerPreAlertDto> UnplacedPreAlerts { get; set; } = Array.Empty<CustomerPreAlertDto>();
+
+    [Parameter] public IReadOnlyList<CustomerParcelDto> UnplacedParcels { get; set; } = Array.Empty<CustomerParcelDto>();
+
+    [Parameter] public IReadOnlyCollection<Guid> Chosen { get; set; } = Array.Empty<Guid>();
+
+    [Parameter] public CustomerPreAlertBody? Package { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    // The form's reference: the same form sent twice creates one shipment (ADR-0019).
+    private readonly string Key = Guid.NewGuid().ToString("N");
+
+    private string Here => ShipmentId is { } id ? "/customer/packages/shipments/" + id + "/edit" : "/customer/packages/shipments/new";
+}

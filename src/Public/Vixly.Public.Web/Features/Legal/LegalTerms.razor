@@ -1,0 +1,61 @@
+﻿@*
+=========================================================
+FILE: LegalTerms.razor
+
+PURPOSE:
+The current Terms and the documents they include, with their PDFs (Slice 8).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- PDFs pass through the public site (same origin)
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+@inject PlatformCatalog Catalog
+
+<section class="pub-section pub-section--narrow">
+    <h1>@T["public.legal.title"]</h1>
+    <p class="pub-lead">@T["public.legal.lead"]</p>
+    <ErrorBox Error="_result?.Error" />
+    @if (_result?.Value is { } terms)
+    {
+        <VxCard Title="@VixlyText.Format(T, "public.legal.terms_version", "version", terms.Version)">
+            @if (terms.EffectiveUtc is { } effective)
+            {
+                <p class="pub-hint">@VixlyText.Format(T, "public.legal.effective", "date", effective.UtcDateTime.ToString("D", CultureInfo.CurrentCulture))</p>
+            }
+            @if (!string.IsNullOrWhiteSpace(terms.Summary))
+            {
+                <p>@terms.Summary</p>
+            }
+            <p><a href="@terms.FileUrl" download>@T["public.legal.download_terms"]</a></p>
+        </VxCard>
+        @if (terms.Parts.Count > 0)
+        {
+            <h2>@T["public.legal.includes"]</h2>
+            <ul class="pub-list">
+                @foreach (Vixly.Contracts.Platform.Legal.PlatformLegalPartInfo part in terms.Parts)
+                {
+                    <li>
+                        <a href="@part.FileUrl" download>@T["public.legal.kind." + part.Kind]</a>
+                        <span class="pub-hint">@VixlyText.Format(T, "public.legal.part_version", "version", part.Version)</span>
+                        @if (!string.IsNullOrWhiteSpace(part.Summary))
+                        {
+                            <p>@part.Summary</p>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    }
+</section>
+
+@code {
+    private PlatformApiResult<Vixly.Contracts.Platform.Legal.PlatformLegalTermsInfo>? _result;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _result = await Catalog.TermsAsync(CancellationToken.None);
+    }
+}

@@ -1,0 +1,101 @@
+﻿@*
+=========================================================
+FILE: DispatchPapersPanel.razor
+
+PURPOSE:
+A closed dispatch's shipments, its carrier cost and its letter of instruction (Slice 6B step 2, D-6 and D-7).
+
+RESPONSIBILITIES:
+- List the shipments with their house numbers and cost shares, with each house air waybill
+- Show the worked-out cost; work it out again; correct it with a note
+- Keep what the letter of instruction adds
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The cost is internal
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+@if (Shipments.Count > 0)
+{
+    <section class="ops-editor__panel" aria-labelledby="shipments-title">
+        <h2 id="shipments-title">@T["ui.dispatch.shipments"]</h2>
+        <OperationsTableViewport Label="@T["ui.dispatch.shipments"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.dispatch.house"]</th><th scope="col">@T["ui.dispatch.shipment"]</th><th scope="col">@T["ui.dispatch.customer"]</th><th scope="col">@T["ui.dispatch.consignee"]</th><th scope="col" class="ops-editor__number">@T["ui.bundles.parcels"]</th><th scope="col" class="ops-editor__number">@T["ui.dispatch.chargeable"]</th><th scope="col" class="ops-editor__number">@T["ui.dispatch.cost.share"]</th><th scope="col"></th></tr></thead>
+                <tbody>
+                    @foreach (OperationsDispatchShipmentRow row in Shipments)
+                    {
+                        <tr>
+                            <td class="ops-editor__identity-cell ops-editor__code">@row.Row.HouseNumber</td>
+                            <td class="ops-editor__code">@row.ShipmentNumber</td>
+                            <td class="ops-editor__code">@row.CustomerCode</td>
+                            <td>@row.Consignee</td>
+                            <td class="ops-editor__number">@row.Row.Pieces</td>
+                            <td class="ops-editor__number">@OperationsBundleWords.Weight(row.Row.ChargeableKg, WeightUnit)</td>
+                            <td class="ops-editor__number">@(row.Row.CostShare is { } share ? Money(share) : string.Empty)</td>
+                            <td>@if (Dispatch.TravelsByAir) { <a href="/staff/dispatches/@Dispatch.Id/hawb?shipment=@row.Row.ShipmentId" target="_blank" rel="noopener">@T["ui.dispatch.hawb"]</a> }</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    </section>
+}
+@if (Dispatch.Status is OperationsDispatchStatus.Departed or OperationsDispatchStatus.Arrived or OperationsDispatchStatus.Closed)
+{
+    <section class="ops-editor__panel" aria-labelledby="cost-title">
+        <h2 id="cost-title">@T["ui.dispatch.cost"]</h2>
+        <dl class="ops-editor__facts">
+            <dt>@T["ui.dispatch.cost.computed"]</dt><dd>@(Dispatch.CostComputed is { } computed ? Money(computed) : T[Dispatch.DepartedUtc is null ? "ui.dispatch.cost.at_departure" : "ui.dispatch.cost.unknown"].Value)</dd>
+            @if (Dispatch.CostNote is { } note) { <dt>@T["ui.dispatch.cost.total"]</dt><dd>@(Dispatch.CostTotal is { } total ? Money(total) : string.Empty) <small>· @note</small></dd> }
+        </dl>
+        @if (Dispatch.Status != OperationsDispatchStatus.Closed)
+        {
+            <form method="post" action="/staff/dispatches/@Dispatch.Id/recost" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.dispatch.cost.recost"]</button>
+            </form>
+        }
+        <form method="post" action="/staff/dispatches/@Dispatch.Id/cost" class="ops-editor__form">
+            <AntiforgeryToken />
+            <label>@VixlyText.Format(T, "ui.dispatch.cost.correct_in", "currency", Dispatch.CostCurrencyCode ?? string.Empty) <input name="total" inputmode="decimal" size="10" value="@(Dispatch.CostNote is not null ? Dispatch.CostTotal?.ToString("0.00", CultureInfo.InvariantCulture) : null)" /></label>
+            <label>@T["ui.dispatch.cost.note"] <input name="note" maxlength="@OperationsDispatch.CostNoteMaxLength" value="@Dispatch.CostNote" /></label>
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
+            <p class="ops-editor__hint">@T["ui.dispatch.cost.hint"]</p>
+        </form>
+    </section>
+}
+@if (Dispatch.Status is not (OperationsDispatchStatus.Arrived or OperationsDispatchStatus.Cancelled))
+{
+    <form method="post" action="/staff/dispatches/@Dispatch.Id/instructions" class="ops-editor__panel ops-editor__form" aria-labelledby="sli-title">
+        <AntiforgeryToken />
+        <h2 id="sli-title">@T["ui.dispatch.instructions"]</h2>
+        <fieldset>
+            <legend>@T["ui.dispatch.charges"]</legend>
+            <label><input type="radio" name="collect" value="false" checked="@(!Dispatch.ChargesCollect)" /> @T["ui.sli.prepaid"]</label>
+            <label><input type="radio" name="collect" value="true" checked="@Dispatch.ChargesCollect" /> @T["ui.sli.collect"]</label>
+        </fieldset>
+        <label>@T["ui.dispatch.export_reference"] <input name="exportReference" maxlength="@OperationsDispatch.ExportReferenceMaxLength" value="@Dispatch.ExportReference" /></label>
+        <fieldset>
+            <legend>@T["ui.dispatch.documents"]</legend>
+            @foreach (OperationsDispatchDocuments document in Enum.GetValues<OperationsDispatchDocuments>().Where(item => item != OperationsDispatchDocuments.None))
+            {
+                <label><input type="checkbox" name="documents" value="@document" checked="@Dispatch.Documents.HasFlag(document)" /> @T["ui.dispatch.document." + document]</label>
+            }
+        </fieldset>
+        <label>@T["ui.dispatch.handling"] <textarea name="handling" rows="2" maxlength="@OperationsDispatch.InstructionsMaxLength">@Dispatch.HandlingInstructions</textarea></label>
+        <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button></p>
+    </form>
+}
+
+@code {
+    [Parameter, EditorRequired] public OperationsDispatch Dispatch { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsDispatchShipmentRow> Shipments { get; set; } = Array.Empty<OperationsDispatchShipmentRow>();
+
+    [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
+
+    private string Money(decimal amount) => amount.ToString("N2", CultureInfo.CurrentUICulture) + " " + (Dispatch.CostCurrencyCode ?? string.Empty);
+}

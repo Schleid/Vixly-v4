@@ -1,0 +1,136 @@
+﻿@*
+=========================================================
+FILE: SiteShell.razor
+
+PURPOSE:
+The HTML document of every tenant site page: SEO, colours, header and footer.
+
+RESPONSIBILITIES:
+- Render the HTML document of every tenant site page: SEO, colours, header and footer
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText and the tenant texts; values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); every value is HTML-encoded by Razor
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<!DOCTYPE html>
+<html lang="@Page.Language" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@Title</title>
+    <meta name="description" content="@Description" />
+    <link rel="canonical" href="@Page.Url(Page.Language)" />
+    @foreach (string language in OperationsSiteLanguages.All)
+    {
+        <link rel="alternate" hreflang="@language" href="@Page.Url(language)" />
+    }
+    <link rel="alternate" hreflang="x-default" href="@Page.Url(OperationsSiteLanguages.All[0])" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="@Page.Company" />
+    <meta property="og:title" content="@Title" />
+    <meta property="og:description" content="@Description" />
+    <meta property="og:url" content="@Page.Url(Page.Language)" />
+    @if (ShareImage is not null)
+    {
+        <meta property="og:image" content="@(Page.Origin + ShareImage)" />
+    }
+    <meta name="twitter:card" content="@(ShareImage is null ? "summary" : "summary_large_image")" />
+    <meta name="theme-color" content="@Settings.PrimaryColour" />
+    @if (Page.Image(Settings.FaviconImageId) is { } favicon)
+    {
+        <link rel="icon" href="@favicon" />
+        <link rel="apple-touch-icon" href="@favicon" />
+    }
+    @if (Page.Site.IsPreview)
+    {
+        <meta name="robots" content="noindex" />
+    }
+    <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-theme.css" />
+    <link rel="stylesheet" href="/css/tenant-site.css" />
+    <style>:root { --site-primary: @Settings.PrimaryColour; --site-accent: @Settings.AccentColour; }</style>
+    <script type="application/ld+json">@((MarkupString)OperationsSiteJsonLd.Build(Page, Description))</script>
+</head>
+<body class="site">
+    <a class="site-skip" href="#main">@T["site.skip"]</a>
+    @if (Page.Site.IsPreview)
+    {
+        <p class="site-preview" role="status">@T["site.preview.banner"]</p>
+    }
+    <header class="site-header">
+        <a class="site-brand" href="@Page.Home">
+            @if (Page.Image(Settings.LogoImageId) is { } logo)
+            {
+                <img src="@logo" alt="@Page.Company" height="44" />
+            }
+            else
+            {
+                <span>@Page.Company</span>
+            }
+        </a>
+        <nav class="site-nav" aria-label="@T["site.nav.label"]">
+            <a href="@(Page.Home)#track">@T["site.nav.track"]</a>
+            <a href="@(Page.Home)/locations">@T["site.nav.locations"]</a>
+            @if (Page.Site.PricingShown) { <a href="@(Page.Home)/pricing">@T["site.nav.pricing"]</a> }
+            <a class="site-button site-button--ghost" href="/customer/sign-in">@T["site.nav.sign_in"]</a>
+            <a class="site-button" href="/customer/sign-up">@T["site.nav.sign_up"]</a>
+        </nav>
+        <nav class="site-languages" aria-label="@T["ui.language"]">
+            @foreach (string language in OperationsSiteLanguages.All)
+            {
+                <a href="/culture/@language?returnUrl=/@(language + Page.Path)" hreflang="@language" lang="@language" aria-current="@(language == Page.Language ? "true" : null)">@language.ToUpperInvariant()</a>
+            }
+        </nav>
+    </header>
+    <main id="main">
+        @ChildContent
+    </main>
+    <footer class="site-footer">
+        <div class="site-footer__about">
+            <strong>@Page.Company</strong>
+            <p>@Page.Text(T, "footer_about", "site.default.footer_about")</p>
+        </div>
+        @if (Social.Any(link => link.Item2 is not null))
+        {
+        <ul class="site-footer__social">
+            @foreach ((string Label, string? Url) link in Social)
+            {
+                if (link.Url is not null)
+                {
+                    <li><a href="@link.Url" rel="noopener noreferrer me" target="_blank">@link.Label</a></li>
+                }
+            }
+        </ul>
+        }
+        <p class="site-footer__links">
+            <a href="@(Page.Home)/locations">@T["site.nav.locations"]</a>
+            <a href="/staff" rel="nofollow">@T["site.nav.staff"]</a>
+        </p>
+        <p class="site-footer__rights">© @DateTime.UtcNow.Year @Page.Company</p>
+    </footer>
+</body>
+</html>
+
+@code {
+    private Vixly.Operations.Domain.Branding.OperationsBrandSettings Settings => Page.Site.Settings;
+
+    private string? ShareImage => Page.Image(Settings.HeroImageId) ?? Page.Image(Settings.LogoImageId);
+
+    private IEnumerable<(string, string?)> Social =>
+        new[] { ("Facebook", Settings.FacebookUrl), ("Instagram", Settings.InstagramUrl), ("X", Settings.XUrl), ("LinkedIn", Settings.LinkedInUrl), ("YouTube", Settings.YouTubeUrl), ("TikTok", Settings.TikTokUrl) };
+
+    [Parameter, EditorRequired]
+    public OperationsSitePage Page { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Description { get; set; } = string.Empty;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

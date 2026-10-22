@@ -1,0 +1,63 @@
+﻿/* Operations scan app (Slice 3B): full screen, large type, read from arm's length; the dock prints one label per scan. */
+body.ops-scan { margin: 0; min-height: 100dvh; font-family: var(--vx-font); background: var(--vx-color-chrome-surface); color: var(--vx-color-chrome-text-strong); -webkit-font-smoothing: antialiased; }
+.ops-scan * { box-sizing: border-box; }
+.ops-scan__app { display: grid; gap: 1rem; max-width: 46rem; margin: 0 auto; padding: max(.75rem, env(safe-area-inset-top)) 1rem 2rem; }
+.ops-scan__bar { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.ops-scan__home { flex: 1 1 auto; color: var(--vx-color-chrome-text-strong); font-weight: 700; text-decoration: none; }
+.ops-scan select, .ops-scan button, .ops-scan input { min-height: 48px; font: inherit; font-size: 1rem; border-radius: .4rem; }
+.ops-scan select { background: var(--vx-color-chrome-hover); color: var(--vx-color-chrome-text-strong); border: 1px solid var(--vx-color-chrome-border); padding: 0 .75rem; }
+.ops-scan button { background: var(--vx-color-chrome-hover); color: var(--vx-color-chrome-text-strong); border: 1px solid var(--vx-color-chrome-scrollbar); padding: 0 1rem; cursor: pointer; }
+.ops-scan button:focus-visible, .ops-scan input:focus-visible, .ops-scan select:focus-visible { outline: 3px solid var(--vx-color-status-warning-border); outline-offset: 2px; }
+.ops-scan h1 { margin: .5rem 0; font-size: 1.5rem; }
+.ops-scan h2 { margin: 1rem 0 .5rem; font-size: 1.1rem; color: var(--vx-color-chrome-text); }
+.ops-scan__error { padding: 1rem; background: var(--vx-color-chrome-danger-soft); border-radius: .4rem; }
+.ops-scan__carriers { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: .75rem; }
+.ops-scan__carriers button { min-height: 72px; font-size: 1.25rem; font-weight: 700; }
+.ops-scan__open { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.ops-scan__open button { width: 100%; text-align: left; }
+.ops-scan__delivery { display: flex; gap: .75rem; align-items: baseline; font-size: 1.1rem; }
+.ops-scan__queue { margin-left: auto; padding: .2rem .6rem; border-radius: 1rem; background: var(--vx-color-status-staged); font-size: .875rem; }
+.ops-scan__input { display: flex; gap: .5rem; }
+.ops-scan__input input { flex: 1; min-height: 64px; padding: 0 1rem; font-size: 1.5rem; letter-spacing: .04em; background: var(--vx-color-chrome-text-strong); color: var(--vx-color-chrome-surface); border: 3px solid var(--vx-color-chrome-accent); }
+.ops-scan__tools, .ops-scan__end { display: flex; gap: .75rem; }
+.ops-scan__tools button, .ops-scan__end button { flex: 1; }
+.ops-scan__damaged[aria-pressed=true] { background: var(--vx-color-status-exception); border-color: var(--vx-color-status-danger-border); font-weight: 700; }
+.ops-scan__close { background: var(--vx-color-status-completed); border-color: var(--vx-color-status-success-border); font-weight: 700; }
+.ops-scan__video { width: 100%; max-height: 40vh; object-fit: cover; border-radius: .4rem; background: var(--vx-color-chrome-footer); }
+.ops-scan__result { min-height: 12rem; padding: 1.25rem; border-radius: .6rem; background: var(--vx-color-chrome-hover); border: 4px solid var(--vx-color-chrome-border); text-align: center; }
+.ops-scan__result p { margin: .25rem 0; }
+.ops-scan__code { font-size: clamp(2.5rem, 12vw, 4.5rem); font-weight: 800; letter-spacing: .04em; }
+.ops-scan__name { font-size: 1.35rem; }
+.ops-scan__number { font-size: 1.1rem; color: var(--vx-color-chrome-text); font-variant-numeric: tabular-nums; }
+.ops-scan__note { color: var(--vx-color-chrome-text); }
+.ops-scan__result[data-outcome=matched] { background: var(--vx-color-status-completed-bg); border-color: var(--vx-color-status-success-border); }
+.ops-scan__result[data-outcome=unidentified], .ops-scan__result[data-outcome=conflict] { background: var(--vx-color-status-staged-bg); border-color: var(--vx-color-status-warning-border); }
+.ops-scan__result[data-outcome=reprint], .ops-scan__result[data-outcome=repeat] { background: var(--vx-color-chrome-active); border-color: var(--vx-color-chrome-accent); }
+.ops-scan__result[data-outcome=error] { background: var(--vx-color-chrome-danger-soft); border-color: var(--vx-color-chrome-danger); }
+.ops-scan__result[data-outcome=queued] { background: var(--vx-color-chrome-border); border-color: var(--vx-color-chrome-text-muted); }
+.ops-scan__recent { margin: 0; padding-left: 1.5rem; color: var(--vx-color-chrome-text); font-variant-numeric: tabular-nums; }
+.ops-scan__recent [data-outcome=unidentified], .ops-scan__recent [data-outcome=conflict] { color: var(--vx-color-status-warning-border); }
+.ops-scan__closed { text-align: center; }
+.ops-scan__receipt { display: inline-block; padding: 1rem 1.5rem; border-radius: .4rem; background: var(--vx-color-chrome-text-strong); color: var(--vx-color-chrome-surface); font-weight: 700; text-decoration: none; }
+.ops-scan__label { display: none; }
+.ops-scan__app { padding-top:max(1.25rem,env(safe-area-inset-top)); gap:1.25rem; }
+.ops-scan__bar { padding-bottom:1rem; border-bottom:1px solid var(--vx-color-chrome-border); }
+.ops-scan__input input { min-width:0; font-family:var(--vx-font-mono); }
+.ops-scan__result { border-width:2px; box-shadow:var(--vx-shadow-2); }
+.ops-scan__result[data-outcome=matched] { color:var(--vx-color-status-completed); }
+.ops-scan__result:is([data-outcome=unidentified],[data-outcome=conflict]) { color:var(--vx-color-status-staged); }
+.ops-scan__result .ops-scan__number,.ops-scan__result .ops-scan__note { color:inherit; }
+.ops-scan__carriers button { transition:border-color .15s ease; }
+.ops-scan__carriers button:hover { border-color:var(--vx-color-chrome-accent); }
+@media(max-width:480px) { .ops-scan__tools,.ops-scan__end { flex-wrap:wrap; } .ops-scan__pick { max-width:100%; } .ops-scan select { max-width:100%; } }
+@media(prefers-reduced-motion:reduce) { .ops-scan__carriers button { transition:none; } }
+@page { size: 2in 1in; margin: 0; }
+@media print {
+    body.ops-scan { background: #fff; color: #000; min-height: 0; }
+    .ops-scan__app { display: none; }
+    .ops-scan__label { display: block; width: 2in; height: 1in; padding: .05in .08in; overflow: hidden; font-family: Arial, sans-serif; color: #000; }
+    .ops-scan__label svg { display: block; width: 100%; height: .42in; fill: #000; }
+    .ops-scan__label p { margin: 0; line-height: 1.1; }
+    .ops-scan__label [data-label-number] { font-size: 7pt; }
+    .ops-scan__label [data-label-code] { font-size: 16pt; font-weight: 700; }
+}

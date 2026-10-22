@@ -1,0 +1,62 @@
+﻿@*
+=========================================================
+FILE: SignUpPage.razor
+
+PURPOSE:
+The customer sign-up page with the bot check.
+
+RESPONSIBILITIES:
+- Render the customer sign-up page with the bot check
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019)
+- Placeholder look: Frontend/UI designs the final experience; never says "Vixly"
+=========================================================
+*@
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.sign_up.title"]" Subtitle="@T["ui.sign_up.subtitle"]" Error="@Error" ReturnHere="/customer/sign-up" BotSiteKey="@BotSiteKey">
+    <form method="post" action="/customer/sign-up" class="customer-portal__form">
+        <AntiforgeryToken />
+        <label>@T["ui.field.first_name"] <input name="firstName" value="@FirstName" autocomplete="given-name" maxlength="100" required /></label>
+        <label>@T["ui.field.last_name"] <input name="lastName" value="@LastName" autocomplete="family-name" maxlength="100" required /></label>
+        <label>@T["ui.field.company"] <input name="companyName" value="@CompanyName" autocomplete="organization" maxlength="150" /></label>
+        <label>@T["ui.field.email"] <input type="email" name="email" value="@Email" autocomplete="email" maxlength="254" required /></label>
+        <label>@T["ui.field.phone"] <input type="tel" name="phone" value="@Phone" autocomplete="tel" maxlength="20" placeholder="+509…" required /></label>
+        <label>@T["ui.field.language"]
+            <select name="language">
+                <option value="en" selected="@(Language == "en")">English</option>
+                <option value="fr" selected="@(Language == "fr")">Français</option>
+                <option value="es" selected="@(Language == "es")">Español</option>
+            </select>
+        </label>
+        <label>@T["ui.field.new_password"] <input type="password" name="password" autocomplete="new-password" minlength="12" maxlength="64" required /></label>
+        @if (BotSiteKey is { Length: > 0 })
+        {
+            <div class="cf-turnstile" data-sitekey="@BotSiteKey" data-language="@Language"></div>
+        }
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.sign_up.submit"]</button>
+    </form>
+    <p>@T["ui.sign_up.have_account"] <a href="/customer/sign-in">@T["ui.sign_in.link"]</a></p>
+</CustomerShell>
+
+@code {
+    [Parameter] public Vixly.Contracts.Operations.Customers.CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public string? FirstName { get; set; }
+
+    [Parameter] public string? LastName { get; set; }
+
+    [Parameter] public string? CompanyName { get; set; }
+
+    [Parameter] public string? Email { get; set; }
+
+    [Parameter] public string? Phone { get; set; }
+
+    [Parameter] public string Language { get; set; } = "en";
+
+    [Parameter] public string? BotSiteKey { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+}

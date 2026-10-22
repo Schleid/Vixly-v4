@@ -1,0 +1,111 @@
+@*
+=========================================================
+FILE: SupplyStockForms.razor
+
+PURPOSE:
+The stock actions at a warehouse (Slice 5E, S-5 to S-7): receive supplies, adjust by hand, send to another warehouse, open a count.
+
+RESPONSIBILITIES:
+- Receiving: the lines with their cost, the supplier and the reference
+- Adjusting: one supply, more or fewer, the reason and a note
+- Sending: the other warehouse and the lines
+- Counting: every supply or one category
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Each form carries a key: sent twice, it moves the stock once (ADR-0019)
+=========================================================
+*@
+<section class="ops-editor__panel" data-tab-label="@T["ui.supplies.stock.receive"]" aria-labelledby="stock-receive">
+    <h2 id="stock-receive">@T["ui.supplies.stock.receive"]</h2>
+    <form method="post" action="/staff/supplies/stock/receive" class="ops-editor__form">
+        <AntiforgeryToken />
+        <input type="hidden" name="warehouse" value="@WarehouseId" />
+        <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+        <SupplyLinesFields T="T" Supplies="Supplies" WithCost="true" />
+        <label class="ops-editor__form-span-3">@T["ui.supplies.stock.supplier"] <input name="supplier" maxlength="@OperationsSupplyStockLimits.SupplierMaxLength" /></label>
+        <label class="ops-editor__form-span-3">@T["ui.supplies.stock.reference"] <input name="reference" maxlength="@OperationsSupplyStockLimits.ReferenceMaxLength" /></label>
+        <div class="ops-editor__form-actions">
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.stock.receive_save"]</button>
+        </div>
+    </form>
+</section>
+<section class="ops-editor__panel" data-tab-label="@T["ui.supplies.stock.adjust"]" aria-labelledby="stock-adjust">
+    <h2 id="stock-adjust">@T["ui.supplies.stock.adjust"]</h2>
+    <form method="post" action="/staff/supplies/stock/adjust" class="ops-editor__form">
+        <AntiforgeryToken />
+        <input type="hidden" name="warehouse" value="@WarehouseId" />
+        <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+        <label class="ops-editor__form-span-3">@T["ui.supplies.stock.supply"]
+            <select name="supply" required>
+                @foreach (OperationsSupply supply in Supplies) { <option value="@supply.Id">@supply.Code · @supply.Name(Language)</option> }
+            </select>
+        </label>
+        <label class="ops-editor__form-span-3">@T["ui.supplies.stock.adjust_quantity"] <input name="quantity" inputmode="numeric" required autocomplete="off" /></label>
+        <p class="ops-editor__hint">@T["ui.supplies.stock.adjust_hint"]</p>
+        <label class="ops-editor__form-span-3">@T["ui.supplies.stock.reason"]
+            <select name="reason" required>
+                @foreach (OperationsSupplyAdjustReason reason in Enum.GetValues<OperationsSupplyAdjustReason>()) { <option value="@reason">@T["ui.supplies.reason." + reason]</option> }
+            </select>
+        </label>
+        <label class="ops-editor__form-span-3">@T["ui.supplies.stock.note"] <input name="note" maxlength="@OperationsSupplyStockLimits.NoteMaxLength" /></label>
+        <div class="ops-editor__form-actions">
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.stock.adjust_save"]</button>
+        </div>
+    </form>
+</section>
+@if (AllWarehouses.Count(item => item.Id != WarehouseId && item.Status == OperationsLocationStatus.Active) > 0)
+{
+    <section class="ops-editor__panel" data-tab-label="@T["ui.supplies.stock.send"]" aria-labelledby="stock-send">
+        <h2 id="stock-send">@T["ui.supplies.stock.send"]</h2>
+        <form method="post" action="/staff/supplies/stock/transfers" class="ops-editor__form">
+            <AntiforgeryToken />
+            <input type="hidden" name="warehouse" value="@WarehouseId" />
+            <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+            <label class="ops-editor__form-span-3">@T["ui.supplies.stock.send_to"]
+                <select name="to" required>
+                    @foreach (OperationsWarehouse other in AllWarehouses.Where(item => item.Id != WarehouseId && item.Status == OperationsLocationStatus.Active)) { <option value="@other.Id">@other.Code · @other.Name</option> }
+                </select>
+            </label>
+            <label class="ops-editor__form-span-3">@T["ui.supplies.stock.note"] <input name="note" maxlength="@OperationsSupplyStockLimits.NoteMaxLength" /></label>
+            <SupplyLinesFields T="T" Supplies="Supplies" />
+            <div class="ops-editor__form-actions">
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.stock.send_save"]</button>
+            </div>
+        </form>
+    </section>
+}
+<section class="ops-editor__panel" data-tab-label="@T["ui.supplies.stock.count"]" aria-labelledby="stock-count">
+    <h2 id="stock-count">@T["ui.supplies.stock.count"]</h2>
+    @if (OpenCountId is { } open)
+    {
+        <p><a class="vx-button vx-button--primary" href="/staff/supplies/stock/counts/@open">@T["ui.supplies.stock.count_continue"]</a></p>
+    }
+    else
+    {
+        <form method="post" action="/staff/supplies/stock/counts" class="ops-list-bar" style="margin-top: 0.5rem;">
+            <AntiforgeryToken />
+            <input type="hidden" name="warehouse" value="@WarehouseId" />
+            <select name="category" aria-label="@T["ui.supplies.category"]" style="min-width: 14rem; height: 32px;">
+                <option value="">@T["ui.supplies.category_all"]</option>
+                @foreach (OperationsSupplyCategory category in Enum.GetValues<OperationsSupplyCategory>()) { <option value="@category">@T["ui.supplies.category." + category]</option> }
+            </select>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.stock.count_open"]</button>
+            <span class="ops-editor__hint" style="margin: 0; margin-inline-start: 0.5rem;">@T["ui.supplies.stock.count_hint"]</span>
+        </form>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public Guid WarehouseId { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsSupply> Supplies { get; set; } = Array.Empty<OperationsSupply>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> AllWarehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public Guid? OpenCountId { get; set; }
+
+    private static string Language => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+}

@@ -1,0 +1,79 @@
+﻿@*
+=========================================================
+FILE: PlanCatalogue.razor
+
+PURPOSE:
+The plan catalogue from Platform: prices, limits, features and trial (Stage 2).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Prices are before tax, in the plan currency
+- Read through PlatformCatalog (5 minutes per language)
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+@inject PlatformCatalog Catalog
+@inject IOptions<PublicSiteOptions> Site
+
+<section class="pub-section">
+    <h1>@T["public.plans.title"]</h1>
+    <p class="pub-lead">@T["public.plans.lead"]</p>
+</section>
+<ErrorBox Error="_result?.Error" />
+@if (_result?.Value is { Count: > 0 } plans)
+{
+    <ul class="pub-plans">
+        @foreach (Vixly.Contracts.Platform.Registration.PlatformPublicPlan plan in plans)
+        {
+            <li class="vx-card pub-plan">
+                <h2>@plan.Name</h2>
+                @if (!string.IsNullOrWhiteSpace(plan.Description))
+                {
+                    <p>@plan.Description</p>
+                }
+                <p class="pub-price">@VixlyText.Format(T, "public.plans.monthly", "price", PlanDisplay.Money(plan.MonthlyPricePerLicence, plan.CurrencyCode))</p>
+                <p class="pub-hint">@VixlyText.Format(T, "public.plans.annual", "price", PlanDisplay.Money(plan.AnnualPricePerLicence, plan.CurrencyCode))</p>
+                <ul class="pub-plan__facts">
+                    <li>@VixlyText.Format(T, "public.plans.minimum", "count", plan.MinimumLicences)</li>
+                    <li>@VixlyText.Format(T, "public.plans.devices", "count", plan.MaxLicensedDevices)</li>
+                    <li>@VixlyText.Format(T, "public.plans.warehouses", "count", plan.MaxWarehouses)</li>
+                    @if (plan.SetupFee > 0m)
+                    {
+                        <li>@VixlyText.Format(T, "public.plans.setup_fee", "price", PlanDisplay.Money(plan.SetupFee, plan.CurrencyCode))</li>
+                    }
+                    @if (plan.TrialDays is int days && days > 0)
+                    {
+                        <li>@VixlyText.Format(T, "public.plans.trial", "days", days)</li>
+                    }
+                    @foreach (string feature in plan.Features.Where(PlanDisplay.Known))
+                    {
+                        <li>@T["public.plans.feature." + feature]</li>
+                    }
+                </ul>
+                <a class="vx-button vx-button--primary" href="@Choose(plan.Code)">@T[Site.Value.RegistrationOpen ? "public.plans.choose" : "public.cta.talk"]</a>
+            </li>
+        }
+    </ul>
+    <p class="pub-hint">@T["public.plans.tax_note"]</p>
+}
+else if (_result is { Succeeded: true })
+{
+    <VxEmptyState Title="@T["public.plans.empty"]" />
+}
+
+@code {
+    private PlatformApiResult<IReadOnlyList<Vixly.Contracts.Platform.Registration.PlatformPublicPlan>>? _result;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _result = await Catalog.PlansAsync(CancellationToken.None);
+    }
+
+    private string Choose(string code)
+    {
+        return Site.Value.RegistrationOpen
+            ? PublicLanguage.Page(PublicLanguage.Current, "register") + "?plan=" + Uri.EscapeDataString(code)
+            : PublicLanguage.Page(PublicLanguage.Current, "contact");
+    }
+}

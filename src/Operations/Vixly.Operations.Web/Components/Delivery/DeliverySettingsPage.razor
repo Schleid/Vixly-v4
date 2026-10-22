@@ -1,0 +1,121 @@
+﻿@*
+=========================================================
+FILE: DeliverySettingsPage.razor
+
+PURPOSE:
+Settings → Delivery (Slice 7 step 3, R-12 to R-15): how drivers record, cash on delivery, the tries, the proof at the door.
+
+RESPONSIBILITIES:
+- Show the company's choices; save them with ops.settings.edit
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.delivery_settings.title"]" Company="@Company" Section="delivery_settings" Error="@Error" Info="@Info">
+    <form method="post" action="/staff/settings/delivery" class="ops-editor__form">
+        <AntiforgeryToken />
+        <section class="ops-editor__panel ops-setting-card" aria-labelledby="delivery-recording-title">
+            <h3 id="delivery-recording-title">@T["ui.delivery_settings.recording"]</h3>
+            <div class="ops-setting-options-grid">
+                @foreach (OperationsDeliveryRecording way in Enum.GetValues<OperationsDeliveryRecording>())
+                {
+                    <label class="ops-toggle-card">
+                        <input type="radio" name="recording" value="@way" checked="@(Recording == way)" disabled="@(!CanEdit)" />
+                        <div class="ops-toggle-card__content">
+                            <span class="ops-toggle-card__title">@T["ui.delivery_settings.recording." + way]</span>
+                        </div>
+                    </label>
+                }
+            </div>
+        </section>
+
+        <section class="ops-editor__panel ops-setting-card" aria-labelledby="delivery-proofs-title">
+            <h3 id="delivery-proofs-title">@T["ui.delivery_settings.proofs"]</h3>
+            <p class="ops-editor__hint" style="margin-bottom: 0.75rem;">@T["ui.delivery_settings.proofs_hint"]</p>
+            <div class="ops-setting-options-grid">
+                @foreach (OperationsDeliveryProofs proof in new[] { OperationsDeliveryProofs.Signature, OperationsDeliveryProofs.Photo, OperationsDeliveryProofs.Id, OperationsDeliveryProofs.Code })
+                {
+                    <label class="ops-toggle-card">
+                        <input type="checkbox" name="proofs" value="@proof" checked="@Proofs.HasFlag(proof)" disabled="@(!CanEdit)" />
+                        <div class="ops-toggle-card__content">
+                            <span class="ops-toggle-card__title">@T["ui.delivery_settings.proof." + proof]</span>
+                        </div>
+                    </label>
+                }
+            </div>
+        </section>
+
+        <div class="ops-charges-duo">
+            <section class="ops-editor__panel ops-setting-card" aria-labelledby="delivery-failed-title">
+                <h3 id="delivery-failed-title">@T["ui.delivery_settings.failed"]</h3>
+                <div style="margin-bottom: 0.75rem;">
+                    <label>
+                        <span class="ops-label-text">@T["ui.delivery_settings.tries"]</span>
+                        <input name="tries" type="number" min="1" max="10" value="@Tries" required disabled="@(!CanEdit)" style="width: 7rem;" />
+                    </label>
+                </div>
+                <div class="ops-setting-options-grid" style="grid-template-columns: 1fr;">
+                    @foreach (OperationsAfterFailedDelivery after in Enum.GetValues<OperationsAfterFailedDelivery>())
+                    {
+                        <label class="ops-toggle-card">
+                            <input type="radio" name="afterFailed" value="@after" checked="@(AfterFailed == after)" disabled="@(!CanEdit)" />
+                            <div class="ops-toggle-card__content">
+                                <span class="ops-toggle-card__title">@T["ui.delivery_settings.after." + after]</span>
+                            </div>
+                        </label>
+                    }
+                </div>
+            </section>
+
+            <section class="ops-editor__panel ops-setting-card" aria-labelledby="delivery-payment-title">
+                <h3 id="delivery-payment-title">@T["ui.delivery_settings.payment"]</h3>
+                <div class="ops-checkbox-group" style="margin-bottom: 0.5rem;">
+                    <label class="ops-checkbox-label">
+                        <input type="checkbox" name="cash" value="true" checked="@CashOnDelivery" disabled="@(!CanEdit)" />
+                        <span>@T["ui.delivery_settings.cash"]</span>
+                    </label>
+                </div>
+                <p class="ops-editor__hint" style="margin-bottom: 1rem;">@T["ui.delivery_settings.cash_hint"]</p>
+
+                <div class="ops-checkbox-group">
+                    <label class="ops-checkbox-label">
+                        <input type="checkbox" name="emails" value="true" checked="@Emails" disabled="@(!CanEdit)" />
+                        <span>@T["ui.delivery_settings.emails"]</span>
+                    </label>
+                </div>
+            </section>
+        </div>
+
+        @if (CanEdit)
+        {
+            <div style="margin-top: 1rem; display: flex; justify-content: flex-start;">
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+            </div>
+        }
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsDeliveryRecording Recording { get; set; }
+
+    [Parameter] public bool CashOnDelivery { get; set; }
+
+    [Parameter] public int Tries { get; set; }
+
+    [Parameter] public OperationsAfterFailedDelivery AfterFailed { get; set; }
+
+    [Parameter] public OperationsDeliveryProofs Proofs { get; set; }
+
+    [Parameter] public bool Emails { get; set; }
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

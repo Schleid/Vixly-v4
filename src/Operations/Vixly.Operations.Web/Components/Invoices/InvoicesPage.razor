@@ -1,0 +1,86 @@
+﻿@*
+=========================================================
+FILE: InvoicesPage.razor
+
+PURPOSE:
+Invoices list (Slice 5F): search, state filter, status chips,
+requests notice, and compact table.
+
+IMPORTANT NOTES:
+- Page component (UI-6): <= 80 lines
+- Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.invoices.title"]" Company="@Company" Section="invoices" Error="@Error" Info="@Info">
+    @if (Requests > 0)
+    {
+        <div class="ops-list-badge">
+            <a href="/staff/invoices/credits">@VixlyText.Format(T, "ui.invoices.requests_waiting", "count", Requests)</a>
+        </div>
+    }
+    <form method="get" action="/staff/invoices" class="ops-list-bar" role="search">
+        <input name="q" value="@Text" maxlength="80" placeholder="@T["ui.invoices.search"]" class="ops-editor__search-input" autofocus style="width: 16rem;" />
+        <select name="state" aria-label="@T["ui.invoices.state"]">
+            @foreach (OperationsInvoiceFilter filter in Enum.GetValues<OperationsInvoiceFilter>())
+            {
+                <option value="@filter" selected="@(filter == Filter)">@T["ui.invoices.filter." + filter]</option>
+            }
+        </select>
+        <button type="submit" class="vx-button vx-button--secondary">@T["ui.invoices.find"]</button>
+        @if (!string.IsNullOrEmpty(Text) || Filter != OperationsInvoiceFilter.All)
+        {
+            <a href="/staff/invoices" class="vx-button vx-button--secondary">@T["ui.customers.clear"]</a>
+        }
+    </form>
+    @if (Invoices.Count == 0)
+    {
+        <div class="ops-editor__empty"><p>@T[Denied ? "ui.invoices.denied" : "ui.invoices.none"]</p></div>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.invoices.title"]">
+            <table class="ops-editor__table">
+                <thead>
+                    <tr>
+                        <th scope="col" class="ops-editor__identity-cell">@T["ui.invoices.number"]</th>
+                        <th scope="col">@T["ui.invoices.date"]</th>
+                        <th scope="col">@T["ui.invoices.reference"]</th>
+                        <th scope="col">@T["ui.invoices.customer"]</th>
+                        <th scope="col">@T["ui.invoices.warehouse"]</th>
+                        <th scope="col" class="ops-editor__number">@T["ui.invoices.total"]</th>
+                        <th scope="col" class="ops-editor__number">@T["ui.invoices.owed"]</th>
+                        <th scope="col">@T["ui.invoices.state"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (OperationsInvoiceRow row in Invoices)
+                    {
+                        <tr>
+                            <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/invoices/@row.InvoiceId">@row.Number</a></td>
+                            <td>@OperationsInvoiceWords.Day(row.IssuedOn)</td>
+                            <td>@row.Reference</td>
+                            <td>@row.Customer</td>
+                            <td>@row.WarehouseCode</td>
+                            <td class="ops-editor__number">@OperationsInvoiceWords.Money(row.Total, row.CurrencyCode)</td>
+                            <td class="ops-editor__number">@OperationsInvoiceWords.Money(Math.Max(row.Owed, 0m), row.CurrencyCode)</td>
+                            <td><span class="ops-editor__status" data-status="@OperationsInvoiceWords.State(row.Voided, row.Owed, row.Credited, row.Pending)">@T["ui.invoices.status." + OperationsInvoiceWords.State(row.Voided, row.Owed, row.Credited, row.Pending)]</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+    [Parameter] public IReadOnlyList<OperationsInvoiceRow> Invoices { get; set; } = Array.Empty<OperationsInvoiceRow>();
+    [Parameter] public int Requests { get; set; }
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public OperationsInvoiceFilter Filter { get; set; }
+    [Parameter] public bool Denied { get; set; }
+    [Parameter] public string? Error { get; set; }
+    [Parameter] public string? Info { get; set; }
+}

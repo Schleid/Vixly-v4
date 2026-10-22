@@ -1,0 +1,51 @@
+﻿@*
+=========================================================
+FILE: ShipmentInstructionsPanel.razor
+
+PURPOSE:
+Where a parcel's shipment goes, who receives it and the options, as the customer wrote them (owner, 2026-10-18).
+
+RESPONSIBILITIES:
+- Show the destination (pickup branch or address), the recipient and phone, consolidation, refrigeration and insurance
+- Say when the customer has not given instructions yet
+
+IMPORTANT NOTES:
+- Markup only; the caller passes its localizer. Staff read the instructions; only the customer writes them (D-C6)
+=========================================================
+*@
+@using Vixly.Operations.Application.Shipments
+@using Vixly.Operations.Domain.Shipments
+@* A parcel nobody owns yet has no shipment: nothing is shown. *@
+@if (Shipment is not null)
+{
+<section class="ops-editor__panel" aria-labelledby="shipment-instructions">
+    <h2 id="shipment-instructions">@T["ui.shipment.title"]</h2>
+    @if (Shipment is not { HasInstructions: true } shipment)
+    {
+        <p>@T["ui.shipment.no_instructions"]</p>
+    }
+    else
+    {
+        <dl>
+            <dt>@T["ui.shipment.destination"]</dt>
+            <dd>@(shipment.BranchId is null ? string.Join(", ", new[] { shipment.Address?.Line1, shipment.Address?.Line2, shipment.Address?.City, shipment.Address?.PostalCode, shipment.CountryCode }.Where(part => !string.IsNullOrWhiteSpace(part))) : VixlyText.Format(T, "ui.shipment.pickup_at", "branch", shipment.BranchName ?? string.Empty))</dd>
+            <dt>@T["ui.shipment.recipient"]</dt><dd>@shipment.RecipientName · @shipment.RecipientPhone</dd>
+            <dt>@T["ui.shipment.service"]</dt><dd>@(shipment.ServiceCode is { } service ? T["ui.services.name." + service].Value : T["ui.shipment.service_any"].Value)</dd>
+            <dt>@T["ui.shipment.options"]</dt>
+            <dd>
+                @if (shipment.Options == OperationsShipmentOptions.None) { @T["ui.shipment.no_options"] }
+                @foreach (OperationsShipmentOptions option in new[] { OperationsShipmentOptions.Consolidate, OperationsShipmentOptions.Refrigerated, OperationsShipmentOptions.Insured, OperationsShipmentOptions.FreightCollect }.Where(item => shipment.Options.HasFlag(item)))
+                {
+                    <span class="ops-editor__status" data-status="@option.ToString().ToLowerInvariant()">@T["ui.shipment.option." + option.ToString().ToLowerInvariant()]</span>
+                }
+            </dd>
+        </dl>
+    }
+</section>
+}
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public OperationsCustomerShipment? Shipment { get; set; }
+}

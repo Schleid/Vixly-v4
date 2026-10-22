@@ -1,0 +1,62 @@
+﻿@*
+=========================================================
+FILE: VerifyPaymentsPage.razor
+
+PURPOSE:
+To verify (Slice 5F, C-6): Zelle and bank transfers waiting for finance; received with the bank reference, or not received with why.
+
+RESPONSIBILITIES:
+- List each waiting tender with the invoice, customer, amount, date and confirmation number
+- Mark it received or not received
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Not received: the invoice is owed again and the customer gets an email
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.payments_verify.title"]" Company="@Company" Section="verify" Error="@Error" Info="@Info">
+    @if (!Payments.Any(payment => payment.Tenders.Any(tender => tender.Status == OperationsTenderStatus.AwaitingConfirmation)))
+    {
+        <div class="ops-editor__empty"><p>@T["ui.payments_verify.none"]</p></div>
+    }
+    <ul class="ops-invoice__credits ops-cashier__verify">
+        @foreach (OperationsPayment payment in Payments)
+        {
+            @foreach (OperationsPaymentTender tender in payment.Tenders.Where(tender => tender.Status == OperationsTenderStatus.AwaitingConfirmation))
+            {
+                <li>
+                    <strong>@T["ui.payments.method." + tender.Method] · @OperationsInvoiceWords.Money(tender.Amount, payment.CurrencyCode)</strong>
+                    · @payment.Number · @payment.TakenUtc.ToString("g", CultureInfo.CurrentCulture)
+                    @if (Invoices.TryGetValue(payment.InvoiceId, out OperationsInvoice? invoice))
+                    {
+                        <span> · @invoice.Number · @invoice.Reference · @OperationsBillingRows.Customer(invoice)</span>
+                    }
+                    @if (tender.Reference is { } reference)
+                    {
+                        <span> · @VixlyText.Format(T, "ui.payments_verify.confirmation", "number", reference)</span>
+                    }
+                    <form method="post" action="/staff/cashier/verify/@payment.Id/@tender.Id" class="ops-editor__inline">
+                        <AntiforgeryToken />
+                        <label>@T["ui.payments_verify.note"] <input name="note" maxlength="500" size="24" /></label>
+                        <button type="submit" name="received" value="true" class="vx-button vx-button--primary">@T["ui.payments_verify.received"]</button>
+                        <button type="submit" name="received" value="false" class="vx-button vx-button--secondary">@T["ui.payments_verify.not_received"]</button>
+                    </form>
+                </li>
+            }
+        }
+    </ul>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsPayment> Payments { get; set; } = Array.Empty<OperationsPayment>();
+
+    [Parameter] public IReadOnlyDictionary<Guid, OperationsInvoice> Invoices { get; set; } = new Dictionary<Guid, OperationsInvoice>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

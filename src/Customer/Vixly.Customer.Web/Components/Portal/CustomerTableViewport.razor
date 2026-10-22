@@ -1,0 +1,16 @@
+﻿@*
+=========================================================
+FILE: CustomerTableViewport.razor
+PURPOSE: Keep wide customer records usable on handheld screens.
+RESPONSIBILITIES: Provide a named keyboard-scrollable table region.
+IMPORTANT NOTES: No data or workflow behavior.
+=========================================================
+*@
+<div class="customer-table-viewport" role="region" aria-label="@Label" tabindex="0">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

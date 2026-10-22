@@ -1,0 +1,51 @@
+﻿@*
+=========================================================
+FILE: CounterCustomerCard.razor
+
+PURPOSE:
+The customer at the counter, shown so it cannot be missed: who they are and where they stand (owner, 2026-10-20: "it has to call for attention").
+
+RESPONSIBILITIES:
+- Name, company, code, phone, email, customer since
+- Standing: good, or not and why, announced to screen readers when not
+- Their figures: shipments open and final, parcels on hold, last shipment
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Not in good standing: the pages show no new shipment and no parcel entry
+- Contact details and counts only: no credit, balances or notes (C-9)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<section class="ops-counter__customer" data-standing="@(Standing.Good ? "good" : "bad")" aria-label="@T["ui.counter.customer"]">
+    <div class="ops-counter__who">
+        <h2>@if (Link) { <a href="/staff/counter/customers/@Customer.Id">@Customer.Name</a> } else { @Customer.Name }</h2>
+        @if (Customer.CompanyName is { } company) { <p class="ops-counter__company">@company</p> }
+        <dl class="ops-counter__contact">
+            <div><dt>@T["ui.counter.code"]</dt><dd class="ops-counter__code">@(Customer.Code ?? "—")</dd></div>
+            <div><dt>@T["ui.counter.phone"]</dt><dd>@Customer.Phone</dd></div>
+            <div><dt>@T["ui.counter.email"]</dt><dd>@Customer.Email</dd></div>
+            <div><dt>@T["ui.counter.since"]</dt><dd>@Standing.MemberSinceUtc.ToString("d", CultureInfo.CurrentCulture)</dd></div>
+        </dl>
+    </div>
+    <div class="ops-counter__standing" role="@(Standing.Good ? "status" : "alert")">
+        <strong>@(Standing.Good ? T["ui.counter.standing.good"] : T["ui.counter.standing.bad"])</strong>
+        @if (Standing.Reason is { } reason) { <p>@T["ui.counter.standing." + reason]</p> }
+    </div>
+    <dl class="ops-counter__figures">
+        <div><dt>@T["ui.counter.figures.open"]</dt><dd>@Standing.OpenShipments</dd></div>
+        <div><dt>@T["ui.counter.figures.final"]</dt><dd>@Standing.FinalShipments</dd></div>
+        <div data-attention="@(Standing.ParcelsOnHold > 0 ? "true" : null)"><dt>@T["ui.counter.figures.on_hold"]</dt><dd>@Standing.ParcelsOnHold</dd></div>
+        <div><dt>@T["ui.counter.figures.last"]</dt><dd>@(Standing.LastShipmentUtc?.ToString("d", CultureInfo.CurrentCulture) ?? "—")</dd></div>
+    </dl>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public OperationsCounterCustomer Customer { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsCounterStanding Standing { get; set; } = null!;
+
+    // On the shipment page, the name leads back to the customer.
+    [Parameter] public bool Link { get; set; }
+}

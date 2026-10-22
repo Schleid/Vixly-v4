@@ -1,0 +1,58 @@
+﻿@*
+=========================================================
+FILE: CarriersPage.razor
+
+PURPOSE:
+The company's carriers (Slice 6B, D-1).
+
+RESPONSIBILITIES:
+- List the carriers with their kind and account
+- Add a carrier
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- ops.carriers.manage
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.carriers.title"]" Company="@Company" Section="carriers" Error="@Error" Info="@Info">
+    <section class="ops-editor__panel" aria-labelledby="carriers-title">
+        <h2 id="carriers-title">@T["ui.carriers.list"]</h2>
+        @if (Carriers.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.carriers.none"]</p></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.carriers.list"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.carriers.name"]</th><th scope="col">@T["ui.carriers.kind"]</th><th scope="col">@T["ui.carriers.account"]</th><th scope="col">@T["ui.carriers.prefix"]</th><th scope="col">@T["ui.carriers.state"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsCarrier carrier in Carriers)
+                        {
+                            <tr>
+                                <td class="ops-editor__identity-cell"><a href="/staff/carriers/@carrier.Id">@carrier.Name</a></td>
+                                <td>@T["ui.dispatch.mode." + OperationsDispatching.Mode(carrier.Kind)]</td>
+                                <td class="ops-editor__code">@carrier.AccountNumber</td>
+                                <td class="ops-editor__code">@carrier.AirlinePrefix</td>
+                                <td>@T[carrier.IsActive ? "ui.carriers.active" : "ui.carriers.inactive"]</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+    </section>
+    <CarrierForm />
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsCarrier> Carriers { get; set; } = Array.Empty<OperationsCarrier>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

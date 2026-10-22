@@ -1,0 +1,114 @@
+﻿@*
+=========================================================
+FILE: RepackBoxPage.razor
+
+PURPOSE:
+One repack box (Slice 6A, D-4): scan its shipment's parcels in, close it with its weight and size, print its label.
+
+RESPONSIBILITIES:
+- Show each parcel of the shipment: in the box, or where it is
+- Scan in and take out while open; close once every parcel is in; void it while in no bundle (ship manager)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- A closed box goes into a bundle at the fill station with all its parcels
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@VixlyText.Format(T, "ui.boxes.box_title", "number", Box.Number)" Company="@Company" Section="bundles" Error="@Error" Info="@Info">
+    <p class="ops-editor__actions">
+        <a href="/staff/bundles/boxes">@T["ui.boxes.back"]</a>
+        @if (Box.Status != OperationsRepackBoxStatus.Voided) { <a class="vx-button vx-button--secondary" href="/staff/bundles/boxes/@Box.Id/label" target="_blank" rel="noopener">@T["ui.bundles.label"]</a> }
+    </p>
+    <section class="ops-editor__panel" aria-labelledby="box-title">
+        <h2 id="box-title"><a href="/staff/shipments/@Shipment.Id">@Shipment.Number</a> · @Warehouse.Code · @T["ui.boxes.status." + Box.Status]</h2>
+        <p>@VixlyText.Format(T, "ui.boxes.counts", new Dictionary<string, object> { ["inside"] = Parcels.Count(parcel => parcel.BoxId == Box.Id), ["total"] = Parcels.Count })</p>
+        @if (Box.WeightKg is { } weight) { <p>@OperationsBundleWords.Weight(weight, WeightUnit) · @OperationsBundleWords.Size(Box.LengthCm, Box.WidthCm, Box.HeightCm, DimensionUnit)</p> }
+        @if (BundleNumber is { } bundle) { <p>@VixlyText.Format(T, "ui.bundles.in_bundle", "number", bundle)</p> }
+        @if (Box.VoidReason is { } reason) { <p>@T["ui.bundles.void_reason"]: @reason</p> }
+        @if (Box.Status == OperationsRepackBoxStatus.Open && CanFill)
+        {
+            <form method="post" action="/staff/bundles/boxes/@Box.Id/scan" class="ops-editor__search ops-bundle-fill__scan">
+                <AntiforgeryToken />
+                <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+                <label>@T["ui.bundles.scan_parcel"] <input name="code" maxlength="40" autocomplete="off" autofocus required /></label>
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.bundles.add"]</button>
+            </form>
+        }
+    </section>
+    <OperationsTableViewport Label="@T["ui.bundles.parcels"]">
+        <table class="ops-editor__table">
+            <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.parcels.number"]</th><th scope="col">@T["ui.boxes.where"]</th><th scope="col" class="ops-editor__number">@T["ui.bundles.weight"]</th><th scope="col"></th></tr></thead>
+            <tbody>
+                @foreach (OperationsParcel parcel in Parcels)
+                {
+                    <tr data-in-box="@(parcel.BoxId == Box.Id)">
+                        <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/parcels/@parcel.Id">@parcel.Number</a></td>
+                        <td>@(parcel.BoxId == Box.Id ? T["ui.boxes.in_box"].Value : parcel.StorageLocationId is { } shelf && Shelves.TryGetValue(shelf, out string? code) ? VixlyText.Format(T, "ui.bundles.on_shelf", "shelf", code) : T["ui.bundles.no_shelf"].Value)</td>
+                        <td class="ops-editor__number">@(parcel.WeightKg is { } kg ? OperationsBundleWords.Weight(kg, WeightUnit) : "—")</td>
+                        <td>
+                            @if (Box.Status == OperationsRepackBoxStatus.Open && CanFill && parcel.BoxId == Box.Id)
+                            {
+                                <form method="post" action="/staff/bundles/boxes/@Box.Id/take-out" class="ops-editor__inline">
+                                    <AntiforgeryToken />
+                                    <input type="hidden" name="parcel" value="@parcel.Id" />
+                                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.bundles.take_out"]</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </OperationsTableViewport>
+    @if (Box.Status == OperationsRepackBoxStatus.Open && (CanFill || CanManage) && Box.ParcelCount > 0)
+    {
+        <form method="post" action="/staff/bundles/boxes/@Box.Id/close" class="ops-editor__panel ops-editor__form" aria-labelledby="close-title">
+            <AntiforgeryToken />
+            <h2 id="close-title">@T["ui.boxes.close"]</h2>
+            <label>@VixlyText.Format(T, "ui.bundles.gross_weight", "unit", WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg") <input name="weight" inputmode="decimal" size="7" required /></label>
+            <label>@VixlyText.Format(T, "ui.bundles.length", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm") <input name="length" inputmode="decimal" size="6" required /></label>
+            <label>@VixlyText.Format(T, "ui.bundles.width", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm") <input name="width" inputmode="decimal" size="6" required /></label>
+            <label>@VixlyText.Format(T, "ui.bundles.height", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm") <input name="height" inputmode="decimal" size="6" required /></label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.boxes.close_button"]</button>
+        </form>
+    }
+    @if (CanManage && Box.Status != OperationsRepackBoxStatus.Voided && Box.BundleId is null)
+    {
+        <form method="post" action="/staff/bundles/boxes/@Box.Id/void" class="ops-editor__panel ops-editor__form" aria-labelledby="void-title">
+            <AntiforgeryToken />
+            <h2 id="void-title">@T["ui.boxes.void"]</h2>
+            <label>@T["ui.bundles.void_reason"] <input name="reason" maxlength="@OperationsBundleLimits.ReasonMaxLength" required /></label>
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.bundles.void_button"]</button>
+        </form>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsRepackBox Box { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsShipment Shipment { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsWarehouse Warehouse { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsParcel> Parcels { get; set; } = Array.Empty<OperationsParcel>();
+
+    [Parameter] public IReadOnlyDictionary<Guid, string> Shelves { get; set; } = new Dictionary<Guid, string>();
+
+    [Parameter] public string? BundleNumber { get; set; }
+
+    [Parameter] public bool CanManage { get; set; }
+
+    [Parameter] public bool CanFill { get; set; }
+
+    [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
+
+    [Parameter] public OperationsDimensionUnit DimensionUnit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

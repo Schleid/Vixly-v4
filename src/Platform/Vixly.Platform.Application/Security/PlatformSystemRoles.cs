@@ -82,6 +82,7 @@ public static class PlatformSystemRoles
                 PlatformPermissions.TenantsReactivate,
                 PlatformPermissions.TenantsDeactivate,
                 PlatformPermissions.TenantsBan,
+                PlatformPermissions.TenantsReviewChanges,
                 PlatformPermissions.PlansView,
                 PlatformPermissions.PlansManage,
                 PlatformPermissions.PlansPublish,
@@ -115,7 +116,9 @@ public static class PlatformSystemRoles
                 PlatformPermissions.LegalManage,
                 PlatformPermissions.LegalPublish,
                 PlatformPermissions.LegalRemind,
-                PlatformPermissions.LegalRecordAcceptance
+                PlatformPermissions.LegalRecordAcceptance,
+                PlatformPermissions.LeadsView,
+                PlatformPermissions.LeadsManage
             },
             [Salesperson] = new[]
             {
@@ -128,7 +131,9 @@ public static class PlatformSystemRoles
                 PlatformPermissions.PromotionsManage,
                 PlatformPermissions.SubscriptionsCharges,
                 PlatformPermissions.LegalView,
-                PlatformPermissions.LegalRemind
+                PlatformPermissions.LegalRemind,
+                PlatformPermissions.LeadsView,
+                PlatformPermissions.LeadsManage
             },
             [SalesManager] = new[]
             {
@@ -148,7 +153,9 @@ public static class PlatformSystemRoles
                 PlatformPermissions.CollectionsView,
                 PlatformPermissions.CollectionsExtendBeyondLimit,
                 PlatformPermissions.LegalView,
-                PlatformPermissions.LegalRemind
+                PlatformPermissions.LegalRemind,
+                PlatformPermissions.LeadsView,
+                PlatformPermissions.LeadsManage
             },
             [ChiefFinancialOfficer] = new[]
             {

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: PaymentsSettingsForm.razor
 
@@ -36,61 +36,73 @@ IMPORTANT NOTES:
     }
     else if (Presenter.State.Account is { } account)
     {
-        <VxCard Title="@T["ui.payments_settings.provider"]">
-            <dl class="vx-facts">
-                <dt>@T["ui.payments_settings.provider"]</dt>
-                <dd>@T[PaymentsDisplay.ProviderKey(account.Provider)]</dd>
-                <dt>@T["ui.payments_settings.mode"]</dt>
-                <dd><VxStatusBadge Status="@(account.Mode == Vixly.Platform.Domain.Payments.PlatformPaymentMode.Live ? VxBadgeStatus.Success : VxBadgeStatus.Warning)" Text="@T[PaymentsDisplay.ModeKey(account.Mode)]" /></dd>
-                <dt>@T["ui.payments_settings.keys"]</dt>
-                <dd>
-                    @if (account.ProviderConfigured)
-                    {
-                        <VxStatusBadge Status="VxBadgeStatus.Active" Text="@T["ui.payments_settings.keys_configured"]" />
-                    }
-                    else
-                    {
-                        <VxStatusBadge Status="VxBadgeStatus.Danger" Text="@Errors.Describe(Vixly.Shared.Kernel.Errors.Error.Create(account.ProviderProblemCode ?? "platform.payments.secret_missing"))" />
-                    }
-                    <span class="vx-hint">@T["ui.payments_settings.keys_help"]</span>
-                </dd>
-                <dt>@T["ui.payments_settings.last_check"]</dt>
-                <dd>
-                    @(account.LastCheckedUtc is null ? T["ui.common.none"].Value : PlatformDisplay.Utc(T, account.LastCheckedUtc))
-                    @if (account.LastCheckedUtc is not null)
-                    {
-                        <VxStatusBadge Status="@(account.LastCheckSucceeded ? VxBadgeStatus.Success : VxBadgeStatus.Danger)" Text="@T[account.LastCheckSucceeded ? "ui.payments_settings.check_ok" : "ui.payments_settings.check_failed"]" />
-                    }
-                </dd>
-                <dt>@T["ui.payments_settings.status"]</dt>
-                <dd><VxStatusBadge Status="@(account.Ready ? VxBadgeStatus.Success : VxBadgeStatus.Deactivated)" Text="@T[account.Ready ? "ui.payments_settings.ready" : "ui.payments_settings.not_ready"]" /></dd>
-            </dl>
-            @if (Presenter.State.CanEdit)
-            {
-                <div class="vx-actions">
-                    <VxButton OnClick="Presenter.CheckAsync" IsBusy="@Presenter.IsBusy">@T["ui.payments_settings.check"]</VxButton>
-                </div>
-            }
-        </VxCard>
-        <VxCard Title="@T["ui.payments_settings.cards"]">
-            <form class="vx-form" @onsubmit="SaveAsync">
-                <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)">
-                    <label for="payments-key">@T["ui.payments_settings.publishable_key"]</label>
-                    <input id="payments-key" @bind="_key" maxlength="255" autocomplete="off" aria-describedby="payments-key-help" />
-                    <p id="payments-key-help" class="vx-hint">@T["ui.payments_settings.publishable_key_help"]</p>
-                    <label for="payments-currencies">@T["ui.payments_settings.currencies"]</label>
-                    <input id="payments-currencies" @bind="_currencies" maxlength="60" aria-describedby="payments-currencies-help" />
-                    <p id="payments-currencies-help" class="vx-hint">@T["ui.payments_settings.currencies_help"]</p>
-                    <label><input type="checkbox" @bind="_enabled" /> @T["ui.payments_settings.enabled"]</label>
-                </fieldset>
+        <div class="vx-cards-duo">
+            <!-- Card 1: Card Provider Telemetry & Check -->
+            <VxCard Title="@T["ui.payments_settings.provider"]">
+                <dl class="vx-facts">
+                    <dt>@T["ui.payments_settings.provider"]</dt>
+                    <dd>@T[PaymentsDisplay.ProviderKey(account.Provider)]</dd>
+                    <dt>@T["ui.payments_settings.mode"]</dt>
+                    <dd><VxStatusBadge Status="@(account.Mode == Vixly.Platform.Domain.Payments.PlatformPaymentMode.Live ? VxBadgeStatus.Success : VxBadgeStatus.Warning)" Text="@T[PaymentsDisplay.ModeKey(account.Mode)]" /></dd>
+                    <dt>@T["ui.payments_settings.keys"]</dt>
+                    <dd>
+                        @if (account.ProviderConfigured)
+                        {
+                            <VxStatusBadge Status="VxBadgeStatus.Active" Text="@T["ui.payments_settings.keys_configured"]" />
+                        }
+                        else
+                        {
+                            <VxStatusBadge Status="VxBadgeStatus.Danger" Text="@Errors.Describe(Vixly.Shared.Kernel.Errors.Error.Create(account.ProviderProblemCode ?? "platform.payments.secret_missing"))" />
+                        }
+                        <span class="vx-hint" style="display: block; width: 100%;">@T["ui.payments_settings.keys_help"]</span>
+                    </dd>
+                    <dt>@T["ui.payments_settings.last_check"]</dt>
+                    <dd>
+                        @(account.LastCheckedUtc is null ? T["ui.common.none"].Value : PlatformDisplay.Utc(T, account.LastCheckedUtc))
+                        @if (account.LastCheckedUtc is not null)
+                        {
+                            <VxStatusBadge Status="@(account.LastCheckSucceeded ? VxBadgeStatus.Success : VxBadgeStatus.Danger)" Text="@T[account.LastCheckSucceeded ? "ui.payments_settings.check_ok" : "ui.payments_settings.check_failed"]" />
+                        }
+                    </dd>
+                    <dt>@T["ui.payments_settings.status"]</dt>
+                    <dd><VxStatusBadge Status="@(account.Ready ? VxBadgeStatus.Success : VxBadgeStatus.Deactivated)" Text="@T[account.Ready ? "ui.payments_settings.ready" : "ui.payments_settings.not_ready"]" /></dd>
+                </dl>
                 @if (Presenter.State.CanEdit)
                 {
-                    <div class="vx-actions">
-                        <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.payments_settings.save"]</VxButton>
+                    <div class="vx-actions" style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--vx-color-border);">
+                        <VxButton OnClick="Presenter.CheckAsync" IsBusy="@Presenter.IsBusy">@T["ui.payments_settings.check"]</VxButton>
                     </div>
                 }
-            </form>
-        </VxCard>
+            </VxCard>
+
+            <!-- Card 2: Card Payments Configuration -->
+            <VxCard Title="@T["ui.payments_settings.cards"]">
+                <form class="vx-form" @onsubmit="SaveAsync" style="height: 100%; display: flex; flex-direction: column;">
+                    <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)" style="border: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem;">
+                        <div class="vx-field-compact">
+                            <label for="payments-key">@T["ui.payments_settings.publishable_key"]</label>
+                            <input id="payments-key" @bind="_key" maxlength="255" autocomplete="off" aria-describedby="payments-key-help" placeholder="pk_test_... or pk_live_..." />
+                            <p id="payments-key-help" class="vx-hint">@T["ui.payments_settings.publishable_key_help"]</p>
+                        </div>
+                        <div class="vx-field-compact">
+                            <label for="payments-currencies">@T["ui.payments_settings.currencies"]</label>
+                            <input id="payments-currencies" @bind="_currencies" maxlength="60" aria-describedby="payments-currencies-help" placeholder="USD, EUR" />
+                            <p id="payments-currencies-help" class="vx-hint">@T["ui.payments_settings.currencies_help"]</p>
+                        </div>
+                        <div class="vx-toggle-box" style="margin-top: 0.25rem;">
+                            <input type="checkbox" @bind="_enabled" id="payments-enabled-checkbox" />
+                            <label for="payments-enabled-checkbox" class="vx-toggle-box__label" style="cursor: pointer; margin: 0;">@T["ui.payments_settings.enabled"]</label>
+                        </div>
+                    </fieldset>
+                    @if (Presenter.State.CanEdit)
+                    {
+                        <div class="vx-actions" style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--vx-color-border);">
+                            <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.payments_settings.save"]</VxButton>
+                        </div>
+                    }
+                </form>
+            </VxCard>
+        </div>
         @if (Presenter.State.StepUpPending)
         {
             <StepUpDialog OnConfirmed="SaveAsync" OnCancelled="Presenter.CancelStepUp" />

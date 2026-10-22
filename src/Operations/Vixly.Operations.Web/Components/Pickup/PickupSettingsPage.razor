@@ -1,0 +1,104 @@
+﻿@*
+=========================================================
+FILE: PickupSettingsPage.razor
+
+PURPOSE:
+Settings → Pickup (Slice 7 step 2, R-4, R-5, R-10): the proof asked at the counter, destination charges, storage at the destination.
+
+RESPONSIBILITIES:
+- Four proof checkboxes, the charges switch, the storage switch with its free days and fee
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Read only without the right to edit settings
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.pickup_settings.title"]" Company="@Company" Section="pickup_settings" Error="@Error" Info="@Info">
+    <form method="post" action="/staff/settings/pickup" class="ops-editor__form">
+        <AntiforgeryToken />
+        <section class="ops-editor__panel ops-setting-card" aria-labelledby="pickup-proofs-title">
+            <h3 id="pickup-proofs-title">@T["ui.pickup_settings.proofs"]</h3>
+            <p class="ops-editor__hint" style="margin-bottom: 0.75rem;">@T["ui.pickup_settings.proofs_hint"]</p>
+            <div class="ops-setting-options-grid">
+                @foreach (OperationsPickupProofs proof in new[] { OperationsPickupProofs.Id, OperationsPickupProofs.Signature, OperationsPickupProofs.Code, OperationsPickupProofs.Photo })
+                {
+                    <label class="ops-toggle-card">
+                        <input type="checkbox" name="proofs" value="@proof" checked="@Proofs.HasFlag(proof)" disabled="@(!CanEdit)" />
+                        <div class="ops-toggle-card__content">
+                            <span class="ops-toggle-card__title">@T["ui.pickup_settings.proof." + proof]</span>
+                        </div>
+                    </label>
+                }
+            </div>
+        </section>
+
+        <div class="ops-charges-duo">
+            <section class="ops-editor__panel ops-setting-card" aria-labelledby="pickup-charges-title">
+                <h3 id="pickup-charges-title">@T["ui.pickup_settings.charges"]</h3>
+                <div class="ops-checkbox-group" style="margin-bottom: 0.5rem;">
+                    <label class="ops-checkbox-label">
+                        <input type="checkbox" name="charges" value="true" checked="@DestinationCharges" disabled="@(!CanEdit)" />
+                        <span>@T["ui.pickup_settings.charges"]</span>
+                    </label>
+                </div>
+                <p class="ops-editor__hint">@T["ui.pickup_settings.charges_hint"]</p>
+            </section>
+
+            <section class="ops-editor__panel ops-setting-card" aria-labelledby="pickup-storage-title">
+                <h3 id="pickup-storage-title">@T["ui.pickup_settings.storage_title"]</h3>
+                <div class="ops-checkbox-group" style="margin-bottom: 0.75rem;">
+                    <label class="ops-checkbox-label">
+                        <input type="checkbox" name="storage" value="true" checked="@DestinationStorage" disabled="@(!CanEdit)" />
+                        <span>@T["ui.pickup_settings.storage"]</span>
+                    </label>
+                </div>
+                <div class="ops-charges-duo" style="margin-bottom: 0.5rem;">
+                    <div>
+                        <label>
+                            <span class="ops-label-text">@T["ui.pickup_settings.free_days"]</span>
+                            <input name="freeDays" type="number" min="0" max="365" value="@FreeDays" required disabled="@(!CanEdit)" />
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <span class="ops-label-text">@VixlyText.Format(T, "ui.pickup_settings.fee", "currency", CurrencyCode)</span>
+                            <input name="fee" type="number" min="0" step="0.01" value="@FeePerDay?.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)" disabled="@(!CanEdit)" />
+                        </label>
+                    </div>
+                </div>
+                <p class="ops-editor__hint">@T["ui.pickup_settings.storage_hint"]</p>
+            </section>
+        </div>
+
+        @if (CanEdit)
+        {
+            <div style="margin-top: 1rem; display: flex; justify-content: flex-start;">
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+            </div>
+        }
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsPickupProofs Proofs { get; set; }
+
+    [Parameter] public bool DestinationCharges { get; set; }
+
+    [Parameter] public bool DestinationStorage { get; set; }
+
+    [Parameter] public int FreeDays { get; set; }
+
+    [Parameter] public decimal? FeePerDay { get; set; }
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

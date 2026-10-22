@@ -1,0 +1,44 @@
+﻿@*
+=========================================================
+FILE: RecoveryPage.razor
+
+PURPOSE:
+Sign-in step 2 with a recovery code.
+
+RESPONSIBILITIES:
+- Render sign-in step 2 with a recovery code
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<AuthShell Title="@T["ui.recovery.title"]" Company="@Company">
+    <FormMessage Error="@Error" />
+    <form method="post" action="/staff/sign-in/recovery" class="vx-form">
+        <AntiforgeryToken />
+        <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+        <div class="vx-field">
+            <label for="code" class="vx-label">@T["ui.recovery.code_label"]</label>
+            <input id="code" name="code" class="vx-input" autocomplete="off" maxlength="20" required autofocus />
+        </div>
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.recovery.submit"]</VxButton>
+    </form>
+    <div class="vx-auth__links">
+        <p><a href="/staff">@T["ui.signin.back"]</a></p>
+    </div>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string? Company { get; set; }
+
+    [Parameter]
+    public string ReturnUrl { get; set; } = "/";
+
+    [Parameter]
+    public string? Error { get; set; }
+}

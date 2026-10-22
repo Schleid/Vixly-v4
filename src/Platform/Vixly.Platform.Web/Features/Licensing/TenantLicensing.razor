@@ -14,10 +14,14 @@ IMPORTANT NOTES:
   the Frontend/UI team designs it
 - Hidden for staff without platform.licensing.view
 - Links go to the owner's email only; staff never see them
+- Owner support (D-O13): the identity check and reason are
+  required; a second-factor reset needs a second staff member
 =========================================================
 *@
 @inherits PlatformPresenterComponent<TenantLicensingPresenter>
 @using Vixly.Platform.Application.Security
+@using Vixly.Platform.Application.UseCases.Licensing
+@using Vixly.Platform.Domain.Licensing
 @inject IStringLocalizer<PlatformText> T
 @inject PlatformErrorText Errors
 
@@ -48,23 +52,72 @@ IMPORTANT NOTES:
                     }
                 </dd>
                 <dt>@T["ui.licensing.pending"]</dt>
-                <dd><a href="/devices?tenant=@TenantId&status=Pending">@summary.Counts.Pending</a></dd>
+                <dd>@summary.Counts.Pending</dd>
                 <dt>@T["ui.licensing.awaiting_review"]</dt>
-                <dd><a href="/devices?tenant=@TenantId&review=true">@summary.Counts.AwaitingReview</a></dd>
+                <dd>@summary.Counts.AwaitingReview</dd>
                 <dt>@T["ui.licensing.allowance"]</dt>
                 <dd>@VixlyText.Format(T, "ui.licensing.allowance_value", "count", summary.ReleaseAllowance)</dd>
             </dl>
-            <p><a href="/devices?tenant=@TenantId">@T["ui.licensing.all_devices"]</a></p>
+            <TenantLicenceList TenantId="@TenantId" Seats="@summary.SeatsBought" />
             @if (summary.Abilities.CanManage)
             {
-                <div class="vx-actions">
-                    @if (summary.FirstDeviceLinkAllowed)
-                    {
+                @if (summary.FirstDeviceLinkAllowed)
+                {
+                    <div class="vx-actions">
                         <VxButton OnClick="() => Presenter.RunAsync(TenantId, TenantLicensingPresenter.FirstDeviceAction)" IsBusy="@Presenter.IsBusy">@T["ui.licensing.send_first_link"]</VxButton>
-                    }
-                    <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => Presenter.RunAsync(TenantId, TenantLicensingPresenter.RecoveryAction)" IsBusy="@Presenter.IsBusy">@T["ui.licensing.start_recovery"]</VxButton>
+                    </div>
+                }
+                <h3>@T["ui.licensing.support_title"]</h3>
+                <p class="vx-hint">@T["ui.licensing.support_help"]</p>
+                <div class="vx-field">
+                    <label for="support-identity">@T["ui.licensing.identity_check"]</label>
+                    <textarea id="support-identity" @bind="_identityCheck" maxlength="@PlatformLicensingLimits.SupportTextMaxLength" rows="2" placeholder="@T["ui.licensing.identity_check_hint"]"></textarea>
+                </div>
+                <div class="vx-field">
+                    <label for="support-reason">@T["ui.licensing.support_reason"]</label>
+                    <textarea id="support-reason" @bind="_reason" maxlength="@PlatformLicensingLimits.SupportTextMaxLength" rows="2"></textarea>
+                </div>
+                <div class="vx-field">
+                    <label for="support-replace">@T["ui.licensing.replace_device"]</label>
+                    <select id="support-replace" @bind="_replace">
+                        <option value="">@T["ui.licensing.replace_none"]</option>
+                        @foreach (PlatformDeviceOption device in summary.ActiveDevices)
+                        {
+                            <option value="@device.DeviceId">@device.Number · @device.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="vx-actions">
+                    <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => Presenter.RunAsync(TenantId, TenantLicensingPresenter.RecoveryAction, Input())" IsBusy="@Presenter.IsBusy">@T["ui.licensing.start_recovery"]</VxButton>
+                    <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => Presenter.RunAsync(TenantId, TenantLicensingPresenter.ResetAction, Input())" IsBusy="@Presenter.IsBusy">@T["ui.licensing.request_reset"]</VxButton>
                 </div>
                 <p class="vx-hint">@T["ui.licensing.recovery_help"]</p>
+                @if (summary.Support.Count > 0)
+                {
+                    <h3>@T["ui.licensing.support_open"]</h3>
+                    <ul class="vx-list">
+                        @foreach (PlatformOwnerSupportItem item in summary.Support)
+                        {
+                            <li>
+                                <strong>@T["ui.licensing.support_kind." + item.Kind.ToString().ToLowerInvariant()]</strong>
+                                · @T["ui.licensing.support_status." + item.Status.ToString().ToLowerInvariant()]
+                                · @(item.RequestedByName ?? T["ui.licensing.unknown_staff"]) · @item.RequestedUtc.ToString("g", System.Globalization.CultureInfo.CurrentCulture)
+                                <div class="vx-hint">@item.IdentityCheck — @item.Reason</div>
+                                @if (item.Kind == PlatformOwnerSupportKind.SecondFactorReset && item.Status == PlatformOwnerSupportStatus.Pending)
+                                {
+                                    <div class="vx-field">
+                                        <label for="note-@item.RequestId">@T["ui.licensing.decision_note"]</label>
+                                        <input id="note-@item.RequestId" @bind="_note" maxlength="@PlatformLicensingLimits.SupportTextMaxLength" />
+                                    </div>
+                                    <div class="vx-actions">
+                                        <VxButton OnClick="() => Presenter.RunAsync(TenantId, TenantLicensingPresenter.ApproveAction + item.RequestId, Input())" IsBusy="@Presenter.IsBusy">@T["ui.licensing.approve_reset"]</VxButton>
+                                        <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => Presenter.RunAsync(TenantId, TenantLicensingPresenter.RefuseAction + item.RequestId, Input())" IsBusy="@Presenter.IsBusy">@T["ui.licensing.refuse_reset"]</VxButton>
+                                    </div>
+                                }
+                            </li>
+                        }
+                    </ul>
+                }
             }
         }
     </VxCard></div>
@@ -79,6 +132,16 @@ IMPORTANT NOTES:
     public Guid TenantId { get; set; }
 
     private Guid _loaded;
+
+    private string? _identityCheck;
+
+    private string? _reason;
+
+    private string? _replace;
+
+    private string? _note;
+
+    private OwnerSupportInput Input() => new(_reason, _identityCheck, Guid.TryParse(_replace, out Guid id) ? id : null, _note);
 
     protected override async Task OnParametersSetAsync()
     {

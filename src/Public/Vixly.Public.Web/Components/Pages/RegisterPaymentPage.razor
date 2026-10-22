@@ -1,0 +1,28 @@
+﻿@*
+=========================================================
+FILE: RegisterPaymentPage.razor
+
+PURPOSE:
+Sign-up: back from the card provider's page.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Sign-up pages are noindex and switched off until Stage 3 (D-U4)
+=========================================================
+*@
+@page "/register/payment"
+@attribute [EnableRateLimiting(PublicRateLimits.Registration)]
+@inject IStringLocalizer<PublicText> T
+
+<PageHead TitleKey="public.register.payment_title" Indexed="false" />
+<section class="pub-section pub-section--narrow">
+    <h1>@T["public.register.payment_title"]</h1>
+    <RegistrationGate>
+        <RegistrationProgress PaymentStatus="@Status" />
+    </RegistrationGate>
+</section>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+}

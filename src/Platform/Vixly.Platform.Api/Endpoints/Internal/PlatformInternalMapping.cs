@@ -15,6 +15,7 @@ using Vixly.Platform.Application.UseCases.Legal;
 using Vixly.Platform.Application.UseCases.Subscriptions;
 using Vixly.Platform.Application.UseCases.TenantAccount;
 using Vixly.Platform.Domain.Messaging;
+using Vixly.Shared.Kernel.Clients;
 using Vixly.Shared.Kernel.Paging;
 
 namespace Vixly.Platform.Api.Endpoints.Internal;
@@ -85,6 +86,34 @@ public static class PlatformInternalMapping
             account.Support is { } support ? new PlatformSupportInfo(support.CompanyName, support.Email, support.Phone, support.Website) : null);
     }
 
+    public static PlatformCompanyChangeInfo CompanyChange(PlatformTenantChangeItem change)
+    {
+        ArgumentNullException.ThrowIfNull(change);
+
+        return new PlatformCompanyChangeInfo(
+            change.RequestId,
+            PlatformWireCodes.Of(change.Status),
+            Company(change.Previous),
+            Company(change.Proposed),
+            change.Reason,
+            change.SubmittedByName,
+            change.SubmittedUtc,
+            change.DecidedUtc,
+            change.DecisionNote);
+    }
+
+    public static PlatformCompanyDetailsInfo Company(PlatformTenantCompanyItem company)
+    {
+        ArgumentNullException.ThrowIfNull(company);
+
+        return new PlatformCompanyDetailsInfo(
+            company.LegalName,
+            company.TradingName,
+            company.Email,
+            company.Phone,
+            new PlatformPostalAddressInfo(company.AddressLine1, company.AddressLine2, company.City, company.StateProvince, company.PostalCode, company.CountryCode));
+    }
+
     public static PlatformSubscriptionInfo Subscription(PlatformTenantSubscriptionView view)
     {
         ArgumentNullException.ThrowIfNull(view);
@@ -151,7 +180,8 @@ public static class PlatformInternalMapping
         ArgumentNullException.ThrowIfNull(device);
 
         return new PlatformDeviceInfo(device.DeviceId, device.Number, device.Name, PlatformWireCodes.Of(device.Kind), PlatformWireCodes.Of(device.Proof), PlatformWireCodes.Of(device.Status),
-            device.SeatHeld, PlatformWireCodes.Of(device.Reason), device.RequestedByName, device.RequestedUtc, device.ApprovedUtc, device.ReleaseRequestedUtc, device.EndedUtc, device.LastSeenUtc, device.Idle);
+            device.SeatHeld, PlatformWireCodes.Of(device.Reason), device.RequestedByName, device.RequestedUtc, device.ApprovedUtc, device.ReleaseRequestedUtc, device.EndedUtc, device.LastSeenUtc, device.Idle,
+            VixlyUserAgents.Browser(device.RegisteredUserAgent), device.ApprovedByName);
     }
 
     public static PlatformDeviceEnrolmentInfo Enrolment(PlatformDeviceEnrolment enrolment)
@@ -165,7 +195,7 @@ public static class PlatformInternalMapping
     {
         ArgumentNullException.ThrowIfNull(check);
 
-        return new PlatformDeviceCheckInfo(check.Allowed, check.Code, PlatformWireCodes.Of(check.Access), check.NewSecret);
+        return new PlatformDeviceCheckInfo(check.Allowed, check.Code, PlatformWireCodes.Of(check.Access), check.NewSecret, check.Name, check.Number, check.Country);
     }
 
     public static PlatformLegalStatusInfo Legal(PlatformLegalStatusAnswer answer)

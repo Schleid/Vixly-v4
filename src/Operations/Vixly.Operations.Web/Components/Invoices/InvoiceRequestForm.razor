@@ -1,0 +1,64 @@
+﻿@*
+=========================================================
+FILE: InvoiceRequestForm.razor
+
+PURPOSE:
+Ask for a credit note or a void (Slice 5F, F-6 and I-6).
+
+RESPONSIBILITIES:
+- A credit: an amount before tax per line, at most what the line still holds, and a reason
+- A void: the whole invoice with a reason, while nothing is paid or credited
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Another person with the right to approve credits decides it
+- Each form carries its key (ADR-0019)
+=========================================================
+*@
+<section class="ops-editor__panel" aria-labelledby="request-title">
+    <h2 id="request-title">@T["ui.invoices.request"]</h2>
+    <p class="ops-editor__hint">@T["ui.invoices.request_hint"]</p>
+    <p class="ops-editor__hint">@T["ui.invoices.reason_printed"]</p>
+    <form method="post" action="/staff/invoices/@Invoice.Id/credits">
+        <AntiforgeryToken />
+        <input type="hidden" name="key" value="@CreditKey" />
+        <OperationsTableViewport Label="@T["ui.invoices.request_credit"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col">@T["ui.invoices.description"]</th><th scope="col" class="ops-editor__number">@T["ui.invoices.remaining"]</th><th scope="col">@T["ui.invoices.credit_amount"]</th></tr></thead>
+                <tbody>
+                    @foreach (OperationsInvoiceLine line in Invoice.Lines.Where(line => line.Remaining > 0m))
+                    {
+                        <tr>
+                            <td>@OperationsInvoiceWords.Line(T, line)</td>
+                            <td class="ops-editor__number">@OperationsInvoiceWords.Money(line.Remaining, Invoice.CurrencyCode)</td>
+                            <td><input name="amount_@line.Id.ToString("N")" inputmode="decimal" size="9" aria-label="@T["ui.invoices.credit_amount"]" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+        <label>@T["ui.invoices.reason"] <input name="reason" maxlength="500" size="40" required /></label>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.invoices.request_credit"]</button>
+    </form>
+    @if (Invoice.CanVoid)
+    {
+        <form method="post" action="/staff/invoices/@Invoice.Id/credits" class="ops-invoice__void">
+            <AntiforgeryToken />
+            <input type="hidden" name="key" value="@VoidKey" />
+            <input type="hidden" name="void" value="true" />
+            <p class="ops-editor__hint">@T[Invoice.Kind == OperationsInvoiceKind.SupplyOrder ? "ui.invoices.void_order_hint" : "ui.invoices.void_hint"]</p>
+            <label>@T["ui.invoices.reason"] <input name="reason" maxlength="500" size="40" required /></label>
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.invoices.request_void"]</button>
+        </form>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsInvoice Invoice { get; set; } = null!;
+
+    private readonly string CreditKey = Guid.NewGuid().ToString("N");
+
+    private readonly string VoidKey = Guid.NewGuid().ToString("N");
+}

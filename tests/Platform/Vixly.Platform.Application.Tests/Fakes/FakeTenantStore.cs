@@ -60,6 +60,8 @@ internal sealed class FakeTenantStore :
 
     public string TenantBaseDomain => "techcrafters.example";
 
+    public bool RegistrationInviteOnly { get; set; }
+
     public void Fill(Span<byte> buffer)
     {
         for (int index = 0; index < buffer.Length; index++)
@@ -191,6 +193,18 @@ internal sealed class FakeTenantStore :
     public Task SendRegistrationLinkAsync(PlatformTenantRegistration registration, string token, CancellationToken cancellationToken)
     {
         Mail.Add(("link", registration.OwnerEmail.Value, token));
+        return Task.CompletedTask;
+    }
+
+    public Task SendCompanyChangeSubmittedAsync(PlatformPermissionHolderItem recipient, PlatformTenant tenant, PlatformTenantChangeRequest request, CancellationToken cancellationToken)
+    {
+        Mail.Add(("change_submitted", recipient.Email, request.Id.ToString("D")));
+        return Task.CompletedTask;
+    }
+
+    public Task SendCompanyChangeDecidedAsync(PlatformTenant tenant, PlatformTenantContact recipient, PlatformTenantChangeRequest request, CancellationToken cancellationToken)
+    {
+        Mail.Add(("change_decided", recipient.Email.Value, request.Status.ToString()));
         return Task.CompletedTask;
     }
 

@@ -1,0 +1,56 @@
+﻿@*
+=========================================================
+FILE: RoleFormPage.razor
+
+PURPOSE:
+The form for one role: its name and permissions.
+
+RESPONSIBILITIES:
+- Render the form for one role: its name and permissions
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019); sensitive actions ask for step-up first
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inherits OperationsAllowedComponent
+@using Vixly.Operations.Domain.Access
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T[RoleId is null ? "ui.roles.add" : "ui.roles.edit"]" Company="@Company" Section="roles" Error="@Error">
+    <form method="post" action="/staff/roles/save" class="ops-editor__panel ops-permission-editor">
+        <AntiforgeryToken />
+        <input type="hidden" name="roleId" value="@RoleId" />
+        <label>@T["ui.roles.name"] <input name="name" value="@Name" maxlength="60" required /></label>
+        @foreach (IGrouping<string, string> area in Vixly.Operations.Domain.Access.OperationsPermissions.All
+            .Where(permission => !Vixly.Operations.Domain.Access.OperationsPermissions.SystemOnly.Contains(permission))
+            .GroupBy(permission => permission.Split('.')[1]))
+        {
+            <fieldset>
+                <legend>@T["ui.permissions.area." + area.Key]</legend>
+                @foreach (string permission in area)
+                {
+                    <label><input type="checkbox" name="permissions" value="@permission" checked="@Permissions.Contains(permission)" /> @T["ui.permissions." + permission]</label>
+                }
+            </fieldset>
+        }
+        <p class="ops-editor__hint">@T["ui.roles.reserved_hint"]</p>
+        <p class="ops-editor__actions">
+            @if (CanAny(OperationsPermissions.RolesCreate, OperationsPermissions.RolesEdit, OperationsPermissions.RolesEditPermissions)) { <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button> }
+            <a href="/staff/roles">@T["ui.editor.cancel"]</a>
+        </p>
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public Guid? RoleId { get; set; }
+
+    [Parameter] public string? Name { get; set; }
+
+    [Parameter] public IReadOnlyList<string> Permissions { get; set; } = Array.Empty<string>();
+
+    [Parameter] public string? Error { get; set; }
+}

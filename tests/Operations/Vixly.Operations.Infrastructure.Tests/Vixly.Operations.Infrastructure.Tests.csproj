@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Operations\Vixly.Operations.Infrastructure\Vixly.Operations.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

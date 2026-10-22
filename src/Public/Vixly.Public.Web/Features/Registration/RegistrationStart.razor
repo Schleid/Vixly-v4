@@ -1,0 +1,135 @@
+﻿@*
+=========================================================
+FILE: RegistrationStart.razor
+
+PURPOSE:
+Step 1 of sign-up: company, address, owner, portal address and the Terms (Slice 2).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Sign-up is switched off until Stage 3 (owner decision D-U4); RegistrationGate shows the closed page
+- The registrant confirms the full address before sending (Slice 2 design)
+- On success the access token goes into a host-only cookie and the email step follows
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+@inject PlatformApi Api
+@inject PlatformCatalog Catalog
+@inject NavigationManager Navigation
+
+@if (Ended)
+{
+    <VxMessage Type="VxMessageType.Warning">@T["public.register.ended"]</VxMessage>
+}
+@if (_offer is { } offer)
+{
+    <OfferSummary Offer="offer" />
+}
+<ErrorBox Error="_error" />
+<EditForm Model="Form" FormName="register-start" OnSubmit="StartAsync" class="pub-form pub-form--grid">
+    <input type="hidden" name="Form.OfferToken" value="@Form!.OfferToken" />
+    <fieldset class="pub-field--full">
+        <legend>@T["public.register.company"]</legend>
+        <RegistrationField Id="reg-legal" Label="@T["public.register.legal_name"]" Class="pub-field--name"><InputText id="reg-legal" class="vx-input" @bind-Value="Form!.LegalName" required maxlength="200" autocomplete="organization" /></RegistrationField>
+        <RegistrationField Id="reg-trading" Label="@T["public.register.trading_name"]" Class="pub-field--name"><InputText id="reg-trading" class="vx-input" @bind-Value="Form!.TradingName" maxlength="200" /></RegistrationField>
+        <RegistrationField Id="reg-cemail" Label="@T["public.register.company_email"]" Class="pub-field--address"><InputText id="reg-cemail" type="email" class="vx-input" @bind-Value="Form!.CompanyEmail" required maxlength="254" /></RegistrationField>
+        <RegistrationField Id="reg-cphone" Label="@T["public.register.company_phone"]" Class="pub-field--phone"><InputText id="reg-cphone" type="tel" class="vx-input" @bind-Value="Form!.CompanyPhone" required maxlength="40" /></RegistrationField>
+    </fieldset>
+    <fieldset class="pub-field--full">
+        <legend>@T["public.register.address"]</legend>
+        <RegistrationField Id="reg-line1" Label="@T["public.register.line1"]" Class="pub-field--full"><InputText id="reg-line1" class="vx-input" @bind-Value="Form!.AddressLine1" required maxlength="200" autocomplete="address-line1" /></RegistrationField>
+        <RegistrationField Id="reg-line2" Label="@T["public.register.line2"]" Class="pub-field--full"><InputText id="reg-line2" class="vx-input" @bind-Value="Form!.AddressLine2" maxlength="200" autocomplete="address-line2" /></RegistrationField>
+        <RegistrationField Id="reg-city" Label="@T["public.register.city"]" Class="pub-field--city"><InputText id="reg-city" class="vx-input" @bind-Value="Form!.City" required maxlength="100" autocomplete="address-level2" /></RegistrationField>
+        <RegistrationField Id="reg-state" Label="@T["public.register.state"]" Class="pub-field--state"><InputText id="reg-state" class="vx-input" @bind-Value="Form!.StateProvince" maxlength="100" autocomplete="address-level1" /></RegistrationField>
+        <RegistrationField Id="reg-postal" Label="@T["public.register.postal"]" Class="pub-field--postal"><InputText id="reg-postal" class="vx-input" @bind-Value="Form!.PostalCode" maxlength="20" autocomplete="postal-code" /></RegistrationField>
+        <RegistrationField Id="reg-country" Label="@T["public.register.country"]" Class="pub-field--country">
+            <InputSelect id="reg-country" class="vx-input" @bind-Value="Form!.CountryCode">
+                @foreach (string country in RegistrationCountries.Codes)
+                {
+                    <option value="@country">@RegistrationCountries.Name(country)</option>
+                }
+            </InputSelect>
+        </RegistrationField>
+        <label class="pub-field--full"><InputCheckbox @bind-Value="Form!.AddressConfirmed" required /> @T["public.register.address_confirm"]</label>
+    </fieldset>
+    <fieldset class="pub-field--full">
+        <legend>@T["public.register.owner"]</legend>
+        <RegistrationField Id="reg-oname" Label="@T["public.register.owner_name"]" Class="pub-field--name"><InputText id="reg-oname" class="vx-input" @bind-Value="Form!.OwnerName" required maxlength="120" autocomplete="name" /></RegistrationField>
+        <RegistrationField Id="reg-oemail" Label="@T["public.register.owner_email"]" Class="pub-field--address"><InputText id="reg-oemail" type="email" class="vx-input" @bind-Value="Form!.OwnerEmail" required maxlength="254" autocomplete="email" /></RegistrationField>
+        <RegistrationField Id="reg-ophone" Label="@T["public.register.owner_phone"]" Class="pub-field--phone"><InputText id="reg-ophone" type="tel" class="vx-input" @bind-Value="Form!.OwnerPhone" required maxlength="40" autocomplete="tel" /></RegistrationField>
+    </fieldset>
+    <fieldset class="pub-field--full">
+        <legend>@T["public.register.portal"]</legend>
+        <RegistrationField Id="reg-slug" Label="@T["public.register.slug"]" Class="pub-field--slug"><InputText id="reg-slug" class="vx-input" @bind-Value="Form!.Slug" required maxlength="40" pattern="[a-z0-9-]+" /></RegistrationField>
+        <p class="pub-hint pub-field--full">@T["public.register.slug_help"]</p>
+    </fieldset>
+    <label class="pub-field--full">
+        <InputCheckbox @bind-Value="Form!.AcceptedTerms" required />
+        @T["public.register.accept"] <a href="@PublicLanguage.Page(PublicLanguage.Current, "legal")" target="_blank" rel="noopener">@T["public.register.accept_link"]</a>
+    </label>
+    <div class="pub-field--full">
+        <BotCheck />
+    </div>
+    <div class="pub-form__actions pub-field--full">
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["public.register.start"]</VxButton>
+    </div>
+</EditForm>
+
+@code {
+    private PlatformApiError? _error;
+
+    private Vixly.Contracts.Platform.Registration.PlatformRegistrationOffer? _offer;
+
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    [SupplyParameterFromForm(FormName = "register-start")]
+    public StartFormModel? Form { get; set; }
+
+    [Parameter]
+    public string? OfferToken { get; set; }
+
+    [Parameter]
+    public bool Ended { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Form ??= new StartFormModel { OfferToken = OfferToken };
+
+        if (!string.IsNullOrWhiteSpace(Form.OfferToken))
+        {
+            PlatformApiResult<Vixly.Contracts.Platform.Registration.PlatformRegistrationOffer> offer = await Api.OfferAsync(Form.OfferToken, CancellationToken.None);
+            _offer = offer.Value;
+            _error = offer.Error;
+        }
+    }
+
+    private async Task StartAsync()
+    {
+        if (!Form!.AddressConfirmed)
+        {
+            _error = new PlatformApiError("public.register.address_confirm_required", T["public.register.address_confirm_required"]);
+            return;
+        }
+
+        PlatformApiResult<Vixly.Contracts.Platform.Legal.PlatformLegalTermsInfo> terms = await Catalog.TermsAsync(CancellationToken.None);
+        PlatformApiResult<Vixly.Contracts.Platform.Registration.PlatformRegistrationAccess> result = await Api.StartAsync(RegistrationStartBody.From(Form, terms.Value, PublicLanguage.Current,
+            HttpContext?.Request.HasFormContentType == true ? HttpContext.Request.Form[BotCheck.FieldName].ToString() : null), CancellationToken.None);
+
+        if (result.Value is { } access && HttpContext is not null)
+        {
+            RegistrationCookies.Write(HttpContext, RegistrationCookies.Access, access.AccessToken, access.ExpiresUtc);
+
+            if (!string.IsNullOrWhiteSpace(Form.OfferToken))
+            {
+                RegistrationCookies.Write(HttpContext, RegistrationCookies.Offer, Form.OfferToken, access.ExpiresUtc);
+            }
+
+            Navigation.NavigateTo(PublicLanguage.Page(PublicLanguage.Current, "register/email"));
+            return;
+        }
+
+        _error = result.Error;
+    }
+}

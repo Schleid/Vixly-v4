@@ -1,0 +1,155 @@
+﻿@*
+=========================================================
+FILE: StaffListPage.razor
+
+PURPOSE:
+The staff of the tenant and the invitation form.
+
+RESPONSIBILITIES:
+- Render the staff of the tenant and the invitation form
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019); sensitive actions ask for step-up first
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+@inject IStringLocalizer<OperationsWorkbenchText> L
+
+<EditorShell Title="@T["ui.staff.title"]" Company="@Company" Section="staff" Error="@Error" Info="@Info">
+    <div class="ops-editor__page-intro"><p class="ops-editor__hint">@L["staff_intro"]</p>@if (CanInvite) { <a href="#invite-person" data-open-panel class="vx-button vx-button--primary">@T["ui.staff.invite"]</a> }</div>
+    <form method="get" action="/staff/people" class="ops-editor__inline ops-editor__search">
+        <input name="search" value="@Search" placeholder="@T["ui.staff.search"]" aria-label="@T["ui.staff.search"]" />
+        <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.search_submit"]</button>
+    </form>
+    <section class="ops-editor__panel">
+        @if (Members.Count == 0)
+        {
+            <div class="ops-editor__empty">
+                <h2>@L["empty_staff"]</h2><p>@L["empty_staff_body"]</p>
+                @if (!string.IsNullOrWhiteSpace(Search)) { <a href="/staff/people">@L["clear_search"]</a> }
+                @if (CanInvite) { <a class="vx-button vx-button--secondary" href="#invite-person" data-open-panel>@L["open_invite"]</a> }
+            </div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.staff.title"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.staff.name"]</th><th scope="col">@T["ui.editor.email"]</th><th scope="col">@T["ui.customers.status"]</th><th scope="col">@L["staff_role"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsStaffMember member in Members)
+                        {
+                            <tr>
+                                <td class="ops-editor__identity-cell"><a href="/staff/people/@member.UserId">@member.FullName</a>@if (member.IsOwner) { <small>@T["ui.staff.owner"]</small> }</td>
+                                <td>@member.Email</td>
+                                <td><span class="ops-editor__status" data-status="@member.Status.ToString().ToLowerInvariant()">@T["ui.staff.status." + member.Status.ToString().ToLowerInvariant()]</span>@if (!member.HasSecondFactor) { <small>@T["ui.staff.no_second_factor"]</small> }</td>
+                                <td>@if (member.PartnerWarehouse is { } partnerAt) { <span class="ops-editor__grant">@T["ui.staff.partner_agent"] · @partnerAt</span> }@foreach (OperationsStaffGrant grant in member.Grants) { <span class="ops-editor__grant">@RoleName(grant) @(grant.ScopeName is null ? null : "· " + grant.ScopeName)</span> }</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+        <p class="ops-editor__list-footer">@VixlyText.Format(T, "ui.staff.count", "count", TotalCount)</p>
+    </section>
+    @if (CanInvite)
+    {
+        <details id="invite-person" class="ops-task-panel">
+        <summary>@T["ui.staff.invite"]<span aria-hidden="true">+</span></summary>
+        <form method="post" action="/staff/people/invite" class="ops-editor__panel">
+            <AntiforgeryToken />
+            <h2>@T["ui.staff.invite"]</h2>
+            <label>@T["ui.staff.name"] <input name="fullName" maxlength="200" required /></label>
+            <label>@T["ui.editor.email"] <input type="email" name="email" maxlength="254" required /></label>
+            <label>@T["ui.staff.language"]
+                <select name="language">
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                    <option value="es">Español</option>
+                </select>
+            </label>
+            <label>@T["ui.staff.role"]
+                <select name="roleId" required>
+                    @foreach (OperationsRoleSummary role in Roles.Where(role => role.IsActive))
+                    {
+                        <option value="@role.RoleId">@RoleName(role)</option>
+                    }
+                </select>
+            </label>
+            <label>@T["ui.staff.scope"] <select name="scope" aria-label="@T["ui.staff.scope"]">
+                <option value="tenant">@T["ui.staff.scope.tenant"]</option>
+                @foreach (Vixly.Operations.Domain.Locations.OperationsBranch branch in Branches)
+                {
+                    <option value="branch:@branch.Id">@T["ui.staff.scope.branch"] @branch.Name</option>
+                }
+                @foreach (Vixly.Operations.Domain.Locations.OperationsWarehouse warehouse in Warehouses)
+                {
+                    <option value="warehouse:@warehouse.Id">@T["ui.staff.scope.warehouse"] @warehouse.Name</option>
+                }
+            </select></label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.invite_submit"]</button>
+        </form>
+        </details>
+        @if (PartnerWarehouses.Count > 0)
+        {
+            @* Slice 7 step 4 (R-8): a partner's staff member, limited to the partner's warehouse. *@
+            <details id="invite-partner" class="ops-task-panel">
+            <summary>@T["ui.staff.invite_partner"]<span aria-hidden="true">+</span></summary>
+            <form method="post" action="/staff/people/invite-partner" class="ops-editor__panel">
+                <AntiforgeryToken />
+                <h2>@T["ui.staff.invite_partner"]</h2>
+                <p class="ops-editor__hint">@T["ui.staff.partner_agent_hint"]</p>
+                <label>@T["ui.staff.name"] <input name="fullName" maxlength="200" required /></label>
+                <label>@T["ui.editor.email"] <input type="email" name="email" maxlength="254" required /></label>
+                <label>@T["ui.staff.language"]
+                    <select name="language">
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                    </select>
+                </label>
+                <label>@T["ui.staff.partner_warehouse"]
+                    <select name="warehouseId" required>
+                        @foreach (Vixly.Operations.Domain.Locations.OperationsWarehouse warehouse in PartnerWarehouses)
+                        {
+                            <option value="@warehouse.Id">@warehouse.Name · @warehouse.PartnerName</option>
+                        }
+                    </select>
+                </label>
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.invite_submit"]</button>
+            </form>
+            </details>
+        }
+    }
+</EditorShell>
+
+@code {
+    private string RoleName(OperationsStaffGrant grant) => grant.IsAdministratorRole ? T["ui.roles.administrator"] : grant.RoleName;
+
+    private string RoleName(OperationsRoleSummary role) => role.IsAdministrator ? T["ui.roles.administrator"] : role.Name;
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public string? Search { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsStaffMember> Members { get; set; } = Array.Empty<OperationsStaffMember>();
+
+    [Parameter] public int TotalCount { get; set; }
+
+    [Parameter] public bool CanInvite { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsRoleSummary> Roles { get; set; } = Array.Empty<OperationsRoleSummary>();
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Locations.OperationsBranch> Branches { get; set; } = Array.Empty<Vixly.Operations.Domain.Locations.OperationsBranch>();
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Locations.OperationsWarehouse> Warehouses { get; set; } = Array.Empty<Vixly.Operations.Domain.Locations.OperationsWarehouse>();
+
+    private IReadOnlyList<Vixly.Operations.Domain.Locations.OperationsWarehouse> PartnerWarehouses => Warehouses
+        .Where(warehouse => warehouse.OperatedBy == Vixly.Operations.Domain.Locations.OperationsDestinationOperator.Partner && warehouse.Status == Vixly.Operations.Domain.Locations.OperationsLocationStatus.Active)
+        .ToList();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

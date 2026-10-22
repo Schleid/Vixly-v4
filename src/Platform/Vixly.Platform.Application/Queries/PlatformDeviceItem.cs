@@ -31,4 +31,14 @@ public sealed record PlatformDeviceItem(
     DateTimeOffset? ReleaseRequestedUtc,
     DateTimeOffset? EndedUtc,
     DateTimeOffset? LastSeenUtc,
-    bool Idle);
+    bool Idle)
+{
+    // Owner, 2026-10-21: where it was registered from, and who approved it (none: the Owner's email link).
+    public string? RegisteredIp { get; init; }
+
+    public string? RegisteredUserAgent { get; init; }
+
+    public string? RegisteredCountry { get; init; }
+
+    public string? ApprovedByName { get; init; }
+}

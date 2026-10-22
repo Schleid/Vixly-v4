@@ -1,0 +1,75 @@
+﻿@*
+=========================================================
+FILE: InspectionOutcomeForm.razor
+
+PURPOSE:
+What the inspector found and decided (Slice 3C design section 5).
+
+RESPONSIBILITIES:
+- Mark the listed items found, write notes, take photos of the contents
+- Choose the outcome; for a hold, what the customer must do and any fee; before a disposal, the call to the customer
+
+IMPORTANT NOTES:
+- Markup only; no script: every field is shown and the outcome decides which count
+- A disposal waits for the Owner or an administrator (Q-C3)
+=========================================================
+*@
+<form method="post" action="/staff/inspection/queue/@InspectionId/finish" enctype="multipart/form-data" class="ops-editor__panel ops-editor__form" aria-labelledby="outcome-title">
+    <AntiforgeryToken />
+    <input type="hidden" name="key" value="@CommandKey" />
+    <h2 id="outcome-title">@T["ui.inspection.outcome.title"]</h2>
+    @if (Applicable.Count > 0)
+    {
+        <fieldset>
+            <legend>@T["ui.inspection.outcome.found"]</legend>
+            @foreach (OperationsRestrictedItem item in Applicable)
+            {
+                <label><input type="checkbox" name="items" value="@item.Id" /> @item.Name @(Named.Contains(item.Id) ? "· " + T["ui.inspection.named"].Value : null)</label>
+            }
+        </fieldset>
+    }
+    <fieldset>
+        <legend>@T["ui.inspection.outcome.result"]</legend>
+        @foreach (string result in OperationsTrackingCodes.InspectionResults)
+        {
+            <label><input type="radio" name="result" value="@result" required checked="@(result == "passed")" /> @T["ui.inspection.result." + result]</label>
+        }
+    </fieldset>
+    <label>@T["ui.inspection.outcome.notes"] <textarea name="notes" rows="3" maxlength="@OperationsInspectionLimits.NotesMaxLength"></textarea></label>
+    <fieldset>
+        <legend>@T["ui.inspection.outcome.customer"]</legend>
+        <p class="ops-editor__hint">@T["ui.inspection.outcome.customer_hint"]</p>
+        <label>@T["ui.inspection.outcome.hold"]
+            <select name="hold">
+                @foreach (OperationsHoldReasons reason in OperationsInspection.CustomerHolds)
+                {
+                    <option value="@reason">@T["ui.hold." + reason]</option>
+                }
+            </select>
+        </label>
+        <label>@T["ui.inspection.outcome.action"] <textarea name="action" rows="3" maxlength="@OperationsInspectionLimits.CustomerActionMaxLength"></textarea></label>
+        <label>@VixlyText.Format(T, "ui.inspection.outcome.fee", "currency", CurrencyCode) <input name="fee" type="number" inputmode="decimal" min="0" step="0.01" /></label>
+    </fieldset>
+    <fieldset>
+        <legend>@T["ui.inspection.outcome.call"]</legend>
+        <p class="ops-editor__hint">@T["ui.inspection.outcome.call_hint"]</p>
+        <label>@T["ui.inspection.outcome.called_on"] <input name="calledOn" type="date" /></label>
+        <label>@T["ui.inspection.outcome.call_notes"] <textarea name="callNotes" rows="2" maxlength="@OperationsInspectionLimits.CallNotesMaxLength"></textarea></label>
+    </fieldset>
+    <label>@T["ui.inspection.outcome.photos"] <input name="photo_contents" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" multiple /></label>
+    <button type="submit" class="vx-button vx-button--primary">@T["ui.inspection.outcome.save"]</button>
+</form>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public Guid InspectionId { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsRestrictedItem> Applicable { get; set; } = Array.Empty<OperationsRestrictedItem>();
+
+    [Parameter] public IReadOnlyList<Guid> Named { get; set; } = Array.Empty<Guid>();
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public string CommandKey { get; set; } = string.Empty;
+}

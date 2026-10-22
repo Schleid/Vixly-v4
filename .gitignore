@@ -46,4 +46,6 @@ Thumbs.db
 
 # Development email pickup folder (contains one-time links)
 .mail/
+# Development files of Operations (parcel photos): OperationsFiles:Root
+.files/
 _to_delete/

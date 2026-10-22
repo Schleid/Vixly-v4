@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "Vixly.Customer.Web": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "launchUrl": "customer",
+      "applicationUrl": "https://localhost:7406;http://localhost:5406",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

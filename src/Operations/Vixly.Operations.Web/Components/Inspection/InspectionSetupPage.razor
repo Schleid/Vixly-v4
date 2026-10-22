@@ -1,0 +1,119 @@
+@*
+=========================================================
+FILE: InspectionSetupPage.razor
+
+PURPOSE:
+The company's restricted-items list, inspection rules and random share (Slice 3C design section 3).
+
+RESPONSIBILITIES:
+- Change the random share
+- Add rules and take them in or out of use
+- Copy the starting list, add entries and change them
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Company-wide (ops.inspection.configure); entries and rules are taken out of use, never deleted
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.inspection.setup.title"]" Company="@Company" Section="inspection_setup" Error="@Error" Info="@Info">
+    <div class="ops-compact-tabs" data-section-tabs="inspection-rules" data-tabs-label="@T["ui.inspection.setup.title"]">
+    <p class="ops-editor__hint">@T["ui.inspection.setup.intro"]</p>
+    <section class="ops-editor__panel" aria-labelledby="share-title">
+        <h2 id="share-title">@T["ui.inspection.share.title"]</h2>
+        <p class="ops-editor__hint">@T["ui.inspection.share.hint"]</p>
+
+        <form method="post" action="/staff/inspection/setup/share" class="ops-editor__inline-field">
+        <AntiforgeryToken />
+
+        <label>@T["ui.inspection.share.percent"] <input name="percent" type="number" min="0" max="100" step="1" value="@Percent" required /></label>
+        <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
+
+    </form>
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="rules-title">
+        <h2 id="rules-title">@T["ui.inspection.rules.title"]</h2>
+        @if (Rules.Count == 0) { <p>@T["ui.inspection.rules.none"]</p> }
+        <ul>
+            @foreach (OperationsInspectionRule rule in Rules)
+            {
+                <li>
+                    <form method="post" action="/staff/inspection/setup/rules" class="ops-editor__inline-field">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="rule" value="@rule.Id" />
+                        <span>@OperationsInspectionWords.Rule(T, rule, CurrencyCode)</span>
+                        <label><input type="checkbox" name="active" value="true" checked="@rule.IsActive" /> @T["ui.inspection.in_use"]</label>
+                        <button type="submit" class="vx-button vx-button--secondary">@T["ui.storage.change"]</button>
+                    </form>
+                </li>
+            }
+        </ul>
+        <form method="post" action="/staff/inspection/setup/rules" class="ops-editor__inline-field">
+            <AntiforgeryToken />
+            <input type="hidden" name="active" value="true" />
+            <label>@T["ui.inspection.rules.kind"]
+                <select name="kind">
+                    @foreach (OperationsInspectionRuleKind kind in Enum.GetValues<OperationsInspectionRuleKind>())
+                    {
+                        <option value="@kind">@T["ui.inspection.rules.kind." + kind]</option>
+                    }
+                </select>
+            </label>
+            <label>@T["ui.inspection.rules.value"] <input name="value" maxlength="@OperationsInspectionLimits.RuleValueMaxLength" /></label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.inspection.rules.add"]</button>
+        </form>
+        <p class="ops-editor__hint">@T["ui.inspection.rules.hint"]</p>
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="items-title">
+        <h2 id="items-title">@T["ui.inspection.items.title"]</h2>
+        @if (Items.Count == 0)
+        {
+            <p>@T["ui.inspection.items.none"]</p>
+            <form method="post" action="/staff/inspection/setup/starting-list">
+                <AntiforgeryToken />
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.inspection.items.copy"]</button>
+            </form>
+            <p class="ops-editor__hint">@T["ui.inspection.items.copy_hint"]</p>
+        }
+        @foreach (OperationsRestrictedItem item in Items)
+        {
+            <details>
+                <summary><strong>@item.Name</strong> · @T["ui.inspection.kind." + item.Kind] · @(item.Countries ?? T["ui.inspection.everywhere"].Value) @(item.IsActive ? null : "· " + T["ui.inspection.not_in_use"].Value)</summary>
+                <form method="post" action="/staff/inspection/setup/items" class="ops-editor__form">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="item" value="@item.Id" />
+                    <RestrictedItemFields T="T" Item="item" />
+                    <label><input type="checkbox" name="active" value="true" checked="@item.IsActive" /> @T["ui.inspection.in_use"]</label>
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
+                </form>
+            </details>
+        }
+        <details>
+            <summary>@T["ui.inspection.items.add"]</summary>
+            <form method="post" action="/staff/inspection/setup/items" class="ops-editor__form">
+                <AntiforgeryToken />
+                <input type="hidden" name="active" value="true" />
+                <RestrictedItemFields T="T" />
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.inspection.items.add"]</button>
+            </form>
+        </details>
+    </section>
+    </div>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsRestrictedItem> Items { get; set; } = Array.Empty<OperationsRestrictedItem>();
+
+    [Parameter] public IReadOnlyList<OperationsInspectionRule> Rules { get; set; } = Array.Empty<OperationsInspectionRule>();
+
+    [Parameter] public int Percent { get; set; }
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

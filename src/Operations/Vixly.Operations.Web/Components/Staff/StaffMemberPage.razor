@@ -1,0 +1,153 @@
+﻿@*
+=========================================================
+FILE: StaffMemberPage.razor
+
+PURPOSE:
+One staff member: roles, status and security actions.
+
+RESPONSIBILITIES:
+- Render one staff member: roles, status and security actions
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019); sensitive actions ask for step-up first
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inherits OperationsAllowedComponent
+@using Vixly.Operations.Domain.Access
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@Member.FullName" Company="@Company" Section="staff" Error="@Error" Info="@Info">
+    <div class="ops-record-layout">
+    <aside class="ops-record-rail">
+    <section class="ops-editor__panel ops-record-summary">
+        <div class="ops-record-symbol" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 22v-3a8 8 0 0 1 16 0v3" /></svg></div>
+        <p>@Member.Email · @T["ui.staff.status." + Member.Status.ToString().ToLowerInvariant()] @(Member.StatusReason is null ? null : "· " + Member.StatusReason)</p>
+        <p>@T[Member.HasSecondFactor ? "ui.staff.has_second_factor" : "ui.staff.no_second_factor"]</p>
+        @if (Member.IsOwner) { <p><strong>@T["ui.staff.owner"]</strong></p> }
+        <p><a href="/staff/audit?actor=@Member.UserId">@T["ui.staff.activity"]</a> · <a href="/staff/activity?member=@Member.UserId">@T["ui.staff.sign_ins"]</a></p>
+    </section>
+    </aside>
+    <div class="ops-record-workflows">
+    <section class="ops-editor__panel">
+        <h2>@T["ui.staff.roles"]</h2>
+        @if (Member.PartnerWarehouse is { } partnerAt)
+        {
+            <p><strong>@T["ui.staff.partner_agent"]</strong> <span>@partnerAt</span></p>
+            <p class="ops-editor__hint">@T["ui.staff.partner_agent_hint"]</p>
+        }
+        else if (Member.Grants.Count == 0) { <p class="ops-editor__empty-message">@T["ui.editor.none"]</p> }
+        <ul class="ops-editor__list">
+            @foreach (OperationsStaffGrant grant in Member.Grants)
+            {
+                <li>
+                    <strong>@(grant.IsAdministratorRole ? T["ui.roles.administrator"] : grant.RoleName)</strong>
+                    <span>@(grant.ScopeName ?? T["ui.staff.scope.tenant"])</span>
+                    @if (!Member.IsOwner && Can(OperationsPermissions.RolesGrant))
+                    {
+                        <form method="post" action="/staff/people/@Member.UserId/revoke/@grant.GrantId" class="ops-editor__inline">
+                            <AntiforgeryToken />
+                            <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.revoke"]</button>
+                        </form>
+                    }
+                </li>
+            }
+        </ul>
+        @if (!Member.IsOwner && Member.PartnerWarehouse is null && Can(OperationsPermissions.RolesGrant))
+        {
+            <form method="post" action="/staff/people/@Member.UserId/grant" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <select name="roleId" aria-label="@T["ui.staff.role"]">
+                    @foreach (OperationsRoleSummary role in Roles.Where(role => role.IsActive))
+                    {
+                        <option value="@role.RoleId">@(role.IsAdministrator ? T["ui.roles.administrator"] : role.Name)</option>
+                    }
+                </select>
+                <select name="scope" aria-label="@T["ui.staff.scope"]">
+                <option value="tenant">@T["ui.staff.scope.tenant"]</option>
+                @foreach (Vixly.Operations.Domain.Locations.OperationsBranch branch in Branches)
+                {
+                    <option value="branch:@branch.Id">@T["ui.staff.scope.branch"] @branch.Name</option>
+                }
+                @foreach (Vixly.Operations.Domain.Locations.OperationsWarehouse warehouse in Warehouses)
+                {
+                    <option value="warehouse:@warehouse.Id">@T["ui.staff.scope.warehouse"] @warehouse.Name</option>
+                }
+            </select>
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.grant"]</button>
+            </form>
+        }
+    </section>
+    @if (!Member.IsOwner && !IsMe && (StatusChoices.Any() || CanAny(OperationsPermissions.StaffResetSecondFactor, OperationsPermissions.StaffEndSessions) || ViewerIsOwner))
+    {
+        <section class="ops-editor__panel ops-panel--restricted">
+            <h2>@T["ui.staff.actions"]</h2>
+            @if (StatusChoices.Any())
+            {
+                <form method="post" action="/staff/people/@Member.UserId/status" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <select name="status" aria-label="@T["ui.staff.change_status"]">
+                        @foreach (string status in StatusChoices)
+                        {
+                            <option value="@status">@T["ui.staff.to." + status.ToLowerInvariant()]</option>
+                        }
+                    </select>
+                    <input name="reason" maxlength="300" required placeholder="@T["ui.staff.reason"]" aria-label="@T["ui.staff.reason"]" />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.change_status"]</button>
+                </form>
+            }
+            @if (Can(OperationsPermissions.StaffResetSecondFactor))
+            {
+                <form method="post" action="/staff/people/@Member.UserId/reset-second-factor" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.reset_second_factor"]</button>
+                </form>
+            }
+            @if (Can(OperationsPermissions.StaffEndSessions))
+            {
+                <form method="post" action="/staff/people/@Member.UserId/end-sessions" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.end_sessions"]</button>
+                </form>
+            }
+            @if (ViewerIsOwner && Member.IsAdministrator && Member.HasSecondFactor)
+            {
+                <form method="post" action="/staff/people/@Member.UserId/transfer" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <label><input type="checkbox" name="confirm" value="true" required /> @T["ui.staff.transfer_confirm"]</label>
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.transfer"]</button>
+                </form>
+            }
+        </section>
+    }
+    </div>
+    </div>
+</EditorShell>
+
+@code {
+    // Each status change needs its own permission (the use case checks the same).
+    private IEnumerable<string> StatusChoices => new[]
+    {
+        ("Suspended", OperationsPermissions.StaffSuspend), ("Locked", OperationsPermissions.StaffLock),
+        ("Deactivated", OperationsPermissions.StaffDeactivate), ("Active", OperationsPermissions.StaffReactivate)
+    }.Where(choice => Can(choice.Item2)).Select(choice => choice.Item1);
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsStaffMember Member { get; set; } = null!;
+
+    [Parameter] public bool IsMe { get; set; }
+
+    [Parameter] public bool ViewerIsOwner { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsRoleSummary> Roles { get; set; } = Array.Empty<OperationsRoleSummary>();
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Locations.OperationsBranch> Branches { get; set; } = Array.Empty<Vixly.Operations.Domain.Locations.OperationsBranch>();
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Locations.OperationsWarehouse> Warehouses { get; set; } = Array.Empty<Vixly.Operations.Domain.Locations.OperationsWarehouse>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}
