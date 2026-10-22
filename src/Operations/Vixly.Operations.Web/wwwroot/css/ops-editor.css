@@ -693,6 +693,17 @@ details.ops-editor__collapsible[open] > summary {
     font-size: 0.75rem !important;
     line-height: 1 !important;
 }
+.ops-editor__table form.ops-editor__inline select {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0.15rem 0.35rem !important;
+    font-size: 0.8125rem;
+}
+.ops-editor__table form.ops-editor__inline input[name=note],
+.ops-editor__table form.ops-editor__inline input.ops-field__control--note {
+    width: 12rem !important;
+    text-align: left !important;
+}
 
 @media (max-width: 1024px) {
     .ops-editor__form {

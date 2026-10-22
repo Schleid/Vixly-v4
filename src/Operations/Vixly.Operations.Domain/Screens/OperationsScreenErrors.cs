@@ -28,5 +28,7 @@ public static class OperationsScreenErrors
 
     public static Error SignatureRequired { get; } = Error.Create("ops.screens.signature_required");
 
+    public static Error AcceptRequired { get; } = Error.Create("ops.screens.accept_required");
+
     public static Error NotOffered { get; } = Error.Create("ops.screens.not_offered");
 }

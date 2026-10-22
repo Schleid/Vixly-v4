@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: DeliveryStopForms.razor
 
@@ -21,44 +21,68 @@ IMPORTANT NOTES:
     <form method="post" action="/staff/delivery/routes/@RouteId/stops/@Stop.Id" enctype="multipart/form-data" class="ops-editor__form" data-signature-pad="@(Signature ? "on" : null)">
         <AntiforgeryToken />
         <input type="hidden" name="outcome" value="delivered" />
-        <label>@T["ui.delivery.receiver"] <input name="receiver" maxlength="@OperationsPickupRelease.NameMaxLength" autocomplete="off" required /></label>
+        <label class="ops-field">
+            <span class="ops-label-text">@T["ui.delivery.receiver"]</span>
+            <input name="receiver" class="ops-field__control" maxlength="@OperationsPickupRelease.NameMaxLength" autocomplete="off" required />
+        </label>
         @if (Proofs.HasFlag(OperationsDeliveryProofs.Id))
         {
-            <label>@T["ui.pickup.id_kind"]
-                <select name="idKind" required>
-                    @foreach (OperationsPickupIdKind kind in Enum.GetValues<OperationsPickupIdKind>())
-                    {
-                        <option value="@kind">@T["ui.pickup.id_kind." + kind]</option>
-                    }
-                </select>
-            </label>
-            <label>@T["ui.pickup.id_last"] <input name="idLast" maxlength="@OperationsPickupRelease.IdLastLength" minlength="@OperationsPickupRelease.IdLastLength" pattern="[A-Za-z0-9]{4}" autocomplete="off" required /></label>
+            <div class="ops-form-grid ops-form-grid--2col">
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.pickup.id_kind"]</span>
+                    <select name="idKind" class="ops-field__control" required>
+                        @foreach (OperationsPickupIdKind kind in Enum.GetValues<OperationsPickupIdKind>())
+                        {
+                            <option value="@kind">@T["ui.pickup.id_kind." + kind]</option>
+                        }
+                    </select>
+                </label>
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.pickup.id_last"]</span>
+                    <input name="idLast" class="ops-field__control ops-editor__code" maxlength="@OperationsPickupRelease.IdLastLength" minlength="@OperationsPickupRelease.IdLastLength" pattern="[A-Za-z0-9]{4}" autocomplete="off" required />
+                </label>
+            </div>
         }
         @if (!Sheet && Proofs.HasFlag(OperationsDeliveryProofs.Code))
         {
-            <label>@T["ui.delivery.code"] <input name="code" maxlength="@OperationsPickupCode.Length" inputmode="numeric" pattern="[0-9]{6}" autocomplete="off" required /></label>
+            <label class="ops-field">
+                <span class="ops-label-text">@T["ui.delivery.code"]</span>
+                <input name="code" class="ops-field__control ops-editor__code" maxlength="@OperationsPickupCode.Length" inputmode="numeric" pattern="[0-9]{6}" autocomplete="off" required />
+            </label>
         }
         @if (Stop.Due > 0m)
         {
-            <label>@VixlyText.Format(T, "ui.delivery.cash_collected", "currency", Stop.CurrencyCode ?? CurrencyCode) <input name="cash" type="number" step="0.01" min="0" value="@OperationsDeliveryWords.Amount(Stop.Due)" readonly /></label>
+            <label class="ops-field">
+                <span class="ops-label-text">@VixlyText.Format(T, "ui.delivery.cash_collected", "currency", Stop.CurrencyCode ?? CurrencyCode)</span>
+                <input name="cash" class="ops-field__control" type="number" step="0.01" min="0" value="@OperationsDeliveryWords.Amount(Stop.Due)" readonly />
+            </label>
             <p class="ops-editor__hint">@T["ui.delivery.cash_hint"]</p>
         }
         @if (!Sheet && Proofs.HasFlag(OperationsDeliveryProofs.Photo))
         {
-            <label>@T["ui.delivery.photo"] <input name="photo" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" required /></label>
+            <label class="ops-field">
+                <span class="ops-label-text">@T["ui.delivery.photo"]</span>
+                <input name="photo" class="ops-field__control ops-file-input" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" required />
+            </label>
         }
         @if (Signature)
         {
-            <input type="hidden" name="signature" />
-            <p class="ops-editor__hint">@T["ui.pickup.sign_here"]</p>
-            <canvas width="600" height="160" aria-label="@T["ui.pickup.sign_here"]"></canvas>
-            <p><button type="button" class="vx-button vx-button--secondary" data-signature-clear>@T["ui.counter.sign_clear"]</button></p>
+            <div class="ops-field">
+                <span class="ops-label-text">@T["ui.pickup.sign_here"]</span>
+                <input type="hidden" name="signature" />
+                <canvas width="600" height="160" aria-label="@T["ui.pickup.sign_here"]"></canvas>
+                <div class="ops-signature-actions">
+                    <button type="button" class="vx-button vx-button--secondary vx-button--sm" data-signature-clear>@T["ui.counter.sign_clear"]</button>
+                </div>
+            </div>
         }
         @if (Sheet && Proofs.HasFlag(OperationsDeliveryProofs.Signature))
         {
             <p class="ops-editor__hint">@T["ui.delivery.sheet_signed_hint"]</p>
         }
-        <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary" disabled="@Stop.Blocked">@T["ui.delivery.delivered_button"]</button></p>
+        <p class="ops-editor__actions">
+            <button type="submit" class="vx-button vx-button--primary" disabled="@Stop.Blocked">@T["ui.delivery.delivered_button"]</button>
+        </p>
     </form>
 </details>
 <details class="ops-delivery__record">
@@ -66,17 +90,25 @@ IMPORTANT NOTES:
     <form method="post" action="/staff/delivery/routes/@RouteId/stops/@Stop.Id" enctype="multipart/form-data" class="ops-editor__form">
         <AntiforgeryToken />
         <input type="hidden" name="outcome" value="failed" />
-        <label>@T["ui.delivery.failure"]
-            <select name="failure" required>
-                @foreach (string reason in OperationsTrackingCodes.DeliveryFailures)
-                {
-                    <option value="@reason">@T["ui.delivery.failure." + reason]</option>
-                }
-            </select>
-        </label>
-        <label>@T["ui.delivery.note"] <input name="note" maxlength="@OperationsDeliveryStop.NoteMaxLength" /></label>
+        <div class="ops-form-grid ops-form-grid--2col">
+            <label class="ops-field">
+                <span class="ops-label-text">@T["ui.delivery.failure"]</span>
+                <select name="failure" class="ops-field__control" required>
+                    @foreach (string reason in OperationsTrackingCodes.DeliveryFailures)
+                    {
+                        <option value="@reason">@T["ui.delivery.failure." + reason]</option>
+                    }
+                </select>
+            </label>
+            <label class="ops-field">
+                <span class="ops-label-text">@T["ui.delivery.note"]</span>
+                <input name="note" class="ops-field__control" maxlength="@OperationsDeliveryStop.NoteMaxLength" />
+            </label>
+        </div>
         <p class="ops-editor__hint">@T["ui.delivery.failure_hint"]</p>
-        <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--secondary">@T["ui.delivery.failed_button"]</button></p>
+        <p class="ops-editor__actions">
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.delivery.failed_button"]</button>
+        </p>
     </form>
 </details>
 

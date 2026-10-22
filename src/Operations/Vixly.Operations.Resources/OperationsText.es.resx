@@ -1666,6 +1666,9 @@ Su aplicación de autenticación no cambia y se le seguirá pidiendo al iniciar 
   <data name="ops.roles.system_role_locked" xml:space="preserve">
     <value>El rol Administrador no se puede modificar.</value>
   </data>
+  <data name="ops.screens.accept_required" xml:space="preserve">
+    <value>Marque la casilla para aceptar antes de firmar.</value>
+  </data>
   <data name="ops.screens.code_invalid" xml:space="preserve">
     <value>Ese código no es correcto o ha caducado. Pida uno nuevo al empleado.</value>
   </data>
@@ -10362,6 +10365,12 @@ Su aplicación de autenticación no cambia y se le seguirá pidiendo al iniciar 
   </data>
   <data name="ui.scan.wait_sending" xml:space="preserve">
     <value>Aún se están enviando escaneos. Inténtelo en un momento.</value>
+  </data>
+  <data name="ui.screen.accept_declaration" xml:space="preserve">
+    <value>He leído la declaración anterior y acepto que este envío no está asegurado, con la responsabilidad de la empresa indicada.</value>
+  </data>
+  <data name="ui.screen.accept_insured" xml:space="preserve">
+    <value>He leído la declaración y las condiciones del seguro anteriores, y las acepto.</value>
   </data>
   <data name="ui.screen.back" xml:space="preserve">
     <value>Volver</value>

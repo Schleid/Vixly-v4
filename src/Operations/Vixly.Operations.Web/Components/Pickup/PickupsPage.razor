@@ -16,26 +16,27 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.pickup.title"]" Company="@Company" Section="pickup" Error="@Error" Info="@Info">
-    <form method="get" action="/staff/pickup" class="ops-editor__panel ops-editor__form" role="search" aria-labelledby="pickup-search">
-        <h2 id="pickup-search">@T["ui.pickup.find"]</h2>
+    <form method="get" action="/staff/pickup" class="ops-list-bar" role="search" aria-labelledby="pickup-search">
         @if (Warehouses.Count > 1)
         {
-            <label>@T["ui.arrivals.warehouse"]
-                <select name="warehouse">
-                    @foreach (OperationsArrivalPlace place in Warehouses)
-                    {
-                        <option value="@place.Id" selected="@(place.Id == WarehouseId)">@place.Code · @place.Name</option>
-                    }
-                </select>
-            </label>
+            <select name="warehouse" aria-label="@T["ui.arrivals.warehouse"]">
+                @foreach (OperationsArrivalPlace place in Warehouses)
+                {
+                    <option value="@place.Id" selected="@(place.Id == WarehouseId)">@place.Code · @place.Name</option>
+                }
+            </select>
         }
         else
         {
             <input type="hidden" name="warehouse" value="@WarehouseId" />
         }
-        <label>@T["ui.pickup.query"] <input name="query" value="@Query" maxlength="64" autocomplete="off" autofocus /></label>
+        <input id="pickup-search" name="query" value="@Query" maxlength="64" placeholder="@T["ui.pickup.query"]" autocomplete="off" autofocus class="ops-editor__search-input" style="width: 18rem;" />
         <button type="submit" class="vx-button vx-button--primary">@T["ui.pickup.search"]</button>
-        <p class="ops-editor__hint">@T["ui.pickup.query_hint"]</p>
+        @if (!string.IsNullOrEmpty(Query))
+        {
+            <a href="/staff/pickup?warehouse=@WarehouseId" class="vx-button vx-button--secondary">@T["ui.customers.clear"]</a>
+        }
+        <span class="ops-editor__hint" style="margin: 0; margin-inline-start: 0.5rem;">@T["ui.pickup.query_hint"]</span>
     </form>
     <section class="ops-editor__panel" aria-labelledby="ready-title">
         <h2 id="ready-title">@T["ui.pickup.ready"]</h2>

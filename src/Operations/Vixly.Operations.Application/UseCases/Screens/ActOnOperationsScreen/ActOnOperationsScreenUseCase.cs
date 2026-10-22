@@ -125,7 +125,9 @@ public sealed class ActOnOperationsScreenUseCase
                     return await CardAsync(screen, invoice, request.ReturnUrl, utcNow, cancellationToken);
 
                 case OperationsScreenAction.Sign:
-                    return await SignAsync(screen, current.Shipment, request.Signature, utcNow, cancellationToken);
+                    return request.Accepted
+                        ? await SignAsync(screen, current.Shipment, request.Signature, utcNow, cancellationToken)
+                        : ActOnOperationsScreenResponse.Failure(OperationsScreenErrors.AcceptRequired);
 
                 default:
                     return ActOnOperationsScreenResponse.Failure(OperationsScreenErrors.StepInvalid);
@@ -208,7 +210,8 @@ public sealed class ActOnOperationsScreenUseCase
             return ActOnOperationsScreenResponse.Failure(exception.Error);
         }
 
-        _audit.Record(null, "ops.shipments.customer_signed", nameof(OperationsShipment), shipment.Id, after: new { number = shipment.Number, screen = screen.Name, clerk });
+        _audit.Record(null, "ops.shipments.customer_signed", nameof(OperationsShipment), shipment.Id,
+            after: new { number = shipment.Number, screen = screen.Name, clerk, insured = shipment.Options.HasFlag(OperationsShipmentOptions.Insured), plan = shipment.InsurancePlanId, accepted = true });
 
         if (await _unitOfWork.SaveChangesAsync(cancellationToken))
         {

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: DiscrepanciesPage.razor
 
@@ -15,12 +15,23 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.arrivals.discrepancies"]" Company="@Company" Section="arrivals" Error="@Error" Info="@Info">
-    <p class="ops-editor__actions">
-        <a href="/staff/arrivals">@T["ui.arrivals.back"]</a>
-        @if (All) { <a href="/staff/arrivals/discrepancies">@T["ui.arrivals.view_open"]</a> } else { <a href="/staff/arrivals/discrepancies?view=all">@T["ui.arrivals.view_all"]</a> }
-    </p>
+    <div class="ops-list-bar">
+        <div class="ops-list-bar__filters">
+            <a href="/staff/arrivals" class="vx-button vx-button--secondary">← @T["ui.arrivals.back"]</a>
+        </div>
+        <div class="ops-list-bar__actions">
+            @if (All)
+            {
+                <a href="/staff/arrivals/discrepancies" class="vx-button vx-button--secondary">@T["ui.arrivals.view_open"]</a>
+            }
+            else
+            {
+                <a href="/staff/arrivals/discrepancies?view=all" class="vx-button vx-button--secondary">@T["ui.arrivals.view_all"]</a>
+            }
+        </div>
+    </div>
     <section class="ops-editor__panel" aria-labelledby="list-title">
-        <h2 id="list-title">@T["ui.arrivals.discrepancies"]</h2>
+        <h2 id="list-title" class="ops-section-title">@T["ui.arrivals.discrepancies"] (@Items.Count)</h2>
         @if (Items.Count == 0)
         {
             <div class="ops-editor__empty"><p>@T["ui.arrivals.no_discrepancies"]</p></div>

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: ArrivalsPage.razor
 
@@ -17,23 +17,32 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.arrivals.title"]" Company="@Company" Section="arrivals" Error="@Error" Info="@Info">
-    @if (Warehouses.Count > 1)
-    {
-        <form method="get" action="/staff/arrivals" class="ops-editor__panel ops-editor__form" aria-label="@T["ui.arrivals.warehouse"]">
-            <label>@T["ui.arrivals.warehouse"]
-                <select name="warehouse">
-                    @foreach (OperationsArrivalPlace place in Warehouses)
-                    {
-                        <option value="@place.Id" selected="@(place.Id == WarehouseId)">@place.Code · @place.Name</option>
-                    }
-                </select>
-            </label>
-            <button type="submit" class="vx-button">@T["ui.arrivals.show"]</button>
-        </form>
-    }
-    <p class="ops-editor__actions"><a href="/staff/arrivals/discrepancies">@T["ui.arrivals.discrepancies"]</a></p>
+    <div class="ops-list-bar">
+        @if (Warehouses.Count > 1)
+        {
+            <form method="get" action="/staff/arrivals" class="ops-list-bar__filters" aria-label="@T["ui.arrivals.warehouse"]">
+                <label class="ops-field ops-field--inline">
+                    <span class="ops-label-text">@T["ui.arrivals.warehouse"]</span>
+                    <select name="warehouse" class="ops-field__control" onchange="this.form.submit()">
+                        @foreach (OperationsArrivalPlace place in Warehouses)
+                        {
+                            <option value="@place.Id" selected="@(place.Id == WarehouseId)">@place.Code · @place.Name</option>
+                        }
+                    </select>
+                </label>
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.arrivals.show"]</button>
+            </form>
+        }
+        else
+        {
+            <div class="ops-list-bar__filters"></div>
+        }
+        <div class="ops-list-bar__actions">
+            <a href="/staff/arrivals/discrepancies" class="vx-button vx-button--secondary">@T["ui.arrivals.discrepancies"]</a>
+        </div>
+    </div>
     <section class="ops-editor__panel" aria-labelledby="coming-title">
-        <h2 id="coming-title">@T["ui.arrivals.coming"]</h2>
+        <h2 id="coming-title" class="ops-section-title">@T["ui.arrivals.coming"] (@Coming.Count)</h2>
         @if (Coming.Count == 0)
         {
             <div class="ops-editor__empty"><p>@T["ui.arrivals.none_coming"]</p></div>
@@ -46,7 +55,7 @@ IMPORTANT NOTES:
     @if (Received.Count > 0)
     {
         <section class="ops-editor__panel" aria-labelledby="received-title">
-            <h2 id="received-title">@T["ui.arrivals.received"]</h2>
+            <h2 id="received-title" class="ops-section-title">@T["ui.arrivals.received"] (@Received.Count)</h2>
             <ArrivalRows Rows="Received" WarehouseId="WarehouseId" TimeZone="@TimeZone" />
         </section>
     }

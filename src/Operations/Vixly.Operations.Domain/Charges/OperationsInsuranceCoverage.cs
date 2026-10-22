@@ -70,6 +70,14 @@ public sealed class OperationsInsuranceCoverage
 
     public string? TermsEs { get; private set; }
 
+    // The policy's own words in the customer's language, English when not written in it (shown before the customer signs).
+    public string? Terms(string? language) => language switch
+    {
+        "fr" => TermsFr ?? TermsEn,
+        "es" => TermsEs ?? TermsEn,
+        _ => TermsEn
+    };
+
     // Common courier practice: own cover of loss and damage, the usual exclusions, paid on the lower of the declared and invoice value,
     // damage claimed within 7 days and loss within 21, with the invoice and photos, filed by the company.
     public static OperationsInsuranceCoverageTerms Defaults { get; } = new(OperationsInsuranceCover.Own, null, null, null, OperationsInsuredRisks.Loss | OperationsInsuredRisks.Damage,

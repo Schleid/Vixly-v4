@@ -26,6 +26,9 @@ public sealed class ActOnOperationsScreenRequest
     // Sign: the signature drawn on the screen, as a PNG.
     public byte[]? Signature { get; init; }
 
+    // Sign: the customer ticked that they accept the declaration and, when insured, the insurance terms.
+    public bool Accepted { get; init; }
+
     // Card: where Stripe sends the customer back (this screen).
     public string? ReturnUrl { get; init; }
 }

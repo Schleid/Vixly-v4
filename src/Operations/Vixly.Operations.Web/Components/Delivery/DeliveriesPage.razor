@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: DeliveriesPage.razor
 
@@ -15,12 +15,15 @@ IMPORTANT NOTES:
 *@
 @inject IStringLocalizer<OperationsText> T
 
+<link rel="stylesheet" href="/css/ops-delivery.css?v=20261022-1" />
+
 <EditorShell Title="@T["ui.delivery.title"]" Company="@Company" Section="delivery" Error="@Error" Info="@Info">
     @if (Warehouses.Count > 1)
     {
-        <form method="get" action="/staff/delivery" class="ops-editor__panel ops-editor__form" aria-label="@T["ui.arrivals.warehouse"]">
-            <label>@T["ui.arrivals.warehouse"]
-                <select name="warehouse">
+        <form method="get" action="/staff/delivery" class="ops-list-bar" aria-label="@T["ui.arrivals.warehouse"]">
+            <label class="ops-field ops-field--inline">
+                <span class="ops-label-text">@T["ui.arrivals.warehouse"]</span>
+                <select name="warehouse" class="ops-field__control" onchange="this.form.submit()">
                     @foreach (OperationsArrivalPlace place in Warehouses)
                     {
                         <option value="@place.Id" selected="@(place.Id == WarehouseId)">@place.Code · @place.Name</option>
@@ -34,26 +37,44 @@ IMPORTANT NOTES:
         <AntiforgeryToken />
         <input type="hidden" name="warehouse" value="@WarehouseId" />
         <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
-        <h2 id="plan-title">@T["ui.delivery.plan"]</h2>
+        <div class="ops-editor__header">
+            <h2 id="plan-title" class="ops-section-title">@T["ui.delivery.plan"]</h2>
+            @if (Waiting.Count > 0)
+            {
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.delivery.plan_button"]</button>
+            }
+        </div>
         @if (Waiting.Count == 0)
         {
             <div class="ops-editor__empty"><p>@T["ui.delivery.none_waiting"]</p></div>
         }
         else
         {
-            <label>@T["ui.delivery.date"] <input type="date" name="date" value="@Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" required /></label>
-            <label>@T["ui.delivery.driver"]
-                <select name="driver" required="@(Recording == OperationsDeliveryRecording.Phone)">
-                    <option value="">@T[Recording == OperationsDeliveryRecording.Phone ? "ui.delivery.driver_choose" : "ui.delivery.driver_named"]</option>
-                    @foreach (OperationsDeliveryDriver driver in Drivers)
-                    {
-                        <option value="@driver.UserId">@driver.Name</option>
-                    }
-                </select>
-            </label>
+            <div class="ops-delivery-plan-controls">
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.delivery.date"]</span>
+                    <input type="date" name="date" class="ops-field__control" value="@Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" required />
+                </label>
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.delivery.driver"]</span>
+                    <select name="driver" class="ops-field__control" required="@(Recording == OperationsDeliveryRecording.Phone)">
+                        <option value="">@T[Recording == OperationsDeliveryRecording.Phone ? "ui.delivery.driver_choose" : "ui.delivery.driver_named"]</option>
+                        @foreach (OperationsDeliveryDriver driver in Drivers)
+                        {
+                            <option value="@driver.UserId">@driver.Name</option>
+                        }
+                    </select>
+                </label>
+                @if (Recording == OperationsDeliveryRecording.Sheet)
+                {
+                    <label class="ops-field">
+                        <span class="ops-label-text">@T["ui.delivery.driver_name"]</span>
+                        <input name="driverName" class="ops-field__control" maxlength="@OperationsDeliveryRoute.NameMaxLength" autocomplete="off" />
+                    </label>
+                }
+            </div>
             @if (Recording == OperationsDeliveryRecording.Sheet)
             {
-                <label>@T["ui.delivery.driver_name"] <input name="driverName" maxlength="@OperationsDeliveryRoute.NameMaxLength" autocomplete="off" /></label>
                 <p class="ops-editor__hint">@T["ui.delivery.driver_hint_sheet"]</p>
             }
             else if (Drivers.Count == 0)
@@ -61,13 +82,23 @@ IMPORTANT NOTES:
                 <p class="ops-editor__hint">@T["ui.delivery.no_drivers"]</p>
             }
             <OperationsTableViewport Label="@T["ui.delivery.waiting"]">
-                <table class="ops-editor__table">
-                    <thead><tr><th scope="col"><span class="vx-visually-hidden">@T["ui.delivery.choose"]</span></th><th scope="col" class="ops-editor__identity-cell">@T["ui.pickup.shipment"]</th><th scope="col">@T["ui.pickup.recipient"]</th><th scope="col">@T["ui.delivery.area"]</th><th scope="col" class="ops-editor__number">@T["ui.pickup.parcels"]</th><th scope="col" class="ops-editor__number">@T["ui.delivery.tries"]</th><th scope="col">@T["ui.pickup.payment"]</th></tr></thead>
+                <table class="ops-editor__table ops-table--compact">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="ops-editor__select-cell"><span class="vx-visually-hidden">@T["ui.delivery.choose"]</span></th>
+                            <th scope="col" class="ops-editor__identity-cell">@T["ui.pickup.shipment"]</th>
+                            <th scope="col">@T["ui.pickup.recipient"]</th>
+                            <th scope="col">@T["ui.delivery.area"]</th>
+                            <th scope="col" class="ops-editor__number">@T["ui.pickup.parcels"]</th>
+                            <th scope="col" class="ops-editor__number">@T["ui.delivery.tries"]</th>
+                            <th scope="col">@T["ui.pickup.payment"]</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         @foreach (OperationsDeliveryWaitingRow row in Waiting)
                         {
                             <tr data-status="@(row.Blocked ? "unpaid" : "ready")">
-                                <td><input type="checkbox" name="shipments" value="@row.ShipmentId" disabled="@row.Blocked" aria-label="@row.Number" /></td>
+                                <td class="ops-editor__select-cell"><input type="checkbox" name="shipments" value="@row.ShipmentId" disabled="@row.Blocked" aria-label="@row.Number" /></td>
                                 <td class="ops-editor__identity-cell ops-editor__code">@row.Number</td>
                                 <td>@row.RecipientName</td>
                                 <td>@row.PostalCode @row.City</td>
@@ -84,7 +115,6 @@ IMPORTANT NOTES:
                 </table>
             </OperationsTableViewport>
             <p class="ops-editor__hint">@T[CashOnDelivery ? "ui.delivery.cod_on_hint" : "ui.delivery.cod_off_hint"]</p>
-            <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.delivery.plan_button"]</button></p>
         }
     </form>
     @if (DestinationCharges && Waiting.Count > 0)
@@ -93,24 +123,38 @@ IMPORTANT NOTES:
             <AntiforgeryToken />
             <input type="hidden" name="warehouse" value="@WarehouseId" />
             <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
-            <h2 id="bill-title">@T["ui.delivery.bill"]</h2>
-            <label>@T["ui.pickup.shipment"]
-                <select name="shipment" required>
-                    @foreach (OperationsDeliveryWaitingRow row in Waiting)
-                    {
-                        <option value="@row.ShipmentId">@row.Number · @row.RecipientName</option>
-                    }
-                </select>
-            </label>
-            <label>@T["ui.charges.line.Duties"] <input name="duties" type="number" min="0" step="0.01" /></label>
-            <label>@T["ui.charges.line.LocalTax"] <input name="localTax" type="number" min="0" step="0.01" /></label>
-            <label>@T["ui.charges.line.LocalFee"] <input name="localFee" type="number" min="0" step="0.01" /></label>
+            <h2 id="bill-title" class="ops-section-title">@T["ui.delivery.bill"]</h2>
+            <div class="ops-delivery-billing-grid">
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.pickup.shipment"]</span>
+                    <select name="shipment" class="ops-field__control" required>
+                        @foreach (OperationsDeliveryWaitingRow row in Waiting)
+                        {
+                            <option value="@row.ShipmentId">@row.Number · @row.RecipientName</option>
+                        }
+                    </select>
+                </label>
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.charges.line.Duties"]</span>
+                    <input name="duties" type="number" min="0" step="0.01" class="ops-field__control" />
+                </label>
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.charges.line.LocalTax"]</span>
+                    <input name="localTax" type="number" min="0" step="0.01" class="ops-field__control" />
+                </label>
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.charges.line.LocalFee"]</span>
+                    <input name="localFee" type="number" min="0" step="0.01" class="ops-field__control" />
+                </label>
+                <div class="ops-delivery-billing-action">
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.delivery.bill_button"]</button>
+                </div>
+            </div>
             <p class="ops-editor__hint">@T[CashOnDelivery ? "ui.delivery.bill_hint_cod" : "ui.delivery.bill_hint"]</p>
-            <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--secondary">@T["ui.delivery.bill_button"]</button></p>
         </form>
     }
     <section class="ops-editor__panel" aria-labelledby="routes-title">
-        <h2 id="routes-title">@T["ui.delivery.routes"]</h2>
+        <h2 id="routes-title" class="ops-section-title">@T["ui.delivery.routes"]</h2>
         @if (Routes.Count == 0)
         {
             <div class="ops-editor__empty"><p>@T["ui.delivery.no_routes"]</p></div>
@@ -118,8 +162,17 @@ IMPORTANT NOTES:
         else
         {
             <OperationsTableViewport Label="@T["ui.delivery.routes"]">
-                <table class="ops-editor__table">
-                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.delivery.route"]</th><th scope="col">@T["ui.delivery.date"]</th><th scope="col">@T["ui.delivery.driver"]</th><th scope="col">@T["ui.delivery.status"]</th><th scope="col" class="ops-editor__number">@T["ui.delivery.stops"]</th><th scope="col" class="ops-editor__number">@T["ui.delivery.cash"]</th></tr></thead>
+                <table class="ops-editor__table ops-table--compact">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="ops-editor__identity-cell">@T["ui.delivery.route"]</th>
+                            <th scope="col">@T["ui.delivery.date"]</th>
+                            <th scope="col">@T["ui.delivery.driver"]</th>
+                            <th scope="col">@T["ui.delivery.status"]</th>
+                            <th scope="col" class="ops-editor__number">@T["ui.delivery.stops"]</th>
+                            <th scope="col" class="ops-editor__number">@T["ui.delivery.cash"]</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         @foreach (OperationsDeliveryRouteRow route in Routes)
                         {
@@ -140,11 +193,19 @@ IMPORTANT NOTES:
     @if (Returns.Count > 0)
     {
         <section class="ops-editor__panel" aria-labelledby="returns-title">
-            <h2 id="returns-title">@T["ui.delivery.returns"]</h2>
+            <h2 id="returns-title" class="ops-section-title">@T["ui.delivery.returns"]</h2>
             <p class="ops-editor__hint">@T["ui.delivery.returns_hint"]</p>
             <OperationsTableViewport Label="@T["ui.delivery.returns"]">
-                <table class="ops-editor__table">
-                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.pickup.parcel"]</th><th scope="col">@T["ui.pickup.shipment"]</th><th scope="col">@T["ui.pickup.recipient"]</th><th scope="col" class="ops-editor__number">@T["ui.delivery.tries"]</th><th scope="col">@T["ui.delivery.return_action"]</th></tr></thead>
+                <table class="ops-editor__table ops-table--compact">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="ops-editor__identity-cell">@T["ui.pickup.parcel"]</th>
+                            <th scope="col">@T["ui.pickup.shipment"]</th>
+                            <th scope="col">@T["ui.pickup.recipient"]</th>
+                            <th scope="col" class="ops-editor__number">@T["ui.delivery.tries"]</th>
+                            <th scope="col" class="ops-editor__action-col">@T["ui.delivery.return_action"]</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         @foreach (OperationsDeliveryReturnRow row in Returns)
                         {
@@ -157,7 +218,7 @@ IMPORTANT NOTES:
                                     <form method="post" action="/staff/delivery/returns/@row.ParcelId" class="ops-editor__inline">
                                         <AntiforgeryToken />
                                         <input type="hidden" name="warehouse" value="@WarehouseId" />
-                                        <label><span class="vx-visually-hidden">@T["ui.delivery.note"]</span><input name="note" maxlength="@OperationsDeliveryStop.NoteMaxLength" placeholder="@T["ui.delivery.note"]" /></label>
+                                        <label><span class="vx-visually-hidden">@T["ui.delivery.note"]</span><input name="note" class="ops-field__control" maxlength="@OperationsDeliveryStop.NoteMaxLength" placeholder="@T["ui.delivery.note"]" /></label>
                                         <button type="submit" class="vx-button vx-button--secondary">@T["ui.delivery.returned_button"]</button>
                                     </form>
                                 </td>

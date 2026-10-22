@@ -1666,6 +1666,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ops.roles.system_role_locked" xml:space="preserve">
     <value>The Administrator role cannot be changed.</value>
   </data>
+  <data name="ops.screens.accept_required" xml:space="preserve">
+    <value>Please tick the box to accept before you sign.</value>
+  </data>
   <data name="ops.screens.code_invalid" xml:space="preserve">
     <value>That code is not right or has expired. Ask the clerk for a new one.</value>
   </data>
@@ -10362,6 +10365,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.scan.wait_sending" xml:space="preserve">
     <value>Scans are still being sent. Try again in a moment.</value>
+  </data>
+  <data name="ui.screen.accept_declaration" xml:space="preserve">
+    <value>I have read the declaration above, and I accept that this shipment is not insured, with the company’s liability shown.</value>
+  </data>
+  <data name="ui.screen.accept_insured" xml:space="preserve">
+    <value>I have read the declaration and the insurance terms above, and I accept them.</value>
   </data>
   <data name="ui.screen.back" xml:space="preserve">
     <value>Back</value>

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: ArrivalPage.razor
 
@@ -19,32 +19,67 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@VixlyText.Format(T, "ui.arrivals.dispatch_title", "number", Number)" Company="@Company" Section="arrivals" Error="@Error" Info="@Info">
-    <p class="ops-editor__actions"><a href="/staff/arrivals?warehouse=@Here.Id">@T["ui.arrivals.back"]</a></p>
     <section class="ops-editor__panel" aria-labelledby="summary-title">
-        <h2 id="summary-title">@T["ui.arrivals.summary"]</h2>
-        <dl class="ops-editor__facts">
-            <dt>@T["ui.dispatch.from"]</dt><dd>@FromCode</dd>
-            <dt>@T["ui.arrivals.warehouse"]</dt><dd>@Here.Code · @Here.Name</dd>
-            <dt>@T["ui.dispatch.state"]</dt><dd>@T["ui.dispatch.status." + Status]@if (Onward) { <span> · @T["ui.arrivals.onward"]</span> }</dd>
-            <dt>@T["ui.arrivals.received_at"]</dt><dd>@(ReceivedUtc is null ? T["ui.arrivals.not_yet"].Value : OperationsDispatchWords.Time(ReceivedUtc, Here.TimeZone))</dd>
+        <div class="ops-record-header">
+            <div class="ops-record-header__identity">
+                <span class="ops-record-header__back">
+                    <a class="vx-button vx-button--secondary" href="/staff/arrivals?warehouse=@Here.Id">← @T["ui.arrivals.back"]</a>
+                </span>
+                <h2 id="summary-title" class="ops-section-title">@Number</h2>
+                <span class="ops-editor__status" data-status="@Status.ToString().ToLowerInvariant()">@T["ui.dispatch.status." + Status]</span>
+                @if (Onward) { <span class="ops-editor__hint">(@T["ui.arrivals.onward"])</span> }
+            </div>
+            <div class="ops-record-header__actions">
+                @if (CanReceive && ReceivedUtc is null)
+                {
+                    <form method="post" action="/staff/arrivals/@DispatchId/finish" class="ops-editor__inline">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="warehouse" value="@Here.Id" />
+                        <button type="submit" class="vx-button vx-button--primary">@T["ui.arrivals.finish_button"]</button>
+                    </form>
+                }
+            </div>
+        </div>
+        <dl class="ops-facts-grid">
+            <div class="ops-facts-grid__item"><dt>@T["ui.dispatch.from"]</dt><dd class="ops-editor__code">@FromCode</dd></div>
+            <div class="ops-facts-grid__item"><dt>@T["ui.arrivals.warehouse"]</dt><dd>@Here.Code · @Here.Name</dd></div>
+            <div class="ops-facts-grid__item"><dt>@T["ui.dispatch.state"]</dt><dd><span class="ops-editor__status" data-status="@Status.ToString().ToLowerInvariant()">@T["ui.dispatch.status." + Status]</span></dd></div>
+            <div class="ops-facts-grid__item"><dt>@T["ui.arrivals.received_at"]</dt><dd>@(ReceivedUtc is null ? T["ui.arrivals.not_yet"].Value : OperationsDispatchWords.Time(ReceivedUtc, Here.TimeZone))</dd></div>
         </dl>
     </section>
+
     @if (CanReceive)
     {
-        <form method="post" action="/staff/arrivals/@DispatchId/scan" class="ops-editor__panel ops-editor__form" aria-labelledby="scan-title">
-            <AntiforgeryToken />
-            <input type="hidden" name="warehouse" value="@Here.Id" />
-            <h2 id="scan-title">@T["ui.arrivals.scan"]</h2>
-            <label>@T["ui.arrivals.code"] <input name="code" maxlength="@OperationsArrivalDiscrepancy.CodeMaxLength" autocomplete="off" autofocus required /></label>
-            <button type="submit" class="vx-button vx-button--primary">@T["ui.arrivals.receive"]</button>
+        <div class="ops-editor__panel ops-scan-bar-card">
+            <h2 id="scan-title" class="ops-section-title">@T["ui.arrivals.scan"]</h2>
+            <form method="post" action="/staff/arrivals/@DispatchId/scan" class="ops-list-bar ops-list-bar--scan" aria-labelledby="scan-title">
+                <AntiforgeryToken />
+                <input type="hidden" name="warehouse" value="@Here.Id" />
+                <div class="ops-list-bar__search">
+                    <label for="arrival-scan-code" class="vx-visually-hidden">@T["ui.arrivals.code"]</label>
+                    <input id="arrival-scan-code" name="code" class="ops-field__control ops-field__control--search" maxlength="@OperationsArrivalDiscrepancy.CodeMaxLength" placeholder="@T["ui.arrivals.code"]" autocomplete="off" autofocus required />
+                </div>
+                <div class="ops-list-bar__actions">
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.arrivals.receive"]</button>
+                </div>
+            </form>
             <p class="ops-editor__hint">@T["ui.arrivals.scan_hint"]</p>
-        </form>
+        </div>
     }
+
     <section class="ops-editor__panel" aria-labelledby="bundles-title">
-        <h2 id="bundles-title">@T["ui.dispatch.bundles"]</h2>
+        <h2 id="bundles-title" class="ops-section-title">@T["ui.dispatch.bundles"] (@Bundles.Count)</h2>
         <OperationsTableViewport Label="@T["ui.dispatch.bundles"]">
-            <table class="ops-editor__table">
-                <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.arrivals.bundle"]</th><th scope="col">@T["ui.dispatch.destination"]</th><th scope="col">@T["ui.dispatch.state"]</th><th scope="col" class="ops-editor__number">@T["ui.arrivals.parcels_here"]</th><th scope="col"><span class="vx-visually-hidden">@T["ui.arrivals.actions"]</span></th></tr></thead>
+            <table class="ops-editor__table ops-table--compact">
+                <thead>
+                    <tr>
+                        <th scope="col" class="ops-editor__identity-cell">@T["ui.arrivals.bundle"]</th>
+                        <th scope="col">@T["ui.dispatch.destination"]</th>
+                        <th scope="col">@T["ui.dispatch.state"]</th>
+                        <th scope="col" class="ops-editor__number">@T["ui.arrivals.parcels_here"]</th>
+                        <th scope="col" class="ops-editor__action-col"><span class="vx-visually-hidden">@T["ui.arrivals.actions"]</span></th>
+                    </tr>
+                </thead>
                 <tbody>
                     @foreach (OperationsArrivalBundleRow bundle in Bundles)
                     {
@@ -57,10 +92,10 @@ IMPORTANT NOTES:
                             <td>
                                 @if (CanReceive && bundle.Here && bundle.EndsHere && bundle.OpenedUtc is null)
                                 {
-                                    <form method="post" action="/staff/arrivals/@DispatchId/bundles/@bundle.BundleId/open">
+                                    <form method="post" action="/staff/arrivals/@DispatchId/bundles/@bundle.BundleId/open" class="ops-editor__inline">
                                         <AntiforgeryToken />
                                         <input type="hidden" name="warehouse" value="@Here.Id" />
-                                        <button type="submit" class="vx-button">@T["ui.arrivals.open"]</button>
+                                        <button type="submit" class="vx-button vx-button--secondary vx-button--sm">@T["ui.arrivals.open"]</button>
                                     </form>
                                 }
                             </td>
@@ -70,49 +105,50 @@ IMPORTANT NOTES:
             </table>
         </OperationsTableViewport>
     </section>
+
     @if (CanCustoms)
     {
         <form method="post" action="/staff/arrivals/@DispatchId/customs" class="ops-editor__panel ops-editor__form" aria-labelledby="customs-title">
             <AntiforgeryToken />
             <input type="hidden" name="warehouse" value="@Here.Id" />
             <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
-            <h2 id="customs-title">@T["ui.arrivals.customs"]</h2>
-            <label>@T["ui.arrivals.customs_step"]
-                <select name="step">
-                    @foreach (string step in new[] { "in_customs", "cleared", "held" })
-                    {
-                        <option value="@step">@T["ui.arrivals.customs." + step]</option>
-                    }
-                </select>
-            </label>
-            <label>@T["ui.arrivals.customs_scope"]
-                <select name="bundle">
-                    <option value="">@T["ui.arrivals.customs_all"]</option>
-                    @foreach (OperationsArrivalBundleRow bundle in Bundles)
-                    {
-                        <option value="@bundle.BundleId">@bundle.Number</option>
-                    }
-                </select>
-            </label>
-            <label>@T["ui.arrivals.customs_message"] <input name="message" maxlength="140" /></label>
-            <button type="submit" class="vx-button">@T["ui.arrivals.customs_record"]</button>
+            <h2 id="customs-title" class="ops-section-title">@T["ui.arrivals.customs"]</h2>
+            <div class="ops-form-grid ops-form-grid--3col">
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.arrivals.customs_step"]</span>
+                    <select name="step" class="ops-field__control">
+                        @foreach (string step in new[] { "in_customs", "cleared", "held" })
+                        {
+                            <option value="@step">@T["ui.arrivals.customs." + step]</option>
+                        }
+                    </select>
+                </label>
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.arrivals.customs_scope"]</span>
+                    <select name="bundle" class="ops-field__control">
+                        <option value="">@T["ui.arrivals.customs_all"]</option>
+                        @foreach (OperationsArrivalBundleRow bundle in Bundles)
+                        {
+                            <option value="@bundle.BundleId">@bundle.Number</option>
+                        }
+                    </select>
+                </label>
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.arrivals.customs_message"]</span>
+                    <input name="message" class="ops-field__control" maxlength="140" />
+                </label>
+            </div>
+            <div class="ops-editor__actions">
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.arrivals.customs_record"]</button>
+            </div>
             <p class="ops-editor__hint">@T["ui.arrivals.customs_hint"]</p>
         </form>
     }
-    @if (CanReceive && ReceivedUtc is null)
-    {
-        <form method="post" action="/staff/arrivals/@DispatchId/finish" class="ops-editor__panel ops-editor__form" aria-labelledby="finish-title">
-            <AntiforgeryToken />
-            <input type="hidden" name="warehouse" value="@Here.Id" />
-            <h2 id="finish-title">@T["ui.arrivals.finish"]</h2>
-            <p class="ops-editor__hint">@T["ui.arrivals.finish_hint"]</p>
-            <button type="submit" class="vx-button vx-button--primary">@T["ui.arrivals.finish_button"]</button>
-        </form>
-    }
+
     @if (Discrepancies.Count > 0)
     {
         <section class="ops-editor__panel" aria-labelledby="discrepancies-title">
-            <h2 id="discrepancies-title">@T["ui.arrivals.discrepancies"]</h2>
+            <h2 id="discrepancies-title" class="ops-section-title">@T["ui.arrivals.discrepancies"] (@Discrepancies.Count)</h2>
             <DiscrepancyRows Rows="Discrepancies" TimeZone="@Here.TimeZone" />
         </section>
     }

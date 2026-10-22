@@ -197,7 +197,7 @@ New in the [UI styling inventory](UI-STYLING-INVENTORY.md) as *Needs styling*: t
 - **The screen** (`/screen` on the company's own address): the code typed once, then a secret in a host-only cookie for 400 days; no sign-in, no licence. It shows welcome, the invoice with *Pay by card* and *Pay with Zelle* (never cash), the Zelle warning and terms, then the Zelle details and QR picture, Stripe's page as a QR code and a link, the declaration to sign, and thank you, in the customer's language. It reloads itself when what it shows changes.
 - **The clerk's side:** *Send to pay* on the cashier invoice and *Send to sign* on the counter shipment, one per screen of that warehouse, with what the screen shows now and *Clear · next customer*; the Zelle acceptance shown while the screen is on that invoice.
 - **At the cashier:** a Zelle payment needs no tick from the clerk when the customer accepted the same terms on a screen for that invoice in the last 4 hours.
-- **The signature** on the screen is the shipment's own (Slice 5D): on the declaration PDF, with the clerk who sent it as the one present.
+- **The signature** on the screen is the shipment's own (Slice 5D): on the declaration PDF, with the clerk who sent it as the one present. Before signing, the customer reads the insurance agreement (cover, insurer, deductible, claim deadlines and the policy's own words, also now printed on the PDF) and ticks that they accept it (owner, 2026-10-22).
 
 ### Database
 
@@ -225,7 +225,7 @@ Left as is (for the owner): rights are checked when the clerk sends, not again w
 
 All suites pass: domain 259, application 97, infrastructure 69, web 112, API 33, customer web 40, customer infrastructure 1, architecture 13 823, platform domain 308, application 236, infrastructure 63, web 43, API 21, public web 23.
 
-New: the screen rules (pairing once with an expiring code, a new code stops the old screen, steps only from where they are offered, terms before the Zelle details, tidying itself) (domain); `CustomerScreen_PairedByCode_PaysAndSigns_OnlyWhatTheClerkSent` (web: the code shown once and kept as a hash, a wrong code and a used code refused, an unpaired browser gets nothing, the invoice sent and shown with card and Zelle and never cash, the version, an old choice refused, the QR picture only after the terms, the cashier's Zelle payment counting the customer's acceptance, the screen saying paid, a second invoice paid by card on Stripe's page with the screen's return address, the thank-you on a phone, the declaration signed, a signature from a page shown before a change refused, clear and remove).
+New: the screen rules (pairing once with an expiring code, a new code stops the old screen, steps only from where they are offered, terms before the Zelle details, tidying itself) (domain); `CustomerScreen_PairedByCode_PaysAndSigns_OnlyWhatTheClerkSent` (web: the code shown once and kept as a hash, a wrong code and a used code refused, an unpaired browser gets nothing, the invoice sent and shown with card and Zelle and never cash, the version, an old choice refused, the QR picture only after the terms, the cashier's Zelle payment counting the customer's acceptance, the screen saying paid, a second invoice paid by card on Stripe's page with the screen's return address, the thank-you on a phone, the declaration with the insurance policy's words, signing refused without the acceptance ticked, the declaration signed, a signature from a page shown before a change refused, clear and remove).
 
 ### Styling
 

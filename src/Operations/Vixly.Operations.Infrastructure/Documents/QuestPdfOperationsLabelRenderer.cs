@@ -537,6 +537,12 @@ internal sealed class QuestPdfOperationsLabelRenderer : IOperationsLabelRenderer
                         {
                             ["damage"] = coverage.DamageClaimDays, ["loss"] = coverage.LossClaimDays
                         }));
+
+                        // The policy's own words, as the customer read them before signing (on paper or on the customer screen).
+                        if (coverage.Terms(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName) is { } policy)
+                        {
+                            column.Item().PaddingTop(4).Text(policy).FontSize(8);
+                        }
                     }
 
                     column.Item().Text(Word("accept")).FontSize(9);

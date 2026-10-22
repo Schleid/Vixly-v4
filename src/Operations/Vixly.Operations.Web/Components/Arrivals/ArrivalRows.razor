@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: ArrivalRows.razor
 
@@ -15,13 +15,25 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <OperationsTableViewport Label="@T["ui.arrivals.coming"]">
-    <table class="ops-editor__table">
-        <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.dispatch.number"]</th><th scope="col">@T["ui.dispatch.from"]</th><th scope="col">@T["ui.dispatch.state"]</th><th scope="col">@T["ui.arrivals.departed"]</th><th scope="col">@T["ui.arrivals.received_at"]</th><th scope="col" class="ops-editor__number">@T["ui.dispatch.bundles"]</th></tr></thead>
+    <table class="ops-editor__table ops-table--compact">
+        <thead>
+            <tr>
+                <th scope="col" class="ops-editor__identity-cell">@T["ui.dispatch.number"]</th>
+                <th scope="col">@T["ui.dispatch.from"]</th>
+                <th scope="col">@T["ui.dispatch.state"]</th>
+                <th scope="col">@T["ui.arrivals.departed"]</th>
+                <th scope="col">@T["ui.arrivals.received_at"]</th>
+                <th scope="col" class="ops-editor__number">@T["ui.dispatch.bundles"]</th>
+            </tr>
+        </thead>
         <tbody>
             @foreach (OperationsArrivalRow row in Rows)
             {
-                <tr data-status="@row.Status">
-                    <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/arrivals/@row.DispatchId?warehouse=@WarehouseId">@row.Number</a>@if (row.Onward) { <span class="ops-editor__hint"> · @T["ui.arrivals.onward"]</span> }</td>
+                <tr data-status="@row.Status.ToString().ToLowerInvariant()">
+                    <td class="ops-editor__identity-cell ops-editor__code">
+                        <a href="/staff/arrivals/@row.DispatchId?warehouse=@WarehouseId">@row.Number</a>
+                        @if (row.Onward) { <span class="ops-editor__hint"> · @T["ui.arrivals.onward"]</span> }
+                    </td>
                     <td>@row.FromCode</td>
                     <td><span class="ops-editor__status" data-status="@row.Status.ToString().ToLowerInvariant()">@T["ui.dispatch.status." + row.Status]</span></td>
                     <td>@OperationsDispatchWords.Time(row.DepartedUtc, TimeZone)</td>
