@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: BillingSettingsPage.razor
 
@@ -15,6 +15,14 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<PlatformText> T
 
 <PageTitle>@T["ui.billing_settings.title"]</PageTitle>
-<h1>@T["ui.billing_settings.title"]</h1>
-<p><a href="/invoices">@T["ui.invoices.title"]</a> · <a href="/billing/tax-rates">@T["ui.tax_rates.title"]</a></p>
+<div class="vx-summary-strip">
+    <div class="vx-summary-strip__main">
+        <h1 class="vx-summary-strip__title">@T["ui.billing_settings.title"]</h1>
+    </div>
+    <div class="vx-summary-strip__actions">
+        <a href="/invoices" class="vx-button vx-button--secondary">@T["ui.invoices.title"]</a>
+        <a href="/billing/tax-rates" class="vx-button vx-button--secondary">@T["ui.tax_rates.title"]</a>
+        <a href="/payments/settings" class="vx-button vx-button--secondary">@T["ui.payments_settings.title"]</a>
+    </div>
+</div>
 <BillingSettingsForm />

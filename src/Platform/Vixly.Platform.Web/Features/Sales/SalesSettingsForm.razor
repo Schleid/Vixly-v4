@@ -20,108 +20,136 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<PlatformText> T
 @inject PlatformErrorText Errors
 
-<div id="sales-settings">
-    <VxCard Title="@T["ui.sales_settings.title"]">
-        @if (Presenter.State.DoneKey is { } done)
-        {
-            <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
-        }
-        @if (Presenter.State.Error is not null)
-        {
-            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
-        }
-        @if (!Presenter.State.Loaded)
-        {
-            <p role="status">@T["ui.common.loading"]</p>
-        }
-        else if (Presenter.State.Settings is { } settings)
-        {
-            <div class="vx-settings-header">
-                <p class="vx-hint">@T["ui.sales_settings.help"]</p>
-                @if (settings.UpdatedUtc is { } updated)
-                {
-                    <span class="vx-settings-meta">@VixlyText.Format(T, "ui.sales_settings.updated", new Dictionary<string, object> { ["name"] = settings.UpdatedByName ?? string.Empty, ["time"] = PlatformDisplay.Utc(T, updated) })</span>
-                }
-            </div>
-            <form class="vx-form" @onsubmit="SaveAsync">
-                <!-- Section 1: Discounts & Fixed Limits -->
-                <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)">
-                    <legend class="vx-fieldset__legend">@T["ui.sales_settings.discounts"]</legend>
-                    <div class="vx-field" style="max-width: 22rem;">
-                        <label for="sales-max-percent" class="vx-label">@T["ui.sales_settings.max_percent"]</label>
-                        <input id="sales-max-percent" type="number" min="0" max="100" step="0.01" class="vx-input" @bind="_model.MaxPercentWithoutApproval" aria-describedby="sales-max-percent-help" />
-                        <span id="sales-max-percent-help" class="vx-hint">@T["ui.sales_settings.max_percent_help"]</span>
-                    </div>
+<div id="sales-settings" class="vx-sales-limits-container">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (!Presenter.State.Loaded)
+    {
+        <p role="status">@T["ui.common.loading"]</p>
+    }
+    else if (Presenter.State.Settings is { } settings)
+    {
+        <div class="vx-settings-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; padding: 0.85rem 1.25rem; background: var(--vx-color-surface); border: 1px solid var(--vx-color-border); border-radius: var(--vx-radius-workbench, 0.5rem);">
+            <p class="vx-hint" style="margin: 0; font-size: 0.8125rem;">@T["ui.sales_settings.help"]</p>
+            @if (settings.UpdatedUtc is { } updated)
+            {
+                <span class="vx-kpi-card__badge">@VixlyText.Format(T, "ui.sales_settings.updated", new Dictionary<string, object> { ["name"] = settings.UpdatedByName ?? string.Empty, ["time"] = PlatformDisplay.Utc(T, updated) })</span>
+            }
+        </div>
 
-                    <div class="vx-field">
-                        <label class="vx-label">@T["ui.sales_settings.fixed_limits"]</label>
-                        <span class="vx-hint">@T["ui.sales_settings.fixed_limits_help"]</span>
-                        @if (_model.FixedLimits.Count > 0)
-                        {
-                            <div class="vx-limit-list">
-                                @for (int index = 0; index < _model.FixedLimits.Count; index++)
-                                {
-                                    SalesSettingsModel.FixedLimitRow row = _model.FixedLimits[index];
-                                    <div class="vx-limit-row">
-                                        <input aria-label="@T["ui.plans.currency"]" class="vx-input vx-limit-currency" @bind="row.CurrencyCode" maxlength="3" required autocomplete="off" placeholder="USD" />
-                                        <input aria-label="@T["ui.sales_settings.fixed_amount"]" class="vx-input vx-limit-amount" type="number" min="0" step="0.01" @bind="row.Amount" placeholder="0.00" />
-                                        <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => _model.FixedLimits.Remove(row)">@T["ui.common.remove"]</VxButton>
-                                    </div>
-                                }
+        <form class="vx-form" @onsubmit="SaveAsync" style="max-width: 100%; display: flex; flex-direction: column; gap: 1.25rem;">
+            <!-- Card 1: Discounts and Currency Limits -->
+            <VxCard Title="@T["ui.sales_settings.discounts"]">
+                <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)" style="border: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.25rem;">
+                    <div class="vx-form-grid-2" style="align-items: start;">
+                        <div class="vx-field-compact">
+                            <label for="sales-max-percent" class="vx-label">@T["ui.sales_settings.max_percent"]</label>
+                            <div class="vx-input-group-unit">
+                                <input id="sales-max-percent" type="number" min="0" max="100" step="0.01" class="vx-input" @bind="_model.MaxPercentWithoutApproval" aria-describedby="sales-max-percent-help" placeholder="e.g. 15.00" />
+                                <span class="vx-input-group-unit__suffix">%</span>
                             </div>
-                        }
-                        <div>
-                            <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => _model.FixedLimits.Add(new SalesSettingsModel.FixedLimitRow())">@T["ui.sales_settings.add_limit"]</VxButton>
+                            <span id="sales-max-percent-help" class="vx-hint">@T["ui.sales_settings.max_percent_help"]</span>
+                        </div>
+
+                        <div style="padding-top: 1.25rem;">
+                            <div class="vx-toggle-box">
+                                <input id="sales-no-end" type="checkbox" class="vx-checkbox" @bind="_model.NoEndWithoutApproval" />
+                                <label for="sales-no-end" class="vx-toggle-box__label" style="cursor: pointer; margin: 0;">@T["ui.sales_settings.no_end"]</label>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="vx-field vx-field--checkbox">
-                        <label class="vx-checkbox-label">
-                            <input type="checkbox" class="vx-checkbox" @bind="_model.NoEndWithoutApproval" />
-                            <span>@T["ui.sales_settings.no_end"]</span>
-                        </label>
+                    <div style="padding-top: 1rem; border-top: 1px solid var(--vx-color-border);">
+                        <label class="vx-label" style="display: block; margin-bottom: 0.25rem;">@T["ui.sales_settings.fixed_limits"]</label>
+                        <span class="vx-hint" style="display: block; margin-bottom: 0.75rem;">@T["ui.sales_settings.fixed_limits_help"]</span>
+
+                        @if (_model.FixedLimits.Count > 0)
+                        {
+                            <table class="vx-limits-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 8rem;">@T["ui.plans.currency"]</th>
+                                        <th>@T["ui.sales_settings.fixed_amount"]</th>
+                                        <th style="width: 6rem; text-align: right;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int index = 0; index < _model.FixedLimits.Count; index++)
+                                    {
+                                        SalesSettingsModel.FixedLimitRow row = _model.FixedLimits[index];
+                                        <tr>
+                                            <td>
+                                                <input aria-label="@T["ui.plans.currency"]" class="vx-input vx-limit-currency" @bind="row.CurrencyCode" maxlength="3" required autocomplete="off" placeholder="USD" style="width: 100%; text-transform: uppercase;" />
+                                            </td>
+                                            <td>
+                                                <input aria-label="@T["ui.sales_settings.fixed_amount"]" class="vx-input vx-limit-amount" type="number" min="0" step="0.01" @bind="row.Amount" placeholder="0.00" style="width: 100%;" />
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => _model.FixedLimits.Remove(row)">@T["ui.common.remove"]</VxButton>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        <div>
+                            <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => _model.FixedLimits.Add(new SalesSettingsModel.FixedLimitRow())">+ @T["ui.sales_settings.add_limit"]</VxButton>
+                        </div>
                     </div>
                 </fieldset>
+            </VxCard>
 
-                <!-- Section 2: Offer Validity -->
-                <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)">
-                    <legend class="vx-fieldset__legend">@T["ui.sales_settings.offers"]</legend>
-                    <div class="vx-field" style="max-width: 22rem;">
-                        <label for="sales-offer-days" class="vx-label">@T["ui.sales_settings.max_offer_days"]</label>
-                        <input id="sales-offer-days" type="number" min="1" max="365" class="vx-input" @bind="_model.MaxOfferValidityDays" aria-describedby="sales-offer-days-help" />
-                        <span id="sales-offer-days-help" class="vx-hint">@T["ui.sales_settings.max_offer_days_help"]</span>
-                    </div>
-                </fieldset>
+            <!-- Cards 2 & 3: Offer Validity and Customer Notices Duo -->
+            <div class="vx-cards-duo">
+                <VxCard Title="@T["ui.sales_settings.offers"]">
+                    <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)" style="border: none; padding: 0; margin: 0;">
+                        <div class="vx-field-compact">
+                            <label for="sales-offer-days" class="vx-label">@T["ui.sales_settings.max_offer_days"]</label>
+                            <div class="vx-input-group-unit">
+                                <input id="sales-offer-days" type="number" min="1" max="365" class="vx-input" @bind="_model.MaxOfferValidityDays" aria-describedby="sales-offer-days-help" placeholder="30" />
+                                <span class="vx-input-group-unit__suffix">days</span>
+                            </div>
+                            <span id="sales-offer-days-help" class="vx-hint">@T["ui.sales_settings.max_offer_days_help"]</span>
+                        </div>
+                    </fieldset>
+                </VxCard>
 
-                <!-- Section 3: Customer Notices & Registration -->
-                <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)">
-                    <legend class="vx-fieldset__legend">@T["ui.sales_settings.customers"]</legend>
-                    <div class="vx-field" style="max-width: 22rem;">
-                        <label for="sales-notice-days" class="vx-label">@T["ui.sales_settings.notice_days"]</label>
-                        <input id="sales-notice-days" type="number" min="1" max="90" class="vx-input" @bind="_model.DiscountEndNoticeDays" aria-describedby="sales-notice-days-help" />
-                        <span id="sales-notice-days-help" class="vx-hint">@T["ui.sales_settings.notice_days_help"]</span>
-                    </div>
-                    <div class="vx-field vx-field--checkbox">
-                        <label class="vx-checkbox-label">
-                            <input type="checkbox" class="vx-checkbox" @bind="_model.PromotionCodesAtRegistration" />
-                            <span>@T["ui.sales_settings.codes_at_registration"]</span>
-                        </label>
-                    </div>
-                </fieldset>
+                <VxCard Title="@T["ui.sales_settings.customers"]">
+                    <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)" style="border: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem;">
+                        <div class="vx-field-compact">
+                            <label for="sales-notice-days" class="vx-label">@T["ui.sales_settings.notice_days"]</label>
+                            <div class="vx-input-group-unit">
+                                <input id="sales-notice-days" type="number" min="1" max="90" class="vx-input" @bind="_model.DiscountEndNoticeDays" aria-describedby="sales-notice-days-help" placeholder="14" />
+                                <span class="vx-input-group-unit__suffix">days</span>
+                            </div>
+                            <span id="sales-notice-days-help" class="vx-hint">@T["ui.sales_settings.notice_days_help"]</span>
+                        </div>
+                        <div class="vx-toggle-box">
+                            <input id="sales-promo-codes" type="checkbox" class="vx-checkbox" @bind="_model.PromotionCodesAtRegistration" />
+                            <label for="sales-promo-codes" class="vx-toggle-box__label" style="cursor: pointer; margin: 0;">@T["ui.sales_settings.codes_at_registration"]</label>
+                        </div>
+                    </fieldset>
+                </VxCard>
+            </div>
 
-                @if (Presenter.State.CanEdit)
-                {
-                    <div class="vx-actions">
-                        <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.sales_settings.save"]</VxButton>
-                    </div>
-                }
-            </form>
-            @if (Presenter.State.StepUpPending)
+            @if (Presenter.State.CanEdit)
             {
-                <StepUpDialog OnConfirmed="SaveAsync" OnCancelled="Presenter.CancelStepUp" />
+                <div class="vx-actions" style="margin-top: 0.5rem;">
+                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.sales_settings.save"]</VxButton>
+                </div>
             }
+        </form>
+        @if (Presenter.State.StepUpPending)
+        {
+            <StepUpDialog OnConfirmed="SaveAsync" OnCancelled="Presenter.CancelStepUp" />
         }
-    </VxCard>
+    }
 </div>
 
 @code {

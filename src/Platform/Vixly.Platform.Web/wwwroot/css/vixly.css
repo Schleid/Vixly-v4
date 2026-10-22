@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    FILE: vixly.css
    PURPOSE: Platform console presentation; shared-style extraction pending.
    NOTES:
@@ -2832,4 +2832,377 @@ details.vx-nav-group .vx-nav-item { margin-block: var(--vx-space-1); }
     margin-top: 2.75rem !important;
     padding-top: 1.5rem !important;
     border-top: 1px solid var(--vx-color-border) !important;
+}
+
+/* =========================================================
+   COLLECTIONS, PAYMENTS, BILLING & SALES LIMITS WORKBENCH
+   ========================================================= */
+
+/* Collections Executive Dashboard */
+.vx-collections-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+    align-items: stretch;
+}
+
+.vx-kpi-card {
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-workbench, 0.5rem);
+    padding: 1.25rem;
+    box-shadow: var(--vx-shadow-1);
+    display: flex;
+    flex-direction: column;
+}
+
+.vx-kpi-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--vx-color-border);
+}
+
+.vx-kpi-card__title {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--vx-color-text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.vx-kpi-card__badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: var(--vx-color-surface-sunken);
+    color: var(--vx-color-text-muted);
+}
+
+.vx-stage-pipeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.vx-stage-step {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--vx-radius-sm);
+    background: var(--vx-color-surface-sunken);
+    border: 1px solid var(--vx-color-border);
+    font-size: 0.8125rem;
+    transition: all var(--vx-transition-fast);
+}
+
+.vx-stage-step:hover {
+    border-color: var(--vx-color-primary);
+    background: color-mix(in srgb, var(--vx-color-primary) 5%, var(--vx-color-surface));
+}
+
+.vx-stage-step__label {
+    font-weight: 600;
+    color: var(--vx-color-text);
+}
+
+.vx-stage-step__count {
+    font-weight: 700;
+    font-family: var(--vx-font-mono, monospace);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.875rem;
+    color: var(--vx-color-primary);
+    background: var(--vx-color-surface);
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--vx-color-border);
+}
+
+.vx-financial-stat {
+    margin-bottom: 1rem;
+}
+
+.vx-financial-stat__label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--vx-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.vx-financial-stat__value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--vx-color-text);
+    font-family: var(--vx-font-mono, monospace);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+}
+
+.vx-financial-stat__value--highlight {
+    color: #dc2626;
+}
+
+.vx-financial-stat__value--success {
+    color: #16a34a;
+}
+
+.vx-stat-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.45rem 0;
+    border-bottom: 1px dashed var(--vx-color-border);
+    font-size: 0.8125rem;
+}
+
+.vx-stat-row:last-child {
+    border-bottom: none;
+}
+
+.vx-stat-row__label {
+    color: var(--vx-color-text-muted);
+    font-weight: 500;
+}
+
+.vx-stat-row__value {
+    font-weight: 700;
+    font-family: var(--vx-font-mono, monospace);
+    font-variant-numeric: tabular-nums;
+    color: var(--vx-color-text);
+}
+
+/* Collections Settings Timeline Progression */
+.vx-timeline-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 1rem;
+    margin: 1rem 0 1.5rem;
+}
+
+.vx-timeline-step-card {
+    background: var(--vx-color-surface-sunken);
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-workbench, 0.5rem);
+    padding: 0.875rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.vx-timeline-step-card__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.vx-timeline-step-card__num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 999px;
+    background: var(--vx-color-primary);
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.vx-timeline-step-card__title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--vx-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.vx-input-group-unit {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.vx-input-group-unit input {
+    width: 100%;
+    padding-right: 3rem !important;
+}
+
+.vx-input-group-unit__suffix {
+    position: absolute;
+    right: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--vx-color-text-muted);
+    font-weight: 600;
+    pointer-events: none;
+}
+
+/* 2-column and multi-column card/form grids */
+.vx-cards-duo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+    gap: 1.25rem;
+    align-items: stretch;
+    margin-bottom: 1.25rem;
+}
+
+.vx-form-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 1rem;
+}
+
+.vx-form-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1rem;
+}
+
+.vx-form-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1rem;
+}
+
+.vx-field-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.vx-field-compact label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--vx-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.vx-field-compact .vx-hint {
+    margin-top: 0.2rem;
+    font-size: 0.75rem;
+}
+
+/* Zelle 2-Column Layout */
+.vx-zelle-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 1.75rem;
+    align-items: start;
+}
+
+@media screen and (max-width: 860px) {
+    .vx-zelle-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.vx-zelle-qr-panel {
+    background: var(--vx-color-surface-sunken);
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-workbench, 0.5rem);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.vx-zelle-qr-box {
+    width: 170px;
+    height: 170px;
+    background: #ffffff;
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    margin: 0.75rem 0;
+    box-shadow: var(--vx-shadow-1);
+}
+
+.vx-zelle-qr-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Sales Limits Elegant Layout */
+.vx-sales-limits-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.vx-limits-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.75rem 0;
+    font-size: 0.8125rem;
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-sm);
+    overflow: hidden;
+}
+
+.vx-limits-table th {
+    background: var(--vx-color-surface-sunken);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--vx-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--vx-color-border);
+}
+
+.vx-limits-table td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--vx-color-border);
+    vertical-align: middle;
+}
+
+.vx-limits-table tr:last-child td {
+    border-bottom: none;
+}
+
+.vx-toggle-box {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    background: var(--vx-color-surface-sunken);
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-sm);
+    cursor: pointer;
+    transition: all var(--vx-transition-fast);
+}
+
+.vx-toggle-box:hover {
+    border-color: var(--vx-color-primary);
+}
+
+.vx-toggle-box input[type="checkbox"] {
+    width: 1.15rem;
+    height: 1.15rem;
+    accent-color: var(--vx-color-primary);
+    cursor: pointer;
+}
+
+.vx-toggle-box__label {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: var(--vx-color-text);
 }
