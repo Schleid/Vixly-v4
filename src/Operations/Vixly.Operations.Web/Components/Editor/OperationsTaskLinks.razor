@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: OperationsTaskLinks.razor
 
@@ -20,7 +20,15 @@ IMPORTANT NOTES:
 <nav class="ops-workspace__links" aria-label="@L["workspace_tasks"]">
     @foreach (var item in OperationsNavigation.Groups.SelectMany(group => group.Items).Where(item => item.Section != "workspace" && OperationsNavigation.Visible(item.Permissions, Allowance)))
     {
-        <a href="@item.Url"><VxWorkspaceArt Kind="@OperationsPageHeading.Scene(item.Section)" /><span>@T["ui.editor.nav." + item.Label]</span><span aria-hidden="true">↗</span></a>
+        <a href="@item.Url">
+            <VxWorkspaceArt Kind="@OperationsPageHeading.Scene(item.Section)" />
+            <span>@T["ui.editor.nav." + item.Label]</span>
+            <span class="ops-workspace__link-arrow" aria-hidden="true">&nearr;</span>
+        </a>
     }
-    <a href="/staff/account"><VxWorkspaceArt Kind="people" /><span>@T["ui.editor.nav.account"]</span><span aria-hidden="true">↗</span></a>
+    <a href="/staff/account">
+        <VxWorkspaceArt Kind="people" />
+        <span>@T["ui.editor.nav.account"]</span>
+        <span class="ops-workspace__link-arrow" aria-hidden="true">&nearr;</span>
+    </a>
 </nav>

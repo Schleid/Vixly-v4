@@ -29,7 +29,7 @@ The shared list of every Operations, customer-portal and Control screen, and whe
 
 | Screen | Component | Route | Status | Updated | By | Notes |
 |---|---|---|---|---|---|---|
-| Home | `SignIn/WorkspacePage.razor` | `/staff` | Styled | 2026-10-22 | FE | Slice 11. Replaced gradient banner with high-utility operational command hub with live station telemetry, instant 1-click counter/dock/dispatch/cashier/events actions, compact user meta, and counters dashboard |
+| Home | `SignIn/WorkspacePage.razor` + `OperationsTaskLinks` | `/staff` | Styled | 2026-10-22 | FE | Slice 11. Complete operational cockpit styling: SVG station launcher cards with primary counter highlight and Alt+N kbd badge; responsive Waiting for you metric tiles with attention indicators and queue routing; styled checklist progress cards; low supplies alert banner with warehouse badges; compact 48px task launcher tiles with miniature workflow art and single arrow. |
 | Front desk: find the customer | `Counter/CounterPage.razor` + `CounterFindBar` | `/staff/counter` | Styled | 2026-10-20 | FE | Compact 32px search bar on top of every counter page, aligned Find and Clear buttons, subtle background, focus ring, keyboard accesskey N |
 | Front desk: the customer | `Counter/CounterCustomerPage.razor` + `CounterCustomerCard` | `/staff/counter/customers/{id}` | Styled | 2026-10-20 | FE | 3-column executive layout, attention-grabbing standing badge with indicator dot, 2x2 tabular metric figures, clean responsive grid |
 | Front desk: the shipment | `Counter/CounterShipmentPage.razor` | `/staff/counter/shipments/{id}` | Changed | 2026-10-20 | FE | Summary strip with route/service/progress chips, single-row 32px parcel entry toolbar with baseline-aligned Add button, inline count correction toolbar · **Changed (Slice 5F):** a final shipment shows its invoice line (`CounterInvoiceNote`: number, total, to pay, PDF) |
@@ -337,3 +337,4 @@ The same rules apply to Control as to Operations, except the sign-in pages, whic
 | 2026-10-22 | Backend | Slice 10 (company API and webhooks): Settings → API and webhooks new (menu item *API and webhooks*) |
 | 2026-10-22 | Backend | Slice 11 (reporting): Reports, Report, Report rules new (menu items *Reports* and *Report rules*); Home becomes the dashboard of counters (was On hold) |
 | 2026-10-22 | FE | Operations: Modernized MFA verification & recovery matching login console, Operational command hub on workspace Home, formatted shipment phone numbers, Arrivals header & customs alignments, Reports card grid & chart styling |
+| 2026-10-22 | FE | Operations Home Page: Full executive styling of Workspace cockpit, Waiting for You metric grid with attention indicators, low supplies alert banner, checklist progress cards, and compact task tiles |
