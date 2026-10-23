@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: RepackBoxPage.razor
 
@@ -17,38 +17,105 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@VixlyText.Format(T, "ui.boxes.box_title", "number", Box.Number)" Company="@Company" Section="bundles" Error="@Error" Info="@Info">
-    <p class="ops-editor__actions">
-        <a href="/staff/bundles/boxes">@T["ui.boxes.back"]</a>
-        @if (Box.Status != OperationsRepackBoxStatus.Voided) { <a class="vx-button vx-button--secondary" href="/staff/bundles/boxes/@Box.Id/label" target="_blank" rel="noopener">@T["ui.bundles.label"]</a> }
-    </p>
-    <section class="ops-editor__panel" aria-labelledby="box-title">
-        <h2 id="box-title"><a href="/staff/shipments/@Shipment.Id">@Shipment.Number</a> · @Warehouse.Code · @T["ui.boxes.status." + Box.Status]</h2>
-        <p>@VixlyText.Format(T, "ui.boxes.counts", new Dictionary<string, object> { ["inside"] = Parcels.Count(parcel => parcel.BoxId == Box.Id), ["total"] = Parcels.Count })</p>
-        @if (Box.WeightKg is { } weight) { <p>@OperationsBundleWords.Weight(weight, WeightUnit) · @OperationsBundleWords.Size(Box.LengthCm, Box.WidthCm, Box.HeightCm, DimensionUnit)</p> }
-        @if (BundleNumber is { } bundle) { <p>@VixlyText.Format(T, "ui.bundles.in_bundle", "number", bundle)</p> }
-        @if (Box.VoidReason is { } reason) { <p>@T["ui.bundles.void_reason"]: @reason</p> }
+    <div class="ops-list-bar" style="margin-bottom: 1.25rem;">
+        <a href="/staff/bundles/boxes" class="vx-button vx-button--secondary">← @T["ui.boxes.back"]</a>
+        <div class="ops-list-bar__actions">
+            @if (Box.Status != OperationsRepackBoxStatus.Voided)
+            {
+                <a class="vx-button vx-button--secondary" href="/staff/bundles/boxes/@Box.Id/label" target="_blank" rel="noopener">@T["ui.bundles.label"] ↗</a>
+            }
+        </div>
+    </div>
+
+    <section class="ops-editor__panel ops-box-summary" aria-labelledby="box-title">
+        <div class="ops-panel__header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2 id="box-title" class="ops-panel__title" style="margin: 0;">
+                <a href="/staff/shipments/@Shipment.Id" class="ops-link--subtle">@Shipment.Number</a> · @Warehouse.Code
+            </h2>
+            <span class="ops-status-pill @(Box.Status == OperationsRepackBoxStatus.Open ? "ops-status-pill--warn" : Box.Status == OperationsRepackBoxStatus.Closed ? "ops-status-pill--positive" : "ops-status-pill--neutral")">
+                @T["ui.boxes.status." + Box.Status]
+            </span>
+        </div>
+
+        <div class="ops-facts-grid" style="margin-bottom: 1rem;">
+            <div class="ops-fact-card">
+                <span class="ops-fact-card__label">@T["ui.bundles.parcels"]</span>
+                <span class="ops-fact-card__value">
+                    @VixlyText.Format(T, "ui.boxes.counts", new Dictionary<string, object> { ["inside"] = Parcels.Count(parcel => parcel.BoxId == Box.Id), ["total"] = Parcels.Count })
+                </span>
+            </div>
+            @if (Box.WeightKg is { } weight)
+            {
+                <div class="ops-fact-card">
+                    <span class="ops-fact-card__label">@T["ui.bundles.weight"] · @T["ui.parcels.size"]</span>
+                    <span class="ops-fact-card__value">@OperationsBundleWords.Weight(weight, WeightUnit) · @OperationsBundleWords.Size(Box.LengthCm, Box.WidthCm, Box.HeightCm, DimensionUnit)</span>
+                </div>
+            }
+            @if (BundleNumber is { } bundle)
+            {
+                <div class="ops-fact-card">
+                    <span class="ops-fact-card__label">@T["ui.bundles.title"]</span>
+                    <span class="ops-fact-card__value">@VixlyText.Format(T, "ui.bundles.in_bundle", "number", bundle)</span>
+                </div>
+            }
+            @if (Box.VoidReason is { } reason)
+            {
+                <div class="ops-fact-card ops-fact-card--danger">
+                    <span class="ops-fact-card__label">@T["ui.bundles.void_reason"]</span>
+                    <span class="ops-fact-card__value">@reason</span>
+                </div>
+            }
+        </div>
+
         @if (Box.Status == OperationsRepackBoxStatus.Open && CanFill)
         {
-            <form method="post" action="/staff/bundles/boxes/@Box.Id/scan" class="ops-editor__search ops-bundle-fill__scan">
+            <form method="post" action="/staff/bundles/boxes/@Box.Id/scan" class="ops-inline-action-bar ops-bundle-fill__scan">
                 <AntiforgeryToken />
                 <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
-                <label>@T["ui.bundles.scan_parcel"] <input name="code" maxlength="40" autocomplete="off" autofocus required /></label>
+                <label class="ops-inline-action-bar__field" style="flex: 1;">
+                    <span class="ops-inline-action-bar__label">@T["ui.bundles.scan_parcel"]</span>
+                    <input name="code" maxlength="40" autocomplete="off" autofocus required class="ops-inline-action-bar__control" placeholder="@T["ui.bundles.scan_parcel"]" />
+                </label>
                 <button type="submit" class="vx-button vx-button--primary">@T["ui.bundles.add"]</button>
             </form>
         }
     </section>
+
     <OperationsTableViewport Label="@T["ui.bundles.parcels"]">
         <table class="ops-editor__table">
-            <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.parcels.number"]</th><th scope="col">@T["ui.boxes.where"]</th><th scope="col" class="ops-editor__number">@T["ui.bundles.weight"]</th><th scope="col"></th></tr></thead>
+            <thead>
+                <tr>
+                    <th scope="col" class="ops-editor__identity-cell">@T["ui.parcels.number"]</th>
+                    <th scope="col">@T["ui.boxes.where"]</th>
+                    <th scope="col" class="ops-editor__number">@T["ui.bundles.weight"]</th>
+                    <th scope="col" class="ops-editor__actions-header"></th>
+                </tr>
+            </thead>
             <tbody>
                 @foreach (OperationsParcel parcel in Parcels)
                 {
-                    <tr data-in-box="@(parcel.BoxId == Box.Id)">
-                        <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/parcels/@parcel.Id">@parcel.Number</a></td>
-                        <td>@(parcel.BoxId == Box.Id ? T["ui.boxes.in_box"].Value : parcel.StorageLocationId is { } shelf && Shelves.TryGetValue(shelf, out string? code) ? VixlyText.Format(T, "ui.bundles.on_shelf", "shelf", code) : T["ui.bundles.no_shelf"].Value)</td>
-                        <td class="ops-editor__number">@(parcel.WeightKg is { } kg ? OperationsBundleWords.Weight(kg, WeightUnit) : "—")</td>
+                    bool inBox = parcel.BoxId == Box.Id;
+                    <tr data-in-box="@inBox">
+                        <td class="ops-editor__identity-cell ops-editor__code">
+                            <a href="/staff/parcels/@parcel.Id" class="ops-link--mono">@parcel.Number</a>
+                        </td>
                         <td>
-                            @if (Box.Status == OperationsRepackBoxStatus.Open && CanFill && parcel.BoxId == Box.Id)
+                            @if (inBox)
+                            {
+                                <span class="ops-status-pill ops-status-pill--positive">@T["ui.boxes.in_box"]</span>
+                            }
+                            else if (parcel.StorageLocationId is { } shelf && Shelves.TryGetValue(shelf, out string? code))
+                            {
+                                <span class="ops-status-pill ops-status-pill--neutral">@VixlyText.Format(T, "ui.bundles.on_shelf", "shelf", code)</span>
+                            }
+                            else
+                            {
+                                <span class="ops-status-pill ops-status-pill--neutral">@T["ui.bundles.no_shelf"]</span>
+                            }
+                        </td>
+                        <td class="ops-editor__number">@(parcel.WeightKg is { } kg ? OperationsBundleWords.Weight(kg, WeightUnit) : "—")</td>
+                        <td class="ops-editor__actions-cell">
+                            @if (Box.Status == OperationsRepackBoxStatus.Open && CanFill && inBox)
                             {
                                 <form method="post" action="/staff/bundles/boxes/@Box.Id/take-out" class="ops-editor__inline">
                                     <AntiforgeryToken />
@@ -62,24 +129,43 @@ IMPORTANT NOTES:
             </tbody>
         </table>
     </OperationsTableViewport>
+
     @if (Box.Status == OperationsRepackBoxStatus.Open && (CanFill || CanManage) && Box.ParcelCount > 0)
     {
-        <form method="post" action="/staff/bundles/boxes/@Box.Id/close" class="ops-editor__panel ops-editor__form" aria-labelledby="close-title">
+        <form method="post" action="/staff/bundles/boxes/@Box.Id/close" class="ops-editor__panel ops-settings-form" aria-labelledby="close-title" style="margin-top: 1.5rem;">
             <AntiforgeryToken />
-            <h2 id="close-title">@T["ui.boxes.close"]</h2>
-            <label>@VixlyText.Format(T, "ui.bundles.gross_weight", "unit", WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg") <input name="weight" inputmode="decimal" size="7" required /></label>
-            <label>@VixlyText.Format(T, "ui.bundles.length", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm") <input name="length" inputmode="decimal" size="6" required /></label>
-            <label>@VixlyText.Format(T, "ui.bundles.width", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm") <input name="width" inputmode="decimal" size="6" required /></label>
-            <label>@VixlyText.Format(T, "ui.bundles.height", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm") <input name="height" inputmode="decimal" size="6" required /></label>
+            <h2 id="close-title" class="ops-panel__title" style="margin-bottom: 1rem;">@T["ui.boxes.close"]</h2>
+            <div class="ops-form-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.85rem; margin-bottom: 1rem;">
+                <label class="ops-field">
+                    <span class="ops-field__label">@VixlyText.Format(T, "ui.bundles.gross_weight", "unit", WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg")</span>
+                    <input name="weight" inputmode="decimal" size="7" required class="ops-input" />
+                </label>
+                <label class="ops-field">
+                    <span class="ops-field__label">@VixlyText.Format(T, "ui.bundles.length", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm")</span>
+                    <input name="length" inputmode="decimal" size="6" required class="ops-input" />
+                </label>
+                <label class="ops-field">
+                    <span class="ops-field__label">@VixlyText.Format(T, "ui.bundles.width", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm")</span>
+                    <input name="width" inputmode="decimal" size="6" required class="ops-input" />
+                </label>
+                <label class="ops-field">
+                    <span class="ops-field__label">@VixlyText.Format(T, "ui.bundles.height", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm")</span>
+                    <input name="height" inputmode="decimal" size="6" required class="ops-input" />
+                </label>
+            </div>
             <button type="submit" class="vx-button vx-button--primary">@T["ui.boxes.close_button"]</button>
         </form>
     }
+
     @if (CanManage && Box.Status != OperationsRepackBoxStatus.Voided && Box.BundleId is null)
     {
-        <form method="post" action="/staff/bundles/boxes/@Box.Id/void" class="ops-editor__panel ops-editor__form" aria-labelledby="void-title">
+        <form method="post" action="/staff/bundles/boxes/@Box.Id/void" class="ops-inline-action-bar ops-list-bar" aria-labelledby="void-title" style="margin-top: 1.5rem;">
             <AntiforgeryToken />
-            <h2 id="void-title">@T["ui.boxes.void"]</h2>
-            <label>@T["ui.bundles.void_reason"] <input name="reason" maxlength="@OperationsBundleLimits.ReasonMaxLength" required /></label>
+            <span id="void-title" class="ops-inline-action-bar__label">@T["ui.boxes.void"]:</span>
+            <label class="ops-inline-action-bar__field" style="flex: 1;">
+                <span class="ops-screen-reader-text">@T["ui.bundles.void_reason"]</span>
+                <input name="reason" maxlength="@OperationsBundleLimits.ReasonMaxLength" required placeholder="@T["ui.bundles.void_reason"]" class="ops-inline-action-bar__control" />
+            </label>
             <button type="submit" class="vx-button vx-button--secondary">@T["ui.bundles.void_button"]</button>
         </form>
     }

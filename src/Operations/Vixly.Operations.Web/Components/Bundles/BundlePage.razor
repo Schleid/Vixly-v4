@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: BundlePage.razor
 
@@ -17,26 +17,31 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@VixlyText.Format(T, "ui.bundles.bundle_title", "number", Bundle.Number)" Company="@Company" Section="bundles" Error="@Error" Info="@Info">
-    <p class="ops-editor__actions">
-        <a href="/staff/bundles">@T["ui.bundles.back"]</a>
-        @if (Bundle.IsOpen && CanFill) { <a class="vx-button vx-button--primary" href="/staff/bundles/@Bundle.Id/fill">@T["ui.bundles.fill"]</a> }
-        @if (Bundle.Status != OperationsBundleStatus.Voided) { <a class="vx-button vx-button--secondary" href="/staff/bundles/@Bundle.Id/label" target="_blank" rel="noopener">@T["ui.bundles.label"]</a> }
-        @if (Bundle.Status == OperationsBundleStatus.Closed) { <a class="vx-button vx-button--secondary" href="/staff/bundles/@Bundle.Id/manifest" target="_blank" rel="noopener">@T["ui.dispatch.bundle_manifest"]</a> }
-    </p>
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <a href="/staff/bundles" class="vx-button vx-button--secondary">@T["ui.bundles.back"]</a>
+            @if (Bundle.Status != OperationsBundleStatus.Voided) { <a class="vx-button vx-button--secondary" href="/staff/bundles/@Bundle.Id/label" target="_blank" rel="noopener">@T["ui.bundles.label"]</a> }
+            @if (Bundle.Status == OperationsBundleStatus.Closed) { <a class="vx-button vx-button--secondary" href="/staff/bundles/@Bundle.Id/manifest" target="_blank" rel="noopener">@T["ui.dispatch.bundle_manifest"]</a> }
+        </div>
+        <div class="ops-list-bar__actions" style="display: flex; gap: 0.5rem; align-items: center;">
+            <span class="ops-editor__status" data-status="@Bundle.Status.ToString().ToLowerInvariant()">@T["ui.bundles.status." + Bundle.Status]</span>
+            @if (Bundle.IsOpen && CanFill) { <a class="vx-button vx-button--primary" href="/staff/bundles/@Bundle.Id/fill">@T["ui.bundles.fill"]</a> }
+        </div>
+    </div>
     <section class="ops-editor__panel" aria-labelledby="bundle-title">
         <h2 id="bundle-title">@Warehouse.Code &gt; @OperationsBundleWords.Destination(T, Bundle.DestinationWarehouseId, Bundle.DestinationCountryCode, Destination is null ? Array.Empty<OperationsWarehouse>() : new[] { Destination })</h2>
-        <dl class="ops-editor__facts">
-            <dt>@T["ui.bundles.state"]</dt><dd><span class="ops-editor__status" data-status="@Bundle.Status.ToString().ToLowerInvariant()">@T["ui.bundles.status." + Bundle.Status]</span></dd>
-            <dt>@T["ui.bundles.service"]</dt><dd>@T["ui.services.name." + Bundle.ServiceCode]</dd>
-            @if (Bundle.TypeName is { } type) { <dt>@T["ui.bundles.type"]</dt><dd>@type</dd> }
-            <dt>@T["ui.bundles.basis"]</dt><dd>@T["ui.bundles.basis." + Bundle.Basis]</dd>
-            <dt>@T["ui.bundles.parcels"]</dt><dd>@Bundle.ParcelCount</dd>
-            <dt>@T["ui.bundles.filled"]</dt><dd>@OperationsBundleWords.Fill(T, Bundle, WeightUnit) <small>@VixlyText.Format(T, "ui.bundles.parcels_weight", new Dictionary<string, object> { ["weight"] = OperationsBundleWords.Weight(Bundle.ParcelsWeightKg, WeightUnit), ["volumetric"] = OperationsBundleWords.Weight(Bundle.ParcelsVolumetricKg, WeightUnit) })</small></dd>
+        <dl class="ops-facts-grid">
+            <div class="ops-fact-cell"><dt>@T["ui.bundles.state"]</dt><dd><span class="ops-editor__status" data-status="@Bundle.Status.ToString().ToLowerInvariant()">@T["ui.bundles.status." + Bundle.Status]</span></dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.bundles.service"]</dt><dd>@T["ui.services.name." + Bundle.ServiceCode]</dd></div>
+            @if (Bundle.TypeName is { } type) { <div class="ops-fact-cell"><dt>@T["ui.bundles.type"]</dt><dd>@type</dd></div> }
+            <div class="ops-fact-cell"><dt>@T["ui.bundles.basis"]</dt><dd>@T["ui.bundles.basis." + Bundle.Basis]</dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.bundles.parcels"]</dt><dd>@Bundle.ParcelCount</dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.bundles.filled"]</dt><dd>@OperationsBundleWords.Fill(T, Bundle, WeightUnit) <small>@VixlyText.Format(T, "ui.bundles.parcels_weight", new Dictionary<string, object> { ["weight"] = OperationsBundleWords.Weight(Bundle.ParcelsWeightKg, WeightUnit), ["volumetric"] = OperationsBundleWords.Weight(Bundle.ParcelsVolumetricKg, WeightUnit) })</small></dd></div>
             @if (Bundle.WeightKg is { } weight)
             {
-                <dt>@T["ui.bundles.closed_weight"]</dt><dd>@OperationsBundleWords.Weight(weight, WeightUnit) · @OperationsBundleWords.Size(Bundle.LengthCm, Bundle.WidthCm, Bundle.HeightCm, DimensionUnit)@if (Bundle.VolumetricKg is { } volumetric) { <small> · @VixlyText.Format(T, "ui.bundles.volumetric", "weight", OperationsBundleWords.Weight(volumetric, WeightUnit))</small> }</dd>
+                <div class="ops-fact-cell"><dt>@T["ui.bundles.closed_weight"]</dt><dd>@OperationsBundleWords.Weight(weight, WeightUnit) · @OperationsBundleWords.Size(Bundle.LengthCm, Bundle.WidthCm, Bundle.HeightCm, DimensionUnit)@if (Bundle.VolumetricKg is { } volumetric) { <small> · @VixlyText.Format(T, "ui.bundles.volumetric", "weight", OperationsBundleWords.Weight(volumetric, WeightUnit))</small> }</dd></div>
             }
-            @if (Bundle.VoidReason is { } reason) { <dt>@T["ui.bundles.void_reason"]</dt><dd>@reason</dd> }
+            @if (Bundle.VoidReason is { } reason) { <div class="ops-fact-cell"><dt>@T["ui.bundles.void_reason"]</dt><dd>@reason</dd></div> }
         </dl>
     </section>
     @if (Bundle.IsOpen && (CanManage || CanFill) && Bundle.ParcelCount > 0)
@@ -44,22 +49,27 @@ IMPORTANT NOTES:
         <form method="post" action="/staff/bundles/@Bundle.Id/close" class="ops-editor__panel ops-editor__form" aria-labelledby="close-title">
             <AntiforgeryToken />
             <h2 id="close-title">@T["ui.bundles.close"]</h2>
-            <label>@VixlyText.Format(T, "ui.bundles.gross_weight", "unit", WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg") <input name="weight" inputmode="decimal" size="7" required /></label>
-            <label>@VixlyText.Format(T, "ui.bundles.length", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm") <input name="length" inputmode="decimal" size="6" required /></label>
-            <label>@VixlyText.Format(T, "ui.bundles.width", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm") <input name="width" inputmode="decimal" size="6" required /></label>
-            <label>@VixlyText.Format(T, "ui.bundles.height", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm") <input name="height" inputmode="decimal" size="6" required /></label>
-            <button type="submit" class="vx-button vx-button--primary">@T["ui.bundles.close_button"]</button>
-            <p class="ops-editor__hint">@T["ui.bundles.close_hint"]</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: 0.75rem; margin-bottom: 0.5rem;">
+                <label>@VixlyText.Format(T, "ui.bundles.gross_weight", "unit", WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg") <input name="weight" inputmode="decimal" size="7" required /></label>
+                <label>@VixlyText.Format(T, "ui.bundles.length", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm") <input name="length" inputmode="decimal" size="6" required /></label>
+                <label>@VixlyText.Format(T, "ui.bundles.width", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm") <input name="width" inputmode="decimal" size="6" required /></label>
+                <label>@VixlyText.Format(T, "ui.bundles.height", "unit", DimensionUnit == OperationsDimensionUnit.Inch ? "in" : "cm") <input name="height" inputmode="decimal" size="6" required /></label>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.bundles.close_button"]</button>
+                <p class="ops-editor__hint" style="margin: 0;">@T["ui.bundles.close_hint"]</p>
+            </div>
         </form>
     }
     @if (CanManage && Bundle.DispatchId is null && (Bundle.Status == OperationsBundleStatus.Closed || (Bundle.IsOpen && Bundle.ParcelCount == 0)))
     {
-        <form method="post" action="/staff/bundles/@Bundle.Id/void" class="ops-editor__panel ops-editor__form" aria-labelledby="void-title">
+        <form method="post" action="/staff/bundles/@Bundle.Id/void" class="ops-editor__panel ops-panel--restricted ops-inline-action-bar" aria-labelledby="void-title">
             <AntiforgeryToken />
-            <h2 id="void-title">@T["ui.bundles.void"]</h2>
-            <label>@T["ui.bundles.void_reason"] <input name="reason" maxlength="@OperationsBundleLimits.ReasonMaxLength" required /></label>
+            <h2 id="void-title" style="margin: 0; font-size: 0.9375rem; width: 100%;">@T["ui.bundles.void"]</h2>
+            <label for="bundle-void-reason" class="ops-inline-action-bar__label">@T["ui.bundles.void_reason"]</label>
+            <input id="bundle-void-reason" name="reason" maxlength="@OperationsBundleLimits.ReasonMaxLength" required class="ops-inline-action-bar__select" style="min-width: 16rem;" />
             <button type="submit" class="vx-button vx-button--secondary">@T["ui.bundles.void_button"]</button>
-            <p class="ops-editor__hint">@T["ui.bundles.void_hint"]</p>
+            <p class="ops-editor__hint" style="margin: 0; width: 100%;">@T["ui.bundles.void_hint"]</p>
         </form>
     }
     @if (List.Count > 0 || (CanManage && Bundle.IsOpen))

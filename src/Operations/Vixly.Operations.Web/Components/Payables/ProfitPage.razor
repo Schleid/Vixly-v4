@@ -1,0 +1,84 @@
+@*
+=========================================================
+FILE: ProfitPage.razor
+
+PURPOSE:
+Profit per shipment (Slice 8) for the shipments invoiced in a period.
+
+RESPONSIBILITIES:
+- Choose the period; each shipment's revenue, carrier cost, other costs, profit and margin, marked when the carrier cost is still an estimate
+- The totals; a CSV of the same rows
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Revenue leaves out sales tax and the duties and local taxes collected for the government
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.profit.title"]" Company="@Company" Section="profit" Error="@Error">
+    <form method="get" action="/staff/profit" class="ops-list-bar ops-inline-action-bar" style="margin-bottom: 0.75rem; padding: 0.5rem 0.75rem; gap: 0.75rem; flex-wrap: wrap;">
+        <label style="display: inline-flex; align-items: center; gap: 0.4rem; margin: 0; font-size: 0.8125rem; font-weight: 500;">
+            <span>@T["ui.profit.from"]</span>
+            <input type="date" name="from" value="@From.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" />
+        </label>
+        <label style="display: inline-flex; align-items: center; gap: 0.4rem; margin: 0; font-size: 0.8125rem; font-weight: 500;">
+            <span>@T["ui.profit.to"]</span>
+            <input type="date" name="to" value="@To.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" />
+        </label>
+        <button type="submit" class="vx-button vx-button--primary" style="height: 32px; padding: 0 0.85rem;">@T["ui.profit.show"]</button>
+        <a href="/staff/profit/export?from=@From.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)&to=@To.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.profit.csv"]</a>
+    </form>
+    <p class="ops-editor__hint" style="margin-bottom: 0.75rem;">@T["ui.profit.how"]</p>
+    @if (Rows.Count == 0)
+    {
+        <div class="ops-editor__empty"><p>@T["ui.profit.none"]</p></div>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.profit.title"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col">@T["ui.profit.shipment"]</th><th scope="col" class="ops-editor__number">@T["ui.profit.revenue"]</th><th scope="col" class="ops-editor__number">@T["ui.profit.carrier"]</th><th scope="col" class="ops-editor__number">@T["ui.profit.other"]</th><th scope="col" class="ops-editor__number">@T["ui.profit.profit"]</th><th scope="col" class="ops-editor__number">@T["ui.profit.margin"]</th></tr></thead>
+                <tbody>
+                    @foreach (OperationsShipmentProfit row in Rows)
+                    {
+                        <tr data-shipment="@row.ShipmentId" data-estimated="@row.Estimated">
+                            <td><a href="/staff/shipments/@row.ShipmentId">@row.Number</a>@if (row.Estimated) { <small> · @T[row.Dispatched ? "ui.profit.estimated" : "ui.profit.not_dispatched"]</small> }</td>
+                            <td class="ops-editor__number">@Money(row.Revenue)</td>
+                            <td class="ops-editor__number">@Money(row.CarrierCost)</td>
+                            <td class="ops-editor__number">@Money(row.DirectCost)</td>
+                            <td class="ops-editor__number">@Money(row.Profit)</td>
+                            <td class="ops-editor__number">@(row.Margin is { } margin ? margin.ToString("0.0", CultureInfo.CurrentCulture) + " %" : string.Empty)</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr data-totals>
+                        <th scope="row">@VixlyText.Format(T, "ui.profit.total", "count", Rows.Count)</th>
+                        <td class="ops-editor__number" style="font-weight: 700;">@Money(Rows.Sum(row => row.Revenue))</td>
+                        <td class="ops-editor__number" style="font-weight: 700;">@Money(Rows.Sum(row => row.CarrierCost))</td>
+                        <td class="ops-editor__number" style="font-weight: 700;">@Money(Rows.Sum(row => row.DirectCost))</td>
+                        <td class="ops-editor__number" style="font-weight: 700;">@Money(Rows.Sum(row => row.Profit))</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </OperationsTableViewport>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsShipmentProfit> Rows { get; set; } = Array.Empty<OperationsShipmentProfit>();
+
+    [Parameter] public DateOnly From { get; set; }
+
+    [Parameter] public DateOnly To { get; set; }
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public string? Error { get; set; }
+
+    private string Money(decimal amount) => OperationsInvoiceWords.Money(amount, CurrencyCode);
+}

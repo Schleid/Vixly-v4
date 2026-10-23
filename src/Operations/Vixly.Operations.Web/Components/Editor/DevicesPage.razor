@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: DevicesPage.razor
 
@@ -16,7 +16,6 @@ RESPONSIBILITIES:
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10); values come from the endpoint
 - A lower number of licences waits for the renewal; the devices in use must be released first
-- Placeholder look: Frontend/UI designs the final experience
 =========================================================
 *@
 @using Vixly.Operations.Application.Ports
@@ -26,11 +25,20 @@ IMPORTANT NOTES:
     <CompanyTabs Current="licences" />
     @if (Seats is { } seats)
     {
-        <p class="ops-licences__summary">@VixlyText.Format(T, "ui.licences.summary", new Dictionary<string, object> { ["inUse"] = seats.InUse, ["seats"] = seats.Seats })</p>
-        @if (seats.ScheduledSeats is { } scheduled && seats.ScheduledUtc is { } from)
-        {
-            <p class="ops-editor__hint">@VixlyText.Format(T, "ui.licences.scheduled", new Dictionary<string, object> { ["seats"] = scheduled, ["date"] = Day(from) })</p>
-        }
+        <div class="ops-editor__panel" style="margin-bottom: 0.75rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                <div>
+                    <strong style="font-size: 1rem;">@VixlyText.Format(T, "ui.licences.summary", new Dictionary<string, object> { ["inUse"] = seats.InUse, ["seats"] = seats.Seats })</strong>
+                    @if (seats.ScheduledSeats is { } scheduled && seats.ScheduledUtc is { } from)
+                    {
+                        <p class="ops-editor__hint" style="margin: 0.25rem 0 0;">@VixlyText.Format(T, "ui.licences.scheduled", new Dictionary<string, object> { ["seats"] = scheduled, ["date"] = Day(from) })</p>
+                    }
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <span class="ops-editor__status" data-status="@(seats.InUse >= seats.Seats ? "overdue" : "active")">@seats.InUse / @seats.Seats @T["ui.licences.licence"]</span>
+                </div>
+            </div>
+        </div>
     }
     <section class="ops-editor__panel">
         <OperationsTableViewport Label="@T["ui.licences.title"]">
@@ -60,11 +68,17 @@ IMPORTANT NOTES:
                         }
                         else
                         {
-                            <td>@device.Number</td>
+                            <td class="ops-editor__code">@device.Number</td>
                             <td><a href="/staff/devices/@device.DeviceId">@device.Name</a></td>
                             <td>@T["ui.devices.kind." + device.Kind]</td>
                             <td>@(device.Browser ?? "-")</td>
-                            <td><span class="ops-editor__status" data-status="@device.Status">@T["ui.licences.status." + device.Status]</span></td>
+                            <td>
+                                <span class="ops-editor__status" data-status="@device.Status">@T["ui.licences.status." + device.Status]</span>
+                                @if (Blocks.Any(block => block.DeviceId == device.DeviceId))
+                                {
+                                    <span class="ops-editor__status" data-status="blocked">@T["ui.licences.blocked"]</span>
+                                }
+                            </td>
                             <td>@Time(device.RequestedUtc)</td>
                             <td>@Authorised(device)</td>
                         }
@@ -87,32 +101,42 @@ IMPORTANT NOTES:
 
     [Parameter] public string? Info { get; set; }
 
+    // Owner, R-6: devices blocked after a sign-in from another country.
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Identity.OperationsDeviceBlock> Blocks { get; set; } = Array.Empty<Vixly.Operations.Domain.Identity.OperationsDeviceBlock>();
+
     // Bound licences first (oldest first), then the free ones, then the devices requested, then those that ended (newest first).
     private IEnumerable<(int?, OperationsDevice?)> Rows
     {
         get
         {
-            List<OperationsDevice> bound = Devices.Where(device => device.SeatHeld || device.Status is "active" or "release_pending")
-                .OrderBy(device => device.ApprovedUtc ?? device.RequestedUtc).ToList();
-            int seats = Math.Max(Seats?.Seats ?? bound.Count, bound.Count);
-
-            for (int index = 0; index < seats; index++)
+            int bound = 0;
+            foreach (OperationsDevice device in Devices.Where(d => d.Status == "active").OrderBy(d => d.RequestedUtc))
             {
-                yield return (index + 1, index < bound.Count ? bound[index] : null);
+                bound++;
+                yield return (bound, device);
             }
-
-            foreach (OperationsDevice device in Devices.Where(device => !bound.Contains(device)).OrderBy(device => device.Status == "pending" ? 0 : 1).ThenByDescending(device => device.RequestedUtc))
+            int total = Seats?.Seats ?? bound;
+            for (int i = bound + 1; i <= total; i++)
+            {
+                yield return (i, null);
+            }
+            foreach (OperationsDevice device in Devices.Where(d => d.Status == "pending").OrderByDescending(d => d.RequestedUtc))
+            {
+                yield return (null, device);
+            }
+            foreach (OperationsDevice device in Devices.Where(d => d.Status is not ("active" or "pending")).OrderByDescending(d => d.RequestedUtc))
             {
                 yield return (null, device);
             }
         }
     }
 
-    private string Authorised(OperationsDevice device) => device.ApprovedUtc is { } approved
-        ? (device.ApprovedByName ?? T["ui.devices.authorised_by_link"].Value) + ", " + Time(approved)
-        : "-";
-
-    private static string Time(DateTimeOffset utc) => utc.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture) + " UTC";
+    private static string Time(DateTimeOffset utc) => utc.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture);
 
     private static string Day(DateTimeOffset utc) => utc.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+
+    private string Authorised(OperationsDevice device) =>
+        device.ApprovedUtc is { } approved
+            ? (device.ApprovedByName ?? T["ui.devices.authorised_by_link"].Value) + ", " + Time(approved)
+            : "-";
 }

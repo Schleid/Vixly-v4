@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: StorageLocationsPage.razor
 
@@ -17,14 +17,23 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@VixlyText.Format(T, "ui.storage.title", "warehouse", Warehouse.Code)" Company="@Company" Section="locations" Error="@Error" Info="@Info">
-    <p><a href="/staff/locations">@T["ui.storage.back"]</a></p>
-    <form method="post" action="/staff/locations/warehouse/@Warehouse.Id/storage" class="ops-editor__panel ops-editor__inline">
+    <div class="ops-list-bar" style="margin-bottom: 1.25rem;">
+        <a href="/staff/locations" class="vx-button vx-button--secondary">← @T["ui.storage.back"]</a>
+    </div>
+
+    <form method="post" action="/staff/locations/warehouse/@Warehouse.Id/storage" class="ops-inline-action-bar ops-list-bar" aria-labelledby="add-shelf-title" style="margin-bottom: 1.5rem;">
         <AntiforgeryToken />
-        <h2>@T["ui.storage.add"]</h2>
-        <label>@T["ui.storage.code"] <input name="code" required maxlength="@OperationsReceivingLimits.LocationCodeMaxLength" pattern="[A-Za-z0-9][A-Za-z0-9\-]*" autocapitalize="characters" placeholder="A-03-2" /></label>
-        <label>@T["ui.storage.zone"] <ZoneSelect T="T" Selected="OperationsStorageZone.Storage" /></label>
+        <span id="add-shelf-title" class="ops-inline-action-bar__label">@T["ui.storage.add"]:</span>
+        <label class="ops-inline-action-bar__field">
+            <span class="ops-screen-reader-text">@T["ui.storage.code"]</span>
+            <input name="code" required maxlength="@OperationsReceivingLimits.LocationCodeMaxLength" pattern="[A-Za-z0-9][A-Za-z0-9\-]*" autocapitalize="characters" placeholder="A-03-2" class="ops-inline-action-bar__control" style="font-family: var(--vx-font-mono); width: 8rem;" />
+        </label>
+        <div class="ops-inline-action-bar__field" style="min-width: 11rem;">
+            <ZoneSelect T="T" Selected="OperationsStorageZone.Storage" />
+        </div>
         <button type="submit" class="vx-button vx-button--primary">@T["ui.storage.add_submit"]</button>
     </form>
+
     <section class="ops-editor__panel">
         @if (Locations.Count == 0)
         {
@@ -34,19 +43,31 @@ IMPORTANT NOTES:
         {
             <OperationsTableViewport Label="@T["ui.storage.list"]">
                 <table class="ops-editor__table">
-                    <thead><tr><th scope="col">@T["ui.storage.code"]</th><th scope="col">@T["ui.storage.zone"]</th><th scope="col">@T["ui.storage.in_use"]</th><th scope="col"><span class="vx-visually-hidden">@T["ui.storage.change"]</span></th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 12rem;">@T["ui.storage.code"]</th>
+                            <th scope="col" colspan="3">@T["ui.storage.zone"] · @T["ui.storage.in_use"]</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         @foreach (OperationsStorageLocation location in Locations)
                         {
                             <tr>
-                                <td class="ops-editor__code">@location.Code</td>
+                                <td class="ops-editor__code ops-table__cell--bold">
+                                    <span class="ops-pill ops-pill--neutral" style="font-family: var(--vx-font-mono); font-weight: 700;">@location.Code</span>
+                                </td>
                                 <td colspan="3">
-                                    <form method="post" action="/staff/locations/warehouse/@Warehouse.Id/storage" class="ops-editor__inline">
+                                    <form method="post" action="/staff/locations/warehouse/@Warehouse.Id/storage" class="ops-field--inline" style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                                         <AntiforgeryToken />
                                         <input type="hidden" name="location" value="@location.Id" />
-                                        <ZoneSelect T="T" Selected="location.Zone" />
-                                        <label><input type="checkbox" name="active" value="true" checked="@location.IsActive" /> @T["ui.storage.in_use"]</label>
-                                        <button type="submit" class="vx-button vx-button--secondary">@T["ui.storage.change"]</button>
+                                        <div style="min-width: 12rem;">
+                                            <ZoneSelect T="T" Selected="location.Zone" />
+                                        </div>
+                                        <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.4rem; margin: 0; cursor: pointer;">
+                                            <input type="checkbox" name="active" value="true" checked="@location.IsActive" />
+                                            <span>@T["ui.storage.in_use"]</span>
+                                        </label>
+                                        <button type="submit" class="vx-button vx-button--secondary" style="height: 30px; padding: 0 0.75rem;">@T["ui.storage.change"]</button>
                                     </form>
                                 </td>
                             </tr>

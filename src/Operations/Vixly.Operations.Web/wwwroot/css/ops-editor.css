@@ -2146,3 +2146,179 @@ tr[data-low="true"] td:first-child {
     font-weight: 600;
 }
 
+
+/* =========================================================
+   CUSTOMER SCREENS, CARD TERMINAL & HARDWARE (Slice 5F & 3B)
+   ========================================================= */
+.ops-screen-code-panel {
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.5rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+}
+.ops-screen-code-box {
+    margin: 1rem 0;
+}
+.ops-screen-code {
+    font-family: var(--vx-font-mono, ui-monospace, monospace);
+    font-size: 2.25rem;
+    font-weight: 700;
+    letter-spacing: 0.25rem;
+    color: var(--vx-color-primary, #2563eb);
+    padding: 0.75rem 1.5rem;
+    background: var(--vx-color-surface-sunken, #f8fafc);
+    border: 2px dashed var(--vx-color-border-strong, #cbd5e1);
+    border-radius: 8px;
+    display: inline-block;
+}
+.ops-step-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 999px;
+    background: var(--vx-color-surface-sunken, #f1f5f9);
+    color: var(--vx-color-text, #1e293b);
+    border: 1px solid var(--vx-color-border, #cbd5e1);
+}
+.ops-screen-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.ops-screen-card {
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.5rem;
+    padding: 1rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: all 140ms ease;
+}
+.ops-screen-card--active {
+    border-color: var(--vx-color-primary, #2563eb);
+    box-shadow: 0 0 0 1px var(--vx-color-primary, #2563eb), 0 2px 6px rgba(37, 99, 235, 0.08);
+}
+.ops-screen-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+.ops-screen-card__name {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--vx-color-text);
+}
+.ops-screen-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--vx-color-border-subtle, #f1f5f9);
+}
+
+/* Card Payment Terminal Page */
+.ops-card-terminal-panel {
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.65rem;
+    padding: 1.5rem;
+    max-width: 32rem;
+    margin: 0 auto;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.ops-card-terminal__header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--vx-color-border);
+}
+.ops-card-terminal__invoice {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--vx-color-text-muted);
+    display: block;
+    margin-bottom: 0.35rem;
+}
+.ops-card-terminal__amount {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.4rem;
+}
+.ops-amount-number {
+    font-size: 2.25rem;
+    font-weight: 800;
+    font-family: var(--vx-font-mono, ui-monospace, monospace);
+    color: var(--vx-color-text);
+    letter-spacing: -0.02em;
+}
+.ops-amount-currency {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--vx-color-text-muted);
+}
+.ops-card-terminal__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+}
+.ops-card-reader-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background: var(--vx-color-surface-sunken);
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.5rem;
+    width: 100%;
+}
+.ops-pulse-indicator {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--vx-color-primary, #2563eb);
+    box-shadow: 0 0 0 rgba(37, 99, 235, 0.4);
+    animation: opsPulse 1.6s infinite;
+}
+@keyframes opsPulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+}
+.ops-card-reader__label {
+    font-weight: 600;
+    margin: 0;
+    color: var(--vx-color-text);
+}
+.ops-qr-container {
+    padding: 0.75rem;
+    background: #ffffff;
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.5rem;
+    display: inline-flex;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+.ops-qr-image {
+    display: block;
+    border-radius: 0.25rem;
+}
+.ops-card-terminal__cancel {
+    margin-top: 0.5rem;
+}
+.ops-card-terminal__success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 0;
+}

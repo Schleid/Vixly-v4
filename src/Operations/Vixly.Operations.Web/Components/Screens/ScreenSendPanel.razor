@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: ScreenSendPanel.razor
 
@@ -14,57 +14,74 @@ IMPORTANT NOTES:
 - The clerk's page reloads itself only when asked; the screen's state is read when the page opens
 =========================================================
 *@
-<section class="ops-editor__panel" aria-labelledby="screens-title" id="screens" data-screens>
-    <h2 id="screens-title">@T["ui.screens.panel_title"]</h2>
+<section class="ops-editor__panel ops-screens-panel" aria-labelledby="screens-title" id="screens" data-screens>
+    <div class="ops-panel__header">
+        <h2 id="screens-title" class="ops-panel__title">@T["ui.screens.panel_title"]</h2>
+    </div>
     @if (Screens.Count == 0)
     {
         <p class="ops-editor__hint">@T["ui.screens.panel_none"] <a href="/staff/screens">@T["ui.screens.title"]</a></p>
     }
     else
     {
-        <ul class="ops-editor__list">
+        <div class="ops-screen-cards-grid">
             @foreach (OperationsScreenRow screen in Screens)
             {
                 bool showingThis = (InvoiceId is not null && screen.InvoiceId == InvoiceId) || (ShipmentId is not null && screen.ShipmentId == ShipmentId);
-                <li data-screen="@screen.ScreenId" data-showing="@showingThis">
-                    <strong>@screen.Name</strong>
-                    @if (!screen.Paired)
-                    {
-                        <span> · @T["ui.screens.waiting_code"]</span>
-                    }
-                    else if (showingThis)
-                    {
-                        <span> · @T["ui.screens.step." + screen.Step]</span>
-                        @if (InvoiceId is not null && screen.ZelleAcceptedUtc is { } accepted)
+                <article class="ops-screen-card @(showingThis ? "ops-screen-card--active" : string.Empty)" data-screen="@screen.ScreenId" data-showing="@showingThis">
+                    <div class="ops-screen-card__header">
+                        <strong class="ops-screen-card__name">@screen.Name</strong>
+                        @if (!screen.Paired)
                         {
-                            <span data-zelle-accepted> · @VixlyText.Format(T, "ui.screens.zelle_accepted", "time", accepted.ToLocalTime().ToString("t", CultureInfo.CurrentCulture))</span>
+                            <span class="ops-status-pill ops-status-pill--neutral">@T["ui.screens.waiting_code"]</span>
                         }
-                        <form method="post" action="/staff/screens/@screen.ScreenId/send" style="display: inline;">
-                            <AntiforgeryToken />
-                            <input type="hidden" name="clear" value="true" />
-                            <input type="hidden" name="back" value="@Back" />
-                            <button type="submit" class="vx-button vx-button--secondary">@T["ui.screens.clear"]</button>
-                        </form>
-                    }
-                    @if (screen.Paired)
+                        else if (showingThis)
+                        {
+                            <span class="ops-status-pill ops-status-pill--positive">@T["ui.screens.step." + screen.Step]</span>
+                        }
+                        else
+                        {
+                            <span class="ops-status-pill ops-status-pill--neutral">@T["ui.screens.step." + screen.Step]</span>
+                        }
+                    </div>
+
+                    @if (showingThis && InvoiceId is not null && screen.ZelleAcceptedUtc is { } accepted)
                     {
-                        <form method="post" action="/staff/screens/@screen.ScreenId/send" style="display: inline;">
-                            <AntiforgeryToken />
-                            @if (InvoiceId is { } invoice)
-                            {
-                                <input type="hidden" name="invoice" value="@invoice" />
-                            }
-                            @if (ShipmentId is { } shipment)
-                            {
-                                <input type="hidden" name="shipment" value="@shipment" />
-                            }
-                            <input type="hidden" name="back" value="@Back" />
-                            <button type="submit" class="vx-button vx-button--primary">@(InvoiceId is not null ? T["ui.screens.send_invoice"] : T["ui.screens.send_sign"])</button>
-                        </form>
+                        <div class="ops-screen-card__meta" data-zelle-accepted>
+                            <span class="ops-pill ops-pill--info">@VixlyText.Format(T, "ui.screens.zelle_accepted", "time", accepted.ToLocalTime().ToString("t", CultureInfo.CurrentCulture))</span>
+                        </div>
                     }
-                </li>
+
+                    <div class="ops-screen-card__actions">
+                        @if (showingThis)
+                        {
+                            <form method="post" action="/staff/screens/@screen.ScreenId/send">
+                                <AntiforgeryToken />
+                                <input type="hidden" name="clear" value="true" />
+                                <input type="hidden" name="back" value="@Back" />
+                                <button type="submit" class="vx-button vx-button--secondary">@T["ui.screens.clear"]</button>
+                            </form>
+                        }
+                        @if (screen.Paired)
+                        {
+                            <form method="post" action="/staff/screens/@screen.ScreenId/send">
+                                <AntiforgeryToken />
+                                @if (InvoiceId is { } invoice)
+                                {
+                                    <input type="hidden" name="invoice" value="@invoice" />
+                                }
+                                @if (ShipmentId is { } shipment)
+                                {
+                                    <input type="hidden" name="shipment" value="@shipment" />
+                                }
+                                <input type="hidden" name="back" value="@Back" />
+                                <button type="submit" class="vx-button vx-button--primary">@(InvoiceId is not null ? T["ui.screens.send_invoice"] : T["ui.screens.send_sign"])</button>
+                            </form>
+                        }
+                    </div>
+                </article>
             }
-        </ul>
+        </div>
     }
 </section>
 

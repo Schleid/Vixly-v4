@@ -19,17 +19,16 @@ IMPORTANT NOTES:
 
 <EditorShell Title="@(Parcel.Number ?? string.Empty)" Company="@Company" Section="parcels" Error="@Error" Info="@Info">
     <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
             <a href="/staff/parcels" class="vx-button vx-button--secondary">@T["ui.parcels.back"]</a>
             <a class="vx-button vx-button--secondary" href="/staff/parcels/@Parcel.ParcelId/label" target="_blank" rel="noopener">@T["ui.parcels.print_label"]</a>
         </div>
-    
-        @if (CanCheck)
-        {
-            <div class="ops-list-bar__actions">
+        <div class="ops-list-bar__actions" style="display: flex; gap: 0.5rem; align-items: center;">
+            @if (CanCheck)
+            {
                 <a class="vx-button vx-button--primary" href="/staff/inspection/@Parcel.ParcelId">@T["ui.inspection.title"]</a>
-            </div>
-        }
+            }
+        </div>
     </div>
     <div class="ops-record-layout" data-editable="@((CanAssign || CanPutAway) ? "true" : "false")">
     <aside class="ops-record-rail">
@@ -39,7 +38,7 @@ IMPORTANT NOTES:
             <dt>@T["ui.parcels.tracking"]</dt><dd class="ops-editor__code">@Parcel.CarrierTrackingNumber</dd>
             @if (!string.IsNullOrWhiteSpace(Parcel.Carrier)) { <dt>@T["ui.receiving.carrier"]</dt><dd>@Parcel.Carrier</dd> }
             <dt>@T["ui.customers.code"]</dt><dd>@if (Parcel.CustomerId is { } customerId) { <a href="/staff/customers/@customerId">@Parcel.CustomerCode · @Parcel.CustomerName</a> } else { @T["ui.hold.Unidentified"] }</dd>
-            @if (CustomerPhone is not null) { <dt>@T["ui.customers.phone"]</dt><dd>@CustomerPhone</dd> }
+            @if (CustomerPhone is not null) { <dt>@T["ui.customers.phone"]</dt><dd><a href="tel:@CustomerPhone" class="ops-phone-link">@OperationsPhoneDisplay.Format(CustomerPhone)</a></dd> }
             <dt>@T["ui.parcels.warehouse"]</dt><dd>@Parcel.WarehouseCode @(Parcel.StorageLocationCode is { } shelf ? "· " + shelf : null)</dd>
             <dt>@T["ui.parcels.milestone"]</dt><dd>@(Parcel.Milestone is { } milestone ? T["ui.milestone." + milestone].Value : null)</dd>
             @if (Parcel.HoldReasons != OperationsHoldReasons.None) { <dt>@T["ui.parcels.holds"]</dt><dd>@string.Join(", ", Enum.GetValues<OperationsHoldReasons>().Where(reason => reason != OperationsHoldReasons.None && Parcel.HoldReasons.HasFlag(reason)).Select(reason => T["ui.hold." + reason].Value))</dd> }
@@ -95,30 +94,34 @@ IMPORTANT NOTES:
             <h2>@T["ui.parcels.assign"]</h2>
             <p>@T["ui.parcels.assign_hint"]</p>
             <label>@T["ui.customers.code"] <input name="customer" required maxlength="20" autocomplete="off" autocapitalize="characters" value="@LabelCustomer?.Code" /></label>
-            <fieldset>
-                <legend>@T["ui.parcels.verified_by"]</legend>
-                @foreach (string method in OperationsTrackingCodes.VerificationMethods)
-                {
-                    <label class="ops-checkbox-label"><input type="radio" name="verifiedBy" value="@method" required /> <span>@T["ui.parcels.verified." + method]</span></label>
-                }
+            <fieldset style="border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.65rem 0.85rem; margin: 0.65rem 0;">
+                <legend style="padding: 0 0.35rem; font-weight: 600; font-size: 0.8125rem;">@T["ui.parcels.verified_by"]</legend>
+                <div style="display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap;">
+                    @foreach (string method in OperationsTrackingCodes.VerificationMethods)
+                    {
+                        <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.35rem; cursor: pointer; font-size: 0.8125rem;">
+                            <input type="radio" name="verifiedBy" value="@method" required />
+                            <span>@T["ui.parcels.verified." + method]</span>
+                        </label>
+                    }
+                </div>
             </fieldset>
             <button type="submit" class="vx-button vx-button--primary">@T["ui.parcels.assign_submit"]</button>
         </form>
     }
     @if (CanPutAway && Locations.Count > 0)
     {
-        <form method="post" action="/staff/parcels/@Parcel.ParcelId/put-away" class="ops-editor__panel">
+        <form method="post" action="/staff/parcels/@Parcel.ParcelId/put-away" class="ops-editor__panel ops-inline-action-bar">
             <AntiforgeryToken />
             <input type="hidden" name="key" value="@CommandKey" />
-            <h2>@T["ui.parcels.put_away"]</h2>
-            <label>@T["ui.receiving.location"]
-                <select name="location" required>
-                    @foreach (OperationsStorageLocation location in Locations)
-                    {
-                        <option value="@location.Id">@location.Code · @T["ui.storage.zone." + location.Zone.ToString().ToLowerInvariant()]</option>
-                    }
-                </select>
-            </label>
+            <h2 style="margin: 0; font-size: 0.9375rem; width: 100%;">@T["ui.parcels.put_away"]</h2>
+            <label for="putaway-location-select" class="ops-inline-action-bar__label">@T["ui.receiving.location"]</label>
+            <select id="putaway-location-select" name="location" required class="ops-inline-action-bar__select" style="min-width: 14rem;">
+                @foreach (OperationsStorageLocation location in Locations)
+                {
+                    <option value="@location.Id">@location.Code · @T["ui.storage.zone." + location.Zone.ToString().ToLowerInvariant()]</option>
+                }
+            </select>
             <button type="submit" class="vx-button vx-button--secondary">@T["ui.parcels.put_away_submit"]</button>
         </form>
     }

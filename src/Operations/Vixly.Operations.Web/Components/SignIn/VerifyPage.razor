@@ -92,7 +92,7 @@ IMPORTANT NOTES:
                 <div class="ops-mfa-form__group">
                     <input id="code" name="code" class="ops-mfa-code-input" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{6,7}" maxlength="7" placeholder="000 000" required autofocus />
                 </div>
-                <button type="submit" class="ops-login__submit" style="width: 100%;">
+                <button type="submit" class="ops-login__submit-btn">
                     <span>@T["ui.verify.submit"]</span>
                     <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                 </button>
@@ -103,7 +103,7 @@ IMPORTANT NOTES:
                     <span>@T["ui.verify.use_recovery"]</span>
                     <span aria-hidden="true">→</span>
                 </a>
-                <a href="/staff" class="ops-mfa-link ops-mfa-link--muted">
+                <a href="/staff" class="ops-mfa-link--back">
                     <span aria-hidden="true">←</span>
                     <span>@T["ui.signin.back"]</span>
                 </a>

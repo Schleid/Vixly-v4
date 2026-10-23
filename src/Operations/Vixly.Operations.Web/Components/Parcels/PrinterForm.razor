@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: PrinterForm.razor
 
@@ -14,39 +14,74 @@ IMPORTANT NOTES:
 *@
 @using Vixly.Operations.Domain.Printing
 
-<form method="post" action="/staff/locations/warehouse/@WarehouseId/printers" class="ops-editor__inline ops-printer">
-    <AntiforgeryToken />
-    @if (Printer is not null) { <input type="hidden" name="printer" value="@Printer.Id" /> }
-    <label>@T["ui.printers.name"] <input name="name" required maxlength="60" value="@Printer?.Name" placeholder="Dock 1" /></label>
-    <label>@T["ui.printers.connection"]
-        <select name="connection">
-            <option value="network" selected="@(Printer?.Connection != OperationsPrinterConnection.Installed)">@T["ui.printers.connection.network"]</option>
-            <option value="installed" selected="@(Printer?.Connection == OperationsPrinterConnection.Installed)">@T["ui.printers.connection.installed"]</option>
-        </select>
-    </label>
-    <label>@T["ui.printers.address"] <input name="address" required maxlength="120" value="@Printer?.Address" placeholder="192.168.1.50:9100" /></label>
-    <label>@T["ui.printers.dpi"]
-        <select name="dpi">
-            <option value="203" selected="@(Printer?.Dpi != 300)">203</option>
-            <option value="300" selected="@(Printer?.Dpi == 300)">300</option>
-        </select>
-    </label>
-    <label>@T["ui.printers.media"]
-        <select name="media">
-            <option value="id" selected="@(Printer?.Media != Vixly.Operations.Domain.Printing.OperationsLabelMedia.ShippingLabel)">@T["ui.printers.media.IdLabel"]</option>
-            <option value="shipping" selected="@(Printer?.Media == Vixly.Operations.Domain.Printing.OperationsLabelMedia.ShippingLabel)">@T["ui.printers.media.ShippingLabel"]</option>
-        </select>
-    </label>
-    @if (Printer is not null) { <label><input type="checkbox" name="active" value="true" checked="@Printer.IsActive" /> @T["ui.storage.in_use"]</label> }
-    <button type="submit" class="vx-button vx-button--secondary">@(Printer is null ? T["ui.printers.add"] : T["ui.storage.change"])</button>
-</form>
-@if (Printer is { IsActive: true })
-{
-    <form method="post" action="/staff/locations/warehouse/@WarehouseId/printers/@Printer.Id/test" class="ops-editor__inline">
+<div class="ops-printer-card" style="padding: 1rem; margin-bottom: 1rem; background: var(--vx-surface-sunken, #f8fafc); border: 1px solid var(--vx-border-subtle, #e2e8f0); border-radius: 6px;">
+    <form method="post" action="/staff/locations/warehouse/@WarehouseId/printers" class="ops-printer-form">
         <AntiforgeryToken />
-        <button type="submit" class="vx-button vx-button--secondary">@T["ui.printers.test"]</button>
+        @if (Printer is not null) { <input type="hidden" name="printer" value="@Printer.Id" /> }
+        
+        <div class="ops-form-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.85rem; align-items: flex-end; margin-bottom: 0.85rem;">
+            <label class="ops-field">
+                <span class="ops-field__label">@T["ui.printers.name"]</span>
+                <input name="name" required maxlength="60" value="@Printer?.Name" placeholder="Dock 1" class="ops-input" />
+            </label>
+            
+            <label class="ops-field">
+                <span class="ops-field__label">@T["ui.printers.connection"]</span>
+                <select name="connection" class="ops-input">
+                    <option value="network" selected="@(Printer?.Connection != OperationsPrinterConnection.Installed)">@T["ui.printers.connection.network"]</option>
+                    <option value="installed" selected="@(Printer?.Connection == OperationsPrinterConnection.Installed)">@T["ui.printers.connection.installed"]</option>
+                </select>
+            </label>
+            
+            <label class="ops-field">
+                <span class="ops-field__label">@T["ui.printers.address"]</span>
+                <input name="address" required maxlength="120" value="@Printer?.Address" placeholder="192.168.1.50:9100" class="ops-input" />
+            </label>
+            
+            <label class="ops-field">
+                <span class="ops-field__label">@T["ui.printers.dpi"]</span>
+                <select name="dpi" class="ops-input">
+                    <option value="203" selected="@(Printer?.Dpi != 300)">203</option>
+                    <option value="300" selected="@(Printer?.Dpi == 300)">300</option>
+                </select>
+            </label>
+            
+            <label class="ops-field">
+                <span class="ops-field__label">@T["ui.printers.media"]</span>
+                <select name="media" class="ops-input">
+                    <option value="id" selected="@(Printer?.Media != Vixly.Operations.Domain.Printing.OperationsLabelMedia.ShippingLabel)">@T["ui.printers.media.IdLabel"]</option>
+                    <option value="shipping" selected="@(Printer?.Media == Vixly.Operations.Domain.Printing.OperationsLabelMedia.ShippingLabel)">@T["ui.printers.media.ShippingLabel"]</option>
+                </select>
+            </label>
+            
+            @if (Printer is not null)
+            {
+                <div class="ops-field" style="margin-bottom: 0.5rem;">
+                    <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.45rem; cursor: pointer;">
+                        <input type="checkbox" name="active" value="true" checked="@Printer.IsActive" />
+                        <span>@T["ui.storage.in_use"]</span>
+                    </label>
+                </div>
+            }
+        </div>
+        
+        <div class="ops-field--inline" style="display: flex; align-items: center; gap: 0.65rem;">
+            <button type="submit" class="vx-button @(Printer is null ? "vx-button--primary" : "vx-button--secondary")">
+                @(Printer is null ? T["ui.printers.add"] : T["ui.storage.change"])
+            </button>
+        </div>
     </form>
-}
+    
+    @if (Printer is { IsActive: true })
+    {
+        <div style="margin-top: 0.5rem;">
+            <form method="post" action="/staff/locations/warehouse/@WarehouseId/printers/@Printer.Id/test" style="display: inline;">
+                <AntiforgeryToken />
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.printers.test"]</button>
+            </form>
+        </div>
+    }
+</div>
 
 @code {
     [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: DispatchLegsPanel.razor
 
@@ -45,23 +45,29 @@ IMPORTANT NOTES:
                                 {
                                     <form method="post" action="/staff/dispatches/@Dispatch.Id/legs/@leg.Id/remove" class="ops-editor__inline">
                                         <AntiforgeryToken />
-                                        <button type="submit" class="vx-button vx-button--secondary">@T["ui.dispatch.remove"]</button>
+                                        <button type="submit" class="vx-button vx-button--secondary" style="height: 30px; padding: 0 0.65rem; font-size: 0.75rem;">@T["ui.dispatch.remove"]</button>
                                     </form>
                                 }
                                 @if (leg.Status == OperationsDispatchLegStatus.Planned && Dispatch.Status is OperationsDispatchStatus.Closed or OperationsDispatchStatus.Departed)
                                 {
-                                    <form method="post" action="/staff/dispatches/@Dispatch.Id/legs/@leg.Id/depart" class="ops-editor__inline">
+                                    <form method="post" action="/staff/dispatches/@Dispatch.Id/legs/@leg.Id/depart" class="ops-editor__inline" style="display: inline-flex; align-items: center; gap: 0.4rem;">
                                         <AntiforgeryToken />
-                                        <label>@T["ui.dispatch.at"] <input type="datetime-local" name="at" value="@OperationsDispatchWords.Field(DateTimeOffset.UtcNow, TimeZone)" /></label>
-                                        <button type="submit" class="vx-button vx-button--primary">@T["ui.dispatch.depart"]</button>
+                                        <label style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8125rem; margin: 0; white-space: nowrap;">
+                                            <span>@T["ui.dispatch.at"]</span>
+                                            <input type="datetime-local" name="at" value="@OperationsDispatchWords.Field(DateTimeOffset.UtcNow, TimeZone)" style="height: 30px; font-size: 0.8125rem; padding: 0.15rem 0.4rem;" />
+                                        </label>
+                                        <button type="submit" class="vx-button vx-button--primary" style="height: 30px; padding: 0 0.65rem; font-size: 0.75rem;">@T["ui.dispatch.depart"]</button>
                                     </form>
                                 }
                                 @if (leg.Status == OperationsDispatchLegStatus.Departed)
                                 {
-                                    <form method="post" action="/staff/dispatches/@Dispatch.Id/legs/@leg.Id/arrive" class="ops-editor__inline">
+                                    <form method="post" action="/staff/dispatches/@Dispatch.Id/legs/@leg.Id/arrive" class="ops-editor__inline" style="display: inline-flex; align-items: center; gap: 0.4rem;">
                                         <AntiforgeryToken />
-                                        <label>@T["ui.dispatch.at"] <input type="datetime-local" name="at" value="@OperationsDispatchWords.Field(DateTimeOffset.UtcNow, TimeZone)" /></label>
-                                        <button type="submit" class="vx-button vx-button--primary">@T["ui.dispatch.arrive"]</button>
+                                        <label style="display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8125rem; margin: 0; white-space: nowrap;">
+                                            <span>@T["ui.dispatch.at"]</span>
+                                            <input type="datetime-local" name="at" value="@OperationsDispatchWords.Field(DateTimeOffset.UtcNow, TimeZone)" style="height: 30px; font-size: 0.8125rem; padding: 0.15rem 0.4rem;" />
+                                        </label>
+                                        <button type="submit" class="vx-button vx-button--primary" style="height: 30px; padding: 0 0.65rem; font-size: 0.75rem;">@T["ui.dispatch.arrive"]</button>
                                     </form>
                                 }
                             </td>
@@ -77,32 +83,36 @@ IMPORTANT NOTES:
             <AntiforgeryToken />
             <h3 id="leg-title">@T["ui.dispatch.add_leg"]</h3>
             <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
-            <label>@T["ui.dispatch.carrier"]
-                <select name="carrier">
-                    <option value="">@T["ui.dispatch.carrier_none"]</option>
-                    @foreach (OperationsCarrier carrier in Carriers.Where(item => item.IsActive))
-                    {
-                        <option value="@carrier.Id">@carrier.Name · @T["ui.dispatch.mode." + OperationsDispatching.Mode(carrier.Kind)]</option>
-                    }
-                </select>
-            </label>
-            <label>@T["ui.dispatch.mode"]
-                <select name="kind">
-                    @foreach (OperationsCarrierKind kind in Enum.GetValues<OperationsCarrierKind>())
-                    {
-                        <option value="@kind">@T["ui.dispatch.mode." + OperationsDispatching.Mode(kind)]</option>
-                    }
-                </select>
-            </label>
-            <label>@T["ui.dispatch.leg_from"] <input name="from" maxlength="@OperationsDispatchLeg.PlaceMaxLength" required /></label>
-            <label>@T["ui.dispatch.leg_to"] <input name="to" maxlength="@OperationsDispatchLeg.PlaceMaxLength" required /></label>
-            <label>@T["ui.dispatch.departs"] <input type="datetime-local" name="departure" /></label>
-            <label>@T["ui.dispatch.arrives"] <input type="datetime-local" name="arrival" /></label>
-            <label>@T["ui.dispatch.reference"] <input name="reference" maxlength="@OperationsDispatchLeg.ReferenceMaxLength" /></label>
-            <label>@T["ui.dispatch.driver"] <input name="driver" maxlength="@OperationsDispatchLeg.PlaceMaxLength" /></label>
-            <label>@T["ui.dispatch.vehicle"] <input name="vehicle" maxlength="@OperationsDispatchLeg.ReferenceMaxLength" /></label>
-            <button type="submit" class="vx-button vx-button--primary">@T["ui.dispatch.add_leg"]</button>
-            <p class="ops-editor__hint">@T["ui.dispatch.leg_hint"] @T["ui.dispatch.places_hint"]</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.85rem; margin-bottom: 0.85rem;">
+                <label>@T["ui.dispatch.carrier"]
+                    <select name="carrier">
+                        <option value="">@T["ui.dispatch.carrier_none"]</option>
+                        @foreach (OperationsCarrier carrier in Carriers.Where(item => item.IsActive))
+                        {
+                            <option value="@carrier.Id">@carrier.Name · @T["ui.dispatch.mode." + OperationsDispatching.Mode(carrier.Kind)]</option>
+                        }
+                    </select>
+                </label>
+                <label>@T["ui.dispatch.mode"]
+                    <select name="kind">
+                        @foreach (OperationsCarrierKind kind in Enum.GetValues<OperationsCarrierKind>())
+                        {
+                            <option value="@kind">@T["ui.dispatch.mode." + OperationsDispatching.Mode(kind)]</option>
+                        }
+                    </select>
+                </label>
+                <label>@T["ui.dispatch.leg_from"] <input name="from" maxlength="@OperationsDispatchLeg.PlaceMaxLength" required /></label>
+                <label>@T["ui.dispatch.leg_to"] <input name="to" maxlength="@OperationsDispatchLeg.PlaceMaxLength" required /></label>
+                <label>@T["ui.dispatch.departs"] <input type="datetime-local" name="departure" /></label>
+                <label>@T["ui.dispatch.arrives"] <input type="datetime-local" name="arrival" /></label>
+                <label>@T["ui.dispatch.reference"] <input name="reference" maxlength="@OperationsDispatchLeg.ReferenceMaxLength" /></label>
+                <label>@T["ui.dispatch.driver"] <input name="driver" maxlength="@OperationsDispatchLeg.PlaceMaxLength" /></label>
+                <label>@T["ui.dispatch.vehicle"] <input name="vehicle" maxlength="@OperationsDispatchLeg.ReferenceMaxLength" /></label>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.dispatch.add_leg"]</button>
+                <p class="ops-editor__hint" style="margin: 0;">@T["ui.dispatch.leg_hint"] @T["ui.dispatch.places_hint"]</p>
+            </div>
         </form>
     }
 </section>

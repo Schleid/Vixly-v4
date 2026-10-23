@@ -1,0 +1,204 @@
+@*
+=========================================================
+FILE: BillPage.razor
+
+PURPOSE:
+One bill (Slice 8): enter or correct it, approve or send it back, record what was paid, void it.
+
+RESPONSIBILITIES:
+- The form while it can change: who sent it, their number, what for, dates, amount, note, shares on dispatches or shipments (by number)
+- Otherwise the facts, the shares and the payments; the actions the person may take
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- A share typed with a dispatch number spreads on that dispatch's shipments by chargeable weight; with a shipment number it stays on that shipment
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@(Bill is null ? T["ui.bills.new"] : VixlyText.Format(T, "ui.bills.bill_title", new Dictionary<string, object> { ["party"] = Bill.PartyName, ["reference"] = Bill.Reference }))" Company="@Company" Section="bills" Error="@Error" Info="@Info">
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <a href="/staff/bills" class="vx-button vx-button--secondary">@T["ui.bills.back"]</a>
+        </div>
+        @if (Bill is { } headerBill)
+        {
+            <div class="ops-list-bar__actions">
+                <span class="ops-status-chip">@T["ui.bills.status." + headerBill.Status]</span>
+            </div>
+        }
+    </div>
+    @if (Bill is { } bill)
+    {
+        <section class="ops-editor__panel" aria-labelledby="bill-facts" data-bill-status="@bill.Status">
+            <h2 id="bill-facts">@T["ui.bills.status." + bill.Status]</h2>
+            <dl class="ops-facts-grid">
+                <div class="ops-fact-cell"><dt>@T["ui.bills.party"]</dt><dd>@bill.PartyName · @T["ui.bills.party_kind." + bill.Party]</dd></div>
+                <div class="ops-fact-cell"><dt>@T["ui.bills.reference"]</dt><dd class="ops-editor__code">@bill.Reference</dd></div>
+                <div class="ops-fact-cell"><dt>@T["ui.bills.category"]</dt><dd>@T["ui.bills.category." + bill.Category]</dd></div>
+                <div class="ops-fact-cell"><dt>@T["ui.bills.billed_on"]</dt><dd>@bill.BilledOn.ToString("d", CultureInfo.CurrentCulture)</dd></div>
+                <div class="ops-fact-cell"><dt>@T["ui.bills.due_on"]</dt><dd>@bill.DueOn.ToString("d", CultureInfo.CurrentCulture)</dd></div>
+                <div class="ops-fact-cell"><dt>@T["ui.bills.amount"]</dt><dd class="ops-editor__number" style="font-weight: 700;">@OperationsInvoiceWords.Money(bill.Amount, bill.CurrencyCode)</dd></div>
+                <div class="ops-fact-cell"><dt>@T["ui.bills.paid"]</dt><dd class="ops-editor__number">@OperationsInvoiceWords.Money(bill.PaidTotal, bill.CurrencyCode)</dd></div>
+                <div class="ops-fact-cell"><dt>@T["ui.bills.entered_by"]</dt><dd>@Person(bill.EnteredByUserId)</dd></div>
+                @if (bill.DecidedByUserId is { } decided) { <div class="ops-fact-cell"><dt>@T["ui.bills.decided_by"]</dt><dd>@Person(decided) · @bill.DecidedUtc?.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)</dd></div> }
+                @if (bill.RejectReason is { } reason) { <div class="ops-fact-cell"><dt>@T["ui.bills.reason"]</dt><dd>@reason</dd></div> }
+                @if (bill.VoidReason is { } voided) { <div class="ops-fact-cell"><dt>@T["ui.bills.void_reason"]</dt><dd>@voided</dd></div> }
+                @if (bill.Note is { } note) { <div class="ops-fact-cell"><dt>@T["ui.bills.note"]</dt><dd>@note</dd></div> }
+            </dl>
+            @if (bill.Allocations.Count > 0)
+            {
+                <h3 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.875rem;">@T["ui.bills.shares"]</h3>
+                <ul data-shares class="ops-editor__list">
+                    @foreach (OperationsBillAllocation share in bill.Allocations)
+                    {
+                        <li>@if (share.DispatchId is { } dispatch) { <a href="/staff/dispatches/@dispatch">@share.Reference</a> } else { <a href="/staff/shipments/@share.ShipmentId">@share.Reference</a> } · @OperationsInvoiceWords.Money(share.Amount, bill.CurrencyCode)</li>
+                    }
+                </ul>
+                <p class="ops-editor__hint" style="margin-top: 0.5rem;">@VixlyText.Format(T, "ui.bills.overhead", "amount", OperationsInvoiceWords.Money(bill.Amount - bill.Allocated, bill.CurrencyCode))</p>
+            }
+            @if (bill.Payments.Count > 0)
+            {
+                <h3 style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.875rem;">@T["ui.bills.payments"]</h3>
+                <ul data-payments class="ops-editor__list">
+                    @foreach (OperationsBillPayment payment in bill.Payments)
+                    {
+                        <li>@payment.PaidOn.ToString("d", CultureInfo.CurrentCulture) · @OperationsInvoiceWords.Money(payment.Amount, bill.CurrencyCode) · @T["ui.bills.method." + payment.Method]@(payment.Reference is { } reference ? " · " + reference : string.Empty) · @Person(payment.RecordedByUserId)</li>
+                    }
+                </ul>
+            }
+        </section>
+        @if (CanDecide)
+        {
+            <form method="post" action="/staff/bills/@bill.Id/decide" class="ops-editor__panel ops-editor__form" aria-labelledby="decide-title">
+                <AntiforgeryToken />
+                <input type="hidden" name="version" value="@OperationsPayablesDesk.Version(bill)" />
+                <h2 id="decide-title">@T["ui.bills.decide"]</h2>
+                <label>@T["ui.bills.reason"] <input name="reason" maxlength="500" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem; width: 100%; max-width: 28rem;" /></label>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button type="submit" name="approve" value="true" class="vx-button vx-button--primary" style="height: 32px; padding: 0 0.85rem;">@T["ui.bills.approve"]</button>
+                    <button type="submit" name="approve" value="false" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.bills.reject"]</button>
+                </div>
+            </form>
+        }
+        @if (CanPay)
+        {
+            <form method="post" action="/staff/bills/@bill.Id/pay" class="ops-editor__panel ops-editor__form" aria-labelledby="pay-title">
+                <AntiforgeryToken />
+                <h2 id="pay-title">@T["ui.bills.record_payment"]</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <label>@T["ui.bills.paid_on"] <input type="date" name="paidOn" value="@Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" required style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></label>
+                    <label>@T["ui.bills.amount"] <input name="amount" inputmode="decimal" size="10" value="@bill.Owed.ToString("0.00", CultureInfo.InvariantCulture)" required style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></label>
+                    <label>@T["ui.bills.method"]
+                        <select name="method" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;">
+                            @foreach (OperationsBillPaymentMethod method in Enum.GetValues<OperationsBillPaymentMethod>())
+                            {
+                                <option value="@method">@T["ui.bills.method." + method]</option>
+                            }
+                        </select>
+                    </label>
+                    <label>@T["ui.bills.payment_reference"] <input name="reference" maxlength="60" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></label>
+                </div>
+                <button type="submit" class="vx-button vx-button--primary" style="height: 32px; padding: 0 0.85rem;">@T["ui.bills.record_payment"]</button>
+            </form>
+        }
+        @if (CanVoid)
+        {
+            <form method="post" action="/staff/bills/@bill.Id/void" class="ops-editor__panel ops-panel--restricted ops-inline-action-bar" aria-labelledby="void-title">
+                <AntiforgeryToken />
+                <h2 id="void-title" style="margin: 0; font-size: 0.9375rem; width: 100%;">@T["ui.bills.void"]</h2>
+                <label for="bill-void-reason" class="ops-inline-action-bar__label">@T["ui.bills.reason"]</label>
+                <input id="bill-void-reason" name="reason" maxlength="500" required class="ops-inline-action-bar__select" style="min-width: 16rem;" />
+                <button type="submit" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.bills.void"]</button>
+            </form>
+        }
+    }
+    @if (CanEdit)
+    {
+        <form method="post" action="/staff/bills/@(Bill?.Id.ToString() ?? "new")" class="ops-editor__panel ops-editor__form" aria-labelledby="bill-form">
+            <AntiforgeryToken />
+            <h2 id="bill-form">@(Bill is null ? T["ui.bills.new"] : T["ui.bills.correct"])</h2>
+            @if (NeedApproval)
+            {
+                <p class="ops-editor__hint">@T["ui.bills.waits_for_approval"]</p>
+            }
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.85rem; margin-bottom: 0.85rem;">
+                <label>@T["ui.bills.party"]
+                    <select name="party" required style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;">
+                        @foreach (IGrouping<OperationsBillParty, OperationsBillPartyOption> kind in Parties.GroupBy(option => option.Party))
+                        {
+                            <optgroup label="@T["ui.bills.party_kind." + kind.Key]">
+                                @foreach (OperationsBillPartyOption option in kind)
+                                {
+                                    <option value="@(option.Party):@(option.Id)" selected="@(Bill is { } shown && PartyOf(shown) == option.Id)">@option.Name</option>
+                                }
+                            </optgroup>
+                        }
+                    </select>
+                </label>
+                <label>@T["ui.bills.reference"] <input name="reference" maxlength="60" required value="@Bill?.Reference" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></label>
+                <label>@T["ui.bills.category"]
+                    <select name="category" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;">
+                        @foreach (OperationsBillCategory category in Enum.GetValues<OperationsBillCategory>())
+                        {
+                            <option value="@category" selected="@(Bill?.Category == category)">@T["ui.bills.category." + category]</option>
+                        }
+                    </select>
+                </label>
+                <label>@T["ui.bills.billed_on"] <input type="date" name="billedOn" required value="@((Bill?.BilledOn ?? Today).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></label>
+                <label>@T["ui.bills.due_on"] <input type="date" name="dueOn" required value="@((Bill?.DueOn ?? Today.AddDays(30)).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture))" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></label>
+                <label>@VixlyText.Format(T, "ui.bills.amount_in", "currency", CurrencyCode) <input name="amount" inputmode="decimal" required value="@Bill?.Amount.ToString("0.00", CultureInfo.InvariantCulture)" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></label>
+            </div>
+            <label style="margin-bottom: 0.85rem;">@T["ui.bills.note"] <textarea name="note" rows="2" maxlength="500" style="padding: 0.4rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem; resize: vertical;">@Bill?.Note</textarea></label>
+            <fieldset style="border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.75rem 1rem; margin-bottom: 0.85rem;">
+                <legend style="padding: 0 0.35rem; font-weight: 600; font-size: 0.8125rem;">@T["ui.bills.shares"]</legend>
+                <p class="ops-editor__hint" style="margin-top: 0; margin-bottom: 0.5rem;">@T["ui.bills.shares_hint"]</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.65rem;">
+                    @for (int row = 0; row < ShareRows; row++)
+                    {
+                        OperationsBillAllocation? share = Bill is not null && row < Bill.Allocations.Count ? Bill.Allocations[row] : null;
+                        <div class="ops-editor__inline" data-share-row="@row" style="display: flex; gap: 0.5rem; align-items: center;">
+                            <label style="margin: 0; font-size: 0.8125rem; flex: 1;">@T["ui.bills.share_number"] <input name="share_number_@row" maxlength="40" value="@share?.Reference" style="height: 30px; padding: 0.2rem 0.4rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem; width: 100%;" /></label>
+                            <label style="margin: 0; font-size: 0.8125rem; width: 6.5rem;">@T["ui.bills.amount"] <input name="share_amount_@row" inputmode="decimal" value="@share?.Amount.ToString("0.00", CultureInfo.InvariantCulture)" style="height: 30px; padding: 0.2rem 0.4rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem; width: 100%;" /></label>
+                        </div>
+                    }
+                </div>
+            </fieldset>
+            <button type="submit" class="vx-button vx-button--primary" style="height: 32px; padding: 0 0.85rem;">@T["ui.bills.save"]</button>
+        </form>
+    }
+</EditorShell>
+
+@code {
+    public const int ShareRows = 10;
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsBill? Bill { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsBillPartyOption> Parties { get; set; } = Array.Empty<OperationsBillPartyOption>();
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public bool CanDecide { get; set; }
+
+    [Parameter] public bool CanPay { get; set; }
+
+    [Parameter] public bool CanVoid { get; set; }
+
+    [Parameter] public bool NeedApproval { get; set; }
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public DateOnly Today { get; set; }
+
+    [Parameter] public IReadOnlyDictionary<Guid, string> People { get; set; } = new Dictionary<Guid, string>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private string Person(Guid userId) => People.TryGetValue(userId, out string? name) ? name : string.Empty;
+
+    private static Guid? PartyOf(OperationsBill bill) => bill.CarrierId ?? bill.PartnerWarehouseId ?? bill.VendorId;
+}

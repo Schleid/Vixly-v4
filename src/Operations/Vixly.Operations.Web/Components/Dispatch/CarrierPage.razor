@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: CarrierPage.razor
 
@@ -18,7 +18,14 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@Carrier.Name" Company="@Company" Section="carriers" Error="@Error" Info="@Info">
-    <p class="ops-editor__actions"><a href="/staff/carriers">@T["ui.carriers.back"]</a></p>
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <a href="/staff/carriers" class="vx-button vx-button--secondary">@T["ui.carriers.back"]</a>
+        </div>
+        <div class="ops-list-bar__actions">
+            <span class="ops-editor__status" data-status="@(Carrier.IsActive ? "active" : "inactive")">@T[Carrier.IsActive ? "ui.carriers.active" : "ui.carriers.inactive"]</span>
+        </div>
+    </div>
     <CarrierForm Carrier="@Carrier" />
     <section class="ops-editor__panel" aria-labelledby="rates-title">
         <h2 id="rates-title">@T["ui.carriers.rates"]</h2>
@@ -45,7 +52,7 @@ IMPORTANT NOTES:
                                     {
                                         <form method="post" action="/staff/carriers/@Carrier.Id/rates/@rate.Id/remove" class="ops-editor__inline">
                                             <AntiforgeryToken />
-                                            <button type="submit" class="vx-button vx-button--secondary">@T["ui.dispatch.remove"]</button>
+                                            <button type="submit" class="vx-button vx-button--secondary" style="height: 30px; padding: 0 0.65rem; font-size: 0.75rem;">@T["ui.dispatch.remove"]</button>
                                         </form>
                                     }
                                 </td>
@@ -60,38 +67,42 @@ IMPORTANT NOTES:
             <form method="post" action="/staff/carriers/@Carrier.Id/rates" class="ops-editor__form" aria-labelledby="rate-title">
                 <AntiforgeryToken />
                 <h3 id="rate-title">@T["ui.carriers.add_rate"]</h3>
-                <label>@T["ui.dispatch.destination"]
-                    <select name="destination">
-                        @foreach (OperationsWarehouse destination in Destinations)
-                        {
-                            <option value="@OperationsBundleWords.DestinationValue(destination.Id, destination.Address.CountryCode)">@destination.Code · @destination.Name</option>
-                        }
-                    </select>
-                </label>
-                @if (Air)
-                {
-                    <label>@VixlyText.Format(T, "ui.carriers.per_weight_in", new Dictionary<string, object> { ["currency"] = CurrencyCode, ["unit"] = WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg" }) <input name="perWeight" inputmode="decimal" size="8" required /></label>
-                    <label>@VixlyText.Format(T, "ui.carriers.minimum_in", "currency", CurrencyCode) <input name="minimum" inputmode="decimal" size="8" /></label>
-                }
-                else
-                {
-                    @if (BundleTypes.Count > 0)
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.85rem; margin-bottom: 0.85rem;">
+                    <label>@T["ui.dispatch.destination"]
+                        <select name="destination">
+                            @foreach (OperationsWarehouse destination in Destinations)
+                            {
+                                <option value="@OperationsBundleWords.DestinationValue(destination.Id, destination.Address.CountryCode)">@destination.Code · @destination.Name</option>
+                            }
+                        </select>
+                    </label>
+                    @if (Air)
                     {
-                        <label>@T["ui.bundles.type"]
-                            <select name="type">
-                                <option value="">@T["ui.carriers.any_type"]</option>
-                                @foreach (string type in BundleTypes)
-                                {
-                                    <option value="@type">@type</option>
-                                }
-                            </select>
-                        </label>
+                        <label>@VixlyText.Format(T, "ui.carriers.per_weight_in", new Dictionary<string, object> { ["currency"] = CurrencyCode, ["unit"] = WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg" }) <input name="perWeight" inputmode="decimal" size="8" required /></label>
+                        <label>@VixlyText.Format(T, "ui.carriers.minimum_in", "currency", CurrencyCode) <input name="minimum" inputmode="decimal" size="8" /></label>
                     }
-                    <label>@VixlyText.Format(T, "ui.carriers.per_bundle_in", "currency", CurrencyCode) <input name="perBundle" inputmode="decimal" size="8" required /></label>
-                }
-                <label>@T["ui.carriers.starts"] <input type="date" name="starts" value="@Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" min="@Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" required /></label>
-                <button type="submit" class="vx-button vx-button--primary">@T["ui.carriers.add_rate"]</button>
-                <p class="ops-editor__hint">@T[Air ? "ui.carriers.air_hint" : "ui.carriers.ocean_hint"]</p>
+                    else
+                    {
+                        @if (BundleTypes.Count > 0)
+                        {
+                            <label>@T["ui.bundles.type"]
+                                <select name="type">
+                                    <option value="">@T["ui.carriers.any_type"]</option>
+                                    @foreach (string type in BundleTypes)
+                                    {
+                                        <option value="@type">@type</option>
+                                    }
+                                </select>
+                            </label>
+                        }
+                        <label>@VixlyText.Format(T, "ui.carriers.per_bundle_in", "currency", CurrencyCode) <input name="perBundle" inputmode="decimal" size="8" required /></label>
+                    }
+                    <label>@T["ui.carriers.starts"] <input type="date" name="starts" value="@Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" min="@Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" required /></label>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.carriers.add_rate"]</button>
+                    <p class="ops-editor__hint" style="margin: 0;">@T[Air ? "ui.carriers.air_hint" : "ui.carriers.ocean_hint"]</p>
+                </div>
             </form>
         }
     </section>

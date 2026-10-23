@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: DispatchPapersPanel.razor
 
@@ -46,24 +46,36 @@ IMPORTANT NOTES:
 @if (Dispatch.Status is OperationsDispatchStatus.Departed or OperationsDispatchStatus.Arrived or OperationsDispatchStatus.Closed)
 {
     <section class="ops-editor__panel" aria-labelledby="cost-title">
-        <h2 id="cost-title">@T["ui.dispatch.cost"]</h2>
-        <dl class="ops-editor__facts">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
+            <h2 id="cost-title" style="margin: 0;">@T["ui.dispatch.cost"]</h2>
+            @if (Dispatch.Status != OperationsDispatchStatus.Closed)
+            {
+                <form method="post" action="/staff/dispatches/@Dispatch.Id/recost" class="ops-editor__inline" style="margin: 0;">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--secondary" style="height: 30px; padding: 0 0.75rem; font-size: 0.75rem;">@T["ui.dispatch.cost.recost"]</button>
+                </form>
+            }
+        </div>
+        <dl class="ops-editor__facts" style="margin: 0.75rem 0;">
             <dt>@T["ui.dispatch.cost.computed"]</dt><dd>@(Dispatch.CostComputed is { } computed ? Money(computed) : T[Dispatch.DepartedUtc is null ? "ui.dispatch.cost.at_departure" : "ui.dispatch.cost.unknown"].Value)</dd>
             @if (Dispatch.CostNote is { } note) { <dt>@T["ui.dispatch.cost.total"]</dt><dd>@(Dispatch.CostTotal is { } total ? Money(total) : string.Empty) <small>· @note</small></dd> }
+            @* Slice 8: the carriers' approved bills replace the estimate in the shipments' costs. *@
+            @if (Dispatch.BilledTotal is { } billed) { <dt>@T["ui.dispatch.cost.billed"]</dt><dd data-billed>@Money(billed)</dd> }
         </dl>
-        @if (Dispatch.Status != OperationsDispatchStatus.Closed)
-        {
-            <form method="post" action="/staff/dispatches/@Dispatch.Id/recost" class="ops-editor__inline">
-                <AntiforgeryToken />
-                <button type="submit" class="vx-button vx-button--secondary">@T["ui.dispatch.cost.recost"]</button>
-            </form>
-        }
-        <form method="post" action="/staff/dispatches/@Dispatch.Id/cost" class="ops-editor__form">
+        <form method="post" action="/staff/dispatches/@Dispatch.Id/cost" class="ops-editor__form" style="margin-top: 0.5rem;">
             <AntiforgeryToken />
-            <label>@VixlyText.Format(T, "ui.dispatch.cost.correct_in", "currency", Dispatch.CostCurrencyCode ?? string.Empty) <input name="total" inputmode="decimal" size="10" value="@(Dispatch.CostNote is not null ? Dispatch.CostTotal?.ToString("0.00", CultureInfo.InvariantCulture) : null)" /></label>
-            <label>@T["ui.dispatch.cost.note"] <input name="note" maxlength="@OperationsDispatch.CostNoteMaxLength" value="@Dispatch.CostNote" /></label>
-            <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
-            <p class="ops-editor__hint">@T["ui.dispatch.cost.hint"]</p>
+            <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.75rem;">
+                <label style="margin: 0; font-size: 0.8125rem; font-weight: 500;">
+                    <span>@VixlyText.Format(T, "ui.dispatch.cost.correct_in", "currency", Dispatch.CostCurrencyCode ?? string.Empty)</span>
+                    <input name="total" inputmode="decimal" style="width: 8rem; height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" value="@(Dispatch.CostNote is not null ? Dispatch.CostTotal?.ToString("0.00", CultureInfo.InvariantCulture) : null)" />
+                </label>
+                <label style="margin: 0; font-size: 0.8125rem; font-weight: 500; flex: 1; min-width: 14rem;">
+                    <span>@T["ui.dispatch.cost.note"]</span>
+                    <input name="note" maxlength="@OperationsDispatch.CostNoteMaxLength" value="@Dispatch.CostNote" style="width: 100%; height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" />
+                </label>
+                <button type="submit" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.editor.save"]</button>
+            </div>
+            <p class="ops-editor__hint" style="margin-top: 0.35rem;">@T["ui.dispatch.cost.hint"]</p>
         </form>
     </section>
 }
@@ -72,21 +84,44 @@ IMPORTANT NOTES:
     <form method="post" action="/staff/dispatches/@Dispatch.Id/instructions" class="ops-editor__panel ops-editor__form" aria-labelledby="sli-title">
         <AntiforgeryToken />
         <h2 id="sli-title">@T["ui.dispatch.instructions"]</h2>
-        <fieldset>
-            <legend>@T["ui.dispatch.charges"]</legend>
-            <label><input type="radio" name="collect" value="false" checked="@(!Dispatch.ChargesCollect)" /> @T["ui.sli.prepaid"]</label>
-            <label><input type="radio" name="collect" value="true" checked="@Dispatch.ChargesCollect" /> @T["ui.sli.collect"]</label>
+        <fieldset style="border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem;">
+            <legend style="padding: 0 0.35rem; font-weight: 600; font-size: 0.8125rem;">@T["ui.dispatch.charges"]</legend>
+            <div style="display: flex; gap: 1.5rem; align-items: center; margin-top: 0.25rem;">
+                <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8125rem;">
+                    <input type="radio" name="collect" value="false" checked="@(!Dispatch.ChargesCollect)" />
+                    <span>@T["ui.sli.prepaid"]</span>
+                </label>
+                <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8125rem;">
+                    <input type="radio" name="collect" value="true" checked="@Dispatch.ChargesCollect" />
+                    <span>@T["ui.sli.collect"]</span>
+                </label>
+            </div>
         </fieldset>
-        <label>@T["ui.dispatch.export_reference"] <input name="exportReference" maxlength="@OperationsDispatch.ExportReferenceMaxLength" value="@Dispatch.ExportReference" /></label>
-        <fieldset>
-            <legend>@T["ui.dispatch.documents"]</legend>
-            @foreach (OperationsDispatchDocuments document in Enum.GetValues<OperationsDispatchDocuments>().Where(item => item != OperationsDispatchDocuments.None))
-            {
-                <label><input type="checkbox" name="documents" value="@document" checked="@Dispatch.Documents.HasFlag(document)" /> @T["ui.dispatch.document." + document]</label>
-            }
+        <div style="margin-bottom: 0.75rem;">
+            <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.8125rem; font-weight: 500;">
+                <span>@T["ui.dispatch.export_reference"]</span>
+                <input name="exportReference" maxlength="@OperationsDispatch.ExportReferenceMaxLength" value="@Dispatch.ExportReference" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem; max-width: 22rem;" />
+            </label>
+        </div>
+        <fieldset style="border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem;">
+            <legend style="padding: 0 0.35rem; font-weight: 600; font-size: 0.8125rem;">@T["ui.dispatch.documents"]</legend>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 0.5rem; margin-top: 0.25rem;">
+                @foreach (OperationsDispatchDocuments document in Enum.GetValues<OperationsDispatchDocuments>().Where(item => item != OperationsDispatchDocuments.None))
+                {
+                    <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8125rem;">
+                        <input type="checkbox" name="documents" value="@document" checked="@Dispatch.Documents.HasFlag(document)" />
+                        <span>@T["ui.dispatch.document." + document]</span>
+                    </label>
+                }
+            </div>
         </fieldset>
-        <label>@T["ui.dispatch.handling"] <textarea name="handling" rows="2" maxlength="@OperationsDispatch.InstructionsMaxLength">@Dispatch.HandlingInstructions</textarea></label>
-        <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button></p>
+        <div style="margin-bottom: 0.75rem;">
+            <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.8125rem; font-weight: 500;">
+                <span>@T["ui.dispatch.handling"]</span>
+                <textarea name="handling" rows="2" maxlength="@OperationsDispatch.InstructionsMaxLength" style="padding: 0.4rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem; resize: vertical;">@Dispatch.HandlingInstructions</textarea>
+            </label>
+        </div>
+        <p class="ops-editor__actions" style="margin: 0;"><button type="submit" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.editor.save"]</button></p>
     </form>
 }
 

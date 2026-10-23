@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: BundleListPanel.razor
 
@@ -44,7 +44,7 @@ IMPORTANT NOTES:
                                 {
                                     <form method="post" action="/staff/bundles/@BundleId/list/@row.ItemId/remove" class="ops-editor__inline">
                                         <AntiforgeryToken />
-                                        <button type="submit" class="vx-button vx-button--secondary">@T["ui.bundles.list_remove"]</button>
+                                        <button type="submit" class="vx-button vx-button--secondary" style="height: 30px; padding: 0 0.65rem; font-size: 0.75rem;">@T["ui.bundles.list_remove"]</button>
                                     </form>
                                 }
                             </td>
@@ -59,15 +59,22 @@ IMPORTANT NOTES:
         <form method="post" action="/staff/bundles/@BundleId/list" class="ops-editor__form" aria-labelledby="list-add-title">
             <AntiforgeryToken />
             <h3 id="list-add-title">@T["ui.bundles.list_add"]</h3>
-            <fieldset>
+            <fieldset style="border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.75rem 1rem; margin-bottom: 0.5rem;">
                 <legend class="vx-visually-hidden">@T["ui.bundles.list_add"]</legend>
-                @foreach (OperationsBundleCandidate candidate in Candidates)
-                {
-                    <label><input type="checkbox" name="items" value="@candidate.Id" /> <span class="ops-editor__code">@candidate.Number</span>@if (candidate.IsBox) { <small> · @VixlyText.Format(T, "ui.bundles.list_box_parcels", "count", candidate.Parcels)</small> } · @candidate.ShipmentNumber</label>
-                }
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 0.5rem;">
+                    @foreach (OperationsBundleCandidate candidate in Candidates)
+                    {
+                        <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8125rem;">
+                            <input type="checkbox" name="items" value="@candidate.Id" />
+                            <span><strong class="ops-editor__code">@candidate.Number</strong>@if (candidate.IsBox) { <small> · @VixlyText.Format(T, "ui.bundles.list_box_parcels", "count", candidate.Parcels)</small> } · @candidate.ShipmentNumber</span>
+                        </label>
+                    }
+                </div>
             </fieldset>
-            <p class="ops-editor__hint">@T["ui.bundles.list_hint"]</p>
-            <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--secondary">@T["ui.bundles.list_add_button"]</button></p>
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <button type="submit" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.bundles.list_add_button"]</button>
+                <p class="ops-editor__hint" style="margin: 0;">@T["ui.bundles.list_hint"]</p>
+            </div>
         </form>
     }
 </section>
