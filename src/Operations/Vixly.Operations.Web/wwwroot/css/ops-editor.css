@@ -2322,3 +2322,375 @@ tr[data-low="true"] td:first-child {
     gap: 1rem;
     padding: 1.5rem 0;
 }
+
+
+/* =========================================================
+   STEP-UP CONFIRMATION (ConfirmPage)
+   ========================================================= */
+.ops-stepup-panel {
+    max-width: 32rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.25rem !important;
+    padding: 1.75rem !important;
+    border-top: 3px solid var(--vx-color-primary) !important;
+    box-shadow: var(--vx-shadow-2) !important;
+    background: var(--vx-color-surface) !important;
+    border-radius: 0.5rem !important;
+}
+.ops-stepup-desc {
+    color: var(--vx-color-text-muted) !important;
+    font-size: 0.875rem !important;
+    line-height: 1.55 !important;
+    margin: 0 !important;
+}
+.ops-stepup-row {
+    display: flex !important;
+    align-items: flex-end !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+}
+.ops-stepup-field {
+    flex: 1 !important;
+    min-width: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.4rem !important;
+}
+.ops-stepup-label {
+    font-size: 0.75rem !important;
+    font-weight: 650 !important;
+    color: var(--vx-color-text) !important;
+    letter-spacing: 0.04em !important;
+}
+.ops-stepup-input {
+    height: 42px !important;
+    min-height: 42px !important;
+    font-family: var(--vx-font-mono, monospace) !important;
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.25rem !important;
+    text-align: center !important;
+    border: 1px solid var(--vx-color-border-control) !important;
+    border-radius: 0.35rem !important;
+    background: var(--vx-color-surface) !important;
+    color: var(--vx-color-text) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+.ops-stepup-input:focus {
+    border-color: var(--vx-color-primary) !important;
+    box-shadow: 0 0 0 2px var(--vx-color-primary-soft) !important;
+    outline: none !important;
+}
+.ops-stepup-btn {
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 0 1.5rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+}
+
+/* =========================================================
+   WEBSITE & BRAND EDITOR (SiteEditorPage)
+   ========================================================= */
+.ops-publication-bar {
+    border-top: 3px solid var(--vx-color-primary) !important;
+    background: var(--vx-color-primary-soft) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.85rem !important;
+}
+.ops-publication-bar__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+.ops-publication-bar__header h2 {
+    margin: 0 0 0.2rem 0;
+    font-size: 0.9375rem;
+    font-weight: 650;
+}
+.ops-publication-bar__status {
+    margin: 0 !important;
+    font-size: 0.8125rem;
+    color: var(--vx-color-text-muted);
+}
+.ops-publication-bar__publish-form {
+    margin: 0;
+}
+.ops-publication-bar__publish-form .vx-button {
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 1.25rem !important;
+    font-weight: 600 !important;
+}
+.ops-publication-bar__previews {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.ops-publication-bar__previews .vx-button {
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 0 0.75rem !important;
+    font-size: 0.75rem !important;
+}
+
+.ops-site-brand-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1.25rem !important;
+}
+.ops-site-brand-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 1rem;
+    align-items: flex-start;
+}
+.ops-site-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.ops-site-field span {
+    color: var(--vx-color-text);
+}
+.ops-site-color-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.ops-site-color-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.ops-site-color-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--vx-color-border-control);
+    border-radius: 0.35rem;
+    background: var(--vx-color-surface);
+    height: 36px;
+    box-sizing: border-box;
+}
+.ops-site-color-control input[type=color] {
+    width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    background: transparent !important;
+}
+.ops-site-color-control code {
+    font-family: var(--vx-font-mono, monospace);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--vx-color-text);
+}
+.ops-site-fieldset {
+    margin: 0 !important;
+    padding: 1rem !important;
+    border: 1px solid var(--vx-color-border) !important;
+    border-radius: 0.5rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+}
+.ops-site-fieldset legend {
+    font-size: 0.75rem;
+    font-weight: 650;
+    padding-inline: 0.4rem;
+}
+.ops-site-checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 0.6rem;
+}
+.ops-site-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.35rem;
+    background: var(--vx-color-surface-sunken);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 150ms ease, background 150ms ease;
+}
+.ops-site-checkbox:hover {
+    border-color: var(--vx-color-border-control);
+    background: var(--vx-color-surface);
+}
+.ops-site-checkbox input[type=checkbox] {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0;
+    flex-shrink: 0;
+}
+.ops-site-social-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 0.75rem;
+}
+.ops-site-save-btn {
+    align-self: flex-start;
+    min-width: 10rem;
+    height: 38px !important;
+    min-height: 38px !important;
+    margin-top: 0.5rem;
+}
+
+/* Site Images Grid & Action Bar */
+.ops-site-images-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+}
+.ops-site-images-header h2 {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.9375rem;
+    font-weight: 650;
+}
+.ops-site-images-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)) !important;
+    gap: 1.25rem !important;
+    margin-top: 0.5rem;
+}
+.ops-site-image-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--vx-color-surface-sunken);
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    gap: 0.75rem;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.ops-site-image-card:hover {
+    border-color: var(--vx-color-border-control);
+    box-shadow: var(--vx-shadow-1);
+}
+.ops-site-image-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 28px;
+}
+.ops-site-image-card__header h3 {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: var(--vx-color-text);
+}
+.ops-site-image-card__remove-form {
+    margin: 0;
+}
+.ops-site-image-card__remove-btn {
+    height: 26px !important;
+    min-height: 26px !important;
+    padding: 0 0.6rem !important;
+    font-size: 0.6875rem !important;
+    border-radius: 0.3rem !important;
+    background: var(--vx-color-surface) !important;
+}
+.ops-site-image-card__preview {
+    min-height: 84px;
+    height: 84px;
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.35rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    overflow: hidden;
+}
+.ops-site-image-card__preview img {
+    max-height: 68px;
+    max-width: 100%;
+    object-fit: contain;
+}
+.ops-site-image-card__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--vx-color-text-subtle);
+}
+.ops-site-image-card__icon {
+    width: 28px;
+    height: 28px;
+    opacity: 0.4;
+}
+.ops-site-image-card__upload-form {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+.ops-site-image-card__upload-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+}
+.ops-editor input[type=file].ops-site-image-card__file-input,
+.ops-site-image-card__file-input {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    border: 1px solid var(--vx-color-border-control) !important;
+    border-style: solid !important;
+    border-radius: 0.35rem !important;
+    background: var(--vx-color-surface) !important;
+    color: var(--vx-color-text) !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+}
+.ops-editor input[type=file].ops-site-image-card__file-input::file-selector-button,
+.ops-site-image-card__file-input::file-selector-button {
+    height: 24px !important;
+    min-height: 24px !important;
+    padding: 0 0.55rem !important;
+    margin-inline-end: 0.5rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    border-radius: 0.25rem !important;
+    border: 1px solid var(--vx-color-border) !important;
+    background: var(--vx-color-surface-sunken) !important;
+    color: var(--vx-color-text) !important;
+    cursor: pointer !important;
+}
+.ops-site-image-card__upload-btn {
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 0.85rem !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+}

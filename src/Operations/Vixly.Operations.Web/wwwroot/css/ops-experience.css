@@ -55,8 +55,8 @@
 .ops-editor__main[data-section=settings] fieldset > h2:first-child { padding-top:0; }
 .ops-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
 .ops-form-grid > :is(p,label:has(textarea),label:has(input[type=file])) { grid-column:1 / -1; }
-.ops-editor input[type=file] { min-height:70px !important; padding:1rem !important; border-style:dashed !important; background:var(--vx-color-surface-sunken) !important; }
-.ops-editor input[type=file]::file-selector-button { border:1px solid var(--vx-color-border); background:var(--vx-color-surface); color:var(--vx-color-link); padding:.5rem .75rem; border-radius:.35rem; font:inherit; margin-right:.75rem; }
+.ops-editor input[type=file]:not(.ops-site-image-card__file-input):not(.ops-file-input) { min-height:70px !important; padding:1rem !important; border-style:dashed !important; background:var(--vx-color-surface-sunken) !important; }
+.ops-editor input[type=file]:not(.ops-site-image-card__file-input):not(.ops-file-input)::file-selector-button { border:1px solid var(--vx-color-border); background:var(--vx-color-surface); color:var(--vx-color-link); padding:.5rem .75rem; border-radius:.35rem; font:inherit; margin-right:.75rem; }
 .ops-permission-editor { max-width:none !important; grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
 .ops-permission-editor > label { grid-column:1 / -1; max-width:30rem; }
 .ops-permission-editor > fieldset { grid-column:auto !important; grid-template-columns:minmax(0,1fr) !important; background:var(--vx-color-surface-sunken); }

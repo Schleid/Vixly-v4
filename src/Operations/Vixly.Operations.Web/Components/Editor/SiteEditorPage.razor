@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: SiteEditorPage.razor
 
@@ -30,56 +30,87 @@ IMPORTANT NOTES:
     @if (Draft is not null)
     {
         <section class="ops-editor__panel ops-publication-bar" aria-labelledby="publish-title">
-            <h2 id="publish-title">@T["ui.editor.site.publish.title"]</h2>
-            <p>@(HasUnpublishedChanges ? T["ui.editor.site.publish.pending"] : T["ui.editor.site.publish.none"])</p>
-            <p class="ops-editor__actions">
+            <div class="ops-publication-bar__header">
+                <div>
+                    <h2 id="publish-title">@T["ui.editor.site.publish.title"]</h2>
+                    <p class="ops-publication-bar__status">@(HasUnpublishedChanges ? T["ui.editor.site.publish.pending"] : T["ui.editor.site.publish.none"])</p>
+                </div>
+                @if (Can(OperationsPermissions.BrandPublish))
+                {
+                    <form method="post" action="/staff/site/publish" class="ops-publication-bar__publish-form">
+                        <AntiforgeryToken />
+                        <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.site.publish"]</button>
+                    </form>
+                }
+            </div>
+            <div class="ops-publication-bar__previews">
                 @foreach (string language in OperationsSiteLanguages.All)
                 {
                     <a class="vx-button vx-button--secondary" href="/@(language)?preview=true" target="_blank" rel="noopener">@T["ui.editor.site.preview"] @language.ToUpperInvariant()</a>
                 }
-            </p>
-            @if (Can(OperationsPermissions.BrandPublish))
-            {
-                <form method="post" action="/staff/site/publish">
-                    <AntiforgeryToken />
-                    <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.site.publish"]</button>
-                </form>
-            }
+            </div>
         </section>
 
-        <form method="post" action="/staff/site?language=@Language" class="ops-editor__panel">
+        <form method="post" action="/staff/site?language=@Language" class="ops-editor__panel ops-site-brand-panel">
             <AntiforgeryToken />
             <h2>@T["ui.editor.site.brand"]</h2>
-            <label>@T["ui.editor.site.display_name"] <input name="displayName" value="@Draft.DisplayName" maxlength="@OperationsBrandSettings.DisplayNameMaxLength" required /></label>
-            <label>@T["ui.editor.site.preset"]
-                <select name="preset">
-                    @foreach (OperationsSitePreset preset in Enum.GetValues<OperationsSitePreset>())
-                    {
-                        <option value="@preset" selected="@(preset == Draft.Preset)">@T["ui.editor.preset." + preset.ToString().ToLowerInvariant()]</option>
-                    }
-                </select>
-            </label>
-            <label>@T["ui.editor.site.primary"] <input type="color" name="primaryColour" value="@Draft.PrimaryColour.ToLowerInvariant()" /></label>
-            <label>@T["ui.editor.site.accent"] <input type="color" name="accentColour" value="@Draft.AccentColour.ToLowerInvariant()" /></label>
+            <div class="ops-site-brand-grid">
+                <label class="ops-site-field">
+                    <span>@T["ui.editor.site.display_name"]</span>
+                    <input name="displayName" value="@Draft.DisplayName" maxlength="@OperationsBrandSettings.DisplayNameMaxLength" required />
+                </label>
+                <label class="ops-site-field">
+                    <span>@T["ui.editor.site.preset"]</span>
+                    <select name="preset">
+                        @foreach (OperationsSitePreset preset in Enum.GetValues<OperationsSitePreset>())
+                        {
+                            <option value="@preset" selected="@(preset == Draft.Preset)">@T["ui.editor.preset." + preset.ToString().ToLowerInvariant()]</option>
+                        }
+                    </select>
+                </label>
+                <div class="ops-site-color-group">
+                    <label class="ops-site-color-field">
+                        <span>@T["ui.editor.site.primary"]</span>
+                        <div class="ops-site-color-control">
+                            <input type="color" name="primaryColour" value="@Draft.PrimaryColour.ToLowerInvariant()" />
+                            <code>@Draft.PrimaryColour.ToUpperInvariant()</code>
+                        </div>
+                    </label>
+                    <label class="ops-site-color-field">
+                        <span>@T["ui.editor.site.accent"]</span>
+                        <div class="ops-site-color-control">
+                            <input type="color" name="accentColour" value="@Draft.AccentColour.ToLowerInvariant()" />
+                            <code>@Draft.AccentColour.ToUpperInvariant()</code>
+                        </div>
+                    </label>
+                </div>
+            </div>
             <p class="ops-editor__hint">@T["ui.editor.site.contrast_hint"]</p>
 
-            <fieldset>
+            <fieldset class="ops-site-fieldset">
                 <legend>@T["ui.editor.site.sections"]</legend>
-                @foreach (string item in OperationsSiteTextKeys.ServiceCodes)
-                {
-                    OperationsSiteServices flag = OperationsEditorForms.Service(item);
-                    <label><input type="checkbox" name="services" value="@item" checked="@Draft.Services.HasFlag(flag)" /> @T["site.service." + item + ".title"]</label>
-                }
-                <label><input type="checkbox" name="showSteps" value="true" checked="@Draft.ShowSteps" /> @T["ui.editor.site.show_steps"]</label>
-                <label><input type="checkbox" name="showFaq" value="true" checked="@Draft.ShowFaq" /> @T["ui.editor.site.show_faq"]</label>
+                <div class="ops-site-checkbox-grid">
+                    @foreach (string item in OperationsSiteTextKeys.ServiceCodes)
+                    {
+                        OperationsSiteServices flag = OperationsEditorForms.Service(item);
+                        <label class="ops-site-checkbox"><input type="checkbox" name="services" value="@item" checked="@Draft.Services.HasFlag(flag)" /> <span>@T["site.service." + item + ".title"]</span></label>
+                    }
+                    <label class="ops-site-checkbox"><input type="checkbox" name="showSteps" value="true" checked="@Draft.ShowSteps" /> <span>@T["ui.editor.site.show_steps"]</span></label>
+                    <label class="ops-site-checkbox"><input type="checkbox" name="showFaq" value="true" checked="@Draft.ShowFaq" /> <span>@T["ui.editor.site.show_faq"]</span></label>
+                </div>
             </fieldset>
 
-            <fieldset>
+            <fieldset class="ops-site-fieldset">
                 <legend>@T["ui.editor.site.social"]</legend>
-                @foreach ((string field, string? value) in Social)
-                {
-                    <label>@T["ui.editor.social." + field] <input type="url" name="@field" value="@value" maxlength="@OperationsBrandSettings.LinkMaxLength" placeholder="https://" /></label>
-                }
+                <div class="ops-site-social-grid">
+                    @foreach ((string field, string? value) in Social)
+                    {
+                        <label class="ops-site-field">
+                            <span>@T["ui.editor.social." + field]</span>
+                            <input type="url" name="@field" value="@value" maxlength="@OperationsBrandSettings.LinkMaxLength" placeholder="https://" />
+                        </label>
+                    }
+                </div>
             </fieldset>
 
             <h2>@T["ui.editor.site.texts"]</h2>
@@ -111,40 +142,55 @@ IMPORTANT NOTES:
                     </div>
                 </details>
             }
-            @if (Can(OperationsPermissions.BrandEdit)) { <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button> }
+            @if (Can(OperationsPermissions.BrandEdit)) { <button type="submit" class="vx-button vx-button--primary ops-site-save-btn">@T["ui.editor.save"]</button> }
         </form>
 
-        <section class="ops-editor__panel" aria-labelledby="images-title">
-            <h2 id="images-title">@T["ui.editor.site.images"]</h2>
-            <p class="ops-editor__hint">@T["ui.editor.site.images_hint"]</p>
-            @foreach (OperationsSiteImageKind kind in Enum.GetValues<OperationsSiteImageKind>())
-            {
-                string item = kind.ToString().ToLowerInvariant();
-                Guid? current = OperationsEditorForms.ImageId(Draft, kind);
-                <div class="ops-editor__image">
-                    <h3>@T["ui.editor.image." + item]</h3>
-                    @if (current is { } id && Can(OperationsPermissions.BrandEdit))
-                    {
-                        <img src="/site/image/@id.ToString("N")" alt="" height="64" />
-                        <form method="post" action="/staff/site/image/@item/remove">
-                            <AntiforgeryToken />
-                            <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.remove"]</button>
-                        </form>
-                    }
-                    else if (current is { } shown)
-                    {
-                        <img src="/site/image/@shown.ToString("N")" alt="" height="64" />
-                    }
-                    @if (Can(OperationsPermissions.BrandEdit))
-                    {
-                        <form method="post" action="/staff/site/image/@item" enctype="multipart/form-data">
-                            <AntiforgeryToken />
-                            <input type="file" name="file" accept="image/png,image/jpeg,image/webp" required />
-                            <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.upload"]</button>
-                        </form>
-                    }
-                </div>
-            }
+        <section class="ops-editor__panel ops-site-images-panel" aria-labelledby="images-title">
+            <div class="ops-site-images-header">
+                <h2 id="images-title">@T["ui.editor.site.images"]</h2>
+                <p class="ops-editor__hint">@T["ui.editor.site.images_hint"]</p>
+            </div>
+            <div class="ops-site-images-grid">
+                @foreach (OperationsSiteImageKind kind in Enum.GetValues<OperationsSiteImageKind>())
+                {
+                    string item = kind.ToString().ToLowerInvariant();
+                    Guid? current = OperationsEditorForms.ImageId(Draft, kind);
+                    <div class="ops-site-image-card">
+                        <div class="ops-site-image-card__header">
+                            <h3>@T["ui.editor.image." + item]</h3>
+                            @if (current is { } id && Can(OperationsPermissions.BrandEdit))
+                            {
+                                <form method="post" action="/staff/site/image/@item/remove" class="ops-site-image-card__remove-form">
+                                    <AntiforgeryToken />
+                                    <button type="submit" class="vx-button vx-button--secondary ops-site-image-card__remove-btn">@T["ui.editor.remove"]</button>
+                                </form>
+                            }
+                        </div>
+                        <div class="ops-site-image-card__preview">
+                            @if (current is { } shown)
+                            {
+                                <img src="/site/image/@shown.ToString("N")" alt="" />
+                            }
+                            else
+                            {
+                                <span class="ops-site-image-card__placeholder">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="ops-site-image-card__icon" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                </span>
+                            }
+                        </div>
+                        @if (Can(OperationsPermissions.BrandEdit))
+                        {
+                            <form method="post" action="/staff/site/image/@item" enctype="multipart/form-data" class="ops-site-image-card__upload-form">
+                                <AntiforgeryToken />
+                                <div class="ops-site-image-card__upload-row">
+                                    <input type="file" name="file" accept="image/png,image/jpeg,image/webp" class="ops-site-image-card__file-input" required />
+                                    <button type="submit" class="vx-button vx-button--primary ops-site-image-card__upload-btn">@T["ui.editor.upload"]</button>
+                                </div>
+                            </form>
+                        }
+                    </div>
+                }
+            </div>
         </section>
     }
 </EditorShell>

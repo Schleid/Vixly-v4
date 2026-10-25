@@ -1,4 +1,4 @@
-﻿# UI styling inventory
+# UI styling inventory
 
 The shared list of every Operations, customer-portal and Control screen, and where each stands for styling. **The backend team** adds a row when it builds or changes a screen. **The Frontend team** updates it as it styles. **The owner** approves. Read it together with the [Operations UI/UX brief](OPERATIONS-UI-UX-BRIEF.md).
 
@@ -73,6 +73,11 @@ The shared list of every Operations, customer-portal and Control screen, and whe
 | Fill a bundle (station) | `Bundles/FillBundlePage.razor` | `/staff/bundles/fill`, `/staff/bundles/{id}/fill` | Changed | 2026-10-21 | Backend | Slice 6A. Brief §5 station anatomy: large 44px focused barcode laser scan box (`ops-bundle-fill__scan`), bundle header with live meter, last scan focus card, running parcels table with inline take out · **Changed (review 2026-10-21):** the bundle list panel (`BundleListPanel`) beside the scans; a parcel not on the list is refused with a message |
 | Consolidated shipments | `Bundles/RepackBoxesPage.razor` | `/staff/bundles/boxes` | Styled | 2026-10-21 | FE | Slice 6A. Consolidated shipments list with company default way indicator, inline switch dropdown and start box action |
 | Repack box | `Bundles/RepackBoxPage.razor` | `/staff/bundles/boxes/{id}` | Styled | 2026-10-23 | FE | Top ops-list-bar with back link and label print button; facts grid with status pill and counts meter; 44px laser scanner bar; parcels table with location pills; responsive 4-column dimensions grid for closing; inline void action bar |
+| Shelf count | `Parcels/ShelfCountsPage.razor`, `ShelfCountPage.razor` | `/staff/parcels/shelf-counts` | Needs styling | 2026-10-23 | Backend | Slice 12D. Start by scanning a shelf; scan field, Finish; results in four lists (found, missing, recorded elsewhere with *Move here*, unknown). Must work on a phone (one column under 600 px). Link from On hand |
+| Camera button on station pages | `wwwroot/js/ops-camera-field.js` | inspection, bundles, arrivals, pickup, move, counts | Needs styling | 2026-10-23 | Backend | Slice 12D. Added by the script beside each scan field (class `ops-camera-button`, video `ops-camera-video`); station pages should be usable on a handheld (one column, large fields) |
+| Route map (staff) | `Delivery/RouteMapPanel.razor` | `/staff/delivery/routes/{id}` | Needs styling | 2026-10-23 | Backend | Slice 12C. Leaflet map of the driver while the route is out (`/lib/leaflet`), status line under it |
+| Driver: stops kept on the phone | `Delivery/DriveQueueText.razor` + `wwwroot/js/ops-drive.js` | `/staff/drive`, route page | Needs styling | 2026-10-23 | Backend | Slice 12B. Banner `ops-drive-queue`, per-stop note `ops-drive-note`, `data-local` on the stop (waiting, sent, refused) |
+| Portable printers (phones) | `Parcels/PhonePairingPanel.razor` | `/staff/locations/warehouse/{id}/printers` | Needs styling | 2026-10-23 | Backend | Slice 12E. *Add a phone*: QR code and one-time code; phone printers listed read-only (`data-phone-printer`) |
 
 ### Staff: setup
 
@@ -137,7 +142,7 @@ The shared list of every Operations, customer-portal and Control screen, and whe
 | Delivery route | `Delivery/DeliveryRoutePage.razor`, `Delivery/DeliveryStopForms.razor` | `/staff/delivery/routes/{id}` | Styled | 2026-10-22 | FE | Slice 7 step 3. Executive workstation header with status pill and print sheet action, 4-col facts grid, mobile stop cards with sequence badges and status indicators, multi-column completed/failed disclosure forms |
 | My routes | `Delivery/DrivePage.razor` | `/staff/drive` | Styled | 2026-10-22 | FE | Slice 7 step 3. Mobile touch-friendly driver route cards with progress indicators, status chips, and date metadata |
 | Delivery settings | `Delivery/DeliverySettingsPage.razor` | `/staff/settings/delivery` | Styled | 2026-10-22 | FE | Slice 7 step 3. ops-settings-form layout, full-width recording & proof cards, 50/50 failed delivery & payment duo, horizontal cash on delivery checkbox, failure handling grid, horizontal proof checkboxes, and email notifications |
-| Website editor | `Editor/SiteEditorPage.razor` | `/staff/site` | Restyle | 2026-10-20 | Backend | |
+| Website editor | `Editor/SiteEditorPage.razor` | `/staff/site` | Styled | 2026-10-23 | FE | Responsive 4-card image grid (Logo, LogoDark, Favicon, Hero) with thumbnail preview canvas, compact inline upload action row with matching 34px file chooser and aligned primary upload button (eliminating detached stacked buttons), brand color pickers with hex readout, multi-column services checkbox grid, and executive publication bar |
 
 ### Staff: administration and account
 
@@ -154,7 +159,7 @@ The shared list of every Operations, customer-portal and Control screen, and whe
 | Audit | `Settings/AuditPage.razor` | `/staff/audit` | Restyle | 2026-10-20 | Backend | |
 | Sign-in activity | `Settings/ActivityPage.razor` | `/staff/activity` | Styled | 2026-10-23 | FE | Header bar with member filter indicator and audit log link; 36px table with status pills, browser tags, and country change warning chips (data-flag); bottom pagination bar |
 | My account | `Staff/AccountPage.razor` | `/staff/account` | Restyle | 2026-10-20 | Backend | |
-| Confirm (step-up) | `Staff/ConfirmPage.razor` | `/staff/confirm` | Restyle | 2026-10-20 | Backend | |
+| Confirm (step-up) | `Staff/ConfirmPage.razor` | `/staff/confirm` | Styled | 2026-10-23 | FE | Focused 32rem security challenge card with top primary accent, bottom-aligned baseline action row pairing uppercase label, 42px monospace large-character one-time-code input, and height-matched primary confirm submit button |
 | Terms acceptance | `Editor/LegalPage.razor` | `/staff/legal` | Restyle | 2026-10-20 | Backend | |
 | Message page | `Editor/EditorMessagePage.razor` | various | Restyle | 2026-10-20 | Backend | |
 
@@ -170,6 +175,8 @@ The shared list of every Operations, customer-portal and Control screen, and whe
 | Devices: enrol, link, waiting | `SignIn/DeviceEnrolPage`, `DeviceLinkPage`, `DeviceWaitingPage` | `/devices/...` | Restyle | 2026-10-21 | Backend | Review 2026-10-21: the type is Desktop, Laptop or Mobile |
 | First setup | `SignIn/SetupHomePage.razor` | `/setup` | Restyle | 2026-10-20 | Backend | |
 | Access limited | `SignIn/AccessLimitedPage.razor` | `/staff/limited` | Restyle | 2026-10-20 | Backend | |
+| Badge and PIN sign-in | `SignIn/QuickSignInPage`, `PinSignInPage`, `PasswordCheckPage` | `/staff/sign-in/badge`, `/pin`, `/password` | Needs styling | 2026-10-23 | Backend | Slice 12A. On a licensed device: badge field (scanner), people list then PIN, daily password check. The sign-in page has a link `ops-login__quick` |
+| Badge and PIN on staff and account pages | `Staff/StaffBadgePanel.razor`, `Staff/MyPinPanel.razor` | `/staff/people/{id}`, `/staff/account` | Needs styling | 2026-10-23 | Backend | Slice 12A. Badge in use, print (PDF card) or revoke; PIN state; set my PIN with the password |
 
 ### Company public site (tenant branded)
 
@@ -199,6 +206,7 @@ The shared list of every Operations, customer-portal and Control screen, and whe
 | Card payment (portal) | `Portal/CardPaymentPage.razor` | `/customer/invoices/card/{chargeId}` | Needs styling | 2026-10-22 | Backend | Slice 5F step 4. A link to Stripe's secure page while started; paid, cancelled or waiting states; back to the invoices |
 | Profile | `Portal/ProfilePage.razor` + `AddressInputs` | `/customer/profile` | Restyle | 2026-10-22 | Backend | Slice 9A: *How we tell you* form (`#notices`, `data-notices`), shown only when the company sends texts: email / SMS / WhatsApp radios and the agreement checkbox |
 | Message page | `Portal/MessagePage.razor` | various | Restyle | 2026-10-20 | Backend | |
+| Driver on the way | `Portal/DriverPanel.razor`, `Portal/TrackPage.razor` | `/customer/packages/shipments/{id}`, `/customer/track/{token}` | Needs styling | 2026-10-23 | Backend | Slice 12C. "N stops away", the map once it is the next stop (`/customer/lib/leaflet`); the private link of the day |
 
 ### Control console (Platform.Web)
 
@@ -339,3 +347,5 @@ The same rules apply to Control as to Operations, except the sign-in pages, whic
 | 2026-10-22 | FE | Operations: Modernized MFA verification & recovery matching login console, Operational command hub on workspace Home, formatted shipment phone numbers, Arrivals header & customs alignments, Reports card grid & chart styling |
 | 2026-10-22 | FE | Operations Home Page: Full executive styling of Workspace cockpit, Waiting for You metric grid with attention indicators, low supplies alert banner, checklist progress cards, and compact task tiles |
 | 2026-10-23 | FE | Comprehensive UI overhaul: MFA verify and recovery submit button styling & back link tightened; Parcel record top inspection alignment & phone links; Labels to print, Storage locations & Label printers; Bundles record & candidate card grid; Repack box with laser scanner and dimensions grid; Carrier rates & Dispatches; Credit account & Payables workbench (Bills, Bill, Vendors, Profit); Customer screens, Send panel & Card payment terminal; Twilio SMS/WhatsApp & API Webhooks settings; Report rules; Licences & Devices management; Sign-in activity logs; ControlPlane device replacement selector |
+| 2026-10-23 | Backend | Slice 12 (handheld and driver apps): badge and PIN sign-in, driver offline queue, route and customer maps, shelf count, camera button, portable printers |
+| 2026-10-23 | Backend | Maintenance notice banner (`.vx-maintenance-banner`, plain default in `vixly-theme.css`) on the staff workspace, company website, customer portal and public site; the 503 maintenance page uses each site's error-page stylesheet (`.vx-error.vx-maintenance`). Control gains *Jobs* (`/jobs`) and *Maintenance* (`/maintenance`) |
