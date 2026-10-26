@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: PackageMoveForm.razor
 
@@ -22,7 +22,8 @@ IMPORTANT NOTES:
     @if (PreAlertId is { } preAlert) { <input type="hidden" name="preAlert" value="@preAlert" /> }
     @if (ParcelId is { } parcel) { <input type="hidden" name="parcel" value="@parcel" /> }
     <input type="hidden" name="back" value="@Back" />
-    <label>@T["ui.packages.move.label"]
+    <label class="customer-package-move__label">
+        <span>@T["ui.packages.move.label"]</span>
         <select name="shipment">
             <option value="" selected="@(Current is null)">@T["ui.packages.move.none"]</option>
             @foreach (CustomerShipmentDto shipment in Choices)

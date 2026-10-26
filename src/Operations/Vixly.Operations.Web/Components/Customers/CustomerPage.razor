@@ -18,10 +18,22 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@Customer.FullName" Company="@Company" Section="customers" Error="@Error" Info="@Info">
-    <div class="ops-list-bar__actions" style="margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-        <a href="/staff/customers" class="vx-button vx-button--secondary">← @T["ui.customers.back"]</a>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
-            <span class="ops-editor__status" data-status="@Customer.Status.ToString().ToLowerInvariant()">@T["ui.customers.status." + Customer.Status.ToString().ToLowerInvariant()]</span>
+    <div class="ops-record-top">
+        <a href="/staff/customers" class="ops-editor__back-link">← @T["ui.customers.back"]</a>
+    </div>
+
+    <div class="ops-record-header">
+        <div class="ops-record-header__identity">
+            <h1 class="ops-record-header__title">
+                @Customer.FullName
+                <span class="ops-editor__status" data-status="@Customer.Status.ToString().ToLowerInvariant()">@T["ui.customers.status." + Customer.Status.ToString().ToLowerInvariant()]</span>
+            </h1>
+            @if (Customer.StatusReason is { } statusReason)
+            {
+                <p class="ops-record-header__subtitle">@statusReason</p>
+            }
+        </div>
+        <div class="ops-record-header__actions">
             @if (Customer.Code is { } customerCode)
             {
                 <a class="vx-button vx-button--primary" href="/staff/counter?find=@customerCode">+ @T["ui.counter.new_shipment"]</a>
@@ -43,7 +55,21 @@ IMPORTANT NOTES:
                 </div>
                 <div class="ops-facts-grid__item">
                     <dt>@T["ui.customers.phone"]</dt>
-                    <dd class="ops-editor__code">@Customer.Phone</dd>
+                    <dd class="ops-editor__code">@Vixly.Shared.Localization.VixlyPhone.International(Customer.Phone)</dd>
+                </div>
+                @* The home address the customer gave at the first sign-in, or brought from V3 (owner, 2026-10-26). *@
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.home_address"]</dt>
+                    <dd>
+                        @if (Customer.HomeAddress is { } home)
+                        {
+                            @home.Line1@if (home.Line2 is not null) { <br />@home.Line2 }<br />@home.City@(home.Region is null ? null : ", " + home.Region) @home.PostalCode<br /><CountryFlag Code="@home.CountryCode" /> @OperationsCountries.Name(T, home.CountryCode)
+                        }
+                        else
+                        {
+                            @T["ui.customers.no_address"]
+                        }
+                    </dd>
                 </div>
                 <div class="ops-facts-grid__item">
                     <dt>@T["ui.customers.company"]</dt>
@@ -78,7 +104,7 @@ IMPORTANT NOTES:
             <form method="post" action="/staff/customers/@Customer.CustomerId/status" class="ops-editor__panel ops-panel--restricted" style="margin-top: 1rem;">
                 <AntiforgeryToken />
                 <h2 style="margin-bottom: 0.5rem;">@T["ui.customers.status"]</h2>
-                <div class="ops-editor__inline-field" style="align-items: flex-end;">
+                <div class="ops-editor__inline-field">
                     <label style="flex: 0 1 12rem;">@T["ui.customers.new_status"]
                         <select name="status">
                             @if (Customer.Status != OperationsCustomerStatus.Active) { <option value="active">@T["ui.customers.status.active"]</option> }
@@ -87,7 +113,7 @@ IMPORTANT NOTES:
                         </select>
                     </label>
                     <label style="flex: 1 1 20rem;">@T["ui.customers.reason"] <input name="reason" maxlength="300" required placeholder="@T["ui.customers.reason"]" /></label>
-                    <button type="submit" class="vx-button vx-button--secondary" style="margin-bottom: 2px;">@T["ui.customers.status_submit"]</button>
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.customers.status_submit"]</button>
                 </div>
             </form>
         }
@@ -124,4 +150,3 @@ IMPORTANT NOTES:
 
     [Parameter] public string? Info { get; set; }
 }
-

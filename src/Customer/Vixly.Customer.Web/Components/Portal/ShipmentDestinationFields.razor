@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: ShipmentDestinationFields.razor
 
@@ -18,23 +18,29 @@ IMPORTANT NOTES:
 @using Vixly.Contracts.Operations.Packages
 @inject IStringLocalizer<CustomerText> T
 
-<fieldset>
+<fieldset class="customer-destination-fieldset">
     <legend>@T["ui.shipments.destination"]</legend>
     @if (Destinations.Count > 0)
     {
-        <label>@T["ui.shipments.deliver_to"]
+        <label class="customer-destination-select">
+            <span>@T["ui.shipments.deliver_to"]</span>
             <select name="destination" required>
                 @foreach (CustomerDestinationDto destination in Destinations) { <option value="@destination.Id" selected="@(destination.Id == Entered?.DestinationId)">@destination.Name · @destination.City, @CountryName(destination.CountryCode)</option> }
             </select>
         </label>
         <p class="customer-portal__hint">@T["ui.shipments.deliver_to_hint"]</p>
-        @if (Destinations.Any(destination => destination.Pickup))
-        {
-            <label><input type="radio" name="delivery" value="pickup" checked="@(Entered?.Delivery != "home")" required /> @T["ui.shipments.pickup_there"]</label>
-        }
+        <div class="customer-delivery-options">
+            @if (Destinations.Any(destination => destination.Pickup))
+            {
+                <label><input type="radio" name="delivery" value="pickup" checked="@(Entered?.Delivery != "home")" required /> <span>@T["ui.shipments.pickup_there"]</span></label>
+            }
+            @if (Destinations.Any(destination => destination.HomeDelivery))
+            {
+                <label><input type="radio" name="delivery" value="home" checked="@(Entered?.Delivery == "home" || !Destinations.Any(destination => destination.Pickup))" required /> <span>@T["ui.shipments.home"]</span></label>
+            }
+        </div>
         @if (Destinations.Any(destination => destination.HomeDelivery))
         {
-            <label><input type="radio" name="delivery" value="home" checked="@(Entered?.Delivery == "home" || !Destinations.Any(destination => destination.Pickup))" required /> @T["ui.shipments.home"]</label>
             <AddressInputs T="T" Entered="Entered" Countries="DestinationCountries" />
         }
     }
@@ -42,8 +48,8 @@ IMPORTANT NOTES:
     {
         @if (Choices.Pickup && Choices.Branches.Count > 0)
         {
-            <label><input type="radio" name="delivery" value="pickup" checked="@(Entered?.Delivery != "home")" required /> @T["ui.shipments.pickup"]</label>
-            <label>@T["ui.shipments.branch"]
+            <label><input type="radio" name="delivery" value="pickup" checked="@(Entered?.Delivery != "home")" required /> <span>@T["ui.shipments.pickup"]</span></label>
+            <label><span>@T["ui.shipments.branch"]</span>
                 <select name="branch">
                     @foreach (CustomerChoiceDto branch in Choices.Branches) { <option value="@branch.Id" selected="@(branch.Id == Entered?.BranchId)">@branch.Name · @branch.Detail</option> }
                 </select>
@@ -51,7 +57,7 @@ IMPORTANT NOTES:
         }
         @if (Choices.HomeDelivery && (Choices.Countries?.Count ?? 0) > 0)
         {
-            <label><input type="radio" name="delivery" value="home" checked="@(Entered?.Delivery == "home" || !(Choices.Pickup && Choices.Branches.Count > 0))" required /> @T["ui.shipments.home"]</label>
+            <label><input type="radio" name="delivery" value="home" checked="@(Entered?.Delivery == "home" || !(Choices.Pickup && Choices.Branches.Count > 0))" required /> <span>@T["ui.shipments.home"]</span></label>
             <AddressInputs T="T" Entered="Entered" Countries="BranchCountries" />
         }
     }

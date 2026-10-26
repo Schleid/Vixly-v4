@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: InvoiceRequestForm.razor
 
@@ -24,21 +24,23 @@ IMPORTANT NOTES:
         <input type="hidden" name="key" value="@CreditKey" />
         <OperationsTableViewport Label="@T["ui.invoices.request_credit"]">
             <table class="ops-editor__table">
-                <thead><tr><th scope="col">@T["ui.invoices.description"]</th><th scope="col" class="ops-editor__number">@T["ui.invoices.remaining"]</th><th scope="col">@T["ui.invoices.credit_amount"]</th></tr></thead>
+                <thead><tr><th scope="col">@T["ui.invoices.description"]</th><th scope="col" class="ops-editor__number">@T["ui.invoices.remaining"]</th><th scope="col" class="ops-editor__number">@T["ui.invoices.credit_amount"]</th></tr></thead>
                 <tbody>
                     @foreach (OperationsInvoiceLine line in Invoice.Lines.Where(line => line.Remaining > 0m))
                     {
                         <tr>
                             <td>@OperationsInvoiceWords.Line(T, line)</td>
                             <td class="ops-editor__number">@OperationsInvoiceWords.Money(line.Remaining, Invoice.CurrencyCode)</td>
-                            <td><input name="amount_@line.Id.ToString("N")" inputmode="decimal" size="9" aria-label="@T["ui.invoices.credit_amount"]" /></td>
+                            <td class="ops-editor__number"><input name="amount_@line.Id.ToString("N")" inputmode="decimal" size="9" style="max-width: 9rem; text-align: right;" aria-label="@T["ui.invoices.credit_amount"]" /></td>
                         </tr>
                     }
                 </tbody>
             </table>
         </OperationsTableViewport>
-        <label>@T["ui.invoices.reason"] <input name="reason" maxlength="500" size="40" required /></label>
-        <button type="submit" class="vx-button vx-button--primary">@T["ui.invoices.request_credit"]</button>
+        <div class="ops-editor__inline-field" style="margin-top: 0.75rem;">
+            <label style="flex: 1 1 24rem;">@T["ui.invoices.reason"] <input name="reason" maxlength="500" required placeholder="@T["ui.invoices.reason"]" /></label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.invoices.request_credit"]</button>
+        </div>
     </form>
     @if (Invoice.CanVoid)
     {
@@ -46,9 +48,11 @@ IMPORTANT NOTES:
             <AntiforgeryToken />
             <input type="hidden" name="key" value="@VoidKey" />
             <input type="hidden" name="void" value="true" />
-            <p class="ops-editor__hint">@T[Invoice.Kind == OperationsInvoiceKind.SupplyOrder ? "ui.invoices.void_order_hint" : "ui.invoices.void_hint"]</p>
-            <label>@T["ui.invoices.reason"] <input name="reason" maxlength="500" size="40" required /></label>
-            <button type="submit" class="vx-button vx-button--secondary">@T["ui.invoices.request_void"]</button>
+            <p class="ops-editor__hint" style="width: 100%; margin: 0 0 0.5rem 0;">@T[Invoice.Kind == OperationsInvoiceKind.SupplyOrder ? "ui.invoices.void_order_hint" : "ui.invoices.void_hint"]</p>
+            <div class="ops-editor__inline-field" style="width: 100%; margin: 0;">
+                <label style="flex: 1 1 24rem;">@T["ui.invoices.reason"] <input name="reason" maxlength="500" required placeholder="@T["ui.invoices.reason"]" /></label>
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.invoices.request_void"]</button>
+            </div>
         </form>
     }
 </section>

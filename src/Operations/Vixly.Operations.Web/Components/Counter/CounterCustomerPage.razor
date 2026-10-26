@@ -127,18 +127,18 @@ IMPORTANT NOTES:
                 </label>
                 <label>@T["ui.estimate.expected_value"] (@CurrencyCode) <input name="expectedValue" inputmode="decimal" size="8" autocomplete="off" /></label>
                 <label>@T["ui.counter.parcel_count"] <input name="parcelCount" type="number" inputmode="numeric" min="1" max="99" step="1" required size="3" value="@EnteredCount" /></label>
-                <label>@T["ui.counter.recipient"] <input name="recipient" value="@Entered?.RecipientName" maxlength="100" required autocomplete="off" /></label>
-                <label>@T["ui.counter.recipient_phone"] <input name="recipientPhone" type="tel" value="@Entered?.RecipientPhone" maxlength="20" required size="16" autocomplete="off" /></label>
+                <label class="ops-editor__form-span-3">@T["ui.counter.recipient"] <input name="recipient" value="@Entered?.RecipientName" maxlength="100" required autocomplete="off" /></label>
+                <label class="ops-editor__form-span-3">@T["ui.counter.recipient_phone"] <input name="recipientPhone" type="tel" value="@Entered?.RecipientPhone" maxlength="20" required size="16" autocomplete="off" /></label>
                 @if (DeliveryModes.HasFlag(OperationsDeliveryModes.HomeDelivery))
                 {
                     <fieldset class="ops-counter__address">
                         <legend>@T["ui.counter.address"]</legend>
-                        <label>@T["ui.counter.line1"] <input name="line1" value="@Entered?.Line1" maxlength="100" /></label>
-                        <label>@T["ui.counter.line2"] <input name="line2" value="@Entered?.Line2" maxlength="100" /></label>
-                        <label>@T["ui.counter.city"] <input name="city" value="@Entered?.City" maxlength="60" size="20" /></label>
-                        <label>@T["ui.counter.region"] <input name="region" value="@Entered?.Region" maxlength="60" size="16" /></label>
-                        <label>@T["ui.counter.postal"] <input name="postalCode" value="@Entered?.PostalCode" maxlength="20" size="10" /></label>
-                        <label>@T["ui.counter.country"] <input name="country" value="@Entered?.CountryCode" maxlength="2" size="3" /></label>
+                        <label class="ops-editor__form-span-full">@T["ui.counter.line1"] <input name="line1" value="@Entered?.Line1" maxlength="100" /></label>
+                        <label class="ops-editor__form-span-full">@T["ui.counter.line2"] <input name="line2" value="@Entered?.Line2" maxlength="100" /></label>
+                        <label class="ops-editor__form-span-3">@T["ui.counter.city"] <input name="city" value="@Entered?.City" maxlength="60" size="20" /></label>
+                        <label class="ops-editor__form-span-3">@T["ui.counter.region"] <input name="region" value="@Entered?.Region" maxlength="60" size="16" /></label>
+                        <label class="ops-editor__form-span-3">@T["ui.counter.postal"] <input name="postalCode" value="@Entered?.PostalCode" maxlength="20" size="10" /></label>
+                        <label class="ops-editor__form-span-3">@T["ui.counter.country"] <input name="country" value="@Entered?.CountryCode" maxlength="2" size="3" /></label>
                     </fieldset>
                 }
                 <fieldset>

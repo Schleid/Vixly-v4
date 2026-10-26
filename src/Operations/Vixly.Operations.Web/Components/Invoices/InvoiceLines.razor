@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: InvoiceLines.razor
 
@@ -41,7 +41,7 @@ IMPORTANT NOTES:
     <div><dt>@T["ui.invoices.subtotal"]</dt><dd>@Money(Invoice.Subtotal)</dd></div>
     @if (Invoice.Taxes.Count == 0)
     {
-        <div><dt>@T["ui.invoices.no_tax"]</dt><dd></dd></div>
+        <div><dt>@T["ui.invoices.no_tax"]</dt><dd>—</dd></div>
     }
     else if (Invoice.TaxPerKind)
     {

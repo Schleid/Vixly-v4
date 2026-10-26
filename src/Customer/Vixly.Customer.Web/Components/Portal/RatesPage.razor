@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: RatesPage.razor
 
@@ -49,20 +49,26 @@ IMPORTANT NOTES:
                     }
                 </select>
             </label>
-            <label>@T["ui.rates.weight"] (@Rates.WeightUnit) <input name="weight" inputmode="decimal" value="@Weight" required /></label>
+            <div class="customer-field-duo">
+                <label>@T["ui.rates.weight"] (@Rates.WeightUnit) <input name="weight" inputmode="decimal" value="@Weight" required /></label>
+                <label>@T["ui.rates.value"] (@Rates.Currency) <input name="value" inputmode="decimal" value="@Value" /></label>
+            </div>
             <fieldset>
                 <legend>@VixlyText.Format(T, "ui.rates.size", "unit", Rates.LengthUnit)</legend>
-                <label>@T["ui.rates.length"] <input name="length" inputmode="decimal" value="@Length" /></label>
-                <label>@T["ui.rates.width"] <input name="width" inputmode="decimal" value="@Width" /></label>
-                <label>@T["ui.rates.height"] <input name="height" inputmode="decimal" value="@Height" /></label>
+                <div class="customer-dim-trio">
+                    <label>@T["ui.rates.length"] <input name="length" inputmode="decimal" value="@Length" /></label>
+                    <label>@T["ui.rates.width"] <input name="width" inputmode="decimal" value="@Width" /></label>
+                    <label>@T["ui.rates.height"] <input name="height" inputmode="decimal" value="@Height" /></label>
+                </div>
             </fieldset>
-            <label>@T["ui.rates.value"] (@Rates.Currency) <input name="value" inputmode="decimal" value="@Value" /></label>
-            <label><input type="checkbox" name="consolidated" value="true" checked="@Consolidated" /> @T["ui.rates.consolidated"]</label>
-            <label><input type="checkbox" name="insured" value="true" checked="@Insured" /> @T["ui.rates.insured"]</label>
-            @if (Rates.Destinations?.Any(destination => destination.HomeDelivery) == true)
-            {
-                <label><input type="checkbox" name="home" value="true" checked="@HomeDelivery" /> @T["ui.rates.home_delivery"]</label>
-            }
+            <div class="customer-options-grid">
+                <label><input type="checkbox" name="consolidated" value="true" checked="@Consolidated" /> <span>@T["ui.rates.consolidated"]</span></label>
+                <label><input type="checkbox" name="insured" value="true" checked="@Insured" /> <span>@T["ui.rates.insured"]</span></label>
+                @if (Rates.Destinations?.Any(destination => destination.HomeDelivery) == true)
+                {
+                    <label><input type="checkbox" name="home" value="true" checked="@HomeDelivery" /> <span>@T["ui.rates.home_delivery"]</span></label>
+                }
+            </div>
             <button type="submit" class="vx-button vx-button--primary">@T["ui.rates.calculate"]</button>
         </form>
     }

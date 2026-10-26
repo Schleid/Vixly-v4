@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: PackageFields.razor
 
@@ -6,20 +6,25 @@ PURPOSE:
 The fields of one announced package (Slice 3B; owner, 2026-10-18).
 
 RESPONSIBILITIES:
-- Ask for the carrier, tracking number, store, contents, value and expected date
+- Ask for the carrier, tracking number, contents, value and expected date
 
 IMPORTANT NOTES:
 - Markup only; the caller passes its localizer and the form around it
 - The customer's own words become the package's declaration; staff never type it (D-C6)
+- No store: a package always comes to the customer's mailbox, and fewer fields are easier (owner, 2026-10-26)
 =========================================================
 *@
 @using Vixly.Contracts.Operations.Packages
-<label>@T["ui.prealert.carrier"] <input name="carrier" value="@Entered?.Carrier" maxlength="40" required="@Required" placeholder="UPS, FedEx, USPS, DHL, Amazon" /></label>
-<label>@T["ui.prealert.tracking"] <input name="tracking" value="@Entered?.TrackingNumber" maxlength="60" required="@Required" autocomplete="off" autocapitalize="characters" spellcheck="false" /></label>
-<label>@T["ui.prealert.store"] <input name="store" value="@Entered?.Store" maxlength="100" /></label>
+
+<div class="customer-field-duo">
+    <label>@T["ui.prealert.carrier"] <input name="carrier" value="@Entered?.Carrier" maxlength="40" required="@Required" placeholder="UPS, FedEx, USPS, DHL, Amazon" /></label>
+    <label>@T["ui.prealert.tracking"] <input name="tracking" value="@Entered?.TrackingNumber" maxlength="60" required="@Required" autocomplete="off" autocapitalize="characters" spellcheck="false" /></label>
+</div>
 <label>@T["ui.prealert.contents"] <textarea name="contents" maxlength="300" required="@Required" rows="3">@Entered?.Contents</textarea></label>
-<label>@T["ui.prealert.value"] <input name="value" type="number" inputmode="decimal" min="0" step="0.01" value="@(Entered is { DeclaredValue: >= 0 } entered ? entered.DeclaredValue.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) : null)" required="@Required" /></label>
-<label>@T["ui.prealert.expected"] <input name="expected" type="date" value="@Entered?.ExpectedDate?.ToString("yyyy-MM-dd")" /></label>
+<div class="customer-field-duo">
+    <label>@T["ui.prealert.value"] <input name="value" type="number" inputmode="decimal" min="0" step="0.01" value="@(Entered is { DeclaredValue: >= 0 } entered ? entered.DeclaredValue.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) : null)" required="@Required" /></label>
+    <label>@T["ui.prealert.expected"] <input name="expected" type="date" value="@Entered?.ExpectedDate?.ToString("yyyy-MM-dd")" /></label>
+</div>
 
 @code {
     [Parameter, EditorRequired] public IStringLocalizer<CustomerText> T { get; set; } = null!;

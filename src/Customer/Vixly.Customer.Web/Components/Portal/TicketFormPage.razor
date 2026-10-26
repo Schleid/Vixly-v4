@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: TicketFormPage.razor
 
@@ -37,14 +37,20 @@ IMPORTANT NOTES:
                     </select>
                 </label>
             }
-            <label>@T["ui.prealert.carrier"] <input name="carrier" required maxlength="40" value="@Entered?.Carrier" autocomplete="off" /></label>
-            <label>@T["ui.prealert.tracking"] <input name="tracking" required maxlength="60" value="@Entered?.TrackingNumber" autocomplete="off" autocapitalize="characters" spellcheck="false" /></label>
-            <label>@T["ui.prealert.store"] <input name="store" maxlength="100" value="@Entered?.Store" /></label>
-            <label>@T["ui.tickets.order"] <input name="order" maxlength="60" value="@Entered?.OrderNumber" autocomplete="off" /></label>
-            <label>@T["ui.tickets.delivered"] <input name="delivered" type="date" value="@Entered?.DeliveredOn?.ToString("yyyy-MM-dd")" /></label>
-            <label>@T["ui.prealert.contents"] <textarea name="contents" required maxlength="300" rows="3">@Entered?.Contents</textarea></label>
-            <label>@T["ui.tickets.proof"] <input name="proof" type="file" accept="application/pdf,image/png,image/jpeg" /></label>
+            <div class="customer-field-duo">
+                <label>@T["ui.prealert.carrier"] <input name="carrier" required maxlength="40" value="@Entered?.Carrier" autocomplete="off" /></label>
+                <label>@T["ui.prealert.tracking"] <input name="tracking" required maxlength="60" value="@Entered?.TrackingNumber" autocomplete="off" autocapitalize="characters" spellcheck="false" /></label>
+            </div>
+            <div class="customer-field-duo">
+                <label>@T["ui.prealert.store"] <input name="store" maxlength="100" value="@Entered?.Store" /></label>
+                <label>@T["ui.tickets.order"] <input name="order" maxlength="60" value="@Entered?.OrderNumber" autocomplete="off" /></label>
+            </div>
+            <div class="customer-field-duo">
+                <label>@T["ui.tickets.delivered"] <input name="delivered" type="date" value="@Entered?.DeliveredOn?.ToString("yyyy-MM-dd")" /></label>
+                <label>@T["ui.tickets.proof"] <input name="proof" type="file" accept="application/pdf,image/png,image/jpeg" /></label>
+            </div>
             <p class="customer-portal__hint">@T["ui.tickets.proof_hint"]</p>
+            <label>@T["ui.prealert.contents"] <textarea name="contents" required maxlength="300" rows="3">@Entered?.Contents</textarea></label>
             <label>@T["ui.tickets.message"] <textarea name="message" maxlength="1000" rows="4">@Entered?.Message</textarea></label>
             @if (tickets.Warehouses.Count > 0) { <button type="submit" class="vx-button vx-button--primary">@T["ui.tickets.submit"]</button> }
             <p><a href="/customer/tickets">@T["ui.tickets.back"]</a></p>

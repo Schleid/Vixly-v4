@@ -70,3 +70,405 @@
 .customer-ticket-status[data-status=Answered] { color:var(--vx-color-status-staged); background:var(--vx-color-status-staged-bg); border-color:var(--vx-color-status-warning-border); }
 .customer-ticket-status[data-status=Resolved] { color:var(--vx-color-status-completed); background:var(--vx-color-status-completed-bg); border-color:var(--vx-color-status-success-border); }
 .customer-table-viewport:has(.customer-ticket-status) .customer-portal__table { min-width:34rem; }
+
+
+/* =========================================================
+   CUSTOMER PORTAL REFINEMENTS & CONTROL ALIGNMENT
+   ========================================================= */
+
+/* Control alignment: Ensure paired inputs in 2-column fieldsets and forms
+   share the exact same baseline regardless of label line-count variations. */
+.customer-portal__form fieldset > label:not(:has(>input:is([type=checkbox],[type=radio]))),
+.customer-portal__field {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    min-width: 0 !important;
+    font-size: 0.75rem !important;
+    font-weight: 650 !important;
+    gap: 0.45rem !important;
+    box-sizing: border-box !important;
+}
+.customer-portal__form fieldset > label:not(:has(>input:is([type=checkbox],[type=radio]))) > :is(input, select, textarea),
+.customer-portal__field > :is(input, select, textarea) {
+    margin-top: auto !important;
+    width: 100% !important;
+}
+.customer-portal__field--full {
+    grid-column: 1 / -1 !important;
+}
+
+/* 2-column field duo for compact, balanced form rows */
+.customer-field-duo {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+    width: 100% !important;
+    align-items: stretch !important;
+}
+.customer-field-duo > label {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    font-size: 0.75rem !important;
+    font-weight: 650 !important;
+    gap: 0.45rem !important;
+    box-sizing: border-box !important;
+}
+.customer-field-duo > label > :is(input, select, textarea) {
+    margin-top: auto !important;
+    width: 100% !important;
+}
+@media(max-width: 600px) {
+    .customer-field-duo {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
+
+/* Destination & delivery choices in ShipmentDestinationFields */
+.customer-destination-select {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.4rem !important;
+}
+.customer-delivery-options {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)) !important;
+    gap: 0.75rem !important;
+    margin: 0.25rem 0 !important;
+}
+.customer-delivery-options label {
+    margin: 0 !important;
+    cursor: pointer !important;
+}
+
+/* Checkbox and options grids */
+.customer-options-grid,
+.customer-packages-choice-grid,
+.customer-channel-options {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)) !important;
+    gap: 0.65rem !important;
+    grid-column: 1 / -1 !important;
+}
+.customer-options-grid label,
+.customer-packages-choice-grid label,
+.customer-channel-options label {
+    margin: 0 !important;
+}
+
+/* Package actions bar in list items: fixes overlapping button bug */
+.customer-package-actions {
+    grid-column: 2 !important;
+    grid-row: 1 / span 2 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0.5rem !important;
+    flex-wrap: wrap !important;
+}
+.customer-package-move {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    margin: 0 !important;
+}
+.customer-package-move__label {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 650 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+}
+.customer-package-move select {
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.8125rem !important;
+    width: auto !important;
+    max-width: 15rem !important;
+    border-radius: 0.35rem !important;
+}
+.customer-package-move .vx-button,
+.customer-package-actions .vx-button {
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0.25rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 0.35rem !important;
+    white-space: nowrap !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+}
+@media(max-width: 640px) {
+    .customer-package-actions {
+        grid-column: 1 !important;
+        grid-row: auto !important;
+        justify-content: flex-start !important;
+        margin-top: 0.5rem !important;
+    }
+}
+
+/* Collector form on ShipmentPage */
+.customer-collector-form {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+    padding: 1.25rem !important;
+    border: 1px solid var(--vx-color-border) !important;
+    border-radius: 0.65rem !important;
+    background: var(--vx-color-surface-sunken) !important;
+    margin-top: 1rem !important;
+}
+.customer-collector-form > :is(h2, p, button) {
+    grid-column: 1 / -1 !important;
+}
+.customer-collector-form label {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    height: 100% !important;
+    font-size: 0.75rem !important;
+    font-weight: 650 !important;
+    gap: 0.4rem !important;
+}
+.customer-collector-form label input {
+    margin-top: auto !important;
+}
+.customer-collector-form button {
+    justify-self: start !important;
+    min-width: 10rem !important;
+    height: 36px !important;
+    min-height: 36px !important;
+}
+@media(max-width: 600px) {
+    .customer-collector-form {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
+
+/* Status badge pill for Customer portal */
+.customer-portal__status {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    padding: 0.2rem 0.6rem !important;
+    border: 1px solid var(--vx-color-border) !important;
+    border-radius: 2rem !important;
+    font-size: 0.6875rem !important;
+    font-weight: 650 !important;
+    line-height: 1.4 !important;
+    white-space: nowrap !important;
+    background: var(--vx-color-surface-sunken) !important;
+    color: var(--vx-color-text-muted) !important;
+}
+.customer-portal__status:is([data-status=paid],[data-status=active],[data-status=settled]) {
+    color: var(--vx-color-status-completed) !important;
+    background: var(--vx-color-status-completed-bg) !important;
+    border-color: var(--vx-color-status-success-border) !important;
+}
+.customer-portal__status:is([data-status=unpaid],[data-status=on_account],[data-status=open],[data-status=pending]) {
+    color: var(--vx-color-status-staged) !important;
+    background: var(--vx-color-status-staged-bg) !important;
+    border-color: var(--vx-color-status-warning-border) !important;
+}
+.customer-portal__status:is([data-status=overdue],[data-status=suspended],[data-status=blocked]) {
+    color: var(--vx-color-status-exception) !important;
+    background: var(--vx-color-status-exception-bg) !important;
+    border-color: var(--vx-color-status-danger-border) !important;
+}
+.customer-portal__status:is([data-status=own],[data-status=discount]) {
+    color: var(--customer-primary) !important;
+    background: color-mix(in srgb, var(--customer-primary) 8%, var(--vx-color-surface)) !important;
+    border-color: color-mix(in srgb, var(--customer-primary) 30%, var(--vx-color-border)) !important;
+}
+
+/* Credit Account KPI Facts Card */
+.customer-portal__facts {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)) !important;
+    gap: 1rem !important;
+    margin: 1rem 0 1.25rem 0 !important;
+    padding: 1.25rem !important;
+    background: var(--vx-color-surface-sunken) !important;
+    border: 1px solid var(--vx-color-border) !important;
+    border-radius: 0.65rem !important;
+}
+.customer-portal__facts dt {
+    font-size: 0.75rem !important;
+    color: var(--vx-color-text-muted) !important;
+    font-weight: 650 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+}
+.customer-portal__facts dd {
+    margin: 0.35rem 0 0 0 !important;
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    font-family: var(--vx-font-mono, monospace) !important;
+    color: var(--vx-color-text) !important;
+}
+.customer-portal__facts dd[data-overdue="true"] {
+    color: var(--vx-color-danger) !important;
+}
+
+/* Pricing Lists Page */
+.customer-pricing {
+    margin-bottom: 1.5rem !important;
+}
+.customer-pricing h2 {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    flex-wrap: wrap !important;
+}
+.customer-pricing__bands {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 1rem 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)) !important;
+    gap: 0.75rem !important;
+}
+.customer-pricing__bands li {
+    padding: 0.75rem 1rem !important;
+    background: var(--vx-color-surface-sunken) !important;
+    border: 1px solid var(--vx-color-border) !important;
+    border-radius: 0.5rem !important;
+    font-size: 0.8125rem !important;
+    font-weight: 550 !important;
+    font-family: var(--vx-font-mono, monospace) !important;
+}
+.customer-pricing__items {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 1rem 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)) !important;
+    gap: 0.6rem !important;
+}
+.customer-pricing__items li {
+    padding: 0.6rem 0.85rem !important;
+    border: 1px solid var(--vx-color-border) !important;
+    border-radius: 0.4rem !important;
+    background: var(--vx-color-surface) !important;
+    font-size: 0.8125rem !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+.customer-pricing__fees {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 1rem 0 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+}
+.customer-pricing__fees li {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 0.35rem 0.75rem !important;
+    border: 1px solid var(--vx-color-border) !important;
+    border-radius: 2rem !important;
+    background: var(--vx-color-surface-sunken) !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    color: var(--vx-color-text-muted) !important;
+}
+
+/* Card Payment Status Panel */
+[data-card-status="paid"] {
+    border-top: 3px solid var(--vx-color-status-completed) !important;
+    background: color-mix(in srgb, var(--vx-color-status-completed-bg) 60%, var(--vx-color-surface)) !important;
+}
+[data-card-status="paid_not_applied"] {
+    border-top: 3px solid var(--vx-color-warning) !important;
+    background: var(--vx-color-warning-bg) !important;
+}
+[data-card-status="cancelled"] {
+    border-top: 3px solid var(--vx-color-text-muted) !important;
+    opacity: 0.8;
+}
+
+
+/* Dimension trio for Rates & Package dimensions */
+.customer-dim-trio {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+}
+.customer-dim-trio label {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    height: 100% !important;
+    margin: 0 !important;
+}
+.customer-dim-trio label input {
+    margin-top: auto !important;
+    width: 100% !important;
+}
+@media(max-width: 600px) {
+    .customer-dim-trio {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Insurance product selection */
+.customer-portal__insurance {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.85rem !important;
+    margin: 1rem 0 !important;
+}
+.customer-portal__insurance-product {
+    border: 1px solid var(--vx-color-border) !important;
+    border-radius: 0.5rem !important;
+    padding: 0.85rem 1rem !important;
+    background: var(--vx-color-surface) !important;
+    transition: border-color 0.15s ease, background-color 0.15s ease !important;
+}
+.customer-portal__insurance-product:hover {
+    border-color: var(--customer-primary, var(--vx-color-primary)) !important;
+}
+.customer-portal__insurance-product > label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+}
+.customer-portal__insurance-product .customer-portal__hint {
+    margin: 0.35rem 0 0.5rem 1.75rem !important;
+    font-size: 0.8125rem !important;
+}
+.customer-portal__insurance-product .customer-portal__terms {
+    margin: 0.5rem 0 0 1.75rem !important;
+}
+
+/* Table actions / Pay card button */
+.customer-portal__table .customer-portal__inline {
+    display: inline-flex !important;
+    align-items: center !important;
+    margin-left: 0.5rem !important;
+}
+.customer-portal__table .vx-button {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0.15rem 0.65rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 0.35rem !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+}
