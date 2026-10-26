@@ -882,23 +882,29 @@ details.ops-editor__collapsible[open] > summary {
     color: var(--vx-color-text);
 }
 
-.ops-invoice__totals {
-    display: grid;
-    gap: 0.4rem;
-    max-width: 22rem;
-    margin: 1.25rem 0 1.25rem auto;
-    padding: 1rem 1.25rem;
-    background: var(--vx-color-surface-sunken);
-    border: 1px solid var(--vx-color-border);
-    border-radius: 0.5rem;
-    font-size: 0.8125rem;
+.ops-editor__panel dl.ops-invoice__totals,
+dl.ops-invoice__totals {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 0.45rem !important;
+    width: 100% !important;
+    max-width: 22rem !important;
+    margin: 1.25rem 0 0.5rem auto !important;
+    padding: 1rem 1.25rem !important;
+    background: var(--vx-color-surface-sunken) !important;
+    border: 1px solid var(--vx-color-border) !important;
+    border-radius: 0.5rem !important;
+    font-size: 0.8125rem !important;
+    box-sizing: border-box !important;
 }
 
-.ops-invoice__totals > div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+.ops-editor__panel dl.ops-invoice__totals > div,
+dl.ops-invoice__totals > div {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 1rem !important;
+    grid-column: 1 / -1 !important;
 }
 
 .ops-invoice__totals dt {
@@ -968,16 +974,83 @@ details.ops-editor__collapsible[open] > summary {
     border-left: 3.5px solid var(--vx-color-danger, #dc2626);
 }
 
-.ops-invoice__void {
+/* Invoice Request Header, Form Row, and Void Card */
+.ops-invoice-request__header {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    margin-top: 1rem;
-    padding: 1rem 1.25rem;
-    background: var(--vx-color-surface-sunken);
-    border: 1px solid var(--vx-color-border);
-    border-radius: 0.5rem;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0;
+}
+
+.ops-invoice-request__header h2 {
+    margin: 0;
+}
+
+.ops-invoice-request__header p {
+    margin: 0;
+}
+
+.ops-invoice-form-row {
+    display: flex !important;
+    align-items: flex-end !important;
+    gap: 0.75rem !important;
+    margin-top: 0.85rem !important;
+    width: 100% !important;
+}
+
+.ops-invoice-form-row label {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.25rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    color: var(--vx-color-text-muted) !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+}
+
+.ops-invoice-form-row label input {
+    height: 32px !important;
+    min-height: 32px !important;
+    box-sizing: border-box !important;
+    padding: 0.25rem 0.65rem !important;
+    font-size: 0.8125rem !important;
+    border: 1px solid var(--vx-color-border-control);
+    border-radius: 0.35rem;
+    background: var(--vx-color-surface);
+    color: var(--vx-color-text);
+    width: 100% !important;
+}
+
+.ops-invoice-form-row .vx-button {
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 1.15rem !important;
+    font-size: 0.8125rem !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    align-self: flex-end !important;
+}
+
+.ops-invoice__void {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.65rem !important;
+    margin-top: 1.25rem !important;
+    padding: 1rem 1.25rem !important;
+    background: var(--vx-color-surface-sunken) !important;
+    border: 1px solid var(--vx-color-border) !important;
+    border-radius: 0.5rem !important;
+}
+
+.ops-invoice-void__hint {
+    margin: 0 !important;
+    font-size: 0.8125rem !important;
+    color: var(--vx-color-text-muted) !important;
+    line-height: 1.5 !important;
 }
 
 /* Low Stock Indicators (Slice 5E) */

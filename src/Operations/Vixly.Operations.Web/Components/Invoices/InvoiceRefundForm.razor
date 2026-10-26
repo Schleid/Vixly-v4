@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: InvoiceRefundForm.razor
 
@@ -28,7 +28,7 @@ IMPORTANT NOTES:
     <label>@T["ui.cashier.amount"] <input name="amount" inputmode="decimal" size="9" value="@Invoice.Refundable.ToString("0.00", CultureInfo.InvariantCulture)" required /></label>
     <label>@T["ui.invoices.reason"] <input name="reason" maxlength="500" size="40" required /></label>
     <label>@T["ui.cashier.reference"] <input name="reference" maxlength="60" size="14" /></label>
-    <button type="submit" class="vx-button vx-button--secondary">@T["ui.payments.refund_button"]</button>
+    <button type="submit" class="vx-button vx-button--primary">@T["ui.payments.refund_button"]</button>
 </form>
 
 @code {

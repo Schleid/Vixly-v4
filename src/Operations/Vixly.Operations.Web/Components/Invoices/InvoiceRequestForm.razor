@@ -16,9 +16,11 @@ IMPORTANT NOTES:
 =========================================================
 *@
 <section class="ops-editor__panel" aria-labelledby="request-title">
-    <h2 id="request-title">@T["ui.invoices.request"]</h2>
-    <p class="ops-editor__hint">@T["ui.invoices.request_hint"]</p>
-    <p class="ops-editor__hint">@T["ui.invoices.reason_printed"]</p>
+    <div class="ops-invoice-request__header">
+        <h2 id="request-title">@T["ui.invoices.request"]</h2>
+        <p class="ops-editor__hint">@T["ui.invoices.request_hint"]</p>
+        <p class="ops-editor__hint">@T["ui.invoices.reason_printed"]</p>
+    </div>
     <form method="post" action="/staff/invoices/@Invoice.Id/credits">
         <AntiforgeryToken />
         <input type="hidden" name="key" value="@CreditKey" />
@@ -37,8 +39,11 @@ IMPORTANT NOTES:
                 </tbody>
             </table>
         </OperationsTableViewport>
-        <div class="ops-editor__inline-field" style="margin-top: 0.75rem;">
-            <label style="flex: 1 1 24rem;">@T["ui.invoices.reason"] <input name="reason" maxlength="500" required placeholder="@T["ui.invoices.reason"]" /></label>
+        <div class="ops-invoice-form-row">
+            <label>
+                <span>@T["ui.invoices.reason"]</span>
+                <input name="reason" maxlength="500" required placeholder="@T["ui.invoices.reason"]" />
+            </label>
             <button type="submit" class="vx-button vx-button--primary">@T["ui.invoices.request_credit"]</button>
         </div>
     </form>
@@ -48,10 +53,13 @@ IMPORTANT NOTES:
             <AntiforgeryToken />
             <input type="hidden" name="key" value="@VoidKey" />
             <input type="hidden" name="void" value="true" />
-            <p class="ops-editor__hint" style="width: 100%; margin: 0 0 0.5rem 0;">@T[Invoice.Kind == OperationsInvoiceKind.SupplyOrder ? "ui.invoices.void_order_hint" : "ui.invoices.void_hint"]</p>
-            <div class="ops-editor__inline-field" style="width: 100%; margin: 0;">
-                <label style="flex: 1 1 24rem;">@T["ui.invoices.reason"] <input name="reason" maxlength="500" required placeholder="@T["ui.invoices.reason"]" /></label>
-                <button type="submit" class="vx-button vx-button--secondary">@T["ui.invoices.request_void"]</button>
+            <p class="ops-invoice-void__hint">@T[Invoice.Kind == OperationsInvoiceKind.SupplyOrder ? "ui.invoices.void_order_hint" : "ui.invoices.void_hint"]</p>
+            <div class="ops-invoice-form-row">
+                <label>
+                    <span>@T["ui.invoices.reason"]</span>
+                    <input name="reason" maxlength="500" required placeholder="@T["ui.invoices.reason"]" />
+                </label>
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.invoices.request_void"]</button>
             </div>
         </form>
     }
