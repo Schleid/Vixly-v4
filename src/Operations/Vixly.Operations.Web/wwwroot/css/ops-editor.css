@@ -650,6 +650,74 @@ form.ops-list-bar .vx-button,
     min-height: 32px !important;
     padding: 0.2rem 0.4rem;
 }
+.ops-list-bar__filters {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.75rem 1rem !important;
+    flex-wrap: wrap !important;
+    flex: 1 1 auto !important;
+}
+.ops-list-bar .ops-checkbox-label {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    box-sizing: border-box !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    cursor: pointer;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    color: var(--vx-color-text) !important;
+    margin: 0 !important;
+}
+.ops-onhand__days-label {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    box-sizing: border-box !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    color: var(--vx-color-text) !important;
+    margin: 0 !important;
+}
+form.ops-list-bar input[name=days],
+.ops-list-bar input[name=days],
+.ops-onhand__days-label input[type=number] {
+    width: 4.5rem !important;
+    min-width: 4.5rem !important;
+    max-width: 4.5rem !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    box-sizing: border-box !important;
+    padding: 0.25rem 0.5rem !important;
+    text-align: center !important;
+    font-size: 0.8125rem !important;
+    flex: 0 0 4.5rem !important;
+    border: 1px solid var(--vx-color-border-control) !important;
+    border-radius: 0.35rem !important;
+    background: var(--vx-color-surface) !important;
+    color: var(--vx-color-text) !important;
+}
+form.ops-list-bar input[name=country],
+.ops-list-bar input[name=country] {
+    width: 4.5rem !important;
+    min-width: 4.5rem !important;
+    max-width: 4.5rem !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    box-sizing: border-box !important;
+    padding: 0.25rem 0.5rem !important;
+    text-align: center !important;
+    font-size: 0.8125rem !important;
+    flex: 0 0 4.5rem !important;
+    text-transform: uppercase !important;
+}
 
 /* Collapsible Panel / Details */
 details.ops-editor__collapsible {
