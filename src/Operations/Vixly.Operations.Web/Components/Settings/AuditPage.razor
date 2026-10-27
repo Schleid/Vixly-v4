@@ -11,29 +11,35 @@ RESPONSIBILITIES:
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10); values come from the endpoint
 - A GET form: filters are in the address, so a filtered view can be shared
-- Placeholder look: Frontend/UI designs the final experience
 =========================================================
 *@
 @using Vixly.Operations.Application.Audit
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.audit.title"]" Company="@Company" Section="audit" Error="@Error">
-    <form method="get" action="/staff/audit" class="ops-editor__inline ops-editor__search">
+    <form method="get" action="/staff/audit" class="ops-list-bar ops-audit__filters">
         @if (ActorUserId is not null)
         {
             <input type="hidden" name="actor" value="@ActorUserId" />
-            <span>@VixlyText.Format(T, "ui.audit.by", "name", ActorName ?? string.Empty)</span>
+            <span class="ops-audit__actor" style="display: inline-flex; align-items: center; height: 32px; font-weight: 600; font-size: 0.8125rem; color: var(--vx-color-text-strong); white-space: nowrap;">@VixlyText.Format(T, "ui.audit.by", "name", ActorName ?? string.Empty)</span>
+            <a href="/staff/audit" class="vx-button vx-button--secondary" style="height: 32px; min-height: 32px; padding: 0 0.75rem; font-size: 0.8125rem; display: inline-flex; align-items: center;">@T["ui.activity.everyone"]</a>
         }
-        <select name="area" aria-label="@T["ui.audit.area"]">
+        <select name="area" aria-label="@T["ui.audit.area"]" style="height: 32px; min-height: 32px; box-sizing: border-box; width: auto; min-width: 9rem; max-width: 14rem;">
             <option value="">@T["ui.audit.all_areas"]</option>
             @foreach (string area in Areas)
             {
                 <option value="@area" selected="@(area == Area)">@T["ui.audit.area." + area]</option>
             }
         </select>
-        <label>@T["ui.audit.from"] <input type="date" name="from" value="@From" /></label>
-        <label>@T["ui.audit.to"] <input type="date" name="to" value="@To" /></label>
-        <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.search_submit"]</button>
+        <label class="ops-list-bar__date" style="display: inline-flex; align-items: center; gap: 0.45rem; height: 32px; min-height: 32px; margin: 0; font-size: 0.8125rem; font-weight: 500; color: var(--vx-color-text-muted); white-space: nowrap;">
+            <span>@T["ui.audit.from"]</span>
+            <input type="date" name="from" value="@From" style="height: 32px; min-height: 32px; box-sizing: border-box; padding: 0.25rem 0.5rem; width: auto; min-width: 8.5rem; max-width: 10.5rem;" />
+        </label>
+        <label class="ops-list-bar__date" style="display: inline-flex; align-items: center; gap: 0.45rem; height: 32px; min-height: 32px; margin: 0; font-size: 0.8125rem; font-weight: 500; color: var(--vx-color-text-muted); white-space: nowrap;">
+            <span>@T["ui.audit.to"]</span>
+            <input type="date" name="to" value="@To" style="height: 32px; min-height: 32px; box-sizing: border-box; padding: 0.25rem 0.5rem; width: auto; min-width: 8.5rem; max-width: 10.5rem;" />
+        </label>
+        <button type="submit" class="vx-button vx-button--primary" style="height: 32px; min-height: 32px; box-sizing: border-box; padding: 0 1rem; margin: 0; align-self: center;">@T["ui.staff.search_submit"]</button>
     </form>
     <section class="ops-editor__panel">
         @if (Lines.Count == 0) { <p class="ops-editor__empty-message">@T["ui.editor.none"]</p> }
@@ -58,11 +64,13 @@ IMPORTANT NOTES:
         </table>
         </OperationsTableViewport>
         }
-        <p>@VixlyText.Format(T, "ui.audit.count", "count", TotalCount)</p>
-        <p class="ops-editor__actions">
-            @if (Page > 1) { <a href="@PageLink(Page - 1)">@T["ui.audit.newer"]</a> }
-            @if (Page * PageSize < TotalCount) { <a href="@PageLink(Page + 1)">@T["ui.audit.older"]</a> }
-        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.85rem; padding-top: 0.5rem; border-top: 1px solid var(--vx-color-border, #e2e8f0);">
+            <span style="font-size: 0.8125rem; color: var(--vx-color-text-muted, #64748b);">@VixlyText.Format(T, "ui.audit.count", "count", TotalCount)</span>
+            <div style="display: flex; gap: 0.5rem;">
+                @if (Page > 1) { <a href="@PageLink(Page - 1)" class="vx-button vx-button--secondary" style="height: 30px; padding: 0 0.75rem; font-size: 0.75rem;">@T["ui.audit.newer"]</a> }
+                @if (Page * PageSize < TotalCount) { <a href="@PageLink(Page + 1)" class="vx-button vx-button--secondary" style="height: 30px; padding: 0 0.75rem; font-size: 0.75rem;">@T["ui.audit.older"]</a> }
+            </div>
+        </div>
     </section>
 </EditorShell>
 
