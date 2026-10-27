@@ -26,31 +26,31 @@ IMPORTANT NOTES:
             <a href="@Link(key, 1)" class="ops-status-chip" aria-current="@(View == view ? "page" : null)"><span>@T["ui.shipments_desk.view." + key]</span>@if (count is { } shown) { <span class="ops-status-chip__count">@shown</span> }</a>
         }
     </nav>
-    <form method="get" action="/staff/shipments" class="ops-list-bar">
+    <form method="get" action="/staff/shipments" class="ops-list-bar ops-shipments__filters">
         <input type="hidden" name="view" value="@Key" />
         <div class="ops-list-bar__search">
-            <input name="search" value="@Search" placeholder="@T["ui.shipments_desk.search"]" aria-label="@T["ui.shipments_desk.search"]" maxlength="60" autocomplete="off" />
-            <button type="submit" class="vx-button vx-button--primary">@T["ui.shipments_desk.filter"]</button>
+            <input name="search" value="@Search" placeholder="@T["ui.shipments_desk.search"]" aria-label="@T["ui.shipments_desk.search"]" maxlength="60" autocomplete="off" style="height: 32px; min-height: 32px;" />
+            <button type="submit" class="vx-button vx-button--primary" style="height: 32px; min-height: 32px;">@T["ui.shipments_desk.filter"]</button>
         </div>
-        <div class="ops-list-bar__filters">
-        @if (Warehouses.Count > 1)
-        {
-            <select name="warehouse" aria-label="@T["ui.receiving.warehouse"]">
-                <option value="">@T["ui.shipments_desk.all_warehouses"]</option>
-                @foreach (OperationsWarehouse warehouse in Warehouses) { <option value="@warehouse.Id" selected="@(warehouse.Id == Warehouse)">@warehouse.Code · @warehouse.Name</option> }
-            </select>
-        }
-        <select name="service" aria-label="@T["ui.shipments_desk.service"]">
-            <option value="">@T["ui.shipments_desk.any_service"]</option>
-            @foreach (Vixly.Contracts.Platform.Catalog.PlatformShippingServiceInfo item in Vixly.Contracts.Platform.Catalog.PlatformShippingServices.All)
+        <div class="ops-list-bar__filters" style="display: inline-flex; align-items: center; gap: 0.5rem 0.75rem; flex-wrap: wrap;">
+            @if (Warehouses.Count > 1)
             {
-                <option value="@item.Code" selected="@(item.Code == Service)">@T["ui.services.name." + item.Code]</option>
+                <select name="warehouse" aria-label="@T["ui.receiving.warehouse"]" style="height: 32px; min-height: 32px;">
+                    <option value="">@T["ui.shipments_desk.all_warehouses"]</option>
+                    @foreach (OperationsWarehouse warehouse in Warehouses) { <option value="@warehouse.Id" selected="@(warehouse.Id == Warehouse)">@warehouse.Code · @warehouse.Name</option> }
+                </select>
             }
-        </select>
-        <input name="country" value="@Country" placeholder="@T["ui.shipments_desk.country"]" aria-label="@T["ui.shipments_desk.country"]" maxlength="2" size="3" autocomplete="off" />
+            <select name="service" aria-label="@T["ui.shipments_desk.service"]" style="height: 32px; min-height: 32px;">
+                <option value="">@T["ui.shipments_desk.any_service"]</option>
+                @foreach (Vixly.Contracts.Platform.Catalog.PlatformShippingServiceInfo item in Vixly.Contracts.Platform.Catalog.PlatformShippingServices.All)
+                {
+                    <option value="@item.Code" selected="@(item.Code == Service)">@T["ui.services.name." + item.Code]</option>
+                }
+            </select>
+            <input name="country" value="@Country" placeholder="@T["ui.shipments_desk.country"]" aria-label="@T["ui.shipments_desk.country"]" maxlength="2" size="3" autocomplete="off" style="width: 5rem; min-width: 5rem; max-width: 5rem; height: 32px; min-height: 32px; text-align: center; text-transform: uppercase; flex: 0 0 5rem;" />
         </div>
-        <div class="ops-list-bar__actions">
-            <a href="@("/staff/shipments/export" + Query(Key, 1))" class="vx-button vx-button--secondary">@T["ui.shipments_desk.export"]</a>
+        <div class="ops-list-bar__actions" style="margin-inline-start: auto; display: inline-flex; align-items: center;">
+            <a href="@("/staff/shipments/export" + Query(Key, 1))" class="vx-button vx-button--secondary" style="height: 32px; min-height: 32px; display: inline-flex; align-items: center;">@T["ui.shipments_desk.export"]</a>
         </div>
     </form>
     <section class="ops-editor__panel">
