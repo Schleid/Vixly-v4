@@ -81,9 +81,9 @@ IMPORTANT NOTES:
     {
         <form method="post" action="/staff/dispatches/@Dispatch.Id/legs" class="ops-editor__form" aria-labelledby="leg-title">
             <AntiforgeryToken />
-            <h3 id="leg-title">@T["ui.dispatch.add_leg"]</h3>
+            <h3 id="leg-title" class="ops-editor__form-full">@T["ui.dispatch.add_leg"]</h3>
             <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.85rem; margin-bottom: 0.85rem;">
+            <div style="grid-column: 1 / -1; width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.85rem; margin-bottom: 0.85rem;">
                 <label>@T["ui.dispatch.carrier"]
                     <select name="carrier">
                         <option value="">@T["ui.dispatch.carrier_none"]</option>
@@ -109,7 +109,7 @@ IMPORTANT NOTES:
                 <label>@T["ui.dispatch.driver"] <input name="driver" maxlength="@OperationsDispatchLeg.PlaceMaxLength" /></label>
                 <label>@T["ui.dispatch.vehicle"] <input name="vehicle" maxlength="@OperationsDispatchLeg.ReferenceMaxLength" /></label>
             </div>
-            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <div class="ops-editor__form-actions" style="grid-column: 1 / -1; width: 100%; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                 <button type="submit" class="vx-button vx-button--primary">@T["ui.dispatch.add_leg"]</button>
                 <p class="ops-editor__hint" style="margin: 0;">@T["ui.dispatch.leg_hint"] @T["ui.dispatch.places_hint"]</p>
             </div>

@@ -57,7 +57,7 @@ IMPORTANT NOTES:
         {
             <OperationsTableViewport Label="@T["ui.dispatch.bundles"]">
                 <table class="ops-editor__table">
-                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.bundles.number"]</th><th scope="col">@T["ui.bundles.type"]</th><th scope="col" class="ops-editor__number">@T["ui.bundles.parcels"]</th><th scope="col" class="ops-editor__number">@T["ui.bundles.weight"]</th><th scope="col"></th></tr></thead>
+                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.bundles.number"]</th><th scope="col">@T["ui.bundles.type"]</th><th scope="col" class="ops-editor__number">@T["ui.bundles.parcels"]</th><th scope="col" class="ops-editor__number">@T["ui.bundles.weight"]</th><th scope="col" style="text-align: right;"></th></tr></thead>
                     <tbody>
                         @foreach (OperationsBundle bundle in Bundles)
                         {
@@ -66,15 +66,17 @@ IMPORTANT NOTES:
                                 <td>@bundle.TypeName</td>
                                 <td class="ops-editor__number">@bundle.ParcelCount</td>
                                 <td class="ops-editor__number">@(bundle.WeightKg is { } kg ? OperationsBundleWords.Weight(kg, WeightUnit) : string.Empty)</td>
-                                <td>
-                                    <a href="/staff/bundles/@bundle.Id/manifest" target="_blank" rel="noopener">@T["ui.dispatch.bundle_manifest"]</a>
-                                    @if (Dispatch.Status == OperationsDispatchStatus.Planned)
-                                    {
-                                        <form method="post" action="/staff/dispatches/@Dispatch.Id/bundles/@bundle.Id/remove" class="ops-editor__inline">
-                                            <AntiforgeryToken />
-                                            <button type="submit" class="vx-button vx-button--secondary">@T["ui.dispatch.remove"]</button>
-                                        </form>
-                                    }
+                                <td style="text-align: right; white-space: nowrap;">
+                                    <div style="display: inline-flex; align-items: center; justify-content: flex-end; gap: 0.75rem;">
+                                        <a href="/staff/bundles/@bundle.Id/manifest" target="_blank" rel="noopener">@T["ui.dispatch.bundle_manifest"]</a>
+                                        @if (Dispatch.Status == OperationsDispatchStatus.Planned)
+                                        {
+                                            <form method="post" action="/staff/dispatches/@Dispatch.Id/bundles/@bundle.Id/remove" class="ops-editor__inline" style="margin: 0;">
+                                                <AntiforgeryToken />
+                                                <button type="submit" class="vx-button vx-button--secondary" style="height: 30px; padding: 0 0.65rem; font-size: 0.75rem;">@T["ui.dispatch.remove"]</button>
+                                            </form>
+                                        }
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -124,8 +126,8 @@ IMPORTANT NOTES:
     {
         <form method="post" action="/staff/dispatches/@Dispatch.Id/close" class="ops-editor__panel ops-editor__form" aria-labelledby="close-title">
             <AntiforgeryToken />
-            <h2 id="close-title">@T["ui.dispatch.close"]</h2>
-            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+            <h2 id="close-title" class="ops-editor__form-full">@T["ui.dispatch.close"]</h2>
+            <div class="ops-editor__form-actions" style="grid-column: 1 / -1; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                 <button type="submit" class="vx-button vx-button--primary" disabled="@(Bundles.Count == 0 || Dispatch.Legs.Count == 0)">@T["ui.dispatch.close_button"]</button>
                 <p class="ops-editor__hint" style="margin: 0;">@T["ui.dispatch.close_hint"]</p>
             </div>

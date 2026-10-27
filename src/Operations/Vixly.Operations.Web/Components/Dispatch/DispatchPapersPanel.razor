@@ -64,7 +64,7 @@ IMPORTANT NOTES:
         </dl>
         <form method="post" action="/staff/dispatches/@Dispatch.Id/cost" class="ops-editor__form" style="margin-top: 0.5rem;">
             <AntiforgeryToken />
-            <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.75rem;">
+            <div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.75rem;">
                 <label style="margin: 0; font-size: 0.8125rem; font-weight: 500;">
                     <span>@VixlyText.Format(T, "ui.dispatch.cost.correct_in", "currency", Dispatch.CostCurrencyCode ?? string.Empty)</span>
                     <input name="total" inputmode="decimal" style="width: 8rem; height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" value="@(Dispatch.CostNote is not null ? Dispatch.CostTotal?.ToString("0.00", CultureInfo.InvariantCulture) : null)" />
@@ -75,7 +75,7 @@ IMPORTANT NOTES:
                 </label>
                 <button type="submit" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.editor.save"]</button>
             </div>
-            <p class="ops-editor__hint" style="margin-top: 0.35rem;">@T["ui.dispatch.cost.hint"]</p>
+            <p class="ops-editor__hint" style="grid-column: 1 / -1; margin-top: 0.35rem;">@T["ui.dispatch.cost.hint"]</p>
         </form>
     </section>
 }
@@ -83,45 +83,45 @@ IMPORTANT NOTES:
 {
     <form method="post" action="/staff/dispatches/@Dispatch.Id/instructions" class="ops-editor__panel ops-editor__form" aria-labelledby="sli-title">
         <AntiforgeryToken />
-        <h2 id="sli-title">@T["ui.dispatch.instructions"]</h2>
-        <fieldset style="border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem;">
+        <h2 id="sli-title" class="ops-editor__form-full">@T["ui.dispatch.instructions"]</h2>
+        <fieldset class="ops-editor__form-full" style="grid-column: 1 / -1; border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem;">
             <legend style="padding: 0 0.35rem; font-weight: 600; font-size: 0.8125rem;">@T["ui.dispatch.charges"]</legend>
             <div style="display: flex; gap: 1.5rem; align-items: center; margin-top: 0.25rem;">
-                <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8125rem;">
-                    <input type="radio" name="collect" value="false" checked="@(!Dispatch.ChargesCollect)" />
+                <label class="ops-checkbox-label" style="display: inline-flex; flex-direction: row; align-items: center; gap: 0.45rem; cursor: pointer; font-size: 0.8125rem; min-height: 32px; margin: 0;">
+                    <input type="radio" name="collect" value="false" checked="@(!Dispatch.ChargesCollect)" style="width: 1rem; height: 1rem; margin: 0; flex-shrink: 0;" />
                     <span>@T["ui.sli.prepaid"]</span>
                 </label>
-                <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8125rem;">
-                    <input type="radio" name="collect" value="true" checked="@Dispatch.ChargesCollect" />
+                <label class="ops-checkbox-label" style="display: inline-flex; flex-direction: row; align-items: center; gap: 0.45rem; cursor: pointer; font-size: 0.8125rem; min-height: 32px; margin: 0;">
+                    <input type="radio" name="collect" value="true" checked="@Dispatch.ChargesCollect" style="width: 1rem; height: 1rem; margin: 0; flex-shrink: 0;" />
                     <span>@T["ui.sli.collect"]</span>
                 </label>
             </div>
         </fieldset>
-        <div style="margin-bottom: 0.75rem;">
+        <div class="ops-editor__form-full" style="grid-column: 1 / -1; margin-bottom: 0.75rem;">
             <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.8125rem; font-weight: 500;">
                 <span>@T["ui.dispatch.export_reference"]</span>
                 <input name="exportReference" maxlength="@OperationsDispatch.ExportReferenceMaxLength" value="@Dispatch.ExportReference" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem; max-width: 22rem;" />
             </label>
         </div>
-        <fieldset style="border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem;">
+        <fieldset class="ops-editor__form-full" style="grid-column: 1 / -1; border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.75rem 1rem; margin-bottom: 0.75rem;">
             <legend style="padding: 0 0.35rem; font-weight: 600; font-size: 0.8125rem;">@T["ui.dispatch.documents"]</legend>
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 0.5rem; margin-top: 0.25rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 0.5rem 1rem; margin-top: 0.25rem;">
                 @foreach (OperationsDispatchDocuments document in Enum.GetValues<OperationsDispatchDocuments>().Where(item => item != OperationsDispatchDocuments.None))
                 {
-                    <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8125rem;">
-                        <input type="checkbox" name="documents" value="@document" checked="@Dispatch.Documents.HasFlag(document)" />
+                    <label class="ops-checkbox-label" style="display: inline-flex; flex-direction: row; align-items: center; gap: 0.45rem; cursor: pointer; font-size: 0.8125rem; min-height: 32px; margin: 0;">
+                        <input type="checkbox" name="documents" value="@document" checked="@Dispatch.Documents.HasFlag(document)" style="width: 1rem; height: 1rem; margin: 0; flex-shrink: 0;" />
                         <span>@T["ui.dispatch.document." + document]</span>
                     </label>
                 }
             </div>
         </fieldset>
-        <div style="margin-bottom: 0.75rem;">
+        <div class="ops-editor__form-full" style="grid-column: 1 / -1; margin-bottom: 0.75rem;">
             <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.8125rem; font-weight: 500;">
                 <span>@T["ui.dispatch.handling"]</span>
                 <textarea name="handling" rows="2" maxlength="@OperationsDispatch.InstructionsMaxLength" style="padding: 0.4rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem; resize: vertical;">@Dispatch.HandlingInstructions</textarea>
             </label>
         </div>
-        <p class="ops-editor__actions" style="margin: 0;"><button type="submit" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.editor.save"]</button></p>
+        <div class="ops-editor__form-actions" style="grid-column: 1 / -1; margin: 0;"><button type="submit" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.editor.save"]</button></div>
     </form>
 }
 

@@ -18,6 +18,7 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 @inject Vixly.Shared.Hosting.Maintenance.VixlyMaintenanceMonitor Maintenance
 @inject IStringLocalizer<OperationsWorkbenchText> L
+@inject IHttpContextAccessor IdleHttp
 
 <!DOCTYPE html>
 <html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
@@ -29,7 +30,7 @@ IMPORTANT NOTES:
     <title>@Title &middot; @Company</title>
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-theme.css" />
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-primitives.css" />
-    <link rel="stylesheet" href="/css/ops-editor.css?v=20261027-1" />
+    <link rel="stylesheet" href="/css/ops-editor.css?v=20261027-2" />
     <link rel="stylesheet" href="/css/ops-help.css?v=20261025-1" />
     <link rel="stylesheet" href="/css/ops-experience.css?v=20261018-customer3" />
     <link rel="stylesheet" href="/css/ops-inspection.css?v=20261019-1" />
@@ -47,7 +48,7 @@ IMPORTANT NOTES:
     <script src="/js/ops-logo-trim.js?v=20261025-1" defer></script>
     <script src="/js/ops-cashier-tenders.js?v=20261026-1" defer></script>
 </head>
-<body class="ops-editor" data-idle-warn="780" data-idle-end="900">
+<body class="ops-editor" data-idle-warn="@Vixly.Operations.Web.Security.OperationsIdlePage.WarnSeconds(IdleHttp.HttpContext)" data-idle-end="@Vixly.Operations.Web.Security.OperationsIdlePage.EndSeconds(IdleHttp.HttpContext)">
     <a class="ops-editor__skip" href="#main-content">@T["site.skip"]</a>
     @if (Vixly.Shared.Hosting.Maintenance.VixlyMaintenanceBanner.Banner(Maintenance, "staff", T) is { } maintenance)
     {

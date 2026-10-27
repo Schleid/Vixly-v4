@@ -2882,16 +2882,34 @@ tr[data-low="true"] td:first-child {
 .ops-editor__form {
     align-items: stretch !important;
 }
-.ops-editor__form label {
+.ops-editor__form label:not(.ops-checkbox-label):not(:has(input[type=checkbox])):not(:has(input[type=radio])) {
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
     height: 100% !important;
 }
-.ops-editor__form label > input,
-.ops-editor__form label > select,
-.ops-editor__form label > textarea {
+.ops-editor__form label:not(.ops-checkbox-label):not(:has(input[type=checkbox])):not(:has(input[type=radio])) > :is(input, select, textarea) {
     margin-top: auto !important;
+}
+.ops-editor__form label.ops-checkbox-label,
+.ops-editor__form label:has(input[type=checkbox]),
+.ops-editor__form label:has(input[type=radio]) {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.45rem !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    cursor: pointer !important;
+    width: auto !important;
+    justify-content: flex-start !important;
+    margin: 0 !important;
+}
+.ops-editor__form label.ops-checkbox-label > :is(input, select, textarea),
+.ops-editor__form label:has(input[type=checkbox]) > input,
+.ops-editor__form label:has(input[type=radio]) > input {
+    margin-top: 0 !important;
+    flex-shrink: 0 !important;
 }
 
 /* Cashier: payments added one by one (owner, 2026-10-26) */
