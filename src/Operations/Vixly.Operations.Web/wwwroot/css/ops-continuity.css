@@ -22,7 +22,30 @@
 .ops-editor__panel label:has(input[type=checkbox]),.ops-editor__panel label:has(input[type=radio]) { display:flex; align-items:center; gap:.6rem; line-height:1.6; }
 .ops-editor input[type=radio] { width:1.1rem; height:1.1rem; min-height:0; accent-color:var(--vx-color-primary); flex-shrink:0; }
 .ops-editor__main :is(input,select,textarea) { max-width:100%; }
-.ops-editor__panel > dl { margin:0; }
+.ops-editor__panel > dl:not(.ops-invoice__totals) { margin:0; }
+.ops-editor__panel > dl.ops-invoice__totals,
+dl.ops-invoice__totals {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 0.45rem !important;
+    width: 100% !important;
+    max-width: 22rem !important;
+    margin: 1.25rem 0 0.5rem auto !important;
+    padding: 1rem 1.25rem !important;
+    background: var(--vx-color-surface-sunken) !important;
+    border: 1px solid var(--vx-color-border) !important;
+    border-radius: 0.5rem !important;
+    font-size: 0.8125rem !important;
+    box-sizing: border-box !important;
+}
+.ops-editor__panel > dl.ops-invoice__totals > div,
+dl.ops-invoice__totals > div {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 1rem !important;
+    grid-column: 1 / -1 !important;
+}
 .ops-editor__panel > dl dt { color:var(--vx-color-text-muted); font-size:.75rem; }
 .ops-editor__panel > dl dd { margin-inline-start:0; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
 .ops-editor__main[data-section=quotes] .ops-editor__panel:has(>label),.ops-editor__main[data-section=charges] .ops-editor__panel:has(>label) { max-width:none; }

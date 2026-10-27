@@ -1251,21 +1251,27 @@ tr[data-low="true"] td:first-child {
 
 /* Cashier Tender Rows */
 .ops-cashier__tender {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 2fr;
-    gap: 0.75rem;
-    align-items: flex-end;
-    padding: 0.5rem 0;
-    border-bottom: 1px dashed var(--vx-color-border);
+    display: grid !important;
+    grid-template-columns: 2fr 1.25fr 1.25fr 2fr !important;
+    gap: 0.75rem !important;
+    align-items: flex-end !important;
+    padding: 0.75rem 0 !important;
+    border-bottom: 1px dashed var(--vx-color-border) !important;
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+}
+.ops-cashier__tender:last-of-type {
+    border-bottom: none !important;
 }
 @media (max-width: 768px) {
     .ops-cashier__tender {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr !important;
     }
 }
 .ops-cashier__tender label {
     display: flex !important;
     flex-direction: column !important;
+    justify-content: flex-end !important;
     gap: 0.25rem !important;
     font-size: 0.75rem !important;
     font-weight: 600 !important;
@@ -1273,8 +1279,8 @@ tr[data-low="true"] td:first-child {
     margin: 0 !important;
     width: 100% !important;
 }
-.ops-cashier__tender input,
-.ops-cashier__tender select {
+.ops-cashier__tender label > input,
+.ops-cashier__tender label > select {
     height: 32px !important;
     min-height: 32px !important;
     padding: 0.25rem 0.5rem !important;
@@ -1283,7 +1289,12 @@ tr[data-low="true"] td:first-child {
     width: 100% !important;
     margin: 0 !important;
 }
-
+.ops-cashier__pay button[type=submit],
+.ops-cashier__pay .vx-button--primary {
+    grid-column: 1 / -1 !important;
+    justify-self: start !important;
+    margin-top: 1rem !important;
+}
 /* Cashier Verification Queue Card */
 .ops-cashier__verify li {
     display: flex;
@@ -2788,3 +2799,26 @@ tr[data-low="true"] td:first-child {
 .ops-editor__form label > textarea {
     margin-top: auto !important;
 }
+
+/* Cashier: payments added one by one (owner, 2026-10-26) */
+.ops-cashier__pay [hidden] { display: none !important; }
+.ops-cashier__pay .ops-cashier__totals { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: .75rem; margin: 0 0 1rem; }
+.ops-cashier__pay .ops-cashier__totals > div { grid-column: auto !important; }
+.ops-cashier__totals div { background: var(--vx-color-surface-muted, #f8fafc); border-radius: .5rem; padding: .65rem .85rem; }
+.ops-cashier__totals dt { font-size: .8rem; color: var(--vx-color-text-muted, #64748b); margin: 0; }
+.ops-cashier__totals dd { margin: .15rem 0 0; font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ops-cashier__totals [data-tenders-left] { color: var(--vx-color-danger, #b91c1c); }
+.ops-cashier__lines { list-style: none; margin: 0 0 1rem; padding: 0; }
+.ops-cashier__lines li { display: flex; align-items: center; gap: .75rem; padding: .55rem 0; border-top: 1px solid var(--vx-color-border, #e2e8f0); }
+.ops-cashier__lines li span { flex: 1; min-width: 0; }
+.ops-cashier__lines li strong { font-variant-numeric: tabular-nums; }
+.ops-cashier__pay [data-tenders-adder] { border: 1px dashed var(--vx-color-border-strong, #cbd5e1); border-radius: .5rem; padding: .75rem; }
+.ops-cashier__pay [data-tender-error]:empty { display: none; }
+.ops-cashier__pay [data-tender-error] { flex-basis: 100%; color: var(--vx-color-danger, #b91c1c); margin: .25rem 0 0; }
+.ops-cashier__card { margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--vx-color-border, #e2e8f0); }
+@media (max-width: 720px) { .ops-cashier__pay .ops-cashier__totals { grid-template-columns: minmax(0, 1fr) !important; } }
+.ops-cashier__pay > :is(dl, ol, div, p) { grid-column: 1 / -1; }
+.ops-cashier__pay [data-tenders-adder] { display: grid !important; grid-template-columns: 2fr 1fr 1.5fr auto !important; align-items: end; border-bottom: 1px dashed var(--vx-color-border-strong, #cbd5e1); }
+.ops-cashier__pay [data-tenders-adder] legend { font-weight: 600; padding: 0 .35rem; }
+@media (max-width: 768px) { .ops-cashier__pay [data-tenders-adder] { grid-template-columns: 1fr 1fr !important; } }
+.ops-cashier__pay [data-tenders-adder] > :is(label, button) { grid-column: auto !important; }
