@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: ShippingServicesPage.razor
 
@@ -11,7 +11,7 @@ RESPONSIBILITIES:
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10)
 - Static form with antiforgery (ADR-0019)
-- Placeholder look: Frontend/UI designs the final experience
+- Structured enterprise table layout with centered toggles and aligned inputs
 =========================================================
 *@
 @using Vixly.Operations.Application.Settings
@@ -21,15 +21,15 @@ IMPORTANT NOTES:
     <form method="post" action="/staff/services" class="ops-editor__panel">
         <AntiforgeryToken />
         <p class="ops-editor__hint">@T["ui.services.hint"]</p>
-        <fieldset disabled="@(!CanEdit)">
+        <fieldset disabled="@(!CanEdit)" style="border: none; padding: 0; margin: 0;">
             <OperationsTableViewport Label="@T["ui.services.title"]">
             <table class="ops-editor__table">
                 <thead>
                     <tr>
-                        <th scope="col">@T["ui.services.offered"]</th>
+                        <th scope="col" style="text-align: center; width: 4.5rem;">@T["ui.services.offered"]</th>
                         <th scope="col">@T["ui.services.service"]</th>
                         <th scope="col">@T["ui.services.label"]</th>
-                        <th scope="col">@T["ui.services.days"]</th>
+                        <th scope="col" style="min-width: 9rem;">@T["ui.services.days"]</th>
                         <th scope="col">@VixlyText.Format(T, "ui.services.divisor", "unit", T["ui.services.unit." + DivisorUnit.Replace('/', '_')].Value)</th>
                     </tr>
                 </thead>
@@ -37,9 +37,9 @@ IMPORTANT NOTES:
                     @foreach (OperationsShippingServiceRow row in Services)
                     {
                         <tr>
-                            <td><input type="checkbox" name="offered" value="@row.Code" checked="@row.Offered" aria-label="@T["ui.services.offered"]" /></td>
+                            <td style="text-align: center;"><input type="checkbox" name="offered" value="@row.Code" checked="@row.Offered" aria-label="@T["ui.services.offered"]" /></td>
                             <td><strong>@T["ui.services.name." + row.Code]</strong> <span class="ops-editor__hint">@T["ui.services.mode." + row.Mode]</span></td>
-                            <td><input name="label_@row.Code" value="@row.Label" maxlength="60" placeholder="@T["ui.services.name." + row.Code]" aria-label="@T["ui.services.label"]" /></td>
+                            <td><input name="label_@row.Code" value="@row.Label" maxlength="60" placeholder="@T["ui.services.name." + row.Code]" aria-label="@T["ui.services.label"]" style="max-width: 16rem;" /></td>
                             <td><div class="ops-service-days">
                                 <input type="number" name="min_@row.Code" value="@row.MinDays" min="1" max="365" required aria-label="@T["ui.services.min_days"]" />
                                 <span>–</span>
@@ -48,7 +48,7 @@ IMPORTANT NOTES:
                             <td>
                                 @if (row.DivisorAllowed)
                                 {
-                                    <input type="number" name="divisor_@row.Code" value="@row.VolumetricDivisor" min="1" step="1" required aria-label="@T["ui.services.divisor_short"]" />
+                                    <input type="number" name="divisor_@row.Code" value="@row.VolumetricDivisor" min="1" step="1" required aria-label="@T["ui.services.divisor_short"]" style="max-width: 6.5rem;" />
                                 }
                                 else
                                 {
@@ -63,7 +63,7 @@ IMPORTANT NOTES:
         </fieldset>
         @if (CanEdit)
         {
-            <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></p>
+            <div class="ops-editor__form-actions" style="margin-top: 1rem;"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></div>
         }
     </form>
 </EditorShell>

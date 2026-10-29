@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: SettingsPage.razor
 
@@ -11,77 +11,116 @@ RESPONSIBILITIES:
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10); values come from the endpoint
 - Static forms with antiforgery and the form guard (ADR-0019)
-- Placeholder look: Frontend/UI designs the final experience
+- Structured enterprise layout with clear sections, responsive grid fields and aligned actions
 =========================================================
 *@
 @using Vixly.Operations.Domain.Settings
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.settings.title"]" Company="@Company" Section="settings" Error="@Error" Info="@Info">
-    <form method="post" action="/staff/settings" class="ops-editor__panel">
+    <form method="post" action="/staff/settings" class="ops-settings-form">
         <AntiforgeryToken />
-        <fieldset disabled="@(!CanEdit)">
-            <h2>@T["ui.settings.money"]</h2>
-            <label>@T["ui.settings.currency"]
-                <select name="currencyCode" disabled="@CurrencyLocked">
-                    @foreach (string currency in OperationsCurrencies.All)
-                    {
-                        <option value="@currency" selected="@(currency == Settings.CurrencyCode)">@currency</option>
-                    }
-                </select>
-            </label>
-            <p class="ops-editor__hint">@T[CurrencyLocked ? "ui.settings.currency_locked" : "ui.settings.currency_hint"]</p>
-            <label><input type="checkbox" name="allowCollect" value="true" checked="@Settings.AllowCollect" /> @T["ui.settings.allow_collect"]</label>
-            <label><input type="checkbox" name="allowCredit" value="true" checked="@Settings.AllowCredit" /> @T["ui.settings.allow_credit"]</label>
-            <label><input type="checkbox" name="publicPricing" value="true" checked="@Settings.PublicPricing" /> @T["ui.settings.public_pricing"]</label>
-            <p class="ops-editor__hint">@T["ui.settings.gate_hint"]</p>
+        <fieldset disabled="@(!CanEdit)" style="display: contents;">
+            <section class="ops-settings-group">
+                <h2>@T["ui.settings.money"]</h2>
+                <div class="ops-settings-group__grid">
+                    <label>@T["ui.settings.currency"]
+                        <select name="currencyCode" disabled="@CurrencyLocked">
+                            @foreach (string currency in OperationsCurrencies.All)
+                            {
+                                <option value="@currency" selected="@(currency == Settings.CurrencyCode)">@currency</option>
+                            }
+                        </select>
+                    </label>
+                </div>
+                <p class="ops-editor__hint">@T[CurrencyLocked ? "ui.settings.currency_locked" : "ui.settings.currency_hint"]</p>
+                <div class="ops-settings-checkboxes">
+                    <label class="ops-checkbox-label"><input type="checkbox" name="allowCollect" value="true" checked="@Settings.AllowCollect" /> @T["ui.settings.allow_collect"]</label>
+                    <label class="ops-checkbox-label"><input type="checkbox" name="allowCredit" value="true" checked="@Settings.AllowCredit" /> @T["ui.settings.allow_credit"]</label>
+                    <label class="ops-checkbox-label"><input type="checkbox" name="publicPricing" value="true" checked="@Settings.PublicPricing" /> @T["ui.settings.public_pricing"]</label>
+                </div>
+                <p class="ops-editor__hint">@T["ui.settings.gate_hint"]</p>
+            </section>
 
-            <h2>@T["ui.settings.units"]</h2>
-            <label>@T["ui.settings.weight"]
-                <select name="weightUnit">
-                    <option value="Kilogram" selected="@(Settings.WeightUnit == OperationsWeightUnit.Kilogram)">@T["ui.settings.kg"]</option>
-                    <option value="Pound" selected="@(Settings.WeightUnit == OperationsWeightUnit.Pound)">@T["ui.settings.lb"]</option>
-                </select>
-            </label>
-            <label>@T["ui.settings.dimension"]
-                <select name="dimensionUnit">
-                    <option value="Centimetre" selected="@(Settings.DimensionUnit == OperationsDimensionUnit.Centimetre)">@T["ui.settings.cm"]</option>
-                    <option value="Inch" selected="@(Settings.DimensionUnit == OperationsDimensionUnit.Inch)">@T["ui.settings.in"]</option>
-                </select>
-            </label>
+            <section class="ops-settings-group">
+                <h2>@T["ui.settings.units"]</h2>
+                <div class="ops-settings-group__grid">
+                    <label>@T["ui.settings.weight"]
+                        <select name="weightUnit">
+                            <option value="Kilogram" selected="@(Settings.WeightUnit == OperationsWeightUnit.Kilogram)">@T["ui.settings.kg"]</option>
+                            <option value="Pound" selected="@(Settings.WeightUnit == OperationsWeightUnit.Pound)">@T["ui.settings.lb"]</option>
+                        </select>
+                    </label>
+                    <label>@T["ui.settings.dimension"]
+                        <select name="dimensionUnit">
+                            <option value="Centimetre" selected="@(Settings.DimensionUnit == OperationsDimensionUnit.Centimetre)">@T["ui.settings.cm"]</option>
+                            <option value="Inch" selected="@(Settings.DimensionUnit == OperationsDimensionUnit.Inch)">@T["ui.settings.in"]</option>
+                        </select>
+                    </label>
+                    <label>@T["ui.settings.time_zone"]
+                        <input name="timeZone" value="@Settings.TimeZone" maxlength="64" list="time-zones" placeholder="America/Port-au-Prince" />
+                        <datalist id="time-zones">
+                            @foreach (string zone in new[] { "America/Port-au-Prince", "America/New_York", "America/Chicago", "America/Los_Angeles", "America/Santo_Domingo", "America/Jamaica", "America/Puerto_Rico", "America/Panama", "America/Bogota", "Europe/Paris", "Europe/London", "Africa/Lagos", "UTC" })
+                            {
+                                <option value="@zone"></option>
+                            }
+                        </datalist>
+                    </label>
+                </div>
+                <p class="ops-editor__hint">@T["ui.settings.time_zone_hint"]</p>
+            </section>
 
-            <label>@T["ui.settings.time_zone"]
-                <input name="timeZone" value="@Settings.TimeZone" maxlength="64" list="time-zones" placeholder="America/Port-au-Prince" />
-                <datalist id="time-zones">
-                    @foreach (string zone in new[] { "America/Port-au-Prince", "America/New_York", "America/Chicago", "America/Los_Angeles", "America/Santo_Domingo", "America/Jamaica", "America/Puerto_Rico", "America/Panama", "America/Bogota", "Europe/Paris", "Europe/London", "Africa/Lagos", "UTC" })
-                    {
-                        <option value="@zone"></option>
-                    }
-                </datalist>
-            </label>
-            <p class="ops-editor__hint">@T["ui.settings.time_zone_hint"]</p>
+            <section class="ops-settings-group">
+                <h2>@T["ui.settings.delivery"]</h2>
+                <div class="ops-settings-checkboxes">
+                    <label class="ops-checkbox-label"><input type="checkbox" name="pickup" value="true" checked="@Settings.DeliveryModes.HasFlag(OperationsDeliveryModes.Pickup)" /> @T["ui.settings.pickup"]</label>
+                    <label class="ops-checkbox-label"><input type="checkbox" name="homeDelivery" value="true" checked="@Settings.DeliveryModes.HasFlag(OperationsDeliveryModes.HomeDelivery)" /> @T["ui.settings.home_delivery"]</label>
+                </div>
+            </section>
 
-            <h2>@T["ui.settings.delivery"]</h2>
-            <label><input type="checkbox" name="pickup" value="true" checked="@Settings.DeliveryModes.HasFlag(OperationsDeliveryModes.Pickup)" /> @T["ui.settings.pickup"]</label>
-            <label><input type="checkbox" name="homeDelivery" value="true" checked="@Settings.DeliveryModes.HasFlag(OperationsDeliveryModes.HomeDelivery)" /> @T["ui.settings.home_delivery"]</label>
+            <section class="ops-settings-group">
+                <h2>@T["ui.settings.security"]</h2>
+                <fieldset style="border: none; padding: 0; margin: 0;">
+                    <legend style="font-size: 0.8125rem; font-weight: 600; color: var(--vx-color-text); margin-bottom: 0.35rem;">@T["ui.settings.require_mfa"]</legend>
+                    <div class="ops-settings-checkboxes">
+                        <label class="ops-checkbox-label"><input type="radio" name="requireMfa" value="true" checked="@Settings.RequireMfa" /> @T["ui.settings.require_mfa_yes"]</label>
+                        <label class="ops-checkbox-label"><input type="radio" name="requireMfa" value="false" checked="@(!Settings.RequireMfa)" /> @T["ui.settings.require_mfa_no"]</label>
+                    </div>
+                </fieldset>
+                <p class="ops-editor__hint">@T["ui.settings.require_mfa_hint"]</p>
+                <div class="ops-settings-checkboxes">
+                    <label class="ops-checkbox-label"><input type="checkbox" name="requireSecondFactor" value="true" checked="@Settings.RequireSecondFactorForAllStaff" /> @T["ui.settings.require_second_factor"]</label>
+                </div>
+                <p class="ops-editor__hint">@T["ui.settings.second_factor_hint"]</p>
+                <div style="margin-top: 0.5rem;">
+                    <span style="display: block; font-size: 0.8125rem; font-weight: 600; color: var(--vx-color-text); margin-bottom: 0.35rem;">@T["ui.settings.idle"]</span>
+                    <div class="ops-settings-group__grid">
+                        <label>@T["ui.settings.idle_staff"] <input name="staffIdle" type="number" inputmode="numeric" min="5" max="60" step="1" required value="@Settings.StaffIdleMinutes" /></label>
+                        <label>@T["ui.settings.idle_customer"] <input name="customerIdle" type="number" inputmode="numeric" min="15" max="240" step="1" required value="@Settings.CustomerIdleMinutes" /></label>
+                        <label>@T["ui.settings.idle_warn"] <input name="idleWarn" type="number" inputmode="numeric" min="1" max="5" step="1" required value="@Settings.IdleWarnMinutes" /></label>
+                    </div>
+                    <p class="ops-editor__hint">@T["ui.settings.idle_hint"]</p>
+                </div>
+            </section>
 
-            <h2>@T["ui.settings.security"]</h2>
-            <label><input type="checkbox" name="requireSecondFactor" value="true" checked="@Settings.RequireSecondFactorForAllStaff" /> @T["ui.settings.require_second_factor"]</label>
-            <p class="ops-editor__hint">@T["ui.settings.second_factor_hint"]</p>
-
-            <h2>@T["ui.settings.numbering"]</h2>
-            <label>@T["ui.settings.prefix.shipment"] <input name="shipmentPrefix" value="@Settings.ShipmentPrefix" maxlength="6" required /></label>
-            <label>@T["ui.settings.prefix.receiving"] <input name="receivingPrefix" value="@Settings.ReceivingPrefix" maxlength="6" required /></label>
-            <label>@T["ui.settings.prefix.invoice"] <input name="invoicePrefix" value="@Settings.InvoicePrefix" maxlength="6" required /></label>
-            <label>@T["ui.settings.prefix.payment"] <input name="paymentPrefix" value="@Settings.PaymentPrefix" maxlength="6" required /></label>
-            <label>@T["ui.settings.prefix.customer"] <input name="customerPrefix" value="@Settings.CustomerPrefix" maxlength="6" required /></label>
-            <label>@T["ui.settings.prefix.parcel"] <input name="parcelPrefix" value="@Settings.ParcelPrefix" maxlength="6" required /></label>
-            <label>@T["ui.settings.prefix.supply_order"] <input name="supplyOrderPrefix" value="@Settings.SupplyOrderPrefix" maxlength="6" required /></label>
-            <label>@T["ui.settings.prefix.credit_note"] <input name="creditNotePrefix" value="@Settings.CreditNotePrefix" maxlength="6" required /></label>
-            <label>@T["ui.settings.prefix.bundle"] <input name="bundlePrefix" value="@Settings.BundlePrefix" maxlength="6" required /></label>
-            <label>@T["ui.settings.prefix.box"] <input name="boxPrefix" value="@Settings.BoxPrefix" maxlength="6" required /></label>
-            <label>@T["ui.settings.prefix.dispatch"] <input name="dispatchPrefix" value="@Settings.DispatchPrefix" maxlength="6" required /></label>
-            <p class="ops-editor__hint">@VixlyText.Format(T, "ui.settings.prefix_hint", "example", Settings.ShipmentPrefix + DateTime.UtcNow.ToString("yy", System.Globalization.CultureInfo.InvariantCulture) + "000001")</p>
+            <section class="ops-settings-group">
+                <h2>@T["ui.settings.numbering"]</h2>
+                <div class="ops-settings-group__grid--4">
+                    <label>@T["ui.settings.prefix.shipment"] <input name="shipmentPrefix" value="@Settings.ShipmentPrefix" maxlength="6" required /></label>
+                    <label>@T["ui.settings.prefix.receiving"] <input name="receivingPrefix" value="@Settings.ReceivingPrefix" maxlength="6" required /></label>
+                    <label>@T["ui.settings.prefix.invoice"] <input name="invoicePrefix" value="@Settings.InvoicePrefix" maxlength="6" required /></label>
+                    <label>@T["ui.settings.prefix.payment"] <input name="paymentPrefix" value="@Settings.PaymentPrefix" maxlength="6" required /></label>
+                    <label>@T["ui.settings.prefix.customer"] <input name="customerPrefix" value="@Settings.CustomerPrefix" maxlength="6" required /></label>
+                    <label>@T["ui.settings.prefix.parcel"] <input name="parcelPrefix" value="@Settings.ParcelPrefix" maxlength="6" required /></label>
+                    <label>@T["ui.settings.prefix.supply_order"] <input name="supplyOrderPrefix" value="@Settings.SupplyOrderPrefix" maxlength="6" required /></label>
+                    <label>@T["ui.settings.prefix.credit_note"] <input name="creditNotePrefix" value="@Settings.CreditNotePrefix" maxlength="6" required /></label>
+                    <label>@T["ui.settings.prefix.bundle"] <input name="bundlePrefix" value="@Settings.BundlePrefix" maxlength="6" required /></label>
+                    <label>@T["ui.settings.prefix.box"] <input name="boxPrefix" value="@Settings.BoxPrefix" maxlength="6" required /></label>
+                    <label>@T["ui.settings.prefix.dispatch"] <input name="dispatchPrefix" value="@Settings.DispatchPrefix" maxlength="6" required /></label>
+                    <label>@T["ui.settings.prefix.tracking"] <input name="trackingPrefix" value="@Settings.TrackingPrefix" minlength="2" maxlength="2" pattern="[A-Za-z]{2}" required /></label>
+                </div>
+                <p class="ops-editor__hint">@VixlyText.Format(T, "ui.settings.prefix_hint", "example", Settings.ShipmentPrefix + DateTime.UtcNow.ToString("yy", System.Globalization.CultureInfo.InvariantCulture) + "000001")</p>
+            </section>
         </fieldset>
         @if (CurrencyLocked)
         {
@@ -89,7 +128,7 @@ IMPORTANT NOTES:
         }
         @if (CanEdit)
         {
-            <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></p>
+            <div class="ops-editor__form-actions" style="margin-top: 0.5rem;"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></div>
         }
     </form>
 </EditorShell>

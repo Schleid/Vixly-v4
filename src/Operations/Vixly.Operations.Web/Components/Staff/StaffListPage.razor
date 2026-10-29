@@ -11,18 +11,29 @@ RESPONSIBILITIES:
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10); values come from the endpoint
 - Static forms with antiforgery and the form guard (ADR-0019); sensitive actions ask for step-up first
-- Placeholder look: Frontend/UI designs the final experience
+- Brief §5 list anatomy with single-line search bar and responsive invite drawers
 =========================================================
 *@
 @inject IStringLocalizer<OperationsText> T
 @inject IStringLocalizer<OperationsWorkbenchText> L
 
 <EditorShell Title="@T["ui.staff.title"]" Company="@Company" Section="staff" Error="@Error" Info="@Info">
-    <div class="ops-editor__page-intro"><p class="ops-editor__hint">@L["staff_intro"]</p>@if (CanInvite) { <a href="#invite-person" data-open-panel class="vx-button vx-button--primary">@T["ui.staff.invite"]</a> }</div>
-    <form method="get" action="/staff/people" class="ops-editor__inline ops-editor__search">
-        <input name="search" value="@Search" placeholder="@T["ui.staff.search"]" aria-label="@T["ui.staff.search"]" />
-        <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.search_submit"]</button>
-    </form>
+    <div class="ops-list-bar">
+        <form method="get" action="/staff/people" class="ops-list-bar__search">
+            <input name="search" value="@Search" placeholder="@T["ui.staff.search"]" aria-label="@T["ui.staff.search"]" />
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.search_submit"]</button>
+            @if (!string.IsNullOrWhiteSpace(Search))
+            {
+                <a href="/staff/people" class="vx-button vx-button--secondary">@L["clear_search"]</a>
+            }
+        </form>
+        @if (CanInvite)
+        {
+            <div class="ops-list-bar__actions">
+                <a href="#invite-person" data-open-panel class="vx-button vx-button--primary">@T["ui.staff.invite"]</a>
+            </div>
+        }
+    </div>
     <section class="ops-editor__panel">
         @if (Members.Count == 0)
         {
@@ -41,9 +52,9 @@ IMPORTANT NOTES:
                         @foreach (OperationsStaffMember member in Members)
                         {
                             <tr>
-                                <td class="ops-editor__identity-cell"><a href="/staff/people/@member.UserId">@member.FullName</a>@if (member.IsOwner) { <small>@T["ui.staff.owner"]</small> }</td>
+                                <td class="ops-editor__identity-cell"><a href="/staff/people/@member.UserId"><strong>@member.FullName</strong></a>@if (member.IsOwner) { <small style="margin-left: 0.35rem; color: var(--vx-color-primary); font-weight: 700;">@T["ui.staff.owner"]</small> }</td>
                                 <td>@member.Email</td>
-                                <td><span class="ops-editor__status" data-status="@member.Status.ToString().ToLowerInvariant()">@T["ui.staff.status." + member.Status.ToString().ToLowerInvariant()]</span>@if (!member.HasSecondFactor) { <small>@T["ui.staff.no_second_factor"]</small> }</td>
+                                <td><span class="ops-editor__status" data-status="@member.Status.ToString().ToLowerInvariant()">@T["ui.staff.status." + member.Status.ToString().ToLowerInvariant()]</span>@if (!member.HasSecondFactor) { <small style="margin-left: 0.35rem; color: var(--vx-color-text-muted);">@T["ui.staff.no_second_factor"]</small> }</td>
                                 <td>@if (member.PartnerWarehouse is { } partnerAt) { <span class="ops-editor__grant">@T["ui.staff.partner_agent"] · @partnerAt</span> }@foreach (OperationsStaffGrant grant in member.Grants) { <span class="ops-editor__grant">@RoleName(grant) @(grant.ScopeName is null ? null : "· " + grant.ScopeName)</span> }</td>
                             </tr>
                         }
@@ -57,19 +68,19 @@ IMPORTANT NOTES:
     {
         <details id="invite-person" class="ops-task-panel">
         <summary>@T["ui.staff.invite"]<span aria-hidden="true">+</span></summary>
-        <form method="post" action="/staff/people/invite" class="ops-editor__panel">
+        <form method="post" action="/staff/people/invite" class="ops-editor__form" style="padding: 1rem;">
             <AntiforgeryToken />
-            <h2>@T["ui.staff.invite"]</h2>
-            <label>@T["ui.staff.name"] <input name="fullName" maxlength="200" required /></label>
-            <label>@T["ui.editor.email"] <input type="email" name="email" maxlength="254" required /></label>
-            <label>@T["ui.staff.language"]
+            <h2 style="grid-column: 1 / -1; margin: 0 0 0.5rem;">@T["ui.staff.invite"]</h2>
+            <label class="ops-editor__form-span-3">@T["ui.staff.name"] <input name="fullName" maxlength="200" required /></label>
+            <label class="ops-editor__form-span-3">@T["ui.editor.email"] <input type="email" name="email" maxlength="254" required /></label>
+            <label class="ops-editor__form-span-2">@T["ui.staff.language"]
                 <select name="language">
                     <option value="en">English</option>
                     <option value="fr">Français</option>
                     <option value="es">Español</option>
                 </select>
             </label>
-            <label>@T["ui.staff.role"]
+            <label class="ops-editor__form-span-2">@T["ui.staff.role"]
                 <select name="roleId" required>
                     @foreach (OperationsRoleSummary role in Roles.Where(role => role.IsActive))
                     {
@@ -77,7 +88,7 @@ IMPORTANT NOTES:
                     }
                 </select>
             </label>
-            <label>@T["ui.staff.scope"] <select name="scope" aria-label="@T["ui.staff.scope"]">
+            <label class="ops-editor__form-span-2">@T["ui.staff.scope"] <select name="scope" aria-label="@T["ui.staff.scope"]">
                 <option value="tenant">@T["ui.staff.scope.tenant"]</option>
                 @foreach (Vixly.Operations.Domain.Locations.OperationsBranch branch in Branches)
                 {
@@ -88,28 +99,27 @@ IMPORTANT NOTES:
                     <option value="warehouse:@warehouse.Id">@T["ui.staff.scope.warehouse"] @warehouse.Name</option>
                 }
             </select></label>
-            <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.invite_submit"]</button>
+            <div class="ops-editor__form-actions" style="margin-top: 0.5rem;"><button type="submit" class="vx-button vx-button--primary">@T["ui.staff.invite_submit"]</button></div>
         </form>
         </details>
         @if (PartnerWarehouses.Count > 0)
         {
-            @* Slice 7 step 4 (R-8): a partner's staff member, limited to the partner's warehouse. *@
             <details id="invite-partner" class="ops-task-panel">
             <summary>@T["ui.staff.invite_partner"]<span aria-hidden="true">+</span></summary>
-            <form method="post" action="/staff/people/invite-partner" class="ops-editor__panel">
+            <form method="post" action="/staff/people/invite-partner" class="ops-editor__form" style="padding: 1rem;">
                 <AntiforgeryToken />
-                <h2>@T["ui.staff.invite_partner"]</h2>
-                <p class="ops-editor__hint">@T["ui.staff.partner_agent_hint"]</p>
-                <label>@T["ui.staff.name"] <input name="fullName" maxlength="200" required /></label>
-                <label>@T["ui.editor.email"] <input type="email" name="email" maxlength="254" required /></label>
-                <label>@T["ui.staff.language"]
+                <h2 style="grid-column: 1 / -1; margin: 0;">@T["ui.staff.invite_partner"]</h2>
+                <p class="ops-editor__hint" style="grid-column: 1 / -1; margin: 0 0 0.5rem;">@T["ui.staff.partner_agent_hint"]</p>
+                <label class="ops-editor__form-span-3">@T["ui.staff.name"] <input name="fullName" maxlength="200" required /></label>
+                <label class="ops-editor__form-span-3">@T["ui.editor.email"] <input type="email" name="email" maxlength="254" required /></label>
+                <label class="ops-editor__form-span-3">@T["ui.staff.language"]
                     <select name="language">
                         <option value="en">English</option>
                         <option value="fr">Français</option>
                         <option value="es">Español</option>
                     </select>
                 </label>
-                <label>@T["ui.staff.partner_warehouse"]
+                <label class="ops-editor__form-span-3">@T["ui.staff.partner_warehouse"]
                     <select name="warehouseId" required>
                         @foreach (Vixly.Operations.Domain.Locations.OperationsWarehouse warehouse in PartnerWarehouses)
                         {
@@ -117,7 +127,7 @@ IMPORTANT NOTES:
                         }
                     </select>
                 </label>
-                <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.invite_submit"]</button>
+                <div class="ops-editor__form-actions" style="margin-top: 0.5rem;"><button type="submit" class="vx-button vx-button--primary">@T["ui.staff.invite_submit"]</button></div>
             </form>
             </details>
         }
