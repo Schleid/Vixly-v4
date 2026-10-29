@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: TicketPage.razor
 
@@ -12,6 +12,7 @@ RESPONSIBILITIES:
 IMPORTANT NOTES:
 - Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
 - Staff are never named; nothing in the warehouse shows before staff link the package
+- Brief §5 record anatomy with elevated panels and status indicators
 =========================================================
 *@
 @using Vixly.Contracts.Operations.Customers
@@ -19,22 +20,29 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<CustomerText> T
 
 <CustomerShell Brand="@Brand" Title="@T["ui.tickets.ticket"]" SignedIn="true" Error="@Error" Info="@Info" ReturnHere="/customer/tickets">
-    <p><a href="/customer/tickets">@T["ui.tickets.back"]</a></p>
-    <dl class="customer-portal__details">
-        <dt>@T["ui.tickets.status"]</dt><dd>@T["ui.tickets.status." + Ticket.Status]</dd>
-        <dt>@T["ui.prealert.carrier"]</dt><dd>@Ticket.Carrier</dd>
-        <dt>@T["ui.prealert.tracking"]</dt><dd>@Ticket.TrackingNumber</dd>
-        @if (!string.IsNullOrWhiteSpace(Ticket.Store)) { <dt>@T["ui.prealert.store"]</dt><dd>@Ticket.Store</dd> }
-        @if (!string.IsNullOrWhiteSpace(Ticket.OrderNumber)) { <dt>@T["ui.tickets.order"]</dt><dd>@Ticket.OrderNumber</dd> }
-        @if (Ticket.DeliveredOn is { } day) { <dt>@T["ui.tickets.delivered"]</dt><dd>@day.ToString("yyyy-MM-dd")</dd> }
-        <dt>@T["ui.prealert.contents"]</dt><dd>@Ticket.Contents</dd>
-        <dt>@T["ui.tickets.proof"]</dt><dd>@(Ticket.HasProof ? T["ui.tickets.proof_sent"] : T["ui.tickets.proof_none"])</dd>
-    </dl>
-    @if (Ticket.ParcelId is { } parcel)
-    {
-        <p class="customer-portal__notice" role="status">@T["ui.tickets.found"] <a href="/customer/packages/@parcel">@T["ui.tickets.open_package"]</a></p>
-    }
-    <section aria-labelledby="messages-title">
+    <div class="customer-portal__actions customer-portal__actions--top">
+        <a href="/customer/tickets" class="vx-button vx-button--secondary">← @T["ui.tickets.back"]</a>
+    </div>
+    <section class="customer-portal__panel" aria-labelledby="ticket-details">
+        <h2 id="ticket-details" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
+            <span>@Ticket.TrackingNumber · @Ticket.Carrier</span>
+            <span class="customer-ticket-status" data-status="@Ticket.Status">@T["ui.tickets.status." + Ticket.Status]</span>
+        </h2>
+        <dl class="customer-portal__details customer-package-details">
+            <dt>@T["ui.prealert.carrier"]</dt><dd>@Ticket.Carrier</dd>
+            <dt>@T["ui.prealert.tracking"]</dt><dd>@Ticket.TrackingNumber</dd>
+            @if (!string.IsNullOrWhiteSpace(Ticket.Store)) { <dt>@T["ui.prealert.store"]</dt><dd>@Ticket.Store</dd> }
+            @if (!string.IsNullOrWhiteSpace(Ticket.OrderNumber)) { <dt>@T["ui.tickets.order"]</dt><dd>@Ticket.OrderNumber</dd> }
+            @if (Ticket.DeliveredOn is { } day) { <dt>@T["ui.tickets.delivered"]</dt><dd>@day.ToString("yyyy-MM-dd")</dd> }
+            <dt>@T["ui.prealert.contents"]</dt><dd>@Ticket.Contents</dd>
+            <dt>@T["ui.tickets.proof"]</dt><dd>@(Ticket.HasProof ? T["ui.tickets.proof_sent"] : T["ui.tickets.proof_none"])</dd>
+        </dl>
+        @if (Ticket.ParcelId is { } parcel)
+        {
+            <p class="customer-portal__notice" role="status">@T["ui.tickets.found"] <a href="/customer/packages/@parcel">@T["ui.tickets.open_package"]</a></p>
+        }
+    </section>
+    <section class="customer-portal__panel" aria-labelledby="messages-title" style="margin-top: 1.25rem;">
         <h2 id="messages-title">@T["ui.tickets.messages"]</h2>
         <ol class="customer-portal__history">
             @foreach (CustomerTicketMessageDto message in Ticket.Messages)
@@ -42,13 +50,15 @@ IMPORTANT NOTES:
                 <li><time datetime="@message.SentUtc.ToString("O")">@message.SentUtc.ToString("yyyy-MM-dd HH:mm")</time> <strong>@(message.FromStaff ? T["ui.tickets.from_staff"] : T["ui.tickets.from_you"])</strong> <span>@message.Text</span></li>
             }
         </ol>
+        <form method="post" action="/customer/tickets/@Ticket.TicketId/messages" class="customer-portal__form" style="margin-top: 1.25rem;">
+            <AntiforgeryToken />
+            <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+            <label>@T["ui.tickets.reply"] <textarea name="message" required maxlength="1000" rows="3"></textarea></label>
+            <div class="customer-portal__actions">
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.tickets.send"]</button>
+            </div>
+        </form>
     </section>
-    <form method="post" action="/customer/tickets/@Ticket.TicketId/messages" class="customer-portal__form">
-        <AntiforgeryToken />
-        <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
-        <label>@T["ui.tickets.reply"] <textarea name="message" required maxlength="1000" rows="3"></textarea></label>
-        <button type="submit" class="vx-button vx-button--primary">@T["ui.tickets.send"]</button>
-    </form>
 </CustomerShell>
 
 @code {

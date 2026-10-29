@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: PreAlertFormPage.razor
 
@@ -12,6 +12,7 @@ RESPONSIBILITIES:
 IMPORTANT NOTES:
 - Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
 - The shipment can be chosen later on the packages page; Operations checks everything again
+- Brief §5 & §8 compliant styling with aligned action buttons
 =========================================================
 *@
 @using Vixly.Contracts.Operations.Customers
@@ -19,12 +20,11 @@ IMPORTANT NOTES:
 @using Vixly.Customer.Web.Portal
 @inject IStringLocalizer<CustomerText> T
 
-<CustomerShell Brand="@Brand" Title="@T["ui.prealert.new"]" SignedIn="true" Error="@Error" ReturnHere="/customer/packages/new">
+<CustomerShell Brand="@Brand" Title="@T["ui.prealert.new"]" SignedIn="true" Error="@Error" ReturnHere="/customer/packages/new" TourStep="@TourStep">
     @if (Choices is { } choices)
     {
         <form method="post" action="/customer/packages/new" class="customer-portal__form customer-prealert-form">
             <AntiforgeryToken />
-            <p>@T["ui.prealert.intro"]</p>
             @if (choices.Origins.Count == 0)
             {
                 <p class="customer-portal__notice">@T["ui.shipments.no_mailbox"]</p>
@@ -53,8 +53,13 @@ IMPORTANT NOTES:
                 </label>
                 <p class="customer-portal__hint">@T["ui.prealert.shipment_hint"]</p>
             }
-            @if (choices.Origins.Count > 0) { <button type="submit" class="vx-button vx-button--primary">@T["ui.prealert.submit"]</button> }
-            <p><a href="/customer/packages">@T["ui.packages.back"]</a></p>
+            <div class="customer-portal__actions" style="grid-column: 1 / -1;">
+                @if (choices.Origins.Count > 0)
+                {
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.prealert.submit"]</button>
+                }
+                <a href="/customer/packages" class="vx-button vx-button--secondary">@T["ui.packages.back"]</a>
+            </div>
         </form>
     }
 </CustomerShell>
@@ -70,4 +75,5 @@ IMPORTANT NOTES:
     [Parameter] public CustomerPreAlertBody? Entered { get; set; }
 
     [Parameter] public string? Error { get; set; }
+    [Parameter] public int TourStep { get; set; }
 }

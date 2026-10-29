@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: PricingPage.razor
 
@@ -56,7 +56,9 @@ IMPORTANT NOTES:
                 <p class="customer-portal__hint">@VixlyText.Format(T, "ui.pricing.since", "date", list.EffectiveFrom.ToString("d", CultureInfo.CurrentCulture))</p>
             </section>
         }
-        <p><a class="vx-button vx-button--secondary" href="/customer/rates">@T["ui.pricing.calculator"]</a></p>
+        <div class="customer-portal__actions">
+            <a class="vx-button vx-button--secondary" href="/customer/rates">@T["ui.pricing.calculator"]</a>
+        </div>
     }
 </CustomerShell>
 

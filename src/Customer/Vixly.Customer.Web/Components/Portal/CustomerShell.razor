@@ -16,6 +16,8 @@ IMPORTANT NOTES:
 =========================================================
 *@
 @inject IStringLocalizer<CustomerText> T
+@inject Vixly.Shared.Hosting.Maintenance.VixlyMaintenanceMonitor Maintenance
+@inject Vixly.Customer.Web.Features.Help.CustomerHelpCatalogue Help
 
 <!DOCTYPE html>
 <html lang="@Lang" data-theme="light">
@@ -32,16 +34,26 @@ IMPORTANT NOTES:
     }
     <link rel="stylesheet" href="_content/Vixly.Shared.UI/vixly-theme.css?v=20261018-customer3" />
     <link rel="stylesheet" href="_content/Vixly.Shared.UI/vixly-primitives.css" />
-    <link rel="stylesheet" href="css/customer-portal.css?v=20261020-1" />
+    <link rel="stylesheet" href="css/customer-portal.css?v=20261029-1" />
     <link rel="stylesheet" href="css/customer-access.css?v=20261018-customer3" />
     <link rel="stylesheet" href="css/customer-continuity.css?v=20261020-1" />
+    <link rel="stylesheet" href="css/customer-help.css?v=20261027-1" />
+    <link rel="stylesheet" href="css/customer-tour.css?v=20261027-1" />
     <script src="_content/Vixly.Shared.UI/vixly-forms.js" defer></script>
+    @if (SignedIn)
+    {
+        <script src="js/customer-session.js?v=20261027-1" defer></script>
+    }
     @if (BotSiteKey is { Length: > 0 })
     {
         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     }
 </head>
-<body class="customer-portal" data-signed-in="@(SignedIn ? "true" : "false")" data-page="@ReturnHere" style="--customer-primary: @Primary; --customer-accent: @Accent;">
+<body class="customer-portal" data-signed-in="@(SignedIn ? "true" : "false")" data-idle-warn="@(SignedIn ? IdleWarnSeconds : null)" data-idle-end="@(SignedIn ? IdleEndSeconds : null)" data-page="@ReturnHere" style="--customer-primary: @Primary; --customer-accent: @Accent;">
+    @if (Vixly.Shared.Hosting.Maintenance.VixlyMaintenanceBanner.Banner(Maintenance, "customers", T) is { } maintenance)
+    {
+        <p class="vx-maintenance-banner" role="status">@maintenance</p>
+    }
     <header class="customer-portal__topbar">
         <a class="customer-portal__brand" href="/customer/">
             @if (Brand?.LogoImageId is { } logo)
@@ -66,6 +78,8 @@ IMPORTANT NOTES:
             </nav>
         }
         <div class="customer-portal__topbar-actions">
+            @if (SignedIn) { <a href="/customer/help">@T["ui.help.title"]</a> }
+            <Vixly.Shared.UI.Primitives.VxHelpLink Href="@Help.ContextAddress(Lang, ReturnHere, SignedIn)" Label="@T["ui.help.title"]" />
             <nav class="customer-portal__languages" aria-label="@T["ui.language"]">
                 <a href="/customer/culture/en?returnUrl=@ReturnHere" hreflang="en" lang="en" aria-current="@(Lang == "en" ? "true" : null)">EN</a>
                 <a href="/customer/culture/fr?returnUrl=@ReturnHere" hreflang="fr" lang="fr" aria-current="@(Lang == "fr" ? "true" : null)">FR</a>
@@ -73,7 +87,7 @@ IMPORTANT NOTES:
             </nav>
             @if (SignedIn)
             {
-                <form method="post" action="/customer/sign-out" class="customer-portal__inline">
+                <form method="post" action="/customer/sign-out" class="customer-portal__inline" data-sign-out>
                     <AntiforgeryToken />
                     <button type="submit" class="vx-button vx-button--secondary customer-portal__signout">@T["ui.sign_out"]</button>
                 </form>
@@ -98,13 +112,28 @@ IMPORTANT NOTES:
             <p class="customer-portal__info" role="status">@Info</p>
         }
         @ChildContent
+        @if (TourStep is >= 1 and <= 3) { <CustomerWelcomeTour Step="@TourStep" Error="@TourError" /> }
         </div>
     </main>
+    @if (SignedIn)
+    {
+        @* The company's inactivity warning, with its countdown (owner, 2026-10-27); customer-session.js shows it. *@
+        <div class="customer-idle" role="alertdialog" aria-live="assertive" data-idle-warning hidden>
+            <p>@T["ui.session.idle_warning"]</p>
+            <p class="customer-idle__time">@T["ui.session.time_left"] <strong data-idle-countdown aria-live="off"></strong></p>
+            <button type="button" class="vx-button vx-button--primary" data-idle-stay>@T["ui.session.stay"]</button>
+        </div>
+    }
 </body>
 </html>
 
 @code {
     private static string Lang => System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+    // The company's inactivity times for customers, in seconds (owner, 2026-10-27).
+    private string IdleEndSeconds => (Math.Max(Brand?.IdleMinutes ?? 60, 1) * 60).ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    private string IdleWarnSeconds => (Math.Max((Brand?.IdleMinutes ?? 60) - (Brand?.IdleWarnMinutes ?? 2), 0) * 60).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
     private string CompanyName => string.IsNullOrWhiteSpace(Brand?.DisplayName) ? T["ui.app.name"] : Brand.DisplayName;
 
@@ -123,6 +152,8 @@ IMPORTANT NOTES:
     [Parameter] public string? Subtitle { get; set; }
 
     [Parameter] public bool SignedIn { get; set; }
+    [Parameter] public int TourStep { get; set; }
+    [Parameter] public bool TourError { get; set; }
 
     [Parameter] public string? Error { get; set; }
 

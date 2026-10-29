@@ -147,4 +147,296 @@
 }
 .customer-portal__content > section {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}/* Owner, 2026-10-27: the tracking number on its own wide row; every field fills its column. */
+.customer-prealert-form > label:has(input[name="tracking"]) { grid-column:1 / -1; }
+.customer-prealert-form > label > :is(input,select,textarea) { width:100%; box-sizing:border-box; }
+/* Owner, 2026-10-27: the inactivity warning with its countdown, as in the staff workspace. */
+.customer-idle[hidden] { display:none !important; }
+.customer-idle { position:fixed; z-index:100; inset:auto 1rem 1rem; max-width:34rem; margin:auto; padding:1.25rem 1.5rem; background:var(--vx-color-surface, #fff); color:var(--vx-color-text, #0f172a); border:1px solid var(--vx-color-warning, #d97706); border-radius:.75rem; box-shadow:0 12px 32px rgba(15,23,42,.18); }
+.customer-idle p { margin:0 0 .75rem; }
+.customer-idle__time strong { font-size:1.35rem; font-variant-numeric:tabular-nums; }
+/* Owner, 2026-10-27: paying an invoice on the portal (Zelle, bank transfer, card). */
+.customer-pay__methods { display:flex; flex-wrap:wrap; gap:.75rem; margin:1rem 0; }
+.customer-pay__how { display:flex; flex-wrap:wrap; gap:1.5rem; align-items:flex-start; margin:1rem 0; }
+.customer-pay__qr { width:180px; height:180px; border:1px solid var(--vx-color-border, #cbd5e1); border-radius:.5rem; background:#fff; }
+.customer-pay__payee { display:grid; grid-template-columns:auto 1fr; gap:.35rem 1rem; margin:0; }
+.customer-pay__payee dt { font-weight:600; }
+.customer-pay__payee dd { margin:0; overflow-wrap:anywhere; }
+.customer-pay__instructions, .customer-pay__terms { white-space:pre-line; padding:.75rem 1rem; border:1px solid var(--vx-color-border, #cbd5e1); border-radius:.5rem; background:var(--vx-color-surface-muted, #f8fafc); max-width:44rem; }
+.customer-pay__form { display:grid; gap:.75rem; max-width:32rem; margin:1rem 0; }
+.customer-pay__form input[name="reference"] { width:100%; box-sizing:border-box; }
+
+/* Paired Field Duos and Fieldsets */
+.customer-field-duo {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem;
+    align-items: start;
+    width: 100%;
+}
+.customer-field-duo > label {
+    display: grid;
+    gap: 0.5rem;
+    min-width: 0;
+    font-size: 0.75rem;
+    font-weight: 650;
+    width: 100%;
+}
+
+.customer-recipient-fieldset {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem;
+    align-items: start;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+.customer-recipient-fieldset > legend {
+    grid-column: 1 / -1;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--vx-color-text);
+    margin-bottom: 0.5rem;
+    padding: 0;
+}
+.customer-recipient-fieldset > .customer-portal__field,
+.customer-recipient-fieldset > label {
+    display: grid;
+    gap: 0.5rem;
+    min-width: 0;
+    width: 100%;
+}
+
+.customer-collector-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem;
+    align-items: end;
+    max-width: 48rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.75rem;
+    background: var(--vx-color-surface);
+    margin: 1.25rem 0;
+}
+.customer-collector-form > :is(h2, p.customer-portal__hint) {
+    grid-column: 1 / -1;
+}
+.customer-collector-form > label {
+    display: grid;
+    gap: 0.5rem;
+    min-width: 0;
+    font-size: 0.75rem;
+    font-weight: 650;
+}
+.customer-collector-form > button {
+    grid-column: 1 / -1;
+    justify-self: start;
+    min-height: 40px;
+    padding: 0 1.5rem;
+}
+
+/* Customer Portal Tables */
+.customer-portal__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+    text-align: left;
+}
+.customer-portal__table th {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 650;
+    color: var(--vx-color-text-muted);
+    border-bottom: 1px solid var(--vx-color-border);
+    background: var(--vx-color-surface-sunken);
+    white-space: nowrap;
+}
+.customer-portal__table td {
+    padding: 0.65rem 0.75rem;
+    border-bottom: 1px solid var(--vx-color-border);
+    color: var(--vx-color-text);
+    vertical-align: middle;
+}
+.customer-portal__table tr:last-child td {
+    border-bottom: 0;
+}
+.customer-portal__table tr:hover td {
+    background: var(--vx-color-surface-sunken);
+}
+.customer-portal__table tr[data-voided="true"] td,
+.customer-portal__table tr[data-voided="True"] td {
+    color: var(--vx-color-text-muted);
+    opacity: 0.75;
+}
+.customer-portal__table tr[data-overdue="true"] td,
+.customer-portal__table tr[data-overdue="True"] td {
+    background: color-mix(in srgb, var(--vx-color-status-exception, #be123c) 5%, transparent);
+}
+.customer-portal__table .vx-button {
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0.25rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 0.35rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+}
+
+.customer-invoice-owed-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Status Pills */
+.customer-portal__status,
+.customer-ticket-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    font-weight: 650;
+    line-height: 1.2;
+    border: 1px solid var(--vx-color-border);
+    background: var(--vx-color-surface-sunken);
+    color: var(--vx-color-text-muted);
+    text-transform: capitalize;
+}
+.customer-portal__status[data-status="paid"],
+.customer-ticket-status[data-status="resolved"] {
+    background: var(--vx-color-status-completed-bg, #ecfdf5);
+    color: var(--vx-color-status-completed, #047857);
+    border-color: var(--vx-color-status-success-border, #a7f3d0);
+}
+.customer-portal__status[data-status="overdue"] {
+    background: var(--vx-color-status-exception-bg, #fff1f2);
+    color: var(--vx-color-status-exception, #be123c);
+    border-color: var(--vx-color-status-danger-border, #fecdd3);
+}
+.customer-portal__status:is([data-status="issued"],[data-status="partially_paid"],[data-status="active"],[data-status="open"]),
+.customer-ticket-status[data-status="open"] {
+    background: var(--vx-color-status-received-bg, #eff6ff);
+    color: var(--vx-color-status-received, #1d4ed8);
+    border-color: var(--vx-color-status-info-border, #bfdbfe);
+}
+.customer-portal__status:is([data-status="voided"],[data-status="cancelled"],[data-status="closed"]),
+.customer-ticket-status[data-status="closed"] {
+    background: var(--vx-color-surface-sunken);
+    color: var(--vx-color-text-muted);
+    border-color: var(--vx-color-border);
+}
+
+/* Customer Portal Facts Grid */
+.customer-portal__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: var(--vx-color-surface-sunken);
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+}
+.customer-portal__facts dt {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--vx-color-text-muted);
+    margin: 0 0 0.25rem;
+}
+.customer-portal__facts dd {
+    font-size: 1.15rem;
+    font-weight: 700;
+    font-family: var(--vx-font-mono, monospace);
+    color: var(--vx-color-text);
+    margin: 0;
+}
+.customer-portal__facts dd[data-overdue="True"],
+.customer-portal__facts dd[data-overdue="true"] {
+    color: var(--vx-color-status-exception, #be123c);
+}
+
+/* Customer Portal Pricing Lists */
+.customer-pricing {
+    margin-bottom: 1.5rem;
+}
+.customer-pricing h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.35rem;
+}
+.customer-pricing__bands,
+.customer-pricing__items,
+.customer-pricing__fees {
+    list-style: none;
+    margin: 0.75rem 0;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.8125rem;
+}
+.customer-pricing__bands li,
+.customer-pricing__items li,
+.customer-pricing__fees li {
+    padding: 0.35rem 0.5rem;
+    background: var(--vx-color-surface-sunken);
+    border-radius: 0.35rem;
+    border: 1px solid var(--vx-color-border-subtle, rgba(0, 0, 0, 0.05));
+    font-variant-numeric: tabular-nums;
+}
+
+/* Insurance Choice & Product Cards */
+.customer-portal__insurance {
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    margin: 1.25rem 0;
+    display: grid;
+    gap: 1rem;
+    background: var(--vx-color-surface);
+}
+.customer-portal__insurance legend {
+    font-weight: 700;
+    font-size: 0.875rem;
+    padding: 0 0.5rem;
+    color: var(--vx-color-text);
+}
+.customer-portal__insurance-product {
+    padding: 1rem;
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.5rem;
+    background: var(--vx-color-surface-sunken);
+    display: grid;
+    gap: 0.5rem;
+}
+.customer-portal__terms {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--vx-color-border);
+    font-size: 0.8125rem;
+}
+.customer-portal__terms summary {
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--customer-primary);
+}
+
+@media (max-width: 640px) {
+    .customer-field-duo,
+    .customer-recipient-fieldset,
+    .customer-collector-form {
+        grid-template-columns: 1fr;
+    }
 }

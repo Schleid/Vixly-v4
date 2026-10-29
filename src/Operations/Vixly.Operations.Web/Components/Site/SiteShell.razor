@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: SiteShell.razor
 
@@ -15,6 +15,7 @@ IMPORTANT NOTES:
 =========================================================
 *@
 @inject IStringLocalizer<OperationsText> T
+@inject Vixly.Shared.Hosting.Maintenance.VixlyMaintenanceMonitor Maintenance
 
 <!DOCTYPE html>
 <html lang="@Page.Language" data-theme="light">
@@ -50,12 +51,16 @@ IMPORTANT NOTES:
         <meta name="robots" content="noindex" />
     }
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-theme.css" />
-    <link rel="stylesheet" href="/css/tenant-site.css" />
+    <link rel="stylesheet" href="/css/tenant-site.css?v=20261029-1" />
     <style>:root { --site-primary: @Settings.PrimaryColour; --site-accent: @Settings.AccentColour; }</style>
     <script type="application/ld+json">@((MarkupString)OperationsSiteJsonLd.Build(Page, Description))</script>
 </head>
 <body class="site">
     <a class="site-skip" href="#main">@T["site.skip"]</a>
+    @if (Vixly.Shared.Hosting.Maintenance.VixlyMaintenanceBanner.Banner(Maintenance, "companies", T) is { } maintenance)
+    {
+        <p class="vx-maintenance-banner" role="status">@maintenance</p>
+    }
     @if (Page.Site.IsPreview)
     {
         <p class="site-preview" role="status">@T["site.preview.banner"]</p>
@@ -64,7 +69,7 @@ IMPORTANT NOTES:
         <a class="site-brand" href="@Page.Home">
             @if (Page.Image(Settings.LogoImageId) is { } logo)
             {
-                <img src="@logo" alt="@Page.Company" height="44" />
+                <img src="@logo" alt="@Page.Company" height="56" />
             }
             else
             {
@@ -90,7 +95,14 @@ IMPORTANT NOTES:
     </main>
     <footer class="site-footer">
         <div class="site-footer__about">
-            <strong>@Page.Company</strong>
+            @if (FooterLogo is { } footerLogo)
+            {
+                <img class="@(Page.Image(Settings.LogoDarkImageId) is null ? "site-footer__logo site-footer__logo--plate" : "site-footer__logo")" src="@footerLogo" alt="@Page.Company" height="56" loading="lazy" />
+            }
+            else
+            {
+                <strong>@Page.Company</strong>
+            }
             <p>@Page.Text(T, "footer_about", "site.default.footer_about")</p>
         </div>
         @if (Social.Any(link => link.Item2 is not null))
@@ -116,6 +128,9 @@ IMPORTANT NOTES:
 
 @code {
     private Vixly.Operations.Domain.Branding.OperationsBrandSettings Settings => Page.Site.Settings;
+
+    // The footer is dark: the dark-background logo when there is one, else the main logo on a light plate.
+    private string? FooterLogo => Page.Image(Settings.LogoDarkImageId) ?? Page.Image(Settings.LogoImageId);
 
     private string? ShareImage => Page.Image(Settings.HeroImageId) ?? Page.Image(Settings.LogoImageId);
 

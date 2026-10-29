@@ -1,4 +1,18 @@
-@* ShipmentPage.razor: Customer shipment - destination, packages and actions (Slice 5C, ADR-0012). *@
+@*
+=========================================================
+FILE: ShipmentPage.razor
+
+PURPOSE:
+Customer shipment - destination, packages and actions (Slice 5C, ADR-0012).
+
+RESPONSIBILITIES:
+- Render destination, packages received, expected packages, and collector actions
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- Brief §5 & §8 compliant styling with structured cards and aligned controls
+=========================================================
+*@
 @using Vixly.Contracts.Operations.Customers
 @using Vixly.Contracts.Operations.Packages
 @using Vixly.Customer.Web.Portal
@@ -14,7 +28,7 @@
         {
             <DriverPanel Driver="@Driver" Refresh="@(Here + "/driver")" />
         }
-        <section aria-labelledby="shipment-where">
+        <section aria-labelledby="shipment-where" class="customer-portal__panel">
             <h2 id="shipment-where">@T["ui.shipments.where"]</h2>
             @if (!Detail.Shipment.HasInstructions)
             {
@@ -45,6 +59,8 @@
                     @if (Detail.Shipment.Booked)
                     {
                         <dt>@T["ui.shipments.amount"]</dt><dd>@((Detail.Shipment.BookedTotal ?? 0m).ToString("N2")) @Detail.Shipment.BookedCurrency</dd>
+                        @* Owner, 2026-10-28: the tracking number comes once the shipment is paid, on account or collect. *@
+                        <dt>@T["ui.shipments.tracking_number"]</dt><dd>@if (Detail.Shipment.TrackingNumber is { } tracking) { <strong>@tracking</strong> <a href="/@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName/track?number=@Uri.EscapeDataString(tracking)">@T["ui.shipments.track_link"]</a> } else { @T["ui.shipments.tracking_after_payment"] }</dd>
                     }
                 </dl>
                 @if (Detail.Shipment.Booked) { <p class="customer-portal__notice">@T["ui.shipments.booked_notice"]</p> }
@@ -60,7 +76,7 @@
                 }
                 else if (Detail.Shipment.Booked && Detail.Shipment.Delivery == "pickup")
                 {
-                    <form method="post" action="/customer/packages/shipments/@Detail.Shipment.ShipmentId/collector" class="customer-portal__form customer-collector-form" aria-labelledby="collector-title">
+                    <form method="post" action="/customer/packages/shipments/@Detail.Shipment.ShipmentId/collector" class="customer-collector-form" aria-labelledby="collector-title">
                         <AntiforgeryToken />
                         <h2 id="collector-title">@T["ui.shipments.collector_title"]</h2>
                         <p class="customer-portal__hint">@T["ui.shipments.collector_hint"]</p>
@@ -150,21 +166,25 @@
         }
         @if (Detail.Shipment.IsOpen && Detail.Shipment.HasInstructions)
         {
-            <section aria-labelledby="shipment-add">
+            <section aria-labelledby="shipment-add" class="customer-portal__panel">
                 <h2 id="shipment-add">@T["ui.shipments.add_package"]</h2>
                 <form method="post" action="/customer/packages/shipments/@Detail.Shipment.ShipmentId/packages" class="customer-portal__form customer-prealert-form">
                     <AntiforgeryToken />
                     <PackageFields T="T" Entered="Package" />
-                    <button type="submit" class="vx-button vx-button--primary">@T["ui.prealert.submit"]</button>
+                    <div class="customer-portal__actions" style="grid-column: 1 / -1;">
+                        <button type="submit" class="vx-button vx-button--primary">@T["ui.prealert.submit"]</button>
+                    </div>
                 </form>
             </section>
         }
         @if (Detail.CanCancel)
         {
-            <form method="post" action="/customer/packages/shipments/@Detail.Shipment.ShipmentId/cancel" class="customer-portal__inline">
-                <AntiforgeryToken />
-                <button type="submit" class="vx-button vx-button--secondary">@T["ui.shipments.cancel"]</button>
-            </form>
+            <div class="customer-portal__actions" style="margin-top: 1.5rem;">
+                <form method="post" action="/customer/packages/shipments/@Detail.Shipment.ShipmentId/cancel" class="customer-portal__inline">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.shipments.cancel"]</button>
+                </form>
+            </div>
         }
     </div>
 </CustomerShell>

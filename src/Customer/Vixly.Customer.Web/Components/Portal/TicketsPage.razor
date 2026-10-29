@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: TicketsPage.razor
 
@@ -11,6 +11,7 @@ RESPONSIBILITIES:
 IMPORTANT NOTES:
 - Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
 - Staff search the warehouse; the customer never does (A-6)
+- Brief §5 list anatomy with structured table and status pills
 =========================================================
 *@
 @using Vixly.Contracts.Operations.Customers
@@ -18,8 +19,9 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<CustomerText> T
 
 <CustomerShell Brand="@Brand" Title="@T["ui.tickets.title"]" SignedIn="true" Error="@Error" ReturnHere="/customer/tickets">
-    <p>@T["ui.tickets.intro"]</p>
-    <p><a class="vx-button vx-button--primary" href="/customer/tickets/new">@T["ui.tickets.new"]</a></p>
+    <div class="customer-portal__actions customer-portal__actions--top">
+        <a class="vx-button vx-button--primary" href="/customer/tickets/new">@T["ui.tickets.new"]</a>
+    </div>
     @if (Tickets is { } tickets)
     {
         @if (tickets.Tickets.Count == 0)
@@ -29,21 +31,28 @@ IMPORTANT NOTES:
         else
         {
             <CustomerTableViewport Label="@T["ui.tickets.title"]">
-<table class="customer-portal__table">
-                <thead><tr><th scope="col">@T["ui.tickets.opened"]</th><th scope="col">@T["ui.prealert.tracking"]</th><th scope="col">@T["ui.prealert.carrier"]</th><th scope="col">@T["ui.tickets.status"]</th></tr></thead>
-                <tbody>
-                    @foreach (CustomerTicketDto ticket in tickets.Tickets)
-                    {
+                <table class="customer-portal__table">
+                    <thead>
                         <tr>
-                            <td><a href="/customer/tickets/@ticket.TicketId">@ticket.CreatedUtc.ToString("yyyy-MM-dd")</a></td>
-                            <td>@ticket.TrackingNumber</td>
-                            <td>@ticket.Carrier</td>
-                            <td><span class="customer-ticket-status" data-status="@ticket.Status">@T["ui.tickets.status." + ticket.Status]</span></td>
+                            <th scope="col">@T["ui.tickets.opened"]</th>
+                            <th scope="col">@T["ui.prealert.tracking"]</th>
+                            <th scope="col">@T["ui.prealert.carrier"]</th>
+                            <th scope="col">@T["ui.tickets.status"]</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-</CustomerTableViewport>
+                    </thead>
+                    <tbody>
+                        @foreach (CustomerTicketDto ticket in tickets.Tickets)
+                        {
+                            <tr>
+                                <td><a href="/customer/tickets/@ticket.TicketId">@ticket.CreatedUtc.ToString("yyyy-MM-dd")</a></td>
+                                <td>@ticket.TrackingNumber</td>
+                                <td>@ticket.Carrier</td>
+                                <td><span class="customer-ticket-status" data-status="@ticket.Status">@T["ui.tickets.status." + ticket.Status]</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </CustomerTableViewport>
         }
     }
 </CustomerShell>

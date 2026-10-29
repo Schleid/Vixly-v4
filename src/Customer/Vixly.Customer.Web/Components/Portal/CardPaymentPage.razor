@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: CardPaymentPage.razor
 
@@ -46,7 +46,9 @@ IMPORTANT NOTES:
             }
         </section>
     }
-    <p><a href="/customer/invoices">@T["ui.card.back"]</a></p>
+    <div class="customer-portal__actions">
+        <a href="/customer/invoices" class="vx-button vx-button--secondary">@T["ui.card.back"]</a>
+    </div>
 </CustomerShell>
 
 @code {
