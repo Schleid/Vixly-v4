@@ -11,7 +11,7 @@ RESPONSIBILITIES:
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10); values come from the endpoint
 - Static forms with antiforgery and the form guard (ADR-0019); sensitive actions ask for step-up first
-- Structured enterprise record layout with role table and aligned action rows
+- Structured enterprise record layout with role table, outside account panel, and aligned action rows
 =========================================================
 *@
 @inherits OperationsAllowedComponent
@@ -142,6 +142,7 @@ IMPORTANT NOTES:
             }
         </section>
     }
+    <OutsideAccountPanel UserId="@Member.UserId" Member="@Member" CanEdit="@Can(OperationsPermissions.StaffEdit)" ViewerIsOwner="@ViewerIsOwner" IsMe="@IsMe" />
     @if (Quick is { Succeeded: true })
     {
         <StaffBadgePanel UserId="@Member.UserId" State="@Quick" CanEdit="@Can(OperationsPermissions.StaffEdit)" />

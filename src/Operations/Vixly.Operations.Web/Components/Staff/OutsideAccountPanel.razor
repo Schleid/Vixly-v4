@@ -1,0 +1,106 @@
+@*
+=========================================================
+FILE: OutsideAccountPanel.razor
+
+PURPOSE:
+A staff member's outside account hours and limits (owner, 2026-10-29, Package C).
+
+RESPONSIBILITIES:
+- Render outside hours status (active outside account, end date, allowed days of week, allowed time window)
+- Configure outside hours with checkbox toggles and time limits
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Static form with antiforgery (ADR-0019)
+- Structured enterprise panel layout with responsive grid and aligned actions
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+@if (Member.Outside is not null || (!Member.IsOwner && !Member.IsAdministrator && Member.PartnerWarehouse is null && !IsMe && CanEdit))
+{
+    Vixly.Operations.Domain.Identity.OperationsOutsideHours? hours = Member.Outside;
+    <section class="ops-editor__panel" aria-labelledby="outside-title">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+            <h2 id="outside-title" style="margin: 0;">@T["ui.staff.outside.title"]</h2>
+            @if (hours is not null)
+            {
+                <span class="ops-editor__status" data-status="active">@T["ui.staff.outside.is_outside"]</span>
+            }
+        </div>
+
+        @if (hours is not null)
+        {
+            <div style="margin-bottom: 0.75rem; padding: 0.75rem 1rem; background: var(--vx-color-surface-sunken); border: 1px solid var(--vx-color-border); border-radius: 0.35rem; font-size: 0.8125rem;">
+                <p style="margin: 0 0 0.35rem;">
+                    <strong>@T["ui.staff.outside.is_outside"]</strong> ·
+                    @(hours.EndsOn is { } ends ? VixlyText.Format(T, "ui.staff.outside.until", "date", ends.ToString("d", System.Globalization.CultureInfo.CurrentCulture)) : T["ui.staff.outside.no_end"].Value)
+                    @(hours.FromMinute is { } f && hours.ToMinute is { } t ? "· " + Clock(f) + "–" + Clock(t) : null)
+                </p>
+                <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.35rem;">
+                    @foreach ((string Key, int Bit) day in Week)
+                    {
+                        bool active = (hours.Days & day.Bit) != 0;
+                        <span class="ops-badge" style="opacity: @(active ? "1" : "0.4"); font-weight: @(active ? "700" : "400");">@T["ui.staff.outside.day." + day.Key]</span>
+                    }
+                </div>
+            </div>
+        }
+        <p class="ops-editor__hint" style="margin: 0 0 0.75rem;">@T["ui.staff.outside.hint"]</p>
+
+        @if (!Member.IsOwner && !Member.IsAdministrator && Member.PartnerWarehouse is null && !IsMe && CanEdit)
+        {
+            <form method="post" action="/staff/people/@UserId/outside" class="ops-editor__form">
+                <AntiforgeryToken />
+                <label class="ops-checkbox-label ops-editor__form-span-full">
+                    <input type="checkbox" name="outside" value="true" checked="@(hours is not null)" />
+                    @T["ui.staff.outside.make"]
+                </label>
+                <label class="ops-editor__form-span-3">
+                    @T["ui.staff.outside.ends_on"]
+                    <input type="date" name="endsOn" value="@(hours?.EndsOn?.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture))" />
+                </label>
+                <div class="ops-editor__form-span-full" style="display: flex; flex-direction: column; gap: 0.35rem;">
+                    <span style="font-size: 0.75rem; font-weight: 600; color: var(--vx-color-text-muted);">@T["ui.staff.outside.days"]</span>
+                    <div class="ops-settings-checkboxes">
+                        @foreach ((string Key, int Bit) day in Week)
+                        {
+                            <label class="ops-checkbox-label">
+                                <input type="checkbox" name="days" value="@day.Bit" checked="@((hours?.Days ?? 31) is var mask && (mask & day.Bit) != 0)" />
+                                @T["ui.staff.outside.day." + day.Key]
+                            </label>
+                        }
+                    </div>
+                </div>
+                <label class="ops-editor__form-span-3">
+                    @T["ui.staff.outside.from"]
+                    <input type="time" name="from" value="@(hours?.FromMinute is { } fm ? Clock(fm) : null)" />
+                </label>
+                <label class="ops-editor__form-span-3">
+                    @T["ui.staff.outside.to"]
+                    <input type="time" name="to" value="@(hours?.ToMinute is { } tm ? Clock(tm % (24 * 60)) : null)" />
+                </label>
+                <p class="ops-editor__hint" style="grid-column: 1 / -1; margin: -0.25rem 0 0.25rem;">@T["ui.staff.outside.hours_hint"]</p>
+                <div class="ops-editor__form-actions" style="margin-top: 0.5rem;">
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+                </div>
+            </form>
+        }
+    </section>
+}
+
+@code {
+    private static readonly (string Key, int Bit)[] Week = { ("mon", 1), ("tue", 2), ("wed", 4), ("thu", 8), ("fri", 16), ("sat", 32), ("sun", 64) };
+
+    private static string Clock(int minute) => (minute / 60).ToString("00", System.Globalization.CultureInfo.InvariantCulture) + ":" + (minute % 60).ToString("00", System.Globalization.CultureInfo.InvariantCulture);
+
+    [Parameter, EditorRequired] public Guid UserId { get; set; }
+
+    [Parameter, EditorRequired] public OperationsStaffMember Member { get; set; } = null!;
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public bool ViewerIsOwner { get; set; }
+
+    [Parameter] public bool IsMe { get; set; }
+}
