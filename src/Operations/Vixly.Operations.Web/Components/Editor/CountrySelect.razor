@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: CountrySelect.razor
 
@@ -16,7 +16,7 @@ IMPORTANT NOTES:
 *@
 @inject IStringLocalizer<OperationsText> T
 
-<label>@T["ui.editor.country"]
+<label class="@Class">@T["ui.editor.country"]
     <select name="@Name" required>
         <option value="">@T["ui.editor.choose"]</option>
         @foreach ((string country, string name) in OperationsCountries.Options(T))
@@ -30,4 +30,6 @@ IMPORTANT NOTES:
     [Parameter, EditorRequired] public string Name { get; set; } = string.Empty;
 
     [Parameter] public string? Value { get; set; }
+
+    [Parameter] public string? Class { get; set; }
 }

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: WarehouseFormPage.razor
 
@@ -19,10 +19,10 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T[Form.WarehouseId is null ? "ui.editor.warehouse.add" : "ui.editor.warehouse.edit"]" Company="@Company" Section="locations" Error="@Error">
-    <form method="post" action="/staff/locations/warehouse" class="ops-editor__panel">
+    <form method="post" action="/staff/locations/warehouse" class="ops-editor__panel ops-editor__form">
         <AntiforgeryToken />
         <input type="hidden" name="warehouseId" value="@Form.WarehouseId" />
-        <label>@T["ui.editor.warehouse.branch"]
+        <label class="ops-editor__form-span-2">@T["ui.editor.warehouse.branch"]
             <select name="branchId" required>
                 @foreach (OperationsBranch branch in Branches)
                 {
@@ -30,34 +30,39 @@ IMPORTANT NOTES:
                 }
             </select>
         </label>
-        <label>@T["ui.editor.code"] <input name="code" value="@Form.Code" maxlength="@OperationsLocationLimits.CodeMaxLength" required /></label>
-        <label>@T["ui.editor.name"] <input name="name" value="@Form.Name" maxlength="@OperationsLocationLimits.NameMaxLength" required /></label>
-        <p class="ops-editor__hint">@T["ui.editor.warehouse.country_hint"]</p>
+        <label class="ops-editor__form-span-2">@T["ui.editor.code"] <input name="code" value="@Form.Code" maxlength="@OperationsLocationLimits.CodeMaxLength" required /></label>
+        <label class="ops-editor__form-span-2">@T["ui.editor.name"] <input name="name" value="@Form.Name" maxlength="@OperationsLocationLimits.NameMaxLength" required /></label>
+        <p class="ops-editor__hint" style="grid-column: 1 / -1;">@T["ui.editor.warehouse.country_hint"]</p>
         <AddressFields Line1="@Form.Line1" Line2="@Form.Line2" City="@Form.City" Region="@Form.Region" PostalCode="@Form.PostalCode" CountryCode="@Form.CountryCode" />
         <ContactFields Phone="@Form.Phone" Email="@Form.Email" OpeningHours="@Form.OpeningHours" />
-        <fieldset>
+        <fieldset class="ops-editor__panel-fieldset" style="grid-column: 1 / -1;">
             <legend>@T["ui.editor.warehouse.roles"]</legend>
-            @foreach (OperationsWarehouseRoles role in new[] { OperationsWarehouseRoles.Receiving, OperationsWarehouseRoles.Storage, OperationsWarehouseRoles.DispatchHub, OperationsWarehouseRoles.PickupPoint })
-            {
-                <label><input type="checkbox" name="roles" value="@role" checked="@Form.Roles.HasFlag(role)" /> @T["ui.editor.role." + role.ToString().ToLowerInvariant()]</label>
-            }
-            <label><input type="checkbox" name="acceptingDeliveries" value="true" checked="@Form.AcceptingDeliveries" /> @T["ui.editor.warehouse.accepting"]</label>
-            <label><input type="checkbox" name="mailbox" value="true" checked="@Form.IsMailbox" /> @T["ui.editor.warehouse.mailbox"]</label>
-            <p class="ops-editor__hint">@T["ui.editor.warehouse.mailbox_hint"]</p>
+            <div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; align-items: center;">
+                @foreach (OperationsWarehouseRoles role in new[] { OperationsWarehouseRoles.Receiving, OperationsWarehouseRoles.Storage, OperationsWarehouseRoles.DispatchHub, OperationsWarehouseRoles.PickupPoint })
+                {
+                    <label class="ops-checkbox-label"><input type="checkbox" name="roles" value="@role" checked="@Form.Roles.HasFlag(role)" /> @T["ui.editor.role." + role.ToString().ToLowerInvariant()]</label>
+                }
+            </div>
+            <div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; align-items: center; margin-top: 0.5rem;">
+                <label class="ops-checkbox-label"><input type="checkbox" name="acceptingDeliveries" value="true" checked="@Form.AcceptingDeliveries" /> @T["ui.editor.warehouse.accepting"]</label>
+                <label class="ops-checkbox-label"><input type="checkbox" name="mailbox" value="true" checked="@Form.IsMailbox" /> @T["ui.editor.warehouse.mailbox"]</label>
+                <Vixly.Operations.Web.Components.Help.OperationsHelpArticleLink Slug="customers-mailbox" />
+            </div>
+            <p class="ops-editor__hint" style="grid-column: 1 / -1;">@T["ui.editor.warehouse.mailbox_hint"]</p>
         </fieldset>
-        <label>@T["ui.editor.warehouse.manager"]
+        <label class="ops-editor__form-span-3">@T["ui.editor.warehouse.manager"]
             <select name="manager">
                 <option value="">-</option>
                 @foreach (Vixly.Operations.Application.Shipments.OperationsChoice manager in Managers) { <option value="@manager.Id" selected="@(manager.Id == Form.ManagerUserId)">@manager.Name</option> }
             </select>
         </label>
-        <label>@T["ui.editor.warehouse.time_zone"] <input name="timeZone" value="@Form.TimeZone" maxlength="64" placeholder="America/Port-au-Prince" /></label>
+        <label class="ops-editor__form-span-3">@T["ui.editor.warehouse.time_zone"] <input name="timeZone" value="@Form.TimeZone" maxlength="64" placeholder="America/Port-au-Prince" /></label>
         <DestinationFields Form="Form" Hubs="@Warehouses.Where(warehouse => warehouse.Roles.HasFlag(OperationsWarehouseRoles.DispatchHub) && warehouse.Id != Form.WarehouseId).ToList()" />
-        <StatusFields Status="@Form.Status" ShowOnSite="@Form.ShowOnSite" />
-        <p class="ops-editor__actions">
+        <StatusFields Status="@Form.Status" ShowOnSite="@Form.ShowOnSite" Class="ops-editor__form-span-3" />
+        <div class="ops-editor__form-actions">
             @if (Can(OperationsPermissions.WarehousesManage)) { <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button> }
-            <a href="/staff/locations">@T["ui.editor.cancel"]</a>
-        </p>
+            <a class="vx-button vx-button--secondary" href="/staff/locations">@T["ui.editor.cancel"]</a>
+        </div>
     </form>
 </EditorShell>
 

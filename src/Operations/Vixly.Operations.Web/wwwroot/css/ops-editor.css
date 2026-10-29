@@ -2934,3 +2934,64 @@ tr[data-low="true"] td:first-child {
 .ops-cashier__pay [data-tenders-adder] legend { font-weight: 600; padding: 0 .35rem; }
 @media (max-width: 768px) { .ops-cashier__pay [data-tenders-adder] { grid-template-columns: 1fr 1fr !important; } }
 .ops-cashier__pay [data-tenders-adder] > :is(label, button) { grid-column: auto !important; }
+
+/* Role permissions grid and cards */
+.ops-permission-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+    gap: 1rem !important;
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+}
+.ops-permission-card {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    padding: 0.85rem 1rem !important;
+    background: var(--vx-color-surface-sunken) !important;
+    border: 1px solid var(--vx-color-border) !important;
+    border-radius: 0.35rem !important;
+    margin: 0 !important;
+}
+.ops-permission-card legend {
+    font-size: 0.8125rem !important;
+    font-weight: 700 !important;
+    color: var(--vx-color-text) !important;
+    padding: 0 0.35rem !important;
+}
+.ops-permission-card label.ops-checkbox-label {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+    font-size: 0.8125rem !important;
+    font-weight: 400 !important;
+    cursor: pointer !important;
+    line-height: 1.4 !important;
+    height: auto !important;
+    min-height: 28px !important;
+}
+.ops-permission-card label.ops-checkbox-label input[type=checkbox] {
+    margin-top: 0.15rem !important;
+}
+.ops-badge--company-only {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.25rem;
+    background: var(--vx-color-surface-muted, #e2e8f0);
+    color: var(--vx-color-text-muted);
+    border: 1px solid var(--vx-color-border);
+    white-space: nowrap;
+    margin-left: 0.35rem;
+}
+.ops-editor__panel-fieldset {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+    border: 1px solid var(--vx-color-border) !important;
+    border-radius: 0.35rem !important;
+}
+.ops-editor__panel-fieldset > :is(h2, h3, p, legend, fieldset) {
+    grid-column: 1 / -1 !important;
+}

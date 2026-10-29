@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: DestinationFields.razor
 
@@ -16,9 +16,9 @@ IMPORTANT NOTES:
 *@
 @inject IStringLocalizer<OperationsText> T
 
-<fieldset>
+<fieldset class="ops-editor__panel-fieldset">
     <legend>@T["ui.editor.destination"]</legend>
-    <p class="ops-editor__hint">@T["ui.editor.destination_hint"]</p>
+    <p class="ops-editor__hint" style="grid-column: 1 / -1;">@T["ui.editor.destination_hint"]</p>
     <label>@T["ui.editor.destination.operated_by"]
         <select name="operatedBy">
             <option value="Company" selected="@(Form.OperatedBy != OperationsDestinationOperator.Partner)">@T["ui.editor.destination.operated_by.Company"]</option>
@@ -28,9 +28,11 @@ IMPORTANT NOTES:
     <label>@T["ui.editor.destination.partner_name"] <input name="partnerName" value="@Form.PartnerName" maxlength="@OperationsLocationLimits.NameMaxLength" /></label>
     <label>@T["ui.editor.destination.partner_phone"] <input name="partnerPhone" type="tel" value="@Form.PartnerPhone" maxlength="@OperationsLocationLimits.PhoneMaxLength" /></label>
     <label>@T["ui.editor.destination.partner_email"] <input name="partnerEmail" type="email" value="@Form.PartnerEmail" maxlength="@OperationsLocationLimits.EmailMaxLength" /></label>
-    <label><input type="checkbox" name="partnerHandlesMoney" value="true" checked="@Form.PartnerHandlesMoney" /> @T["ui.editor.destination.partner_money"]</label>
-    <p class="ops-editor__hint">@T["ui.editor.destination.partner_money_hint"]</p>
-    <label>@T["ui.editor.destination.hub"]
+    <div style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 0.25rem;">
+        <label class="ops-checkbox-label"><input type="checkbox" name="partnerHandlesMoney" value="true" checked="@Form.PartnerHandlesMoney" /> @T["ui.editor.destination.partner_money"]</label>
+        <p class="ops-editor__hint">@T["ui.editor.destination.partner_money_hint"]</p>
+    </div>
+    <label style="grid-column: 1 / -1;">@T["ui.editor.destination.hub"]
         <select name="hub">
             <option value="">@T["ui.editor.destination.no_hub"]</option>
             @* The current hub stays chosen even when it no longer qualifies; the save then says why. *@
@@ -38,12 +40,16 @@ IMPORTANT NOTES:
             @foreach (OperationsWarehouse hub in Hubs) { <option value="@hub.Id" selected="@(hub.Id == Form.HubWarehouseId)">@hub.Name · @hub.Address.City, @hub.Address.CountryCode</option> }
         </select>
     </label>
-    <p class="ops-editor__hint">@T["ui.editor.destination.hub_hint"]</p>
-    <label><input type="checkbox" name="deliversHome" value="true" checked="@Form.DeliversHome" /> @T["ui.editor.destination.delivers_home"]</label>
-    <label>@T["ui.editor.destination.home_area"] <textarea name="homeArea" rows="3">@string.Join(Environment.NewLine, Form.HomeArea ?? Array.Empty<string>())</textarea></label>
-    <p class="ops-editor__hint">@T["ui.editor.destination.home_area_hint"]</p>
-    <label><input type="checkbox" name="clearsCustoms" value="true" checked="@Form.ClearsCustoms" /> @T["ui.editor.destination.clears_customs"]</label>
-    <p class="ops-editor__hint">@T["ui.editor.destination.clears_customs_hint"]</p>
+    <p class="ops-editor__hint" style="grid-column: 1 / -1;">@T["ui.editor.destination.hub_hint"]</p>
+    <div style="grid-column: 1 / -1;">
+        <label class="ops-checkbox-label"><input type="checkbox" name="deliversHome" value="true" checked="@Form.DeliversHome" /> @T["ui.editor.destination.delivers_home"]</label>
+    </div>
+    <label style="grid-column: 1 / -1;">@T["ui.editor.destination.home_area"] <textarea name="homeArea" rows="3">@string.Join(Environment.NewLine, Form.HomeArea ?? Array.Empty<string>())</textarea></label>
+    <p class="ops-editor__hint" style="grid-column: 1 / -1;">@T["ui.editor.destination.home_area_hint"]</p>
+    <div style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 0.25rem;">
+        <label class="ops-checkbox-label"><input type="checkbox" name="clearsCustoms" value="true" checked="@Form.ClearsCustoms" /> @T["ui.editor.destination.clears_customs"]</label>
+        <p class="ops-editor__hint">@T["ui.editor.destination.clears_customs_hint"]</p>
+    </div>
 </fieldset>
 
 @code {

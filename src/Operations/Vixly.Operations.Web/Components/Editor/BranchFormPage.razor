@@ -1,12 +1,12 @@
-﻿@*
+@*
 =========================================================
 FILE: BranchFormPage.razor
 
 PURPOSE:
-The form for one branch.
+The form for one branch: a country or market the company serves (owner, 2026-10-29).
 
 RESPONSIBILITIES:
-- Render the form for one branch
+- Render the form for one branch: code, name, country, legal identity, optional office, status
 
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10); values come from the endpoint
@@ -19,26 +19,28 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T[Form.BranchId is null ? "ui.editor.branch.add" : "ui.editor.branch.edit"]" Company="@Company" Section="locations" Error="@Error">
-    <form method="post" action="/staff/locations/branch" class="ops-editor__panel">
+    <form method="post" action="/staff/locations/branch" class="ops-editor__panel ops-editor__form">
         <AntiforgeryToken />
         <input type="hidden" name="branchId" value="@Form.BranchId" />
-        <label>@T["ui.editor.code"] <input name="code" value="@Form.Code" maxlength="@OperationsLocationLimits.CodeMaxLength" required /></label>
-        <label>@T["ui.editor.name"] <input name="name" value="@Form.Name" maxlength="@OperationsLocationLimits.NameMaxLength" required /></label>
-        <AddressFields Line1="@Form.Line1" Line2="@Form.Line2" City="@Form.City" Region="@Form.Region" PostalCode="@Form.PostalCode" CountryCode="@Form.CountryCode" />
+        <label class="ops-editor__form-span-2">@T["ui.editor.code"] <input name="code" value="@Form.Code" maxlength="@OperationsLocationLimits.CodeMaxLength" required /></label>
+        <label class="ops-editor__form-span-4">@T["ui.editor.name"] <input name="name" value="@Form.Name" maxlength="@OperationsLocationLimits.NameMaxLength" required /></label>
+        <p class="ops-editor__hint" style="grid-column: 1 / -1;">@T["ui.editor.branch.hint"]</p>
+        <CountrySelect Name="countryCode" Value="@Form.CountryCode" Class="ops-editor__form-span-3" />
+        <fieldset class="ops-editor__panel-fieldset" style="grid-column: 1 / -1;">
+            <legend>@T["ui.editor.branch.legal"]</legend>
+            <p class="ops-editor__hint" style="grid-column: 1 / -1;">@T["ui.editor.branch.legal_hint"]</p>
+            <label>@T["ui.editor.branch.legal_name"] <input name="legalName" value="@Form.LegalName" maxlength="@OperationsBranch.LegalNameMaxLength" /></label>
+            <label>@T["ui.editor.branch.tax_number"] <input name="taxNumber" value="@Form.TaxNumber" maxlength="@OperationsBranch.TaxNumberMaxLength" /></label>
+            <label style="grid-column: 1 / -1;">@T["ui.editor.branch.legal_notes"] <textarea name="legalNotes" maxlength="@OperationsBranch.LegalNotesMaxLength" rows="3">@Form.LegalNotes</textarea></label>
+        </fieldset>
+        <AddressFields Line1="@Form.Line1" Line2="@Form.Line2" City="@Form.City" Region="@Form.Region" PostalCode="@Form.PostalCode" CountryCode="@Form.CountryCode"
+                       Optional="true" ShowCountry="false" Legend="ui.editor.branch.office" Hint="ui.editor.branch.office_hint" />
         <ContactFields Phone="@Form.Phone" Email="@Form.Email" OpeningHours="@Form.OpeningHours" />
-        <label>@T["ui.editor.branch.side"]
-            <select name="side">
-                @foreach (OperationsBranchSide side in Enum.GetValues<OperationsBranchSide>())
-                {
-                    <option value="@side" selected="@(side == Form.Side)">@T["ui.editor.side." + side.ToString().ToLowerInvariant()]</option>
-                }
-            </select>
-        </label>
-        <StatusFields Status="@Form.Status" ShowOnSite="@Form.ShowOnSite" />
-        <p class="ops-editor__actions">
+        <StatusFields Status="@Form.Status" ShowOnSite="@Form.ShowOnSite" Class="ops-editor__form-span-3" />
+        <div class="ops-editor__form-actions">
             @if (Can(OperationsPermissions.BranchesManage)) { <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button> }
-            <a href="/staff/locations">@T["ui.editor.cancel"]</a>
-        </p>
+            <a class="vx-button vx-button--secondary" href="/staff/locations">@T["ui.editor.cancel"]</a>
+        </div>
     </form>
 </EditorShell>
 

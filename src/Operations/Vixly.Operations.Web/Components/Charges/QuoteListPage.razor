@@ -46,7 +46,7 @@ IMPORTANT NOTES:
         {
             <OperationsTableViewport Label="@T["ui.quotes.list.page_title"]">
                 <table class="ops-editor__table">
-                    <thead><tr><th scope="col">@T["ui.quotes.list.number"]</th><th scope="col">@T["ui.quotes.list.created"]</th><th scope="col">@T["ui.quotes.list.customer"]</th><th scope="col">@T["ui.quotes.service"]</th><th scope="col">@T["ui.quotes.list.destination"]</th><th scope="col" class="ops-editor__number">@T["ui.quotes.list.amount"]</th><th scope="col">@T["ui.quotes.list.valid"]</th><th scope="col">@T["ui.quotes.list.status"]</th><th scope="col"><span class="vx-visually-hidden">@T["ui.quotes.withdraw"]</span></th></tr></thead>
+                    <thead><tr><th scope="col">@T["ui.quotes.list.number"]</th><th scope="col">@T["ui.quotes.list.created"]</th><th scope="col">@T["ui.quotes.list.customer"]</th><th scope="col">@T["ui.quotes.service"]</th><th scope="col">@T["ui.quotes.list.destination"]</th><th scope="col" class="ops-editor__number">@T["ui.quotes.list.amount"]</th><th scope="col">@T["ui.quotes.list.valid"]</th><th scope="col">@T["ui.quotes.list.status"]</th><th scope="col" style="text-align: right;"><span class="vx-visually-hidden">@T["ui.quotes.withdraw"]</span></th></tr></thead>
                     <tbody>
                         @foreach (OperationsQuoteRow row in Quotes)
                         {
@@ -60,15 +60,24 @@ IMPORTANT NOTES:
                                 <td class="ops-editor__number">@OperationsChargeWords.Money(row.Quote.Total, row.Quote.CurrencyCode)@if (row.Quote.IsPreferred) { <small> @VixlyText.Format(T, "ui.quotes.list.standard", "amount", OperationsChargeWords.Money(row.Quote.StandardTotal, row.Quote.CurrencyCode))</small> }</td>
                                 <td>@row.Quote.ValidUntilUtc.ToString("d", CultureInfo.CurrentCulture)</td>
                                 <td><span class="ops-editor__status" data-status="@state">@T["ui.quotes.state." + state]</span></td>
-                                <td>
-                                    @if (state == "open")
-                                    {
-                                        <form method="post" action="/staff/quotes/@row.Quote.Id/withdraw" class="ops-editor__inline">
-                                            <AntiforgeryToken />
-                                            <input type="hidden" name="from" value="list" />
-                                            <button type="submit" class="vx-button vx-button--secondary">@T["ui.quotes.withdraw"]</button>
-                                        </form>
-                                    }
+                                <td style="text-align: right; white-space: nowrap;">
+                                    <div style="display: inline-flex; align-items: center; justify-content: flex-end; gap: 0.5rem;">
+                                        @* Owner, 2026-10-28: print the quote, or email it with its PDF while it is open. *@
+                                        <a class="vx-button vx-button--secondary" href="/staff/quotes/@row.Quote.Id/pdf" target="_blank" rel="noopener">@T["ui.quotes.print"]</a>
+                                        @if (state == "open")
+                                        {
+                                            <form method="post" action="/staff/quotes/@row.Quote.Id/email" style="display: inline; margin: 0;">
+                                                <AntiforgeryToken />
+                                                <input type="hidden" name="from" value="list" />
+                                                <button type="submit" class="vx-button vx-button--secondary">@T["ui.quotes.email"]</button>
+                                            </form>
+                                            <form method="post" action="/staff/quotes/@row.Quote.Id/withdraw" style="display: inline; margin: 0;">
+                                                <AntiforgeryToken />
+                                                <input type="hidden" name="from" value="list" />
+                                                <button type="submit" class="vx-button vx-button--secondary">@T["ui.quotes.withdraw"]</button>
+                                            </form>
+                                        }
+                                    </div>
                                 </td>
                             </tr>
                         }
