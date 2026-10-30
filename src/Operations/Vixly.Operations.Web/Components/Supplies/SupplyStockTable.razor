@@ -1,0 +1,55 @@
+﻿@*
+=========================================================
+FILE: SupplyStockTable.razor
+
+PURPOSE:
+The stock on hand of each supply at a warehouse (Slice 5E, S-4 and S-8), with its reorder level.
+
+RESPONSIBILITIES:
+- List the supplies with on hand, low stock and the reorder level to change
+- Link to each supply's movements
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Supplies not in use are listed only while they still have stock
+=========================================================
+*@
+<OperationsTableViewport Label="@T["ui.supplies.stock.title"]">
+    <table class="ops-editor__table">
+        <thead><tr><th scope="col">@T["ui.supplies.code"]</th><th scope="col">@T["ui.supplies.name"]</th><th scope="col" class="ops-editor__number">@T["ui.supplies.stock.on_hand"]</th><th scope="col">@T["ui.supplies.stock.reorder"]</th><th scope="col"><span class="vx-visually-hidden">@T["ui.supplies.stock.history"]</span></th></tr></thead>
+        <tbody>
+            @foreach (OperationsSupply supply in Supplies)
+            {
+                OperationsSupplyStock? stock = Stock.FirstOrDefault(item => item.SupplyId == supply.Id);
+                @if (!supply.IsActive && (stock?.OnHand ?? 0) == 0) { continue; }
+                <tr data-low="@(stock?.IsLow == true ? "true" : "false")">
+                    <td class="ops-editor__code">@supply.Code</td>
+                    <td>@supply.Name(Language)</td>
+                    <td class="ops-editor__number"><strong>@(stock?.OnHand ?? 0)</strong>@if (stock?.IsLow == true) { <span class="ops-editor__status" data-status="low"> @T["ui.supplies.stock.low"]</span> }</td>
+                    <td>
+                        <form method="post" action="/staff/supplies/stock/reorder" class="ops-editor__inline">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="warehouse" value="@WarehouseId" />
+                            <input type="hidden" name="supply" value="@supply.Id" />
+                            <input name="level" value="@stock?.ReorderLevel" inputmode="numeric" size="5" autocomplete="off" aria-label="@T["ui.supplies.stock.reorder"]" />
+                            <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
+                        </form>
+                    </td>
+                    <td><a href="/staff/supplies/@supply.Id/movements?warehouse=@WarehouseId">@T["ui.supplies.stock.history"]</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</OperationsTableViewport>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public Guid WarehouseId { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsSupply> Supplies { get; set; } = Array.Empty<OperationsSupply>();
+
+    [Parameter] public IReadOnlyList<OperationsSupplyStock> Stock { get; set; } = Array.Empty<OperationsSupplyStock>();
+
+    private static string Language => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+}

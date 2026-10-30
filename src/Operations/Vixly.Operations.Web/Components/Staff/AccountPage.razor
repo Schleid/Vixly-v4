@@ -1,0 +1,135 @@
+@*
+=========================================================
+FILE: AccountPage.razor
+
+PURPOSE:
+My account: password, sessions, recovery codes.
+
+RESPONSIBILITIES:
+- Render my account: password, sessions, recovery codes
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019); sensitive actions ask for step-up first
+- Structured enterprise account layout with executive profile summary and sessions table
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.account.title"]" Company="@Company" Section="account" Error="@Error" Info="@Info">
+    <section class="ops-editor__panel">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+            <div>
+                <strong style="font-size: 1.125rem; color: var(--vx-color-text);">@Me.FullName</strong>
+                <span class="ops-editor__hint" style="margin-left: 0.5rem;">@Me.Email</span>
+            </div>
+            <span class="ops-editor__status" data-status="@(Me.HasSecondFactor ? "active" : "pending")">
+                @T[Me.HasSecondFactor ? "ui.staff.has_second_factor" : "ui.staff.no_second_factor"]
+            </span>
+        </div>
+        @if (Me.HasSecondFactor)
+        {
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--vx-color-border);">
+                <span style="font-size: 0.8125rem;">@VixlyText.Format(T, "ui.account.codes_left", "count", RecoveryCodesLeft)</span>
+                <form method="post" action="/staff/account/recovery-codes" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.account.new_codes"]</button>
+                </form>
+            </div>
+        }
+        @if (NewCodes is { Count: > 0 })
+        {
+            <p class="ops-editor__notice" style="margin-top: 0.75rem;">@T["ui.account.codes_once"]</p>
+            <ul class="ops-editor__codes">
+                @foreach (string recoveryCode in NewCodes) { <li><code>@recoveryCode</code></li> }
+            </ul>
+        }
+    </section>
+
+    <form method="post" action="/staff/account/language" class="ops-editor__panel" style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <AntiforgeryToken />
+        <label style="display: inline-flex; align-items: center; gap: 0.65rem; font-size: 0.8125rem; font-weight: 600; color: var(--vx-color-text-muted);">
+            @T["ui.account.language"]
+            <select name="language" style="height: 32px; min-height: 32px; width: auto; min-width: 10rem; padding: 0.25rem 0.5rem; font-size: 0.8125rem; border: 1px solid var(--vx-color-border-control); border-radius: 0.35rem; background: var(--vx-color-surface);">
+                <option value="en" selected="@(Language == "en")">English</option>
+                <option value="fr" selected="@(Language == "fr")">Français</option>
+                <option value="es" selected="@(Language == "es")">Español</option>
+            </select>
+        </label>
+        <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
+    </form>
+
+    <form method="post" action="/staff/account/password" class="ops-editor__panel">
+        <AntiforgeryToken />
+        <h2 style="margin: 0 0 0.75rem;">@T["ui.account.password"]</h2>
+        <div class="ops-editor__form">
+            <label class="ops-editor__form-span-3">@T["ui.account.current_password"] <input type="password" name="currentPassword" autocomplete="current-password" required /></label>
+            <label class="ops-editor__form-span-3">@T["ui.account.new_password"] <input type="password" name="newPassword" autocomplete="new-password" minlength="12" required /></label>
+            <div class="ops-editor__form-actions" style="margin-top: 0.5rem;"><button type="submit" class="vx-button vx-button--primary">@T["ui.account.change_password"]</button></div>
+        </div>
+    </form>
+
+    <MyPinPanel HasPin="@HasPin" PinLocked="@PinLocked" />
+
+    <section class="ops-editor__panel">
+        <h2 style="margin: 0 0 0.75rem;">@T["ui.account.sessions"]</h2>
+        <OperationsTableViewport Label="@T["ui.account.sessions"]">
+            <table class="ops-editor__table">
+                <thead>
+                    <tr>
+                        <th scope="col">@T["ui.activity.signed_in"]</th>
+                        <th scope="col">@T["ui.activity.device"]</th>
+                        <th scope="col">@T["ui.activity.browser"]</th>
+                        <th scope="col" style="text-align: right;"><span class="vx-visually-hidden">@T["ui.storage.link"]</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (OperationsSessionSummary session in Sessions)
+                    {
+                        <tr>
+                            <td style="white-space: nowrap;">@session.StartedUtc.ToLocalTime().ToString("g", System.Globalization.CultureInfo.CurrentCulture)</td>
+                            <td><code>@session.IpAddress</code></td>
+                            <td class="ops-editor__hint" style="max-width: 22rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@session.UserAgent</td>
+                            <td style="text-align: right; white-space: nowrap;">
+                                @if (session.IsCurrent)
+                                {
+                                    <span class="ops-editor__status" data-status="active">@T["ui.account.this_session"]</span>
+                                }
+                                else
+                                {
+                                    <form method="post" action="/staff/account/sessions/@session.SessionId/end" class="ops-editor__inline">
+                                        <AntiforgeryToken />
+                                        <button type="submit" class="vx-button vx-button--secondary">@T["ui.account.end_session"]</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsStaffMember Me { get; set; } = null!;
+
+    [Parameter] public int RecoveryCodesLeft { get; set; }
+
+    [Parameter] public string Language { get; set; } = "en";
+
+    [Parameter] public IReadOnlyList<OperationsSessionSummary> Sessions { get; set; } = Array.Empty<OperationsSessionSummary>();
+
+    [Parameter] public IReadOnlyList<string>? NewCodes { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    // Slice 12A: my PIN for licensed devices.
+    [Parameter] public bool HasPin { get; set; }
+
+    [Parameter] public bool PinLocked { get; set; }
+}

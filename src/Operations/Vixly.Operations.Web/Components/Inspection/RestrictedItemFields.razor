@@ -1,0 +1,35 @@
+@*
+=========================================================
+FILE: RestrictedItemFields.razor
+
+PURPOSE:
+The fields of one entry of the restricted-items list (Slice 3C design section 3).
+
+RESPONSIBILITIES:
+- Name, words, prohibited or restricted, destinations, carriers, what is needed
+
+IMPORTANT NOTES:
+- Markup only; the caller passes its localizer and the form around it
+- Empty destinations or carriers mean all
+- Structured grid layout with responsive span classes
+=========================================================
+*@
+<label class="ops-editor__form-span-3">@T["ui.inspection.item.name"] <input name="name" value="@Item?.Name" maxlength="@OperationsInspectionLimits.NameMaxLength" required /></label>
+<label class="ops-editor__form-span-3">@T["ui.inspection.item.kind"]
+    <select name="kind">
+        <option value="Restricted" selected="@(Item?.Kind != OperationsRestrictedItemKind.Prohibited)">@T["ui.inspection.kind.Restricted"]</option>
+        <option value="Prohibited" selected="@(Item?.Kind == OperationsRestrictedItemKind.Prohibited)">@T["ui.inspection.kind.Prohibited"]</option>
+    </select>
+</label>
+<label class="ops-editor__form-span-full">@T["ui.inspection.item.words"] <textarea name="words" rows="2" maxlength="@OperationsInspectionLimits.WordsMaxLength" required>@Item?.Words</textarea></label>
+<p class="ops-editor__hint" style="grid-column: 1 / -1; margin: -0.25rem 0 0.25rem;">@T["ui.inspection.item.words_hint"]</p>
+<label class="ops-editor__form-span-3">@T["ui.inspection.item.countries"] <input name="countries" value="@Item?.Countries" maxlength="@OperationsInspectionLimits.CountriesMaxLength" placeholder="HT, DO" autocapitalize="characters" /></label>
+<label class="ops-editor__form-span-3">@T["ui.inspection.item.carriers"] <input name="carriers" value="@Item?.Carriers" maxlength="@OperationsInspectionLimits.CarriersMaxLength" placeholder="DHL, FedEx" /></label>
+<p class="ops-editor__hint" style="grid-column: 1 / -1; margin: -0.25rem 0 0.25rem;">@T["ui.inspection.item.where_hint"]</p>
+<label class="ops-editor__form-span-full">@T["ui.inspection.item.requirement"] <textarea name="requirement" rows="2" maxlength="@OperationsInspectionLimits.RequirementMaxLength">@Item?.Requirement</textarea></label>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public OperationsRestrictedItem? Item { get; set; }
+}

@@ -58,6 +58,30 @@ public sealed class PlatformLicensingTests
         Assert.Equal(1, seats.SeatsInUse);
     }
 
+    // Owner, 2026-10-21: where a device was registered from, its type, and who approved it.
+    [Fact]
+    public void Enrol_KeepsWhereItCameFrom_AndApproval_KeepsWho()
+    {
+        PlatformDevice device = PlatformDevice.Enrol(Tenant, "D-000001", "Front desk", PlatformDeviceKind.Laptop, null, HashA, Admin, Now,
+            new PlatformDeviceOrigin(" 203.0.113.7 ", new string('u', 600), "us")).Device;
+        PlatformDevice nowhere = PlatformDevice.Enrol(Tenant, "D-000002", "Dock", PlatformDeviceKind.Desktop, null, HashB, Admin, Now, new PlatformDeviceOrigin(null, " ", "XYZ")).Device;
+
+        device.Approve(Admin, Now);
+
+        Assert.Equal("203.0.113.7", device.RegisteredIp);
+        Assert.Equal(512, device.RegisteredUserAgent!.Length);
+        Assert.Equal("US", device.RegisteredCountry);
+        Assert.Equal("Grace Admin", device.ApprovedByName);
+        Assert.Null(nowhere.RegisteredUserAgent);
+        Assert.Null(nowhere.RegisteredCountry);
+
+        // A device without a country takes the first real one it is used from, never Tor or unknown, and keeps it.
+        Assert.False(nowhere.KeepCountry("T1", Now));
+        Assert.True(nowhere.KeepCountry("ht", Now));
+        Assert.False(nowhere.KeepCountry("FR", Now));
+        Assert.Equal("HT", nowhere.RegisteredCountry);
+    }
+
     [Fact]
     public void Enrol_NeedsANameAndExactlyOneProof_AndFinalStatesStayFinal()
     {

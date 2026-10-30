@@ -1,0 +1,51 @@
+﻿@*
+=========================================================
+FILE: EnrolPage.razor
+
+PURPOSE:
+Authenticator app enrolment during sign-in, for staff who must have a second factor.
+
+RESPONSIBILITIES:
+- Render authenticator app enrolment during sign-in, for staff who must have a second factor
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<AuthShell Title="@T["ui.enrol.title"]" Subtitle="@T["ui.enrol.intro"]" Company="@Company">
+    <FormMessage Error="@Error" />
+    <div class="vx-auth__qr">
+        <img src="@QrDataUri" alt="@T["ui.enrol.qr_alt"]" width="200" height="200" />
+    </div>
+    <p class="vx-auth__manual">@T["ui.enrol.manual_key"] <code>@ManualKey</code></p>
+    <form method="post" action="/staff/sign-in/enrol" class="vx-form">
+        <AntiforgeryToken />
+        <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+        <div class="vx-field">
+            <label for="code" class="vx-label">@T["ui.enrol.code_label"]</label>
+            <input id="code" name="code" class="vx-input vx-input--code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]{6,7}" maxlength="7" required />
+        </div>
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.enrol.submit"]</VxButton>
+    </form>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string? Company { get; set; }
+
+    [Parameter]
+    public string ReturnUrl { get; set; } = "/";
+
+    [Parameter]
+    public string? Error { get; set; }
+
+    [Parameter]
+    public string ManualKey { get; set; } = string.Empty;
+
+    [Parameter]
+    public string QrDataUri { get; set; } = string.Empty;
+}

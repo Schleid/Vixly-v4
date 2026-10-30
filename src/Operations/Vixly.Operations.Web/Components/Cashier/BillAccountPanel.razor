@@ -1,0 +1,38 @@
+﻿@*
+=========================================================
+FILE: BillAccountPanel.razor
+
+PURPOSE:
+Bill the customer's credit account at the cashier (Slice 5F step 2b, K-3).
+
+RESPONSIBILITIES:
+- Show what the account has available; bill the whole amount owed
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Above the limit: refused, or waiting for the credit department, as the company chose
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+@if (Account is { IsActive: true } && Position is not null && Invoice.OnAccount == OperationsAccountCharge.None && Invoice.PendingTotal == 0m)
+{
+    <form method="post" action="/staff/cashier/invoices/@Invoice.Id/bill-account" class="ops-editor__panel ops-editor__form ops-cashier__account" aria-labelledby="account-title">
+        <AntiforgeryToken />
+        <h2 id="account-title">@T["ui.credit.bill_title"]</h2>
+        <p>@VixlyText.Format(T, "ui.credit.bill_available", "amount", OperationsInvoiceWords.Money(Position.Available, Invoice.CurrencyCode))</p>
+        <button type="submit" class="vx-button vx-button--secondary">@VixlyText.Format(T, "ui.credit.bill_button", "amount", OperationsInvoiceWords.Money(Invoice.Owed, Invoice.CurrencyCode))</button>
+    </form>
+}
+else if (Account is not null && !Account.IsActive)
+{
+    <p class="ops-editor__notice">@T["ui.credit.account_not_active"]</p>
+}
+
+@code {
+    [Parameter, EditorRequired] public OperationsInvoice Invoice { get; set; } = null!;
+
+    [Parameter] public OperationsCreditAccount? Account { get; set; }
+
+    [Parameter] public OperationsCreditPosition? Position { get; set; }
+}

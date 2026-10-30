@@ -1,0 +1,99 @@
+﻿@*
+=========================================================
+FILE: HomeOverview.razor
+
+PURPOSE:
+What Vixly does: the opening, modules and daily flow.
+
+RESPONSIBILITIES:
+Present localized marketing copy and subject-specific illustrations.
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+@inject IOptions<PublicSiteOptions> Site
+
+<section class="pub-hero">
+    <p class="pub-eyebrow">@T["public.home.eyebrow"]</p>
+    <h1>@T["public.home.headline"]</h1>
+    <p class="pub-lead">@T["public.home.lead"]</p>
+    <p class="pub-actions">
+        <a class="vx-button vx-button--primary" href="@Start">@T[Site.Value.RegistrationOpen ? "public.cta.start" : "public.cta.talk"]</a>
+        <a class="vx-button" href="@PublicLanguage.Page(PublicLanguage.Current, "plans")">@T["public.cta.plans"]</a>
+    </p>
+    <p class="pub-hint">@T["public.home.audience_line"]</p>
+</section>
+<section class="pub-section" aria-labelledby="home-modules">
+    <h2 id="home-modules">@T["public.home.modules.title"]</h2>
+    <p class="pub-lead">@T["public.home.modules.lead"]</p>
+    <ul class="pub-grid">
+        @foreach (string module in Modules)
+        {
+            <li class="vx-card pub-tile">
+                <h3>@T["public.home.module." + module + ".title"]</h3>
+                <p>@T["public.home.module." + module + ".text"]</p>
+                <img class="pub-module-sketch" src="@($"/images/sketch-{(module == "tenants" ? "organization" : module)}.webp")" alt="" width="800" height="600" loading="lazy" decoding="async" />
+            </li>
+        }
+    </ul>
+</section>
+<section class="pub-section" aria-labelledby="home-flow">
+    <h2 id="home-flow">@T["public.home.flow.title"]</h2>
+    <ol class="pub-steps">
+        @foreach (string step in Steps)
+        {
+            <li>
+                <h3>@T["public.home.flow." + step + ".title"]</h3>
+                <p>@T["public.home.flow." + step + ".text"]</p>
+            </li>
+        }
+    </ol>
+</section>
+<section class="pub-section" aria-labelledby="home-audience">
+    <h2 id="home-audience">@T["public.home.audience.title"]</h2>
+    <ul class="pub-grid">
+        @foreach (string audience in Audiences)
+        {
+            <li class="vx-card pub-tile">
+                <h3>@T["public.home.audience." + audience + ".title"]</h3>
+                <p>@T["public.home.audience." + audience + ".text"]</p>
+            </li>
+        }
+    </ul>
+</section>
+<section class="pub-section" aria-labelledby="home-why">
+    <h2 id="home-why">@T["public.home.why.title"]</h2>
+    <p class="pub-lead">@T["public.home.why.lead"]</p>
+    <ul class="pub-grid">
+        @foreach (string reason in Reasons)
+        {
+            <li class="pub-tile">
+                <h3>@T["public.home.why." + reason + ".title"]</h3>
+                <p>@T["public.home.why." + reason + ".text"]</p>
+            </li>
+        }
+    </ul>
+</section>
+<section class="pub-section pub-closing">
+    <h2>@T["public.home.closing.title"]</h2>
+    <p>@T["public.home.closing.text"]</p>
+    <p class="pub-actions">
+        <a class="vx-button vx-button--primary" href="@Start">@T[Site.Value.RegistrationOpen ? "public.cta.start" : "public.cta.talk"]</a>
+        <a class="vx-button" href="@PublicLanguage.Page(PublicLanguage.Current, "features")">@T["public.cta.features"]</a>
+    </p>
+</section>
+
+@code {
+    public static readonly string[] Modules = { "shipments", "parcels", "dispatch", "warehouse", "billing", "tenants" };
+
+    public static readonly string[] Steps = { "customer", "shipment", "scan", "dispatch", "payment" };
+
+    public static readonly string[] Audiences = { "courier", "freight", "warehouse", "multi_branch" };
+
+    public static readonly string[] Reasons = { "visibility", "branches", "barcodes" };
+
+    private string Start => PublicLanguage.Page(PublicLanguage.Current, Site.Value.RegistrationOpen ? "register" : "contact");
+}

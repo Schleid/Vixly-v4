@@ -1,0 +1,71 @@
+﻿@*
+=========================================================
+FILE: StockCountsPage.razor
+
+PURPOSE:
+The counts of the undeclared parcels area: start one for a warehouse, see the earlier ones (Slice 4D step 3).
+
+RESPONSIBILITIES:
+- Start (or continue) the count of a warehouse
+- List counts, newest first, with what they found
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); the use case limits the list to covered warehouses
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.counts.title"]" Company="@Company" Section="parcels" Error="@Error">
+    <div class="ops-stock-workflow">
+    <nav class="ops-editor__inline" aria-label="@T["ui.parcels.views"]">
+        <a href="/staff/parcels">@T["ui.parcels.view.all"]</a>
+        <a href="/staff/parcels/unidentified">@T["ui.parcels.view.unidentified"]</a>
+        <a href="/staff/parcels/counts" aria-current="page">@T["ui.counts.title"]</a>
+    </nav>
+    <section class="ops-editor__panel">
+        <p class="ops-editor__hint">@T["ui.counts.hint"]</p>
+        @if (Warehouses.Count > 0)
+        {
+            <form method="post" action="/staff/parcels/counts" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <select name="warehouse" aria-label="@T["ui.receiving.warehouse"]">
+                    @foreach (OperationsWarehouse warehouse in Warehouses) { <option value="@warehouse.Id">@warehouse.Code · @warehouse.Name</option> }
+                </select>
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.counts.start"]</button>
+            </form>
+        }
+        @if (Counts.Count == 0)
+        {
+            <div class="ops-editor__empty"><h2>@T["ui.counts.none"]</h2></div>
+        }
+        else
+        {
+            <ul>
+                @foreach (Vixly.Operations.Domain.Holds.OperationsStockCount count in Counts)
+                {
+                    <li>
+                        <a href="/staff/parcels/counts/@count.Id">@count.CreatedUtc.ToString("yyyy-MM-dd HH:mm") · @(Warehouses.FirstOrDefault(warehouse => warehouse.Id == count.WarehouseId)?.Code)</a>
+                        · @(count.IsOpen ? T["ui.counts.open"].Value : T["ui.counts.closed"].Value)
+                        · @VixlyText.Format(T, "ui.counts.summary", new Dictionary<string, object>
+                            {
+                                ["found"] = count.Lines.Count(line => line.Result == Vixly.Operations.Domain.Holds.OperationsCountResult.Found),
+                                ["missing"] = count.Lines.Count(line => line.Result == Vixly.Operations.Domain.Holds.OperationsCountResult.Missing),
+                                ["total"] = count.Lines.Count
+                            })
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+    </div>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Holds.OperationsStockCount> Counts { get; set; } = Array.Empty<Vixly.Operations.Domain.Holds.OperationsStockCount>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public string? Error { get; set; }
+}

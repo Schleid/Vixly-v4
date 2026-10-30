@@ -1,0 +1,51 @@
+﻿@*
+=========================================================
+FILE: PublicLayout.razor
+
+PURPOSE:
+The public frame: header with navigation, language links and the main call to action, then the page, then the footer.
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- "Get started" goes to contact while sign-up is switched off (D-U4)
+=========================================================
+*@
+@inherits LayoutComponentBase
+@inject IStringLocalizer<PublicText> T
+@inject IOptions<PublicSiteOptions> Site
+@inject TimeProvider Clock
+
+<a class="pub-skip" href="#main">@T["public.layout.skip"]</a>
+<header class="pub-header">
+    <a class="pub-brand" href="@PublicLanguage.Page(Lang)">
+        <img src="@Assets["_content/Vixly.Shared.UI/img/vixly-icon.png"]" alt="" width="32" height="32" />
+        <span>@T["public.brand"]</span>
+    </a>
+    <nav class="pub-nav" aria-label="@T["public.nav.label"]">
+        <a href="@PublicLanguage.Page(Lang)">@T["public.nav.home"]</a>
+        <a href="@PublicLanguage.Page(Lang, "features")">@T["public.nav.features"]</a>
+        <a href="@PublicLanguage.Page(Lang, "plans")">@T["public.nav.plans"]</a>
+        <a href="@PublicLanguage.Page(Lang, "contact")">@T["public.nav.contact"]</a>
+    </nav>
+    <LanguageLinks />
+    <a class="vx-button vx-button--primary pub-cta" href="@StartLink">@T[Site.Value.RegistrationOpen ? "public.cta.start" : "public.cta.talk"]</a>
+</header>
+<main id="main" class="pub-main">
+    @Body
+</main>
+<footer class="pub-footer">
+    <p>@T["public.footer.about"]</p>
+    <nav aria-label="@T["public.footer.label"]">
+        <a href="@PublicLanguage.Page(Lang, "plans")">@T["public.nav.plans"]</a>
+        <a href="@PublicLanguage.Page(Lang, "contact")">@T["public.nav.contact"]</a>
+        <a href="@PublicLanguage.Page(Lang, "legal")">@T["public.nav.legal"]</a>
+    </nav>
+    <p class="pub-footer__copy">@VixlyText.Format(T, "public.footer.copyright", "year", Clock.GetUtcNow().Year)</p>
+</footer>
+
+@code {
+    private static string Lang => PublicLanguage.Current;
+
+    private string StartLink => PublicLanguage.Page(Lang, Site.Value.RegistrationOpen ? "register" : "contact");
+}

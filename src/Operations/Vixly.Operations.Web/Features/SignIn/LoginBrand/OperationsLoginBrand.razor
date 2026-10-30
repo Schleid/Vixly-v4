@@ -1,0 +1,43 @@
+﻿@inherits Vixly.Shared.UI.Presenters.PresenterComponent<OperationsLoginBrandPresenter>
+@using Microsoft.Extensions.Localization
+@using Vixly.Operations.Resources
+@using Vixly.Operations.Application.Ports
+@inject IHttpContextAccessor Http
+@inject IStringLocalizer<OperationsLoginText> L
+@* =========================================================
+FILE: OperationsLoginBrand.razor
+
+PURPOSE:
+The published tenant identity at staff entry.
+
+RESPONSIBILITIES:
+- Render the logo with an initials fallback
+
+IMPORTANT NOTES:
+- The owned data scope is initialized from the resolved host only
+- No platform logo or draft image is shown
+========================================================= *@
+<div class="ops-login__identity">
+    <span class="ops-login__logo" data-login-logo>
+        <span class="ops-login__initials" aria-hidden="true">@Initials</span>
+        @if (Presenter.State.LogoUrl is { } logo)
+        {
+            <img src="@logo" alt="@Company" width="64" height="64" data-tenant-logo />
+        }
+    </span>
+    <span>@L["portal"]</span>
+</div>
+
+@code {
+    [Parameter]
+    public string? Company { get; set; }
+
+    private string Initials => string.IsNullOrWhiteSpace(Company) ? "" : string.Concat(Company.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(word => System.Globalization.StringInfo.GetNextTextElement(word))).ToUpperInvariant();
+
+    protected override void PrepareScope(IServiceProvider services)
+    {
+        services.GetRequiredService<IOperationsTenantScope>().Enter(Vixly.Operations.Web.Security.OperationsCurrentUser.Context(Http.HttpContext!).RequiredTenantId);
+    }
+
+    protected override async Task OnInitializedAsync() => await Presenter.LoadAsync();
+}

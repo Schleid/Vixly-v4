@@ -1,0 +1,114 @@
+@*
+=========================================================
+FILE: SuppliesPage.razor
+
+PURPOSE:
+Prices → Supplies (Slice 5E, S-3): the shipping supplies the company sells, and a new one.
+
+RESPONSIBILITIES:
+- List the supplies with their category, unit, price today, barcodes and state; filter by text and category
+- Add a supply with its first price
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- ops.charges.configure, as the prices; without it only the refusal is shown
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.supplies.page_title"]" Company="@Company" Section="supplies" Error="@Error" Info="@Info">
+    @if (!Denied)
+    {
+        <form method="get" action="/staff/supplies" class="ops-list-bar" role="search">
+            <input name="search" value="@Search" placeholder="@T["ui.supplies.search"]" aria-label="@T["ui.supplies.search"]" maxlength="80" autocomplete="off" autofocus />
+            <select name="category" aria-label="@T["ui.supplies.category"]">
+                <option value="">@T["ui.supplies.category_all"]</option>
+                @foreach (OperationsSupplyCategory category in Enum.GetValues<OperationsSupplyCategory>())
+                {
+                    <option value="@category" selected="@(Category == category)">@T["ui.supplies.category." + category]</option>
+                }
+            </select>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.search_submit"]</button>
+            <a href="#supplies-new" class="vx-button vx-button--secondary">+ @T["ui.supplies.new"]</a>
+        </form>
+        <section class="ops-editor__panel" aria-labelledby="supplies-list">
+            <h2 id="supplies-list">@T["ui.supplies.list_title"]</h2>
+            @if (Shown.Count == 0)
+            {
+                <div class="ops-editor__empty"><p>@T["ui.supplies.none"]</p></div>
+            }
+            else
+            {
+                <OperationsTableViewport Label="@T["ui.supplies.list_title"]">
+                    <table class="ops-editor__table">
+                        <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.supplies.code"]</th><th scope="col">@T["ui.supplies.name"]</th><th scope="col">@T["ui.supplies.category"]</th><th scope="col">@T["ui.supplies.unit"]</th><th scope="col" class="ops-editor__number">@T["ui.supplies.price_now"]</th><th scope="col">@T["ui.supplies.barcodes"]</th><th scope="col">@T["ui.supplies.state"]</th></tr></thead>
+                        <tbody>
+                            @foreach (OperationsSupply supply in Shown)
+                            {
+                                <tr data-active="@(supply.IsActive ? "true" : "false")">
+                                    <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/supplies/@supply.Id">@supply.Code</a></td>
+                                    <td>@supply.Name(Language)@if (!supply.IsTaxed) { <small> · @T["ui.supplies.not_taxed"]</small> }</td>
+                                    <td>@T["ui.supplies.category." + supply.Category]</td>
+                                    <td>@(supply.Unit ?? T["ui.supplies.unit_each"].Value)</td>
+                                    <td class="ops-editor__number ops-editor__code">@(supply.UnitPrice(null, 1, UtcNow) is { } price ? OperationsChargeWords.Money(price, Currency) : T["ui.supplies.no_price"].Value)@if (supply.Prices.Any(item => item.EffectiveFromUtc > UtcNow)) { <small> · @T["ui.supplies.price_scheduled"]</small> }</td>
+                                    <td class="ops-editor__code">@supply.Barcodes.Count</td>
+                                    <td>@(supply.IsActive ? T["ui.charges.in_use"] : T["ui.supplies.not_in_use"])</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </OperationsTableViewport>
+            }
+        </section>
+        <section class="ops-editor__panel" id="supplies-new" aria-labelledby="supplies-new-heading">
+            <h2 id="supplies-new-heading">@T["ui.supplies.new"]</h2>
+            <form method="post" action="/staff/supplies" class="ops-editor__form">
+                <AntiforgeryToken />
+                <input type="hidden" name="active" value="true" />
+                <SupplyDetailsFields T="T" Form="Entered" />
+                <SupplyPriceFields T="T" Form="Entered" Warehouses="Warehouses" Currency="@Currency" />
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.add"]</button>
+            </form>
+        </section>
+        <SupplyStockSettingsPanel T="T" CountsStock="CountsStock" StockOut="StockOut" Settings="Settings" />
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsSupply> Supplies { get; set; } = Array.Empty<OperationsSupply>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+
+    [Parameter] public DateTimeOffset UtcNow { get; set; }
+
+    [Parameter] public string? Search { get; set; }
+
+    [Parameter] public OperationsSupplyCategory? Category { get; set; }
+
+    [Parameter] public OperationsSupplyForm Entered { get; set; } = new();
+
+    [Parameter] public bool CountsStock { get; set; } = true;
+
+    [Parameter] public OperationsSupplyStockOut StockOut { get; set; } = OperationsSupplyStockOut.AllowWithWarning;
+
+    [Parameter] public Vixly.Operations.Domain.Settings.OperationsTenantSettings? Settings { get; set; }
+
+    [Parameter] public bool Denied { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private static string Language => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+    // By text in the code, the names or a barcode, and by category.
+    private IReadOnlyList<OperationsSupply> Shown => Supplies
+        .Where(supply => Category is null || supply.Category == Category)
+        .Where(supply => string.IsNullOrWhiteSpace(Search) || supply.Answers(Search) || new[] { supply.Code, supply.NameEn, supply.NameFr, supply.NameEs }
+            .Any(text => text?.Contains(Search.Trim(), StringComparison.CurrentCultureIgnoreCase) == true))
+        .ToList();
+}

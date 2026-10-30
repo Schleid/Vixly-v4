@@ -96,7 +96,8 @@ public static class PlatformRegistrationEndpoints
                     AcceptedTerms = body.AcceptedTerms,
                     TermsVersion = body.TermsVersion,
                     PrivacyVersion = body.PrivacyVersion,
-                    BotToken = body.BotToken
+                    BotToken = body.BotToken,
+                    OfferToken = body.OfferToken
                 },
                 cancellationToken);
 
@@ -291,6 +292,7 @@ public static class PlatformRegistrationEndpoints
             PlatformPlanFeature.CustomDomain => "custom_domain",
             PlatformPlanFeature.WhiteLabelPortal => "white_label_portal",
             PlatformPlanFeature.AdvancedAnalytics => "advanced_analytics",
+            PlatformPlanFeature.PartnerAgents => "partner_agents",
             _ => "data_export"
         };
     }

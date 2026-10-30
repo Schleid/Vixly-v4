@@ -1,0 +1,142 @@
+@*
+=========================================================
+FILE: DevicesPage.razor
+
+PURPOSE:
+The Licences tab of the company (owner, 2026-10-21): every
+licence, bound to a device or free, and the devices requested or
+ended.
+
+RESPONSIBILITIES:
+- Render the licences (number, device ID, name, type, browser,
+  status, registered, authorised by) and the free ones
+- Link each device to its page, where it is approved, denied or
+  released
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- A lower number of licences waits for the renewal; the devices in use must be released first
+=========================================================
+*@
+@using Vixly.Operations.Application.Ports
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.licences.title"]" Company="@Company" Section="company" Error="@Error" Info="@Info">
+    <CompanyTabs Current="licences" />
+    @if (Seats is { } seats)
+    {
+        <div class="ops-editor__panel" style="margin-bottom: 0.75rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                <div>
+                    <strong style="font-size: 1rem;">@VixlyText.Format(T, "ui.licences.summary", new Dictionary<string, object> { ["inUse"] = seats.InUse, ["seats"] = seats.Seats })</strong>
+                    @if (seats.ScheduledSeats is { } scheduled && seats.ScheduledUtc is { } from)
+                    {
+                        <p class="ops-editor__hint" style="margin: 0.25rem 0 0;">@VixlyText.Format(T, "ui.licences.scheduled", new Dictionary<string, object> { ["seats"] = scheduled, ["date"] = Day(from) })</p>
+                    }
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <span class="ops-editor__status" data-status="@(seats.InUse >= seats.Seats ? "overdue" : "active")">@seats.InUse / @seats.Seats @T["ui.licences.licence"]</span>
+                </div>
+            </div>
+        </div>
+    }
+    <section class="ops-editor__panel">
+        <OperationsTableViewport Label="@T["ui.licences.title"]">
+        <table class="ops-editor__table ops-licences">
+            <thead>
+                <tr>
+                    <th scope="col">@T["ui.licences.licence"]</th>
+                    <th scope="col">@T["ui.licences.device_id"]</th>
+                    <th scope="col">@T["ui.licences.name"]</th>
+                    <th scope="col">@T["ui.devices.kind"]</th>
+                    <th scope="col">@T["ui.devices.browser"]</th>
+                    <th scope="col">@T["ui.licences.status"]</th>
+                    <th scope="col">@T["ui.devices.registered"]</th>
+                    <th scope="col">@T["ui.devices.authorised_by"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ((int? licence, OperationsDevice? device) in Rows)
+                {
+                    <tr data-status="@(device?.Status ?? "free")">
+                        <td>@(licence?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "-")</td>
+                        @if (device is null)
+                        {
+                            <td>-</td>
+                            <td colspan="5"><span class="ops-editor__status" data-status="free">@T["ui.licences.status.free"]</span></td>
+                            <td>-</td>
+                        }
+                        else
+                        {
+                            <td class="ops-editor__code">@device.Number</td>
+                            <td><a href="/staff/devices/@device.DeviceId">@device.Name</a></td>
+                            <td>@T["ui.devices.kind." + device.Kind]</td>
+                            <td>@(device.Browser ?? "-")</td>
+                            <td>
+                                <span class="ops-editor__status" data-status="@device.Status">@T["ui.licences.status." + device.Status]</span>
+                                @if (Blocks.Any(block => block.DeviceId == device.DeviceId))
+                                {
+                                    <span class="ops-editor__status" data-status="blocked">@T["ui.licences.blocked"]</span>
+                                }
+                            </td>
+                            <td>@Time(device.RequestedUtc)</td>
+                            <td>@Authorised(device)</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+        </OperationsTableViewport>
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsDevice> Devices { get; set; } = Array.Empty<OperationsDevice>();
+
+    [Parameter] public OperationsDeviceSeats? Seats { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    // Owner, R-6: devices blocked after a sign-in from another country.
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Identity.OperationsDeviceBlock> Blocks { get; set; } = Array.Empty<Vixly.Operations.Domain.Identity.OperationsDeviceBlock>();
+
+    // Bound licences first (oldest first), then the free ones, then the devices requested, then those that ended (newest first).
+    private IEnumerable<(int?, OperationsDevice?)> Rows
+    {
+        get
+        {
+            int bound = 0;
+            foreach (OperationsDevice device in Devices.Where(d => d.Status == "active").OrderBy(d => d.RequestedUtc))
+            {
+                bound++;
+                yield return (bound, device);
+            }
+            int total = Seats?.Seats ?? bound;
+            for (int i = bound + 1; i <= total; i++)
+            {
+                yield return (i, null);
+            }
+            foreach (OperationsDevice device in Devices.Where(d => d.Status == "pending").OrderByDescending(d => d.RequestedUtc))
+            {
+                yield return (null, device);
+            }
+            foreach (OperationsDevice device in Devices.Where(d => d.Status is not ("active" or "pending")).OrderByDescending(d => d.RequestedUtc))
+            {
+                yield return (null, device);
+            }
+        }
+    }
+
+    private static string Time(DateTimeOffset utc) => utc.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+
+    private static string Day(DateTimeOffset utc) => utc.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+
+    private string Authorised(OperationsDevice device) =>
+        device.ApprovedUtc is { } approved
+            ? (device.ApprovedByName ?? T["ui.devices.authorised_by_link"].Value) + ", " + Time(approved)
+            : "-";
+}

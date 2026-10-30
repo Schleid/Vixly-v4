@@ -1,0 +1,38 @@
+﻿@inherits PlatformPresenterComponent<InvoiceListPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@* =========================================================
+   FILE: InvoiceOverview.razor
+
+   PURPOSE:
+   A live metric and first-page preview for the Control overview.
+
+   RESPONSIBILITIES:
+   Present existing authorized Control data and navigation.
+
+   IMPORTANT NOTES:
+   Uses existing presenters; no business rules or sample values.
+   ========================================================= *@
+<div class="vx-control-module">
+    <a class="vx-control-metric-link" href="/invoices?overdue=true">
+        <VxMetricCard Label="@T["ui.control.overdue_invoices"]" Value="@(Presenter.State.Loaded && Presenter.State.Error is null ? Presenter.State.TotalCount.ToString("N0") : "—")" Detail="@T["ui.control.invoices_context"]" />
+    </a>
+    <section class="vx-control-panel" aria-busy="@(!Presenter.State.Loaded ? "true" : "false")">
+        <header class="vx-control-panel__header"><h2>@T["ui.control.overdue_invoices"]</h2><a href="/invoices?overdue=true">@T["ui.control.view_all"] →</a></header>
+        @if (Presenter.State.Error is not null)
+        {
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+        }
+        else
+        {
+            <VxDataTable Items="Presenter.State.Invoices.Take(5).ToArray()" IsLoading="@(!Presenter.State.Loaded)" Caption="@T["ui.control.invoices_context"]">
+                <HeaderContent><th scope="col">@T["ui.invoices.number"]</th><th scope="col">@T["ui.subscriptions.tenant"]</th><th scope="col">@T["ui.invoices.balance"]</th></HeaderContent>
+                <RowTemplate Context="item"><td><a href="/invoices/@item.PlatformInvoiceId">@item.Number</a></td><td>@item.TenantName</td><td class="vx-table__number">@BillingDisplay.Money(item.Balance, item.CurrencyCode)</td></RowTemplate>
+                <EmptyContent><VxEmptyState Title="@T["ui.invoices.empty"]" /></EmptyContent>
+            </VxDataTable>
+        }
+    </section>
+</div>
+@code {
+    protected override Task OnParametersSetAsync() => Presenter.LoadAsync(null, true, null, null, null, null, 1);
+}

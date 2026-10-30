@@ -27,14 +27,17 @@ public sealed class PlatformRegistrationPaidHandler : IPlatformOutboxHandler
 
     private readonly PlatformAuditTrail _audit;
 
+    private readonly PlatformOutboxWriter _outbox;
+
     private readonly IPlatformUnitOfWork _unitOfWork;
 
     private readonly TimeProvider _timeProvider;
 
-    public PlatformRegistrationPaidHandler(IPlatformTenantRegistrationRepository registrations, PlatformAuditTrail audit, IPlatformUnitOfWork unitOfWork, TimeProvider timeProvider)
+    public PlatformRegistrationPaidHandler(IPlatformTenantRegistrationRepository registrations, PlatformAuditTrail audit, PlatformOutboxWriter outbox, IPlatformUnitOfWork unitOfWork, TimeProvider timeProvider)
     {
         _registrations = registrations ?? throw new ArgumentNullException(nameof(registrations));
         _audit = audit ?? throw new ArgumentNullException(nameof(audit));
+        _outbox = outbox ?? throw new ArgumentNullException(nameof(outbox));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
@@ -52,6 +55,10 @@ public sealed class PlatformRegistrationPaidHandler : IPlatformOutboxHandler
         }
 
         _audit.Record(null, "platform.registrations.paid", null, nameof(PlatformTenantRegistration), registration.Id, after: new { invoice = paid.Number });
+        _outbox.Write(
+            PlatformMessageTypes.RegistrationAccountSetupReady,
+            paid.PlatformTenantId,
+            new PlatformRegistrationAccountSetupReady(paid.PlatformTenantId, registration.Id, _timeProvider.GetUtcNow()));
 
         if (!await _unitOfWork.SaveChangesAsync(cancellationToken))
         {

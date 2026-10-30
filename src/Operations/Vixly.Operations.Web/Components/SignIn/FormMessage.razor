@@ -1,0 +1,32 @@
+﻿@*
+=========================================================
+FILE: FormMessage.razor
+
+PURPOSE:
+An error or information message on a sign-in form.
+
+RESPONSIBILITIES:
+- Render an error or information message on a sign-in form
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@if (!string.IsNullOrEmpty(Error))
+{
+    <VxMessage Type="VxMessageType.Error">@Error</VxMessage>
+}
+@if (!string.IsNullOrEmpty(Info))
+{
+    <VxMessage Type="VxMessageType.Info">@Info</VxMessage>
+}
+
+@code {
+    [Parameter]
+    public string? Error { get; set; }
+
+    [Parameter]
+    public string? Info { get; set; }
+}

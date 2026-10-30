@@ -1,0 +1,260 @@
+@*
+=========================================================
+FILE: DeliveriesPage.razor
+
+PURPOSE:
+The delivery desk of a warehouse (Slice 7 step 3, R-7, R-12 to R-14): plan a route from the shipments waiting, its routes, the parcels going back.
+
+RESPONSIBILITIES:
+- Choose the warehouse; plan a route for a day and a driver with the shipments chosen
+- List the routes and the parcels going back to their origin, each returned with a note
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<link rel="stylesheet" href="/css/ops-delivery.css?v=20261022-1" />
+
+<EditorShell Title="@T["ui.delivery.title"]" Company="@Company" Section="delivery" Error="@Error" Info="@Info">
+    @if (Warehouses.Count > 1)
+    {
+        <form method="get" action="/staff/delivery" class="ops-list-bar" aria-label="@T["ui.arrivals.warehouse"]">
+            <label class="ops-field ops-field--inline">
+                <span class="ops-label-text">@T["ui.arrivals.warehouse"]</span>
+                <select name="warehouse" class="ops-field__control" onchange="this.form.submit()">
+                    @foreach (OperationsArrivalPlace place in Warehouses)
+                    {
+                        <option value="@place.Id" selected="@(place.Id == WarehouseId)">@place.Code · @place.Name</option>
+                    }
+                </select>
+            </label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.delivery.show"]</button>
+        </form>
+    }
+    <form method="post" action="/staff/delivery" class="ops-editor__panel ops-editor__form" aria-labelledby="plan-title">
+        <AntiforgeryToken />
+        <input type="hidden" name="warehouse" value="@WarehouseId" />
+        <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+        <div class="ops-editor__header">
+            <h2 id="plan-title" class="ops-section-title">@T["ui.delivery.plan"]</h2>
+            @if (Waiting.Count > 0)
+            {
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.delivery.plan_button"]</button>
+            }
+        </div>
+        @if (Waiting.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.delivery.none_waiting"]</p></div>
+        }
+        else
+        {
+            <div class="ops-delivery-plan-controls">
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.delivery.date"]</span>
+                    <input type="date" name="date" class="ops-field__control" value="@Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)" required />
+                </label>
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.delivery.driver"]</span>
+                    <select name="driver" class="ops-field__control" required="@(Recording == OperationsDeliveryRecording.Phone)">
+                        <option value="">@T[Recording == OperationsDeliveryRecording.Phone ? "ui.delivery.driver_choose" : "ui.delivery.driver_named"]</option>
+                        @foreach (OperationsDeliveryDriver driver in Drivers)
+                        {
+                            <option value="@driver.UserId">@driver.Name</option>
+                        }
+                    </select>
+                </label>
+                @if (Recording == OperationsDeliveryRecording.Sheet)
+                {
+                    <label class="ops-field">
+                        <span class="ops-label-text">@T["ui.delivery.driver_name"]</span>
+                        <input name="driverName" class="ops-field__control" maxlength="@OperationsDeliveryRoute.NameMaxLength" autocomplete="off" />
+                    </label>
+                }
+            </div>
+            @if (Recording == OperationsDeliveryRecording.Sheet)
+            {
+                <p class="ops-editor__hint">@T["ui.delivery.driver_hint_sheet"]</p>
+            }
+            else if (Drivers.Count == 0)
+            {
+                <p class="ops-editor__hint">@T["ui.delivery.no_drivers"]</p>
+            }
+            <OperationsTableViewport Label="@T["ui.delivery.waiting"]">
+                <table class="ops-editor__table ops-table--compact">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="ops-editor__select-cell"><span class="vx-visually-hidden">@T["ui.delivery.choose"]</span></th>
+                            <th scope="col" class="ops-editor__identity-cell">@T["ui.pickup.shipment"]</th>
+                            <th scope="col">@T["ui.pickup.recipient"]</th>
+                            <th scope="col">@T["ui.delivery.area"]</th>
+                            <th scope="col" class="ops-editor__number">@T["ui.pickup.parcels"]</th>
+                            <th scope="col" class="ops-editor__number">@T["ui.delivery.tries"]</th>
+                            <th scope="col">@T["ui.pickup.payment"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (OperationsDeliveryWaitingRow row in Waiting)
+                        {
+                            <tr data-status="@(row.Blocked ? "unpaid" : "ready")">
+                                <td class="ops-editor__select-cell"><input type="checkbox" name="shipments" value="@row.ShipmentId" disabled="@row.Blocked" aria-label="@row.Number" /></td>
+                                <td class="ops-editor__identity-cell ops-editor__code">@row.Number</td>
+                                <td>@row.RecipientName</td>
+                                <td>@row.PostalCode @row.City</td>
+                                <td class="ops-editor__number">@row.Parcels</td>
+                                <td class="ops-editor__number">@row.Tries</td>
+                                <td>
+                                    @if (row.Blocked) { <span class="ops-editor__status" data-status="unpaid">@T["ui.delivery.pay_first"]</span> }
+                                    else if (row.Due > 0m) { <span class="ops-editor__status" data-status="cod">@VixlyText.Format(T, "ui.delivery.collect", new Dictionary<string, object> { ["amount"] = OperationsDeliveryWords.Amount(row.Due), ["currency"] = row.CurrencyCode ?? string.Empty })</span> }
+                                    else { <span class="ops-editor__status" data-status="paid">@T["ui.pickup.paid"]</span> }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+            <p class="ops-editor__hint">@T[CashOnDelivery ? "ui.delivery.cod_on_hint" : "ui.delivery.cod_off_hint"]</p>
+        }
+    </form>
+    @if (DestinationCharges && Waiting.Count > 0)
+    {
+        <form method="post" action="/staff/delivery/bill" class="ops-editor__panel ops-editor__form" aria-labelledby="bill-title">
+            <AntiforgeryToken />
+            <input type="hidden" name="warehouse" value="@WarehouseId" />
+            <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+            <h2 id="bill-title" class="ops-section-title">@T["ui.delivery.bill"]</h2>
+            <div class="ops-delivery-billing-grid">
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.pickup.shipment"]</span>
+                    <select name="shipment" class="ops-field__control" required>
+                        @foreach (OperationsDeliveryWaitingRow row in Waiting)
+                        {
+                            <option value="@row.ShipmentId">@row.Number · @row.RecipientName</option>
+                        }
+                    </select>
+                </label>
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.charges.line.Duties"]</span>
+                    <input name="duties" type="number" min="0" step="0.01" class="ops-field__control" />
+                </label>
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.charges.line.LocalTax"]</span>
+                    <input name="localTax" type="number" min="0" step="0.01" class="ops-field__control" />
+                </label>
+                <label class="ops-field">
+                    <span class="ops-label-text">@T["ui.charges.line.LocalFee"]</span>
+                    <input name="localFee" type="number" min="0" step="0.01" class="ops-field__control" />
+                </label>
+                <div class="ops-delivery-billing-action">
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.delivery.bill_button"]</button>
+                </div>
+            </div>
+            <p class="ops-editor__hint">@T[CashOnDelivery ? "ui.delivery.bill_hint_cod" : "ui.delivery.bill_hint"]</p>
+        </form>
+    }
+    <section class="ops-editor__panel" aria-labelledby="routes-title">
+        <h2 id="routes-title" class="ops-section-title">@T["ui.delivery.routes"]</h2>
+        @if (Routes.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.delivery.no_routes"]</p></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.delivery.routes"]">
+                <table class="ops-editor__table ops-table--compact">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="ops-editor__identity-cell">@T["ui.delivery.route"]</th>
+                            <th scope="col">@T["ui.delivery.date"]</th>
+                            <th scope="col">@T["ui.delivery.driver"]</th>
+                            <th scope="col">@T["ui.delivery.status"]</th>
+                            <th scope="col" class="ops-editor__number">@T["ui.delivery.stops"]</th>
+                            <th scope="col" class="ops-editor__number">@T["ui.delivery.cash"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (OperationsDeliveryRouteRow route in Routes)
+                        {
+                            <tr data-status="@OperationsDeliveryWords.Status(route.Status)">
+                                <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/delivery/routes/@route.Id">@route.Number</a></td>
+                                <td>@route.ServiceDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)</td>
+                                <td>@route.DriverName</td>
+                                <td><span class="ops-editor__status" data-status="@OperationsDeliveryWords.Status(route.Status)">@T["ui.delivery.route_status." + route.Status]</span></td>
+                                <td class="ops-editor__number">@route.Done / @route.Stops</td>
+                                <td class="ops-editor__number">@OperationsDeliveryWords.Amount(route.CashCollected)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+    </section>
+    @if (Returns.Count > 0)
+    {
+        <section class="ops-editor__panel" aria-labelledby="returns-title">
+            <h2 id="returns-title" class="ops-section-title">@T["ui.delivery.returns"]</h2>
+            <p class="ops-editor__hint">@T["ui.delivery.returns_hint"]</p>
+            <OperationsTableViewport Label="@T["ui.delivery.returns"]">
+                <table class="ops-editor__table ops-table--compact">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="ops-editor__identity-cell">@T["ui.pickup.parcel"]</th>
+                            <th scope="col">@T["ui.pickup.shipment"]</th>
+                            <th scope="col">@T["ui.pickup.recipient"]</th>
+                            <th scope="col" class="ops-editor__number">@T["ui.delivery.tries"]</th>
+                            <th scope="col" class="ops-editor__action-col">@T["ui.delivery.return_action"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (OperationsDeliveryReturnRow row in Returns)
+                        {
+                            <tr>
+                                <td class="ops-editor__identity-cell ops-editor__code">@row.Number</td>
+                                <td class="ops-editor__code">@row.ShipmentNumber</td>
+                                <td>@row.RecipientName</td>
+                                <td class="ops-editor__number">@row.Tries</td>
+                                <td>
+                                    <form method="post" action="/staff/delivery/returns/@row.ParcelId" class="ops-editor__inline">
+                                        <AntiforgeryToken />
+                                        <input type="hidden" name="warehouse" value="@WarehouseId" />
+                                        <label><span class="vx-visually-hidden">@T["ui.delivery.note"]</span><input name="note" class="ops-field__control" maxlength="@OperationsDeliveryStop.NoteMaxLength" placeholder="@T["ui.delivery.note"]" /></label>
+                                        <button type="submit" class="vx-button vx-button--secondary">@T["ui.delivery.returned_button"]</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        </section>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsArrivalPlace> Warehouses { get; set; } = Array.Empty<OperationsArrivalPlace>();
+
+    [Parameter] public Guid WarehouseId { get; set; }
+
+    [Parameter] public DateOnly Today { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsDeliveryWaitingRow> Waiting { get; set; } = Array.Empty<OperationsDeliveryWaitingRow>();
+
+    [Parameter] public IReadOnlyList<OperationsDeliveryRouteRow> Routes { get; set; } = Array.Empty<OperationsDeliveryRouteRow>();
+
+    [Parameter] public IReadOnlyList<OperationsDeliveryReturnRow> Returns { get; set; } = Array.Empty<OperationsDeliveryReturnRow>();
+
+    [Parameter] public IReadOnlyList<OperationsDeliveryDriver> Drivers { get; set; } = Array.Empty<OperationsDeliveryDriver>();
+
+    [Parameter] public OperationsDeliveryRecording Recording { get; set; }
+
+    [Parameter] public bool CashOnDelivery { get; set; }
+
+    [Parameter] public bool DestinationCharges { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

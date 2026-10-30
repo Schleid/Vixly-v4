@@ -1,0 +1,181 @@
+/* Shipment estimate beside the shipment form (Slice 5D). High-elevation, calm, and executive live estimate. */
+.customer-portal__with-estimate {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 23rem);
+    gap: 1.5rem;
+    align-items: start;
+}
+.customer-portal__estimate-side {
+    position: sticky;
+    top: 52px;
+    height: calc(100vh - 52px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.customer-portal__estimate-side--pinned {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    height: auto;
+    z-index: 5;
+}
+.customer-portal__estimate {
+    max-height: calc(100vh - 52px - 2rem);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.75rem;
+    background: var(--vx-color-surface);
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+}
+.customer-portal__estimate h2 {
+    margin: 0;
+    padding: 0.85rem 1.15rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--vx-color-text);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--customer-primary, var(--vx-color-primary)) 12%, var(--vx-color-surface)), var(--vx-color-surface));
+    border-bottom: 1px solid color-mix(in srgb, var(--customer-primary, var(--vx-color-primary)) 18%, var(--vx-color-border));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.customer-portal__estimate-live {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: var(--vx-color-status-completed);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 1rem;
+    background: var(--vx-color-status-completed-bg);
+    border: 1px solid var(--vx-color-status-success-border);
+}
+.customer-portal__estimate h3 {
+    margin: 1rem 0 0.4rem;
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: var(--vx-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.customer-portal__estimate-body {
+    padding: 1rem 1.15rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+}
+.customer-portal__estimate-lines {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+}
+.customer-portal__estimate-lines tr {
+    border-bottom: 1px dashed var(--vx-color-border);
+}
+.customer-portal__estimate-lines th {
+    text-align: left;
+    font-weight: 500;
+    font-size: 0.8125rem;
+    padding: 0.45rem 0;
+    color: var(--vx-color-text);
+}
+.customer-portal__estimate-lines td {
+    text-align: right;
+    white-space: nowrap;
+    font-family: var(--vx-font-mono);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    padding: 0.45rem 0 0.45rem 0.75rem;
+    color: var(--vx-color-text);
+}
+.customer-portal__estimate-lines small {
+    display: block;
+    color: var(--vx-color-text-muted);
+    font-size: 0.72rem;
+    margin-top: 0.15rem;
+    font-family: var(--vx-font);
+    font-weight: 400;
+}
+.customer-portal__estimate-rate th {
+    color: var(--vx-color-text-muted);
+    font-size: 0.75rem;
+}
+.customer-portal__estimate-lines tfoot tr {
+    border-bottom: none;
+}
+.customer-portal__estimate-lines tfoot th,
+.customer-portal__estimate-lines tfoot td {
+    border-top: 2px solid var(--vx-color-border);
+    font-weight: 700;
+    font-size: 1.15rem;
+    padding-top: 0.75rem;
+    color: var(--vx-color-text);
+}
+.customer-portal__estimate-total-card {
+    margin: 0.85rem 0 0.35rem;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #0F172A, #1E293B);
+    color: #FFFFFF;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+}
+.customer-portal__estimate-total-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #94A3B8;
+}
+.customer-portal__estimate-total-val {
+    font-size: 1.35rem;
+    font-weight: 700;
+    font-family: var(--vx-font-mono);
+    color: #F8FAFC;
+}
+.customer-portal__what-if {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.8125rem;
+}
+.customer-portal__what-if li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.375rem;
+    background: var(--vx-color-surface-sunken);
+    transition: all 150ms ease;
+}
+.customer-portal__what-if li:hover {
+    border-color: var(--customer-primary, var(--vx-color-primary));
+    background: color-mix(in srgb, var(--customer-primary, var(--vx-color-primary)) 6%, var(--vx-color-surface));
+}
+.customer-portal__what-if li[data-current=true] {
+    border-color: var(--customer-primary, var(--vx-color-primary));
+    background: color-mix(in srgb, var(--customer-primary, var(--vx-color-primary)) 10%, var(--vx-color-surface));
+    font-weight: 600;
+}
+@media (max-width: 1000px) {
+    .customer-portal__with-estimate {
+        grid-template-columns: 1fr;
+    }
+    .customer-portal__estimate-side {
+        position: static;
+        height: auto;
+    }
+    .customer-portal__estimate {
+        max-height: none;
+    }
+}

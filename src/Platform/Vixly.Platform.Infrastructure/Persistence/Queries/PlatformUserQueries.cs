@@ -156,6 +156,49 @@ internal sealed class PlatformUserQueries : IPlatformUserQueries
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<PagedResult<PlatformSignInItem>> ListSignInsAsync(
+        Guid? platformUserId,
+        DateTimeOffset utcNow,
+        PagedRequest page,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(page);
+
+        IQueryable<PlatformUserSession> sessions = _context.UserSessions.AsNoTracking();
+
+        if (platformUserId is { } userId)
+        {
+            sessions = sessions.Where(session => session.PlatformUserId == userId);
+        }
+
+        int total = await sessions.CountAsync(cancellationToken);
+        var rows = await sessions
+            .OrderByDescending(session => session.CreatedUtc)
+            .Skip(page.Skip)
+            .Take(page.PageSize)
+            .Join(_context.Users, session => session.PlatformUserId, user => user.Id, (session, user) => new { session, user.FirstName, user.LastName })
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<PlatformSignInItem>(rows.Select(row => Item(row.session, row.FirstName + " " + row.LastName, utcNow)).ToList(), page, total);
+    }
+
+    // A session nobody ended stops at the first of its idle and absolute limits: shown as ended there.
+    private static PlatformSignInItem Item(PlatformUserSession session, string name, DateTimeOffset utcNow)
+    {
+        DateTimeOffset idleAt = session.LastSeenUtc + PlatformIdentityLimits.SessionIdleTimeout;
+        (DateTimeOffset limit, string reason) = idleAt < session.ExpiresUtc ? (idleAt, "idle_timeout") : (session.ExpiresUtc, "absolute_lifetime");
+        (DateTimeOffset? outUtc, string? ended) = session.EndedUtc is { } endedUtc
+            ? (endedUtc, Snake((session.EndReason ?? PlatformSessionEndReason.SignedOut).ToString()))
+            : limit <= utcNow
+                ? (limit, reason)
+                : ((DateTimeOffset?)null, (string?)null);
+
+        return new PlatformSignInItem(session.Id, session.PlatformUserId, name.Trim(), session.CreatedUtc, outUtc, ended, session.IpAddress, session.UserAgent, session.Country);
+    }
+
+    private static string Snake(string value) =>
+        string.Concat(value.Select((letter, index) => index > 0 && char.IsUpper(letter) ? "_" + char.ToLowerInvariant(letter) : char.ToLowerInvariant(letter).ToString()));
+
     private static string EscapeLike(string value)
     {
         return value

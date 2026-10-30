@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: ErrorPage.razor
+
+PURPOSE:
+The page shown when the site itself failed.
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Page (UI-6): route and composition only
+- No exception detail is shown (S-9)
+=========================================================
+*@
+@page "/error"
+@inject IStringLocalizer<PublicText> T
+
+<PageHead TitleKey="public.error.title" Indexed="false" />
+<section class="pub-section pub-section--narrow">
+    <h1>@T["public.error.title"]</h1>
+    <p>@T["public.error.unavailable"]</p>
+    <p><a href="@PublicLanguage.Page(PublicLanguage.Current)">@T["public.not_found.home"]</a></p>
+</section>

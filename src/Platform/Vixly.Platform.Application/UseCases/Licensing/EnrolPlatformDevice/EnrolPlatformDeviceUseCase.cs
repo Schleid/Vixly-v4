@@ -69,7 +69,7 @@ public sealed class EnrolPlatformDeviceUseCase
         try
         {
             (device, requested) = PlatformDevice.Enrol(tenant.Id, seats.NextNumber(_licensing.UtcNow), request.Name, request.Kind, keyed ? request.PublicKey : null, secret?.Hash,
-                PlatformLicensingAdministration.ActorOf(context), _licensing.UtcNow);
+                PlatformLicensingAdministration.ActorOf(context), _licensing.UtcNow, request.Origin);
         }
         catch (DomainException exception)
         {

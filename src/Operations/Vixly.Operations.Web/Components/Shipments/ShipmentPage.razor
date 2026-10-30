@@ -1,0 +1,182 @@
+@*
+=========================================================
+FILE: ShipmentPage.razor
+
+PURPOSE:
+One shipment for staff: where it goes, its customer, its pre-alerts and each parcel with where it stands (Slice 5A).
+
+RESPONSIBILITIES:
+- Show the instructions, the parcels (cleared, label printed, chargeable weight) and the totals
+- Change the service before departure; the two documents
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The customer's name only for staff who may see customers; the use cases check again
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@(Shipment.Number ?? T["ui.shipments_desk.shipment"].Value)" Company="@Company" Section="shipments" Error="@Error" Info="@Info">
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <a href="/staff/shipments" class="vx-button vx-button--secondary">@T["ui.shipments_desk.back"]</a>
+            @if (!Shipment.IsWaiting && Shipment.Status != OperationsShipmentStatus.Cancelled && Parcels.Count > 0)
+            {
+                <a class="vx-button vx-button--secondary" href="/staff/shipments/@Shipment.Id/documents/packing-list" target="_blank" rel="noopener">@T["ui.shipments_desk.packing_list"]</a>
+                <a class="vx-button vx-button--secondary" href="/staff/shipments/@Shipment.Id/documents/commercial-invoice" target="_blank" rel="noopener">@T["ui.shipments_desk.commercial_invoice"]</a>
+            }
+            @if (Shipment.Options.HasFlag(OperationsShipmentOptions.Insured))
+            {
+                <a class="vx-button vx-button--secondary" href="/staff/shipments/@Shipment.Id/certificate" target="_blank" rel="noopener">@T["ui.shipments_desk.certificate"]</a>
+            }
+        </div>
+        <div class="ops-list-bar__actions">
+            <span class="ops-editor__status" data-status="@Shipment.Status">@T["ui.shipments_desk.status." + Shipment.Status]</span>
+        </div>
+    </div>
+    <div class="ops-compact-tabs" data-section-tabs="shipment" data-tabs-label="@T["ui.shipments_desk.shipment"]">
+    <section class="ops-editor__panel" data-tab-label="@T["ui.customers.details"]">
+        <dl class="ops-facts-grid">
+            <div class="ops-fact-cell"><dt>@T["ui.customers.code"]</dt><dd>@CustomerCode @(CustomerName is null ? null : "· " + CustomerName)</dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.origin"]</dt><dd>@Origin?.Code · @Origin?.Name</dd></div>
+            @if (Shipment.IsWaiting)
+            {
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.destination"]</dt><dd>@T["ui.shipments_desk.waiting_hint"]</dd></div>
+            }
+            else
+            {
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.destination"]</dt><dd>@(Shipment.DeliveryAddress is { } address ? T["ui.shipments_desk.home"].Value + ": " + address.Line1 + ", " + address.City + ", " + address.CountryCode : T["ui.shipments_desk.pickup"].Value + ": " + DestinationName + ", " + Shipment.DestinationCountryCode)</dd></div>
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.recipient"]</dt><dd>@Shipment.RecipientName · <a href="tel:@Shipment.RecipientPhone" class="ops-phone-link">@OperationsPhoneDisplay.Format(Shipment.RecipientPhone)</a></dd></div>
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.service"]</dt><dd>@(Shipment.ServiceCode is { } code ? T["ui.services.name." + code].Value : T["ui.shipments_desk.no_service"].Value)</dd></div>
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.options"]</dt><dd>@string.Join(", ", Options())</dd></div>
+            }
+            <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.status"]</dt><dd><span class="ops-editor__status" data-status="@Shipment.Status">@T["ui.shipments_desk.status." + Shipment.Status]</span></dd></div>
+            @if (Shipment.ParcelCount is { } declared)
+            {
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.parcel_count"]</dt><dd>@VixlyText.Format(T, "ui.shipments_desk.parcels_of", new Dictionary<string, object> { ["entered"] = Parcels.Count, ["count"] = declared })</dd></div>
+            }
+            @if (Shipment.BookedTotal is { } total)
+            {
+                <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.amount_final"]</dt><dd class="ops-editor__number">@total.ToString("N2", System.Globalization.CultureInfo.CurrentCulture) @Shipment.BookedCurrencyCode</dd></div>
+            }
+        </dl>
+    </section>
+    @if (CanChangeService && Services.Count > 0)
+    {
+        <form method="post" action="/staff/shipments/@Shipment.Id/service" class="ops-editor__panel ops-panel--restricted ops-inline-action-bar">
+            <AntiforgeryToken />
+            <label for="change-service-select" class="ops-inline-action-bar__label">@T["ui.shipments_desk.change_service"]</label>
+            <select id="change-service-select" name="service" required class="ops-inline-action-bar__select">
+                @foreach (string offered in Services) { <option value="@offered" selected="@(offered == Shipment.ServiceCode)">@T["ui.services.name." + offered]</option> }
+            </select>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.shipments_desk.save_service"]</button>
+            <span class="ops-editor__hint">@T["ui.shipments_desk.change_service_hint"]</span>
+        </form>
+    }
+    <section class="ops-editor__panel">
+        <h2>@T["ui.shipments_desk.parcels"]</h2>
+        @if (Parcels.Count == 0)
+        {
+            <p>@T["ui.shipments_desk.no_parcels"]</p>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.shipments_desk.parcels"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.shipments_desk.number"]</th><th scope="col">@T["ui.shipments_desk.contents"]</th><th scope="col">@T["ui.shipments_desk.weight"]</th><th scope="col">@T["ui.shipments_desk.chargeable"]</th><th scope="col">@T["ui.shipments_desk.stage"]</th><th scope="col">@T["ui.shipments_desk.label"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsShipmentParcel row in Parcels)
+                        {
+                            <tr>
+                                <td><a href="/staff/parcels/@row.Parcel.Id">@row.Parcel.Number</a></td>
+                                <td>@row.Parcel.DeclaredContents</td>
+                                <td>@Weight(row.Parcel.WeightKg)</td>
+                                <td>@Weight(row.ChargeableKg)</td>
+                                <td>@(row.Parcel.Milestone is { } milestone ? T["ui.milestone." + milestone].Value : null)@(row.Cleared ? " · " + T["ui.shipments_desk.cleared"].Value : row.Parcel.HoldReasons != OperationsHoldReasons.None ? " · " + T["ui.shipments_desk.on_hold"].Value : null)</td>
+                                <td>@(row.Parcel.ShippingLabelUtc is not null ? T["ui.shipments_desk.printed"].Value : row.Cleared ? T["ui.shipments_desk.to_print"].Value : "—")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+            <p>@VixlyText.Format(T, "ui.shipments_desk.totals", new Dictionary<string, object>
+                {
+                    ["pieces"] = Parcels.Count,
+                    ["weight"] = Weight(Parcels.Sum(row => row.Parcel.WeightKg ?? 0m)),
+                    ["chargeable"] = Weight(Parcels.Sum(row => row.ChargeableKg ?? 0m)),
+                    ["value"] = Parcels.Sum(row => row.Parcel.DeclaredValue ?? 0m).ToString("0.00") + " " + (Settings?.CurrencyCode ?? OperationsTenantSettings.DefaultCurrency)
+                })</p>
+        }
+    </section>
+    @if (PreAlerts.Count > 0)
+    {
+        <section class="ops-editor__panel">
+            <h2>@T["ui.shipments_desk.expected"]</h2>
+            <ul>
+                @foreach (OperationsPreAlert preAlert in PreAlerts) { <li>@preAlert.Carrier · @preAlert.TrackingNumber · @preAlert.Contents @(preAlert.ExpectedDate is { } day ? "· " + day.ToString("yyyy-MM-dd") : null)</li> }
+            </ul>
+        </section>
+    }
+    @if (Profit is { } profit)
+    {
+        <Vixly.Operations.Web.Components.Payables.ShipmentProfitPanel T="T" Profit="profit" CurrencyCode="@(Settings?.CurrencyCode ?? OperationsTenantSettings.DefaultCurrency)" />
+    }
+    </div>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsShipment Shipment { get; set; } = null!;
+
+    [Parameter] public OperationsWarehouse? Origin { get; set; }
+
+    [Parameter] public string? DestinationName { get; set; }
+
+    [Parameter] public string? CustomerCode { get; set; }
+
+    [Parameter] public string? CustomerName { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsPreAlert> PreAlerts { get; set; } = Array.Empty<OperationsPreAlert>();
+
+    [Parameter] public IReadOnlyList<OperationsShipmentParcel> Parcels { get; set; } = Array.Empty<OperationsShipmentParcel>();
+
+    [Parameter] public IReadOnlyList<string> Services { get; set; } = Array.Empty<string>();
+
+    [Parameter] public bool CanChangeService { get; set; }
+
+    [Parameter] public OperationsTenantSettings? Settings { get; set; }
+
+    // Slice 8: shown only to whoever may see costs.
+    [Parameter] public Vixly.Operations.Application.Payables.OperationsShipmentProfit? Profit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    // In the company's unit.
+    private string Weight(decimal? kilograms)
+    {
+        OperationsWeightUnit unit = Settings?.WeightUnit ?? OperationsWeightUnit.Kilogram;
+        return kilograms is { } kg ? OperationsUnits.ToShownWeight(kg, unit).ToString("0.##") + (unit == OperationsWeightUnit.Pound ? " lb" : " kg") : "—";
+    }
+
+    private IEnumerable<string> Options()
+    {
+        bool any = false;
+
+        foreach ((OperationsShipmentOptions option, string key) in new[] { (OperationsShipmentOptions.Consolidate, "consolidate"), (OperationsShipmentOptions.Refrigerated, "refrigerated"), (OperationsShipmentOptions.Insured, "insured"), (OperationsShipmentOptions.FreightCollect, "freight_collect") })
+        {
+            if (Shipment.Options.HasFlag(option))
+            {
+                any = true;
+                yield return T["ui.shipments_desk.option." + key].Value;
+            }
+        }
+
+        if (!any)
+        {
+            yield return T["ui.shipments_desk.option.none"].Value;
+        }
+    }
+}

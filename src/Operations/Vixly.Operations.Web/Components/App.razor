@@ -1,0 +1,33 @@
+﻿@*
+=========================================================
+FILE: App.razor
+
+PURPOSE:
+The Operations document: language, styles and the router (Slice 0: static pages only).
+
+RESPONSIBILITIES:
+- Render the HTML shell
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- No script yet: Slice 1 adds the interactive console and vixly-forms.js for sign-in (ADR-0019)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<!DOCTYPE html>
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <base href="/" />
+    <link rel="stylesheet" href="@Assets["_content/Vixly.Shared.UI/vixly-theme.css"]" />
+    <link rel="stylesheet" href="@Assets["_content/Vixly.Shared.UI/vixly-primitives.css"]" />
+    <link rel="stylesheet" href="/css/ops-status.css" />
+    <script src="@Assets["_content/Vixly.Shared.UI/vixly-forms.js"]" defer></script>
+    <HeadOutlet />
+</head>
+<body>
+    <Routes />
+</body>
+</html>

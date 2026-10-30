@@ -1,0 +1,52 @@
+﻿@*
+=========================================================
+FILE: SetupHomePage.razor
+
+PURPOSE:
+The owner setup page: what is done and the last step.
+
+RESPONSIBILITIES:
+- Render the owner setup page
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<AuthShell Title="@T["ui.setup.title"]" Subtitle="@T["ui.setup.signed_in_body"]" Company="@Company" SignedIn="true" ReturnHere="/setup">
+    <p>@T["ui.signed_in_as"] <strong>@Name</strong></p>
+    <FormMessage Error="@Error" Info="@Info" />
+    <ol class="vx-auth__steps">
+        <li>@T["ui.setup.done_password"]</li>
+        <li>@T["ui.setup.done_second_factor"]</li>
+        <li><strong>@T["ui.setup.next_device"]</strong></li>
+    </ol>
+    <form method="post" action="/setup/first-device" class="vx-form">
+        <AntiforgeryToken />
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T[LinkSent ? "ui.setup.device_resend" : "ui.setup.device_send"]</VxButton>
+    </form>
+    <form method="post" action="/staff/sign-out" class="vx-form">
+        <AntiforgeryToken />
+        <VxButton Variant="VxButtonVariant.Secondary" Type="submit">@T["ui.signout"]</VxButton>
+    </form>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string? Company { get; set; }
+
+    [Parameter]
+    public string Name { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool LinkSent { get; set; }
+
+    [Parameter]
+    public string? Error { get; set; }
+
+    [Parameter]
+    public string? Info { get; set; }
+}

@@ -1,0 +1,108 @@
+@*
+=========================================================
+FILE: AuditPage.razor
+
+PURPOSE:
+The audit log: who did what, when, newest first.
+
+RESPONSIBILITIES:
+- Render the filters, the entries and the paging
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- A GET form: filters are in the address, so a filtered view can be shared
+=========================================================
+*@
+@using Vixly.Operations.Application.Audit
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.audit.title"]" Company="@Company" Section="audit" Error="@Error">
+    <form method="get" action="/staff/audit" class="ops-list-bar ops-audit__filters">
+        @if (ActorUserId is not null)
+        {
+            <input type="hidden" name="actor" value="@ActorUserId" />
+            <span class="ops-audit__actor" style="display: inline-flex; align-items: center; height: 32px; font-weight: 600; font-size: 0.8125rem; color: var(--vx-color-text-strong); white-space: nowrap;">@VixlyText.Format(T, "ui.audit.by", "name", ActorName ?? string.Empty)</span>
+            <a href="/staff/audit" class="vx-button vx-button--secondary" style="height: 32px; min-height: 32px; padding: 0 0.75rem; font-size: 0.8125rem; display: inline-flex; align-items: center;">@T["ui.activity.everyone"]</a>
+        }
+        <select name="area" aria-label="@T["ui.audit.area"]" style="height: 32px; min-height: 32px; box-sizing: border-box; width: auto; min-width: 9rem; max-width: 14rem;">
+            <option value="">@T["ui.audit.all_areas"]</option>
+            @foreach (string area in Areas)
+            {
+                <option value="@area" selected="@(area == Area)">@T["ui.audit.area." + area]</option>
+            }
+        </select>
+        <label class="ops-list-bar__date" style="display: inline-flex; align-items: center; gap: 0.45rem; height: 32px; min-height: 32px; margin: 0; font-size: 0.8125rem; font-weight: 500; color: var(--vx-color-text-muted); white-space: nowrap;">
+            <span>@T["ui.audit.from"]</span>
+            <input type="date" name="from" value="@From" style="height: 32px; min-height: 32px; box-sizing: border-box; padding: 0.25rem 0.5rem; width: auto; min-width: 8.5rem; max-width: 10.5rem;" />
+        </label>
+        <label class="ops-list-bar__date" style="display: inline-flex; align-items: center; gap: 0.45rem; height: 32px; min-height: 32px; margin: 0; font-size: 0.8125rem; font-weight: 500; color: var(--vx-color-text-muted); white-space: nowrap;">
+            <span>@T["ui.audit.to"]</span>
+            <input type="date" name="to" value="@To" style="height: 32px; min-height: 32px; box-sizing: border-box; padding: 0.25rem 0.5rem; width: auto; min-width: 8.5rem; max-width: 10.5rem;" />
+        </label>
+        <button type="submit" class="vx-button vx-button--primary" style="height: 32px; min-height: 32px; box-sizing: border-box; padding: 0 1rem; margin: 0; align-self: center;">@T["ui.staff.search_submit"]</button>
+    </form>
+    <section class="ops-editor__panel">
+        @if (Lines.Count == 0) { <p class="ops-editor__empty-message">@T["ui.editor.none"]</p> }
+        @if (Lines.Count > 0)
+        {
+        <OperationsTableViewport Label="@T["ui.audit.title"]">
+        <table class="ops-editor__table">
+            <thead>
+                <tr><th scope="col">@T["ui.audit.when"]</th><th scope="col">@T["ui.audit.who"]</th><th scope="col">@T["ui.audit.what"]</th><th scope="col">@T["ui.audit.details"]</th></tr>
+            </thead>
+            <tbody>
+                @foreach (OperationsAuditLine line in Lines)
+                {
+                    <tr>
+                        <td>@line.OccurredUtc.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture) UTC</td>
+                        <td>@(line.ActorName ?? T["ui.audit.system"])</td>
+                        <td><code>@line.ActionCode</code></td>
+                        <td>@line.Reason <span class="ops-editor__hint">@line.IpAddress</span> <span class="ops-editor__hint">@line.Details</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        </OperationsTableViewport>
+        }
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.85rem; padding-top: 0.5rem; border-top: 1px solid var(--vx-color-border, #e2e8f0);">
+            <span style="font-size: 0.8125rem; color: var(--vx-color-text-muted, #64748b);">@VixlyText.Format(T, "ui.audit.count", "count", TotalCount)</span>
+            <div style="display: flex; gap: 0.5rem;">
+                @if (Page > 1) { <a href="@PageLink(Page - 1)" class="vx-button vx-button--secondary" style="height: 30px; padding: 0 0.75rem; font-size: 0.75rem;">@T["ui.audit.newer"]</a> }
+                @if (Page * PageSize < TotalCount) { <a href="@PageLink(Page + 1)" class="vx-button vx-button--secondary" style="height: 30px; padding: 0 0.75rem; font-size: 0.75rem;">@T["ui.audit.older"]</a> }
+            </div>
+        </div>
+    </section>
+</EditorShell>
+
+@code {
+    public static readonly string[] Areas = { "auth", "account", "staff", "roles", "devices", "site", "locations", "services", "customers", "receiving", "parcels", "storage", "printers", "settings", "company", "legal", "setup" };
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsAuditLine> Lines { get; set; } = Array.Empty<OperationsAuditLine>();
+
+    [Parameter] public int TotalCount { get; set; }
+
+    [Parameter] public int Page { get; set; } = 1;
+
+    [Parameter] public int PageSize { get; set; } = 50;
+
+    [Parameter] public Guid? ActorUserId { get; set; }
+
+    [Parameter] public string? ActorName { get; set; }
+
+    [Parameter] public string? Area { get; set; }
+
+    [Parameter] public string? From { get; set; }
+
+    [Parameter] public string? To { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    private string PageLink(int page) =>
+        "/staff/audit?page=" + page
+        + (ActorUserId is null ? null : "&actor=" + ActorUserId)
+        + (string.IsNullOrEmpty(Area) ? null : "&area=" + Uri.EscapeDataString(Area))
+        + (string.IsNullOrEmpty(From) ? null : "&from=" + From)
+        + (string.IsNullOrEmpty(To) ? null : "&to=" + To);
+}

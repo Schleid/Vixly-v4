@@ -1,0 +1,30 @@
+﻿@*
+=========================================================
+FILE: PayLinkPage.razor
+
+PURPOSE:
+Pay an invoice from the link in an invoice email (Slice 5).
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- No language in the address: the cookie or the browser chooses (D-U5)
+- noindex; pay posts are limited to 20 per hour per visitor IP
+=========================================================
+*@
+@page "/pay/{Token}"
+@attribute [EnableRateLimiting(PublicRateLimits.Pay)]
+@inject IStringLocalizer<PublicText> T
+
+<PageHead TitleKey="public.pay.title" Indexed="false" />
+<section class="pub-section pub-section--narrow">
+    <h1>@T["public.pay.title"]</h1>
+    <PaymentPanel Target="PaymentTarget.Link(Token, false)" Status="@Status" />
+</section>
+
+@code {
+    [Parameter]
+    public string Token { get; set; } = string.Empty;
+
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+}

@@ -1,0 +1,132 @@
+@*
+=========================================================
+FILE: NewBundleForm.razor
+
+PURPOSE:
+The ship manager's form for a new bundle (Slice 6A, D-2): for a ready group, or for any destination and service.
+
+RESPONSIBILITIES:
+- Choose the type, the size policy and the target; the warehouse, destination and service when they are not given
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- A hidden form key makes a double click one bundle (ADR-0019)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<form method="post" action="/staff/bundles" class="@(Destination is null ? "ops-editor__panel ops-editor__form" : "ops-editor__inline")">
+    <AntiforgeryToken />
+    <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+    @if (Destination is null)
+    {
+        <h2>@T["ui.bundles.new"]</h2>
+        <div class="ops-charges-trio">
+            <div>
+                <label>@T["ui.bundles.warehouse"]
+                    <select name="warehouse">
+                        @foreach (OperationsWarehouse warehouse in Warehouses)
+                        {
+                            <option value="@warehouse.Id">@warehouse.Code · @warehouse.Name</option>
+                        }
+                    </select>
+                </label>
+            </div>
+            <div>
+                <label>@T["ui.bundles.destination"]
+                    <select name="destination">
+                        @foreach (OperationsWarehouse destination in Destinations)
+                        {
+                            <option value="@OperationsBundleWords.DestinationValue(destination.Id, destination.Address.CountryCode)">@destination.Code · @destination.Name</option>
+                        }
+                    </select>
+                </label>
+            </div>
+            <div>
+                <label>@T["ui.bundles.service"]
+                    <select name="service">
+                        @foreach (string service in Services)
+                        {
+                            <option value="@service">@T["ui.services.name." + service]</option>
+                        }
+                    </select>
+                </label>
+            </div>
+        </div>
+        <div class="ops-editor__inline-field" style="align-items: flex-end;">
+            @if (Types.Count > 0)
+            {
+                <label style="flex: 1 1 10rem;">@T["ui.bundles.type"]
+                    <select name="type">
+                        @foreach (string type in Types)
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </select>
+                </label>
+            }
+            <label style="flex: 1 1 10rem;">@T["ui.bundles.basis"]
+                <select name="basis">
+                    <option value="@OperationsBundleBasis.Free">@T["ui.bundles.basis.Free"]</option>
+                    <option value="@OperationsBundleBasis.Weight">@T["ui.bundles.basis.Weight"]</option>
+                    @if (Volumetric)
+                    {
+                        <option value="@OperationsBundleBasis.Volumetric">@T["ui.bundles.basis.Volumetric"]</option>
+                    }
+                </select>
+            </label>
+            <label style="flex: 1 1 8rem;">@VixlyText.Format(T, "ui.bundles.target", "unit", WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg") <input name="target" inputmode="decimal" size="7" /></label>
+            <button type="submit" class="vx-button vx-button--primary" style="margin-bottom: 2px;">@T["ui.bundles.create"]</button>
+        </div>
+    }
+    else
+    {
+        <input type="hidden" name="warehouse" value="@WarehouseId" />
+        <input type="hidden" name="destination" value="@Destination" />
+        <input type="hidden" name="service" value="@Service" />
+        @if (Types.Count > 0)
+        {
+            <label>@T["ui.bundles.type"]
+                <select name="type">
+                    @foreach (string type in Types)
+                    {
+                        <option value="@type">@type</option>
+                    }
+                </select>
+            </label>
+        }
+        <label>@T["ui.bundles.basis"]
+            <select name="basis">
+                <option value="@OperationsBundleBasis.Free">@T["ui.bundles.basis.Free"]</option>
+                <option value="@OperationsBundleBasis.Weight">@T["ui.bundles.basis.Weight"]</option>
+                @if (Volumetric)
+                {
+                    <option value="@OperationsBundleBasis.Volumetric">@T["ui.bundles.basis.Volumetric"]</option>
+                }
+            </select>
+        </label>
+        <label>@VixlyText.Format(T, "ui.bundles.target", "unit", WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg") <input name="target" inputmode="decimal" size="7" /></label>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.bundles.create"]</button>
+    }
+</form>
+
+@code {
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Destinations { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<string> Services { get; set; } = Array.Empty<string>();
+
+    [Parameter] public IReadOnlyList<string> Types { get; set; } = Array.Empty<string>();
+
+    [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
+
+    // Given for a ready group: the form shows only the size policy.
+    [Parameter] public Guid? WarehouseId { get; set; }
+
+    [Parameter] public string? Destination { get; set; }
+
+    [Parameter] public string? Service { get; set; }
+
+    [Parameter] public bool Volumetric { get; set; } = true;
+}

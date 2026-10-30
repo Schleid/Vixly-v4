@@ -12,5 +12,6 @@
 // IMPORTANT NOTES:
 // - Wire type: BCL only (C-0); never a domain type
 // - Version 1: add fields only; consumers ignore unknown fields (D-K4)
+// - Rotate false: a check that never rotates the secret (a sign-in; review 2026-10-21). Country: where the person is, kept as the device's own when it has none yet.
 // =========================================================
-public sealed record VerifyPlatformDeviceBody(string? Secret, string? Challenge, string? Signature);
+public sealed record VerifyPlatformDeviceBody(string? Secret, string? Challenge, string? Signature, bool? Rotate = null, string? Country = null);

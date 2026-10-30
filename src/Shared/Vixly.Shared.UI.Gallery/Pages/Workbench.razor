@@ -1,0 +1,29 @@
+﻿@page "/primitives/workbench"
+@using Vixly.Shared.UI.Gallery.Demos
+@using Vixly.Shared.UI.Gallery.Resources
+@* =========================================================
+   FILE: Workbench.razor
+
+   PURPOSE:
+   Compose dense, reusable component examples.
+
+   RESPONSIBILITIES:
+   Read the preview language and compose demo fixtures.
+
+   IMPORTANT NOTES:
+   Sample data only; no live workflows or plane services.
+   ========================================================= *@
+<div lang="@(Lang is "fr" or "es" ? Lang : "en")">
+<h1>@L("title")</h1>
+<p class="wb-notice">@L("preview")</p>
+<nav class="wb-language" aria-label="@L("language")">
+    <a href="/primitives/workbench?lang=en" lang="en">@L("english")</a>
+    <a href="/primitives/workbench?lang=fr" lang="fr">@L("french")</a>
+    <a href="/primitives/workbench?lang=es" lang="es">@L("spanish")</a>
+</nav>
+<DenseWorkbenchDemo Language="@Lang" />
+</div>
+@code {
+    [Parameter, SupplyParameterFromQuery(Name = "lang")] public string Lang { get; set; } = "en";
+    private string L(string key) => WorkbenchLabels.Get(key, Lang);
+}

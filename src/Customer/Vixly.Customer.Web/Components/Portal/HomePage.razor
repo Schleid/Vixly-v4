@@ -1,0 +1,57 @@
+@*
+=========================================================
+FILE: HomePage.razor
+
+PURPOSE:
+The signed-in customer's home: the mailbox addresses and the code.
+
+RESPONSIBILITIES:
+- Render the signed-in customer's home: the mailbox addresses and the code
+- Calm, fast workspace without decorative sketches (UI/UX brief section 2)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019)
+- Tenant surface: never says "Vixly" (ADR-0012 W-1)
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Customers
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@VixlyText.Format(T, "ui.home.hello", "name", Customer.FirstName)" SignedIn="true" Info="@Info" ReturnHere="/customer/">
+    <nav class="customer-home-actions" aria-label="@T["ui.nav"]">
+        <a href="/customer/packages"><svg class="customer-home-action__icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7.5 4.27 9 5.15M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg><span>@T["ui.nav.packages"]</span><span aria-hidden="true">↗</span></a>
+        <a href="/customer/rates"><svg class="customer-home-action__icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/></svg><span>@T["ui.nav.rates"]</span><span aria-hidden="true">↗</span></a>
+        <a href="/customer/tickets"><svg class="customer-home-action__icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>@T["ui.nav.tickets"]</span><span aria-hidden="true">↗</span></a>
+    </nav>
+    <section class="customer-portal__panel" aria-labelledby="mailbox-title">
+        <h2 id="mailbox-title">@T["ui.mailbox.title"]</h2>
+        <p class="customer-portal__code">@VixlyText.Format(T, "ui.mailbox.code", "code", Customer.Code ?? string.Empty)</p>
+        <p class="customer-portal__hint">@T["ui.mailbox.hint"]</p>
+        @if (Customer.Mailboxes.Count == 0)
+        {
+            <p>@T["ui.mailbox.none"]</p>
+        }
+        <div class="customer-portal__mailboxes">
+        @foreach (CustomerMailboxDto mailbox in Customer.Mailboxes)
+        {
+            <address class="customer-portal__mailbox">
+                <strong>@mailbox.WarehouseName</strong><br />
+                @mailbox.Addressee<br />
+                @mailbox.Line1<br />
+                @if (!string.IsNullOrWhiteSpace(mailbox.Line2)) { @mailbox.Line2<br /> }
+                @mailbox.City@(mailbox.Region is null ? null : ", " + mailbox.Region) @mailbox.PostalCode<br />
+                @mailbox.CountryCode
+            </address>
+        }
+        </div>
+    </section>
+</CustomerShell>
+
+@code {
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter, EditorRequired] public CustomerProfileDto Customer { get; set; } = null!;
+
+    [Parameter] public string? Info { get; set; }
+}

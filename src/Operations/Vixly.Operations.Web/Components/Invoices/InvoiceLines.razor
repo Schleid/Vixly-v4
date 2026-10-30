@@ -1,0 +1,89 @@
+@*
+=========================================================
+FILE: InvoiceLines.razor
+
+PURPOSE:
+The lines, taxes and totals of an invoice (Slice 5F, I-3 and I-4).
+
+RESPONSIBILITIES:
+- Show each line with its discount and what was credited, then the taxes and totals
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Taxes shown one per kind or in one line, as the invoice was issued
+=========================================================
+*@
+<OperationsTableViewport Label="@T["ui.invoices.lines"]">
+    <table class="ops-editor__table ops-invoice__lines">
+        <thead>
+            <tr>
+                <th scope="col">@T["ui.invoices.description"]</th><th scope="col" class="ops-editor__number">@T["ui.invoices.quantity"]</th>
+                <th scope="col" class="ops-editor__number">@T["ui.invoices.unit_price"]</th><th scope="col" class="ops-editor__number">@T["ui.invoices.discount"]</th>
+                <th scope="col" class="ops-editor__number">@T["ui.invoices.amount"]</th><th scope="col" class="ops-editor__number">@T["ui.invoices.credited"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (OperationsInvoiceLine line in Invoice.Lines)
+            {
+                <tr data-taxed="@line.Taxed">
+                    <td>@OperationsInvoiceWords.Line(T, line)@if (!line.Taxed && Invoice.Taxes.Count > 0) { <span class="ops-editor__hint"> · @T["ui.invoices.untaxed"]</span> }</td>
+                    <td class="ops-editor__number">@line.Quantity.ToString("0.###", CultureInfo.CurrentCulture)</td>
+                    <td class="ops-editor__number">@Money(line.UnitPrice)</td>
+                    <td class="ops-editor__number">@(line.Discount > 0m ? "-" + Money(line.Discount) + " (" + line.DiscountPercent.ToString("0.##", CultureInfo.CurrentCulture) + " %)" : string.Empty)</td>
+                    <td class="ops-editor__number">@Money(line.Amount)</td>
+                    <td class="ops-editor__number">@(line.Credited > 0m ? "-" + Money(line.Credited) : string.Empty)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</OperationsTableViewport>
+<dl class="ops-invoice__totals" style="display: grid !important; grid-template-columns: 1fr !important; gap: 0.45rem !important; width: 100% !important; max-width: 22rem !important; margin: 1.25rem 0 0.5rem auto !important; padding: 1rem 1.25rem !important; background: var(--vx-color-surface-sunken) !important; border: 1px solid var(--vx-color-border) !important; border-radius: 0.5rem !important; font-size: 0.8125rem !important; box-sizing: border-box !important;">
+    <div style="display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 1rem !important; width: 100% !important;"><dt>@T["ui.invoices.subtotal"]</dt><dd>@Money(Invoice.Subtotal)</dd></div>
+    @if (Invoice.Taxes.Count == 0)
+    {
+        <div style="display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 1rem !important; width: 100% !important;"><dt>@T["ui.invoices.no_tax"]</dt><dd>—</dd></div>
+    }
+    else if (Invoice.TaxPerKind)
+    {
+        @foreach (OperationsInvoiceTax tax in Invoice.Taxes)
+        {
+            <div style="display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 1rem !important; width: 100% !important;"><dt>@TaxName · @T["ui.invoice.tax_kind." + tax.Kind] @tax.RatePercent.ToString("0.###", CultureInfo.CurrentCulture) %</dt><dd>@Money(tax.Amount)</dd></div>
+        }
+    }
+    else
+    {
+        <div style="display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 1rem !important; width: 100% !important;"><dt>@TaxName</dt><dd>@Money(Invoice.TaxTotal)</dd></div>
+    }
+    <div class="ops-invoice__total" style="display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 1rem !important; width: 100% !important;"><dt>@T["ui.invoices.total"]</dt><dd>@Money(Invoice.Total)</dd></div>
+    @if (Invoice.CreditedTotal > 0m)
+    {
+        <div style="display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 1rem !important; width: 100% !important;"><dt>@T["ui.invoices.credited"]</dt><dd>-@Money(Invoice.CreditedTotal)</dd></div>
+    }
+    @if (Invoice.PaidTotal > 0m)
+    {
+        <div style="display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 1rem !important; width: 100% !important;"><dt>@T["ui.invoices.paid"]</dt><dd>-@Money(Invoice.PaidTotal)</dd></div>
+    }
+    @if (Invoice.PendingTotal > 0m)
+    {
+        <div style="display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 1rem !important; width: 100% !important;"><dt>@T["ui.invoices.pending"]</dt><dd>-@Money(Invoice.PendingTotal)</dd></div>
+    }
+    @if (Invoice.RefundedTotal > 0m)
+    {
+        <div style="display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 1rem !important; width: 100% !important;"><dt>@T["ui.invoices.refunded"]</dt><dd>@Money(Invoice.RefundedTotal)</dd></div>
+    }
+    <div class="ops-invoice__owed" style="display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 1rem !important; width: 100% !important;"><dt>@T["ui.invoices.owed"]</dt><dd>@Money(Math.Max(Invoice.Owed, 0m))</dd></div>
+    @if (Invoice.Refundable > 0m)
+    {
+        <div style="display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 1rem !important; width: 100% !important;"><dt>@T["ui.invoices.refundable"]</dt><dd>@Money(Invoice.Refundable)</dd></div>
+    }
+</dl>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsInvoice Invoice { get; set; } = null!;
+
+    private string TaxName => Invoice.TaxName ?? T["ui.invoices.tax"].Value;
+
+    private string Money(decimal amount) => OperationsInvoiceWords.Money(amount, Invoice.CurrencyCode);
+}

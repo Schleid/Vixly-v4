@@ -1,0 +1,33 @@
+﻿@*
+=========================================================
+FILE: RegisterPage.razor
+
+PURPOSE:
+Sign-up, step 1.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Sign-up pages are noindex and switched off until Stage 3 (D-U4)
+=========================================================
+*@
+@page "/en/register"
+@page "/fr/register"
+@page "/es/register"
+@attribute [EnableRateLimiting(PublicRateLimits.Start)]
+@inject IStringLocalizer<PublicText> T
+
+<PageHead TitleKey="public.register.title" Indexed="false" />
+<section class="pub-section pub-section--narrow">
+    <h1>@T["public.register.title"]</h1>
+    <RegistrationGate>
+        <RegistrationStart OfferToken="@Offer" Ended="@(Ended == 1)" />
+    </RegistrationGate>
+</section>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Offer { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Ended { get; set; }
+}

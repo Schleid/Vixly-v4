@@ -1,0 +1,78 @@
+﻿@*
+=========================================================
+FILE: SupplyCountPage.razor
+
+PURPOSE:
+A stock count of supplies at a warehouse (Slice 5E, S-7): the clerk enters what is on the shelf, saves as they go, then closes.
+
+RESPONSIBILITIES:
+- List the supplies to count with the stock on hand and the quantity found
+- Save, close (differences become count corrections) or cancel
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- An empty quantity is not counted: that supply is left as it is
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.supplies.stock.count"]" Company="@Company" Section="supplies_stock" Error="@Error" Info="@Info">
+    <p><a href="/staff/supplies/stock?warehouse=@Count?.WarehouseId">@T["ui.supplies.stock.back"]</a></p>
+    @if (Count is { } count)
+    {
+    <section class="ops-editor__panel" aria-labelledby="count-title">
+        <h2 id="count-title">@VixlyText.Format(T, "ui.supplies.stock.count_at", new Dictionary<string, object> { ["warehouse"] = WarehouseName, ["date"] = count.CreatedUtc.ToString("g", CultureInfo.CurrentCulture) })</h2>
+        @if (!count.IsOpen)
+        {
+            <p class="ops-editor__notice">@(count.Cancelled ? T["ui.supplies.stock.count_cancelled"] : T["ui.supplies.stock.count_done"])</p>
+        }
+        <form method="post" action="/staff/supplies/stock/counts/@count.Id" class="ops-editor__form">
+            <AntiforgeryToken />
+            <OperationsTableViewport Label="@T["ui.supplies.stock.count"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.supplies.code"]</th><th scope="col">@T["ui.supplies.name"]</th><th scope="col" class="ops-editor__number">@T["ui.supplies.stock.on_hand"]</th><th scope="col">@T["ui.supplies.stock.counted"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsSupplyCountLine line in count.Lines)
+                        {
+                            OperationsSupply? supply = Supplies.FirstOrDefault(item => item.Id == line.SupplyId);
+                            <tr>
+                                <td class="ops-editor__code">@supply?.Code</td>
+                                <td>@supply?.Name(Language)</td>
+                                <td class="ops-editor__number">@(Stock.FirstOrDefault(item => item.SupplyId == line.SupplyId)?.OnHand ?? 0)</td>
+                                <td><input name="@("count_" + line.SupplyId)" value="@line.Counted" inputmode="numeric" size="6" autocomplete="off" disabled="@(!count.IsOpen)" aria-label="@T["ui.supplies.stock.counted"]" /></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+            @if (count.IsOpen)
+            {
+                <p class="ops-editor__hint">@T["ui.supplies.stock.count_close_hint"]</p>
+                <p class="ops-editor__actions">
+                    <button type="submit" name="action" value="save" class="vx-button vx-button--secondary">@T["ui.supplies.stock.count_save"]</button>
+                    <button type="submit" name="action" value="close" class="vx-button vx-button--primary">@T["ui.supplies.stock.count_close"]</button>
+                    <button type="submit" name="action" value="cancel" class="vx-button vx-button--secondary">@T["ui.supplies.stock.count_cancel"]</button>
+                </p>
+            }
+        </form>
+    </section>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsSupplyCount? Count { get; set; }
+
+    [Parameter] public string WarehouseName { get; set; } = string.Empty;
+
+    [Parameter] public IReadOnlyList<OperationsSupply> Supplies { get; set; } = Array.Empty<OperationsSupply>();
+
+    [Parameter] public IReadOnlyList<OperationsSupplyStock> Stock { get; set; } = Array.Empty<OperationsSupplyStock>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private static string Language => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+}

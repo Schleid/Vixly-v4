@@ -1,0 +1,41 @@
+/* Inspection station: a dedicated scan entry and a factual empty-state guide. */
+.ops-inspection-station { margin:1.5rem 0; border:1px solid var(--vx-color-border); border-radius:.85rem; background:var(--vx-color-surface); overflow:hidden; }
+.ops-inspection-station__intro { display:flex; justify-content:space-between; align-items:center; gap:2rem; padding:2rem 2.25rem 1.25rem; background:linear-gradient(110deg,var(--vx-color-surface),var(--vx-color-primary-soft)); border-bottom:1px solid var(--vx-color-border); }
+.ops-inspection-station__intro > div { max-width:34rem; min-width:0; }
+.ops-inspection-station__eyebrow { display:flex; align-items:center; gap:.65rem; margin:0 0 1rem; color:var(--vx-color-primary); font-size:.625rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.ops-inspection-station__eyebrow::before { content:''; width:1.2rem; height:2px; background:currentColor; }
+.ops-inspection-station__intro h2 { margin:0; font-size:1.8rem; line-height:1.2; letter-spacing:-.045em; font-weight:700; }
+.ops-inspection-station__description { color:var(--vx-color-text-muted); font-size:.875rem; line-height:1.8; max-width:29rem; margin:.8rem 0 0; }
+.ops-inspection-station__scan { display:grid; grid-template-columns:3.5rem minmax(0,1fr); align-items:start; gap:1.25rem; padding:1.75rem 2.25rem; }
+.ops-inspection-station__scan-icon { display:grid; place-items:center; width:3.5rem; height:3.5rem; margin-top:1.5rem; border:1px solid var(--vx-color-status-info-border); border-radius:.65rem; color:var(--vx-color-primary); background:var(--vx-color-primary-soft); }
+.ops-inspection-station__scan-icon svg { width:27px; height:27px; stroke:currentColor; stroke-width:1.35; fill:none; }
+.ops-inspection-station__input { min-width:0; }
+.ops-inspection-entry { display:grid; grid-template-columns:minmax(0,1fr) minmax(8rem,11rem); align-items:end; gap:.75rem; margin:0; }
+.ops-inspection-entry > label { display:grid; gap:.6rem; min-width:0; margin:0; font-size:.75rem; font-weight:650; }
+.ops-inspection-station .ops-inspection-entry input[name=code] { width:100%; height:48px !important; min-height:48px !important; box-sizing:border-box !important; border-radius:.5rem; border:1px solid var(--vx-color-border-control); background:var(--vx-color-surface-sunken); padding:0 1rem; font-family:var(--vx-font-mono); font-size:1.1rem; letter-spacing:.045em; color:var(--vx-color-text); }
+.ops-inspection-station .ops-inspection-entry input[name=code]:focus-visible { background:var(--vx-color-surface); }
+.ops-inspection-entry > .vx-button { height:48px !important; min-height:48px !important; box-sizing:border-box !important; border-radius:.5rem; font-size:.875rem; font-weight:650; padding:0 1.5rem !important; align-self:end; display:inline-flex; align-items:center; justify-content:center; }
+.ops-inspection-station__hint { display:flex; align-items:center; flex-wrap:wrap; gap:.5rem; margin:.8rem 0 0; font-size:.6875rem; line-height:1.7; color:var(--vx-color-text-subtle); }
+.ops-inspection-station__hint kbd { display:inline-grid; place-items:center; width:1.6rem; height:1.25rem; border:1px solid var(--vx-color-border); border-bottom-width:2px; border-radius:.25rem; color:var(--vx-color-text-muted); background:var(--vx-color-surface-sunken); font-size:.75rem; }
+.ops-inspection-station__steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1.5rem; margin:0; list-style:none; padding:1.5rem 2.25rem; border-top:1px solid var(--vx-color-border); background:var(--vx-color-surface-sunken); }
+.ops-inspection-station__steps li { display:flex; align-items:baseline; gap:.8rem; padding-right:1.25rem; border-right:1px solid var(--vx-color-border); min-width:0; }
+.ops-inspection-station__steps li:last-child { border:0; padding-right:0; }
+.ops-inspection-station__steps li > span { font:500 .625rem var(--vx-font-mono); color:var(--vx-color-primary); }
+.ops-inspection-station__steps h3 { font-size:.8125rem; letter-spacing:-.015em; margin:0 0 .5rem; }
+.ops-inspection-station__steps p { font-size:.6875rem; line-height:1.75; color:var(--vx-color-text-muted); margin:0; }
+.ops-inspection-station[data-loaded=true] .ops-inspection-station__scan { padding:1rem 1.25rem; }
+.ops-inspection-station[data-loaded=true] .ops-inspection-station__hint { display:none; }
+.ops-inspection-sketch { width:270px; height:175px; flex-shrink:0; stroke-width:1.4; stroke-linejoin:round; stroke-linecap:round; }
+.ops-inspection-sketch__ground { fill:var(--vx-color-primary); opacity:.06; }
+.ops-inspection-sketch__detail { stroke:var(--vx-color-primary); opacity:.65; }
+.ops-inspection-sketch__platform,.ops-inspection-sketch__top { fill:var(--vx-color-surface); stroke:var(--vx-color-status-info-border); }
+.ops-inspection-sketch__base { fill:var(--vx-color-primary-soft); stroke:var(--vx-color-primary); }
+.ops-inspection-sketch__box { fill:var(--vx-color-surface); stroke:var(--vx-color-primary); }
+.ops-inspection-sketch__side { fill:var(--vx-color-primary-soft); stroke:var(--vx-color-primary); }
+.ops-inspection-sketch__tape { fill:var(--vx-color-status-info-border); stroke:var(--vx-color-primary); }
+.ops-inspection-sketch__label,.ops-inspection-sketch__screen { fill:var(--vx-color-surface); stroke:var(--vx-color-primary); }
+.ops-inspection-sketch__scanner { fill:var(--vx-color-chrome-active); stroke:var(--vx-color-primary); }
+.ops-inspection-sketch__beam { stroke:var(--vx-color-primary); opacity:.4; stroke-dasharray:3 4; }
+@media(max-width:1000px) { .ops-inspection-station__intro { padding:1.5rem; gap:1rem; }.ops-inspection-sketch { width:210px; height:145px; }.ops-inspection-station__scan,.ops-inspection-station__steps { padding:1.5rem; }.ops-inspection-station__intro h2 { font-size:1.6rem; } }
+@media(max-width:640px) { .ops-inspection-station__intro { align-items:flex-start; padding:1.4rem; }.ops-inspection-sketch { width:120px; height:110px; margin-right:-.5rem; }.ops-inspection-station__intro h2 { font-size:1.4rem; }.ops-inspection-station__description { font-size:.8125rem; }.ops-inspection-station__eyebrow { font-size:.5625rem; }.ops-inspection-station__scan { grid-template-columns:minmax(0,1fr); gap:0; padding:1.4rem; }.ops-inspection-station__scan-icon { display:none; }.ops-inspection-entry { grid-template-columns:minmax(0,1fr); }.ops-inspection-entry > .vx-button { min-height:48px; }.ops-inspection-station__steps { grid-template-columns:minmax(0,1fr); gap:1rem; padding:1.4rem; }.ops-inspection-station__steps li { padding:0 0 1rem; border-right:0; border-bottom:1px solid var(--vx-color-border); }.ops-inspection-station__steps li:last-child { padding:0; }.ops-inspection-station__steps p { font-size:.75rem; }.ops-inspection-station[data-loaded=true] .ops-inspection-station__scan { padding:1.25rem; } }
+@media(max-width:420px) { .ops-inspection-station__intro { display:block; position:relative; padding-right:1.4rem; }.ops-inspection-sketch { display:block; width:190px; height:120px; margin:1rem auto -.6rem; }.ops-inspection-station__description { max-width:none; } }

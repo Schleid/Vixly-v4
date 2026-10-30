@@ -1,0 +1,138 @@
+@*
+=========================================================
+FILE: ScanPage.razor
+
+PURPOSE:
+The scan app of the dock: scan a carrier barcode, the ID label prints (Slice 3B, owner 2026-10-18).
+
+RESPONSIBILITIES:
+- Choose the warehouse and the printer; open or continue a carrier delivery; scan; close and print the receipt
+
+IMPORTANT NOTES:
+- Markup only; ops-scan.js does the scanning, printing and offline queue. Text comes from OperationsText (L-10)
+- Works with a USB or Bluetooth scanner (it types), a handheld, or the phone camera
+- Full screen, large type: read from arm's length
+=========================================================
+*@
+@using Vixly.Operations.Application.UseCases.Receiving.GetOperationsScanStation
+@using Vixly.Operations.Domain.Printing
+@inject IStringLocalizer<OperationsText> T
+<!DOCTYPE html>
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#0f172a" />
+    <title>@T["ui.scan.title"] · @Company</title>
+    <link rel="manifest" href="/scan.webmanifest" />
+    <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-theme.css" />
+    <link rel="stylesheet" href="/css/ops-scan.css?v=20261029-1" />
+    <script src="/_content/Vixly.Shared.UI/vixly-forms.js" defer></script>
+    <script src="/js/ops-camera-reader.js?v=20261027-1" defer></script>
+    <script src="/js/ops-scan.js?v=20261027-1" defer></script>
+</head>
+<body class="ops-scan">
+    <AntiforgeryToken />
+    <main class="ops-scan__app" data-scan
+          data-text-outcome-error="@T["ui.scan.error"]" data-text-offline="@T["ui.scan.offline"]" data-text-queued="@T["ui.scan.queued"]"
+          data-text-sent="@T["ui.scan.sent"]" data-text-camera-denied="@T["ui.scan.camera_denied"]" data-text-pieces="@T["ui.scan.pieces"]"
+          data-text-close-confirm="@T["ui.scan.close_confirm"]" data-text-unidentified="@T["ui.scan.unidentified"]"
+          data-text-label-needed="@T["ui.scan.label_needed"]" data-text-failed="@T["ui.scan.failed"]" data-text-wait-sending="@T["ui.scan.wait_sending"]">
+        <header class="ops-scan__bar">
+            <a href="/staff" class="ops-scan__home">@Company</a>
+            @if (Station.Warehouses.Count > 0)
+            {
+                <form method="get" action="/staff/scan" class="ops-scan__pick">
+                    <select name="warehouse" aria-label="@T["ui.receiving.warehouse"]" data-autosubmit>
+                        @foreach (OperationsWarehouse warehouse in Station.Warehouses)
+                        {
+                            <option value="@warehouse.Id" selected="@(warehouse.Id == Station.WarehouseId)">@warehouse.Code</option>
+                        }
+                    </select>
+                </form>
+                <select class="ops-scan__printer" aria-label="@T["ui.scan.printer"]" data-printer>
+                    <option value="browser">@T["ui.scan.print_here"]</option>
+                    @foreach (OperationsLabelPrinter printer in Station.Printers)
+                    {
+                        <option value="@printer.Id">@printer.Name</option>
+                    }
+                    <option value="none">@T["ui.scan.print_none"]</option>
+                </select>
+            }
+        </header>
+        @if (Error is not null)
+        {
+            <p class="ops-scan__error" role="alert">@Error</p>
+        }
+        else
+        {
+            <section class="ops-scan__deliveries" data-step="deliveries" data-warehouse="@Station.WarehouseId">
+                <h1>@T["ui.scan.new_delivery"]</h1>
+                <div class="ops-scan__carriers">
+                    @foreach (string carrier in Vixly.Operations.Application.Receiving.OperationsReceivingCarriers.Common)
+                    {
+                        <button type="button" data-open="@carrier">@carrier</button>
+                    }
+                    <button type="button" data-open="">@T["ui.scan.other_carrier"]</button>
+                </div>
+                @if (Station.Deliveries.Count > 0)
+                {
+                    <h2>@T["ui.scan.open_deliveries"]</h2>
+                    <ul class="ops-scan__open">
+                        @foreach (Vixly.Operations.Application.Receiving.OperationsDeliverySummary delivery in Station.Deliveries)
+                        {
+                            <li><button type="button" data-continue="@delivery.DeliveryId" data-carrier="@delivery.Carrier" data-pieces="@delivery.Pieces">
+                                <strong>@(delivery.Carrier ?? T["ui.scan.other_carrier"])</strong> · @delivery.OpenedUtc.ToLocalTime().ToString("HH:mm") · @VixlyText.Format(T, "ui.scan.pieces", "count", delivery.Pieces)
+                            </button></li>
+                        }
+                    </ul>
+                }
+            </section>
+            <section class="ops-scan__scanning" data-step="scanning" hidden>
+                <div class="ops-scan__delivery"><strong data-delivery-carrier></strong> <span data-count></span> <span class="ops-scan__queue" data-queue hidden></span></div>
+                <form class="ops-scan__input" data-scan-form autocomplete="off">
+                    <input name="barcode" data-barcode inputmode="none" autocapitalize="characters" spellcheck="false" aria-label="@T["ui.scan.barcode"]" placeholder="@T["ui.scan.barcode"]" />
+                    <button type="button" class="ops-scan__keyboard" data-keyboard aria-label="@T["ui.scan.keyboard"]">⌨</button>
+                </form>
+                <div class="ops-scan__tools">
+                    <button type="button" class="ops-scan__damaged" data-damaged aria-pressed="false">@T["ui.scan.damaged"]</button>
+                    <button type="button" data-camera>@T["ui.scan.camera"]</button>
+                </div>
+                <video class="ops-scan__video" data-video playsinline muted hidden></video>
+                <article class="ops-scan__result" data-result data-outcome="idle" aria-live="assertive">
+                    <p class="ops-scan__code" data-result-code>—</p>
+                    <p class="ops-scan__name" data-result-name>@T["ui.scan.ready"]</p>
+                    <p class="ops-scan__number" data-result-number></p>
+                    <p class="ops-scan__note" data-result-note></p>
+                </article>
+                <ol class="ops-scan__recent" data-recent></ol>
+                <div class="ops-scan__end">
+                    <button type="button" data-leave>@T["ui.scan.leave"]</button>
+                    <button type="button" class="ops-scan__close" data-close>@T["ui.scan.close"]</button>
+                </div>
+            </section>
+            <section class="ops-scan__closed" data-step="closed" hidden>
+                <h1 data-receipt-number></h1>
+                <p>@T["ui.scan.closed_hint"]</p>
+                <p><a class="ops-scan__receipt" data-receipt-link href="#" target="_blank" rel="noopener">@T["ui.scan.print_receipt"]</a></p>
+                <p><button type="button" data-again>@T["ui.scan.new_delivery"]</button></p>
+            </section>
+        }
+    </main>
+    <div class="ops-scan__label" data-label aria-hidden="true">
+        <div data-label-barcode></div>
+        <p data-label-number></p>
+        <p data-label-code></p>
+    </div>
+</body>
+</html>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public GetOperationsScanStationResponse Station { get; set; } = null!;
+
+    [Parameter] public string? Error { get; set; }
+}

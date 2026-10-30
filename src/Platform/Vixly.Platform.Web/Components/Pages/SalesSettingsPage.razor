@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: SalesSettingsPage.razor
 
@@ -15,6 +15,12 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<PlatformText> T
 
 <PageTitle>@T["ui.sales_settings.title"]</PageTitle>
-<p><a href="/approvals">@T["ui.approvals.title"]</a></p>
-<h1>@T["ui.sales_settings.title"]</h1>
+<div class="vx-summary-strip">
+    <div class="vx-summary-strip__main">
+        <h1 class="vx-summary-strip__title">@T["ui.sales_settings.title"]</h1>
+    </div>
+    <div class="vx-summary-strip__actions">
+        <a href="/approvals" class="vx-button vx-button--secondary">@T["ui.approvals.title"]</a>
+    </div>
+</div>
 <SalesSettingsForm />

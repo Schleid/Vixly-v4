@@ -1,0 +1,80 @@
+@*
+=========================================================
+FILE: ArrivalsPage.razor
+
+PURPOSE:
+What a destination warehouse receives (Slice 7, R-1): the dispatches on their way, then the last ones received.
+
+RESPONSIBILITIES:
+- Choose the warehouse
+- List the dispatches, each linked to its receiving page
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Only warehouses where the person receives or records customs
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.arrivals.title"]" Company="@Company" Section="arrivals" Error="@Error" Info="@Info">
+    <div class="ops-list-bar">
+        @if (Warehouses.Count > 1)
+        {
+            <form method="get" action="/staff/arrivals" class="ops-list-bar__filters" aria-label="@T["ui.arrivals.warehouse"]">
+                <label class="ops-field ops-field--inline">
+                    <span class="ops-label-text">@T["ui.arrivals.warehouse"]</span>
+                    <select name="warehouse" class="ops-field__control" onchange="this.form.submit()">
+                        @foreach (OperationsArrivalPlace place in Warehouses)
+                        {
+                            <option value="@place.Id" selected="@(place.Id == WarehouseId)">@place.Code · @place.Name</option>
+                        }
+                    </select>
+                </label>
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.arrivals.show"]</button>
+            </form>
+        }
+        else
+        {
+            <div class="ops-list-bar__filters"></div>
+        }
+        <div class="ops-list-bar__actions">
+            <a href="/staff/arrivals/discrepancies" class="vx-button vx-button--secondary">@T["ui.arrivals.discrepancies"]</a>
+        </div>
+    </div>
+    <section class="ops-editor__panel" aria-labelledby="coming-title">
+        <h2 id="coming-title" class="ops-section-title">@T["ui.arrivals.coming"] (@Coming.Count)</h2>
+        @if (Coming.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.arrivals.none_coming"]</p></div>
+        }
+        else
+        {
+            <ArrivalRows Rows="Coming" WarehouseId="WarehouseId" TimeZone="@TimeZone" />
+        }
+    </section>
+    @if (Received.Count > 0)
+    {
+        <section class="ops-editor__panel" aria-labelledby="received-title">
+            <h2 id="received-title" class="ops-section-title">@T["ui.arrivals.received"] (@Received.Count)</h2>
+            <ArrivalRows Rows="Received" WarehouseId="WarehouseId" TimeZone="@TimeZone" />
+        </section>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsArrivalPlace> Warehouses { get; set; } = Array.Empty<OperationsArrivalPlace>();
+
+    [Parameter] public Guid WarehouseId { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsArrivalRow> Coming { get; set; } = Array.Empty<OperationsArrivalRow>();
+
+    [Parameter] public IReadOnlyList<OperationsArrivalRow> Received { get; set; } = Array.Empty<OperationsArrivalRow>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private string? TimeZone => Warehouses.FirstOrDefault(place => place.Id == WarehouseId)?.TimeZone;
+}

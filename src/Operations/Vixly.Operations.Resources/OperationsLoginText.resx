@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <data name="portal" xml:space="preserve">
+    <value>Operations portal</value>
+  </data>
+  <data name="badge" xml:space="preserve">
+    <value>Staff workspace</value>
+  </data>
+  <data name="eyebrow" xml:space="preserve">
+    <value>Your operations, connected</value>
+  </data>
+  <data name="welcome" xml:space="preserve">
+    <value>Welcome back,</value>
+  </data>
+  <data name="welcome_fallback" xml:space="preserve">
+    <value>Welcome back.</value>
+  </data>
+  <data name="body" xml:space="preserve">
+    <value>Your team, shipments and warehouse activity. One connected workspace.</value>
+  </data>
+  <data name="shipments" xml:space="preserve">
+    <value>Shipments</value>
+  </data>
+  <data name="shipments_body" xml:space="preserve">
+    <value>Track every movement</value>
+  </data>
+  <data name="warehouses" xml:space="preserve">
+    <value>Warehouses</value>
+  </data>
+  <data name="warehouses_body" xml:space="preserve">
+    <value>Keep work connected</value>
+  </data>
+  <data name="team" xml:space="preserve">
+    <value>Your team</value>
+  </data>
+  <data name="team_body" xml:space="preserve">
+    <value>One shared workspace</value>
+  </data>
+  <data name="heading" xml:space="preserve">
+    <value>Staff login</value>
+  </data>
+  <data name="subtitle" xml:space="preserve">
+    <value>Sign in to your company workspace.</value>
+  </data>
+  <data name="protected" xml:space="preserve">
+    <value>Protected staff access for authorized tenant users only.</value>
+  </data>
+  <data name="show_password" xml:space="preserve">
+    <value>Show password</value>
+  </data>
+  <data name="hide_password" xml:space="preserve">
+    <value>Hide password</value>
+  </data>
+  <data name="password_placeholder" xml:space="preserve">
+    <value>Enter your password</value>
+  </data>
+  <data name="email_placeholder" xml:space="preserve">
+    <value>staff@company.com</value>
+  </data>
+</root>

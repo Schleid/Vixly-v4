@@ -21,4 +21,10 @@ public sealed class VerifyPlatformDeviceRequest
     public string? Challenge { get; init; }
 
     public string? Signature { get; init; }
+
+    // A sign-in checks without rotating: a lost answer would leave the browser with an old secret (review 2026-10-21).
+    public bool Rotate { get; init; } = true;
+
+    // Where the person is now; a device registered before countries were kept takes this one (owner, 2026-10-21).
+    public string? Country { get; init; }
 }

@@ -23,12 +23,13 @@ public sealed class PlatformDeviceLink : AuditableEntity
         TokenHash = string.Empty;
     }
 
-    private PlatformDeviceLink(PlatformDeviceLinkKind kind, Guid tenantId, Guid? registrationId, string tokenHash, DateTimeOffset utcNow)
+    private PlatformDeviceLink(PlatformDeviceLinkKind kind, Guid tenantId, Guid? registrationId, Guid? supportRequestId, string tokenHash, DateTimeOffset utcNow)
         : base(utcNow)
     {
         Kind = kind;
         PlatformTenantId = tenantId;
         PlatformTenantRegistrationId = registrationId;
+        SupportRequestId = supportRequestId;
         TokenHash = tokenHash;
         ExpiresUtc = utcNow.Add(kind == PlatformDeviceLinkKind.FirstDevice ? PlatformLicensingLimits.FirstDeviceLinkLifetime : PlatformLicensingLimits.RecoveryLinkLifetime);
     }
@@ -38,6 +39,9 @@ public sealed class PlatformDeviceLink : AuditableEntity
     public Guid PlatformTenantId { get; private set; }
 
     public Guid? PlatformTenantRegistrationId { get; private set; }
+
+    // The support request a recovery or second-factor reset link answers (D-O13).
+    public Guid? SupportRequestId { get; private set; }
 
     public string TokenHash { get; private set; }
 
@@ -51,12 +55,17 @@ public sealed class PlatformDeviceLink : AuditableEntity
 
     public static PlatformDeviceLink Create(PlatformDeviceLinkKind kind, Guid tenantId, Guid? registrationId, string? tokenHash, DateTimeOffset utcNow)
     {
+        return Create(kind, tenantId, registrationId, null, tokenHash, utcNow);
+    }
+
+    public static PlatformDeviceLink Create(PlatformDeviceLinkKind kind, Guid tenantId, Guid? registrationId, Guid? supportRequestId, string? tokenHash, DateTimeOffset utcNow)
+    {
         if (!Enum.IsDefined(kind) || tenantId == Guid.Empty || tokenHash is null || tokenHash.Length != PlatformLicensingLimits.HashLength)
         {
             throw new DomainException(PlatformLicensingErrors.LinkInvalid);
         }
 
-        return new PlatformDeviceLink(kind, tenantId, registrationId, tokenHash, utcNow);
+        return new PlatformDeviceLink(kind, tenantId, registrationId, supportRequestId, tokenHash, utcNow);
     }
 
     public bool IsUsableAt(DateTimeOffset utcNow) => UsedUtc is null && VoidedUtc is null && utcNow < ExpiresUtc && Tries < PlatformLicensingLimits.LinkMaxTries;

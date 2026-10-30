@@ -1,0 +1,44 @@
+@*
+=========================================================
+FILE: InvoiceRefundForm.razor
+
+PURPOSE:
+Give money back after a credit note on a paid invoice (Slice 5F, F-7 and C-8).
+
+RESPONSIBILITIES:
+- The method, the amount up to what can be given back, a reason and a reference
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Cash comes out of the person's open drawer at the invoice's warehouse
+=========================================================
+*@
+<form method="post" action="/staff/invoices/@Invoice.Id/refunds" class="ops-editor__panel ops-editor__form" aria-labelledby="refund-title">
+    <AntiforgeryToken />
+    <input type="hidden" name="key" value="@Key" />
+    <h2 id="refund-title">@VixlyText.Format(T, "ui.payments.refund_title", "amount", OperationsInvoiceWords.Money(Invoice.Refundable, Invoice.CurrencyCode))</h2>
+    <label>@T["ui.cashier.method"]
+        <select name="method">
+            @foreach (OperationsPaymentMethod method in Methods)
+            {
+                <option value="@method">@OperationsPaymentWords.Method(T, method, Others)</option>
+            }
+        </select>
+    </label>
+    <label>@T["ui.cashier.amount"] <input name="amount" inputmode="decimal" size="9" value="@Invoice.Refundable.ToString("0.00", CultureInfo.InvariantCulture)" required /></label>
+    <label>@T["ui.invoices.reason"] <input name="reason" maxlength="500" size="40" required /></label>
+    <label>@T["ui.cashier.reference"] <input name="reference" maxlength="60" size="14" /></label>
+    <button type="submit" class="vx-button vx-button--primary">@T["ui.payments.refund_button"]</button>
+</form>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsInvoice Invoice { get; set; } = null!;
+
+    [Parameter] public IReadOnlyDictionary<OperationsPaymentMethod, string> Others { get; set; } = new Dictionary<OperationsPaymentMethod, string>();
+
+    [Parameter] public IReadOnlyList<OperationsPaymentMethod> Methods { get; set; } = Array.Empty<OperationsPaymentMethod>();
+
+    private readonly string Key = Guid.NewGuid().ToString("N");
+}

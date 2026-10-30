@@ -1,0 +1,124 @@
+@*
+=========================================================
+FILE: CreditAccountPage.razor
+
+PURPOSE:
+A customer's credit account (Slice 5F step 2b, K-6): where it stands, its open items with their age, its statement; change it.
+
+RESPONSIBILITIES:
+- Open the account when there is none
+- Show the position and the open items (due dates, overdue)
+- Change the limit, the terms or the state with a reason
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Closed only when nothing is owed
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@VixlyText.Format(T, "ui.credit.account_title", "name", Customer.FullName)" Company="@Company" Section="credit" Error="@Error" Info="@Info">
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <a href="/staff/credit" class="vx-button vx-button--secondary">@T["ui.credit.back"]</a>
+            @if (Account is not null) { <a class="vx-button vx-button--secondary" href="/staff/credit/customers/@Customer.Id/statement" target="_blank" rel="noopener">@T["ui.credit.statement"]</a> }
+        </div>
+        @if (Account is not null)
+        {
+            <div class="ops-list-bar__actions">
+                <span class="ops-editor__status" data-status="@Account.Status.ToString().ToLowerInvariant()">@T["ui.credit.status." + Account.Status]</span>
+            </div>
+        }
+    </div>
+    @if (Account is null)
+    {
+        <form method="post" action="/staff/credit/accounts" class="ops-editor__panel ops-editor__form" aria-labelledby="open-title">
+            <AntiforgeryToken />
+            <input type="hidden" name="customer" value="@Customer.Id" />
+            <h2 id="open-title">@T["ui.credit.open"] · @Customer.Code</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.85rem; margin-bottom: 0.85rem;">
+                <label>@VixlyText.Format(T, "ui.credit.limit", "currency", CurrencyCode) <input name="limit" inputmode="decimal" size="10" required /></label>
+                <label>@T["ui.credit.terms"] <input name="terms" inputmode="numeric" size="4" placeholder="@CompanyTermsDays" /></label>
+            </div>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.credit.open_button"]</button>
+        </form>
+    }
+    else
+    {
+        <section class="ops-editor__panel" aria-labelledby="position-title">
+            <h2 id="position-title">@Customer.Code · <span class="ops-editor__status" data-status="@Account.Status.ToString().ToLowerInvariant()">@T["ui.credit.status." + Account.Status]</span>@if (Account.Reason is { } reason) { <small> · @reason</small> }</h2>
+            <p>@VixlyText.Format(T, "ui.credit.limit_terms", new Dictionary<string, object> { ["limit"] = OperationsInvoiceWords.Money(Account.Limit, CurrencyCode), ["days"] = Account.TermsOr(CompanyTermsDays) })</p>
+            <CreditPositionFacts T="T" Position="Position" CurrencyCode="@CurrencyCode" ShowAges="true" />
+        </section>
+        <form method="post" action="/staff/credit/customers/@Customer.Id" class="ops-editor__panel ops-editor__form ops-panel--restricted" aria-labelledby="change-title">
+            <AntiforgeryToken />
+            <h2 id="change-title">@T["ui.credit.change"]</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.85rem; margin-bottom: 0.85rem;">
+                <label>@VixlyText.Format(T, "ui.credit.limit", "currency", CurrencyCode) <input name="limit" inputmode="decimal" size="10" value="@Account.Limit.ToString("0.00", CultureInfo.InvariantCulture)" required /></label>
+                <label>@T["ui.credit.terms"] <input name="terms" inputmode="numeric" size="4" value="@Account.TermsDays" placeholder="@CompanyTermsDays" /></label>
+                <label>@T["ui.credit.state"]
+                    <select name="status">
+                        @foreach (OperationsCreditAccountStatus status in Enum.GetValues<OperationsCreditAccountStatus>())
+                        {
+                            <option value="@status" selected="@(status == Account.Status)">@T["ui.credit.status." + status]</option>
+                        }
+                    </select>
+                </label>
+                <label>@T["ui.credit.reason"] <input name="reason" maxlength="300" /></label>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+                <p class="ops-editor__hint" style="margin: 0;">@T["ui.credit.change_hint"]</p>
+            </div>
+        </form>
+    }
+    <section class="ops-editor__panel" aria-labelledby="items-title">
+        <h2 id="items-title">@T["ui.credit.items"]</h2>
+        @if (Items.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.statement.nothing_owed"]</p></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.credit.items"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.statement.invoice"]</th><th scope="col">@T["ui.statement.reference"]</th><th scope="col">@T["ui.statement.date"]</th><th scope="col">@T["ui.statement.due"]</th><th scope="col" class="ops-editor__number">@T["ui.statement.owed"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsInvoice item in Items)
+                        {
+                            <tr data-overdue="@(item.DueOn is { } due && due < Today)" data-awaiting="@(item.OnAccount == OperationsAccountCharge.AwaitingApproval)">
+                                <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/invoices/@item.Id">@item.Number</a></td>
+                                <td class="ops-editor__code">@item.Reference</td>
+                                <td>@OperationsInvoiceWords.Day(item.IssuedOn)</td>
+                                <td>@(item.DueOn is { } day ? OperationsInvoiceWords.Day(day) : T["ui.credit.awaiting"].Value)</td>
+                                <td class="ops-editor__number">@OperationsInvoiceWords.Money(item.Owed, item.CurrencyCode)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsCustomer Customer { get; set; } = null!;
+
+    [Parameter] public OperationsCreditAccount? Account { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsInvoice> Items { get; set; } = Array.Empty<OperationsInvoice>();
+
+    [Parameter, EditorRequired] public OperationsCreditPosition Position { get; set; } = null!;
+
+    [Parameter] public int CompanyTermsDays { get; set; }
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public DateOnly Today { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

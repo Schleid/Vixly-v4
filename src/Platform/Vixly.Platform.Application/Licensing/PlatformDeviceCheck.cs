@@ -15,4 +15,12 @@ namespace Vixly.Platform.Application.Licensing;
 // - Codes only; the caller resolves text
 // - Customers are never device-checked
 // =========================================================
-public sealed record PlatformDeviceCheck(bool Allowed, string? Code, PlatformSubscriptionAccess Access, string? NewSecret);
+public sealed record PlatformDeviceCheck(bool Allowed, string? Code, PlatformSubscriptionAccess Access, string? NewSecret)
+{
+    // The device as registered, when it is allowed (owner, 2026-10-21: activity lines and the country check).
+    public string? Name { get; init; }
+
+    public string? Number { get; init; }
+
+    public string? Country { get; init; }
+}

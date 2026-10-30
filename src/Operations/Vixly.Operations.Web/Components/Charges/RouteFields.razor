@@ -1,0 +1,46 @@
+﻿@*
+=========================================================
+FILE: RouteFields.razor
+
+PURPOSE:
+The route of a price list, an extra or a quote: from an origin (drop-off) to a destination warehouse, or any (Slice 4C).
+
+RESPONSIBILITIES:
+- Two selects: origin and destination
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Empty choice: any origin, any destination
+- A warehouse chosen before and no longer listed stays chosen
+=========================================================
+*@
+<label>@T["ui.charges.route.origin"]
+    <select name="origin">
+        <option value="">@T["ui.charges.route.any_origin"]</option>
+        @* A warehouse no longer an origin stays chosen: saving never widens the route. *@
+        @if (Origin is { } keptOrigin && !Origins.Any(origin => origin.Id == keptOrigin)) { <option value="@keptOrigin" selected>@T["ui.charges.route.kept"]</option> }
+        @foreach (OperationsWarehouse origin in Origins) { <option value="@origin.Id" selected="@(origin.Id == Origin)">@origin.Name · @origin.Address.City, @origin.Address.CountryCode</option> }
+    </select>
+</label>
+<label>@T["ui.charges.route.destination"]
+    <select name="destination" required="@RequireDestination">
+        @if (!RequireDestination) { <option value="">@T["ui.charges.route.any_destination"]</option> }
+        @if (Destination is { } keptDestination && !Destinations.Any(destination => destination.Id == keptDestination)) { <option value="@keptDestination" selected>@T["ui.charges.route.kept"]</option> }
+        @foreach (OperationsWarehouse destination in Destinations) { <option value="@destination.Id" selected="@(destination.Id == Destination)">@destination.Name · @destination.Address.City, @destination.Address.CountryCode</option> }
+    </select>
+</label>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Origins { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Destinations { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public Guid? Origin { get; set; }
+
+    [Parameter] public Guid? Destination { get; set; }
+
+    // A quote prices one destination; a price list or an extra may be for any.
+    [Parameter] public bool RequireDestination { get; set; }
+}

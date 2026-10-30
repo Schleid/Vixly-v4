@@ -1,0 +1,114 @@
+@*
+=========================================================
+FILE: BillsPage.razor
+
+PURPOSE:
+Bills (Slice 8, payables): what the company owes its carriers, partner agents and other vendors.
+
+RESPONSIBILITIES:
+- Totals owed and overdue, bills waiting for approval
+- Filter by state; the list with each bill's vendor, number, category, dates, amount and what is still owed
+- Whether bills need someone else's approval (for whoever edits settings)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.bills.title"]" Company="@Company" Section="bills" Error="@Error" Info="@Info">
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            @if (CanEnter)
+            {
+                <a class="vx-button vx-button--primary" href="/staff/bills/new">@T["ui.bills.new"]</a>
+                <a class="vx-button vx-button--secondary" href="/staff/vendors">@T["ui.vendors.title"]</a>
+            }
+            <a class="vx-button vx-button--secondary" href="/staff/profit">@T["ui.profit.title"]</a>
+        </div>
+    </div>
+    <div class="ops-editor__panel" style="margin-bottom: 0.75rem;">
+        <dl class="ops-facts-grid" data-bill-totals>
+            <div class="ops-fact-cell"><dt>@T["ui.bills.owed"]</dt><dd data-owed class="ops-editor__number" style="font-weight: 700;">@OperationsInvoiceWords.Money(Owed, CurrencyCode)</dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.bills.overdue"]</dt><dd data-overdue class="ops-editor__number" style="font-weight: 700; color: var(--vx-color-danger, #ef4444);">@OperationsInvoiceWords.Money(Overdue, CurrencyCode)</dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.bills.to_approve"]</dt><dd style="font-weight: 700;">@ToApprove</dd></div>
+        </dl>
+    </div>
+    <nav class="ops-list-bar" aria-label="@T["ui.bills.filter"]" style="margin-bottom: 0.75rem; gap: 0.4rem; flex-wrap: wrap;">
+        <a href="/staff/bills" class="vx-button @(Status is null ? "vx-button--primary" : "vx-button--secondary")" style="height: 30px; padding: 0 0.75rem; font-size: 0.75rem;">@T["ui.bills.all"]</a>
+        @foreach (OperationsBillStatus status in Enum.GetValues<OperationsBillStatus>())
+        {
+            <a href="/staff/bills?status=@status" class="vx-button @(Status == status ? "vx-button--primary" : "vx-button--secondary")" style="height: 30px; padding: 0 0.75rem; font-size: 0.75rem;">@T["ui.bills.status." + status]</a>
+        }
+    </nav>
+    @if (Bills.Count == 0)
+    {
+        <div class="ops-editor__empty"><p>@T["ui.bills.none"]</p></div>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.bills.title"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col">@T["ui.bills.billed_on"]</th><th scope="col">@T["ui.bills.party"]</th><th scope="col">@T["ui.bills.reference"]</th><th scope="col">@T["ui.bills.category"]</th><th scope="col">@T["ui.bills.due_on"]</th><th scope="col" class="ops-editor__number">@T["ui.bills.amount"]</th><th scope="col" class="ops-editor__number">@T["ui.bills.still_owed"]</th><th scope="col">@T["ui.bills.state"]</th></tr></thead>
+                <tbody>
+                    @foreach (OperationsBill bill in Bills)
+                    {
+                        <tr data-bill="@bill.Id" data-status="@bill.Status" data-overdue="@(bill.Owed > 0m && bill.DueOn < Today)">
+                            <td>@bill.BilledOn.ToString("d", CultureInfo.CurrentCulture)</td>
+                            <td>@bill.PartyName</td>
+                            <td><a href="/staff/bills/@bill.Id">@bill.Reference</a></td>
+                            <td>@T["ui.bills.category." + bill.Category]</td>
+                            <td>@bill.DueOn.ToString("d", CultureInfo.CurrentCulture)</td>
+                            <td class="ops-editor__number">@OperationsInvoiceWords.Money(bill.Amount, bill.CurrencyCode)</td>
+                            <td class="ops-editor__number">@(bill.Owed > 0m ? OperationsInvoiceWords.Money(bill.Owed, bill.CurrencyCode) : string.Empty)</td>
+                            <td><span class="ops-status-chip">@T["ui.bills.status." + bill.Status]</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    }
+    @if (CanChangeSettings)
+    {
+        <form method="post" action="/staff/bills/settings" class="ops-editor__panel ops-editor__form" aria-labelledby="bill-settings">
+            <AntiforgeryToken />
+            <h2 id="bill-settings">@T["ui.bills.settings"]</h2>
+            <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8125rem;">
+                <input type="checkbox" name="needApproval" value="true" checked="@NeedApproval" />
+                <span>@T["ui.bills.need_approval"]</span>
+            </label>
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <button type="submit" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.bills.save_settings"]</button>
+                <p class="ops-editor__hint" style="margin: 0;">@T["ui.bills.need_approval_hint"]</p>
+            </div>
+        </form>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsBill> Bills { get; set; } = Array.Empty<OperationsBill>();
+
+    [Parameter] public OperationsBillStatus? Status { get; set; }
+
+    [Parameter] public decimal Owed { get; set; }
+
+    [Parameter] public decimal Overdue { get; set; }
+
+    [Parameter] public int ToApprove { get; set; }
+
+    [Parameter] public DateOnly Today { get; set; }
+
+    [Parameter] public bool CanEnter { get; set; }
+
+    [Parameter] public bool NeedApproval { get; set; }
+
+    [Parameter] public bool CanChangeSettings { get; set; }
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

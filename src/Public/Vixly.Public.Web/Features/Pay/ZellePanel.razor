@@ -1,0 +1,127 @@
+﻿@*
+=========================================================
+FILE: ZellePanel.razor
+
+PURPOSE:
+How to pay by Zelle and the "I paid" report (Zelle update).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- The report is checked by staff against the bank before it counts
+- The QR image passes through the public site
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+@inject PlatformApi Api
+@inject NavigationManager Navigation
+
+<section class="pub-section" aria-labelledby="pay-zelle">
+    <h2 id="pay-zelle">@T["public.pay.zelle_title"]</h2>
+    <p>@T["public.pay.zelle_text"]</p>
+    <dl class="vx-facts">
+        <div>
+            <dt>@T["public.pay.zelle_recipient"]</dt>
+            <dd>@Zelle.RecipientName</dd>
+        </div>
+        @if (Zelle.Email is { } email)
+        {
+            <div>
+                <dt>@T["public.pay.zelle_email"]</dt>
+                <dd>@email</dd>
+            </div>
+        }
+        @if (Zelle.Tag is { } tag)
+        {
+            <div>
+                <dt>@T["public.pay.zelle_tag"]</dt>
+                <dd>@tag</dd>
+            </div>
+        }
+        @if (Zelle.Phone is { } phone)
+        {
+            <div>
+                <dt>@T["public.pay.zelle_phone"]</dt>
+                <dd>@phone</dd>
+            </div>
+        }
+    </dl>
+    @if (QrUrl is { } qr)
+    {
+        <img class="pub-qr" src="@qr" alt="@T["public.pay.zelle_qr"]" width="200" height="200" />
+    }
+    <ErrorBox Error="_error" />
+    @if (Zelle.Waiting is { } waiting)
+    {
+        <VxMessage Type="VxMessageType.Info">@VixlyText.Format(T, "public.pay.zelle_waiting", new Dictionary<string, object>(StringComparer.Ordinal)
+            {
+                ["amount"] = Vixly.Public.Web.Features.Plans.PlanDisplay.Money(waiting.Amount, Currency),
+                ["date"] = waiting.SentOn.ToString("d", CultureInfo.CurrentCulture)
+            })</VxMessage>
+    }
+    else if (Zelle.CanReport)
+    {
+        <h3>@T["public.pay.zelle_report"]</h3>
+        <EditForm Model="Report" FormName="pay-zelle" OnSubmit="ReportAsync" class="pub-form pub-form--grid">
+            <div class="vx-field pub-field--short">
+                <label class="vx-label" for="zelle-amount">@T["public.pay.zelle_amount"]</label>
+                <InputNumber id="zelle-amount" class="vx-input" @bind-Value="Report!.Amount" step="0.01" min="0.01" required />
+            </div>
+            <div class="vx-field pub-field--short">
+                <label class="vx-label" for="zelle-sent">@T["public.pay.zelle_sent_on"]</label>
+                <InputDate id="zelle-sent" class="vx-input" @bind-Value="Report!.SentOn" required />
+            </div>
+            <div class="vx-field pub-field--name">
+                <label class="vx-label" for="zelle-sender">@T["public.pay.zelle_sender"]</label>
+                <InputText id="zelle-sender" class="vx-input" @bind-Value="Report!.SenderName" maxlength="100" required />
+            </div>
+            <div class="vx-field pub-field--name">
+                <label class="vx-label" for="zelle-reference">@T["public.pay.zelle_reference"]</label>
+                <InputText id="zelle-reference" class="vx-input" @bind-Value="Report!.Reference" maxlength="60" required />
+            </div>
+            <div class="pub-form__actions pub-field--full">
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["public.pay.zelle_send"]</VxButton>
+            </div>
+        </EditForm>
+    }
+</section>
+
+@code {
+    private PlatformApiError? _error;
+
+    [Parameter, EditorRequired]
+    public PlatformZelleInfo Zelle { get; set; } = default!;
+
+    [Parameter]
+    public decimal Balance { get; set; }
+
+    [Parameter]
+    public string Currency { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public PaymentTarget Target { get; set; } = default!;
+
+    [SupplyParameterFromForm(FormName = "pay-zelle")]
+    public ZelleFormModel? Report { get; set; }
+
+    // Platform answers /payments/zelle/qr?v=N; the public site serves the same image at /pay/zelle/qr?v=N.
+    private string? QrUrl => Zelle.QrCodeUrl is { } url && url.IndexOf('?', StringComparison.Ordinal) is int at and >= 0 ? "/pay/zelle/qr" + url[at..] : null;
+
+    protected override void OnInitialized()
+    {
+        Report ??= new ZelleFormModel { Amount = Balance, SentOn = DateTime.Today };
+    }
+
+    private async Task ReportAsync()
+    {
+        PlatformApiResult<bool> result = await Target.ZelleAsync(Api, new PlatformZelleReportBody(Report!.Amount ?? 0m, Report.SentOn, Report.SenderName, Report.Reference), CancellationToken.None);
+
+        if (result.Succeeded)
+        {
+            Navigation.NavigateTo(Target.ReturnPath + "?status=zelle");
+            return;
+        }
+
+        _error = result.Error;
+    }
+}

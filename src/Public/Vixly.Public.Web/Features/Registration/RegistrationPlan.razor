@@ -1,0 +1,158 @@
+﻿@*
+=========================================================
+FILE: RegistrationPlan.razor
+
+PURPOSE:
+Step 3 of sign-up: choose a plan, term and licences, with a trial or to pay now; or accept a sales offer (Slices 3 and 5).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Sign-up is switched off until Stage 3 (owner decision D-U4); RegistrationGate shows the closed page
+- With an offer link, the offer’s terms are used as agreed
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+@inject PlatformApi Api
+@inject PlatformCatalog Catalog
+@inject NavigationManager Navigation
+
+<ErrorBox Error="_error" />
+@if (_offer is { } offer)
+{
+    <OfferSummary Offer="offer" />
+    <form method="post" class="pub-form" @formname="register-offer" @onsubmit="AcceptOfferAsync">
+        <AntiforgeryToken />
+        <div class="pub-form__actions">
+            <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["public.register.offer_accept"]</VxButton>
+        </div>
+    </form>
+}
+else if (_plans is { Count: > 0 } plans)
+{
+    <EditForm Model="Choice" FormName="register-plan" OnSubmit="ChooseAsync" class="pub-form pub-form--grid">
+        <fieldset class="pub-field--full">
+            <legend>@T["public.register.plan"]</legend>
+            <InputRadioGroup @bind-Value="Choice!.PlanCode">
+                <div class="pub-plan-radio-group">
+                    @foreach (Vixly.Contracts.Platform.Registration.PlatformPublicPlan plan in plans)
+                    {
+                        <label class="pub-plan-radio-option">
+                            <InputRadio Value="plan.Code" required />
+                            <span class="pub-plan-radio-label">
+                                <strong>@plan.Name</strong> · @VixlyText.Format(T, "public.plans.monthly", "price", Vixly.Public.Web.Features.Plans.PlanDisplay.Money(plan.MonthlyPricePerLicence, plan.CurrencyCode))
+                                @if (plan.TrialDays is int days && days > 0)
+                                {
+                                    <span class="pub-hint">@VixlyText.Format(T, "public.plans.trial", "days", days)</span>
+                                }
+                            </span>
+                        </label>
+                    }
+                </div>
+            </InputRadioGroup>
+        </fieldset>
+        <div class="vx-field pub-field--short">
+            <label class="vx-label" for="reg-term">@T["public.register.term"]</label>
+            <InputSelect id="reg-term" class="vx-input" @bind-Value="Choice!.Term">
+                <option value="monthly">@T["public.register.term.monthly"]</option>
+                <option value="annual">@T["public.register.term.annual"]</option>
+            </InputSelect>
+        </div>
+        <div class="vx-field pub-field--short">
+            <label class="vx-label" for="reg-licences">@T["public.register.licences"]</label>
+            <InputNumber id="reg-licences" class="vx-input" @bind-Value="Choice!.Licences" min="1" max="500" required />
+        </div>
+        <div class="vx-field pub-field--short">
+            <label class="vx-label" for="reg-promo">@T["public.register.promotion"]</label>
+            <InputText id="reg-promo" class="vx-input" @bind-Value="Choice!.PromotionCode" maxlength="40" />
+        </div>
+        <label class="pub-field--full"><InputCheckbox @bind-Value="Choice!.StartTrial" /> @T["public.register.trial"]</label>
+        <p class="pub-hint pub-field--full">@T["public.plans.tax_note"]</p>
+        <div class="pub-form__actions pub-field--full">
+            <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["public.register.choose"]</VxButton>
+        </div>
+    </EditForm>
+}
+
+@code {
+    private IReadOnlyList<Vixly.Contracts.Platform.Registration.PlatformPublicPlan>? _plans;
+
+    private Vixly.Contracts.Platform.Registration.PlatformRegistrationOffer? _offer;
+
+    private PlatformApiError? _error;
+
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    [SupplyParameterFromForm(FormName = "register-plan")]
+    public PlanChoiceModel? Choice { get; set; }
+
+    [Parameter]
+    public string? Plan { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Choice ??= new PlanChoiceModel { PlanCode = Plan };
+
+        if (RegistrationCookies.Read(HttpContext, RegistrationCookies.Access) is not { } access)
+        {
+            Navigation.NavigateTo(PublicLanguage.Page(PublicLanguage.Current, "register"));
+            return;
+        }
+
+        PlatformApiResult<Vixly.Contracts.Platform.Registration.PlatformRegistrationStatus> status = await Api.StatusAsync(access, CancellationToken.None);
+
+        if (status.Value is { Step: not "pending_plan_selection" } moved)
+        {
+            Navigation.NavigateTo(RegistrationSteps.PageFor(moved.Step));
+            return;
+        }
+
+        if (RegistrationCookies.Read(HttpContext, RegistrationCookies.Offer) is { } offerToken)
+        {
+            _offer = (await Api.OfferAsync(offerToken, CancellationToken.None)).Value;
+        }
+
+        PlatformApiResult<IReadOnlyList<Vixly.Contracts.Platform.Registration.PlatformPublicPlan>> plans = await Catalog.PlansAsync(CancellationToken.None);
+        _plans = plans.Value;
+        _error ??= status.Error ?? plans.Error;
+    }
+
+    private Task ChooseAsync()
+    {
+        return SelectAsync(new Vixly.Contracts.Platform.Registration.SelectPlatformRegistrationPlanBody
+        {
+            PlanCode = Choice!.PlanCode ?? string.Empty,
+            Term = Choice.Term,
+            Licences = Choice.Licences,
+            StartTrial = Choice.StartTrial,
+            PromotionCode = string.IsNullOrWhiteSpace(Choice.PromotionCode) ? null : Choice.PromotionCode.Trim()
+        });
+    }
+
+    private Task AcceptOfferAsync()
+    {
+        return SelectAsync(new Vixly.Contracts.Platform.Registration.SelectPlatformRegistrationPlanBody
+        {
+            PlanCode = _offer!.PlanCode,
+            Term = _offer.Term,
+            Licences = _offer.Licences,
+            StartTrial = _offer.StartTrial,
+            OfferToken = RegistrationCookies.Read(HttpContext, RegistrationCookies.Offer)
+        });
+    }
+
+    private async Task SelectAsync(Vixly.Contracts.Platform.Registration.SelectPlatformRegistrationPlanBody body)
+    {
+        PlatformApiResult<Vixly.Contracts.Platform.Registration.PlatformPlanChoice> result = await Api.SelectPlanAsync(RegistrationCookies.Read(HttpContext, RegistrationCookies.Access) ?? string.Empty, body, CancellationToken.None);
+
+        if (result.Value is { } choice && HttpContext is not null)
+        {
+            RegistrationCookies.Clear(HttpContext, RegistrationCookies.Offer);
+            Navigation.NavigateTo(RegistrationSteps.PageFor(choice.Step));
+            return;
+        }
+
+        _error = result.Error;
+    }
+}

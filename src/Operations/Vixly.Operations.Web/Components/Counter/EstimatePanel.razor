@@ -1,0 +1,122 @@
+@*
+=========================================================
+FILE: EstimatePanel.razor
+
+PURPOSE:
+The shipment estimate beside the counter's forms, always in view (Slice 5D: the clerk can always say what it costs now).
+
+RESPONSIBILITIES:
+- The shipment's own charges, then each parcel with its size and cost, then the total
+- While no parcel is in: the service's rates and minimum, and the insurance on the value the customer expects
+- What if: each insurance product, no insurance, consolidation the other way, with the total each would make
+- The amount fixed when the shipment became final, under the estimate
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Always an estimate, titled only "Shipment estimate" (owner, 2026-10-20): no taxes, no delivery fees
+- Rendered alone by the counter's estimate endpoint, so the page can refresh it as the clerk types
+=========================================================
+*@
+@using Vixly.Operations.Application.Charges
+@using Vixly.Operations.Domain.Charges
+@using Vixly.Operations.Web.Components.Charges
+@inject IStringLocalizer<OperationsText> T
+
+<aside class="ops-counter__estimate" id="shipment-estimate" aria-labelledby="estimate-title" aria-live="polite">
+    <h2 id="estimate-title">
+        <span>@T["ui.estimate.title"]</span>
+        <span class="ops-counter__estimate-live" title="Live pricing">● LIVE</span>
+    </h2>
+    <div class="ops-counter__estimate-body">
+    @if (Estimate is not { Priced: true } estimate)
+    {
+        <p class="ops-editor__hint">@(Estimate is null ? T["ui.estimate.choose"] : T["ui.estimate.not_priced"])</p>
+    }
+    else
+    {
+        <table class="ops-counter__estimate-lines">
+            <tbody>
+                @foreach (OperationsChargeLine line in estimate.Shipment)
+                {
+                    <tr><th scope="row">@OperationsChargeWords.Line(T, line)@(line.Kind == OperationsChargeLineKind.Insurance && line.Basis is { } insured ? " · " + VixlyText.Format(T, "ui.estimate.insured_value", "amount", OperationsChargeWords.Money(insured, estimate.CurrencyCode)) : null)</th><td>@OperationsChargeWords.Money(line.Amount, estimate.CurrencyCode)</td></tr>
+                }
+                @if (estimate.Rates is { } rates)
+                {
+                    @foreach (OperationsRateBand band in rates.Bands)
+                    {
+                        <tr class="ops-counter__estimate-rate"><th scope="row" colspan="2">@OperationsChargeWords.Band(T, band, estimate.Basis == OperationsRateBasis.Volume ? OperationsChargeWords.Volume(DimensionUnit) : OperationsChargeWords.Weight(WeightUnit), estimate.CurrencyCode)</th></tr>
+                    }
+                    @if (rates.MinimumCharge is { } minimum)
+                    {
+                        <tr class="ops-counter__estimate-rate"><th scope="row" colspan="2">@VixlyText.Format(T, "ui.estimate.minimum", "amount", OperationsChargeWords.Money(minimum, estimate.CurrencyCode))</th></tr>
+                    }
+                }
+                @* Slice 5E (S-16): the supplies added to the shipment. *@
+                @foreach (OperationsEstimateSupply supply in estimate.SupplyLines)
+                {
+                    <tr class="ops-counter__estimate-supply">
+                        <th scope="row">@supply.Quantity × @supply.Code · @supply.Name@if (supply.DiscountPercent > 0m) { <small> · −@supply.DiscountPercent.ToString("0.##", CultureInfo.CurrentCulture)%</small> }</th>
+                        <td>@OperationsChargeWords.Money(supply.Amount, estimate.CurrencyCode)</td>
+                    </tr>
+                }
+                @foreach (OperationsEstimateParcel parcel in estimate.Parcels)
+                {
+                    <tr class="ops-counter__estimate-parcel">
+                        <th scope="row">
+                            @(parcel.Label ?? VixlyText.Format(T, "ui.estimate.parcel", "number", parcel.Number))
+                            <small>@Size(parcel)@(parcel.Billable is { } billable ? " · " + VixlyText.Format(T, "ui.estimate.billed", new Dictionary<string, object> { ["amount"] = OperationsChargeWords.Number(billable), ["unit"] = estimate.Basis == OperationsRateBasis.Volume ? OperationsChargeWords.Volume(DimensionUnit) : OperationsChargeWords.Weight(WeightUnit) }) : null)</small>
+                        </th>
+                        <td>@OperationsChargeWords.Money(parcel.Amount, estimate.CurrencyCode)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="ops-counter__estimate-total-card">
+            <span class="ops-counter__estimate-total-label">@T["ui.estimate.total"]</span>
+            <span class="ops-counter__estimate-total-val">@OperationsChargeWords.Money(estimate.Total, estimate.CurrencyCode)</span>
+        </div>
+        @if (Final is { } final)
+        {
+            <p class="ops-counter__estimate-final">@VixlyText.Format(T, "ui.estimate.final", "amount", OperationsChargeWords.Money(final, estimate.CurrencyCode))</p>
+        }
+        @if (estimate.WhatIf.Count > 1)
+        {
+            <h3>@T["ui.estimate.what_if"]</h3>
+            <ul class="ops-counter__what-if">
+                @foreach (OperationsEstimateOption option in estimate.WhatIf)
+                {
+                    <li data-current="@(option.Current ? "true" : null)">
+                        <span>@Name(option)</span>
+                        <span>@(option.Total is { } total ? OperationsChargeWords.Money(total, estimate.CurrencyCode) + (option.Change is { } change && change != 0m ? " (" + (change > 0 ? "+" : "−") + OperationsChargeWords.Money(Math.Abs(change), estimate.CurrencyCode) + ")" : null) : T["ui.estimate.not_possible"].Value)</span>
+                    </li>
+                }
+            </ul>
+        }
+    }
+    </div>
+</aside>
+
+@code {
+    // Null: not enough is known yet (no service).
+    [Parameter] public OperationsEstimate? Estimate { get; set; }
+
+    [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
+
+    [Parameter] public OperationsDimensionUnit DimensionUnit { get; set; }
+
+    // The amount fixed when the shipment became final.
+    [Parameter] public decimal? Final { get; set; }
+
+    private string Size(OperationsEstimateParcel parcel) =>
+        OperationsChargeWords.Number(OperationsUnits.ToShownWeight(parcel.WeightKg, WeightUnit)) + " " + OperationsChargeWords.Weight(WeightUnit) + " · "
+        + string.Join(" × ", new[] { parcel.LengthCm, parcel.WidthCm, parcel.HeightCm }.Select(side => OperationsChargeWords.Number(OperationsUnits.ToShownLength(side, DimensionUnit))))
+        + " " + OperationsChargeWords.Length(DimensionUnit);
+
+    private string Name(OperationsEstimateOption option) => option.Kind switch
+    {
+        "none" => T["ui.estimate.option.none"].Value,
+        "consolidate" => T["ui.estimate.option.consolidate"].Value,
+        "separate" => T["ui.estimate.option.separate"].Value,
+        _ => VixlyText.Format(T, "ui.estimate.option.product", "name", option.Name ?? string.Empty)
+    };
+}

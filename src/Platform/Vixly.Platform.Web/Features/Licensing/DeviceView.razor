@@ -13,11 +13,14 @@ IMPORTANT NOTES:
 - Text comes from PlatformText (UI-10); placeholder look until
   the Frontend/UI team designs it
 - Device secrets and keys are never shown
+- Not who authorised, released or revoked it: the company's own
+  business (owner, 2026-10-21)
 =========================================================
 *@
 @inherits PlatformPresenterComponent<DevicePresenter>
 @using Vixly.Platform.Application.Queries
 @using Vixly.Platform.Domain.Licensing
+@using Vixly.Shared.Kernel.Clients
 @inject IStringLocalizer<PlatformText> T
 @inject PlatformErrorText Errors
 
@@ -37,7 +40,7 @@ else if (Presenter.State.Detail is { } detail)
 {
     PlatformDeviceItem device = detail.Device;
     <h1>@device.Number · @device.Name</h1>
-    <p><a href="/tenants/@device.PlatformTenantId#tenant-licensing">@device.TenantName</a> · <a href="/devices">@T["ui.devices.title"]</a></p>
+    <p><a href="/tenants/@device.PlatformTenantId#tenant-licensing">@device.TenantName</a></p>
     <div id="device-overview"><VxCard Title="@T["ui.device.title"]">
         <dl class="vx-facts">
             <dt>@T["ui.devices.status"]</dt>
@@ -56,6 +59,12 @@ else if (Presenter.State.Detail is { } detail)
             <dd>@T[LicensingDisplay.KindKey(device.Kind)]</dd>
             <dt>@T["ui.device.proof"]</dt>
             <dd>@T[LicensingDisplay.ProofKey(device.Proof)]</dd>
+            <dt>@T["ui.devices.system"]</dt>
+            <dd>@(VixlyUserAgents.System(device.RegisteredUserAgent) ?? "-")</dd>
+            <dt>@T["ui.devices.browser"]</dt>
+            <dd>@(VixlyUserAgents.Browser(device.RegisteredUserAgent) ?? "-")</dd>
+            <dt>@T["ui.devices.address"]</dt>
+            <dd>@(device.RegisteredIp ?? "-") @if (device.RegisteredCountry is { } country) { <span class="vx-hint">@country</span> }</dd>
             <dt>@T["ui.device.requested_by"]</dt>
             <dd>@(device.RequestedByName ?? "-") <span class="vx-hint">@PlatformDisplay.Utc(T, device.RequestedUtc)</span></dd>
             @if (device.ApprovedUtc is { } approved)
@@ -105,7 +114,6 @@ else if (Presenter.State.Detail is { } detail)
             <HeaderContent>
                 <th scope="col">@T["ui.audit.when"]</th>
                 <th scope="col">@T["ui.device.what"]</th>
-                <th scope="col">@T["ui.audit.who"]</th>
             </HeaderContent>
             <RowTemplate Context="line">
                 <td>@PlatformDisplay.Utc(T, line.OccurredUtc)</td>
@@ -120,7 +128,6 @@ else if (Presenter.State.Detail is { } detail)
                         <div class="vx-hint">@text</div>
                     }
                 </td>
-                <td>@(line.ActorName ?? T["ui.audit.no_actor"].Value)</td>
             </RowTemplate>
         </VxDataTable>
     </VxCard></div>

@@ -1,0 +1,62 @@
+@*
+=========================================================
+FILE: StaffBadgePanel.razor
+
+PURPOSE:
+A staff member's badge and PIN on their page (Slice 12A, owner H-8).
+
+RESPONSIBILITIES:
+- Say whether a badge is in use and a PIN is set (or locked)
+- Print a new badge, or revoke the one in use
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Printing a new badge revokes the old one; the use case asks a fresh code
+- Executive status presentation with aligned action buttons
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<section class="ops-editor__panel ops-badge-panel" aria-labelledby="badge-title">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+        <h2 id="badge-title" style="margin: 0;">@T["ui.staff.badge_title"]</h2>
+        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            @if (State.HasBadge)
+            {
+                <span class="ops-editor__status" data-status="active">@VixlyText.Format(T, "ui.staff.badge_in_use", "date", State.BadgeIssuedUtc?.ToLocalTime().ToString("d", System.Globalization.CultureInfo.CurrentCulture) ?? string.Empty)</span>
+            }
+            else
+            {
+                <span class="ops-editor__status" data-status="pending">@T["ui.staff.badge_none"]</span>
+            }
+            <span class="ops-editor__status" data-status="@(State.PinLocked ? "suspended" : State.HasPin ? "active" : "pending")">
+                @T[State.HasPin ? (State.PinLocked ? "ui.staff.pin_locked" : "ui.staff.pin_set") : "ui.staff.pin_none"]
+            </span>
+        </div>
+    </div>
+    @if (CanEdit)
+    {
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.5rem;">
+            <form method="post" action="/staff/people/@UserId/badge" class="ops-editor__inline" target="_blank">
+                <AntiforgeryToken />
+                <button type="submit" class="vx-button vx-button--primary">@T[State.HasBadge ? "ui.staff.badge_reprint" : "ui.staff.badge_print"]</button>
+            </form>
+            @if (State.HasBadge)
+            {
+                <form method="post" action="/staff/people/@UserId/badge/revoke" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.badge_revoke"]</button>
+                </form>
+            }
+        </div>
+        <p class="ops-editor__hint" style="margin-top: 0.5rem;">@T["ui.staff.badge_hint"]</p>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public Guid UserId { get; set; }
+
+    [Parameter, EditorRequired] public Vixly.Operations.Application.UseCases.Staff.GetOperationsQuickSignInState.GetOperationsQuickSignInStateResponse State { get; set; } = null!;
+
+    [Parameter] public bool CanEdit { get; set; }
+}

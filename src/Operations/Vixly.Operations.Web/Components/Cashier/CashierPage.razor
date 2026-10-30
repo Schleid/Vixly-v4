@@ -1,0 +1,102 @@
+@*
+=========================================================
+FILE: CashierPage.razor
+
+PURPOSE:
+The cashier (Slice 5F, C-2): find a customer or an invoice, see what they have to pay, and the person's cash drawers.
+
+RESPONSIBILITIES:
+- Show the search, the matches, the customer's invoices to pay with Pay, and the drawers
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The search box takes a scan of an invoice or shipment number
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.cashier.title"]" Company="@Company" Section="cashier" Error="@Error" Info="@Info">
+    <form method="get" action="/staff/cashier" class="ops-list-bar ops-cashier__find" role="search">
+        <label>@T["ui.cashier.find"] <input name="find" value="@Find" maxlength="80" size="32" autofocus data-scan /></label>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.cashier.find_button"]</button>
+        <a class="vx-button vx-button--secondary" href="/staff/cashier" accesskey="n">@T["ui.cashier.next"]</a>
+    </form>
+    <div class="ops-cashier__drawers" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; font-size: 0.8125rem;">
+        @if (Drawers.Count == 0)
+        {
+            <span>@T["ui.cashier.no_drawer"]</span>
+        }
+        @foreach (OperationsCashDrawer drawer in Drawers)
+        {
+            <span data-drawer="open">@VixlyText.Format(T, "ui.cashier.drawer_open", new Dictionary<string, object> { ["warehouse"] = Warehouse(drawer.WarehouseId), ["expected"] = drawer.Expected.ToString("N2", CultureInfo.CurrentCulture) })</span>
+        }
+        <a href="/staff/cashier/drawers">@T["ui.cashier.drawers"]</a>
+        <a href="/staff/screens">@T["ui.screens.title"]</a>
+    </div>
+    @if (Matches.Count > 1)
+    {
+        <ul class="ops-cashier__matches">
+            @foreach (OperationsCustomer match in Matches)
+            {
+                <li><a href="/staff/cashier?customer=@match.Id">@match.FirstName @match.LastName</a>@(match.Code is { } code ? " · " + code : string.Empty) · @match.Phone</li>
+            }
+        </ul>
+    }
+    else if (Find is not null && Customer is null)
+    {
+        <div class="ops-editor__empty"><p>@T["ui.cashier.not_found"]</p></div>
+    }
+    @if (Customer is { } customer)
+    {
+        <section class="ops-editor__panel" aria-labelledby="customer-title">
+            <h2 id="customer-title">@customer.FirstName @customer.LastName@(customer.Code is { } code ? " · " + code : string.Empty)</h2>
+            @if (Invoices.Count == 0)
+            {
+                <p>@T["ui.cashier.nothing_to_pay"]</p>
+            }
+            else
+            {
+                <OperationsTableViewport Label="@T["ui.cashier.to_pay"]">
+                    <table class="ops-editor__table">
+                        <thead><tr><th scope="col">@T["ui.invoices.number"]</th><th scope="col">@T["ui.invoices.reference"]</th><th scope="col">@T["ui.invoices.date"]</th><th scope="col" class="ops-editor__number">@T["ui.invoices.owed"]</th><th scope="col">@T["ui.invoices.state"]</th><th scope="col"></th></tr></thead>
+                        <tbody>
+                            @foreach (OperationsInvoice invoice in Invoices)
+                            {
+                                <tr>
+                                    <td>@invoice.Number</td>
+                                    <td>@invoice.Reference</td>
+                                    <td>@OperationsInvoiceWords.Day(invoice.IssuedOn)</td>
+                                    <td class="ops-editor__number">@OperationsInvoiceWords.Money(Math.Max(invoice.Owed, 0m), invoice.CurrencyCode)</td>
+                                    <td><span class="ops-editor__status" data-status="@OperationsPaymentWords.State(invoice.PaymentState)">@T["ui.payments.state." + OperationsPaymentWords.State(invoice.PaymentState)]</span></td>
+                                    <td>@if (invoice.Owed > 0m) { <a class="vx-button vx-button--primary" href="/staff/cashier/invoices/@invoice.Id">@T["ui.cashier.pay"]</a> }</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </OperationsTableViewport>
+            }
+        </section>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public string? Find { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsCustomer> Matches { get; set; } = Array.Empty<OperationsCustomer>();
+
+    [Parameter] public OperationsCustomer? Customer { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsInvoice> Invoices { get; set; } = Array.Empty<OperationsInvoice>();
+
+    [Parameter] public IReadOnlyList<OperationsCashDrawer> Drawers { get; set; } = Array.Empty<OperationsCashDrawer>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private string Warehouse(Guid id) => Warehouses.FirstOrDefault(warehouse => warehouse.Id == id)?.Code ?? string.Empty;
+}

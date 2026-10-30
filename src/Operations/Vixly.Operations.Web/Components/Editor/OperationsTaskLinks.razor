@@ -1,0 +1,34 @@
+@*
+=========================================================
+FILE: OperationsTaskLinks.razor
+
+PURPOSE:
+The task shortcuts of the workspace home page.
+
+RESPONSIBILITIES:
+- Link the pages of the menu the person's role allows, in the menu's order, then their own account
+
+IMPORTANT NOTES:
+- Markup only; the items and their permissions come from OperationsNavigation
+- Hiding is a second layer: every page still checks permissions (owner, 2026-10-18)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+@inject IStringLocalizer<OperationsWorkbenchText> L
+@inherits OperationsAllowedComponent
+
+<nav class="ops-workspace__links" aria-label="@L["workspace_tasks"]">
+    @foreach (var item in OperationsNavigation.Groups.SelectMany(group => group.Items).Where(item => item.Section != "workspace" && OperationsNavigation.Visible(item.Permissions, Allowance)))
+    {
+        <a href="@item.Url">
+            <VxWorkspaceArt Kind="@OperationsPageHeading.Scene(item.Section)" />
+            <span>@T["ui.editor.nav." + item.Label]</span>
+            <span class="ops-workspace__link-arrow" aria-hidden="true">&nearr;</span>
+        </a>
+    }
+    <a href="/staff/account">
+        <VxWorkspaceArt Kind="people" />
+        <span>@T["ui.editor.nav.account"]</span>
+        <span class="ops-workspace__link-arrow" aria-hidden="true">&nearr;</span>
+    </a>
+</nav>

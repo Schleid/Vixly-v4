@@ -1,0 +1,75 @@
+@*
+=========================================================
+FILE: DiscrepancyRows.razor
+
+PURPOSE:
+What did not match at a destination (Slice 7, R-2), with a resolve form on the open lines the person may settle.
+
+RESPONSIBILITIES:
+- One row per discrepancy
+- Lost or settled, with a note
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Lost tells the customer when the company sends those emails
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<OperationsTableViewport Label="@T["ui.arrivals.discrepancies"]">
+    <table class="ops-editor__table ops-table--compact">
+        <thead>
+            <tr>
+                <th scope="col" class="ops-editor__identity-cell">@T["ui.arrivals.code"]</th>
+                <th scope="col">@T["ui.arrivals.kind"]</th>
+                <th scope="col">@T["ui.dispatch.number"]</th>
+                <th scope="col">@T["ui.arrivals.warehouse"]</th>
+                <th scope="col">@T["ui.arrivals.noted"]</th>
+                <th scope="col">@T["ui.dispatch.state"]</th>
+                <th scope="col" class="ops-editor__action-col">@T["ui.arrivals.resolution"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (OperationsDiscrepancyRow row in Rows)
+            {
+                <tr data-status="@row.Status.ToString().ToLowerInvariant()">
+                    <td class="ops-editor__identity-cell ops-editor__code">@row.Code</td>
+                    <td>@T["ui.arrivals.discrepancy." + row.Kind]</td>
+                    <td class="ops-editor__code">@row.DispatchNumber</td>
+                    <td>@row.WarehouseCode</td>
+                    <td>@OperationsDispatchWords.Time(row.CreatedUtc, TimeZone)</td>
+                    <td><span class="ops-editor__status" data-status="@row.Status.ToString().ToLowerInvariant()">@T["ui.arrivals.discrepancy_status." + row.Status]</span></td>
+                    <td>
+                        @if (row.CanResolve)
+                        {
+                            <form method="post" action="/staff/arrivals/discrepancies/@row.Id" class="ops-editor__inline ops-discrepancy-resolve-form">
+                                <AntiforgeryToken />
+                                <label class="vx-visually-hidden" for="outcome-@row.Id">@T["ui.arrivals.outcome"]</label>
+                                <select id="outcome-@row.Id" name="outcome" class="ops-field__control ops-field__control--sm">
+                                    <option value="@OperationsDiscrepancyStatus.Resolved">@T["ui.arrivals.discrepancy_status.Resolved"]</option>
+                                    @if (row.Kind is OperationsDiscrepancyKind.MissingBundle or OperationsDiscrepancyKind.MissingParcel)
+                                    {
+                                        <option value="@OperationsDiscrepancyStatus.Lost">@T["ui.arrivals.discrepancy_status.Lost"]</option>
+                                    }
+                                </select>
+                                <label class="vx-visually-hidden" for="note-@row.Id">@T["ui.arrivals.note"]</label>
+                                <input id="note-@row.Id" name="note" class="ops-field__control ops-field__control--sm ops-field__control--note" maxlength="@OperationsArrivalDiscrepancy.NoteMaxLength" placeholder="@T["ui.arrivals.note"]" required />
+                                <button type="submit" class="vx-button vx-button--secondary vx-button--sm">@T["ui.arrivals.resolve"]</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="ops-editor__hint">@row.Note</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</OperationsTableViewport>
+
+@code {
+    [Parameter] public IReadOnlyList<OperationsDiscrepancyRow> Rows { get; set; } = Array.Empty<OperationsDiscrepancyRow>();
+
+    [Parameter] public string? TimeZone { get; set; }
+}

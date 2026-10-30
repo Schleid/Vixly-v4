@@ -97,6 +97,69 @@ public sealed class SmtpPlatformTenantMailer : IPlatformTenantMailer
             cancellationToken);
     }
 
+    public Task SendCompanyChangeSubmittedAsync(
+        Vixly.Platform.Application.Queries.PlatformPermissionHolderItem recipient,
+        PlatformTenant tenant,
+        PlatformTenantChangeRequest request,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(recipient);
+        ArgumentNullException.ThrowIfNull(tenant);
+        ArgumentNullException.ThrowIfNull(request);
+
+        Vixly.Shared.Kernel.Localization.LanguageCode language =
+            Vixly.Shared.Kernel.Localization.LanguageCode.TryCreate(recipient.Language, out Vixly.Shared.Kernel.Localization.LanguageCode? parsed) ? parsed : Vixly.Shared.Kernel.Localization.LanguageCode.Default;
+
+        return _sender.SendAsync(
+            recipient.Email,
+            recipient.FirstName + " " + recipient.LastName,
+            language,
+            text => (
+                VixlyText.Format(text, "email.company_change.submitted_subject", "company", tenant.Company.DisplayName),
+                VixlyText.Format(
+                    text,
+                    "email.company_change.submitted_body",
+                    new Dictionary<string, object>(StringComparer.Ordinal)
+                    {
+                        ["name"] = recipient.FirstName,
+                        ["company"] = tenant.Company.DisplayName,
+                        ["code"] = tenant.TenantCode,
+                        ["link"] = _hosting.ConsoleBaseUrl.TrimEnd('/') + "/tenants/changes/" + request.Id.ToString("D", System.Globalization.CultureInfo.InvariantCulture)
+                    })),
+            cancellationToken);
+    }
+
+    public Task SendCompanyChangeDecidedAsync(
+        PlatformTenant tenant,
+        PlatformTenantContact recipient,
+        PlatformTenantChangeRequest request,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(tenant);
+        ArgumentNullException.ThrowIfNull(recipient);
+        ArgumentNullException.ThrowIfNull(request);
+
+        string kind = request.Status == PlatformTenantChangeStatus.Approved ? "approved" : "rejected";
+
+        return _sender.SendAsync(
+            recipient.Email.Value,
+            recipient.Name,
+            tenant.DefaultLanguage,
+            text => (
+                VixlyText.Format(text, $"email.company_change.{kind}_subject", "company", request.Previous.DisplayName),
+                VixlyText.Format(
+                    text,
+                    $"email.company_change.{kind}_body",
+                    new Dictionary<string, object>(StringComparer.Ordinal)
+                    {
+                        ["name"] = recipient.Name,
+                        ["company"] = request.Proposed.DisplayName,
+                        ["note"] = request.DecisionNote ?? string.Empty,
+                        ["support"] = _sender.SupportAddress
+                    })),
+            cancellationToken);
+    }
+
     private static string CategoryKey(PlatformSuspensionCategory category)
     {
         return category switch

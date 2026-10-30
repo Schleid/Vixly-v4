@@ -1,0 +1,224 @@
+@*
+=========================================================
+FILE: SupportPage.razor
+
+PURPOSE:
+The support agent's call: the caller's phone, then a tracking number, then a call ticket for staff (owner, 2026-10-29, design section 9).
+
+RESPONSIBILITIES:
+- Step 1: the caller's full phone number; the short name, code and standing, or "no account"
+- Step 2: a tracking number (Vixly's, or the carrier's for a package); the status only without a caller, everything in 9.2 with one
+- A call ticket for staff once both matched
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); the endpoints load the data
+- Masked contact only; no print, export or download (the page hides itself when printed)
+- Phones and numbers are posted, never in the address
+- Brief §5 workstation layout with elevated panels, status pills, and aligned action bars
+=========================================================
+*@
+@using Vixly.Operations.Application.Support
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.support.title"]" Company="@Company" Section="support" Error="@Error" Info="@Info">
+    <style>@@media print { .ops-support { display: none !important; } .ops-support-print { display: block !important; } }</style>
+    <p class="ops-support-print" hidden>@T["ui.support.no_print"]</p>
+    @if (!Refused)
+    {
+    <div class="ops-support">
+        <section class="ops-editor__panel">
+            <h2 style="margin: 0 0 0.5rem;">@T["ui.support.step_caller"]</h2>
+            <form method="post" action="/staff/support/caller" class="ops-list-bar" autocomplete="off">
+                <AntiforgeryToken />
+                <div class="ops-list-bar__search" style="flex: 1;">
+                    <input type="tel" name="phone" maxlength="30" required placeholder="@T["ui.support.phone"]" aria-label="@T["ui.support.phone"]" autofocus="@(!Asked && Case is null)" />
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.support.find_caller"]</button>
+                    <a href="/staff/support" class="vx-button vx-button--secondary">@T["ui.support.new_call"]</a>
+                </div>
+            </form>
+            @if (Caller is { } caller)
+            {
+                <div class="ops-support-caller-card">
+                    <div class="ops-support-caller-card__avatar" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M4 22v-3a8 8 0 0 1 16 0v3" /></svg>
+                    </div>
+                    <div class="ops-support-caller-card__info">
+                        <div class="ops-support-caller-card__name">@caller.ShortName</div>
+                        <div class="ops-support-caller-card__meta">
+                            <span class="ops-badge">@(caller.Code ?? T["ui.customers.no_code"].Value)</span>
+                            <span class="ops-editor__status" data-status="@(caller.GoodStanding ? "active" : "suspended")">
+                                @T[caller.GoodStanding ? "ui.support.good_standing" : "ui.support.refer_to_billing"]
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (Asked && CallerToken is null && Case is null)
+            {
+                <div style="margin: 0.75rem 0 0.5rem; padding: 0.5rem 0.75rem; background: var(--vx-color-surface-sunken); border-radius: 0.35rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <span class="ops-editor__status" data-status="pending">@T["ui.support.no_account"]</span>
+                </div>
+            }
+            <p class="ops-editor__hint" style="margin-top: 0.5rem;">@T["ui.support.caller_hint"]</p>
+        </section>
+
+        <section class="ops-editor__panel">
+            <h2 style="margin: 0 0 0.5rem;">@T["ui.support.step_number"]</h2>
+            <form method="post" action="/staff/support/case" class="ops-list-bar" autocomplete="off">
+                <AntiforgeryToken />
+                <input type="hidden" name="caller" value="@CallerToken" />
+                <div class="ops-list-bar__search" style="flex: 1;">
+                    <input name="number" maxlength="60" required value="@Number" placeholder="@T["ui.support.number"]" aria-label="@T["ui.support.number"]" autofocus="@(Asked && Case is null)" />
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.support.open"]</button>
+                </div>
+            </form>
+            <p class="ops-editor__hint" style="margin-top: 0.5rem;">@T[CallerToken is null ? "ui.support.number_hint_status" : "ui.support.number_hint"]</p>
+        </section>
+
+        @if (Case is { } found)
+        {
+            <section class="ops-editor__panel">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+                    <h2 style="margin: 0; font-family: var(--vx-font-mono, monospace);">@found.Number</h2>
+                    <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                        @if (found.StatusOnly)
+                        {
+                            <span class="ops-editor__status" data-status="pending">@T["ui.support.status_only"]</span>
+                        }
+                        @if (found.Cancelled)
+                        {
+                            <span class="ops-editor__status" data-status="suspended">@T["ui.milestone.Cancelled"]</span>
+                        }
+                        @if (found.IsPackage)
+                        {
+                            <span class="ops-editor__status" data-status="@(found.Received ? "active" : "pending")">
+                                @(found.Received ? VixlyText.Format(T, "ui.support.package_received", "date", found.ReceivedUtc?.ToLocalTime().ToString("g", System.Globalization.CultureInfo.CurrentCulture) ?? string.Empty) : T["ui.support.package_announced"].Value)
+                            </span>
+                            @if (found.OtherPackages > 0)
+                            {
+                                <span class="ops-badge">@VixlyText.Format(T, "ui.support.other_packages", "count", found.OtherPackages)</span>
+                            }
+                        }
+                        @if (found.OnHold)
+                        {
+                            <span class="ops-editor__status" data-status="hold">
+                                @T["ui.support.on_hold"]
+                                @(found.Holds == Vixly.Operations.Domain.Tracking.OperationsHoldReasons.None ? null
+                                    : ": " + string.Join(", ", Enum.GetValues<Vixly.Operations.Domain.Tracking.OperationsHoldReasons>()
+                                        .Where(reason => reason != Vixly.Operations.Domain.Tracking.OperationsHoldReasons.None && found.Holds.HasFlag(reason))
+                                        .Select(reason => T["ui.hold." + reason].Value)))
+                            </span>
+                        }
+                    </div>
+                </div>
+
+                @if (found.Milestones.Count == 0)
+                {
+                    <p class="ops-editor__empty-message">@T["ui.support.no_milestones"]</p>
+                }
+                else
+                {
+                    <ol class="ops-editor__list" style="margin-bottom: 1rem;">
+                        @foreach (Vixly.Operations.Application.Site.OperationsPublicMilestone milestone in found.Milestones)
+                        {
+                            <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.75rem;">
+                                <strong>@T["ui.milestone." + milestone.Code]</strong>
+                                <span class="ops-editor__hint" style="font-family: var(--vx-font-mono, monospace);">@milestone.ReachedUtc.ToLocalTime().ToString("g", System.Globalization.CultureInfo.CurrentCulture)</span>
+                            </li>
+                        }
+                    </ol>
+                }
+
+                @if (!found.StatusOnly)
+                {
+                    <div class="ops-facts-grid" style="margin-top: 1rem;">
+                        @if (found.Destination is { } destination)
+                        {
+                            <div><dt>@T["ui.support.destination"]</dt><dd>@destination</dd></div>
+                        }
+                        <div>
+                            <dt>@T["ui.support.amount_due"]</dt>
+                            <dd>
+                                @if (found.AmountDue is { } due)
+                                {
+                                    @if (found.Paid)
+                                    {
+                                        <span class="ops-editor__status" data-status="active">@T["ui.support.paid"]</span>
+                                    }
+                                    else
+                                    {
+                                        <strong style="font-family: var(--vx-font-mono, monospace);">@due.ToString("N2", System.Globalization.CultureInfo.CurrentCulture) @found.CurrencyCode</strong>
+                                        @if (found.Collect)
+                                        {
+                                            <span class="ops-badge" style="margin-left: 0.35rem;">@T["ui.support.collect"]</span>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="ops-editor__hint">@T["ui.support.not_invoiced"]</span>
+                                }
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>@T["ui.support.customer"]</dt>
+                            <dd><strong>@found.CustomerName</strong> · <span class="ops-badge">@(found.CustomerCode ?? T["ui.customers.no_code"].Value)</span></dd>
+                        </div>
+                        <div>
+                            <dt>@T["ui.support.contact"]</dt>
+                            <dd>@found.MaskedPhone @(found.MaskedEmail is { } email ? "· " + email : null)</dd>
+                        </div>
+                        @if (found.City is { } city)
+                        {
+                            <div><dt>@T["ui.support.city"]</dt><dd>@city</dd></div>
+                        }
+                    </div>
+                }
+            </section>
+
+            @if (!found.StatusOnly && CallerToken is not null)
+            {
+                <section class="ops-editor__panel">
+                    <h2 style="margin: 0 0 0.5rem;">@T["ui.support.request_title"]</h2>
+                    <form method="post" action="/staff/support/request" class="ops-editor__form" autocomplete="off">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="caller" value="@CallerToken" />
+                        <input type="hidden" name="number" value="@Number" />
+                        <label class="ops-editor__form-span-full">
+                            <span class="vx-visually-hidden">@T["ui.support.request_title"]</span>
+                            <textarea name="text" maxlength="1000" rows="3" required placeholder="@T["ui.support.request_placeholder"]" aria-label="@T["ui.support.request_title"]" style="width: 100%; min-height: 80px;"></textarea>
+                        </label>
+                        <div class="ops-editor__form-actions" style="margin-top: 0.5rem;">
+                            <button type="submit" class="vx-button vx-button--primary">@T["ui.support.request_open"]</button>
+                        </div>
+                    </form>
+                    <p class="ops-editor__hint" style="margin-top: 0.5rem;">@T["ui.support.request_hint"]</p>
+                </section>
+            }
+        }
+    </div>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    // The phone step was done (with or without an account found).
+    [Parameter] public bool Asked { get; set; }
+
+    [Parameter] public OperationsSupportCaller? Caller { get; set; }
+
+    // The caller's account, protected for this agent (OperationsSupportEndpoints).
+    [Parameter] public string? CallerToken { get; set; }
+
+    [Parameter] public OperationsSupportCase? Case { get; set; }
+
+    [Parameter] public string? Number { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    // Not allowed (or outside the account's hours): only the reason shows.
+    [Parameter] public bool Refused { get; set; }
+}

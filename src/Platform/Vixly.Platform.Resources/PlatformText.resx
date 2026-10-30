@@ -6696,7 +6696,7 @@ Thank you: we have received payment and full access to Vixly is restored for {co
     <value>Computer</value>
   </data>
   <data name="ui.device.kind.phone" xml:space="preserve">
-    <value>Phone</value>
+    <value>Mobile</value>
   </data>
   <data name="ui.device.kind.scanner" xml:space="preserve">
     <value>Scanner</value>
@@ -7676,5 +7676,609 @@ Questions? Contact us at {support}.</value>
   </data>
   <data name="platform.internal.too_many_items" xml:space="preserve">
     <value>Send at most {max} items at once.</value>
+  </data>
+  <data name="platform.leads.company_required" xml:space="preserve">
+    <value>Give the company name (at most 200 characters).</value>
+  </data>
+  <data name="platform.leads.name_required" xml:space="preserve">
+    <value>Give your name (at most 120 characters).</value>
+  </data>
+  <data name="platform.leads.email_invalid" xml:space="preserve">
+    <value>Give a valid work email address.</value>
+  </data>
+  <data name="platform.leads.phone_invalid" xml:space="preserve">
+    <value>Give a valid phone number, or leave it empty.</value>
+  </data>
+  <data name="platform.leads.country_invalid" xml:space="preserve">
+    <value>Choose a country from the list.</value>
+  </data>
+  <data name="platform.leads.kind_invalid" xml:space="preserve">
+    <value>Choose the kind of operation you run.</value>
+  </data>
+  <data name="platform.leads.message_too_long" xml:space="preserve">
+    <value>The message can be at most {max} characters.</value>
+  </data>
+  <data name="platform.leads.note_too_long" xml:space="preserve">
+    <value>The note can be at most {max} characters.</value>
+  </data>
+  <data name="platform.leads.status_invalid" xml:space="preserve">
+    <value>Choose a status.</value>
+  </data>
+  <data name="platform.leads.lead_not_found" xml:space="preserve">
+    <value>The request was not found.</value>
+  </data>
+  <data name="platform.leads.bot_check_failed" xml:space="preserve">
+    <value>We could not confirm you are a person. Please try again.</value>
+  </data>
+  <data name="ui.permission.platform.leads.view" xml:space="preserve">
+    <value>View contact requests</value>
+  </data>
+  <data name="ui.permission.platform.leads.manage" xml:space="preserve">
+    <value>Follow up contact requests</value>
+  </data>
+  <data name="ui.permission_area.leads" xml:space="preserve">
+    <value>Contact requests</value>
+  </data>
+  <data name="ui.audit.action.platform.leads.received" xml:space="preserve">
+    <value>Contact request received</value>
+  </data>
+  <data name="ui.audit.action.platform.leads.status_changed" xml:space="preserve">
+    <value>Contact request updated</value>
+  </data>
+  <data name="ui.leads.title" xml:space="preserve">
+    <value>Contact requests</value>
+  </data>
+  <data name="ui.leads.request" xml:space="preserve">
+    <value>Contact request</value>
+  </data>
+  <data name="ui.leads.search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="ui.leads.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.leads.status.all" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="ui.leads.status.new" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="ui.leads.status.contacted" xml:space="preserve">
+    <value>Contacted</value>
+  </data>
+  <data name="ui.leads.status.closed" xml:space="preserve">
+    <value>Closed</value>
+  </data>
+  <data name="ui.leads.count" xml:space="preserve">
+    <value>{count} requests</value>
+  </data>
+  <data name="ui.leads.received" xml:space="preserve">
+    <value>Received</value>
+  </data>
+  <data name="ui.leads.company" xml:space="preserve">
+    <value>Company</value>
+  </data>
+  <data name="ui.leads.contact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="ui.leads.email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="ui.leads.phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="ui.leads.country" xml:space="preserve">
+    <value>Country</value>
+  </data>
+  <data name="ui.leads.kind" xml:space="preserve">
+    <value>Operation</value>
+  </data>
+  <data name="ui.leads.kind.courier" xml:space="preserve">
+    <value>Courier company</value>
+  </data>
+  <data name="ui.leads.kind.freight" xml:space="preserve">
+    <value>Freight handling</value>
+  </data>
+  <data name="ui.leads.kind.warehouse" xml:space="preserve">
+    <value>Warehouse operation</value>
+  </data>
+  <data name="ui.leads.kind.multi_branch" xml:space="preserve">
+    <value>Multi-branch logistics</value>
+  </data>
+  <data name="ui.leads.kind.other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="ui.leads.language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="ui.leads.message" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="ui.leads.handled" xml:space="preserve">
+    <value>Last updated by</value>
+  </data>
+  <data name="ui.leads.follow_up" xml:space="preserve">
+    <value>Follow-up</value>
+  </data>
+  <data name="ui.leads.note" xml:space="preserve">
+    <value>Internal note</value>
+  </data>
+  <data name="ui.leads.save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ui.leads.saved" xml:space="preserve">
+    <value>Request updated.</value>
+  </data>
+  <data name="email.lead.subject" xml:space="preserve">
+    <value>New contact request: {company}</value>
+  </data>
+  <data name="email.lead.body" xml:space="preserve">
+    <value>Hello {name},
+
+A contact request arrived from the public site.
+
+Company: {company}
+Contact: {contact}
+Email: {email}
+Phone: {phone}
+Country: {country}
+Operation: {kind}
+Language: {language}
+
+Message:
+{message}
+
+Open it in the console: {link}</value>
+  </data>
+  <data name="platform.registrations.invitation_required" xml:space="preserve">
+    <value>Sign-up is by invitation for now. Use the link Vixly sent you, or contact our sales team.</value>
+  </data>
+  <data name="platform.tenant_changes.reason_required" xml:space="preserve">
+    <value>Say why the company details are changing.</value>
+  </data>
+  <data name="platform.tenant_changes.reason_too_long" xml:space="preserve">
+    <value>The reason is too long.</value>
+  </data>
+  <data name="platform.tenant_changes.no_difference" xml:space="preserve">
+    <value>The new details are the same as the current ones.</value>
+  </data>
+  <data name="platform.tenant_changes.proof_required" xml:space="preserve">
+    <value>Attach a document that proves the change.</value>
+  </data>
+  <data name="platform.tenant_changes.proof_type_invalid" xml:space="preserve">
+    <value>The proof must be a PDF, JPEG or PNG file.</value>
+  </data>
+  <data name="platform.tenant_changes.proof_too_large" xml:space="preserve">
+    <value>The proof file is larger than 10 MB.</value>
+  </data>
+  <data name="platform.tenant_changes.not_pending" xml:space="preserve">
+    <value>This request has already been decided or withdrawn.</value>
+  </data>
+  <data name="platform.tenant_changes.note_required" xml:space="preserve">
+    <value>Add a note telling the tenant why.</value>
+  </data>
+  <data name="platform.tenant_changes.note_too_long" xml:space="preserve">
+    <value>The note is too long.</value>
+  </data>
+  <data name="platform.tenant_changes.already_pending" xml:space="preserve">
+    <value>A change request is already waiting for review.</value>
+  </data>
+  <data name="platform.tenant_changes.not_found" xml:space="preserve">
+    <value>The change request was not found.</value>
+  </data>
+  <data name="ui.tenant_changes.title" xml:space="preserve">
+    <value>Company changes</value>
+  </data>
+  <data name="ui.tenant_changes.lead" xml:space="preserve">
+    <value>Tenants ask to change their legal details here. Check the proof, then approve or reject.</value>
+  </data>
+  <data name="ui.tenant_changes.request" xml:space="preserve">
+    <value>Change request</value>
+  </data>
+  <data name="ui.tenant_changes.count" xml:space="preserve">
+    <value>{count} requests</value>
+  </data>
+  <data name="ui.tenant_changes.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.tenant_changes.status.all" xml:space="preserve">
+    <value>All statuses</value>
+  </data>
+  <data name="ui.tenant_changes.status.pending" xml:space="preserve">
+    <value>Waiting for review</value>
+  </data>
+  <data name="ui.tenant_changes.status.approved" xml:space="preserve">
+    <value>Approved</value>
+  </data>
+  <data name="ui.tenant_changes.status.rejected" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="ui.tenant_changes.status.withdrawn" xml:space="preserve">
+    <value>Withdrawn</value>
+  </data>
+  <data name="ui.tenant_changes.submitted" xml:space="preserve">
+    <value>Sent</value>
+  </data>
+  <data name="ui.tenant_changes.tenant" xml:space="preserve">
+    <value>Tenant</value>
+  </data>
+  <data name="ui.tenant_changes.from" xml:space="preserve">
+    <value>Current details</value>
+  </data>
+  <data name="ui.tenant_changes.to" xml:space="preserve">
+    <value>Requested details</value>
+  </data>
+  <data name="ui.tenant_changes.reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="ui.tenant_changes.proof" xml:space="preserve">
+    <value>Proof</value>
+  </data>
+  <data name="ui.tenant_changes.decided" xml:space="preserve">
+    <value>Decided</value>
+  </data>
+  <data name="ui.tenant_changes.note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="ui.tenant_changes.decide" xml:space="preserve">
+    <value>Decision</value>
+  </data>
+  <data name="ui.tenant_changes.decide_help" xml:space="preserve">
+    <value>Approving replaces the tenant’s legal details. Invoices already issued keep the old details.</value>
+  </data>
+  <data name="ui.tenant_changes.note_optional" xml:space="preserve">
+    <value>Note (optional)</value>
+  </data>
+  <data name="ui.tenant_changes.reject_note" xml:space="preserve">
+    <value>Why it is rejected (sent to the tenant)</value>
+  </data>
+  <data name="ui.tenant_changes.approve" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="ui.tenant_changes.reject" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="ui.tenant_changes.approved" xml:space="preserve">
+    <value>The change is approved and the new details are in place.</value>
+  </data>
+  <data name="ui.tenant_changes.rejected" xml:space="preserve">
+    <value>The change is rejected. The tenant has been told.</value>
+  </data>
+  <data name="ui.tenants.company_locked" xml:space="preserve">
+    <value>Legal details change only when the tenant sends a request with proof.</value>
+  </data>
+  <data name="ui.tenants.edit_settings" xml:space="preserve">
+    <value>Edit settings</value>
+  </data>
+  <data name="ui.tenant_history.company_changed" xml:space="preserve">
+    <value>Company details changed (approved request)</value>
+  </data>
+  <data name="ui.audit.action.platform.tenants.company_change_submitted" xml:space="preserve">
+    <value>Company change requested</value>
+  </data>
+  <data name="ui.audit.action.platform.tenants.company_change_withdrawn" xml:space="preserve">
+    <value>Company change withdrawn</value>
+  </data>
+  <data name="ui.audit.action.platform.tenants.company_change_approved" xml:space="preserve">
+    <value>Company change approved</value>
+  </data>
+  <data name="ui.audit.action.platform.tenants.company_change_rejected" xml:space="preserve">
+    <value>Company change rejected</value>
+  </data>
+  <data name="ui.permission.platform.tenants.review_changes" xml:space="preserve">
+    <value>Approve company changes</value>
+  </data>
+  <data name="email.company_change.submitted_subject" xml:space="preserve">
+    <value>Company change to review: {company}</value>
+  </data>
+  <data name="email.company_change.submitted_body" xml:space="preserve">
+    <value>Hello {name},
+
+{company} ({code}) asked to change its legal details and attached proof.
+
+Review it here: {link}</value>
+  </data>
+  <data name="email.company_change.approved_subject" xml:space="preserve">
+    <value>Your company details are updated: {company}</value>
+  </data>
+  <data name="email.company_change.approved_body" xml:space="preserve">
+    <value>Hello {name},
+
+We approved your request. Your company now appears as {company} on new invoices. Invoices already issued keep the old details.
+
+{note}
+
+Questions? Write to {support}.</value>
+  </data>
+  <data name="email.company_change.rejected_subject" xml:space="preserve">
+    <value>Your company change was not approved: {company}</value>
+  </data>
+  <data name="email.company_change.rejected_body" xml:space="preserve">
+    <value>Hello {name},
+
+We could not approve the change to {company}. Our reason:
+
+{note}
+
+You can send a new request with updated proof. Questions? Write to {support}.</value>
+  </data>
+  <data name="ui.control.workspace" xml:space="preserve"><value>Platform administration</value></data>
+  <data name="ui.control.shortcuts" xml:space="preserve"><value>Administration shortcuts</value></data>
+  <data name="ui.control.view_all" xml:space="preserve"><value>View all</value></data>
+  <data name="ui.control.tenants_context" xml:space="preserve"><value>Tenant directory · first 5 results</value></data>
+  <data name="ui.control.subscriptions_context" xml:space="preserve"><value>Current subscriptions · first 5 results</value></data>
+  <data name="ui.control.invoices_context" xml:space="preserve"><value>Overdue invoices · first 5 results</value></data>
+  <data name="ui.control.approvals_context" xml:space="preserve"><value>Your approval queue · first 5 results</value></data>
+  <data name="ui.control.overdue_invoices" xml:space="preserve"><value>Overdue invoices</value></data>
+  <data name="ui.control.filtered_results" xml:space="preserve"><value>Matching current filters</value></data>
+  <data name="ui.control.overview" xml:space="preserve"><value>Overview</value></data>
+  <data name="ui.control.organizations" xml:space="preserve"><value>Organizations</value></data>
+  <data name="ui.control.commercial" xml:space="preserve"><value>Commercial</value></data>
+  <data name="ui.control.security" xml:space="preserve"><value>Security &amp; access</value></data>
+  <data name="ui.control.system" xml:space="preserve"><value>Settings</value></data>
+  <data name="ui.control.theme" xml:space="preserve"><value>Switch light or dark theme</value></data>
+  <data name="ui.control.skip" xml:space="preserve"><value>Skip to workspace</value></data>
+  <data name="email.licensing.welcome.subject" xml:space="preserve">
+    <value>{company} is ready</value>
+  </data>
+  <data name="email.licensing.welcome.body" xml:space="preserve">
+    <value>Hello {name},
+
+Welcome! Setting up {company} is complete: your first computer is enrolled and your company is now active on Vixly.
+
+Your staff sign in here:
+{staff}
+
+Your customers find you here:
+{site}
+
+Next steps: add your branches and warehouses, your phone numbers per country, and your logo and colours, from Website and Locations once you are signed in.
+
+Questions? Write to {support}.</value>
+  </data>
+  <data name="platform.licensing.support_reason_required" xml:space="preserve">
+    <value>Give the reason for this support action.</value>
+  </data>
+  <data name="platform.licensing.identity_check_required" xml:space="preserve">
+    <value>Say how you confirmed the caller is the owner (for example, a call back to the owner phone on file).</value>
+  </data>
+  <data name="platform.licensing.approver_must_differ" xml:space="preserve">
+    <value>Another staff member must approve this reset, not the one who asked for it.</value>
+  </data>
+  <data name="platform.licensing.support_not_pending" xml:space="preserve">
+    <value>This request was already decided.</value>
+  </data>
+  <data name="email.licensing.support_started.device.subject" xml:space="preserve">
+    <value>{company}: Vixly support started a device recovery</value>
+  </data>
+  <data name="email.licensing.support_started.device.body" xml:space="preserve">
+    <value>Hello {name},
+
+Vixly support started a device recovery for the owner of {company}, at the owner's request. The owner receives a one-time link to enrol a new device.
+
+If no one at {company} asked for this, contact us right away at {support}.</value>
+  </data>
+  <data name="email.licensing.support_started.second_factor.subject" xml:space="preserve">
+    <value>{company}: Vixly support is resetting the owner's second factor</value>
+  </data>
+  <data name="email.licensing.support_started.second_factor.body" xml:space="preserve">
+    <value>Hello {name},
+
+Vixly support approved a reset of the owner's second factor (authenticator app) for {company}, at the owner's request. The owner receives a one-time link to enrol a new one.
+
+If no one at {company} asked for this, contact us right away at {support}.</value>
+  </data>
+  <data name="email.licensing.second_factor_link.subject" xml:space="preserve">
+    <value>Set up a new authenticator app for {company}</value>
+  </data>
+  <data name="email.licensing.second_factor_link.body" xml:space="preserve">
+    <value>Hello {name},
+
+Vixly support approved the reset of your second factor for {company}. Open this link, confirm your email and password, then scan the new code with your authenticator app:
+{link}
+
+The link works once and expires on {expires} (UTC). If you did not ask for this, contact us right away at {support}.</value>
+  </data>
+  <data name="email.licensing.second_factor_done.subject" xml:space="preserve">
+    <value>{company}: the owner's second factor was replaced</value>
+  </data>
+  <data name="email.licensing.second_factor_done.body" xml:space="preserve">
+    <value>Hello {name},
+
+The owner of {company} enrolled a new second factor through a Vixly support link. Every earlier session of the owner was ended.
+
+If no one at {company} asked for this, contact us right away at {support}.</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.second_factor_reset_requested" xml:space="preserve">
+    <value>Owner second-factor reset requested</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.second_factor_reset_approved" xml:space="preserve">
+    <value>Owner second-factor reset approved</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.second_factor_reset_refused" xml:space="preserve">
+    <value>Owner second-factor reset refused</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.second_factor_reset_completed" xml:space="preserve">
+    <value>Owner second-factor reset completed</value>
+  </data>
+  <data name="ui.licensing.support_title" xml:space="preserve">
+    <value>Owner support</value>
+  </data>
+  <data name="ui.licensing.support_help" xml:space="preserve">
+    <value>Only when the owner called and you confirmed it is them: call back the owner phone on file, never a number given during the call.</value>
+  </data>
+  <data name="ui.licensing.identity_check" xml:space="preserve">
+    <value>How you confirmed the caller</value>
+  </data>
+  <data name="ui.licensing.identity_check_hint" xml:space="preserve">
+    <value>Called back the owner phone on file; confirmed the company details</value>
+  </data>
+  <data name="ui.licensing.support_reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="ui.licensing.replace_device" xml:space="preserve">
+    <value>Lost device to replace (when every seat is in use)</value>
+  </data>
+  <data name="ui.licensing.replace_none" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="ui.licensing.request_reset" xml:space="preserve">
+    <value>Ask to reset the owner's second factor</value>
+  </data>
+  <data name="ui.licensing.support_open" xml:space="preserve">
+    <value>Open support requests</value>
+  </data>
+  <data name="ui.licensing.support_kind.devicerecovery" xml:space="preserve">
+    <value>Device recovery</value>
+  </data>
+  <data name="ui.licensing.support_kind.secondfactorreset" xml:space="preserve">
+    <value>Second-factor reset</value>
+  </data>
+  <data name="ui.licensing.support_status.pending" xml:space="preserve">
+    <value>Waiting for a second staff member</value>
+  </data>
+  <data name="ui.licensing.support_status.approved" xml:space="preserve">
+    <value>Link sent, not used yet</value>
+  </data>
+  <data name="ui.licensing.support_status.refused" xml:space="preserve">
+    <value>Refused</value>
+  </data>
+  <data name="ui.licensing.support_status.completed" xml:space="preserve">
+    <value>Completed</value>
+  </data>
+  <data name="ui.licensing.unknown_staff" xml:space="preserve">
+    <value>Unknown staff member</value>
+  </data>
+  <data name="ui.licensing.decision_note" xml:space="preserve">
+    <value>Note (optional)</value>
+  </data>
+  <data name="ui.licensing.approve_reset" xml:space="preserve">
+    <value>Approve and send the link</value>
+  </data>
+  <data name="ui.licensing.refuse_reset" xml:space="preserve">
+    <value>Refuse</value>
+  </data>
+  <data name="ui.licensing.reset_requested" xml:space="preserve">
+    <value>Requested. Another staff member must approve it.</value>
+  </data>
+  <data name="ui.licensing.reset_approved" xml:space="preserve">
+    <value>Approved. The link was sent to the owner; the owner and billing contacts were told.</value>
+  </data>
+  <data name="ui.licensing.reset_refused" xml:space="preserve">
+    <value>Refused. Nothing was sent.</value>
+  </data>
+  <data name="ui.error.title" xml:space="preserve">
+    <value>Something went wrong</value>
+  </data>
+  <data name="ui.error.body" xml:space="preserve">
+    <value>That did not work. Go back and try again; if it happens again, tell the engineering team.</value>
+  </data>
+  <data name="ui.error.back" xml:space="preserve">
+    <value>Back to the console</value>
+  </data>
+  <data name="ui.devices.system" xml:space="preserve">
+    <value>Operating system</value>
+  </data>
+  <data name="ui.devices.browser" xml:space="preserve">
+    <value>Browser</value>
+  </data>
+  <data name="ui.devices.address" xml:space="preserve">
+    <value>IP address</value>
+  </data>
+  <data name="ui.device.approved_by_link" xml:space="preserve">
+    <value>The owner's email link</value>
+  </data>
+  <data name="ui.device.kind.desktop" xml:space="preserve">
+    <value>Desktop</value>
+  </data>
+  <data name="ui.device.kind.laptop" xml:space="preserve">
+    <value>Laptop</value>
+  </data>
+  <data name="ui.activity.title" xml:space="preserve">
+    <value>Sign-in activity</value>
+  </data>
+  <data name="ui.activity.filtered" xml:space="preserve">
+    <value>Showing one person's sign-ins.</value>
+  </data>
+  <data name="ui.activity.everyone" xml:space="preserve">
+    <value>Show everyone</value>
+  </data>
+  <data name="ui.activity.count" xml:space="preserve">
+    <value>{count} sign-ins</value>
+  </data>
+  <data name="ui.activity.who" xml:space="preserve">
+    <value>Who</value>
+  </data>
+  <data name="ui.activity.signed_in" xml:space="preserve">
+    <value>Signed in</value>
+  </data>
+  <data name="ui.activity.signed_out" xml:space="preserve">
+    <value>Signed out</value>
+  </data>
+  <data name="ui.activity.address" xml:space="preserve">
+    <value>IP address</value>
+  </data>
+  <data name="ui.activity.country" xml:space="preserve">
+    <value>Country</value>
+  </data>
+  <data name="ui.activity.browser" xml:space="preserve">
+    <value>Browser</value>
+  </data>
+  <data name="ui.activity.system" xml:space="preserve">
+    <value>Operating system</value>
+  </data>
+  <data name="ui.activity.empty" xml:space="preserve">
+    <value>No sign-ins yet.</value>
+  </data>
+  <data name="ui.activity.still_signed_in" xml:space="preserve">
+    <value>Still signed in</value>
+  </data>
+  <data name="ui.activity.ended.signed_out" xml:space="preserve">
+    <value>signed out</value>
+  </data>
+  <data name="ui.activity.ended.ended_by_user" xml:space="preserve">
+    <value>ended by the person</value>
+  </data>
+  <data name="ui.activity.ended.ended_by_administrator" xml:space="preserve">
+    <value>ended by an administrator</value>
+  </data>
+  <data name="ui.activity.ended.account_restricted" xml:space="preserve">
+    <value>account restricted</value>
+  </data>
+  <data name="ui.activity.ended.idle_timeout" xml:space="preserve">
+    <value>idle</value>
+  </data>
+  <data name="ui.activity.ended.absolute_lifetime" xml:space="preserve">
+    <value>session limit</value>
+  </data>
+  <data name="ui.activity.ended.password_changed" xml:space="preserve">
+    <value>password changed</value>
+  </data>
+  <data name="ui.activity.ended.second_factor_reset" xml:space="preserve">
+    <value>second step reset</value>
+  </data>
+  <data name="ui.activity.ended.step_up_failed" xml:space="preserve">
+    <value>confirmation failed</value>
+  </data>
+  <data name="ui.activity.country.tor" xml:space="preserve">
+    <value>Tor</value>
+  </data>
+  <data name="ui.activity.country.unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="ui.licences.title" xml:space="preserve">
+    <value>Licences</value>
+  </data>
+  <data name="ui.licences.licence" xml:space="preserve">
+    <value>Licence</value>
+  </data>
+  <data name="ui.licences.device_id" xml:space="preserve">
+    <value>Device ID</value>
+  </data>
+  <data name="ui.licences.free" xml:space="preserve">
+    <value>Free</value>
+  </data>
+  <data name="ui.plans.feature.partner_agents" xml:space="preserve">
+    <value>Partner agents</value>
   </data>
 </root>

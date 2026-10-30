@@ -1,0 +1,92 @@
+@*
+=========================================================
+FILE: BundleListPanel.razor
+
+PURPOSE:
+A bundle's list (owner, 2026-10-21): entered from the computer, scanned at the station, missing.
+
+RESPONSIBILITIES:
+- Show the counts entered, scanned and missing, and each line
+- Take a line not scanned yet off the list; add parcels and closed boxes that may go in (ship managers)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The station only takes what is on the list once the list has a line; the bundle closes once nothing is missing
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<section class="ops-editor__panel ops-bundle-list" aria-labelledby="list-title">
+    <h2 id="list-title">@T["ui.bundles.list"]</h2>
+    <p class="ops-bundle-list__counts">
+        <span class="ops-editor__status" data-status="entered">@VixlyText.Format(T, "ui.bundles.list_entered", "count", List.Count)</span>
+        <span class="ops-editor__status" data-status="scanned">@VixlyText.Format(T, "ui.bundles.list_scanned", "count", List.Count(row => row.Scanned))</span>
+        <span class="ops-editor__status" data-status="missing">@VixlyText.Format(T, "ui.bundles.list_missing", "count", List.Count(row => !row.Scanned))</span>
+    </p>
+    @if (List.Count == 0)
+    {
+        <p class="ops-editor__hint">@T["ui.bundles.list_none"]</p>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.bundles.list"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.bundles.list_item"]</th><th scope="col">@T["ui.bundles.shipment"]</th><th scope="col">@T["ui.bundles.state"]</th><th scope="col"><span class="vx-visually-hidden">@T["ui.bundles.list_remove"]</span></th></tr></thead>
+                <tbody>
+                    @foreach (OperationsBundleListRow row in List)
+                    {
+                        <tr data-status="@(row.Scanned ? "scanned" : "missing")">
+                            <td class="ops-editor__identity-cell ops-editor__code">@row.Number@if (row.IsBox) { <small> · @T["ui.bundles.list_box"]</small> }</td>
+                            <td class="ops-editor__code">@row.ShipmentNumber</td>
+                            <td><span class="ops-editor__status" data-status="@(row.Scanned ? "scanned" : row.Blocked ? "blocked" : "missing")">@T[row.Scanned ? "ui.bundles.list_state.scanned" : row.Blocked ? "ui.bundles.list_state.blocked" : "ui.bundles.list_state.missing"]</span></td>
+                            <td>
+                                @if (CanManage && Open && !row.Scanned)
+                                {
+                                    <form method="post" action="/staff/bundles/@BundleId/list/@row.ItemId/remove" class="ops-editor__inline">
+                                        <AntiforgeryToken />
+                                        <button type="submit" class="vx-button vx-button--secondary" style="height: 30px; padding: 0 0.65rem; font-size: 0.75rem;">@T["ui.bundles.list_remove"]</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    }
+    @if (CanManage && Open && Candidates.Count > 0)
+    {
+        <form method="post" action="/staff/bundles/@BundleId/list" class="ops-editor__form" aria-labelledby="list-add-title">
+            <AntiforgeryToken />
+            <h3 id="list-add-title">@T["ui.bundles.list_add"]</h3>
+            <fieldset style="border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.75rem 1rem; margin-bottom: 0.5rem;">
+                <legend class="vx-visually-hidden">@T["ui.bundles.list_add"]</legend>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 0.5rem;">
+                    @foreach (OperationsBundleCandidate candidate in Candidates)
+                    {
+                        <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8125rem;">
+                            <input type="checkbox" name="items" value="@candidate.Id" />
+                            <span><strong class="ops-editor__code">@candidate.Number</strong>@if (candidate.IsBox) { <small> · @VixlyText.Format(T, "ui.bundles.list_box_parcels", "count", candidate.Parcels)</small> } · @candidate.ShipmentNumber</span>
+                        </label>
+                    }
+                </div>
+            </fieldset>
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <button type="submit" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.bundles.list_add_button"]</button>
+                <p class="ops-editor__hint" style="margin: 0;">@T["ui.bundles.list_hint"]</p>
+            </div>
+        </form>
+    }
+</section>
+
+@code {
+    [Parameter] public Guid BundleId { get; set; }
+
+    [Parameter] public bool Open { get; set; }
+
+    [Parameter] public bool CanManage { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsBundleListRow> List { get; set; } = Array.Empty<OperationsBundleListRow>();
+
+    [Parameter] public IReadOnlyList<OperationsBundleCandidate> Candidates { get; set; } = Array.Empty<OperationsBundleCandidate>();
+}

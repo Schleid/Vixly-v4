@@ -1,0 +1,125 @@
+@*
+=========================================================
+FILE: RatesPage.razor
+
+PURPOSE:
+The customer's rate calculator, the estimate of a shipment and the company's quotes (Slice 4 design section 8).
+
+RESPONSIBILITIES:
+- Ask the destination, weight, size, value and options; show an estimate for each service
+- Show the estimate of one shipment's measured packages
+- List the customer's quotes
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10)
+- Always marked as an estimate; never another customer's prices
+=========================================================
+*@
+@using System.Globalization
+@using Vixly.Contracts.Operations.Customers
+@using Vixly.Contracts.Operations.Rates
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.rates.title"]" SignedIn="true" Error="@Error" ReturnHere="/customer/rates">
+    <p class="customer-portal__notice" role="note">@T["ui.rates.estimate_note"]</p>
+    @if (ShipmentId is not null)
+    {
+        <p><a href="@("/customer/packages/shipments/" + ShipmentId)">@T["ui.rates.back_to_shipment"]</a></p>
+        @if (Rates.Unmeasured > 0) { <p class="customer-portal__info">@VixlyText.Format(T, "ui.rates.unmeasured", "count", Rates.Unmeasured)</p> }
+        @if (Rates.ShipmentDestination is { } destinationName) { <p>@VixlyText.Format(T, "ui.rates.shipment_destination", "destination", destinationName)</p> }
+        @if (Rates.Estimates.Count == 0) { <p>@T["ui.rates.shipment_none"]</p> }
+    }
+    else
+    {
+        <form method="post" action="/customer/rates" class="customer-portal__form customer-rate-form">
+            <AntiforgeryToken />
+            @if ((Rates.Origins?.Count ?? 0) > 1)
+            {
+                <label>@T["ui.rates.from"]
+                    <select name="origin" required>
+                        @foreach (Vixly.Contracts.Operations.Packages.CustomerChoiceDto origin in Rates.Origins!) { <option value="@origin.Id" selected="@(Origin == origin.Id)">@origin.Name · @origin.Detail</option> }
+                    </select>
+                </label>
+            }
+            <label>@T["ui.rates.to"]
+                <select name="destination" required>
+                    @foreach (Vixly.Contracts.Operations.Packages.CustomerDestinationDto destination in Rates.Destinations ?? Array.Empty<Vixly.Contracts.Operations.Packages.CustomerDestinationDto>())
+                    {
+                        <option value="@destination.Id" selected="@(Destination == destination.Id)">@destination.Name · @destination.City, @destination.CountryCode</option>
+                    }
+                </select>
+            </label>
+            <div class="customer-field-duo">
+                <label>@T["ui.rates.weight"] (@Rates.WeightUnit) <input name="weight" inputmode="decimal" value="@Weight" required /></label>
+                <label>@T["ui.rates.value"] (@Rates.Currency) <input name="value" inputmode="decimal" value="@Value" /></label>
+            </div>
+            <fieldset>
+                <legend>@VixlyText.Format(T, "ui.rates.size", "unit", Rates.LengthUnit)</legend>
+                <div class="customer-dim-trio">
+                    <label>@T["ui.rates.length"] <input name="length" inputmode="decimal" value="@Length" /></label>
+                    <label>@T["ui.rates.width"] <input name="width" inputmode="decimal" value="@Width" /></label>
+                    <label>@T["ui.rates.height"] <input name="height" inputmode="decimal" value="@Height" /></label>
+                </div>
+            </fieldset>
+            <div class="customer-options-grid">
+                <label><input type="checkbox" name="consolidated" value="true" checked="@Consolidated" /> <span>@T["ui.rates.consolidated"]</span></label>
+                <label><input type="checkbox" name="insured" value="true" checked="@Insured" /> <span>@T["ui.rates.insured"]</span></label>
+                @if (Rates.Destinations?.Any(destination => destination.HomeDelivery) == true)
+                {
+                    <label><input type="checkbox" name="home" value="true" checked="@HomeDelivery" /> <span>@T["ui.rates.home_delivery"]</span></label>
+                }
+            </div>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.rates.calculate"]</button>
+        </form>
+    }
+    @foreach (CustomerRateEstimateDto estimate in Rates.Estimates)
+    {
+        <section aria-label="@Service(estimate.ServiceCode, estimate.Label)">
+            <RateLines T="T" Lines="estimate.Lines" Total="estimate.Total" Currency="@Rates.Currency" Caption="@(Service(estimate.ServiceCode, estimate.Label) + " · " + T["ui.rates.estimate"].Value)" />
+            @if (estimate.InsuranceRefused) { <p class="customer-portal__info">@T["ui.rates.insurance_refused"]</p> }
+        </section>
+    }
+    @if (Rates.Quotes.Count > 0)
+    {
+        <section aria-labelledby="quotes-title">
+            <h2 id="quotes-title">@T["ui.rates.quotes"]</h2>
+            @foreach (CustomerQuoteDto quote in Rates.Quotes)
+            {
+                <RateLines T="T" Lines="quote.Lines" Total="quote.Total" Currency="@(quote.Currency.Length > 0 ? quote.Currency : Rates.Currency)"
+                    Caption="@(quote.Number + " · " + Service(quote.ServiceCode, null) + " · " + quote.Country + " · " + VixlyText.Format(T, "ui.rates.valid_until", "date", quote.ValidUntilUtc.ToString("d", CultureInfo.CurrentCulture)))" />
+            }
+        </section>
+    }
+</CustomerShell>
+
+@code {
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter, EditorRequired] public CustomerRatesDto Rates { get; set; } = null!;
+
+    [Parameter] public Guid? ShipmentId { get; set; }
+
+    [Parameter] public Guid? Origin { get; set; }
+
+    [Parameter] public Guid? Destination { get; set; }
+
+    [Parameter] public bool HomeDelivery { get; set; }
+
+    [Parameter] public string? Weight { get; set; }
+
+    [Parameter] public string? Length { get; set; }
+
+    [Parameter] public string? Width { get; set; }
+
+    [Parameter] public string? Height { get; set; }
+
+    [Parameter] public string? Value { get; set; }
+
+    [Parameter] public bool Consolidated { get; set; }
+
+    [Parameter] public bool Insured { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    private string Service(string code, string? label) => label ?? T["ui.rates.service." + code].Value;
+}

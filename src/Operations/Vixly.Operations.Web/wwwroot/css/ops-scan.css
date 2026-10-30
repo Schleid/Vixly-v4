@@ -1,0 +1,477 @@
+/* =========================================================
+   Operations scan app (Slice 3B / Brief §5 Station Anatomy)
+   Full screen, arm's length high-contrast warehouse terminal.
+   The dock scans carrier barcodes and prints one ID label per parcel.
+   ========================================================= */
+
+body.ops-scan {
+    margin: 0;
+    min-height: 100dvh;
+    font-family: var(--vx-font, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    background: var(--vx-color-chrome-surface, #0f172a);
+    color: var(--vx-color-chrome-text-strong, #f8fafc);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.ops-scan * {
+    box-sizing: border-box;
+}
+
+.ops-scan__app {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: max(1.25rem, env(safe-area-inset-top)) 1.25rem 2.5rem;
+}
+
+/* Station top executive bar */
+.ops-scan__bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--vx-color-chrome-border, #334155);
+}
+
+.ops-scan__home {
+    flex: 1 1 auto;
+    color: var(--vx-color-chrome-text-strong, #f8fafc);
+    font-weight: 750;
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ops-scan__home:hover {
+    color: var(--vx-color-chrome-accent, #38bdf8);
+}
+
+.ops-scan select,
+.ops-scan button,
+.ops-scan input {
+    min-height: 48px;
+    font: inherit;
+    font-size: 1rem;
+    border-radius: 0.45rem;
+}
+
+.ops-scan select {
+    background: var(--vx-color-chrome-hover, #1e293b);
+    color: var(--vx-color-chrome-text-strong, #f8fafc);
+    border: 1px solid var(--vx-color-chrome-border, #334155);
+    padding: 0 0.85rem;
+    font-weight: 600;
+}
+
+.ops-scan button {
+    background: var(--vx-color-chrome-hover, #1e293b);
+    color: var(--vx-color-chrome-text-strong, #f8fafc);
+    border: 1px solid var(--vx-color-chrome-scrollbar, #475569);
+    padding: 0 1.15rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 140ms ease, border-color 140ms ease, transform 100ms ease;
+}
+
+.ops-scan button:hover {
+    background: var(--vx-color-chrome-active, #334155);
+    border-color: var(--vx-color-chrome-accent, #38bdf8);
+}
+
+.ops-scan button:active {
+    transform: translateY(1px);
+}
+
+.ops-scan button:focus-visible,
+.ops-scan input:focus-visible,
+.ops-scan select:focus-visible {
+    outline: 3px solid var(--vx-color-status-warning-border, #f59e0b);
+    outline-offset: 2px;
+}
+
+.ops-scan h1 {
+    margin: 0.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 750;
+    letter-spacing: -0.01em;
+}
+
+.ops-scan h2 {
+    margin: 1.25rem 0 0.65rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--vx-color-chrome-text, #cbd5e1);
+}
+
+.ops-scan__error {
+    padding: 1rem 1.25rem;
+    background: var(--vx-color-chrome-danger-soft, rgba(239, 68, 68, 0.2));
+    border: 1px solid var(--vx-color-chrome-danger, #ef4444);
+    border-radius: 0.5rem;
+    color: #fca5a5;
+    font-weight: 600;
+}
+
+/* Carrier launcher cards */
+.ops-scan__carriers {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+    gap: 0.85rem;
+}
+
+.ops-scan__carriers button {
+    min-height: 72px;
+    font-size: 1.2rem;
+    font-weight: 750;
+    letter-spacing: 0.02em;
+    border-radius: 0.5rem;
+    border: 1px solid var(--vx-color-chrome-border, #334155);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%), var(--vx-color-chrome-hover, #1e293b);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.ops-scan__carriers button:hover {
+    border-color: var(--vx-color-chrome-accent, #38bdf8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* Open deliveries queue list */
+.ops-scan__open {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.65rem;
+}
+
+.ops-scan__open button {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.85rem 1.15rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--vx-color-chrome-border, #334155);
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.ops-scan__open button strong {
+    color: var(--vx-color-chrome-accent, #38bdf8);
+    font-size: 1.05rem;
+}
+
+.ops-scan__open button:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--vx-color-chrome-accent, #38bdf8);
+}
+
+/* Scanning Station Live Cockpit */
+.ops-scan__delivery {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    font-size: 1.25rem;
+    font-weight: 750;
+    margin-bottom: 0.25rem;
+}
+
+.ops-scan__queue {
+    margin-left: auto;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    background: var(--vx-color-status-staged, #f59e0b);
+    color: #0f172a;
+    font-size: 0.8125rem;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* Focused Barcode Laser Scan Input */
+.ops-scan__input {
+    display: flex;
+    gap: 0.65rem;
+}
+
+.ops-scan__input input {
+    flex: 1;
+    min-height: 64px;
+    min-width: 0;
+    padding: 0 1.25rem;
+    font-size: 1.65rem;
+    font-weight: 700;
+    font-family: var(--vx-font-mono, monospace);
+    letter-spacing: 0.06em;
+    background: #ffffff;
+    color: #0f172a;
+    border: 3px solid var(--vx-color-chrome-accent, #38bdf8);
+    border-radius: 0.5rem;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+}
+
+.ops-scan__input input:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.4);
+    outline: none;
+}
+
+.ops-scan__keyboard {
+    min-width: 60px;
+    font-size: 1.5rem;
+    padding: 0;
+}
+
+/* Auxiliary scan tools (Damaged & Camera) */
+.ops-scan__tools,
+.ops-scan__end {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.ops-scan__tools button,
+.ops-scan__end button {
+    flex: 1;
+    min-height: 52px;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.ops-scan__damaged[aria-pressed=true] {
+    background: var(--vx-color-status-exception, #be123c) !important;
+    border-color: var(--vx-color-status-danger-border, #fca5a5) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    box-shadow: 0 0 16px rgba(190, 18, 60, 0.5);
+}
+
+.ops-scan__close {
+    background: var(--vx-color-status-completed, #059669) !important;
+    border-color: var(--vx-color-status-success-border, #6ee7b7) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+}
+
+.ops-scan__close:hover {
+    background: #047857 !important;
+}
+
+.ops-scan__video {
+    width: 100%;
+    max-height: 40vh;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    background: var(--vx-color-chrome-footer, #090d16);
+    border: 2px solid var(--vx-color-chrome-border, #334155);
+}
+
+/* Large Arm's-Length Outcome Result Box */
+.ops-scan__result {
+    min-height: 13rem;
+    padding: 1.5rem 1.25rem;
+    border-radius: 0.75rem;
+    background: var(--vx-color-chrome-hover, #1e293b);
+    border: 3px solid var(--vx-color-chrome-border, #334155);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: var(--vx-shadow-2, 0 4px 16px rgba(0, 0, 0, 0.3));
+    transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.ops-scan__result p {
+    margin: 0.25rem 0;
+}
+
+.ops-scan__code {
+    font-size: clamp(2.75rem, 14vw, 4.75rem);
+    font-weight: 850;
+    font-family: var(--vx-font-mono, monospace);
+    letter-spacing: 0.05em;
+    line-height: 1.05;
+}
+
+.ops-scan__name {
+    font-size: 1.4rem;
+    font-weight: 650;
+}
+
+.ops-scan__number {
+    font-size: 1.15rem;
+    font-family: var(--vx-font-mono, monospace);
+    color: var(--vx-color-chrome-text, #cbd5e1);
+    font-variant-numeric: tabular-nums;
+}
+
+.ops-scan__note {
+    font-size: 1rem;
+    color: var(--vx-color-chrome-text, #cbd5e1);
+}
+
+.ops-scan__result[data-outcome=matched] {
+    background: rgba(16, 185, 129, 0.15) !important;
+    border-color: #10b981 !important;
+    color: #34d399 !important;
+}
+
+.ops-scan__result:is([data-outcome=unidentified], [data-outcome=conflict]) {
+    background: rgba(245, 158, 11, 0.15) !important;
+    border-color: #f59e0b !important;
+    color: #fbbf24 !important;
+}
+
+.ops-scan__result:is([data-outcome=reprint], [data-outcome=repeat]) {
+    background: rgba(6, 182, 212, 0.15) !important;
+    border-color: #06b6d4 !important;
+    color: #22d3ee !important;
+}
+
+.ops-scan__result[data-outcome=error] {
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-color: #ef4444 !important;
+    color: #f87171 !important;
+}
+
+.ops-scan__result[data-outcome=queued] {
+    background: var(--vx-color-chrome-border, #334155) !important;
+    border-color: var(--vx-color-chrome-scrollbar, #475569) !important;
+    color: var(--vx-color-chrome-text, #cbd5e1) !important;
+}
+
+.ops-scan__result .ops-scan__number,
+.ops-scan__result .ops-scan__note {
+    color: inherit;
+}
+
+/* Recent Scans Journal */
+.ops-scan__recent {
+    margin: 0.75rem 0 0;
+    padding-left: 1.5rem;
+    color: var(--vx-color-chrome-text, #cbd5e1);
+    font-variant-numeric: tabular-nums;
+    font-family: var(--vx-font-mono, monospace);
+    font-size: 0.95rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.ops-scan__recent [data-outcome=unidentified],
+.ops-scan__recent [data-outcome=conflict] {
+    color: #fbbf24;
+}
+
+.ops-scan__recent [data-outcome=matched] {
+    color: #34d399;
+}
+
+/* Delivery Closed Screen */
+.ops-scan__closed {
+    text-align: center;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ops-scan__closed h1 {
+    font-size: 2.25rem;
+    font-family: var(--vx-font-mono, monospace);
+    color: var(--vx-color-chrome-accent, #38bdf8);
+}
+
+.ops-scan__receipt {
+    display: inline-block;
+    padding: 1rem 1.75rem;
+    border-radius: 0.5rem;
+    background: var(--vx-color-chrome-text-strong, #f8fafc);
+    color: var(--vx-color-chrome-surface, #0f172a);
+    font-weight: 750;
+    font-size: 1.15rem;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    transition: transform 140ms ease, background 140ms ease;
+}
+
+.ops-scan__receipt:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+}
+
+.ops-scan__label {
+    display: none;
+}
+
+@media (max-width: 480px) {
+    .ops-scan__tools,
+    .ops-scan__end {
+        flex-wrap: wrap;
+    }
+    .ops-scan__pick {
+        max-width: 100%;
+    }
+    .ops-scan select {
+        max-width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ops-scan__carriers button {
+        transition: none;
+    }
+}
+
+/* Thermal Label Print (2in x 1in label) */
+@page {
+    size: 2in 1in;
+    margin: 0;
+}
+
+@media print {
+    body.ops-scan {
+        background: #fff;
+        color: #000;
+        min-height: 0;
+    }
+    .ops-scan__app {
+        display: none;
+    }
+    .ops-scan__label {
+        display: block;
+        width: 2in;
+        height: 1in;
+        padding: .05in .08in;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+        color: #000;
+    }
+    .ops-scan__label svg {
+        display: block;
+        width: 100%;
+        height: .42in;
+        fill: #000;
+    }
+    .ops-scan__label p {
+        margin: 0;
+        line-height: 1.1;
+    }
+    .ops-scan__label [data-label-number] {
+        font-size: 7pt;
+    }
+    .ops-scan__label [data-label-code] {
+        font-size: 16pt;
+        font-weight: 700;
+    }
+}

@@ -1,0 +1,48 @@
+﻿@*
+=========================================================
+FILE: PriceListPanel.razor
+
+PURPOSE:
+One price list: its route, customer and customs, its versions, and the form to schedule new prices (Slice 4B; routes, Slice 4C).
+
+RESPONSIBILITIES:
+- Show the version history
+- Schedule new prices; change the customs policy; take the list out of use
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+<details>
+    <summary>
+        <strong>@T["ui.services.name." + Row.Card.ServiceCode]</strong> · @(Row.OriginName ?? T["ui.charges.route.any_origin"].Value) → @(Row.DestinationName ?? T["ui.charges.route.any_destination"].Value)
+        · @(Row.CustomerCode is null ? T["ui.charges.standard"].Value : Row.CustomerCode + " " + Row.CustomerName)
+        · @T["ui.charges.customs." + Row.Card.Customs] @(Row.Card.IsActive ? null : "· " + T["ui.charges.not_in_use"].Value)
+    </summary>
+    <VersionHistory T="T" Card="Row.Card" UtcNow="UtcNow" Unit="@Unit" Currency="@Currency" />
+    <form method="post" action="/staff/charges/cards" class="ops-editor__form">
+        <AntiforgeryToken />
+        <input type="hidden" name="mode" value="@Row.Card.Mode" />
+        <input type="hidden" name="card" value="@Row.Card.Id" />
+        <h3>@T["ui.charges.version.new"]</h3>
+        <PriceVersionFields T="T" Mode="Row.Card.Mode" Version="@(Row.Card.VersionAt(UtcNow) ?? Row.Card.Versions.FirstOrDefault())" ItemTypes="ItemTypes" Currency="@Currency" Unit="@Unit" />
+        <CustomsField T="T" Value="Row.Card.Customs" />
+        <label><input type="checkbox" name="active" value="true" checked="@Row.Card.IsActive" /> @T["ui.charges.in_use"]</label>
+        @if (Row.Card.CustomerId is null) { <label><input type="checkbox" name="published" value="true" checked="@Row.Card.Published" /> @T["ui.charges.published"]</label> }
+        <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button>
+    </form>
+</details>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsRateCardRow Row { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsItemType> ItemTypes { get; set; } = Array.Empty<OperationsItemType>();
+
+    [Parameter] public DateTimeOffset UtcNow { get; set; }
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+
+    [Parameter] public string Unit { get; set; } = string.Empty;
+}

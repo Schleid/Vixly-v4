@@ -1,0 +1,126 @@
+@*
+=========================================================
+FILE: QuoteListPage.razor
+
+PURPOSE:
+The quotes list: every saved quote with its status (owner, 2026-10-20: "we cannot see a list of previous quotes and their status").
+
+RESPONSIBILITIES:
+- Tabs by status with their counts: all, open, expired, withdrawn
+- Search by quote number or customer; a page at a time, newest first
+- Withdraw an open quote
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- ops.quotes.create, as the quotes page; without it only the refusal is shown
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.quotes.list.page_title"]" Company="@Company" Section="quotes" Error="@Error" Info="@Info">
+    @if (!Denied)
+    {
+    <div class="ops-list-bar">
+        <form method="get" action="/staff/quotes/list" class="ops-list-bar__search" role="search">
+            <input type="hidden" name="state" value="@State" />
+            <input name="search" value="@Search" placeholder="@T["ui.quotes.list.search"]" aria-label="@T["ui.quotes.list.search"]" maxlength="80" autofocus />
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.staff.search_submit"]</button>
+        </form>
+        <a class="vx-button vx-button--primary ops-list-bar__new" href="/staff/quotes">@T["ui.quotes.list.new"]</a>
+    </div>
+    <nav class="ops-status-chips" aria-label="@T["ui.quotes.list.states"]">
+        @foreach ((string key, int count) in new[] { ("all", Counts.All), ("open", Counts.Open), ("expired", Counts.Expired), ("withdrawn", Counts.Withdrawn) })
+        {
+            <a href="@Link(key, Search, 1)" class="ops-status-chip" aria-current="@(State == key ? "page" : null)">
+                <span class="ops-status-chip__label">@T["ui.quotes.state." + key]</span>
+                <span class="ops-status-chip__count">@count</span>
+            </a>
+        }
+    </nav>
+    <section class="ops-editor__panel ops-quotes__list-panel" aria-label="@T["ui.quotes.list.page_title"]">
+        @if (Quotes.Count == 0)
+        {
+            <div class="ops-editor__empty"><h2>@T["ui.quotes.list.none"]</h2></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.quotes.list.page_title"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.quotes.list.number"]</th><th scope="col">@T["ui.quotes.list.created"]</th><th scope="col">@T["ui.quotes.list.customer"]</th><th scope="col">@T["ui.quotes.service"]</th><th scope="col">@T["ui.quotes.list.destination"]</th><th scope="col" class="ops-editor__number">@T["ui.quotes.list.amount"]</th><th scope="col">@T["ui.quotes.list.valid"]</th><th scope="col">@T["ui.quotes.list.status"]</th><th scope="col" style="text-align: right;"><span class="vx-visually-hidden">@T["ui.quotes.withdraw"]</span></th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsQuoteRow row in Quotes)
+                        {
+                            string state = StateOf(row.Quote);
+                            <tr>
+                                <td class="ops-editor__code">@row.Quote.Number</td>
+                                <td>@row.Quote.CreatedUtc.ToString("d", CultureInfo.CurrentCulture)</td>
+                                <td>@row.CustomerCode @row.CustomerName</td>
+                                <td>@T["ui.services.name." + row.Quote.ServiceCode]</td>
+                                <td>@row.Quote.CountryCode</td>
+                                <td class="ops-editor__number">@OperationsChargeWords.Money(row.Quote.Total, row.Quote.CurrencyCode)@if (row.Quote.IsPreferred) { <small> @VixlyText.Format(T, "ui.quotes.list.standard", "amount", OperationsChargeWords.Money(row.Quote.StandardTotal, row.Quote.CurrencyCode))</small> }</td>
+                                <td>@row.Quote.ValidUntilUtc.ToString("d", CultureInfo.CurrentCulture)</td>
+                                <td><span class="ops-editor__status" data-status="@state">@T["ui.quotes.state." + state]</span></td>
+                                <td style="text-align: right; white-space: nowrap;">
+                                    <div style="display: inline-flex; align-items: center; justify-content: flex-end; gap: 0.5rem;">
+                                        @* Owner, 2026-10-28: print the quote, or email it with its PDF while it is open. *@
+                                        <a class="vx-button vx-button--secondary" href="/staff/quotes/@row.Quote.Id/pdf" target="_blank" rel="noopener">@T["ui.quotes.print"]</a>
+                                        @if (state == "open")
+                                        {
+                                            <form method="post" action="/staff/quotes/@row.Quote.Id/email" style="display: inline; margin: 0;">
+                                                <AntiforgeryToken />
+                                                <input type="hidden" name="from" value="list" />
+                                                <button type="submit" class="vx-button vx-button--secondary">@T["ui.quotes.email"]</button>
+                                            </form>
+                                            <form method="post" action="/staff/quotes/@row.Quote.Id/withdraw" style="display: inline; margin: 0;">
+                                                <AntiforgeryToken />
+                                                <input type="hidden" name="from" value="list" />
+                                                <button type="submit" class="vx-button vx-button--secondary">@T["ui.quotes.withdraw"]</button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+        <nav class="ops-editor__inline ops-list-pager" aria-label="@T["ui.customers.pages"]">
+            @if (Page > 1) { <a class="vx-button vx-button--secondary" href="@Link(State, Search, Page - 1)">@T["ui.customers.previous"]</a> }
+            @if (Page * PageSize < TotalCount) { <a class="vx-button vx-button--secondary" href="@Link(State, Search, Page + 1)">@T["ui.customers.next"]</a> }
+        </nav>
+    </section>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public string State { get; set; } = "all";
+
+    [Parameter] public string? Search { get; set; }
+
+    [Parameter] public int Page { get; set; } = 1;
+
+    [Parameter] public int PageSize { get; set; } = 50;
+
+    [Parameter] public int TotalCount { get; set; }
+
+    [Parameter] public OperationsQuoteCounts Counts { get; set; } = new(0, 0, 0);
+
+    [Parameter] public IReadOnlyList<OperationsQuoteRow> Quotes { get; set; } = Array.Empty<OperationsQuoteRow>();
+
+    [Parameter] public DateTimeOffset UtcNow { get; set; }
+
+    [Parameter] public bool Denied { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private string StateOf(OperationsQuote quote) =>
+        quote.Status == OperationsQuoteStatus.Withdrawn ? "withdrawn" : quote.ValidUntilUtc < UtcNow ? "expired" : "open";
+
+    private static string Link(string state, string? search, int page) =>
+        "/staff/quotes/list?state=" + state + (string.IsNullOrWhiteSpace(search) ? null : "&search=" + Uri.EscapeDataString(search)) + (page > 1 ? "&page=" + page : null);
+}

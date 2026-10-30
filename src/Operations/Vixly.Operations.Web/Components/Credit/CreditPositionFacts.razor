@@ -1,0 +1,37 @@
+﻿@*
+=========================================================
+FILE: CreditPositionFacts.razor
+
+PURPOSE:
+Where a credit account stands (Slice 5F step 2b, K-5): owed, awaiting approval, available, overdue and by age.
+
+RESPONSIBILITIES:
+- Show the figures of a position
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+<dl class="ops-editor__facts ops-credit__position">
+    <dt>@T["ui.credit.owed"]</dt><dd data-owed>@OperationsInvoiceWords.Money(Position.Owed, CurrencyCode)</dd>
+    @if (Position.Awaiting > 0m) { <dt>@T["ui.credit.awaiting"]</dt><dd>@OperationsInvoiceWords.Money(Position.Awaiting, CurrencyCode)</dd> }
+    <dt>@T["ui.credit.available"]</dt><dd data-available>@OperationsInvoiceWords.Money(Position.Available, CurrencyCode)</dd>
+    <dt>@T["ui.credit.overdue"]</dt><dd data-overdue="@(Position.Overdue > 0m)">@OperationsInvoiceWords.Money(Position.Overdue, CurrencyCode)</dd>
+    @if (ShowAges)
+    {
+        @for (int age = 0; age < Position.Ages.Count; age++)
+        {
+            <dt>@T["ui.statement.age." + age]</dt><dd>@OperationsInvoiceWords.Money(Position.Ages[age], CurrencyCode)</dd>
+        }
+    }
+</dl>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsCreditPosition Position { get; set; } = null!;
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public bool ShowAges { get; set; }
+}

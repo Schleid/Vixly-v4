@@ -1,0 +1,129 @@
+@*
+=========================================================
+FILE: ScreensPage.razor
+
+PURPOSE:
+Customer screens (Slice 5F step 3, P-2): the tablets at the counters that customers use to pay and sign.
+
+RESPONSIBILITIES:
+- Add a screen to a warehouse and show the code to type on it, once
+- List the screens with their state; a new code for a screen; remove one
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The code is shown only in the answer to the form that made it, never in an address
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.screens.title"]" Company="@Company" Section="cashier" Error="@Error" Info="@Info">
+    <p class="ops-editor__hint">@VixlyText.Format(T, "ui.screens.intro", "url", ScreenUrl)</p>
+    @if (Code is not null)
+    {
+        <section class="ops-editor__panel ops-screen-code-panel" aria-labelledby="code-title" data-screen-code>
+            <h2 id="code-title">@VixlyText.Format(T, "ui.screens.code_title", "name", CodeFor ?? string.Empty)</h2>
+            <p>@VixlyText.Format(T, "ui.screens.code_how", "url", ScreenUrl)</p>
+            <div class="ops-screen-code-box">
+                <span class="ops-screen-code" data-code>@Code</span>
+            </div>
+            <p class="ops-editor__hint">@VixlyText.Format(T, "ui.screens.code_until", "time", (CodeExpiresUtc ?? DateTimeOffset.UtcNow).ToLocalTime().ToString("t", CultureInfo.CurrentCulture))</p>
+        </section>
+    }
+    @if (Warehouses.Count > 0)
+    {
+        <form method="post" action="/staff/screens" class="ops-inline-action-bar ops-list-bar" aria-labelledby="add-title">
+            <AntiforgeryToken />
+            <span id="add-title" class="ops-inline-action-bar__label">@T["ui.screens.add"]:</span>
+            <label class="ops-inline-action-bar__field">
+                <span class="ops-screen-reader-text">@T["ui.screens.warehouse"]</span>
+                <select name="warehouse" class="ops-inline-action-bar__control">
+                    @foreach (OperationsWarehouse warehouse in Warehouses)
+                    {
+                        <option value="@warehouse.Id">@warehouse.Code · @warehouse.Name</option>
+                    }
+                </select>
+            </label>
+            <label class="ops-inline-action-bar__field">
+                <span class="ops-screen-reader-text">@T["ui.screens.name"]</span>
+                <input name="name" maxlength="60" size="20" required placeholder="@T["ui.screens.name_example"]" class="ops-inline-action-bar__control" />
+            </label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.screens.add_button"]</button>
+        </form>
+    }
+    @if (Screens.Count == 0)
+    {
+        <div class="ops-editor__empty"><p>@T["ui.screens.none"]</p></div>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.screens.title"]">
+            <table class="ops-editor__table">
+                <thead>
+                    <tr>
+                        <th scope="col">@T["ui.screens.name"]</th>
+                        <th scope="col">@T["ui.screens.warehouse"]</th>
+                        <th scope="col">@T["ui.screens.state"]</th>
+                        <th scope="col">@T["ui.screens.showing"]</th>
+                        <th scope="col" class="ops-editor__actions-header"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (OperationsScreenRow screen in Screens)
+                    {
+                        <tr data-screen="@screen.ScreenId" data-paired="@screen.Paired">
+                            <td class="ops-table__cell--bold">@screen.Name</td>
+                            <td>@screen.WarehouseName</td>
+                            <td>
+                                @if (screen.Paired)
+                                {
+                                    <span class="ops-status-pill ops-status-pill--positive">
+                                        @(screen.LastSeenUtc is { } seen ? VixlyText.Format(T, "ui.screens.seen", "time", seen.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)) : T["ui.screens.paired"].Value)
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="ops-status-pill ops-status-pill--neutral">@T["ui.screens.waiting_code"]</span>
+                                }
+                            </td>
+                            <td><span class="ops-step-chip">@T["ui.screens.step." + screen.Step]</span></td>
+                            <td class="ops-editor__actions-cell">
+                                <div class="ops-field--inline">
+                                    <form method="post" action="/staff/screens/@screen.ScreenId/code">
+                                        <AntiforgeryToken />
+                                        <button type="submit" class="vx-button vx-button--secondary">@T["ui.screens.new_code"]</button>
+                                    </form>
+                                    <form method="post" action="/staff/screens/@screen.ScreenId/remove">
+                                        <AntiforgeryToken />
+                                        <button type="submit" class="vx-button vx-button--secondary">@T["ui.screens.remove"]</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsScreenRow> Screens { get; set; } = Array.Empty<OperationsScreenRow>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    // This company's screen address, to open on the tablet.
+    [Parameter] public string ScreenUrl { get; set; } = string.Empty;
+
+    // Only in the answer to the form that made it.
+    [Parameter] public string? Code { get; set; }
+
+    [Parameter] public string? CodeFor { get; set; }
+
+    [Parameter] public DateTimeOffset? CodeExpiresUtc { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

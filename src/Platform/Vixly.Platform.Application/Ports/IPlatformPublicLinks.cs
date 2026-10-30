@@ -28,4 +28,10 @@ public interface IPlatformPublicLinks
 
     // The tenant portal page where the owner reads and accepts the Terms (Slice 8).
     string LegalLink(string portalSlug);
+
+    // The tenant's own site and its staff sign-in (welcome email).
+    string PortalLink(string portalSlug, string path);
+
+    // The tenant host page where the Owner enrols a new second factor (D-O13); the token is after "#".
+    string SecondFactorResetLink(string portalSlug, string token);
 }

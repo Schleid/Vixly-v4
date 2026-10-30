@@ -1,0 +1,33 @@
+@* =========================================================
+   FILE: SiteServiceIcon.razor
+
+   PURPOSE:
+   Decorative transport-service symbols in the tenant storefront.
+
+   RESPONSIBILITIES:
+   - Render the symbol for an existing service code
+
+   IMPORTANT NOTES:
+   - Pure presentation; service availability is decided by the parent
+   - No tenant names or user-facing text
+   ========================================================= *@
+<span class="site-service__icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="@Shape" />
+    </svg>
+</span>
+
+@code {
+    private string Shape => Code switch
+    {
+        "air" => "m3 10 7 2 9-9 2 2-9 9 2 7-2 1-4-6-5-4z",
+        "ocean" => "M4 17 2 11l10-4 10 4-2 6M7 9V4h10v5M10 4V2h4v2M2 21q3-4 5 0 3-4 5 0 3-4 5 0 3-4 5 0",
+        "consolidation" => "m2 6 5-3 5 3-5 3zM2 6v6l5 3 5-3V6M7 9v6m5-3 5-3 5 3-5 3zM12 12v6l5 3 5-3v-6m-5 3v6",
+        "door_to_door" => "m3 10 9-7 9 7M5 9v12h14V9M10 21v-7h4v7",
+        "pickup" => "M3 4h11v13H3zM14 9h4l3 4v4h-7M6 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4m12 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4",
+        _ => "M3 7h18v14H3zM3 7l4-4h10l4 4M3 11h18M9 15h6"
+    };
+
+    [Parameter, EditorRequired]
+    public string Code { get; set; } = string.Empty;
+}

@@ -1,0 +1,98 @@
+﻿@*
+=========================================================
+FILE: AuthShell.razor
+
+PURPOSE:
+The full HTML document around every staff sign-in page.
+
+RESPONSIBILITIES:
+- Render the full HTML document around every staff sign-in page
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+@inject IStringLocalizer<OperationsWorkbenchText> L
+
+<!DOCTYPE html>
+<html lang="@Lang" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="robots" content="noindex" />
+    <title>@Title · @CompanyName</title>
+    <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-theme.css" />
+    <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-primitives.css" />
+    <link rel="stylesheet" href="/css/ops-auth.css" />
+    <script src="/_content/Vixly.Shared.UI/vixly-forms.js" defer></script>
+    @if (SignedIn)
+    {
+        <script src="/js/ops-session.js" defer></script>
+    }
+</head>
+<body class="vx-auth ops-auth" data-idle-warn="@(SignedIn ? "780" : null)" data-idle-end="@(SignedIn ? "900" : null)">
+    <header class="vx-auth__topbar">
+        <div class="vx-auth__topbar-inner">
+            <a href="/" class="vx-auth__brand-title">@CompanyName</a>
+            <nav class="vx-auth__languages" aria-label="@T["ui.language"]">
+                <a href="/culture/en?returnUrl=@ReturnHere" hreflang="en" lang="en" aria-current="@(Lang == "en" ? "true" : null)">EN</a>
+                <a href="/culture/fr?returnUrl=@ReturnHere" hreflang="fr" lang="fr" aria-current="@(Lang == "fr" ? "true" : null)">FR</a>
+                <a href="/culture/es?returnUrl=@ReturnHere" hreflang="es" lang="es" aria-current="@(Lang == "es" ? "true" : null)">ES</a>
+            </nav>
+        </div>
+    </header>
+    <main id="main-content" class="vx-auth__stage" aria-labelledby="vx-page-title">
+        <div class="vx-auth__terminal">
+            <header class="vx-auth__header">
+                <div class="ops-access-heading"><div><p class="ops-access-kicker">@L["access"]</p>
+                <h1 id="vx-page-title" class="vx-auth__title">@Title</h1>
+                @if (!string.IsNullOrWhiteSpace(Subtitle))
+                {
+                    <p class="vx-auth__subtitle">@Subtitle</p>
+                }
+                </div><AccessIllustration /></div>
+            </header>
+            <div class="vx-auth__content">
+                @ChildContent
+            </div>
+        </div>
+    </main>
+    @if (SignedIn)
+    {
+        <div class="vx-auth__idle" role="alertdialog" aria-live="assertive" data-idle-warning hidden>
+            <p>@T["ui.session.idle_warning"]</p>
+            <button type="button" class="vx-button vx-button--primary" data-idle-stay>@T["ui.session.stay"]</button>
+        </div>
+        @* The idle timer signs out through this form (ops-session.js). *@
+        <form method="post" action="/staff/sign-out" data-sign-out hidden><AntiforgeryToken /></form>
+    }
+</body>
+</html>
+
+@code {
+    private static string Lang => System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+    private string CompanyName => string.IsNullOrWhiteSpace(Company) ? T["ui.app.name"] : Company;
+
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Subtitle { get; set; }
+
+    [Parameter]
+    public string? Company { get; set; }
+
+    [Parameter]
+    public bool SignedIn { get; set; }
+
+    [Parameter]
+    public string ReturnHere { get; set; } = "/staff";
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

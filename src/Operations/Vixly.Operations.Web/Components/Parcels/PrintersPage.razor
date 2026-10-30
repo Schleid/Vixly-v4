@@ -1,0 +1,98 @@
+@*
+=========================================================
+FILE: PrintersPage.razor
+
+PURPOSE:
+The label printers and dock print programs of a warehouse (Slice 3B).
+
+RESPONSIBILITIES:
+- Add or change a printer; print a test label
+- Register a print program (its key is shown once) or stop one
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); needs ops.printers.manage for this warehouse
+=========================================================
+*@
+@using Vixly.Operations.Domain.Printing
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@VixlyText.Format(T, "ui.printers.title", "warehouse", Warehouse.Code)" Company="@Company" Section="locations" Error="@Error" Info="@Info">
+    <div class="ops-list-bar" style="margin-bottom: 1.25rem;">
+        <a href="/staff/locations" class="vx-button vx-button--secondary">← @T["ui.storage.back"]</a>
+    </div>
+
+    @if (NewKey is not null)
+    {
+        <section class="ops-editor__panel ops-panel--restricted" aria-labelledby="key-title" style="margin-bottom: 1.5rem; padding: 1.25rem; background: var(--vx-surface-sunken, #f8fafc); border: 2px dashed var(--vx-warning, #eab308); border-radius: 8px;">
+            <h2 id="key-title" style="margin-top: 0; color: var(--vx-warning-text, #854d0e);">@T["ui.printers.key_title"]</h2>
+            <p>@T["ui.printers.key_hint"]</p>
+            <p><code style="font-family: var(--vx-font-mono); font-size: 1.15rem; font-weight: 700; padding: 0.35rem 0.65rem; background: var(--vx-surface-elevated, #fff); border: 1px solid var(--vx-border-strong, #cbd5e1); border-radius: 4px;">@NewKey</code></p>
+        </section>
+    }
+
+    <section class="ops-editor__panel" aria-labelledby="printers-title" style="margin-bottom: 1.5rem;">
+        <h2 id="printers-title" class="ops-panel__title">@T["ui.printers.printers"]</h2>
+        <p class="ops-editor__hint">@T["ui.printers.hint"]</p>
+        
+        @foreach (OperationsLabelPrinter printer in Printers)
+        {
+            <PrinterForm T="T" WarehouseId="Warehouse.Id" Printer="printer" />
+        }
+        <PrinterForm T="T" WarehouseId="Warehouse.Id" Printer="null" />
+    </section>
+
+    <section class="ops-editor__panel" aria-labelledby="agents-title">
+        <h2 id="agents-title" class="ops-panel__title">@T["ui.printers.agents"]</h2>
+        <p class="ops-editor__hint">@T["ui.printers.agents_hint"]</p>
+        
+        @if (Agents.Count > 0)
+        {
+            <div class="ops-agent-cards" style="margin-bottom: 1.25rem;">
+                @foreach (OperationsPrintAgent agent in Agents)
+                {
+                    <div class="ops-agent-card" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; margin-bottom: 0.5rem; background: var(--vx-surface-sunken, #f8fafc); border: 1px solid var(--vx-border-subtle, #e2e8f0); border-radius: 6px;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <strong style="font-size: 0.9375rem;">@agent.Name</strong>
+                            <span class="ops-status-pill @(agent.IsActive ? "ops-status-pill--positive" : "ops-status-pill--neutral")">
+                                @(agent.IsActive ? (agent.LastSeenUtc is { } seen ? VixlyText.Format(T, "ui.printers.seen", "time", seen.ToString("yyyy-MM-dd HH:mm")) : T["ui.printers.never_seen"].Value) : T["ui.printers.stopped"].Value)
+                            </span>
+                        </div>
+                        @if (agent.IsActive)
+                        {
+                            <form method="post" action="/staff/locations/warehouse/@Warehouse.Id/printers/agents/@agent.Id/stop">
+                                <AntiforgeryToken />
+                                <button type="submit" class="vx-button vx-button--secondary" style="height: 30px; padding: 0 0.75rem;">@T["ui.printers.stop"]</button>
+                            </form>
+                        }
+                    </div>
+                }
+            </div>
+        }
+
+        <form method="post" action="/staff/locations/warehouse/@Warehouse.Id/printers/agents" class="ops-inline-action-bar ops-list-bar">
+            <AntiforgeryToken />
+            <span class="ops-inline-action-bar__label">@T["ui.printers.agent_name"]:</span>
+            <label class="ops-inline-action-bar__field" style="flex: 1; max-width: 20rem;">
+                <span class="ops-screen-reader-text">@T["ui.printers.agent_name"]</span>
+                <input name="name" required maxlength="60" placeholder="Dock PC 1" class="ops-inline-action-bar__control" />
+            </label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.printers.register"]</button>
+        </form>
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsWarehouse Warehouse { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsLabelPrinter> Printers { get; set; } = Array.Empty<OperationsLabelPrinter>();
+
+    [Parameter] public IReadOnlyList<OperationsPrintAgent> Agents { get; set; } = Array.Empty<OperationsPrintAgent>();
+
+    [Parameter] public string? NewKey { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

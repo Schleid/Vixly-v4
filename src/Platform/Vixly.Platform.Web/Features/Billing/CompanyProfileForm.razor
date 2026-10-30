@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: CompanyProfileForm.razor
 
@@ -14,6 +14,7 @@ IMPORTANT NOTES:
   limited); documents never fetch a URL
 =========================================================
 *@
+@inherits Vixly.Shared.UI.Presenters.GuardedComponent
 @using Vixly.Platform.Application.UseCases.Billing
 @using Vixly.Platform.Domain.Billing
 @using Vixly.Shared.Kernel.Errors
@@ -21,60 +22,116 @@ IMPORTANT NOTES:
 
 <div id="company-profile"><VxCard Title="@T["ui.billing_settings.company_profile"]">
     <p class="vx-hint">@T["ui.billing_settings.company_profile_help"]</p>
-    <form class="vx-form" @onsubmit="() => OnSave.InvokeAsync(_model)">
-        <fieldset class="vx-fieldset" disabled="@(!CanEdit)">
-            <label for="profile-legal">@T["ui.tenants.legal_name"]</label>
-            <input id="profile-legal" @bind="_model.LegalName" maxlength="200" required />
-            <label for="profile-trading">@T["ui.tenants.trading_name"]</label>
-            <input id="profile-trading" @bind="_model.TradingName" maxlength="200" />
-            <label for="profile-email">@T["ui.billing_settings.email"]</label>
-            <input id="profile-email" type="email" @bind="_model.Email" maxlength="254" required />
-            <label for="profile-phone">@T["ui.billing_settings.phone"]</label>
-            <input id="profile-phone" type="tel" @bind="_model.Phone" maxlength="30" required />
-            <label for="profile-line1">@T["ui.tenants.address_line1"]</label>
-            <input id="profile-line1" @bind="_model.Line1" maxlength="200" required />
-            <label for="profile-line2">@T["ui.tenants.address_line2"]</label>
-            <input id="profile-line2" @bind="_model.Line2" maxlength="200" />
-            <label for="profile-city">@T["ui.tenants.city"]</label>
-            <input id="profile-city" @bind="_model.City" maxlength="100" required />
-            <label for="profile-region">@T["ui.tenants.state_province"]</label>
-            <input id="profile-region" @bind="_model.StateProvince" maxlength="100" />
-            <label for="profile-postal">@T["ui.tenants.postal_code"]</label>
-            <input id="profile-postal" @bind="_model.PostalCode" maxlength="20" />
-            <label for="profile-country">@T["ui.tenants.country"]</label>
-            <select id="profile-country" @bind="_model.CountryCode" required>
-                <option value="">-</option>
-                @foreach ((string country, string name) in PlatformDisplay.Countries(T))
-                {
-                    <option value="@country">@name</option>
-                }
-            </select>
-            <label for="profile-tax">@T["ui.billing_settings.tax_id"]</label>
-            <input id="profile-tax" @bind="_model.TaxId" maxlength="50" />
-            <label for="profile-website">@T["ui.billing_settings.website"]</label>
-            <input id="profile-website" type="url" @bind="_model.Website" maxlength="200" placeholder="https://" />
-            <label for="profile-support-email">@T["ui.billing_settings.support_email"]</label>
-            <input id="profile-support-email" type="email" @bind="_model.SupportEmail" maxlength="254" />
-            <label for="profile-support-phone">@T["ui.billing_settings.support_phone"]</label>
-            <input id="profile-support-phone" type="tel" @bind="_model.SupportPhone" maxlength="32" aria-describedby="profile-support-help" />
-            <p id="profile-support-help" class="vx-hint">@T["ui.billing_settings.support_help"]</p>
+    <form class="vx-form" @onsubmit="() => OnSave.InvokeAsync(_model)" style="max-width: 100%;">
+        <fieldset class="vx-fieldset" disabled="@(!CanEdit)" style="border: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.25rem;">
+            <!-- Names -->
+            <div class="vx-form-grid-2">
+                <div class="vx-field-compact">
+                    <label for="profile-legal">@T["ui.tenants.legal_name"]</label>
+                    <input id="profile-legal" @bind="_model.LegalName" maxlength="200" required />
+                </div>
+                <div class="vx-field-compact">
+                    <label for="profile-trading">@T["ui.tenants.trading_name"]</label>
+                    <input id="profile-trading" @bind="_model.TradingName" maxlength="200" />
+                </div>
+            </div>
+
+            <!-- Billing Contact & Tax -->
+            <div class="vx-form-grid-2">
+                <div class="vx-field-compact">
+                    <label for="profile-email">@T["ui.billing_settings.email"]</label>
+                    <input id="profile-email" type="email" @bind="_model.Email" maxlength="254" required />
+                </div>
+                <div class="vx-field-compact">
+                    <label for="profile-phone">@T["ui.billing_settings.phone"]</label>
+                    <input id="profile-phone" type="tel" @bind="_model.Phone" maxlength="30" required />
+                </div>
+            </div>
+
+            <!-- Support Contact & Online -->
+            <div class="vx-form-grid-2">
+                <div class="vx-field-compact">
+                    <label for="profile-support-email">@T["ui.billing_settings.support_email"]</label>
+                    <input id="profile-support-email" type="email" @bind="_model.SupportEmail" maxlength="254" />
+                </div>
+                <div class="vx-field-compact">
+                    <label for="profile-support-phone">@T["ui.billing_settings.support_phone"]</label>
+                    <input id="profile-support-phone" type="tel" @bind="_model.SupportPhone" maxlength="32" aria-describedby="profile-support-help" />
+                    <p id="profile-support-help" class="vx-hint">@T["ui.billing_settings.support_help"]</p>
+                </div>
+            </div>
+
+            <div class="vx-form-grid-2">
+                <div class="vx-field-compact">
+                    <label for="profile-tax">@T["ui.billing_settings.tax_id"]</label>
+                    <input id="profile-tax" @bind="_model.TaxId" maxlength="50" />
+                </div>
+                <div class="vx-field-compact">
+                    <label for="profile-website">@T["ui.billing_settings.website"]</label>
+                    <input id="profile-website" type="url" @bind="_model.Website" maxlength="200" placeholder="https://" />
+                </div>
+            </div>
+
+            <!-- Address -->
+            <div style="padding-top: 1rem; border-top: 1px solid var(--vx-color-border); display: flex; flex-direction: column; gap: 0.75rem;">
+                <div class="vx-form-grid-2">
+                    <div class="vx-field-compact">
+                        <label for="profile-line1">@T["ui.tenants.address_line1"]</label>
+                        <input id="profile-line1" @bind="_model.Line1" maxlength="200" required />
+                    </div>
+                    <div class="vx-field-compact">
+                        <label for="profile-line2">@T["ui.tenants.address_line2"]</label>
+                        <input id="profile-line2" @bind="_model.Line2" maxlength="200" />
+                    </div>
+                </div>
+                <div class="vx-form-grid-4">
+                    <div class="vx-field-compact">
+                        <label for="profile-city">@T["ui.tenants.city"]</label>
+                        <input id="profile-city" @bind="_model.City" maxlength="100" required />
+                    </div>
+                    <div class="vx-field-compact">
+                        <label for="profile-region">@T["ui.tenants.state_province"]</label>
+                        <input id="profile-region" @bind="_model.StateProvince" maxlength="100" />
+                    </div>
+                    <div class="vx-field-compact">
+                        <label for="profile-postal">@T["ui.tenants.postal_code"]</label>
+                        <input id="profile-postal" @bind="_model.PostalCode" maxlength="20" />
+                    </div>
+                    <div class="vx-field-compact">
+                        <label for="profile-country">@T["ui.tenants.country"]</label>
+                        <select id="profile-country" @bind="_model.CountryCode" required>
+                            <option value="">-</option>
+                            @foreach ((string country, string name) in PlatformDisplay.Countries(T))
+                            {
+                                <option value="@country">@name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
         </fieldset>
         @if (CanEdit)
         {
-            <div class="vx-actions">
+            <div class="vx-actions" style="margin-top: 0.75rem;">
                 <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@IsBusy">@T["ui.billing_settings.save_profile"]</VxButton>
             </div>
         }
     </form>
     @if (Profile is not null)
     {
-        <p>@T[Profile.HasLogo ? "ui.billing_settings.logo_set" : "ui.billing_settings.logo_none"]</p>
-        @if (CanEdit)
-        {
-            <label for="profile-logo">@T["ui.billing_settings.logo"]</label>
-            <InputFile id="profile-logo" accept="image/png,image/jpeg" OnChange="UploadAsync" aria-describedby="profile-logo-help" />
-            <p id="profile-logo-help" class="vx-hint">@VixlyText.Format(T, "ui.billing_settings.logo_help", "maxKilobytes", PlatformBillingLimits.MaxLogoKilobytes)</p>
-        }
+        <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--vx-color-border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <strong style="font-size: 0.84rem; display: block;">@T["ui.billing_settings.logo"]</strong>
+                <span class="vx-hint">@T[Profile.HasLogo ? "ui.billing_settings.logo_set" : "ui.billing_settings.logo_none"]</span>
+            </div>
+            @if (CanEdit)
+            {
+                <div style="display: flex; flex-direction: column; gap: 0.25rem; min-width: 14rem;">
+                    <InputFile id="profile-logo" accept="image/png,image/jpeg" OnChange="UploadAsync" aria-describedby="profile-logo-help" style="font-size: 0.8125rem;" />
+                    <span id="profile-logo-help" class="vx-hint">@VixlyText.Format(T, "ui.billing_settings.logo_help", "maxKilobytes", PlatformBillingLimits.MaxLogoKilobytes)</span>
+                </div>
+            }
+        </div>
     }
 </VxCard></div>
 

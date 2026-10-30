@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <data name="portal" xml:space="preserve">
+    <value>Portail des opérations</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="badge" xml:space="preserve">
+    <value>Espace du personnel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="eyebrow" xml:space="preserve">
+    <value>Vos opérations, connectées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="welcome" xml:space="preserve">
+    <value>Heureux de vous revoir,</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="welcome_fallback" xml:space="preserve">
+    <value>Heureux de vous revoir.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="body" xml:space="preserve">
+    <value>Votre équipe, vos expéditions et votre activité en entrepôt. Un espace de travail connecté.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="shipments" xml:space="preserve">
+    <value>Expéditions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="shipments_body" xml:space="preserve">
+    <value>Suivez chaque mouvement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="warehouses" xml:space="preserve">
+    <value>Entrepôts</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="warehouses_body" xml:space="preserve">
+    <value>Gardez le travail connecté</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="team" xml:space="preserve">
+    <value>Votre équipe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="team_body" xml:space="preserve">
+    <value>Un espace de travail partagé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="heading" xml:space="preserve">
+    <value>Connexion du personnel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="subtitle" xml:space="preserve">
+    <value>Connectez-vous à l’espace de travail de votre entreprise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="protected" xml:space="preserve">
+    <value>Accès protégé réservé au personnel autorisé de l’entreprise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="show_password" xml:space="preserve">
+    <value>Afficher le mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="hide_password" xml:space="preserve">
+    <value>Masquer le mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="password_placeholder" xml:space="preserve">
+    <value>Saisissez votre mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email_placeholder" xml:space="preserve">
+    <value>personnel@entreprise.com</value>
+    <comment>needs-review</comment>
+  </data>
+</root>

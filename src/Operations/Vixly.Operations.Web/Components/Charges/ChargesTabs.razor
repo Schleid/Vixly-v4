@@ -1,0 +1,26 @@
+﻿@*
+=========================================================
+FILE: ChargesTabs.razor
+
+PURPOSE:
+The Air, Ocean and Ground tabs of the Prices page (Slice 4C, owner: each mode on its own).
+
+RESPONSIBILITIES:
+- Link to each mode; mark the one shown
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+<nav class="ops-editor__tabs" aria-label="@T["ui.charges.modes"]">
+    @foreach (OperationsTransportMode mode in Enum.GetValues<OperationsTransportMode>())
+    {
+        <a href="/staff/charges?mode=@mode.ToString().ToLowerInvariant()" aria-current="@(mode == Mode ? "page" : null)">@T["ui.charges.mode." + mode]</a>
+    }
+</nav>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public OperationsTransportMode Mode { get; set; }
+}

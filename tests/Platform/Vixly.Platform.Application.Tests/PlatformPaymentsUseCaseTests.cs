@@ -272,9 +272,13 @@ public sealed class PlatformPaymentsUseCaseTests
         PlatformOutboxWriter outbox = _kit.Kit.Tenants.Outbox();
         outbox.Write(PlatformMessageTypes.InvoicePaid, tenantId, new PlatformInvoicePaid(Guid.NewGuid(), "INV-2026-000001", tenantId, null, 10m, "USD", _kit.Now));
 
-        await new PlatformRegistrationPaidHandler(_kit.Kit.Tenants.Tenants, _kit.Kit.Tenants.Audit(), _kit.Kit.Tenants.Store, _kit.Kit.Tenants.Clock)
+        await new PlatformRegistrationPaidHandler(_kit.Kit.Tenants.Tenants, _kit.Kit.Tenants.Audit(), outbox, _kit.Kit.Tenants.Store, _kit.Kit.Tenants.Clock)
             .HandleAsync(_kit.Kit.Tenants.Tenants.Outbox.Last(), CancellationToken.None);
 
         Assert.Equal(PlatformTenantRegistrationStatus.PendingAccountSetup, registration.Status);
+        PlatformRegistrationAccountSetupReady ready = PlatformOutboxWriter.Read<PlatformRegistrationAccountSetupReady>(
+            Assert.Single(_kit.Kit.Tenants.Tenants.Outbox, message => message.Type == PlatformMessageTypes.RegistrationAccountSetupReady));
+        Assert.Equal(tenantId, ready.PlatformTenantId);
+        Assert.Equal(registration.Id, ready.RegistrationId);
     }
 }

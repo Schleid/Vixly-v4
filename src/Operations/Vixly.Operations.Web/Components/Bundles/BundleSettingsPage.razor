@@ -1,0 +1,68 @@
+@*
+=========================================================
+FILE: BundleSettingsPage.razor
+
+PURPOSE:
+Settings → Bundles (Slice 6A, D-1): the company's bundle types, what a target does, how consolidated shipments travel.
+
+RESPONSIBILITIES:
+- Edit the types, one per line; choose warn or refuse; choose repack or keep together
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The prefixes BD and CB are under Settings → Numbering
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.bundle_settings.title"]" Company="@Company" Section="bundle_settings" Error="@Error" Info="@Info">
+    <form method="post" action="/staff/settings/bundles" class="ops-editor__panel ops-editor__form">
+        <AntiforgeryToken />
+        <fieldset disabled="@(!CanEdit)">
+            <label>@T["ui.bundle_settings.types"]
+                <textarea name="types" rows="4" maxlength="@((OperationsBundleLimits.TypeMaxLength + 2) * OperationsBundleLimits.MaxTypes)" style="width: 100%; box-sizing: border-box;">@string.Join("\n", Types)</textarea>
+            </label>
+            <p class="ops-editor__hint">@VixlyText.Format(T, "ui.bundle_settings.types_hint", "count", OperationsBundleLimits.MaxTypes)</p>
+            <div class="ops-charges-duo" style="margin-top: 1rem;">
+                <fieldset style="padding: 0.75rem; border: 1px solid var(--vx-color-border); border-radius: 0.5rem;">
+                    <legend style="font-size: 0.8125rem; font-weight: 600; padding: 0 0.25rem;">@T["ui.bundle_settings.target"]</legend>
+                    <div class="ops-checkbox-group">
+                        @foreach (OperationsBundleTargetRule rule in Enum.GetValues<OperationsBundleTargetRule>())
+                        {
+                            <label class="ops-checkbox-label"><input type="radio" name="rule" value="@rule" checked="@(rule == TargetRule)" required /> <span>@T["ui.bundle_settings.target." + rule]</span></label>
+                        }
+                    </div>
+                </fieldset>
+                <fieldset style="padding: 0.75rem; border: 1px solid var(--vx-color-border); border-radius: 0.5rem;">
+                    <legend style="font-size: 0.8125rem; font-weight: 600; padding: 0 0.25rem;">@T["ui.bundle_settings.way"]</legend>
+                    <div class="ops-checkbox-group">
+                        @foreach (OperationsConsolidationWay way in Enum.GetValues<OperationsConsolidationWay>())
+                        {
+                            <label class="ops-checkbox-label"><input type="radio" name="way" value="@way" checked="@(way == Way)" required /> <span>@T["ui.boxes.way." + way] <small style="color: var(--vx-color-text-muted);">(@T["ui.bundle_settings.way_hint." + way])</small></span></label>
+                        }
+                    </div>
+                </fieldset>
+            </div>
+        </fieldset>
+        @if (CanEdit)
+        {
+            <p class="ops-editor__actions" style="margin-top: 1rem;"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></p>
+        }
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<string> Types { get; set; } = Array.Empty<string>();
+
+    [Parameter] public OperationsBundleTargetRule TargetRule { get; set; }
+
+    [Parameter] public OperationsConsolidationWay Way { get; set; }
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

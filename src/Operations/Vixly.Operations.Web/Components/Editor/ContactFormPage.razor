@@ -1,0 +1,48 @@
+@*
+=========================================================
+FILE: ContactFormPage.razor
+
+PURPOSE:
+The form for the contact of one serving country.
+
+RESPONSIBILITIES:
+- Render the form for the contact of one serving country
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); owner only (the use cases refuse others)
+- Static forms with antiforgery and the form guard (ADR-0019); placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inherits OperationsAllowedComponent
+@using Vixly.Operations.Domain.Access
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T[Form.ContactId is null ? "ui.editor.contact.add" : "ui.editor.contact.edit"]" Company="@Company" Section="locations" Error="@Error">
+    <form method="post" action="/staff/locations/contact" class="ops-editor__panel ops-editor__form">
+        <AntiforgeryToken />
+        <input type="hidden" name="contactId" value="@Form.ContactId" />
+        <CountrySelect Name="countryCode" Value="@Form.CountryCode" Class="ops-editor__form-span-2" />
+        <label class="ops-editor__form-span-4">@T["ui.editor.contact.label"] <input name="label" value="@Form.Label" maxlength="@OperationsLocationLimits.LabelMaxLength" /></label>
+        <label class="ops-editor__form-span-full">@T["ui.editor.contact.phones"]
+            <textarea name="phones" rows="4" required>@string.Join("\n", Form.Phones)</textarea>
+        </label>
+        <p class="ops-editor__hint" style="grid-column: 1 / -1;">@T["ui.editor.contact.phones_hint"]</p>
+        <label class="ops-editor__form-span-3">@T["ui.editor.contact.whatsapp"] <input type="tel" name="whatsApp" value="@Form.WhatsApp" maxlength="@OperationsLocationLimits.PhoneMaxLength" /></label>
+        <label class="ops-editor__form-span-3">@T["ui.editor.email"] <input type="email" name="email" value="@Form.Email" maxlength="@OperationsLocationLimits.EmailMaxLength" /></label>
+        <label class="ops-editor__form-span-4">@T["ui.editor.hours"] <input name="hours" value="@Form.Hours" maxlength="@OperationsLocationLimits.HoursMaxLength" /></label>
+        <label class="ops-editor__form-span-2">@T["ui.editor.contact.order"] <input type="number" name="sortOrder" value="@Form.SortOrder" min="0" max="999" /></label>
+        <div class="ops-editor__form-actions">
+            @if (Can(OperationsPermissions.BranchesManage)) { <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button> }
+            <a class="vx-button vx-button--secondary" href="/staff/locations">@T["ui.editor.cancel"]</a>
+        </div>
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public SaveOperationsCountryContactRequest Form { get; set; } = null!;
+
+    [Parameter] public string? Error { get; set; }
+}

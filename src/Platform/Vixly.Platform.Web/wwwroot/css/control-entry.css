@@ -1,0 +1,590 @@
+/* =========================================================
+   FILE: control-entry.css
+   PURPOSE: Creative executive entry console for Vixly Control plane.
+   STANDARDS:
+   - ADR-0012: Theme-provider compatible (light and dark mode tokens)
+   - ADR-0013: Design system foundations, comfortable density (40px inputs)
+   - Fits 1366x768 and 1920x1080 screens without vertical scrollbars
+   ========================================================= */
+
+body.control-entry {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--vx-color-bg-app);
+    color: var(--vx-color-text);
+    font-family: var(--vx-font);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+/* Chrome Top Bar - Authoritative Dark Shell in Both Themes */
+.control-entry__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    height: 56px;
+    padding: 0 clamp(1rem, 3vw, 2.5rem);
+    background: var(--vx-color-chrome-surface, #0F172A);
+    border-bottom: 1px solid var(--vx-color-chrome-border, #2B3950);
+    color: var(--vx-color-chrome-text, #CBD5E1);
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.control-entry__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    user-select: none;
+}
+
+.control-entry__brand img {
+    border-radius: 6px;
+    display: block;
+}
+
+.control-entry__brand-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #FFFFFF;
+}
+
+.control-entry__brand-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    background: var(--vx-color-chrome-hover, #1C2A42);
+    border: 1px solid var(--vx-color-chrome-border, #2B3950);
+    color: var(--vx-color-chrome-accent, #93C5FD);
+}
+
+.control-entry__telemetry {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background: var(--vx-color-chrome-hover, #1C2A42);
+    border: 1px solid var(--vx-color-chrome-border, #2B3950);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--vx-color-chrome-text, #CBD5E1);
+}
+
+.control-entry__status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--vx-color-chrome-success, #34D399);
+    box-shadow: 0 0 6px rgba(52, 211, 153, 0.6);
+    animation: vx-telemetry-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes vx-telemetry-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.9); }
+}
+
+.control-entry__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.control-entry__theme-btn {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    background: var(--vx-color-chrome-hover, #1C2A42);
+    border: 1px solid var(--vx-color-chrome-border, #2B3950);
+    color: var(--vx-color-chrome-text, #CBD5E1);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.control-entry__theme-btn:hover {
+    background: var(--vx-color-chrome-active, #1B3359);
+    color: #FFFFFF;
+    border-color: var(--vx-color-chrome-active-border, #6094DB);
+}
+
+:root .control-entry__icon-sun { display: none; }
+:root .control-entry__icon-moon { display: block; }
+:root[data-theme="dark"] .control-entry__icon-sun { display: block; }
+:root[data-theme="dark"] .control-entry__icon-moon { display: none; }
+
+.control-entry__languages {
+    display: flex;
+    padding: 2px;
+    border-radius: 6px;
+    background: var(--vx-color-chrome-hover, #1C2A42);
+    border: 1px solid var(--vx-color-chrome-border, #2B3950);
+    gap: 2px;
+}
+
+.control-entry__languages a {
+    display: grid;
+    place-items: center;
+    min-width: 32px;
+    height: 30px;
+    padding: 0 0.4rem;
+    border-radius: 4px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--vx-color-chrome-text-muted, #A8B7CC);
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.control-entry__languages a:hover {
+    color: #FFFFFF;
+    background: var(--vx-color-chrome-active, #1B3359);
+}
+
+.control-entry__languages a[aria-current="true"] {
+    color: #FFFFFF;
+    background: var(--vx-color-primary, #2563EB);
+}
+
+/* Stage & Dual-Wing Container */
+.control-entry__stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(0.75rem, 2vh, 1.75rem) clamp(1rem, 3vw, 2rem);
+    min-height: 0;
+}
+
+.control-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    width: min(100%, 58rem);
+    max-height: calc(100dvh - 56px - 2rem);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.05);
+}
+
+:root[data-theme="dark"] .control-card {
+    border-color: #1F2B45;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* Left Wing: Platform Governance Showcase */
+.control-card__showcase {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(1.25rem, 2.2vw, 1.85rem);
+    background: linear-gradient(150deg, #0A1224 0%, #0F1E3D 50%, #162C5B 100%);
+    color: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+}
+
+.control-card__showcase::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: 
+        radial-gradient(ellipse at 85% 15%, rgba(59, 130, 246, 0.25) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 90%, rgba(14, 165, 233, 0.15) 0%, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px;
+    pointer-events: none;
+}
+
+.control-card__showcase-header {
+    position: relative;
+    z-index: 1;
+}
+
+.control-card__showcase-pill {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    background: rgba(59, 130, 246, 0.18);
+    border: 1px solid rgba(147, 197, 253, 0.3);
+    color: #93C5FD;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    margin-bottom: 0.5rem;
+}
+
+.control-card__showcase-headline {
+    margin: 0 0 0.35rem;
+    font-size: clamp(1.15rem, 1.7vw, 1.4rem);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.025em;
+    color: #FFFFFF;
+}
+
+.control-card__showcase-desc {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: #94A3B8;
+    max-width: 26rem;
+}
+
+.control-card__artwork {
+    position: relative;
+    z-index: 1;
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-card__artwork img {
+    display: block;
+    max-width: 100%;
+    max-height: clamp(130px, 22vh, 200px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.4));
+    transition: transform 0.3s ease;
+}
+
+.control-card:hover .control-card__artwork img {
+    transform: scale(1.02);
+}
+
+.control-card__security-badges {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+}
+
+.control-card__security-badges span {
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #CBD5E1;
+}
+
+/* Right Wing: Credential Console */
+.control-card__console {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(1.25rem, 2.5vw, 2rem);
+    background: var(--vx-color-surface);
+    overflow-y: auto;
+}
+
+.control-card__heading {
+    margin-bottom: 1rem;
+}
+
+.control-card__heading h1 {
+    margin: 0 0 0.3rem;
+    font-size: 1.5rem;
+    font-weight: 750;
+    line-height: 1.2;
+    letter-spacing: -0.035em;
+    color: var(--vx-color-text);
+}
+
+.control-card__subtitle {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    color: var(--vx-color-text-muted);
+}
+
+.control-card__body {
+    display: flex;
+    flex-direction: column;
+}
+
+.control-card .vx-message {
+    margin-bottom: 0.85rem;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.8125rem;
+    border-radius: 6px;
+}
+
+/* Form Fields - Comfortable Density: 40px height */
+.control-card .vx-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin: 0;
+}
+
+.control-card .vx-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0;
+}
+
+.control-card .vx-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--vx-color-text);
+    margin: 0;
+}
+
+.control-card .vx-field__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.control-card .vx-auth__forgot {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--vx-color-link);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.control-card .vx-auth__forgot:hover {
+    text-decoration: underline;
+}
+
+.control-card .vx-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.control-card .vx-input-icon {
+    position: absolute;
+    left: 0.85rem;
+    color: var(--vx-color-text-subtle);
+    pointer-events: none;
+}
+
+.control-card .vx-input {
+    width: 100%;
+    height: 40px;
+    min-height: 40px;
+    padding: 0.5rem 0.85rem 0.5rem 2.5rem;
+    border: 1px solid var(--vx-color-border-control);
+    border-radius: 6px;
+    background: var(--vx-color-surface);
+    color: var(--vx-color-text);
+    font: inherit;
+    font-size: 0.875rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    box-sizing: border-box;
+}
+
+.control-card .vx-input:hover:not(:focus) {
+    border-color: var(--vx-color-text-muted);
+}
+
+.control-card .vx-input:focus {
+    border-color: var(--vx-color-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--vx-color-primary) 22%, transparent);
+}
+
+/* Primary Submit Button */
+.control-card .vx-button--primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 40px;
+    min-height: 40px;
+    margin-top: 0.2rem;
+    padding: 0 1.15rem;
+    border: 1px solid var(--vx-color-primary);
+    border-radius: 6px;
+    background: var(--vx-color-primary);
+    color: var(--vx-color-on-primary, #FFFFFF);
+    font-size: 0.84rem;
+    font-weight: 650;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.control-card .vx-button--primary:hover:not(:disabled) {
+    background: var(--vx-color-primary-hover);
+    border-color: var(--vx-color-primary-hover);
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+}
+
+.control-card .vx-button--primary:hover .vx-auth__submit-arrow {
+    transform: translateX(3px);
+}
+
+.control-card .vx-auth__submit-arrow {
+    transition: transform 0.15s ease;
+}
+
+/* Passkey & Divider */
+.control-card .vx-passkey {
+    margin-top: 0.15rem;
+}
+
+.control-card .vx-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0.75rem 0;
+    color: var(--vx-color-text-muted);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.control-card .vx-divider::before,
+.control-card .vx-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--vx-color-border);
+}
+
+.control-card .vx-button--passkey {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    width: 100%;
+    height: 40px;
+    min-height: 40px;
+    padding: 0 1rem;
+    border: 1px solid var(--vx-color-border);
+    border-radius: 6px;
+    background: var(--vx-color-surface-sunken);
+    color: var(--vx-color-text);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.control-card .vx-button--passkey:hover {
+    border-color: var(--vx-color-primary);
+    background: var(--vx-color-primary-soft);
+    color: var(--vx-color-primary);
+}
+
+.control-card .vx-passkey__icon-box {
+    display: grid;
+    place-items: center;
+    color: var(--vx-color-primary);
+}
+
+/* Authorized Only Seal */
+.control-entry__access {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    margin: 1rem 0 0;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--vx-color-border);
+    font-size: 0.6875rem;
+    color: var(--vx-color-text-muted);
+    text-align: center;
+}
+
+.control-entry__access svg {
+    flex-shrink: 0;
+    color: var(--vx-color-text-subtle);
+}
+
+/* Accessibility & Utility */
+.control-entry :is(a, button):focus-visible {
+    outline: 2px solid var(--vx-color-focus);
+    outline-offset: 2px;
+}
+
+.control-entry [hidden] {
+    display: none !important;
+}
+
+/* Responsive Behavior */
+@media (max-width: 900px) {
+    .control-card {
+        grid-template-columns: minmax(0, 1fr);
+        max-width: 28rem;
+        max-height: none;
+    }
+    .control-card__showcase {
+        padding: 1.25rem 1.5rem;
+    }
+    .control-card__artwork {
+        display: none;
+    }
+    .control-card__security-badges {
+        margin-top: 0.75rem;
+    }
+}
+
+@media (max-width: 520px) {
+    .control-entry__bar {
+        padding: 0 0.75rem;
+    }
+    .control-entry__telemetry {
+        display: none;
+    }
+    .control-entry__stage {
+        padding: 1rem 0.75rem;
+        align-items: flex-start;
+    }
+    .control-card__console {
+        padding: 1.25rem;
+    }
+    /* Touch target guarantee >= 44px */
+    .control-card .vx-input,
+    .control-card .vx-button--primary,
+    .control-card .vx-button--passkey {
+        height: 44px;
+        min-height: 44px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .control-entry__status-dot {
+        animation: none;
+    }
+    .control-card .vx-input,
+    .control-card .vx-button--primary,
+    .control-card .vx-button--passkey,
+    .control-card .vx-auth__submit-arrow,
+    .control-card__artwork img {
+        transition: none !important;
+        transform: none !important;
+    }
+}

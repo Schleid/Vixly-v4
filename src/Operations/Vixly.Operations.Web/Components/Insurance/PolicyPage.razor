@@ -1,0 +1,223 @@
+@*
+=========================================================
+FILE: PolicyPage.razor
+
+PURPOSE:
+Record or change one of the company's insurance policies, and keep its documents (Slice 5B, design section 3).
+
+RESPONSIBILITIES:
+- What it covers and its kind; insurer and broker; number and period; limits and deductible; risks, modes, territory, exclusions; duties to the insurer
+- Documents: upload, open, remove; archive or bring back
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Shown again with what was typed when refused
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@(Policy is null ? T["ui.insurance_module.add_policy"].Value : Title)" Company="@Company" Section="insurance" Error="@Error" Info="@Info">
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <a href="/staff/insurance" class="vx-button vx-button--secondary">@T["ui.insurance_module.back"]</a>
+            @if (Policy is not null && Covers.Count > 0)
+            {
+                <span class="ops-editor__hint" style="margin: 0;">@VixlyText.Format(T, "ui.insurance_module.behind_covers", "modes", string.Join(", ", Covers.Select(cover => T["ui.insurance_module.mode." + cover.Mode].Value)))</span>
+            }
+        </div>
+        <div class="ops-list-bar__actions" style="display: flex; gap: 0.5rem; align-items: center;">
+            @if (Policy is not null)
+            {
+                <span class="ops-editor__status" data-status="@State">@T["ui.insurance_module.state." + State]</span>
+                @if (CanManage)
+                {
+                    <form method="post" action="/staff/insurance/policies/@Policy.Id/archive" class="ops-editor__inline" style="margin: 0;">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="archived" value="@(Policy.IsArchived ? "false" : "true")" />
+                        <button type="submit" class="vx-button vx-button--secondary">@(Policy.IsArchived ? T["ui.insurance_module.restore"] : T["ui.insurance_module.archive"])</button>
+                    </form>
+                }
+            }
+        </div>
+    </div>
+
+    <form method="post" action="@(Policy is null ? "/staff/insurance/policies/new" : "/staff/insurance/policies/" + Policy.Id)" class="ops-editor__panel ops-compact-tabs" data-section-tabs="policy" data-tabs-label="@Title">
+        <AntiforgeryToken />
+
+        <section id="policy-cover-panel" data-tab-label="@T["ui.insurance_module.scope_of_cover"]" data-tab-default class="ops-editor__form">
+            <fieldset class="ops-editor__form-full" style="grid-column: 1 / -1; border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.85rem 1rem; margin-bottom: 0.75rem;" disabled="@(!CanManage)">
+                <legend style="padding: 0 0.35rem; font-weight: 600; font-size: 0.8125rem;">@T["ui.insurance_module.what"]</legend>
+                <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+                    @foreach (OperationsPolicyScope scope in Enum.GetValues<OperationsPolicyScope>())
+                    {
+                        <label class="ops-checkbox-label" style="display: inline-flex; flex-direction: row; align-items: flex-start; gap: 0.45rem; cursor: pointer; font-size: 0.8125rem;">
+                            <input type="radio" name="scope" value="@scope" checked="@(Terms.Scope == scope)" required style="width: 1rem; height: 1rem; margin-top: 0.15rem; flex-shrink: 0;" />
+                            <div>
+                                <strong>@T["ui.insurance_module.scope." + scope]</strong>
+                                <div style="font-size: 0.75rem; color: var(--vx-color-text-muted, #64748b);">@T["ui.insurance_module.scope_hint." + scope]</div>
+                            </div>
+                        </label>
+                    }
+                </div>
+                <label style="max-width: 22rem; display: flex; flex-direction: column; gap: 0.25rem;">
+                    <span style="font-weight: 600; font-size: 0.8125rem;">@T["ui.insurance_module.kind"]</span>
+                    <select name="kind" required style="height: 32px;">
+                        @foreach (OperationsPolicyKind kind in Enum.GetValues<OperationsPolicyKind>()) { <option value="@kind" selected="@(Terms.Kind == kind)">@T["ui.insurance_module.kind." + kind]</option> }
+                    </select>
+                </label>
+                <p class="ops-editor__hint" style="margin-top: 0.35rem; margin-bottom: 0;">@T["ui.insurance_module.kind_hint"]</p>
+            </fieldset>
+
+            <fieldset class="ops-editor__form-full" style="grid-column: 1 / -1; border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.85rem 1rem;" disabled="@(!CanManage)">
+                <legend style="padding: 0 0.35rem; font-weight: 600; font-size: 0.8125rem;">@T["ui.insurance_module.insurer"]</legend>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.75rem;">
+                    <label><span>@T["ui.insurance_module.insurer_name"]</span><input name="insurer" value="@Terms.InsurerName" maxlength="@OperationsInsurancePolicy.NameMaxLength" /></label>
+                    <label><span>@T["ui.insurance_module.number"]</span><input name="number" value="@Terms.PolicyNumber" maxlength="@OperationsInsurancePolicy.NumberMaxLength" /></label>
+                    <label><span>@T["ui.insurance_module.email"]</span><input name="insurer_email" value="@Terms.InsurerEmail" maxlength="@OperationsInsurancePolicy.ContactMaxLength" /></label>
+                    <label><span>@T["ui.insurance_module.phone"]</span><input name="insurer_phone" value="@Terms.InsurerPhone" maxlength="@OperationsInsurancePolicy.ContactMaxLength" /></label>
+                    <label><span>@T["ui.insurance_module.claims_email"]</span><input name="claims_email" value="@Terms.ClaimsEmail" maxlength="@OperationsInsurancePolicy.ContactMaxLength" /></label>
+                    <label><span>@T["ui.insurance_module.claims_phone"]</span><input name="claims_phone" value="@Terms.ClaimsPhone" maxlength="@OperationsInsurancePolicy.ContactMaxLength" /></label>
+                    <label><span>@T["ui.insurance_module.broker"]</span><input name="broker" value="@Terms.BrokerName" maxlength="@OperationsInsurancePolicy.NameMaxLength" /></label>
+                    <label><span>@T["ui.insurance_module.broker_email"]</span><input name="broker_email" value="@Terms.BrokerEmail" maxlength="@OperationsInsurancePolicy.ContactMaxLength" /></label>
+                    <label><span>@T["ui.insurance_module.broker_phone"]</span><input name="broker_phone" value="@Terms.BrokerPhone" maxlength="@OperationsInsurancePolicy.ContactMaxLength" /></label>
+                </div>
+                <p class="ops-editor__hint" style="margin-top: 0.5rem; margin-bottom: 0;">@T["ui.insurance_module.insurer_hint"]</p>
+            </fieldset>
+        </section>
+
+        <section id="policy-limits-panel" data-tab-label="@T["ui.insurance_module.period_limits"]" class="ops-editor__form">
+            <fieldset class="ops-editor__form-full" style="grid-column: 1 / -1; border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.85rem 1rem; margin-bottom: 0.75rem;" disabled="@(!CanManage)">
+                <legend style="padding: 0 0.35rem; font-weight: 600; font-size: 0.8125rem;">@T["ui.insurance_module.period_limits"]</legend>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.75rem;">
+                    <label><span>@T["ui.insurance_module.starts"]</span><input name="starts" type="date" value="@Terms.StartsOn?.ToString("yyyy-MM-dd")" /></label>
+                    <label><span>@T["ui.insurance_module.ends"]</span><input name="ends" type="date" value="@Terms.EndsOn?.ToString("yyyy-MM-dd")" /></label>
+                    <label><span>@T["ui.insurance_module.currency"]</span><input name="currency" value="@(Terms.CurrencyCode ?? Currency ?? "USD")" maxlength="3" size="4" required /></label>
+                    <label><span>@T["ui.insurance_module.limit_shipment"]</span><input name="limit_shipment" inputmode="decimal" value="@Number(Terms.LimitPerShipment)" /></label>
+                    <label><span>@T["ui.insurance_module.limit_conveyance"]</span><input name="limit_conveyance" inputmode="decimal" value="@Number(Terms.LimitPerConveyance)" /></label>
+                    <label><span>@T["ui.insurance_module.limit_location"]</span><input name="limit_location" inputmode="decimal" value="@Number(Terms.LimitPerLocation)" /></label>
+                    <label><span>@T["ui.insurance_module.limit_year"]</span><input name="limit_year" inputmode="decimal" value="@Number(Terms.LimitPerYear)" /></label>
+                    <label><span>@T["ui.insurance_module.deductible_amount"]</span><input name="deductible_amount" inputmode="decimal" value="@Number(Terms.DeductibleAmount)" /></label>
+                    <label><span>@T["ui.insurance_module.deductible_percent"]</span><input name="deductible_percent" inputmode="decimal" value="@Number(Terms.DeductiblePercent)" /></label>
+                    <label><span>@T["ui.insurance_module.deductible_minimum"]</span><input name="deductible_minimum" inputmode="decimal" value="@Number(Terms.DeductibleMinimum)" /></label>
+                </div>
+            </fieldset>
+
+            <fieldset class="ops-editor__form-full" style="grid-column: 1 / -1; border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.85rem 1rem; margin-bottom: 0.75rem;" disabled="@(!CanManage)">
+                <legend style="padding: 0 0.35rem; font-weight: 600; font-size: 0.8125rem;">@T["ui.insurance_module.scope_of_cover"]</legend>
+                <div style="display: flex; gap: 1.25rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+                    @foreach (OperationsPolicyRisks risk in Enum.GetValues<OperationsPolicyRisks>().Where(value => value != OperationsPolicyRisks.None))
+                    {
+                        <label class="ops-checkbox-label" style="display: inline-flex; flex-direction: row; align-items: center; gap: 0.45rem; cursor: pointer; font-size: 0.8125rem;">
+                            <input type="checkbox" name="risks" value="@risk" checked="@Terms.Risks.HasFlag(risk)" style="width: 1rem; height: 1rem; margin: 0; flex-shrink: 0;" />
+                            <span>@T["ui.insurance_module.risk." + risk]</span>
+                        </label>
+                    }
+                </div>
+                <div style="display: flex; gap: 1.25rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+                    @foreach (OperationsPolicyModes mode in Enum.GetValues<OperationsPolicyModes>().Where(value => value != OperationsPolicyModes.None))
+                    {
+                        <label class="ops-checkbox-label" style="display: inline-flex; flex-direction: row; align-items: center; gap: 0.45rem; cursor: pointer; font-size: 0.8125rem;">
+                            <input type="checkbox" name="modes" value="@mode" checked="@Terms.Modes.HasFlag(mode)" style="width: 1rem; height: 1rem; margin: 0; flex-shrink: 0;" />
+                            <span>@T["ui.insurance_module.mode." + mode]</span>
+                        </label>
+                    }
+                </div>
+                <p class="ops-editor__hint" style="margin-top: 0; margin-bottom: 0.75rem;">@T["ui.insurance_module.modes_hint"]</p>
+                <label style="display: flex; flex-direction: column; gap: 0.25rem; max-width: 24rem;">
+                    <span style="font-weight: 600; font-size: 0.8125rem;">@T["ui.insurance_module.territory"]</span>
+                    <input name="territory" value="@Terms.Territory" maxlength="@OperationsInsurancePolicy.TerritoryMaxLength" />
+                </label>
+            </fieldset>
+
+            <fieldset class="ops-editor__form-full" style="grid-column: 1 / -1; border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.85rem 1rem;" disabled="@(!CanManage)">
+                <legend style="padding: 0 0.35rem; font-weight: 600; font-size: 0.8125rem;">@T["ui.insurance.exclusions"]</legend>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 0.5rem 1rem; margin-bottom: 0.75rem;">
+                    @foreach (OperationsInsuranceExclusions exclusion in Enum.GetValues<OperationsInsuranceExclusions>().Where(value => value is not (OperationsInsuranceExclusions.None or OperationsInsuranceExclusions.Standard)))
+                    {
+                        <label class="ops-checkbox-label" style="display: inline-flex; flex-direction: row; align-items: center; gap: 0.45rem; cursor: pointer; font-size: 0.8125rem;">
+                            <input type="checkbox" name="exclusions" value="@exclusion" checked="@Terms.Exclusions.HasFlag(exclusion)" style="width: 1rem; height: 1rem; margin: 0; flex-shrink: 0;" />
+                            <span>@T["ui.insurance.exclusion." + exclusion]</span>
+                        </label>
+                    }
+                </div>
+                <label style="display: flex; flex-direction: column; gap: 0.25rem;">
+                    <span style="font-weight: 600; font-size: 0.8125rem;">@T["ui.insurance_module.other_exclusions"]</span>
+                    <textarea name="other_exclusions" rows="3" maxlength="@OperationsInsurancePolicy.TextMaxLength">@Terms.OtherExclusions</textarea>
+                </label>
+            </fieldset>
+        </section>
+
+        <section id="policy-duties-panel" data-tab-label="@T["ui.insurance_module.duties"]" class="ops-editor__form">
+            <fieldset class="ops-editor__form-full" style="grid-column: 1 / -1; border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.85rem 1rem;" disabled="@(!CanManage)">
+                <legend style="padding: 0 0.35rem; font-weight: 600; font-size: 0.8125rem;">@T["ui.insurance_module.duties"]</legend>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <label><span>@T["ui.insurance_module.notice_days"]</span><input name="notice_days" inputmode="numeric" value="@Terms.NoticeDays" /></label>
+                    <label><span>@T["ui.insurance_module.declarations"]</span>
+                        <select name="declarations">
+                            @foreach (OperationsDeclarationFrequency frequency in Enum.GetValues<OperationsDeclarationFrequency>()) { <option value="@frequency" selected="@(Terms.Declarations == frequency)">@T["ui.insurance_module.declarations." + frequency]</option> }
+                        </select>
+                    </label>
+                </div>
+                <label style="display: flex; flex-direction: column; gap: 0.25rem;">
+                    <span style="font-weight: 600; font-size: 0.8125rem;">@T["ui.insurance_module.notes"]</span>
+                    <textarea name="notes" rows="3" maxlength="@OperationsInsurancePolicy.TextMaxLength">@Terms.Notes</textarea>
+                </label>
+            </fieldset>
+        </section>
+
+        @if (CanManage)
+        {
+            <div class="ops-editor__form-actions" style="grid-column: 1 / -1; width: 100%; display: flex; align-items: center; gap: 0.75rem; margin-top: 1rem;">
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+                <a href="/staff/insurance" class="vx-button vx-button--secondary">@T["ui.editor.cancel"]</a>
+            </div>
+        }
+    </form>
+
+    @if (Policy is not null)
+    {
+        <PolicyDocumentsPanel Policy="@Policy" CanManage="@CanManage" />
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsInsurancePolicy? Policy { get; set; }
+
+    [Parameter] public OperationsPolicyTerms? Entered { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsInsurancePlan> Covers { get; set; } = Array.Empty<OperationsInsurancePlan>();
+
+    [Parameter] public DateOnly Today { get; set; }
+
+    [Parameter] public bool CanManage { get; set; }
+
+    [Parameter] public string? Currency { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private string Title => Policy!.Kind == OperationsPolicyKind.SelfInsured ? T["ui.insurance_module.kind.SelfInsured"].Value : Policy.Name;
+
+    private string State =>
+        Policy is null ? "new"
+        : Policy.IsArchived ? "archived"
+        : Policy.EndsSoon(Today) ? "ending"
+        : Policy.IsInForce(Today) ? "in_force"
+        : Policy.StartsOn > Today ? "future"
+        : "ended";
+
+    // What was typed, else the policy, else a new cargo policy with the usual risks and exclusions.
+    private OperationsPolicyTerms Terms => Entered ?? (Policy is { } policy
+        ? new OperationsPolicyTerms(policy.Scope, policy.Kind, policy.InsurerName, policy.InsurerEmail, policy.InsurerPhone, policy.ClaimsEmail, policy.ClaimsPhone, policy.BrokerName,
+            policy.BrokerEmail, policy.BrokerPhone, policy.PolicyNumber, policy.StartsOn, policy.EndsOn, policy.CurrencyCode, policy.LimitPerShipment, policy.LimitPerConveyance,
+            policy.LimitPerLocation, policy.LimitPerYear, policy.DeductibleAmount, policy.DeductiblePercent, policy.DeductibleMinimum, policy.Risks, policy.Modes, policy.Territory,
+            policy.Exclusions, policy.OtherExclusions, policy.NoticeDays, policy.Declarations, policy.Notes)
+        : new OperationsPolicyTerms(OperationsPolicyScope.CustomerShipments, OperationsPolicyKind.OpenCargo, null, null, null, null, null, null, null, null, null, null, null, null,
+            null, null, null, null, null, null, null, OperationsPolicyRisks.Loss | OperationsPolicyRisks.Damage | OperationsPolicyRisks.Theft, OperationsPolicyModes.None, null,
+            OperationsInsuranceExclusions.Standard, null, null, OperationsDeclarationFrequency.None, null));
+
+    private static string? Number(decimal? value) => value?.ToString("0.###", CultureInfo.InvariantCulture);
+}

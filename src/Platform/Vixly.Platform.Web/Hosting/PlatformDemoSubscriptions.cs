@@ -236,7 +236,8 @@ public sealed class PlatformDemoSubscriptions
     private void Subscribe(PlatformTenantListItem tenant, PlatformTenant? record, DemoPlans plans, int scenario, bool withOverride, Guid actor, DateTimeOffset now)
     {
         List<PlatformSubscriptionEvent> events = new();
-        int kind = scenario % 8;
+        // Tenant codes are random, so the situations land on different companies each time; the Operations demo companies stay paid.
+        int kind = PlatformDemoTenants.OperationsSlugs.Contains(tenant.Slug) ? 2 : scenario % 8;
         PlatformPlan plan = kind switch
         {
             0 or 4 => plans.Basic,

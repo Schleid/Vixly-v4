@@ -1,4 +1,5 @@
 ﻿using Vixly.Platform.Application.Audit;
+using Vixly.Platform.Application.Messaging;
 using Vixly.Platform.Application.Ports;
 using Vixly.Platform.Application.Security;
 using Vixly.Platform.Application.UseCases;
@@ -190,6 +191,14 @@ public sealed class SelectRegistrationPlanUseCase
         }
 
         _administration.Subscriptions.Add(subscription);
+
+        if (registration.Status == PlatformTenantRegistrationStatus.PendingAccountSetup)
+        {
+            _administration.Outbox.Write(
+                PlatformMessageTypes.RegistrationAccountSetupReady,
+                tenantId,
+                new PlatformRegistrationAccountSetupReady(tenantId, registration.Id, utcNow));
+        }
 
         foreach ((PlatformSubscriptionEvent change, string action) in changes)
         {

@@ -34,6 +34,8 @@ internal sealed class FakeLicensingStore : IPlatformLicensingRepository, IPlatfo
 
     public List<PlatformDeviceLink> Links { get; } = new();
 
+    public List<PlatformOwnerSupportRequest> SupportRequests { get; } = new();
+
     public List<(string To, PlatformLicensingMail Mail)> Mails { get; } = new();
 
     public Task<PlatformTenantLicensing?> GetSeatsAsync(Guid platformTenantId, CancellationToken cancellationToken) => Task.FromResult(Seats.FirstOrDefault(item => item.PlatformTenantId == platformTenantId));
@@ -82,6 +84,14 @@ internal sealed class FakeLicensingStore : IPlatformLicensingRepository, IPlatfo
     {
         return Task.FromResult(Events.Count(item => item.PlatformTenantId == platformTenantId && item.EventCode == PlatformDeviceEventCodes.LinkSent && item.CreatedUtc >= sinceUtc));
     }
+
+    public void AddSupportRequest(PlatformOwnerSupportRequest request) => SupportRequests.Add(request);
+
+    public Task<PlatformOwnerSupportRequest?> GetSupportRequestAsync(Guid requestId, CancellationToken cancellationToken) =>
+        Task.FromResult(SupportRequests.FirstOrDefault(item => item.Id == requestId));
+
+    public Task<IReadOnlyList<PlatformOwnerSupportRequest>> ListOpenSupportRequestsAsync(Guid platformTenantId, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<PlatformOwnerSupportRequest>>(SupportRequests.Where(item => item.PlatformTenantId == platformTenantId && item.IsOpen).OrderByDescending(item => item.RequestedUtc).ToArray());
 
     public Task<PagedResult<PlatformDeviceItem>> ListDevicesAsync(PlatformDeviceFilter filter, PagedRequest page, DateTimeOffset utcNow, CancellationToken cancellationToken)
     {

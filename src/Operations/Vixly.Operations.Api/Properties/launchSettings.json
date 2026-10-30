@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Vixly.Operations.Api": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "applicationUrl": "https://localhost:7405;http://localhost:5405",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+<resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms</value></resheader>
+<resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms</value></resheader>
+<data name="title" xml:space="preserve"><value>Operations component workbench</value></data>
+<data name="preview" xml:space="preserve"><value>Sample data only — component preview, no live operations.</value></data>
+<data name="active" xml:space="preserve"><value>Active shipments</value></data>
+<data name="received" xml:space="preserve"><value>Parcels received today</value></data>
+<data name="revenue" xml:space="preserve"><value>Revenue collected (USD)</value></data>
+<data name="exceptions" xml:space="preserve"><value>Open exceptions</value></data>
+<data name="comparison" xml:space="preserve"><value>vs. previous period</value></data>
+<data name="search" xml:space="preserve"><value>Search tracking numbers</value></data>
+<data name="branch" xml:space="preserve"><value>Branch</value></data>
+<data name="all" xml:space="preserve"><value>All</value></data>
+<data name="status" xml:space="preserve"><value>Status</value></data>
+<data name="tracking" xml:space="preserve"><value>Tracking number</value></data>
+<data name="customer" xml:space="preserve"><value>Customer</value></data>
+<data name="weight" xml:space="preserve"><value>Weight (kg)</value></data>
+<data name="amount" xml:space="preserve"><value>Amount (USD)</value></data>
+<data name="actions" xml:space="preserve"><value>Actions</value></data>
+<data name="open" xml:space="preserve"><value>Open detail</value></data>
+<data name="select" xml:space="preserve"><value>Select row</value></data>
+<data name="selectall" xml:space="preserve"><value>Select this page</value></data>
+<data name="empty" xml:space="preserve"><value>No matching shipments</value></data>
+<data name="clear" xml:space="preserve"><value>Clear filters</value></data>
+<data name="previous" xml:space="preserve"><value>Previous page</value></data>
+<data name="next" xml:space="preserve"><value>Next page</value></data>
+<data name="registered" xml:space="preserve"><value>Registered</value></data>
+<data name="staged" xml:space="preserve"><value>In warehouse</value></data>
+<data name="transit" xml:space="preserve"><value>In transit</value></data>
+<data name="delivered" xml:space="preserve"><value>Delivered</value></data>
+<data name="hold" xml:space="preserve"><value>Exception / hold</value></data>
+<data name="feed" xml:space="preserve"><value>Recent scans</value></data>
+<data name="queue" xml:space="preserve"><value>Staging queue</value></data>
+<data name="dispatch" xml:space="preserve"><value>Quick dispatch preview</value></data>
+<data name="route" xml:space="preserve"><value>Route leg</value></data>
+<data name="review" xml:space="preserve"><value>Review selection</value></data>
+<data name="selected" xml:space="preserve"><value>Selected parcels</value></data>
+<data name="sample" xml:space="preserve"><value>Preview only. Nothing is dispatched or saved.</value></data>
+<data name="detail" xml:space="preserve"><value>Shipment detail components</value></data>
+<data name="lifecycle" xml:space="preserve"><value>Shipment lifecycle</value></data>
+<data name="intake" xml:space="preserve"><value>Customer intake</value></data>
+<data name="scan" xml:space="preserve"><value>Warehouse scan</value></data>
+<data name="bundle" xml:space="preserve"><value>Bundle assembly</value></data>
+<data name="dispatchstep" xml:space="preserve"><value>Dispatch</value></data>
+<data name="delivery" xml:space="preserve"><value>Final delivery</value></data>
+<data name="cargo" xml:space="preserve"><value>Cargo details</value></data>
+<data name="barcodes" xml:space="preserve"><value>Barcodes</value></data>
+<data name="ledger" xml:space="preserve"><value>Billing ledger</value></data>
+<data name="audit" xml:space="preserve"><value>Audit log</value></data>
+<data name="dimensions" xml:space="preserve"><value>Dimensions (cm)</value></data>
+<data name="actual" xml:space="preserve"><value>Actual weight (kg)</value></data>
+<data name="dim" xml:space="preserve"><value>Volumetric weight (kg)</value></data>
+<data name="formula" xml:space="preserve"><value>Sample DIM: 60 × 40 × 35 ÷ 5000 = 16.8 kg. Divisor is carrier-specific.</value></data>
+<data name="views" xml:space="preserve"><value>Detail views</value></data>
+<data name="loading" xml:space="preserve"><value>Loading state</value></data>
+<data name="table" xml:space="preserve"><value>Shipment table components</value></data>
+<data name="english" xml:space="preserve"><value>English</value></data>
+<data name="french" xml:space="preserve"><value>Français</value></data>
+<data name="spanish" xml:space="preserve"><value>Español</value></data>
+<data name="shortcut" xml:space="preserve"><value>Ctrl / ⌘ K</value></data>
+<data name="language" xml:space="preserve"><value>Language</value></data>
+</root>

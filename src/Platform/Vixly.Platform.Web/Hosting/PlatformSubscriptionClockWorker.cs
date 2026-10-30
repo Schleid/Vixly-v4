@@ -121,6 +121,15 @@ public sealed class PlatformSubscriptionClockWorker : BackgroundService
                 {
                     _logger.LogInformation("Event feed clock removed {Count} old event(s).", pruned);
                 }
+
+                // Contact requests (Stage 2): closed ones are deleted after 24 months.
+                await using AsyncServiceScope leads = _scopes.CreateAsyncScope();
+                int forgotten = await leads.ServiceProvider.GetRequiredService<PlatformSalesLeadClock>().RunAsync(stoppingToken);
+
+                if (forgotten > 0)
+                {
+                    _logger.LogInformation("Lead clock deleted {Count} closed lead(s).", forgotten);
+                }
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {

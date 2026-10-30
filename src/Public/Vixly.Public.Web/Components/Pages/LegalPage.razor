@@ -1,0 +1,17 @@
+﻿@*
+=========================================================
+FILE: LegalPage.razor
+
+PURPOSE:
+The legal page in each language.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+=========================================================
+*@
+@page "/en/legal"
+@page "/fr/legal"
+@page "/es/legal"
+@attribute [OutputCache(Duration = 600)]
+<PageHead TitleKey="public.legal.page_title" DescriptionKey="public.legal.description" Page="legal" />
+<LegalTerms />

@@ -361,12 +361,22 @@ public sealed class PlatformTenant : AuditableEntity
         MarkAsModified(utcNow);
     }
 
-    public void UpdateCompany(PlatformCompanyDetails company, DateTimeOffset utcNow)
+    // B12: legal details change only through an approved change request.
+    internal PlatformTenantLifecycleEvent ApplyCompanyChange(PlatformCompanyDetails company, Guid requestId, Guid actorUserId, DateTimeOffset utcNow)
     {
         ArgumentNullException.ThrowIfNull(company);
 
+        Dictionary<string, string> arguments = new(StringComparer.Ordinal)
+        {
+            ["from"] = Company.LegalName,
+            ["to"] = company.LegalName,
+            ["request"] = requestId.ToString("D")
+        };
+
         Company = company;
         MarkAsModified(utcNow);
+
+        return PlatformTenantLifecycleEvent.Record(this, PlatformTenantEventCodes.CompanyChanged, Status, actorUserId, utcNow, arguments: arguments);
     }
 
     public void UpdateSettings(LanguageCode defaultLanguage, string? timeZone, DateTimeOffset utcNow)

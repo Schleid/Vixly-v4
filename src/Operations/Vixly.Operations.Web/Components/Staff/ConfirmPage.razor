@@ -1,0 +1,57 @@
+@*
+=========================================================
+FILE: ConfirmPage.razor
+
+PURPOSE:
+The step-up page: confirm a code before a sensitive action.
+
+RESPONSIBILITIES:
+- Render the step-up page: confirm a code before a sensitive action
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019); sensitive actions ask for step-up first
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.confirm.title"]" Company="@Company" Section="account" Error="@Error">
+    <form method="post" action="/staff/confirm" class="ops-editor__panel ops-stepup-panel">
+        <AntiforgeryToken />
+        <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+        <p class="ops-stepup-desc">@T[HasSecondFactor ? "ui.confirm.body" : PasswordConfirms ? "ui.confirm.body_password" : "ui.confirm.enrol_first"]</p>
+        @if (HasSecondFactor)
+        {
+            <div class="ops-stepup-row">
+                <div class="ops-stepup-field">
+                    <label for="stepup-code" class="ops-stepup-label">@T["ui.devices.code"]</label>
+                    <input id="stepup-code" name="code" class="ops-stepup-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" autofocus required />
+                </div>
+                <button type="submit" class="vx-button vx-button--primary ops-stepup-btn">@T["ui.confirm.submit"]</button>
+            </div>
+        }
+        else if (PasswordConfirms)
+        {
+            <div class="ops-stepup-row">
+                <div class="ops-stepup-field">
+                    <label for="stepup-pwd" class="ops-stepup-label">@T["ui.confirm.password"]</label>
+                    <input id="stepup-pwd" name="code" type="password" class="ops-stepup-input" autocomplete="current-password" required />
+                </div>
+                <button type="submit" class="vx-button vx-button--primary ops-stepup-btn">@T["ui.confirm.submit"]</button>
+            </div>
+        }
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public string ReturnUrl { get; set; } = "/staff";
+
+    [Parameter] public bool HasSecondFactor { get; set; }
+
+    [Parameter] public bool PasswordConfirms { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+}

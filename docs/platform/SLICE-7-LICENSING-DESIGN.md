@@ -93,7 +93,8 @@ A lost or stolen device revoked over the allowance is in **Revoked, seat held**:
 
 ### Owner recovery (D-L8)
 
-- **Who starts it:** staff with `platform.licensing.manage` and step-up, or the owner through Operations after email confirmation.
+- **Who starts it:** Vixly staff only, with `platform.licensing.manage` and step-up, after checking the caller's identity (owner decision 2026-10-18, Operations Slice 1 D-O13). The route "owner through Operations after email confirmation" is withdrawn; its internal call is removed in Operations Slice 1C.
+- **Second-factor reset:** for an Owner who also lost the authenticator and recovery codes, staff start a reset that a second staff member approves; Platform emails a single-use link (60 minutes) to the Owner contact, and Operations completes it on the tenant host (built in Operations Slice 1C).
 - **The link:** emailed to the owner contact only (60 minutes, 5 tries). It is never shown on screen or returned by an API.
 - **Using it:** the device enrols as Active. If no seat is free, the device the owner names is revoked in the same commit. The owner gets "device replaced".
 
@@ -178,7 +179,14 @@ Decisions taken while building; none changes an owner decision.
 - **Waiting requests** expire after 7 days, checked by the clock every minute. At most 10 requests can wait per tenant.
 - **Last seen** is written at most once an hour per device, so checks stay read-only most of the time.
 - **Owner links** (first device, recovery) are created when the email is sent; only their hash is stored. A new link voids older ones of the same kind. A link allows 5 tries; at most 3 links per tenant per hour.
-- **Recovery when every seat is taken:** the owner names a device to replace. That device is revoked ("Replaced during owner recovery") and the owner gets an email about it.
+- **Recovery when every seat is taken:** support names the lost device when it starts the recovery (the owner told them on the call); the page may still name another. That device is revoked ("Replaced during owner recovery") and the owner gets an email about it.
+- **Owner support, built 2026-10-18 (D-O13):**
+  - Every support action is an `OwnerSupportRequest` (table `OwnerSupportRequests`): tenant, kind (device recovery, second-factor reset), reason, how support confirmed the caller, the device to replace, who asked and when, status (pending, approved, refused, completed), who decided, when and with what note. The link carries the request id.
+  - **Device recovery:** one staff member with `platform.licensing.manage` and step-up; reason and identity check required; approved at once; the link email goes to the owner, and "support started" to the owner and billing contacts.
+  - **Second-factor reset:** asked by one staff member, approved or refused by another (`platform.licensing.approver_must_differ` otherwise), both with the permission and step-up. Approval emails the owner a single-use link (60 minutes) to `/account/second-factor-reset#token` on the tenant host, and "support started" to the owner and billing contacts. Operations posts the token to `POST /internal/v1/device-links/second-factor-reset/complete` (tenant from the caller token; a link of another tenant is refused), then lets the owner enrol a new authenticator; Platform marks the request completed and tells the owner and billing contacts.
+  - "Device replaced" also goes to the billing contact when it differs from the owner.
+  - The tenant page lists the open requests with Approve and Refuse.
+  - The Operations-started recovery (`POST /internal/v1/tenant/devices/owner-recovery`, `StartPlatformOwnerRecoveryForOwner`) is removed.
 - **First-device link** completes the registration and activates the tenant in one commit. The activation event has no staff actor; its audit action is `platform.tenants.activated_by_registration`.
 - **Staff "Send the first-device link again"** shows only when no device holds a seat (a new tenant, or one whose devices were all ended).
 - **Internal check answers** (for Slice 9): allowed, or refused with `device_unknown`, `device_pending`, `device_released`, `device_revoked`, `proof_invalid`, `tenant_suspended`, `tenant_closed` or `subscription_none`; plus the subscription access level and, when rotating, the new secret. Customers are never checked.

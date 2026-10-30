@@ -1,0 +1,152 @@
+@*
+=========================================================
+FILE: CustomerPage.razor
+
+PURPOSE:
+One customer: details, the packages coming to them, status and credit (Slice 2).
+
+RESPONSIBILITIES:
+- Show the customer and the packages coming to them; never the mailbox's street address (owner, 2026-10-18)
+- Suspend, reactivate or close; allow or remove credit. The details are the customer's own (owner, 2026-10-18)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); the endpoint loads the data
+- Compact label-over-value facts grid (Brief §3, §5)
+- Credit needs ops.customers.credit and step-up; the use cases decide
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@Customer.FullName" Company="@Company" Section="customers" Error="@Error" Info="@Info">
+    <div class="ops-record-top">
+        <a href="/staff/customers" class="ops-editor__back-link">← @T["ui.customers.back"]</a>
+    </div>
+
+    <div class="ops-record-header">
+        <div class="ops-record-header__identity">
+            <h1 class="ops-record-header__title">
+                @Customer.FullName
+                <span class="ops-editor__status" data-status="@Customer.Status.ToString().ToLowerInvariant()">@T["ui.customers.status." + Customer.Status.ToString().ToLowerInvariant()]</span>
+            </h1>
+            @if (Customer.StatusReason is { } statusReason)
+            {
+                <p class="ops-record-header__subtitle">@statusReason</p>
+            }
+        </div>
+        <div class="ops-record-header__actions">
+            @if (Customer.Code is { } customerCode)
+            {
+                <a class="vx-button vx-button--primary" href="/staff/counter?find=@customerCode">+ @T["ui.counter.new_shipment"]</a>
+            }
+        </div>
+    </div>
+
+    <div class="ops-customer-tabs ops-compact-tabs" data-section-tabs="customer" data-tabs-label="@T["ui.customers.details"]">
+        <section class="ops-editor__panel ops-record-summary" aria-labelledby="customer-details">
+            <h2 id="customer-details">@T["ui.customers.details"]</h2>
+            <dl class="ops-facts-grid">
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.code"]</dt>
+                    <dd class="ops-editor__code">@(Customer.Code ?? T["ui.customers.no_code"])</dd>
+                </div>
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.editor.email"]</dt>
+                    <dd>@Customer.Email @(Customer.EmailVerified ? null : "· " + T["ui.customers.not_verified"])</dd>
+                </div>
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.phone"]</dt>
+                    <dd class="ops-editor__code">@Vixly.Shared.Localization.VixlyPhone.International(Customer.Phone)</dd>
+                </div>
+                @* The home address the customer gave at the first sign-in, or brought from V3 (owner, 2026-10-26). *@
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.home_address"]</dt>
+                    <dd>
+                        @if (Customer.HomeAddress is { } home)
+                        {
+                            @home.Line1@if (home.Line2 is not null) { <br />@home.Line2 }<br />@home.City@(home.Region is null ? null : ", " + home.Region) @home.PostalCode<br /><CountryFlag Code="@home.CountryCode" /> @OperationsCountries.Name(T, home.CountryCode)
+                        }
+                        else
+                        {
+                            @T["ui.customers.no_address"]
+                        }
+                    </dd>
+                </div>
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.company"]</dt>
+                    <dd>@(string.IsNullOrWhiteSpace(Customer.CompanyName) ? "—" : Customer.CompanyName)</dd>
+                </div>
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.staff.language"]</dt>
+                    <dd>@Customer.Language.ToUpperInvariant()</dd>
+                </div>
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.credit"]</dt>
+                    <dd><span class="ops-editor__status" data-status="@(Customer.CreditAllowed ? "active" : "neutral")">@(Customer.CreditAllowed ? T["ui.customers.credit_on"] : T["ui.customers.credit_off"])</span> @(Customer.CreditReason is null ? null : "· " + Customer.CreditReason)</dd>
+                </div>
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.created"]</dt>
+                    <dd>@Customer.CreatedUtc.ToString("yyyy-MM-dd")</dd>
+                </div>
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.last_sign_in"]</dt>
+                    <dd>@(Customer.LastSignInUtc?.ToString("yyyy-MM-dd HH:mm") ?? T["ui.customers.never"])</dd>
+                </div>
+            </dl>
+        </section>
+
+        @if (CanSeePackages)
+        {
+            <CustomerIncomingPackages T="T" CustomerCode="@Customer.Code" Packages="Incoming" />
+        }
+
+        @if (CanManage)
+        {
+            <form method="post" action="/staff/customers/@Customer.CustomerId/status" class="ops-editor__panel ops-panel--restricted" style="margin-top: 1rem;">
+                <AntiforgeryToken />
+                <h2 style="margin-bottom: 0.5rem;">@T["ui.customers.status"]</h2>
+                <div class="ops-editor__inline-field">
+                    <label style="flex: 0 1 12rem;">@T["ui.customers.new_status"]
+                        <select name="status">
+                            @if (Customer.Status != OperationsCustomerStatus.Active) { <option value="active">@T["ui.customers.status.active"]</option> }
+                            @if (Customer.Status != OperationsCustomerStatus.Suspended) { <option value="suspended">@T["ui.customers.status.suspended"]</option> }
+                            @if (Customer.Status != OperationsCustomerStatus.Closed) { <option value="closed">@T["ui.customers.status.closed"]</option> }
+                        </select>
+                    </label>
+                    <label style="flex: 1 1 20rem;">@T["ui.customers.reason"] <input name="reason" maxlength="300" required placeholder="@T["ui.customers.reason"]" /></label>
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.customers.status_submit"]</button>
+                </div>
+            </form>
+        }
+
+        @if (CanSetCredit)
+        {
+            <section class="ops-editor__panel ops-panel--restricted" style="margin-top: 1rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+                    <div>
+                        <h2 style="margin: 0;">@T["ui.customers.credit"]</h2>
+                        <p class="ops-editor__hint" style="margin: 0.25rem 0 0 0;">@T["ui.customers.credit_account_hint"]</p>
+                    </div>
+                    <a class="vx-button vx-button--secondary" href="/staff/credit/customers/@Customer.CustomerId">@T["ui.customers.credit_account"]</a>
+                </div>
+            </section>
+        }
+    </div>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsCustomerProfile Customer { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsIncomingPackage> Incoming { get; set; } = Array.Empty<OperationsIncomingPackage>();
+
+    [Parameter] public bool CanSeePackages { get; set; }
+
+    [Parameter] public bool CanManage { get; set; }
+
+    [Parameter] public bool CanSetCredit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

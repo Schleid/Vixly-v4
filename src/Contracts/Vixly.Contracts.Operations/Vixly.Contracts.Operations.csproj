@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Wire types only. BCL only; no package or project references (Global Standard 3, C-0). -->
+
+</Project>

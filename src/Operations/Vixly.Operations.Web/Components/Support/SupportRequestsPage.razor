@@ -1,0 +1,115 @@
+@*
+=========================================================
+FILE: SupportRequestsPage.razor
+
+PURPOSE:
+Staff's queue of call tickets opened by support agents (owner, 2026-10-29, S-3).
+
+RESPONSIBILITIES:
+- List the open ones oldest first, or the ones done; open the customer and the shipment or package
+- Close one with what was done
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); the endpoint loads the data
+- Needs ops.customers.manage for the whole company (the use cases check it)
+- Staff answer the customer the usual way; the ticket is never shown to the customer
+- Brief §5 workstation queue styling with filter chips, ticket cards, and aligned actions
+=========================================================
+*@
+@using Vixly.Operations.Application.Support
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.support.requests_title"]" Company="@Company" Section="support_requests" Error="@Error" Info="@Info">
+    <div class="ops-list-bar">
+        <div class="ops-status-chips">
+            <a href="/staff/support/requests" class="ops-status-chip" aria-current="@(Done ? null : "page")">@T["ui.support.requests_open"]</a>
+            <a href="/staff/support/requests?done=true" class="ops-status-chip" aria-current="@(Done ? "page" : null)">@T["ui.support.requests_done"]</a>
+        </div>
+        <div class="ops-list-bar__actions">
+            <span class="ops-editor__hint" style="font-size: 0.8125rem;">@TotalCount</span>
+        </div>
+    </div>
+    <section class="ops-editor__panel">
+        @if (Items.Count == 0)
+        {
+            <div class="ops-editor__empty"><h2>@T["ui.support.requests_none"]</h2></div>
+        }
+        else
+        {
+            @foreach (OperationsSupportRequestLine item in Items)
+            {
+                <div class="ops-support-ticket-card">
+                    <div class="ops-support-ticket-card__header">
+                        <div class="ops-support-ticket-card__title">
+                            <a href="/staff/customers/@item.CustomerId">@item.CustomerName</a>
+                            <span class="ops-badge">@(item.CustomerCode ?? T["ui.customers.no_code"].Value)</span>
+                            @if (item.ShipmentId is { } shipment)
+                            {
+                                <a href="/staff/shipments/@shipment" style="font-family: var(--vx-font-mono, monospace);">@item.Reference</a>
+                            }
+                            else if (item.ParcelId is { } parcel)
+                            {
+                                <a href="/staff/parcels/@parcel" style="font-family: var(--vx-font-mono, monospace);">@item.Reference</a>
+                            }
+                        </div>
+                        <div class="ops-support-ticket-card__time">
+                            <span>@item.OpenedUtc.ToLocalTime().ToString("g", System.Globalization.CultureInfo.CurrentCulture)</span>
+                            <span>·</span>
+                            <span>@VixlyText.Format(T, "ui.support.by", "name", item.AgentName)</span>
+                        </div>
+                    </div>
+                    <div class="ops-support-ticket-card__body">@item.Text</div>
+                    <div class="ops-support-ticket-card__footer">
+                        @if (item.DoneUtc is { } doneAt)
+                        {
+                            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                <span class="ops-editor__status" data-status="active">
+                                    @VixlyText.Fill(T["ui.support.closed_by"].Value, new Dictionary<string, object> { ["name"] = item.DoneByName ?? string.Empty, ["date"] = doneAt.ToLocalTime().ToString("g", System.Globalization.CultureInfo.CurrentCulture) })
+                                </span>
+                                @if (item.DoneNote is { } note)
+                                {
+                                    <span class="ops-editor__hint">· @note</span>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <form method="post" action="/staff/support/requests/@item.RequestId/close" class="ops-support-ticket-card__action">
+                                <AntiforgeryToken />
+                                <input name="note" maxlength="1000" placeholder="@T["ui.support.close_note"]" aria-label="@T["ui.support.close_note"]" />
+                                <button type="submit" class="vx-button vx-button--secondary">@T["ui.support.close"]</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            }
+            @if (TotalCount > PageSize)
+            {
+                <nav class="ops-list-pager" aria-label="Pagination">
+                    @if (Page > 1) { <a href="@PageLink(Page - 1)" class="vx-button vx-button--secondary">@T["ui.support.previous"]</a> }
+                    @if (Page * PageSize < TotalCount) { <a href="@PageLink(Page + 1)" class="vx-button vx-button--secondary">@T["ui.support.next"]</a> }
+                </nav>
+            }
+        }
+    </section>
+</EditorShell>
+
+@code {
+    private string PageLink(int page) => "/staff/support/requests?page=" + page + (Done ? "&done=true" : null);
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public bool Done { get; set; }
+
+    [Parameter] public int Page { get; set; } = 1;
+
+    [Parameter] public IReadOnlyList<OperationsSupportRequestLine> Items { get; set; } = Array.Empty<OperationsSupportRequestLine>();
+
+    [Parameter] public int TotalCount { get; set; }
+
+    [Parameter] public int PageSize { get; set; } = 25;
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

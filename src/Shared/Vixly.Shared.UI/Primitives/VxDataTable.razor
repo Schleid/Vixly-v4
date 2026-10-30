@@ -1,4 +1,4 @@
-@namespace Vixly.Shared.UI.Primitives
+﻿@namespace Vixly.Shared.UI.Primitives
 @typeparam TItem
 @*
 =========================================================
@@ -13,7 +13,7 @@ IMPORTANT NOTES:
 =========================================================
 *@
 
-<div class="vx-table-container">
+<div class="vx-table-container" aria-busy="@(IsLoading ? "true" : "false")">
     <table class="vx-table">
         @if (!string.IsNullOrEmpty(Caption))
         {
