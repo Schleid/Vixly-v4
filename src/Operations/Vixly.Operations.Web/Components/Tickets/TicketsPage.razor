@@ -1,14 +1,42 @@
+@*
+=========================================================
+FILE: TicketsPage.razor
+
+PURPOSE:
+The ticket desk: the tickets of the person's departments (owner, 2026-10-29, ticket desk).
+
+RESPONSIBILITIES:
+- Filter by state (new, taken, answered, resolved, escalated), topic, warehouse and "mine"
+- List each ticket with its topic, who opened it, who took it, and an escalation mark
+- The escalation limits, for whoever edits the settings
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); the endpoint loads the data
+- Which tickets show is decided by the use case (each topic at the warehouses of its department)
+=========================================================
+*@
+@inherits OperationsAllowedComponent
 @inject IStringLocalizer<OperationsText> T
 
-<EditorShell Title="@T["ui.tickets.title"]" Company="@Company" Section="parcels" Error="@Error">
-    <div class="ops-status-chips" role="tablist" aria-label="@T["ui.tickets.status"]">
-        <a href="/staff/tickets?status=open@(Warehouse is { } w1 ? "&warehouse=" + w1 : null)" class="ops-status-chip" aria-current="@(Status == "open" ? "true" : null)">@T["ui.tickets.filter.open"]</a>
-        <a href="/staff/tickets?status=answered@(Warehouse is { } w2 ? "&warehouse=" + w2 : null)" class="ops-status-chip" aria-current="@(Status == "answered" ? "true" : null)">@T["ui.tickets.filter.answered"]</a>
-        <a href="/staff/tickets?status=resolved@(Warehouse is { } w3 ? "&warehouse=" + w3 : null)" class="ops-status-chip" aria-current="@(Status == "resolved" ? "true" : null)">@T["ui.tickets.filter.resolved"]</a>
-        <a href="/staff/tickets?status=all@(Warehouse is { } w4 ? "&warehouse=" + w4 : null)" class="ops-status-chip" aria-current="@(Status == "all" ? "true" : null)">@T["ui.tickets.filter.all"] <span class="ops-status-chip__badge">@TotalCount</span></a>
-    </div>
+<EditorShell Title="@T["ui.tickets.title"]" Company="@Company" Section="tickets" Error="@Error" Info="@Info">
+    <nav class="ops-status-chips" role="tablist" aria-label="@T["ui.tickets.status"]">
+        @foreach (string state in States)
+        {
+            <a href="@Link(state, Topic, Mine)" class="ops-status-chip" aria-current="@(Status == state ? "page" : null)">
+                <span class="ops-status-chip__label">@T["ui.tickets.filter." + state]</span>
+                @if (Status == state) { <span class="ops-status-chip__count">@TotalCount</span> }
+            </a>
+        }
+    </nav>
     <form method="get" action="/staff/tickets" class="ops-list-bar">
         <input type="hidden" name="status" value="@Status" />
+        @if (Topics.Count > 1)
+        {
+            <select name="topic" aria-label="@T["ui.tickets.topic"]">
+                <option value="">@T["ui.tickets.all_topics"]</option>
+                @foreach (OperationsTicketTopic topic in Topics) { <option value="@topic" selected="@(topic == Topic)">@T["ui.tickets.topic." + topic]</option> }
+            </select>
+        }
         @if (Warehouses.Count > 1)
         {
             <select name="warehouse" aria-label="@T["ui.receiving.warehouse"]">
@@ -16,10 +44,11 @@
                 @foreach (OperationsWarehouse wh in Warehouses) { <option value="@wh.Id" selected="@(wh.Id == Warehouse)">@wh.Code · @wh.Name</option> }
             </select>
         }
+        <label class="ops-checkbox-label"><input type="checkbox" name="mine" value="true" checked="@Mine" /> @T["ui.tickets.mine"]</label>
         <button type="submit" class="vx-button vx-button--primary">@T["ui.tickets.filter"]</button>
         <a href="/staff/tickets" class="vx-button vx-button--subtle">@T["ui.parcels.view.all"]</a>
     </form>
-    <section class="ops-editor__panel">
+    <section class="ops-editor__panel ops-tickets-list-panel">
         @if (Tickets.Count == 0)
         {
             <div class="ops-editor__empty"><h2>@T["ui.tickets.none"]</h2></div>
@@ -28,16 +57,36 @@
         {
             <OperationsTableViewport Label="@T["ui.tickets.title"]">
                 <table class="ops-editor__table">
-                    <thead><tr><th scope="col">@T["ui.tickets.opened"]</th><th scope="col">@T["ui.receiving.warehouse"]</th><th scope="col">@T["ui.tickets.carrier"]</th><th scope="col">@T["ui.tickets.tracking"]</th><th scope="col">@T["ui.tickets.status"]</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th scope="col">@T["ui.tickets.opened"]</th>
+                            <th scope="col">@T["ui.tickets.topic"]</th>
+                            <th scope="col">@T["ui.receiving.warehouse"]</th>
+                            <th scope="col">@T["ui.tickets.tracking"]</th>
+                            <th scope="col">@T["ui.tickets.opened_by"]</th>
+                            <th scope="col">@T["ui.tickets.taken_by"]</th>
+                            <th scope="col">@T["ui.tickets.status"]</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         @foreach (OperationsTicket ticket in Tickets)
                         {
                             <tr>
-                                <td><a href="/staff/tickets/@ticket.Id">@ticket.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</a></td>
+                                <td><a href="/staff/tickets/@ticket.Id" class="ops-ticket-link">@ticket.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</a></td>
+                                <td><span class="ops-ticket-topic">@T["ui.tickets.topic." + ticket.Topic]</span></td>
                                 <td>@(Warehouses.FirstOrDefault(wh => wh.Id == ticket.WarehouseId)?.Code)</td>
-                                <td>@ticket.Carrier</td>
                                 <td class="ops-editor__code">@ticket.TrackingNumber</td>
-                                <td><span class="ops-ticket-status" data-status="@ticket.Status">@T["ui.tickets.status." + ticket.Status]</span></td>
+                                <td>@T[ticket.FromCustomer ? "ui.tickets.by_customer" : "ui.tickets.by_agent"]</td>
+                                <td>@(ticket.TakenByUserId is { } taker ? People.GetValueOrDefault(taker) : T["ui.tickets.nobody"].Value)</td>
+                                <td>
+                                    <div class="ops-ticket-status-group">
+                                        <span class="ops-ticket-status" data-status="@ticket.Status">@T["ui.tickets.status." + ticket.Status]</span>
+                                        @if (ticket.EscalationsSent > 0 && ticket.Status != OperationsTicketStatus.Resolved)
+                                        {
+                                            <span class="ops-ticket-status" data-status="Escalated">@T["ui.tickets.escalated"]</span>
+                                        }
+                                    </div>
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -46,22 +95,46 @@
             @if (TotalCount > Vixly.Operations.Application.UseCases.Tickets.ListOperationsTickets.ListOperationsTicketsUseCase.PageSize)
             {
                 <nav class="ops-list-pager" aria-label="@T["ui.customers.pages"]">
-                    @if (PageNumber > 1) { <a href="/staff/tickets?status=@Status&amp;warehouse=@Warehouse&amp;page=@(PageNumber - 1)" class="ops-list-pager__link">@T["ui.customers.previous"]</a> }
+                    @if (PageNumber > 1) { <a href="@(Link(Status, Topic, Mine) + "&page=" + (PageNumber - 1))" class="ops-list-pager__link">@T["ui.customers.previous"]</a> }
                     <span class="ops-list-pager__info">@PageNumber</span>
-                    @if (TotalCount > PageNumber * Vixly.Operations.Application.UseCases.Tickets.ListOperationsTickets.ListOperationsTicketsUseCase.PageSize) { <a href="/staff/tickets?status=@Status&amp;warehouse=@Warehouse&amp;page=@(PageNumber + 1)" class="ops-list-pager__link">@T["ui.tickets.next"]</a> }
+                    @if (TotalCount > PageNumber * Vixly.Operations.Application.UseCases.Tickets.ListOperationsTickets.ListOperationsTicketsUseCase.PageSize) { <a href="@(Link(Status, Topic, Mine) + "&page=" + (PageNumber + 1))" class="ops-list-pager__link">@T["ui.tickets.next"]</a> }
                 </nav>
             }
         }
     </section>
+    @if (Can(Vixly.Operations.Domain.Access.OperationsPermissions.SettingsEdit))
+    {
+        <section id="rules" class="ops-editor__panel ops-tickets-limits-panel">
+            <h2>@T["ui.tickets.limits.title"]</h2>
+            <form method="post" action="/staff/tickets/settings" class="ops-editor__form ops-tickets-limits-form">
+                <AntiforgeryToken />
+                <label class="ops-editor__form-span-3">@T["ui.tickets.limits.take_hours"] <input type="number" name="takeHours" min="1" max="@OperationsTicket.TakeHoursMax" value="@Limits.TakeHours" required /></label>
+                <label class="ops-editor__form-span-3">@T["ui.tickets.limits.resolve_days"] <input type="number" name="resolveDays" min="1" max="@OperationsTicket.ResolveDaysMax" value="@Limits.ResolveDays" required /></label>
+                <p class="ops-editor__hint span-full">@T["ui.tickets.limits.hint"]</p>
+                <div class="ops-editor__form-actions span-full"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></div>
+            </form>
+        </section>
+    }
 </EditorShell>
 
 @code {
+    private static readonly string[] States = { "open", "new", "taken", "answered", "escalated", "resolved", "all" };
+
+    private string Link(string state, OperationsTicketTopic? topic, bool mine) =>
+        "/staff/tickets?status=" + state + (topic is { } t ? "&topic=" + t : null) + (Warehouse is { } w ? "&warehouse=" + w : null) + (mine ? "&mine=true" : null);
+
     [Parameter] public string? Company { get; set; }
     [Parameter] public IReadOnlyList<OperationsTicket> Tickets { get; set; } = Array.Empty<OperationsTicket>();
     [Parameter] public int TotalCount { get; set; }
     [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+    [Parameter] public IReadOnlyList<OperationsTicketTopic> Topics { get; set; } = Array.Empty<OperationsTicketTopic>();
+    [Parameter] public IReadOnlyDictionary<Guid, string> People { get; set; } = new Dictionary<Guid, string>();
+    [Parameter] public (int TakeHours, int ResolveDays) Limits { get; set; } = (OperationsTicket.TakeHoursDefault, OperationsTicket.ResolveDaysDefault);
     [Parameter] public Guid? Warehouse { get; set; }
+    [Parameter] public OperationsTicketTopic? Topic { get; set; }
+    [Parameter] public bool Mine { get; set; }
     [Parameter] public string Status { get; set; } = "open";
     [Parameter] public int PageNumber { get; set; } = 1;
     [Parameter] public string? Error { get; set; }
+    [Parameter] public string? Info { get; set; }
 }
