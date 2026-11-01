@@ -15,7 +15,7 @@ IMPORTANT NOTES:
 *@
 @inject IStringLocalizer<OperationsText> T
 
-<form method="post" action="/staff/bundles" class="@(Destination is null ? "ops-editor__panel ops-editor__form" : "ops-editor__inline")">
+<form method="post" action="/staff/bundles" class="@(Destination is null ? "ops-editor__panel ops-editor__form" : "ops-editor__inline ops-bundle-ready-form")">
     <AntiforgeryToken />
     <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
     @if (Destination is null)
@@ -86,7 +86,8 @@ IMPORTANT NOTES:
         <input type="hidden" name="service" value="@Service" />
         @if (Types.Count > 0)
         {
-            <label>@T["ui.bundles.type"]
+            <label>
+                <span>@T["ui.bundles.type"]</span>
                 <select name="type">
                     @foreach (string type in Types)
                     {
@@ -95,7 +96,8 @@ IMPORTANT NOTES:
                 </select>
             </label>
         }
-        <label>@T["ui.bundles.basis"]
+        <label>
+            <span>@T["ui.bundles.basis"]</span>
             <select name="basis">
                 <option value="@OperationsBundleBasis.Free">@T["ui.bundles.basis.Free"]</option>
                 <option value="@OperationsBundleBasis.Weight">@T["ui.bundles.basis.Weight"]</option>
@@ -105,7 +107,10 @@ IMPORTANT NOTES:
                 }
             </select>
         </label>
-        <label>@VixlyText.Format(T, "ui.bundles.target", "unit", WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg") <input name="target" inputmode="decimal" size="7" /></label>
+        <label>
+            <span>@VixlyText.Format(T, "ui.bundles.target", "unit", WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg")</span>
+            <input name="target" inputmode="decimal" size="7" />
+        </label>
         <button type="submit" class="vx-button vx-button--primary">@T["ui.bundles.create"]</button>
     }
 </form>

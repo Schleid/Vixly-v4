@@ -14,36 +14,36 @@ IMPORTANT NOTES:
 *@
 @inject IStringLocalizer<OperationsText> T
 
-<form method="post" action="@(Carrier is null ? "/staff/carriers" : "/staff/carriers/" + Carrier.Id)" class="ops-editor__panel ops-editor__form" aria-labelledby="carrier-form-title">
+<form method="post" action="@(Carrier is null ? "/staff/carriers" : "/staff/carriers/" + Carrier.Id)" class="ops-editor__panel ops-editor__form ops-carrier-form" aria-labelledby="carrier-form-title">
     <AntiforgeryToken />
-    <h2 id="carrier-form-title">@T[Carrier is null ? "ui.carriers.new" : "ui.carriers.edit"]</h2>
-    <div class="ops-charges-duo">
-        <div>
-            <label>@T["ui.carriers.name"] <input name="name" value="@Carrier?.Name" maxlength="@OperationsCarrier.NameMaxLength" required /></label>
-        </div>
-        <div>
-            <label>@T["ui.carriers.kind"]
-                <select name="kind">
-                    @foreach (OperationsCarrierKind kind in Enum.GetValues<OperationsCarrierKind>())
-                    {
-                        <option value="@kind" selected="@(Carrier?.Kind == kind)">@T["ui.dispatch.mode." + OperationsDispatching.Mode(kind)]</option>
-                    }
-                </select>
-            </label>
-        </div>
-    </div>
-    <div class="ops-charges-duo">
-        <div>
-            <label>@T["ui.carriers.account"] <input name="account" value="@Carrier?.AccountNumber" maxlength="@OperationsCarrier.AccountMaxLength" /></label>
-        </div>
-        <div>
-            <label>@T["ui.carriers.prefix"] <input name="prefix" value="@Carrier?.AirlinePrefix" maxlength="3" inputmode="numeric" pattern="[0-9]{3}" size="4" /></label>
-            <p class="ops-editor__hint">@T["ui.carriers.prefix_hint"]</p>
-        </div>
+    <h2 id="carrier-form-title" class="span-full">@T[Carrier is null ? "ui.carriers.new" : "ui.carriers.edit"]</h2>
+    <label class="ops-editor__form-span-3">
+        <span>@T["ui.carriers.name"]</span>
+        <input name="name" value="@Carrier?.Name" maxlength="@OperationsCarrier.NameMaxLength" required />
+    </label>
+    <label class="ops-editor__form-span-3">
+        <span>@T["ui.carriers.kind"]</span>
+        <select name="kind">
+            @foreach (OperationsCarrierKind kind in Enum.GetValues<OperationsCarrierKind>())
+            {
+                <option value="@kind" selected="@(Carrier?.Kind == kind)">@T["ui.dispatch.mode." + OperationsDispatching.Mode(kind)]</option>
+            }
+        </select>
+    </label>
+    <label class="ops-editor__form-span-3">
+        <span>@T["ui.carriers.account"]</span>
+        <input name="account" value="@Carrier?.AccountNumber" maxlength="@OperationsCarrier.AccountMaxLength" />
+    </label>
+    <div class="ops-editor__form-span-3 ops-carrier-prefix-field">
+        <label>
+            <span>@T["ui.carriers.prefix"]</span>
+            <input name="prefix" value="@Carrier?.AirlinePrefix" maxlength="3" inputmode="numeric" pattern="[0-9]{3}" size="4" />
+        </label>
+        <p class="ops-editor__hint">@T["ui.carriers.prefix_hint"]</p>
     </div>
     @if (Carrier is not null)
     {
-        <div class="ops-checkbox-group" style="margin: 0.5rem 0;">
+        <div class="ops-checkbox-group span-full" style="margin: 0.5rem 0;">
             <label class="ops-checkbox-label">
                 <input type="checkbox" name="active" value="true" checked="@Carrier.IsActive" />
                 <span>@T["ui.carriers.active"]</span>
@@ -54,7 +54,7 @@ IMPORTANT NOTES:
     {
         <input type="hidden" name="active" value="true" />
     }
-    <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></p>
+    <p class="ops-editor__actions span-full"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></p>
 </form>
 
 @code {
