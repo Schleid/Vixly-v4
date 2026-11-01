@@ -1,0 +1,59 @@
+@*
+=========================================================
+FILE: CustomerShipments.razor
+
+PURPOSE:
+What the customer sends, on the staff customer page (owner, 2026-10-31: the page showed only what is coming in).
+
+RESPONSIBILITIES:
+- The customer's latest shipments, newest first: number, date, service, route, parcels and where each stands, each linked to its page
+
+IMPORTANT NOTES:
+- Markup only; the caller passes its localizer. Only shipments at warehouses the person may see
+- Compact table layout like the incoming packages
+=========================================================
+*@
+<section class="ops-editor__panel ops-customer-shipments-panel" aria-labelledby="customer-shipments">
+    <h2 id="customer-shipments">@T["ui.customers.shipments"]</h2>
+    @if (Shipments.Count == 0)
+    {
+        <div class="ops-editor__empty"><p>@T["ui.customers.shipments_none"]</p></div>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.customers.shipments"]">
+            <table class="ops-editor__table">
+                <thead>
+                    <tr>
+                        <th scope="col" class="ops-editor__identity-cell">@T["ui.customers.shipment_number"]</th>
+                        <th scope="col">@T["ui.customers.shipment_date"]</th>
+                        <th scope="col">@T["ui.customers.shipment_service"]</th>
+                        <th scope="col">@T["ui.customers.shipment_route"]</th>
+                        <th scope="col">@T["ui.customers.shipment_parcels"]</th>
+                        <th scope="col">@T["ui.customers.shipment_state"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (OperationsCustomerShipmentRow row in Shipments)
+                    {
+                        <tr data-state="@row.State">
+                            <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/shipments/@row.Id">@(string.IsNullOrWhiteSpace(row.Number) ? "—" : row.Number)</a></td>
+                            <td>@row.CreatedUtc.ToString("yyyy-MM-dd")</td>
+                            <td>@(row.ServiceCode is { } service ? T["ui.services.name." + service] : "—")</td>
+                            <td>@row.Origin → @(row.Destination ?? "—")</td>
+                            <td>@(row.Parcels?.ToString() ?? "—")</td>
+                            <td><span class="ops-editor__status" data-status="@row.State">@T["ui.customers.shipment_state." + row.State]</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+        @if (Shipments.Count >= 20) { <p class="ops-editor__hint">@T["ui.customers.shipments_latest"]</p> }
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsCustomerShipmentRow> Shipments { get; set; } = Array.Empty<OperationsCustomerShipmentRow>();
+}

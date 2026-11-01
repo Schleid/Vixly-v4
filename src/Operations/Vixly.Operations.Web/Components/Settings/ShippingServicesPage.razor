@@ -6,7 +6,7 @@ PURPOSE:
 The shipping services the tenant offers, and how.
 
 RESPONSIBILITIES:
-- Render one row per Vixly service: offered, label, business days and volumetric divisor
+- Render one row per Vixly service: offered, label, label code, business days and volumetric divisor
 
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10)
@@ -29,6 +29,7 @@ IMPORTANT NOTES:
                         <th scope="col" style="text-align: center; width: 4.5rem;">@T["ui.services.offered"]</th>
                         <th scope="col">@T["ui.services.service"]</th>
                         <th scope="col">@T["ui.services.label"]</th>
+                        <th scope="col" style="width: 5.5rem; text-align: center;">@T["ui.services.label_code"]</th>
                         <th scope="col" style="min-width: 9rem;">@T["ui.services.days"]</th>
                         <th scope="col">@VixlyText.Format(T, "ui.services.divisor", "unit", T["ui.services.unit." + DivisorUnit.Replace('/', '_')].Value)</th>
                     </tr>
@@ -40,6 +41,8 @@ IMPORTANT NOTES:
                             <td style="text-align: center;"><input type="checkbox" name="offered" value="@row.Code" checked="@row.Offered" aria-label="@T["ui.services.offered"]" /></td>
                             <td><strong>@T["ui.services.name." + row.Code]</strong> <span class="ops-editor__hint">@T["ui.services.mode." + row.Mode]</span></td>
                             <td><input name="label_@row.Code" value="@row.Label" maxlength="60" placeholder="@T["ui.services.name." + row.Code]" aria-label="@T["ui.services.label"]" style="max-width: 16rem;" /></td>
+                            <td style="text-align: center;"><input name="code_@row.Code" value="@row.LabelCode" minlength="3" maxlength="3" pattern="[A-Za-z]{3}" required size="3"
+                                       class="ops-service-code" autocapitalize="characters" title="@T["ui.services.label_code_hint"]" aria-label="@T["ui.services.label_code"]" /></td>
                             <td><div class="ops-service-days">
                                 <input type="number" name="min_@row.Code" value="@row.MinDays" min="1" max="365" required aria-label="@T["ui.services.min_days"]" />
                                 <span>–</span>

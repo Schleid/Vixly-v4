@@ -1,0 +1,73 @@
+@*
+=========================================================
+FILE: ItemsReviewPage.razor
+
+PURPOSE:
+Items to review: parcels at origin whose items still need a customs code or a country of origin (owner, 2026-11-01).
+
+RESPONSIBILITIES:
+- List the parcels, oldest first, with what was declared and how many items are missing
+- Link each to its items on the parcel page
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Brief §5 table layout with status pills and sticky header
+=========================================================
+*@
+@using Vixly.Operations.Application.Items
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.items.review.title"]" Company="@Company" Section="items_review" Error="@Error">
+    <section class="ops-editor__panel ops-items-review-panel" aria-labelledby="items-review">
+        <div class="ops-items-review__header">
+            <h2 id="items-review">@T["ui.items.review.title"]</h2>
+            <p class="ops-editor__hint">@T[Required ? "ui.items.review.hint_required" : "ui.items.review.hint"]</p>
+        </div>
+        @if (Parcels.Count == 0)
+        {
+            <div class="ops-editor__empty"><h2>@T["ui.items.review.none"]</h2></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.items.review.title"]">
+                <table class="ops-editor__table">
+                    <thead>
+                        <tr>
+                            <th scope="col">@T["ui.items.review.parcel"]</th>
+                            <th scope="col">@T["ui.items.review.warehouse"]</th>
+                            <th scope="col">@T["ui.items.review.received"]</th>
+                            <th scope="col">@T["ui.items.declared"]</th>
+                            <th scope="col" class="ops-editor__number">@T["ui.items.review.missing"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (OperationsItemReviewRow parcel in Parcels)
+                        {
+                            <tr>
+                                <td><a href="/staff/parcels/@parcel.ParcelId#items" class="ops-ticket-link">@parcel.Number</a></td>
+                                <td>@parcel.WarehouseCode</td>
+                                <td><time datetime="@parcel.CreatedUtc.ToString("O")">@parcel.CreatedUtc.ToString("yyyy-MM-dd")</time></td>
+                                <td>@parcel.Contents</td>
+                                <td class="ops-editor__number">
+                                    <span class="ops-status-pill" data-status="missing">
+                                        @(parcel.Items == 0 ? T["ui.items.review.no_items"].Value : parcel.Missing.ToString(System.Globalization.CultureInfo.InvariantCulture))
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsItemReviewRow> Parcels { get; set; } = Array.Empty<OperationsItemReviewRow>();
+
+    [Parameter] public bool Required { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+}

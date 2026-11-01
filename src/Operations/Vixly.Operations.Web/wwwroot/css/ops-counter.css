@@ -788,3 +788,69 @@
     margin: 0 !important;
 }
 
+
+/* =========================================================
+   Counter Shipment - Additional Items Details Drawer
+   ========================================================= */
+.ops-counter__items {
+    flex-basis: 100% !important;
+    width: 100% !important;
+    margin-top: 0.5rem;
+    padding-top: 0.65rem;
+    border-top: 1px dashed var(--vx-color-border);
+}
+.ops-counter__items summary {
+    font-size: 0.75rem;
+    font-weight: 650;
+    color: var(--vx-color-primary);
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 0.5rem;
+    outline: none;
+}
+.ops-counter__items summary:hover {
+    text-decoration: underline;
+}
+.ops-counter__item {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.45rem;
+    padding: 0.45rem 0.65rem;
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: 0.375rem;
+}
+.ops-counter__item label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--vx-color-text-muted);
+    margin: 0;
+}
+.ops-counter__item label:nth-child(1) {
+    flex: 1 1 12rem;
+}
+.ops-counter__item label:nth-child(2) {
+    flex: 0 0 4.5rem;
+}
+.ops-counter__item label:nth-child(3) {
+    flex: 0 0 6.5rem;
+}
+.ops-counter__item label:nth-child(4) {
+    flex: 0 0 6.5rem;
+}
+.ops-counter__item input,
+.ops-counter__item select {
+    height: 32px !important;
+    min-height: 32px !important;
+    box-sizing: border-box !important;
+    font-size: 0.8125rem !important;
+    padding: 0.2rem 0.5rem !important;
+    border: 1px solid var(--vx-color-border-control) !important;
+    border-radius: 0.35rem !important;
+    background: var(--vx-color-surface) !important;
+}
