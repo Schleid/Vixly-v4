@@ -77,7 +77,7 @@ public sealed class GetOperationsShippingLabelUseCase
 
         if (await _shippingLabels.BuildAsync(parcel, cancellationToken) is not { } label)
         {
-            return GetOperationsShippingLabelResponse.Failure(OperationsPrintingErrors.NotCleared);
+            return GetOperationsShippingLabelResponse.Failure(await _shippingLabels.RefusalAsync(parcel, cancellationToken));
         }
 
         // Downloaded to print: it leaves the labels to print, and the shipment keeps its number.

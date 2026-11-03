@@ -15,6 +15,7 @@ namespace Vixly.Platform.Application.Ports;
 // IMPORTANT NOTES:
 // - Implemented in Infrastructure
 // - Called from the outbox, never inside a request
+// - statementWording (receipts for card payments only) tells the payer how the charge reads on their statement
 // =========================================================
 public interface IPlatformBillingMailer
 {
@@ -24,5 +25,6 @@ public interface IPlatformBillingMailer
         PlatformInvoice invoice,
         PlatformBillingDocument document,
         string? payLink,
+        string? statementWording,
         CancellationToken cancellationToken);
 }

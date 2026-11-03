@@ -49,5 +49,8 @@ public sealed class OperationsSitePage
         return Site.Text(key) is { Length: > 0 } own ? own : VixlyText.Format(text, defaultKey, "company", Company);
     }
 
+    // Landing page rates (owner, 2026-10-30): what the visitor asked to estimate, and the answer; null until asked.
+    public OperationsSiteEstimate? Estimate { get; init; }
+
     public string? Image(Guid? imageId) => imageId is { } id ? "/site/image/" + id.ToString("N") : null;
 }

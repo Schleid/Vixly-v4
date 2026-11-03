@@ -18,4 +18,7 @@ public sealed class ConfirmSecondFactorRequest
     public string Code { get; init; } = string.Empty;
 
     public bool UseRecoveryCode { get; init; }
+
+    // Require MFA = No and no second factor: Code holds the password.
+    public bool UsePassword { get; init; }
 }

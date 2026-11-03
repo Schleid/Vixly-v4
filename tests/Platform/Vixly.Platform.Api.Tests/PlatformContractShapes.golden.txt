@@ -28,16 +28,17 @@ Internal.Devices.ReleasePlatformDeviceBody: reason:string
 Internal.Devices.VerifyPlatformDeviceBody: secret:string?, challenge:string?, signature:string?, rotate:bool?, country:string?
 Internal.Entitlements.PlatformEntitlementsBatchBody: tenantIds:IReadOnlyList<Guid>
 Internal.Entitlements.PlatformEntitlementsBatchInfo: items:IReadOnlyList<PlatformEntitlementsInfo>
-Internal.Entitlements.PlatformEntitlementsInfo: tenantId:Guid, status:string?, access:string, features:IReadOnlyList<string>, limits:IReadOnlyDictionary<string,int>, nonPayment:PlatformNonPaymentPartInfo?, legal:PlatformEntitlementsLegalInfo?
+Internal.Entitlements.PlatformEntitlementsInfo: tenantId:Guid, status:string?, access:string, features:IReadOnlyList<string>, limits:IReadOnlyDictionary<string,int>, nonPayment:PlatformNonPaymentPartInfo?, legal:PlatformEntitlementsLegalInfo?, extraShipmentPrice:decimal, currencyCode:string?
 Internal.Entitlements.PlatformEntitlementsLegalInfo: status:string, deadlineUtc:DateTimeOffset?, requiredVersion:string?
 Internal.Entitlements.PlatformMoneyInfo: currencyCode:string, amount:decimal
 Internal.Entitlements.PlatformNonPaymentPartInfo: blockedUtc:DateTimeOffset?, amountDue:IReadOnlyList<PlatformMoneyInfo>, cardPaymentsAvailable:bool
+Internal.Entitlements.PlatformShipmentUsageBody: month:string, shipments:int, isFinal:bool
 Internal.Legal.AcceptPlatformLegalTermsBody: documentId:Guid, sha256:string, language:string
 Internal.Legal.PlatformLegalStatusInfo: status:string, deadlineUtc:DateTimeOffset?, readOnly:bool, terms:PlatformLegalTermsInfo?
 Internal.Portal.PlatformPortalAccessBatchBody: slugs:IReadOnlyList<string>
 Internal.Portal.PlatformPortalAccessBatchInfo: items:IReadOnlyList<PlatformPortalAccessBatchItem>
 Internal.Portal.PlatformPortalAccessBatchItem: slug:string, access:PlatformPortalAccessInfo
-Internal.Portal.PlatformPortalAccessInfo: found:bool, tenantId:Guid?, status:string?, access:string, canonicalSlug:string?, defaultLanguage:string?, legal:string
+Internal.Portal.PlatformPortalAccessInfo: found:bool, tenantId:Guid?, status:string?, access:string, canonicalSlug:string?, defaultLanguage:string?, legal:string, timeZone:string?
 Internal.Subscription.PlatformPlanOptionInfo: planId:Guid, code:string, name:string, currencyCode:string, monthlyPricePerLicence:decimal, annualPricePerLicence:decimal, setupFee:decimal, minimumLicences:int, maxLicences:int, trialDays:int?
 Internal.Subscription.PlatformScheduledChangeInfo: planCode:string, planName:string, term:string, licences:int, effectiveUtc:DateTimeOffset, periodAmount:decimal
 Internal.Subscription.PlatformSubscriptionChangeBody: planId:Guid, term:string, licences:int

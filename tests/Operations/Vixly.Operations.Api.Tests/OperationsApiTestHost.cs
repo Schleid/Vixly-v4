@@ -63,8 +63,11 @@ internal sealed class OperationsApiTestHost : IAsyncDisposable
             new[]
             {
                 "--environment=Production",
+                "--VixlySettingsCheck:Enabled=false",
                 "--applicationName=Vixly.Operations.Api",
                 "--AllowedHosts=*",
+                "--TenantHosting:BaseDomains:0=techcrafters.ltd",
+                "--OperationsLinks:PortalUrlTemplate=https://{slug}.techcrafters.ltd",
                 "--OperationsFiles:Root=" + Path.Combine(Path.GetTempPath(), "vixly-files-" + Guid.NewGuid().ToString("N")),
                 "--ConnectionStrings:Operations=" + (connectionString ?? "Server=127.0.0.1,1;Database=None;User Id=none;Password=none;Connect Timeout=1;TrustServerCertificate=True")
             },

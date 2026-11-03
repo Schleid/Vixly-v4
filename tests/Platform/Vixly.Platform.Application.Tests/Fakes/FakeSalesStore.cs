@@ -100,6 +100,8 @@ internal sealed class FakeSalesStore :
 
     public string SecondFactorResetLink(string portalSlug, string token) => $"https://{portalSlug}.vixly.test/account/second-factor-reset#{token}";
 
+    public string ControlLink(string path) => "https://control.vixly.test/" + path.TrimStart('/');
+
     public Task SendApprovalRequestAsync(PlatformPermissionHolderItem recipient, string kindKey, string subject, CancellationToken cancellationToken)
     {
         ApprovalMails.Add((recipient.Email, kindKey, subject));

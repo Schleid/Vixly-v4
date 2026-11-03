@@ -32,16 +32,20 @@ public sealed class GetOperationsCashierUseCase
 
     private readonly IOperationsPaymentRepository _payments;
 
+    private readonly Vixly.Operations.Application.Customers.OperationsCustomerLookups _lookups;
+
     public GetOperationsCashierUseCase(
         OperationsBillingDesk desk,
         IOperationsBillingRepository billing,
         IOperationsCustomerRepository customers,
-        IOperationsPaymentRepository payments)
+        IOperationsPaymentRepository payments,
+        Vixly.Operations.Application.Customers.OperationsCustomerLookups lookups)
     {
         _desk = desk ?? throw new ArgumentNullException(nameof(desk));
         _billing = billing ?? throw new ArgumentNullException(nameof(billing));
         _customers = customers ?? throw new ArgumentNullException(nameof(customers));
         _payments = payments ?? throw new ArgumentNullException(nameof(payments));
+        _lookups = lookups ?? throw new ArgumentNullException(nameof(lookups));
     }
 
     public async Task<GetOperationsCashierResponse> ExecuteAsync(
@@ -73,7 +77,14 @@ public sealed class GetOperationsCashierUseCase
             else if (!access.IsPartnerAgent)
             {
                 // A partner agent finds only by a number of its own warehouse: never another customer by phone or email (R-8).
-                matches = await _customers.FindForCounterAsync(find, 10, cancellationToken);
+                // Owner, 2026-10-29: recorded, and limited per hour (design 4.4).
+                (matches, Error? limit) = await _lookups.FindAsync(access, find, 10, cancellationToken);
+
+                if (limit is not null)
+                {
+                    return GetOperationsCashierResponse.Failure(limit);
+                }
+
                 customer = matches.Count == 1 ? matches[0] : null;
             }
         }

@@ -7,8 +7,12 @@ using Vixly.Operations.Application.UseCases.Company.CreateOperationsPayLink;
 using Vixly.Operations.Application.UseCases.Company.GetOperationsBilling;
 using Vixly.Operations.Application.UseCases.Company.GetOperationsBillingDocument;
 using Vixly.Operations.Application.UseCases.Company.GetOperationsCompany;
+using Vixly.Operations.Application.UseCases.Company.GetOperationsDocumentLogo;
+using Vixly.Operations.Application.UseCases.Company.RemoveOperationsDocumentLogo;
+using Vixly.Operations.Application.UseCases.Company.SaveOperationsDocumentLogo;
 using Vixly.Operations.Application.UseCases.Company.SubmitOperationsCompanyChange;
 using Vixly.Operations.Application.UseCases.Company.UpdateOperationsCompanyContacts;
+using Vixly.Operations.Application.UseCases.Company.UpdateOperationsCompanyProfile;
 using Vixly.Operations.Application.UseCases.Company.WithdrawOperationsCompanyChange;
 using Vixly.Operations.Application.UseCases.SignIn.GetOperationsSignInBrand;
 using Vixly.Operations.Resources;
@@ -26,7 +30,7 @@ namespace Vixly.Operations.Web.Endpoints;
 // The company and billing pages (Slice 1E).
 //
 // RESPONSIBILITIES:
-// - /staff/company: legal details, contacts, language, time zone and change requests
+// - /staff/company: the company profile (saved directly), contacts, language, time zone, and legal name change requests
 // - /staff/billing: the plan, invoices, pay links and billing PDFs
 //
 // IMPORTANT NOTES:
@@ -45,7 +49,91 @@ public static class OperationsCompanyEndpoints
         RouteGroupBuilder staff = endpoints.MapGroup("/staff").RequireAuthorization().RequireFormToken();
 
         staff.MapGet("/company", async (HttpContext http, string? done, GetOperationsCompanyUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText text, IStringLocalizer<OperationsText> texts) =>
-            await CompanyPageAsync(http, get, brand, text, null, done is null ? null : texts["ui.company.done." + (done == "change" ? "change" : "saved")].Value));
+            await CompanyPageAsync(http, get, brand, text, null, done is null ? null : texts["ui.company.done." + done switch
+            {
+                "change" => "change",
+                "logo_saved" => "logo_saved",
+                "logo_removed" => "logo_removed",
+                _ => "saved"
+            }].Value));
+
+        // Owner, 2026-10-28: the logo on documents and labels, shown on the company page once saved.
+        staff.MapGet("/company/document-logo", async (HttpContext http, bool? label, GetOperationsDocumentLogoUseCase get) =>
+        {
+            GetOperationsDocumentLogoResponse logo = await get.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsDocumentLogoRequest { Label = label == true }, http.RequestAborted);
+
+            if (logo.Content is not { } content)
+            {
+                return Results.NotFound();
+            }
+
+            http.Response.Headers.CacheControl = "private, max-age=3600";
+            http.Response.Headers.XContentTypeOptions = "nosniff";
+            return Results.File(content, logo.ContentType);
+        });
+
+        staff.MapPost("/company/document-logo", async (HttpContext http, IFormFile? logo, SaveOperationsDocumentLogoUseCase save, GetOperationsCompanyUseCase get,
+            GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
+        {
+            byte[] content = Array.Empty<byte>();
+
+            if (logo is { Length: > 0 and <= Vixly.Operations.Domain.Branding.OperationsSiteImage.MaxBytes })
+            {
+                await using MemoryStream buffer = new();
+                await logo.CopyToAsync(buffer, http.RequestAborted);
+                content = buffer.ToArray();
+            }
+
+            SaveOperationsDocumentLogoResponse response = logo is { Length: > Vixly.Operations.Domain.Branding.OperationsSiteImage.MaxBytes }
+                ? SaveOperationsDocumentLogoResponse.Failure(Vixly.Operations.Domain.Branding.OperationsBrandingErrors.ImageTooLarge)
+                : await save.ExecuteAsync(OperationsCurrentUser.Context(http), new SaveOperationsDocumentLogoRequest { Content = content }, http.RequestAborted);
+
+            return response.Succeeded
+                ? Results.Redirect("/staff/company?done=logo_saved#document-logo")
+                : OperationsStaffEndpoints.StepUp(response.Error, "/staff/company#document-logo") ?? await CompanyPageAsync(http, get, brand, text, response.Error, null);
+        });
+
+        staff.MapPost("/company/document-logo/remove", async (HttpContext http, RemoveOperationsDocumentLogoUseCase remove, GetOperationsCompanyUseCase get,
+            GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
+        {
+            RemoveOperationsDocumentLogoResponse response = await remove.ExecuteAsync(OperationsCurrentUser.Context(http), new RemoveOperationsDocumentLogoRequest { Confirmed = true },
+                http.RequestAborted);
+
+            return response.Succeeded
+                ? Results.Redirect("/staff/company?done=logo_removed#document-logo")
+                : OperationsStaffEndpoints.StepUp(response.Error, "/staff/company#document-logo") ?? await CompanyPageAsync(http, get, brand, text, response.Error, null);
+        });
+
+        // Sample PDFs drawn with the saved logo, to check it before a customer sees it.
+        staff.MapGet("/company/document-logo/sample", async (HttpContext http, GetOperationsDocumentLogoUseCase get, GetOperationsSignInBrandUseCase brand, IOperationsLabelRenderer renderer) =>
+        {
+            if (!(await get.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsDocumentLogoRequest(), http.RequestAborted)).Succeeded)
+            {
+                return Results.NotFound();
+            }
+
+            string company = (await brand.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsSignInBrandRequest(), http.RequestAborted)).DisplayName ?? string.Empty;
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            byte[] pdf = renderer.RenderReceipt(new OperationsReceiptDocument(company, "WH1", Text(http, "ui.company.document_logo.sample_warehouse"), "SAMPLE", "UPS",
+                now.AddMinutes(-20), now, Text(http, "ui.company.document_logo.sample_person"), 1, 0,
+                new[] { new OperationsReceiptLine("PK26000001", "1Z999AA10123456784", "C00001", false) }));
+            return Pdf(http, pdf);
+        });
+
+        staff.MapGet("/company/document-logo/sample-label", async (HttpContext http, GetOperationsDocumentLogoUseCase get, GetOperationsSignInBrandUseCase brand, IOperationsLabelRenderer renderer) =>
+        {
+            if (!(await get.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsDocumentLogoRequest(), http.RequestAborted)).Succeeded)
+            {
+                return Results.NotFound();
+            }
+
+            string company = (await brand.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsSignInBrandRequest(), http.RequestAborted)).DisplayName ?? string.Empty;
+            string tracking = Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.Make(Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.DefaultPrefix,
+                new[] { 4, 8, 2, 9, 1, 7, 3, 6, 0, 5 });
+            byte[] pdf = renderer.RenderShippingLabel(new OperationsShippingLabel(company, "SH26000001", "PK26000001", 1, 1, "FLL", "CAY", "air_standard", "Jean Baptiste", "Les Cayes", true,
+                "4.5 lb", tracking, null, "VXA", "Air standard", "air", false, DateTime.UtcNow.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture), "FLL", false, false));
+            return Pdf(http, pdf);
+        });
 
         staff.MapPost("/company/contacts", async (HttpContext http, [FromForm] string? billingName, [FromForm] string? billingEmail, [FromForm] string? billingPhone,
             [FromForm] string? technicalName, [FromForm] string? technicalEmail, [FromForm] string? technicalPhone, [FromForm] string? language, [FromForm] string? timeZone,
@@ -63,8 +151,34 @@ public static class OperationsCompanyEndpoints
                 : OperationsStaffEndpoints.StepUp(response.Error, "/staff/company") ?? await CompanyPageAsync(http, get, brand, text, response.Error, null);
         });
 
-        staff.MapPost("/company/change", async (HttpContext http, [FromForm] string? legalName, [FromForm] string? tradingName, [FromForm] string? email, [FromForm] string? phone,
+        // 2026-10-25: everything but the legal name is the company's own: saved at once, no approval.
+        staff.MapPost("/company/profile", async (HttpContext http, [FromForm] string? tradingName, [FromForm] string? email, [FromForm] string? phone,
             [FromForm] string? line1, [FromForm] string? line2, [FromForm] string? city, [FromForm] string? region, [FromForm] string? postalCode, [FromForm] string? country,
+            UpdateOperationsCompanyProfileUseCase update, GetOperationsCompanyUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
+        {
+            UpdateOperationsCompanyProfileResponse response = await Unavailable(() => update.ExecuteAsync(OperationsCurrentUser.Context(http), new UpdateOperationsCompanyProfileRequest
+            {
+                Input = new OperationsCompanyChangeInput
+                {
+                    TradingName = string.IsNullOrWhiteSpace(tradingName) ? null : tradingName.Trim(),
+                    Email = email?.Trim() ?? string.Empty,
+                    Phone = phone?.Trim() ?? string.Empty,
+                    AddressLine1 = line1?.Trim() ?? string.Empty,
+                    AddressLine2 = string.IsNullOrWhiteSpace(line2) ? null : line2.Trim(),
+                    City = city?.Trim() ?? string.Empty,
+                    StateProvince = string.IsNullOrWhiteSpace(region) ? null : region.Trim(),
+                    PostalCode = string.IsNullOrWhiteSpace(postalCode) ? null : postalCode.Trim(),
+                    CountryCode = (country ?? string.Empty).Trim().ToUpperInvariant()
+                }
+            }, http.RequestAborted));
+
+            return response.Succeeded
+                ? Results.Redirect("/staff/company?done=saved")
+                : OperationsStaffEndpoints.StepUp(response.Error, "/staff/company") ?? await CompanyPageAsync(http, get, brand, text, response.Error, null);
+        });
+
+        // The legal name only, with a reason and proof; Vixly approves it (B12).
+        staff.MapPost("/company/change", async (HttpContext http, [FromForm] string? legalName,
             [FromForm] string? reason, IFormFile? proof, SubmitOperationsCompanyChangeUseCase submit, GetOperationsCompanyUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
         {
             byte[]? content = null;
@@ -83,15 +197,6 @@ public static class OperationsCompanyEndpoints
                     Input = new OperationsCompanyChangeInput
                     {
                         LegalName = legalName ?? string.Empty,
-                        TradingName = tradingName,
-                        Email = email ?? string.Empty,
-                        Phone = phone ?? string.Empty,
-                        AddressLine1 = line1 ?? string.Empty,
-                        AddressLine2 = line2,
-                        City = city ?? string.Empty,
-                        StateProvince = region,
-                        PostalCode = postalCode,
-                        CountryCode = (country ?? string.Empty).Trim().ToUpperInvariant(),
                         Reason = reason ?? string.Empty,
                         ProofFileName = proof is null ? null : Path.GetFileName(proof.FileName),
                         ProofContent = content
@@ -147,11 +252,21 @@ public static class OperationsCompanyEndpoints
     {
         GetOperationsCompanyResponse company = await Unavailable(() => get.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsCompanyRequest(), http.RequestAborted));
         string? name = (await brand.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsSignInBrandRequest(), http.RequestAborted)).DisplayName;
+        GetOperationsDocumentLogoResponse logo = await http.RequestServices.GetRequiredService<GetOperationsDocumentLogoUseCase>()
+            .ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsDocumentLogoRequest(), http.RequestAborted);
         http.Response.Headers.CacheControl = "no-store";
 
         return company.View is null
             ? new RazorComponentResult<EditorMessagePage>(new { Title = Text(http, "ui.company.title"), Company = name, Section = "company", Error = text.Describe(company.Error) })
-            : new RazorComponentResult<CompanyPage>(new { Company = name, View = company.View, Error = text.Describe(error), Info = info });
+            : new RazorComponentResult<CompanyPage>(new { Company = name, View = company.View, Error = text.Describe(error), Info = info, DocumentLogo = logo.Succeeded ? logo : null });
+    }
+
+    // Shown in the tab, ready to print; never kept by a cache.
+    private static IResult Pdf(HttpContext http, byte[] pdf)
+    {
+        http.Response.Headers.CacheControl = "private, no-store";
+        http.Response.Headers.XContentTypeOptions = "nosniff";
+        return Results.File(pdf, "application/pdf");
     }
 
     private static async Task<IResult> BillingPageAsync(HttpContext http, GetOperationsBillingUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText text, int page, Error? error)

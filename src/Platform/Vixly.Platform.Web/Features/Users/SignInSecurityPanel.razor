@@ -1,0 +1,70 @@
+﻿@*
+=========================================================
+FILE: SignInSecurityPanel.razor
+
+PURPOSE:
+Control's sign-in rule on the users page: Require MFA Yes/No
+(owner, 2026-10-22).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10)
+- Only a SuperUser may change it, after step-up
+=========================================================
+*@
+@inherits PlatformPresenterComponent<SignInSecurityPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.Loaded)
+{
+    <VxCard Title="@T["ui.security.title"]">
+        @if (Presenter.State.DoneKey is { } done)
+        {
+            <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+        }
+        @if (Presenter.State.Error is not null)
+        {
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+        }
+        <p class="vx-hint">@T["ui.security.help"]</p>
+        <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit || Presenter.IsBusy)">
+            <legend class="vx-label">@T["ui.security.require_mfa"]</legend>
+            <label><input type="radio" name="require-mfa" checked="@Presenter.State.RequireMfa" @onchange="() => Presenter.SaveAsync(true)" /> @T["ui.common.yes"]</label>
+            <label><input type="radio" name="require-mfa" checked="@(!Presenter.State.RequireMfa)" @onchange="() => Presenter.SaveAsync(false)" /> @T["ui.common.no"]</label>
+        </fieldset>
+        <p class="vx-hint">@T[Presenter.State.RequireMfa ? "ui.security.require_mfa_yes" : "ui.security.require_mfa_no"]</p>
+        @if (Presenter.State.UpdatedUtc is { } updated)
+        {
+            <p class="vx-hint">@VixlyText.Format(T, "ui.security.updated", new Dictionary<string, object> { ["name"] = Presenter.State.UpdatedBy ?? string.Empty, ["time"] = PlatformDisplay.Utc(T, updated) })</p>
+        }
+        @if (!Presenter.State.CanEdit)
+        {
+            <p class="vx-hint">@T["ui.security.superuser_only"]</p>
+        }
+        <fieldset class="vx-fieldset vx-security-idle" disabled="@(!Presenter.State.CanEditIdle || Presenter.IsBusy)">
+            <legend class="vx-label">@T["ui.security.idle"]</legend>
+            <label>@T["ui.security.idle_minutes"] <input type="number" inputmode="numeric" min="5" max="30" step="1" @bind="_idleMinutes" /></label>
+            <label>@T["ui.security.idle_warn"] <input type="number" inputmode="numeric" min="1" max="5" step="1" @bind="_idleWarn" /></label>
+            <VxButton OnClick="() => Presenter.SaveIdleAsync(_idleMinutes, _idleWarn)">@T["ui.security.idle_save"]</VxButton>
+        </fieldset>
+        <p class="vx-hint">@T[Presenter.State.CanEditIdle ? "ui.security.idle_hint" : "ui.security.idle_admin_only"]</p>
+    </VxCard>
+}
+@if (Presenter.State.Pending is not null || Presenter.State.PendingIdle is not null)
+{
+    <StepUpDialog OnConfirmed="Presenter.ConfirmPendingAsync" OnCancelled="Presenter.CancelStepUp" />
+}
+
+@code {
+    private int _idleMinutes = 5;
+
+    private int _idleWarn = 1;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Presenter.LoadAsync();
+        (_idleMinutes, _idleWarn) = (Presenter.State.IdleMinutes, Presenter.State.IdleWarnMinutes);
+    }
+}

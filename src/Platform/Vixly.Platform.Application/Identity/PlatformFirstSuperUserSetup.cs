@@ -77,7 +77,7 @@ public sealed class PlatformFirstSuperUserSetup
             EmailAddress.Create(email),
             LanguageCode.Default,
             PlatformUserAuthorityLevel.SuperUser,
-            null,
+            await _users.NextEmployeeNumberAsync(cancellationToken),
             null,
             utcNow);
 

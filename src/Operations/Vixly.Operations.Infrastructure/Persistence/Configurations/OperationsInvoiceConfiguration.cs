@@ -96,5 +96,9 @@ internal sealed class OperationsInvoiceConfiguration : IEntityTypeConfiguration<
 
         // Slice 5F step 2b: the invoices on credit accounts, and the charges waiting for the credit department.
         builder.HasIndex(invoice => new { invoice.TenantId, invoice.OnAccount, invoice.CustomerId }).HasFilter("[OnAccount] <> 0");
+        // Slice 10: the company API and webhooks read in order of creation.
+        builder.HasIndex(invoice => new { invoice.TenantId, invoice.CreatedUtc });
+        // Slice 11: reports by issue day.
+        builder.HasIndex(invoice => new { invoice.TenantId, invoice.IssuedOn });
     }
 }

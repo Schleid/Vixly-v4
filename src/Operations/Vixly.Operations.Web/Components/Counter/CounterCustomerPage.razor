@@ -55,38 +55,41 @@ IMPORTANT NOTES:
             </OperationsTableViewport>
         }
     </section>
-    @* Slice 5E (S-14): supplies ordered on their own, next to the shipments. *@
-    <section class="ops-editor__panel" aria-labelledby="counter-orders">
-        <h2 id="counter-orders">@T["ui.counter.supplies.orders"]</h2>
-        @if (Standing.Good)
-        {
-            <form method="post" action="/staff/counter/customers/@Customer.Id/orders" class="ops-editor__inline">
-                <AntiforgeryToken />
-                @* At the counter's warehouse: the clerk picks it when they serve at several (review of 5E). *@
-                @if (Origins.Count > 1)
-                {
-                    <select name="warehouse" aria-label="@T["ui.counter.origin"]">
-                        @foreach (OperationsChoice origin in Origins) { <option value="@origin.Id">@origin.Name</option> }
-                    </select>
-                }
-                else if (Origins.Count == 1)
-                {
-                    <input type="hidden" name="warehouse" value="@Origins[0].Id" />
-                }
-                <button type="submit" class="vx-button vx-button--secondary" accesskey="o">@T["ui.counter.supplies.order_new"]</button>
-            </form>
-        }
-        @if (Orders.Count > 0)
-        {
-            <ul class="ops-editor__list">
-                @foreach (OperationsSupplySale order in Orders)
-                {
-                    <li><a href="/staff/counter/orders/@order.Id">@(order.Number ?? T["ui.counter.supplies.order"].Value)</a> · @order.CreatedUtc.ToString("yyyy-MM-dd")
-                        · @T["ui.counter.supplies.status." + order.Status] · @order.Total.ToString("N2", CultureInfo.CurrentCulture) @order.CurrencyCode</li>
-                }
-            </ul>
-        }
-    </section>
+    @if (SuppliesOn)
+    {
+        @* Slice 5E (S-14): supplies ordered on their own, next to the shipments. *@
+        <section class="ops-editor__panel" aria-labelledby="counter-orders">
+            <h2 id="counter-orders">@T["ui.counter.supplies.orders"]</h2>
+            @if (Standing.Good)
+            {
+                <form method="post" action="/staff/counter/customers/@Customer.Id/orders" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    @* At the counter's warehouse: the clerk picks it when they serve at several (review of 5E). *@
+                    @if (Origins.Count > 1)
+                    {
+                        <select name="warehouse" aria-label="@T["ui.counter.origin"]">
+                            @foreach (OperationsChoice origin in Origins) { <option value="@origin.Id">@origin.Name</option> }
+                        </select>
+                    }
+                    else if (Origins.Count == 1)
+                    {
+                        <input type="hidden" name="warehouse" value="@Origins[0].Id" />
+                    }
+                    <button type="submit" class="vx-button vx-button--secondary" accesskey="o">@T["ui.counter.supplies.order_new"]</button>
+                </form>
+            }
+            @if (Orders.Count > 0)
+            {
+                <ul class="ops-editor__list">
+                    @foreach (OperationsSupplySale order in Orders)
+                    {
+                        <li><a href="/staff/counter/orders/@order.Id">@(order.Number ?? T["ui.counter.supplies.order"].Value)</a> · @order.CreatedUtc.ToString("yyyy-MM-dd")
+                            · @T["ui.counter.supplies.status." + order.Status] · @order.Total.ToString("N2", CultureInfo.CurrentCulture) @order.CurrencyCode</li>
+                    }
+                </ul>
+            }
+        </section>
+    }
     @if (Origins.Count > 0 && Standing.Good)
     {
         <details class="ops-editor__panel" open="@(Entered is not null || Shipments.Count == 0)">
@@ -186,6 +189,9 @@ IMPORTANT NOTES:
 
     // Slice 5D: the company's insurance products.
     [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Charges.OperationsInsurancePlan> Insurance { get; set; } = Array.Empty<Vixly.Operations.Domain.Charges.OperationsInsurancePlan>();
+
+    // Vixly Lite (owner, 2026-10-30): supplies are in the company's plan.
+    [Parameter] public bool SuppliesOn { get; set; } = true;
 
     [Parameter] public string CurrencyCode { get; set; } = string.Empty;
 

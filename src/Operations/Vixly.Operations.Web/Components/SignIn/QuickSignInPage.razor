@@ -1,0 +1,47 @@
+﻿@*
+=========================================================
+FILE: QuickSignInPage.razor
+
+PURPOSE:
+Sign-in on a licensed device with a staff badge or a PIN (Slice 12A, owner H-8).
+
+RESPONSIBILITIES:
+- The badge field, ready for a scanner
+- The way to a PIN, or to the email sign-in
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- The field hides what the scanner types, as a password field does
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<AuthShell Title="@T["ui.quick.title"]" Subtitle="@T["ui.quick.subtitle"]" Company="@Company" ReturnHere="/staff">
+    <FormMessage Error="@Error" Info="@Info" />
+    <form method="post" action="/staff/sign-in/badge" class="vx-form" data-quick-badge>
+        <AntiforgeryToken />
+        <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+        <div class="vx-field">
+            <label for="badge" class="vx-label">@T["ui.quick.badge"]</label>
+            <input id="badge" name="badge" type="password" class="vx-input" autocomplete="off" autocapitalize="characters" spellcheck="false" required autofocus />
+        </div>
+        <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.quick.submit"]</VxButton>
+    </form>
+    <p><a href="/staff/sign-in/pin?returnUrl=@Uri.EscapeDataString(ReturnUrl)">@T["ui.quick.use_pin"]</a></p>
+    <p><a href="/staff?email=1">@T["ui.quick.use_email"]</a></p>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string? Company { get; set; }
+
+    [Parameter]
+    public string ReturnUrl { get; set; } = "/staff";
+
+    [Parameter]
+    public string? Error { get; set; }
+
+    [Parameter]
+    public string? Info { get; set; }
+}

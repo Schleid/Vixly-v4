@@ -12,5 +12,6 @@
 // IMPORTANT NOTES:
 // - Newest first, up to 100
 // - CardOffered (Slice 5F step 4): the company takes cards on Stripe's page
+// - ZelleOffered, BankTransferOffered (owner, 2026-10-27): offered on the portal by the company
 // =========================================================
-public sealed record CustomerInvoicesDto(IReadOnlyList<CustomerInvoiceDto> Invoices, bool CardOffered = false);
+public sealed record CustomerInvoicesDto(IReadOnlyList<CustomerInvoiceDto> Invoices, bool CardOffered = false, bool ZelleOffered = false, bool BankTransferOffered = false);

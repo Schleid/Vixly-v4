@@ -56,6 +56,8 @@ public sealed class AddOperationsCounterParcelUseCase
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly Vixly.Operations.Application.Items.OperationsItemDeclaration _declaration;
+
     public AddOperationsCounterParcelUseCase(
         OperationsCounterDesk desk,
         IOperationsReceivingRepository receiving,
@@ -67,8 +69,10 @@ public sealed class AddOperationsCounterParcelUseCase
         OperationsShipmentBooking booking,
         IOperationsUnitOfWork unitOfWork,
         TimeProvider timeProvider,
-        IOperationsCustomerRepository customers)
+        IOperationsCustomerRepository customers,
+        Vixly.Operations.Application.Items.OperationsItemDeclaration declaration)
     {
+        _declaration = declaration ?? throw new ArgumentNullException(nameof(declaration));
         _customers = customers ?? throw new ArgumentNullException(nameof(customers));
         _desk = desk ?? throw new ArgumentNullException(nameof(desk));
         _receiving = receiving ?? throw new ArgumentNullException(nameof(receiving));
@@ -151,6 +155,7 @@ public sealed class AddOperationsCounterParcelUseCase
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();
         OperationsTenantSettings settings = await _settings.FindAsync(cancellationToken) ?? OperationsTenantSettings.CreateDefault(context.RequiredTenantId, utcNow);
         OperationsParcel parcel;
+        IReadOnlyList<Vixly.Operations.Domain.Items.OperationsParcelItem> items;
 
         try
         {
@@ -164,8 +169,26 @@ public sealed class AddOperationsCounterParcelUseCase
                 OperationsUnits.ToCentimetres(length, settings.DimensionUnit),
                 OperationsUnits.ToCentimetres(width, settings.DimensionUnit),
                 OperationsUnits.ToCentimetres(height, settings.DimensionUnit));
+            // Owner, 2026-11-01: the first item is the contents and value typed on the row; more items follow it.
+            List<Vixly.Operations.Application.Items.OperationsItemDraft> lines = Vixly.Operations.Application.Items.OperationsItemDeclaration.Filled(request.MoreItems).ToList();
+
+            if (lines.Count > 0 && !string.IsNullOrWhiteSpace(request.Contents))
+            {
+                lines.Insert(0, new Vixly.Operations.Application.Items.OperationsItemDraft(request.Contents, 1m, request.Value ?? -1m, false));
+            }
+
+            (string? contents, decimal? value) = (request.Contents, request.Value);
+
+            if (lines.Count > 0)
+            {
+                (contents, value) = Vixly.Operations.Application.Items.OperationsItemDeclaration.Summary(lines);
+            }
+
             parcel = OperationsParcel.DropOff(context.RequiredTenantId, await _numbering.NextAsync(OperationsNumberKind.Parcel, cancellationToken), shipment, measurements,
-                request.Contents, request.Value, settings.CurrencyCode, utcNow);
+                contents, value, settings.CurrencyCode, utcNow);
+            items = await _declaration.PrepareAsync(context.RequiredTenantId,
+                lines.Count > 0 ? lines : new[] { new Vixly.Operations.Application.Items.OperationsItemDraft(parcel.DeclaredContents, 1m, parcel.DeclaredValue ?? 0m, false) },
+                settings.CurrencyCode, utcNow, cancellationToken);
         }
         catch (DomainException exception)
         {
@@ -174,6 +197,7 @@ public sealed class AddOperationsCounterParcelUseCase
 
         parcel.TakeStorageTerms(settings.StorageFreeDays, settings.StorageFeePerDay);
         _tracking.Add(parcel);
+        _declaration.AddForParcel(items, parcel, utcNow);
         shipment.TakePackage(utcNow);
 
         // Received at the counter, then measured: the same history as the dock and the station, from the counter (C-7).

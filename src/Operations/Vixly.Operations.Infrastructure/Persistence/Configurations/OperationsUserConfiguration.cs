@@ -38,6 +38,8 @@ internal sealed class OperationsUserConfiguration : IEntityTypeConfiguration<Ope
         builder.Ignore(user => user.UnusedRecoveryCodeCount);
         // Slice 7 step 4 (R-8): a partner agent belongs to one partner-operated warehouse.
         builder.Ignore(user => user.IsPartnerAgent);
+        // Owner, 2026-10-29 (S-5): an outside account's end date and hours are columns of the user; the hours object is read from them.
+        builder.Ignore(user => user.OutsideHours);
         builder.HasOne<Vixly.Operations.Domain.Locations.OperationsWarehouse>().WithMany().HasForeignKey(user => user.PartnerWarehouseId).OnDelete(DeleteBehavior.Restrict);
 
         builder.OwnsOne(user => user.Account, account =>

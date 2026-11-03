@@ -172,8 +172,8 @@ A separate reviewer read the 1D and 1E code without having written it. Its findi
   - The website editor says which part the plan does not include.
   - Operations reads the features from Platform's entitlements and keeps them 5 minutes per tenant. If Platform cannot answer, the site shows the tenant's own choices.
   - Test: one tenant moves through no features, theme only, then all.
-- **Staging on `vixly.freedns.org`, answered yes (wildcard supported):**
+- **Staging on `vixly.freeddns.org`, answered yes (wildcard supported):**
   - Every host has an `appsettings.Staging.json`, loaded with `ASPNETCORE_ENVIRONMENT=Staging`.
-  - Host names: `vixly.freedns.org` (public site), `control.` (console), `api.` (API, which also serves the internal calls), `ops-internal.` (Operations internal API), and `{slug}.` (tenants).
+  - Host names: `vixly.freeddns.org` (public site), `control.` (console), `api.` (API, which also serves the internal calls), `ops-internal.` (Operations internal API), and `{slug}.` (tenants).
   - Secrets (connection strings, caller keys, mail, payments, bot check) stay outside the files, as in production.
   - `ops-internal` and `vixly-ops-internal` are now reserved slugs in Platform's code floor, because the internal host shares the tenant wildcard. The Global Standard H-2 and the hostname table record it.

@@ -37,8 +37,17 @@ public static class OperationsRateLimits
     // Slice 5F step 4: Stripe's events to a company's webhook, per host (Stripe sends from many addresses).
     public const string CardWebhook = "card-webhook";
 
+    // Slice 9: Twilio's message reports to a company, per host.
+    public const string TextWebhook = "text-webhook";
+
+    // Slice 10: the company API, per address before the key is checked (each key also has its own limit once checked).
+    public const string CompanyApi = "company-api";
+
     // Slice 5F step 3: codes typed on a customer screen, per address.
     public const string ScreenPair = "screen-pair";
+
+    // Slice 12C: the map pictures, per address (a map page asks a few dozen at a time).
+    public const string MapTiles = "map-tiles";
 
     public const int StatusPagesPerMinute = 60;
 
@@ -66,8 +75,11 @@ public static class OperationsRateLimits
             options.AddPolicy(PasswordReset, http => RateLimitPartition.GetFixedWindowLimiter(Address(http), _ => Window(5, TimeSpan.FromHours(1))));
             options.AddPolicy(AccountLink, http => RateLimitPartition.GetFixedWindowLimiter(Address(http), _ => Window(10, TimeSpan.FromHours(1))));
             options.AddPolicy(Estimate, http => RateLimitPartition.GetFixedWindowLimiter(Address(http), _ => Window(240, TimeSpan.FromMinutes(1))));
+            options.AddPolicy(MapTiles, http => RateLimitPartition.GetFixedWindowLimiter(Address(http), _ => Window(600, TimeSpan.FromMinutes(1))));
             options.AddPolicy(ScreenPair, http => RateLimitPartition.GetFixedWindowLimiter(Address(http), _ => Window(10, TimeSpan.FromMinutes(10))));
             options.AddPolicy(CardWebhook, http => RateLimitPartition.GetFixedWindowLimiter(http.Request.Host.Host.ToLowerInvariant(), _ => Window(600, TimeSpan.FromMinutes(1))));
+            options.AddPolicy(CompanyApi, http => RateLimitPartition.GetFixedWindowLimiter(Address(http), _ => Window(600, TimeSpan.FromMinutes(1))));
+            options.AddPolicy(TextWebhook, http => RateLimitPartition.GetFixedWindowLimiter(http.Request.Host.Host.ToLowerInvariant(), _ => Window(1200, TimeSpan.FromMinutes(1))));
         });
     }
 

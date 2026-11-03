@@ -16,6 +16,7 @@ namespace Vixly.Platform.Infrastructure.Payments;
 //
 // IMPORTANT NOTES:
 // - Saving a card relies on payment_intent.succeeded and setup_intent.succeeded, which carry the payment method
+// - A checkout paid by bank debit completes unpaid (processing) and later sends async_payment_succeeded or async_payment_failed
 // =========================================================
 internal static class StripeEvents
 {
@@ -31,6 +32,13 @@ internal static class StripeEvents
         {
             case Session session when stripeEvent.Type == "checkout.session.completed" && session.Mode == "payment" && session.PaymentStatus == "paid":
                 return New(stripeEvent, PlatformCardEventKind.CheckoutCompleted, session.Id, session.Id, session.PaymentIntentId, null, null, session.CustomerId, null, null, session.Metadata, occurred);
+            case Session session when stripeEvent.Type == "checkout.session.completed" && session.Mode == "payment" && session.PaymentStatus == "unpaid":
+                // A bank debit was started; it settles (or fails) days later.
+                return New(stripeEvent, PlatformCardEventKind.CheckoutProcessing, session.Id, session.Id, session.PaymentIntentId, null, null, session.CustomerId, null, null, session.Metadata, occurred);
+            case Session session when stripeEvent.Type == "checkout.session.async_payment_succeeded":
+                return New(stripeEvent, PlatformCardEventKind.CheckoutPaymentSucceeded, session.Id, session.Id, session.PaymentIntentId, null, null, session.CustomerId, null, null, session.Metadata, occurred);
+            case Session session when stripeEvent.Type == "checkout.session.async_payment_failed":
+                return New(stripeEvent, PlatformCardEventKind.CheckoutPaymentFailed, session.Id, session.Id, session.PaymentIntentId, null, null, session.CustomerId, "bank_payment_failed", null, session.Metadata, occurred);
             case Session session when stripeEvent.Type == "checkout.session.expired":
                 return New(stripeEvent, PlatformCardEventKind.CheckoutExpired, session.Id, session.Id, session.PaymentIntentId, null, null, session.CustomerId, null, null, session.Metadata, occurred);
             case SetupIntent setup when stripeEvent.Type == "setup_intent.succeeded":

@@ -59,6 +59,18 @@ public sealed class PlatformTenantRegistrationFlowTests
         Assert.Equal(PlatformRegistrationErrors.LegalVersionInvalid, (await StartAsync(terms: "2025-01")).Error);
     }
 
+    [Theory]
+    [InlineData("America/Vancouver", "America/Vancouver")]
+    [InlineData(null, "America/Toronto")]
+    [InlineData("Not a zone", "America/Toronto")]
+    public async Task Start_KeepsTheBrowserTimeZone_OrTakesTheAddressOne(string? browser, string expected)
+    {
+        StartPlatformTenantRegistrationResponse response = await StartAsync(timeZone: browser);
+
+        Assert.True(response.Succeeded);
+        Assert.Equal(expected, Assert.Single(_kit.Tenants.Registrations).TimeZone);
+    }
+
     [Fact]
     public async Task Start_ClaimsTheSlug_StoresOnlyHashes_AndSendsALink()
     {
@@ -323,7 +335,8 @@ public sealed class PlatformTenantRegistrationFlowTests
         bool accepted = true,
         string terms = "2026-10",
         string email = "grace@northwind.example",
-        string? offerToken = null)
+        string? offerToken = null,
+        string? timeZone = "America/Toronto")
     {
         return new StartPlatformTenantRegistrationUseCase(
             _kit.Tenants,
@@ -348,7 +361,7 @@ public sealed class PlatformTenantRegistrationFlowTests
                     OwnerEmail = email,
                     OwnerPhone = "+1 514 555 0101",
                     Language = "es",
-                    TimeZone = "America/Toronto",
+                    TimeZone = timeZone,
                     Slug = "Northwind",
                     AcceptedTerms = accepted,
                     TermsVersion = terms,

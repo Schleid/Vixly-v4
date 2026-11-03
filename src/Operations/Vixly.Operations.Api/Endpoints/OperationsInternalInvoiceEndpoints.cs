@@ -5,7 +5,9 @@ using Vixly.Operations.Application.UseCases.Billing.GetMyOperationsCardPayment;
 using Vixly.Operations.Application.UseCases.Billing.GetMyOperationsCreditAccount;
 using Vixly.Operations.Application.UseCases.Billing.GetMyOperationsCreditStatement;
 using Vixly.Operations.Application.UseCases.Billing.GetMyOperationsInvoiceDocument;
+using Vixly.Operations.Application.UseCases.Billing.GetMyOperationsZelleQr;
 using Vixly.Operations.Application.UseCases.Billing.ListMyOperationsInvoices;
+using Vixly.Operations.Application.UseCases.Billing.PayMyOperationsInvoice;
 using Vixly.Operations.Application.UseCases.Billing.PayMyOperationsInvoiceByCard;
 using Vixly.Operations.Domain.Billing;
 
@@ -54,7 +56,7 @@ public static class OperationsInternalInvoiceEndpoints
                         OperationsPaymentState.AwaitingCredit => "awaiting_credit",
                         _ => "unpaid"
                     }))
-                    .ToList(), response.CardOffered))
+                    .ToList(), response.CardOffered, response.ZelleOffered, response.BankTransferOffered))
                 : OperationsApiErrors.Problem(http, response.Error!);
         });
 
@@ -67,6 +69,54 @@ public static class OperationsInternalInvoiceEndpoints
                 SessionToken = OperationsInternalPackageEndpoints.Session(http), InvoiceId = invoiceId, ReturnUrlPrefix = body?.ReturnUrlPrefix ?? string.Empty
             }, cancellationToken);
             return response.Succeeded ? Results.Ok(new CustomerCardStartDto(response.ChargeId)) : OperationsApiErrors.Problem(http, response.Error!);
+        });
+
+        // Owner, 2026-10-27: pay by Zelle or bank transfer; the customer reports it and the company confirms it in the bank.
+        invoices.MapGet("/{invoiceId:guid}/pay/{method}", async (HttpContext http, Guid invoiceId, string method, PayMyOperationsInvoiceUseCase useCase,
+            CancellationToken cancellationToken) =>
+        {
+            PayMyOperationsInvoiceResponse response = await useCase.ExecuteAsync(OperationsInternalPackageEndpoints.Context(http), new PayMyOperationsInvoiceRequest
+            {
+                SessionToken = OperationsInternalPackageEndpoints.Session(http), InvoiceId = invoiceId, Method = Method(method)
+            }, cancellationToken);
+            return response.Succeeded
+                ? Results.Ok(new CustomerPayDto(response.InvoiceNumber, response.Memo, response.Amount, response.CurrencyCode, response.Text, response.Tag, response.Contact,
+                    response.Name, response.HasQr))
+                : OperationsApiErrors.Problem(http, response.Error!);
+        });
+
+        invoices.MapPost("/{invoiceId:guid}/pay/{method}", async (HttpContext http, Guid invoiceId, string method, CustomerPayReportBody body, PayMyOperationsInvoiceUseCase useCase,
+            CancellationToken cancellationToken) =>
+        {
+            PayMyOperationsInvoiceResponse response = await useCase.ExecuteAsync(OperationsInternalPackageEndpoints.Context(http), new PayMyOperationsInvoiceRequest
+            {
+                SessionToken = OperationsInternalPackageEndpoints.Session(http),
+                InvoiceId = invoiceId,
+                Method = Method(method),
+                Report = true,
+                Reference = body?.Reference,
+                TermsAccepted = body?.TermsAccepted == true,
+                RequestKey = body?.RequestKey ?? Guid.Empty
+            }, cancellationToken);
+            return response.Succeeded
+                ? Results.Ok(new CustomerPayReportDto(response.InvoiceNumber, response.PaymentNumber ?? string.Empty))
+                : OperationsApiErrors.Problem(http, response.Error!);
+        });
+
+        invoices.MapGet("/zelle-qr", async (HttpContext http, GetMyOperationsZelleQrUseCase useCase, CancellationToken cancellationToken) =>
+        {
+            GetMyOperationsZelleQrResponse response = await useCase.ExecuteAsync(OperationsInternalPackageEndpoints.Context(http),
+                new GetMyOperationsZelleQrRequest { SessionToken = OperationsInternalPackageEndpoints.Session(http) }, cancellationToken);
+
+            if (!response.Succeeded)
+            {
+                return OperationsApiErrors.Problem(http, response.Error!);
+            }
+
+            http.Response.Headers.CacheControl = "private, no-store";
+            http.Response.Headers.XContentTypeOptions = "nosniff";
+            http.Response.Headers.ContentSecurityPolicy = "default-src 'none'; sandbox";
+            return Results.Bytes(response.Content, response.ContentType);
         });
 
         invoices.MapGet("/card/{chargeId:guid}", async (HttpContext http, Guid chargeId, GetMyOperationsCardPaymentUseCase useCase, CancellationToken cancellationToken) =>
@@ -141,4 +191,12 @@ public static class OperationsInternalInvoiceEndpoints
 
         return endpoints;
     }
+
+    // The method in the address: zelle or bank_transfer; anything else is refused by the use case.
+    private static OperationsPaymentMethod Method(string? method) => method switch
+    {
+        "zelle" => OperationsPaymentMethod.Zelle,
+        "bank_transfer" => OperationsPaymentMethod.BankTransfer,
+        _ => OperationsPaymentMethod.Cash
+    };
 }

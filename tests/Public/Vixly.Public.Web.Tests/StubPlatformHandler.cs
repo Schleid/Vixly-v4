@@ -35,8 +35,11 @@ internal sealed class StubPlatformHandler : HttpMessageHandler
 
         (HttpStatusCode Status, string Json)? answer = _state.Find(request.Method, path);
 
+        // An empty answer is sent without a body, like a rate limiter's 429.
         return answer is { } found
-            ? new HttpResponseMessage(found.Status) { Content = new StringContent(found.Json, Encoding.UTF8, "application/json") }
+            ? found.Json.Length == 0
+                ? new HttpResponseMessage(found.Status)
+                : new HttpResponseMessage(found.Status) { Content = new StringContent(found.Json, Encoding.UTF8, "application/json") }
             : new HttpResponseMessage(HttpStatusCode.ServiceUnavailable);
     }
 }

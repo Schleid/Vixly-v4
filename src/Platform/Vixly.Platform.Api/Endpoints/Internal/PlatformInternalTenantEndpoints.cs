@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Vixly.Contracts.Platform.Internal.Billing;
+using Vixly.Contracts.Platform.Internal.Entitlements;
 using Vixly.Contracts.Platform.Internal.Legal;
 using Vixly.Contracts.Platform.Internal.Subscription;
 using Vixly.Contracts.Platform.Internal.Tenant;
@@ -23,8 +24,10 @@ using Vixly.Platform.Application.UseCases.TenantAccount.GetTenantSubscription;
 using Vixly.Platform.Application.UseCases.TenantAccount.ListTenantBillingDocuments;
 using Vixly.Platform.Application.UseCases.TenantAccount.ListTenantInvoices;
 using Vixly.Platform.Application.UseCases.TenantAccount.ListTenantPlanOptions;
+using Vixly.Platform.Application.UseCases.TenantAccount.ReportTenantShipmentUsage;
 using Vixly.Platform.Application.UseCases.TenantAccount.PreviewTenantSubscriptionChange;
 using Vixly.Platform.Application.UseCases.TenantAccount.UpdateTenantAccount;
+using Vixly.Platform.Application.UseCases.TenantAccount.UpdateTenantCompanyProfile;
 using Vixly.Platform.Application.UseCases.Tenants;
 using Vixly.Platform.Domain.Billing;
 using Vixly.Platform.Domain.Subscriptions;
@@ -85,6 +88,14 @@ public static class PlatformInternalTenantEndpoints
         {
             GetTenantEntitlementsResponse response = await useCase.ExecuteAsync(PlatformInternalRequest.Tenant(http), new GetTenantEntitlementsRequest(), cancellationToken);
             return response.Succeeded ? PlatformInternalCache.Ok(http, PlatformInternalMapping.Entitlements(response.Entitlements!), PlatformInternalCache.TenantSeconds) : errors.InternalProblem(response.Error!);
+        });
+
+        // Shipment cap (owner, 2026-10-29): Operations reports the month's shipments; a final report charges what is above the cap.
+        tenant.MapPost("/usage/shipments", async (PlatformShipmentUsageBody body, ReportTenantShipmentUsageUseCase useCase, HttpContext http, PlatformApiErrors errors, CancellationToken cancellationToken) =>
+        {
+            ReportTenantShipmentUsageResponse response = await useCase.ExecuteAsync(PlatformInternalRequest.Tenant(http),
+                new ReportTenantShipmentUsageRequest { Month = body.Month ?? string.Empty, Shipments = body.Shipments, IsFinal = body.IsFinal }, cancellationToken);
+            return response.Succeeded ? Results.NoContent() : errors.InternalProblem(response.Error!);
         });
 
         tenant.MapGet("/subscription", async (string? language, GetTenantSubscriptionUseCase useCase, HttpContext http, PlatformApiErrors errors, CancellationToken cancellationToken) =>
@@ -171,7 +182,30 @@ public static class PlatformInternalTenantEndpoints
             return Results.File(response.Content!, "application/pdf", response.FileName);
         });
 
-        // B12: the tenant owner asks TechCrafters to change the company's legal details.
+        // 2026-10-25: the owner keeps the company profile (trading name, email, phone, address) without approval.
+        // The same body as a change request; its legal name, reason and proof are not used.
+        tenant.MapPut("/company", async (PlatformCompanyChangeBody body, UpdateTenantCompanyProfileUseCase useCase, HttpContext http, PlatformApiErrors errors, CancellationToken cancellationToken) =>
+        {
+            UpdateTenantCompanyProfileResponse response = await useCase.ExecuteAsync(PlatformInternalRequest.Tenant(http), new UpdateTenantCompanyProfileRequest
+            {
+                Company = new PlatformCompanyInput
+                {
+                    TradingName = body.TradingName,
+                    Email = body.Email,
+                    Phone = body.Phone,
+                    AddressLine1 = body.AddressLine1,
+                    AddressLine2 = body.AddressLine2,
+                    City = body.City,
+                    StateProvince = body.StateProvince,
+                    PostalCode = body.PostalCode,
+                    CountryCode = body.CountryCode
+                }
+            }, cancellationToken);
+
+            return response.Succeeded ? Results.NoContent() : errors.InternalProblem(response.Error!);
+        });
+
+        // B12: the tenant owner asks TechCrafters to change the company's legal name.
         tenant.MapGet("/company-change", async (GetTenantCompanyChangeUseCase useCase, HttpContext http, PlatformApiErrors errors, CancellationToken cancellationToken) =>
         {
             GetTenantCompanyChangeResponse response = await useCase.ExecuteAsync(PlatformInternalRequest.Tenant(http), new GetTenantCompanyChangeRequest(), cancellationToken);

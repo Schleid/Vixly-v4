@@ -245,6 +245,12 @@
   <data name="ops.shipments.waiting" xml:space="preserve">
     <value>These packages wait for a shipment: put each one into one of your shipments, or create one.</value>
   </data>
+  <data name="ops.texts.channel_unavailable" xml:space="preserve">
+    <value>This way of receiving notices is not offered.</value>
+  </data>
+  <data name="ops.texts.consent_required" xml:space="preserve">
+    <value>Tick the box to agree to receive notices by text message.</value>
+  </data>
   <data name="ops.tickets.another_open" xml:space="preserve">
     <value>You have another report open about this package; write there.</value>
   </data>
@@ -966,7 +972,7 @@
     <value>You can also choose its shipment later, from your packages.</value>
   </data>
   <data name="ui.prealert.store" xml:space="preserve">
-    <value>Store</value>
+    <value>Purchase store</value>
   </data>
   <data name="ui.prealert.submit" xml:space="preserve">
     <value>Announce</value>
@@ -1027,6 +1033,24 @@
   </data>
   <data name="ui.profile.change_password" xml:space="preserve">
     <value>Change the password</value>
+  </data>
+  <data name="ui.profile.notices" xml:space="preserve">
+    <value>How we send you notices</value>
+  </data>
+  <data name="ui.profile.notices.email" xml:space="preserve">
+    <value>By email</value>
+  </data>
+  <data name="ui.profile.notices.sms" xml:space="preserve">
+    <value>By SMS</value>
+  </data>
+  <data name="ui.profile.notices.whatsapp" xml:space="preserve">
+    <value>By WhatsApp</value>
+  </data>
+  <data name="ui.profile.notices_consent" xml:space="preserve">
+    <value>I agree to receive {company}’s notices about my packages and shipments by text message at {phone}. Message and data rates may apply.</value>
+  </data>
+  <data name="ui.profile.notices_stop" xml:space="preserve">
+    <value>Reply STOP to any SMS to stop them; notices then come by email. You can change this here at any time.</value>
   </data>
   <data name="ui.profile.password" xml:space="preserve">
     <value>Password</value>
@@ -1654,5 +1678,218 @@
   </data>
   <data name="ui.verify.title" xml:space="preserve">
     <value>Confirm your email</value>
+  </data>
+  <data name="ui.driver.title" xml:space="preserve">
+    <value>Out for delivery today</value>
+  </data>
+  <data name="ui.driver.next" xml:space="preserve">
+    <value>Your delivery is the driver’s next stop.</value>
+  </data>
+  <data name="ui.driver.stops_away" xml:space="preserve">
+    <value>The driver is {count} stop(s) away.</value>
+  </data>
+  <data name="ui.driver.delivered" xml:space="preserve">
+    <value>Delivered.</value>
+  </data>
+  <data name="ui.driver.track_title" xml:space="preserve">
+    <value>Shipment {number}</value>
+  </data>
+  <data name="ui.driver.sign_in" xml:space="preserve">
+    <value>Sign in to see your shipments</value>
+  </data>
+  <data name="ui.driver.link_old_title" xml:space="preserve">
+    <value>This link has ended</value>
+  </data>
+  <data name="ui.driver.link_old" xml:space="preserve">
+    <value>A delivery link works on the day of the delivery only. Sign in to follow your shipments.</value>
+  </data>
+  <data name="ui.maintenance.page_title" xml:space="preserve">
+    <value>Under maintenance</value>
+  </data>
+  <data name="ui.maintenance.page_body" xml:space="preserve">
+    <value>We are doing planned maintenance. We expect to be back by {time} (UTC).</value>
+  </data>
+  <data name="ui.maintenance.banner" xml:space="preserve">
+    <value>Planned maintenance from {start} to {end} (UTC): the site will be unavailable during this time.</value>
+  </data>
+  <data name="ui.address.title" xml:space="preserve">
+    <value>Your address</value>
+  </data>
+  <data name="ui.address.intro" xml:space="preserve">
+    <value>Before you start, tell us where you live. It goes on your account and helps us reach you about your shipments.</value>
+  </data>
+  <data name="ui.address.save" xml:space="preserve">
+    <value>Save and continue</value>
+  </data>
+  <data name="ui.address.choose_country" xml:space="preserve">
+    <value>Choose a country</value>
+  </data>
+  <data name="ui.profile.address" xml:space="preserve">
+    <value>Home address</value>
+  </data>
+  <data name="ui.help.title" xml:space="preserve"><value>Help</value></data>
+  <data name="ui.help.sign_in" xml:space="preserve"><value>Sign in to see instructions for your account.</value></data>
+  <data name="ui.help.not_found" xml:space="preserve"><value>This guide could not be found.</value></data>
+  <data name="ui.help.back" xml:space="preserve"><value>Back to help</value></data>
+  <data name="ui.help.related" xml:space="preserve"><value>Next steps</value></data>
+  <data name="ui.help.intro" xml:space="preserve"><value>Start here: find your mailbox address, announce a package, then create a shipment.</value></data>
+  <data name="ui.help.search" xml:space="preserve"><value>Search help</value></data>
+  <data name="ui.help.empty" xml:space="preserve"><value>No matching guide. Try another word.</value></data>
+  <data name="ui.session.idle_warning" xml:space="preserve">
+    <value>You have been inactive for a while. For your security, you will be signed out soon.</value>
+  </data>
+  <data name="ui.session.time_left" xml:space="preserve">
+    <value>Time left:</value>
+  </data>
+  <data name="ui.session.stay" xml:space="preserve">
+    <value>Stay signed in</value>
+  </data>
+  <data name="ui.sign_in.idle" xml:space="preserve">
+    <value>You were signed out after a period of inactivity. Sign in again to continue.</value>
+  </data>
+  <data name="ui.invoices.pay" xml:space="preserve">
+    <value>Pay</value>
+  </data>
+  <data name="ui.pay.title" xml:space="preserve">
+    <value>Pay this invoice</value>
+  </data>
+  <data name="ui.pay.choose" xml:space="preserve">
+    <value>Choose how you want to pay.</value>
+  </data>
+  <data name="ui.pay.method.zelle" xml:space="preserve">
+    <value>Pay by Zelle</value>
+  </data>
+  <data name="ui.pay.method.bank_transfer" xml:space="preserve">
+    <value>Pay by bank transfer</value>
+  </data>
+  <data name="ui.pay.method.card" xml:space="preserve">
+    <value>Pay by card</value>
+  </data>
+  <data name="ui.pay.back" xml:space="preserve">
+    <value>Back to invoices</value>
+  </data>
+  <data name="ui.pay.zelle_qr" xml:space="preserve">
+    <value>Zelle QR code</value>
+  </data>
+  <data name="ui.pay.zelle_tag" xml:space="preserve">
+    <value>Zelle tag</value>
+  </data>
+  <data name="ui.pay.zelle_contact" xml:space="preserve">
+    <value>Email or phone</value>
+  </data>
+  <data name="ui.pay.zelle_name" xml:space="preserve">
+    <value>Name shown</value>
+  </data>
+  <data name="ui.pay.amount" xml:space="preserve">
+    <value>Amount to send</value>
+  </data>
+  <data name="ui.pay.memo" xml:space="preserve">
+    <value>Write in the memo</value>
+  </data>
+  <data name="ui.pay.memo_hint" xml:space="preserve">
+    <value>Send exactly this amount and write the invoice number in the memo or reference, so the payment is matched to your invoice.</value>
+  </data>
+  <data name="ui.pay.accept_terms" xml:space="preserve">
+    <value>I have read and I accept these terms.</value>
+  </data>
+  <data name="ui.pay.reference.zelle" xml:space="preserve">
+    <value>Zelle confirmation number</value>
+  </data>
+  <data name="ui.pay.reference.bank_transfer" xml:space="preserve">
+    <value>Transfer reference</value>
+  </data>
+  <data name="ui.pay.sent" xml:space="preserve">
+    <value>I have sent the payment</value>
+  </data>
+  <data name="ui.pay.wait_hint" xml:space="preserve">
+    <value>Your invoice shows "waiting for confirmation" until the company sees the money arrive.</value>
+  </data>
+  <data name="ui.pay.reported" xml:space="preserve">
+    <value>Thank you. Your payment for invoice {number} is waiting for confirmation by the company.</value>
+  </data>
+  <data name="ops.payments.zelle_terms_required" xml:space="preserve">
+    <value>Accept the Zelle terms first.</value>
+  </data>
+  <data name="ops.payments.method_not_accepted" xml:space="preserve">
+    <value>This way of paying is not offered.</value>
+  </data>
+  <data name="ops.payments.reference_required" xml:space="preserve">
+    <value>Enter the confirmation number or reference of your payment.</value>
+  </data>
+  <data name="ops.payments.text_invalid" xml:space="preserve">
+    <value>This text is too long or contains characters that are not allowed.</value>
+  </data>
+  <data name="ui.tour.step" xml:space="preserve"><value>Step {step} of 3</value></data>
+  <data name="ui.tour.title.1" xml:space="preserve"><value>Your mailbox address</value></data>
+  <data name="ui.tour.body.1" xml:space="preserve"><value>Use this complete address and your customer code when shopping online. It is the warehouse address, not your home address. If it is missing, contact your company before ordering.</value></data>
+  <data name="ui.tour.title.2" xml:space="preserve"><value>Announce your package</value></data>
+  <data name="ui.tour.body.2" xml:space="preserve"><value>Enter the carrier’s tracking number here, not the shop’s order number. Add the purchase store, contents and value when you are ready to announce the package.</value></data>
+  <data name="ui.tour.title.3" xml:space="preserve"><value>Choose where your goods go next</value></data>
+  <data name="ui.tour.body.3" xml:space="preserve"><value>A shipment gives instructions for the onward journey. Choose the final destination and pickup or home delivery, check the recipient, then select the packages that belong together.</value></data>
+  <data name="ui.tour.no_submit" xml:space="preserve"><value>This is only a tour. You do not need to fill in or submit these forms.</value></data>
+  <data name="ui.tour.next" xml:space="preserve"><value>Next</value></data>
+  <data name="ui.tour.skip" xml:space="preserve"><value>Skip tour</value></data>
+  <data name="ui.tour.finish" xml:space="preserve"><value>Finish</value></data>
+  <data name="ui.tour.replay" xml:space="preserve"><value>Take the guided tour</value></data>
+  <data name="ui.tour.save_failed" xml:space="preserve"><value>We could not save your tour preference. Please try Skip tour or Finish again.</value></data>
+  <data name="ui.shipments.tracking_number" xml:space="preserve">
+    <value>Tracking number</value>
+  </data>
+  <data name="ui.shipments.track_link" xml:space="preserve">
+    <value>Track</value>
+  </data>
+  <data name="ui.shipments.tracking_after_payment" xml:space="preserve">
+    <value>Given once the shipment is paid</value>
+  </data>
+  <data name="ops.shipments.requests_paused" xml:space="preserve">
+    <value>New shipment requests are paused for now. Please contact us.</value>
+  </data>
+  <data name="ops.customers.portal_unavailable" xml:space="preserve">
+    <value>Online accounts are not available. Please contact us.</value>
+  </data>
+  <data name="ops.shipments.insurance_unavailable" xml:space="preserve">
+    <value>Insurance is not offered for shipments.</value>
+  </data>
+  <data name="ops.customers.banned_contact" xml:space="preserve">
+    <value>This phone number cannot be used for an account. Contact us.</value>
+  </data>
+  <data name="ui.prealert.items" xml:space="preserve">
+    <value>What is inside</value>
+  </data>
+  <data name="ui.prealert.items_hint" xml:space="preserve">
+    <value>List each item in your own words, with how many and the value of one. Leave empty rows blank.</value>
+  </data>
+  <data name="ui.prealert.item" xml:space="preserve">
+    <value>Item</value>
+  </data>
+  <data name="ui.prealert.item_example" xml:space="preserve">
+    <value>Sneakers</value>
+  </data>
+  <data name="ui.prealert.quantity" xml:space="preserve">
+    <value>How many</value>
+  </data>
+  <data name="ui.prealert.value_each" xml:space="preserve">
+    <value>Value of one (USD)</value>
+  </data>
+  <data name="ui.prealert.condition" xml:space="preserve">
+    <value>New or used</value>
+  </data>
+  <data name="ops.items.words_required" xml:space="preserve">
+    <value>Describe each item in a few words (at most {maxLength} characters).</value>
+  </data>
+  <data name="ops.items.quantity_invalid" xml:space="preserve">
+    <value>Enter how many of each item, from 1.</value>
+  </data>
+  <data name="ops.items.value_invalid" xml:space="preserve">
+    <value>Enter the value of one item, from 0.</value>
+  </data>
+  <data name="ops.items.too_many" xml:space="preserve">
+    <value>A package can list at most {max} items.</value>
+  </data>
+  <data name="ui.prealert.condition_new" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="ui.prealert.condition_used" xml:space="preserve">
+    <value>Used</value>
   </data>
 </root>

@@ -11,6 +11,7 @@ namespace Vixly.Operations.Domain.Settings;
 //
 // RESPONSIBILITIES:
 // - Whether the tenant offers the service, its label, expected business days and volumetric divisor
+// - The label code printed large on the shipping label: exactly three capital letters A to Z (owner, 2026-10-31)
 //
 // IMPORTANT NOTES:
 // - The service code comes from the Platform catalogue (checked by the use case)
@@ -25,6 +26,8 @@ public sealed class OperationsShippingServiceSetup : OperationsEntity
     public const int DaysLimit = 365;
 
     public const decimal MaxDivisor = 1_000_000m;
+
+    public const int LabelCodeLength = 3;
 
     private OperationsShippingServiceSetup()
     {
@@ -49,6 +52,41 @@ public sealed class OperationsShippingServiceSetup : OperationsEntity
     public int MaxDays { get; private set; }
 
     public decimal? VolumetricDivisor { get; private set; }
+
+    // Slice 11 (owner, 2026-10-22): days after arrival at destination for a parcel to be ready (pickup or delivery); none: not measured.
+    public int? ReadyTargetDays { get; private set; }
+
+    public const int ReadyTargetDaysLimit = 60;
+
+    public void ChangeReadyTarget(int? days, DateTimeOffset utcNow)
+    {
+        if (days is < 1 or > ReadyTargetDaysLimit)
+        {
+            throw new DomainException(Vixly.Operations.Domain.Reports.OperationsReportErrors.RulesInvalid);
+        }
+
+        ReadyTargetDays = days;
+        MarkAsModified(utcNow);
+    }
+
+    // Owner, 2026-10-31: the code warehouse workers sort by (VXA, VXE, VXS, VXG...); none: the catalogue's default.
+    public string? LabelCode { get; private set; }
+
+    // Exactly three letters A to Z, stored in capitals; two services may share a code.
+    public void ChangeLabelCode(string? labelCode, DateTimeOffset utcNow)
+    {
+        string code = labelCode?.Trim().ToUpperInvariant() ?? string.Empty;
+
+        if (!IsLabelCode(code))
+        {
+            throw new DomainException(OperationsShippingServiceErrors.LabelCodeInvalid);
+        }
+
+        LabelCode = code;
+        MarkAsModified(utcNow);
+    }
+
+    public static bool IsLabelCode(string? code) => code is { Length: LabelCodeLength } && code.All(character => character is >= 'A' and <= 'Z');
 
     public static OperationsShippingServiceSetup Create(Guid tenantId, string serviceCode, DateTimeOffset utcNow)
     {

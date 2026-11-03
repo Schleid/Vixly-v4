@@ -58,6 +58,11 @@ public sealed record PlatformPlanVersionTerms
 
     public IReadOnlyCollection<PlatformPlanFeature> Features { get; }
 
+    // Shipment cap (owner, 2026-10-29): 0 means no cap; the price of each shipment above it, in the plan's currency.
+    public int MaxShipmentsPerMonth { get; private init; }
+
+    public decimal ExtraShipmentPrice { get; private init; }
+
     public static PlatformPlanVersionTerms Create(
         string? currencyCode,
         decimal monthlyPricePerLicence,
@@ -111,6 +116,14 @@ public sealed record PlatformPlanVersionTerms
     }
 
     public bool HasAnyPrice => MonthlyPricePerLicence > 0m || AnnualPricePerLicence > 0m;
+
+    // Without a cap there is nothing to charge, so the extra-shipment price is cleared.
+    public PlatformPlanVersionTerms WithShipmentCap(int maxShipmentsPerMonth, decimal extraShipmentPrice)
+    {
+        int cap = Limit(maxShipmentsPerMonth);
+        decimal price = Price(extraShipmentPrice);
+        return this with { MaxShipmentsPerMonth = cap, ExtraShipmentPrice = cap == 0 ? 0m : price };
+    }
 
     private static decimal Price(decimal value)
     {

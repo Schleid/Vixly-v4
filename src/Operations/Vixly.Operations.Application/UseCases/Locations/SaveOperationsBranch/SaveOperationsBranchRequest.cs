@@ -22,6 +22,7 @@ public sealed class SaveOperationsBranchRequest
 
     public string Name { get; init; } = string.Empty;
 
+    // The main office, optional (owner, 2026-10-29): empty line 1 and city mean no office.
     public string Line1 { get; init; } = string.Empty;
 
     public string? Line2 { get; init; }
@@ -44,5 +45,9 @@ public sealed class SaveOperationsBranchRequest
 
     public OperationsLocationStatus Status { get; init; }
 
-    public OperationsBranchSide Side { get; init; } = OperationsBranchSide.Both;
+    public string? LegalName { get; init; }
+
+    public string? TaxNumber { get; init; }
+
+    public string? LegalNotes { get; init; }
 }

@@ -15,6 +15,7 @@ namespace Vixly.Operations.Domain.Tests;
 // - Zelle waits for finance; received or not received
 // - Drawers close with a counted difference and a note
 // - Refunds after a credit note; no void once paid
+// - Several methods with the card last for the rest (owner, 2026-10-26)
 //
 // IMPORTANT NOTES:
 // - Pure domain; no database
@@ -72,6 +73,55 @@ public sealed class OperationsPaymentDomainTests
         Assert.Equal(OperationsPaymentErrors.ZelleTermsRequired, Assert.Throws<DomainException>(() => Pay(invoice, drawer, false, new OperationsTenderDraft(OperationsPaymentMethod.Zelle, 40m, null, null))).Error);
         Assert.Equal(0m, invoice.PaidTotal);
     }
+
+    // Owner, 2026-10-26: Zelle 15, cash 5, then the card for the 20 left; one payment once Stripe confirms the card.
+    [Fact]
+    public void TheCard_ChargesWhatIsLeft_AndTheOtherLinesAreRecordedWithIt()
+    {
+        OperationsInvoice invoice = Invoice();
+        OperationsTenderDraft[] others = { new(OperationsPaymentMethod.Zelle, 15m, null, "ZL-1"), new(OperationsPaymentMethod.Cash, 5m, 10m, null) };
+
+        Assert.Equal(OperationsPaymentErrors.ZelleTermsRequired, Assert.Throws<DomainException>(() => Start(invoice, others, false)).Error);
+        Assert.Equal(OperationsCardErrors.NothingLeftForCard, Assert.Throws<DomainException>(() => Start(invoice, new[] { new OperationsTenderDraft(OperationsPaymentMethod.Cash, 40m, null, null) }, false)).Error);
+        Assert.Equal(OperationsPaymentErrors.AmountInvalid, Assert.Throws<DomainException>(() => Start(invoice, new[] { new OperationsTenderDraft(OperationsPaymentMethod.Card, 10m, null, null) }, false)).Error);
+        Assert.Equal(OperationsPaymentErrors.AmountInvalid, Assert.Throws<DomainException>(() =>
+            OperationsCardCharge.Start(Tenant, invoice, OperationsCardChannel.Portal, null, null, false, Now, others, true)).Error);
+
+        OperationsCardCharge charge = Start(invoice, others, true);
+        Assert.Equal((20m, 20m), (charge.Amount, charge.OtherTotal));
+        Assert.Equal(40m, invoice.Owed);
+
+        OperationsCashDrawer drawer = Drawer();
+        OperationsPayment payment = OperationsPayment.Take(Tenant, invoice, "PAY2", charge.OtherTenders, drawer, charge.ZelleTermsAccepted, Cashier, charge.Id, Now,
+            new OperationsCardPart(charge.Amount, "pi_123"));
+
+        Assert.Equal(new[] { OperationsPaymentMethod.Zelle, OperationsPaymentMethod.Cash, OperationsPaymentMethod.Card }, payment.Tenders.Select(tender => tender.Method).ToArray());
+        Assert.Equal((40m, 5m, true), (payment.Total, payment.Change, payment.Pending));
+        Assert.Equal((OperationsPaymentState.AwaitingConfirmation, 0m, 25m), (invoice.PaymentState, invoice.Owed, invoice.PaidTotal));
+        Assert.Equal(5m, drawer.CashIn);
+
+        // Zelle not received: only its 15 is owed again; the card stays paid.
+        payment.Check(invoice, payment.Tenders[0].Id, false, "Not in the bank", Guid.NewGuid(), Now);
+        Assert.Equal((15m, 25m), (invoice.Owed, invoice.PaidTotal));
+    }
+
+    // Owner, 2026-10-27: freight collect is a payment term, changed only while nothing is paid.
+    [Fact]
+    public void FreightCollect_ChangesOnlyWhileNothingIsPaid()
+    {
+        OperationsInvoice invoice = Invoice();
+
+        Assert.True(invoice.ChangePaymentPlace(true, Now));
+        Assert.False(invoice.ChangePaymentPlace(true, Now));
+        Assert.True(invoice.PayAtDestination);
+        Assert.Equal(40m, invoice.Owed);
+
+        Pay(invoice, Drawer(), false, new OperationsTenderDraft(OperationsPaymentMethod.Cash, 40m, null, null));
+        Assert.Equal(OperationsBillingErrors.CollectAfterPayment, Assert.Throws<DomainException>(() => invoice.ChangePaymentPlace(false, Now)).Error);
+    }
+
+    private static OperationsCardCharge Start(OperationsInvoice invoice, IReadOnlyList<OperationsTenderDraft> others, bool terms) =>
+        OperationsCardCharge.Start(Tenant, invoice, OperationsCardChannel.Reader, Cashier, Guid.NewGuid(), false, Now, others, terms);
 
     [Fact]
     public void Zelle_WaitsForFinance_ReceivedIsPaid_NotReceivedIsOwedAgain()

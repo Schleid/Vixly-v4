@@ -73,11 +73,11 @@ public sealed partial class OperationsCustomerPackageFlowTests : IClassFixture<O
             DateTimeOffset now = DateTimeOffset.UtcNow;
             OperationsTenantBrand brand = OperationsTenantBrand.Create(_tenant, "Parcel Express", now);
             brand.Publish(now);
-            OperationsBranch branch = OperationsBranch.Create(_tenant, Details("MIA", "Miami"), OperationsBranchSide.Origin, now);
+            OperationsBranch branch = OperationsBranch.Create(_tenant, Details("MIA", "Miami"), "US", OperationsBranchLegal.None, now);
             OperationsWarehouse warehouse = OperationsWarehouse.Create(_tenant, branch.Id, Details("WH1", "Doral"), OperationsWarehouseRoles.Receiving, true, now);
             _warehouse = warehouse.Id;
             OperationsBranch pickup = OperationsBranch.Create(_tenant, new OperationsLocationDetails("PAP", "Port-au-Prince office",
-                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsBranchSide.Destination, now);
+                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), "HT", OperationsBranchLegal.None, now);
             _branch = pickup.Id;
             context.AddRange(brand, branch, warehouse, pickup);
             return Task.CompletedTask;
@@ -88,6 +88,7 @@ public sealed partial class OperationsCustomerPackageFlowTests : IClassFixture<O
             new[]
             {
                 "--environment=Production",
+                "--VixlySettingsCheck:Enabled=false",
                 "--applicationName=Vixly.Customer.Web",
                 "--AllowedHosts=*",
                 "--ConnectionStrings:Customer=Server=127.0.0.1,1;Database=None;User Id=none;Password=none;Connect Timeout=1;TrustServerCertificate=True",
@@ -143,7 +144,7 @@ public sealed partial class OperationsCustomerPackageFlowTests : IClassFixture<O
         Guid shipment = Guid.Parse(shipmentPath["/customer/packages/shipments/".Length..^"?done=created".Length]);
         string page = WebUtility.HtmlDecode(await ana.GetStringAsync(shipmentPath));
         Assert.Contains("Port-au-Prince office", page, StringComparison.Ordinal);
-        Assert.Contains("Ana Pierre · +50937123456", page, StringComparison.Ordinal);
+        Assert.Contains("Ana Pierre · +509 3712-3456", page, StringComparison.Ordinal);
         Assert.Contains("Consolidate", page, StringComparison.Ordinal);
         Assert.Contains("1Z999AA10123456784", page, StringComparison.Ordinal);
 
@@ -257,7 +258,7 @@ public sealed partial class OperationsCustomerPackageFlowTests : IClassFixture<O
         Guid other = Guid.Empty;
         await WithDatabaseAsync(async context =>
         {
-            OperationsBranch branch = await context.Branches.FirstAsync(item => item.Side == OperationsBranchSide.Origin);
+            OperationsBranch branch = await context.Branches.FirstAsync(item => item.CountryCode == "US");
             OperationsWarehouse warehouse = OperationsWarehouse.Create(_tenant, branch.Id, Details("WH2", "Medley"), OperationsWarehouseRoles.Receiving, true, DateTimeOffset.UtcNow);
             other = warehouse.Id;
             context.Add(warehouse);
@@ -265,6 +266,40 @@ public sealed partial class OperationsCustomerPackageFlowTests : IClassFixture<O
         await ReceivedAsync(await CustomerIdAsync("ana@example.com"), "TBA0001230002", other);
         Assert.Contains("This package is at, or announced for, another of our warehouses.",
             WebUtility.HtmlDecode(await Read(await ana.PostAsync(first, packages, PreAlert("TBA0001230002")))), StringComparison.Ordinal);
+    }
+
+    // Owner, 2026-11-01: the customer announces what is inside item by item; the items make the contents and the value, and wait for the parcel.
+    [SqlServerFact]
+    public async Task Customer_AnnouncesItems_ThatMakeTheContentsAndTheValue()
+    {
+        Browser ana = await ConfirmedAsync("ana@example.com");
+        Dictionary<string, string> form = new()
+        {
+            ["carrier"] = "Amazon",
+            ["tracking"] = "TBA0007770001",
+            ["store"] = "Runner shop",
+            ["item_words"] = "Running sneakers",
+            ["item_qty"] = "2",
+            ["item_value"] = "45.50",
+            ["item_used"] = "new"
+        };
+
+        Assert.Contains("value of one item", WebUtility.HtmlDecode(await Read(await ana.PostAsync("/customer/packages/new", "/customer/packages/new",
+            new Dictionary<string, string>(form) { ["item_value"] = "" }))), StringComparison.Ordinal);
+        Assert.Equal("/customer/packages?done=added", (await ana.PostAsync("/customer/packages/new", "/customer/packages/new", form)).Headers.Location?.OriginalString);
+
+        await WithDatabaseAsync(async context =>
+        {
+            Vixly.Operations.Domain.Receiving.OperationsPreAlert preAlert = await context.PreAlerts.AsNoTracking().SingleAsync(row => row.TrackingNumber == "TBA0007770001");
+            Assert.Equal("2 x Running sneakers", preAlert.Contents);
+            Assert.Equal(91.00m, preAlert.DeclaredValue);
+            Vixly.Operations.Domain.Items.OperationsParcelItem item = await context.ParcelItems.AsNoTracking().SingleAsync(row => row.PreAlertId == preAlert.Id);
+            Assert.Equal("Running sneakers", item.Words);
+            Assert.Equal(2m, item.Quantity);
+            Assert.Equal(45.50m, item.ValueEach);
+            Assert.Null(item.ParcelId);
+            Assert.Null(item.OriginCountryCode);
+        });
     }
 
     // Slice 4D (owner, 2026-10-19): pre-alerts first, then shipments; several shipments at once, one without any package (goods dropped off);
@@ -603,6 +638,10 @@ public sealed partial class OperationsCustomerPackageFlowTests : IClassFixture<O
             invoiceId = invoice.Id;
         });
 
+        // Owner, 2026-10-27: cards show on the portal only once the company offers them there.
+        Assert.DoesNotContain("action=\"/customer/invoices/" + invoiceId + "/card\"", await ana.GetStringAsync("/customer/invoices"), StringComparison.Ordinal);
+        await WithDatabaseAsync(async context => (await context.TenantSettings.SingleAsync()).ChangePortal(false, false, true, null, null, null, DateTimeOffset.UtcNow));
+
         string list = WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/invoices"));
         Assert.Contains("action=\"/customer/invoices/" + invoiceId + "/card\"", list, StringComparison.Ordinal);
 
@@ -631,6 +670,79 @@ public sealed partial class OperationsCustomerPackageFlowTests : IClassFixture<O
             Assert.Equal(0m, (await context.Invoices.AsNoTracking().SingleAsync(item => item.Id == invoiceId)).Owed);
             Vixly.Operations.Domain.Billing.OperationsPayment payment = await context.Payments.AsNoTracking().SingleAsync(item => item.InvoiceId == invoiceId);
             Assert.Null(payment.TakenByUserId);
+        });
+    }
+
+    // Owner, 2026-10-27: a customer pays by Zelle or bank transfer on the portal when the company offers it there; it waits for finance; never another customer's invoice.
+    [SqlServerFact]
+    public async Task Customer_PaysByZelleOrBankTransfer_WhenOffered_AndItWaitsForFinance()
+    {
+        Browser ana = await ConfirmedAsync("ana@example.com");
+        Guid anaId = await CustomerIdAsync("ana@example.com");
+        Guid invoiceId = Guid.Empty;
+
+        await WithDatabaseAsync(async context =>
+        {
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            Vixly.Operations.Domain.Billing.OperationsInvoiceLine[] lines =
+            {
+                new(null, Guid.NewGuid(), "TAPE", "Packing tape", null, 2m, null, 10m, 20m, 0m, 0m, Vixly.Operations.Domain.Billing.OperationsTaxKind.Supplies, true)
+            };
+            Vixly.Operations.Domain.Billing.OperationsInvoice invoice = Vixly.Operations.Domain.Billing.OperationsInvoice.Issue(_tenant, "INV26000999",
+                new Vixly.Operations.Domain.Billing.OperationsInvoiceDraft(Vixly.Operations.Domain.Billing.OperationsInvoiceKind.SupplyOrder, anaId, _warehouse, null, null, "SO26000999", null, null,
+                    "USD", "en", new Vixly.Operations.Domain.Billing.OperationsInvoiceParty("Ana's carrier", null, "Miami", null, "Ana", null, "+1", "ana@example.com"), lines, "Sales tax", false,
+                    new Vixly.Operations.Domain.Billing.OperationsTaxRates(0m, 0m, 0m, 0m), null), DateOnly.FromDateTime(now.UtcDateTime), now);
+            Vixly.Operations.Domain.Settings.OperationsTenantSettings? settings = await context.TenantSettings.SingleOrDefaultAsync();
+
+            if (settings is null)
+            {
+                settings = Vixly.Operations.Domain.Settings.OperationsTenantSettings.CreateDefault(_tenant, now);
+                context.Add(settings);
+            }
+
+            settings.ChangeZelle("@andescourier", null, "Andes Courier", "Write the invoice number in the memo.", null, null, now);
+            settings.ChangePayments(true, true, false, true, null, null, null, now);
+            context.Add(invoice);
+            invoiceId = invoice.Id;
+        });
+
+        // Accepted at the cashier, not yet offered on the portal: no Pay button.
+        Assert.DoesNotContain("/customer/invoices/" + invoiceId + "/pay", await ana.GetStringAsync("/customer/invoices"), StringComparison.Ordinal);
+        await WithDatabaseAsync(async context =>
+            (await context.TenantSettings.SingleAsync()).ChangePortal(true, true, false, "Bank: Unibank. Account: 12345. Name: Andes Courier.", null, null, DateTimeOffset.UtcNow));
+
+        Assert.Contains("href=\"/customer/invoices/" + invoiceId + "/pay\"", await ana.GetStringAsync("/customer/invoices"), StringComparison.Ordinal);
+        string choose = WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/invoices/" + invoiceId + "/pay"));
+        Assert.Contains("Pay by Zelle", choose, StringComparison.Ordinal);
+        Assert.Contains("Pay by bank transfer", choose, StringComparison.Ordinal);
+        string bank = WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/invoices/" + invoiceId + "/pay/bank_transfer"));
+        Assert.Contains("Bank: Unibank. Account: 12345.", bank, StringComparison.Ordinal);
+        string zelle = WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/invoices/" + invoiceId + "/pay/zelle"));
+        Assert.Contains("@andescourier", zelle, StringComparison.Ordinal);
+        Assert.Contains("INV26000999", zelle, StringComparison.Ordinal);
+
+        // Another customer sees nothing of it.
+        Browser ben = await ConfirmedAsync("ben@example.com");
+        Assert.Contains("This invoice was not found.", WebUtility.HtmlDecode(await ben.GetStringAsync("/customer/invoices/" + invoiceId + "/pay/zelle")), StringComparison.Ordinal);
+
+        // Ana sends it by Zelle: terms first, then the reference; the invoice waits for the company.
+        Assert.Contains("Accept the Zelle terms first.", WebUtility.HtmlDecode(await Read(await ana.PostAsync("/customer/invoices/" + invoiceId + "/pay/zelle",
+            "/customer/invoices/" + invoiceId + "/pay/zelle", new() { ["reference"] = "ZL-1234", ["key"] = Guid.NewGuid().ToString("N") }))), StringComparison.Ordinal);
+        string key = Guid.NewGuid().ToString("N");
+        HttpResponseMessage sent = await ana.PostAsync("/customer/invoices/" + invoiceId + "/pay/zelle", "/customer/invoices/" + invoiceId + "/pay/zelle",
+            new() { ["reference"] = "ZL-1234", ["terms"] = "true", ["key"] = key });
+        Assert.Equal("/customer/invoices?done=reported&number=INV26000999", sent.Headers.Location?.OriginalString);
+        string after = WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/invoices"));
+        Assert.DoesNotContain("/customer/invoices/" + invoiceId + "/pay\"", after, StringComparison.Ordinal);
+
+        await WithDatabaseAsync(async context =>
+        {
+            Vixly.Operations.Domain.Billing.OperationsPayment payment = await context.Payments.AsNoTracking().SingleAsync(item => item.InvoiceId == invoiceId);
+            Assert.True(payment.Pending);
+            Assert.Null(payment.TakenByUserId);
+            Assert.Equal(20m, payment.Total);
+            Assert.Equal("ZL-1234", Assert.Single(payment.Tenders).Reference);
+            Assert.Equal(20m, (await context.Invoices.AsNoTracking().SingleAsync(item => item.Id == invoiceId)).PendingTotal);
         });
     }
 

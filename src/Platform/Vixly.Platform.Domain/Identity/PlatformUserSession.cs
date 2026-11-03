@@ -110,19 +110,27 @@ public sealed class PlatformUserSession : AuditableEntity
     // =====================================================
     // METHOD: VALIDATE AND TOUCH
     // =====================================================
-    public PlatformSessionEndReason? ExpiryReasonAt(DateTimeOffset utcNow)
+    public PlatformSessionEndReason? ExpiryReasonAt(DateTimeOffset utcNow) => ExpiryReasonAt(utcNow, PlatformIdentityLimits.SessionIdleTimeout);
+
+    // The idle time is Control's setting (owner, 2026-10-27); the one above is the default.
+    public PlatformSessionEndReason? ExpiryReasonAt(DateTimeOffset utcNow, TimeSpan idleTimeout)
     {
         if (utcNow >= ExpiresUtc)
         {
             return PlatformSessionEndReason.AbsoluteLifetime;
         }
 
-        if (utcNow - LastSeenUtc >= PlatformIdentityLimits.SessionIdleTimeout + TouchInterval)
+        if (utcNow - LastSeenUtc >= idleTimeout + TouchInterval)
         {
             return PlatformSessionEndReason.IdleTimeout;
         }
 
         return null;
+    }
+
+    public bool IsValidAt(DateTimeOffset utcNow, TimeSpan idleTimeout)
+    {
+        return !IsEnded && ExpiryReasonAt(utcNow, idleTimeout) is null;
     }
 
     public bool IsValidAt(DateTimeOffset utcNow)

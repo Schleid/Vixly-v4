@@ -17,4 +17,7 @@ public sealed class VerifyOperationsDeviceRequest
     public Guid DeviceId { get; init; }
 
     public string Secret { get; init; } = string.Empty;
+
+    // The company's address, for the link in the administrators' email when the device is blocked (owner, R-6).
+    public string? PortalSlug { get; init; }
 }

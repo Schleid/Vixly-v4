@@ -12,4 +12,5 @@
 // IMPORTANT NOTES:
 // - Checked by the domain
 // =========================================================
-public sealed record OperationsPackageDraft(string? Carrier, string? TrackingNumber, string? Store, string? Contents, decimal DeclaredValue, DateOnly? ExpectedDate);
+public sealed record OperationsPackageDraft(string? Carrier, string? TrackingNumber, string? Store, string? Contents, decimal DeclaredValue, DateOnly? ExpectedDate,
+    IReadOnlyList<Vixly.Operations.Application.Items.OperationsItemDraft>? Items = null);

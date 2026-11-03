@@ -18,11 +18,12 @@ IMPORTANT NOTES:
 - No links to unimplemented shipment or dispatch screens
 ========================================================= *@
 <nav aria-label="@L["navigation"]" class="ops-nav">
-    @foreach (var group in Groups.Where(group => group.Items.Any(item => Visible(item.Permissions, Allowance))))
+    @foreach (var group in Groups.Where(group => group.Items.Any(item => Visible(item.Permissions, Allowance) && !Allowance.Hides(item.Url))))
     {
-        <details open class="ops-nav__group">
+        @* The section stays closed once the user closes it, and the menu keeps its scroll (vixly-nav.js, owner 2026-10-30). *@
+        <details open class="ops-nav__group" data-nav-group="@group.Key">
             <summary>@L[group.Key]</summary>
-            @foreach (var item in group.Items.Where(item => Visible(item.Permissions, Allowance)))
+            @foreach (var item in group.Items.Where(item => Visible(item.Permissions, Allowance) && !Allowance.Hides(item.Url)))
             {
                 <a href="@item.Url" aria-current="@(Section == item.Section ? "page" : null)">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="@Icon(item.Section)" /></svg>
@@ -31,6 +32,10 @@ IMPORTANT NOTES:
             }
         </details>
     }
+    <a href="/staff/help" aria-current="@(Section == "help" ? "page" : null)">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 9a3 3 0 0 1 6 0c0 2-3 2-3 5M12 18h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20" /></svg>
+        <span>@T["ui.help.title"]</span>
+    </a>
 </nav>
 
 @code {
@@ -39,46 +44,54 @@ IMPORTANT NOTES:
     // An item with no permission is open to every signed-in person; otherwise any one of its permissions shows it.
     public static bool Visible(string[] permissions, GetOperationsMenuResponse allowed) => permissions.Length == 0 || allowed.HasAny(permissions);
 
-    // Daily work first, then setup, then people, then the company itself (owner, 2026-10-18).
-    // Billing and Terms live inside Company (its tabs); Receiving and Parcels arrived with Slice 3B, Shipments and more follow in "workspace".
-    // Each item names the permissions of its page (the page's use case checks the same ones).
+    // Four chapters (owner, 2026-10-22): Front Office (serving customers), Warehouse Operations (moving packages),
+    // Back Office (running the business: money, setup, people, the company) and Technical (website, integrations, history).
+    // Billing, Terms and Licences live inside Company (its tabs). Each item names the permissions of its page (the page's use case checks the same ones).
     public static readonly (string Key, (string Section, string Url, string Label, string[] Permissions)[] Items)[] Groups =
     {
-        ("workspace", new[]
+        ("front_office", new[]
         {
             ("workspace", "/staff", "workspace", Array.Empty<string>()),
             ("counter", "/staff/counter", "counter", new[] { OperationsPermissions.CounterServe }),
+            ("quotes", "/staff/quotes", "quotes", new[] { OperationsPermissions.QuotesCreate }),
+            ("customers", "/staff/customers", "customers", new[] { OperationsPermissions.CustomersView, OperationsPermissions.CustomersLookup }),
+            ("credit", "/staff/credit", "credit", new[] { OperationsPermissions.CustomersCredit }),
+            ("cashier", "/staff/cashier", "cashier", new[] { OperationsPermissions.PaymentsTake }),
+            ("verify", "/staff/cashier/verify", "verify", new[] { OperationsPermissions.PaymentsConfirm }),
+            ("invoices", "/staff/invoices", "invoices", new[] { OperationsPermissions.InvoicesView }),
+            ("pickup", "/staff/pickup", "pickup", new[] { OperationsPermissions.PickupRelease }),
+            ("shipments", "/staff/shipments", "shipments", new[] { OperationsPermissions.ShipmentsView })
+        }),
+        ("warehouse_operations", new[]
+        {
             ("receiving", "/staff/receiving", "receiving", new[] { OperationsPermissions.ReceivingReceive }),
             ("inspection", "/staff/inspection", "inspection", new[] { OperationsPermissions.InspectionCheck }),
             ("inspection_queue", "/staff/inspection/queue", "inspection_queue", new[] { OperationsPermissions.InspectionPerform }),
+            ("items_review", "/staff/items", "items_review", new[] { OperationsPermissions.InspectionCheck }),
             ("holds", "/staff/holds", "holds", new[] { OperationsPermissions.HoldsManage }),
-            ("quotes", "/staff/quotes", "quotes", new[] { OperationsPermissions.QuotesCreate }),
+            ("inventory", "/staff/parcels/on-hand", "inventory", new[] { OperationsPermissions.ParcelsView, OperationsPermissions.ReceivingReceive }),
+            ("parcels", "/staff/parcels", "parcels", new[] { OperationsPermissions.ParcelsView }),
             ("supplies_stock", "/staff/supplies/stock", "supplies_stock", new[] { OperationsPermissions.SuppliesStock }),
-            ("cashier", "/staff/cashier", "cashier", new[] { OperationsPermissions.PaymentsTake }),
-            ("verify", "/staff/cashier/verify", "verify", new[] { OperationsPermissions.PaymentsConfirm }),
-            ("credit", "/staff/credit", "credit", new[] { OperationsPermissions.CustomersCredit }),
             ("bundles", "/staff/bundles", "bundles", new[] { OperationsPermissions.BundlesManage, OperationsPermissions.BundlesFill }),
             ("dispatches", "/staff/dispatches", "dispatches", new[] { OperationsPermissions.DispatchesManage }),
             ("arrivals", "/staff/arrivals", "arrivals", new[] { OperationsPermissions.ArrivalsReceive, OperationsPermissions.CustomsRecord }),
-            ("pickup", "/staff/pickup", "pickup", new[] { OperationsPermissions.PickupRelease }),
-            ("delivery", "/staff/delivery", "delivery", new[] { OperationsPermissions.DeliveryPlan }),
-            ("drive", "/staff/drive", "drive", new[] { OperationsPermissions.DeliveryDrive }),
             ("events", "/staff/events", "events", new[] { OperationsPermissions.EventsView, OperationsPermissions.EventsAdd }),
-            ("invoices", "/staff/invoices", "invoices", new[] { OperationsPermissions.InvoicesView }),
-            ("parcels", "/staff/parcels", "parcels", new[] { OperationsPermissions.ParcelsView }),
-            ("shipments", "/staff/shipments", "shipments", new[] { OperationsPermissions.ShipmentsView }),
-            ("customers", "/staff/customers", "customers", new[] { OperationsPermissions.CustomersView })
+            ("delivery", "/staff/delivery", "delivery", new[] { OperationsPermissions.DeliveryPlan }),
+            ("drive", "/staff/drive", "drive", new[] { OperationsPermissions.DeliveryDrive })
         }),
-        ("business", new[]
+        ("back_office", new[]
         {
+            ("bills", "/staff/bills", "bills", new[] { OperationsPermissions.BillsEnter, OperationsPermissions.BillsApprove, OperationsPermissions.CostsView }),
+            ("profit", "/staff/profit", "profit", new[] { OperationsPermissions.CostsView }),
+            ("reports", "/staff/reports", "reports", new[] { OperationsPermissions.ReportsOperations, OperationsPermissions.ReportsFinance }),
             ("locations", "/staff/locations", "locations", new[] { OperationsPermissions.BranchesView, OperationsPermissions.WarehousesView }),
             ("services", "/staff/services", "services", new[] { OperationsPermissions.ServicesView }),
+            ("item_catalogue", "/staff/settings/items", "item_catalogue", new[] { OperationsPermissions.ServicesView }),
             ("charges", "/staff/charges", "charges", new[] { OperationsPermissions.ChargesConfigure }),
             ("supplies", "/staff/supplies", "supplies", new[] { OperationsPermissions.ChargesConfigure }),
             ("carriers", "/staff/carriers", "carriers", new[] { OperationsPermissions.CarriersManage }),
             ("insurance", "/staff/insurance", "insurance", new[] { OperationsPermissions.InsuranceView }),
             ("inspection_setup", "/staff/inspection/setup", "inspection_setup", new[] { OperationsPermissions.InspectionConfigure }),
-            ("site", "/staff/site", "site", new[] { OperationsPermissions.BrandView }),
             ("settings", "/staff/settings", "settings", new[] { OperationsPermissions.SettingsView }),
             ("invoice_settings", "/staff/settings/invoices", "invoice_settings", new[] { OperationsPermissions.SettingsView }),
             ("payment_settings", "/staff/settings/payments", "payment_settings", new[] { OperationsPermissions.SettingsView }),
@@ -86,16 +99,28 @@ IMPORTANT NOTES:
             ("credit_settings", "/staff/settings/credit", "credit_settings", new[] { OperationsPermissions.SettingsView }),
             ("event_settings", "/staff/settings/events", "event_settings", new[] { OperationsPermissions.SettingsView }),
             ("pickup_settings", "/staff/settings/pickup", "pickup_settings", new[] { OperationsPermissions.SettingsView }),
-            ("delivery_settings", "/staff/settings/delivery", "delivery_settings", new[] { OperationsPermissions.SettingsView })
-        }),
-        ("team", new[]
-        {
+            ("delivery_settings", "/staff/settings/delivery", "delivery_settings", new[] { OperationsPermissions.SettingsView }),
+            ("report_settings", "/staff/settings/reports", "report_settings", new[] { OperationsPermissions.SettingsView }),
             ("staff", "/staff/people", "staff", new[] { OperationsPermissions.StaffView }),
-            ("roles", "/staff/roles", "roles", new[] { OperationsPermissions.RolesView })
+            ("roles", "/staff/roles", "roles", new[] { OperationsPermissions.RolesView }),
+            ("company", "/staff/company", "company", new[] { OperationsPermissions.CompanyView })
         }),
-        ("company", new[]
+        // Owner, 2026-10-29: support has its own chapter, just above Technical: the agents' calls, their call tickets, the customers' package tickets.
+        ("support", new[]
         {
-            ("company", "/staff/company", "company", new[] { OperationsPermissions.CompanyView }),
+            ("support", "/staff/support", "support", new[] { OperationsPermissions.SupportLookup }),
+            // Owner, 2026-10-29 (ticket desk): one desk for every department's tickets.
+            ("tickets", "/staff/tickets", "tickets", new[]
+            {
+                OperationsPermissions.ParcelsView, OperationsPermissions.InvoicesView, OperationsPermissions.PaymentsTake, OperationsPermissions.CustomersManage,
+                OperationsPermissions.ShipmentsManage, OperationsPermissions.InsuranceManage
+            })
+        }),
+        ("technical", new[]
+        {
+            ("site", "/staff/site", "site", new[] { OperationsPermissions.BrandView }),
+            ("texts_settings", "/staff/settings/messages", "texts_settings", new[] { OperationsPermissions.SettingsView }),
+            ("api_settings", "/staff/settings/api", "api_settings", new[] { OperationsPermissions.SettingsView }),
             ("audit", "/staff/audit", "audit", new[] { OperationsPermissions.AuditView }),
             ("activity", "/staff/activity", "activity", new[] { OperationsPermissions.AuditView })
         })
@@ -106,10 +131,13 @@ IMPORTANT NOTES:
         "workspace" => "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
         "receiving" => "M3 7h18v13H3zM3 7l3-4h12l3 4M12 11v6M9 14l3 3 3-3",
         "parcels" => "m3 7 9-5 9 5-9 5-9-5Zm0 0v10l9 5 9-5V7M7.5 4.5l9 5",
+        "inventory" => "M3 3v18M21 3v18M3 9h18M3 15h18M6 5h4v4H6zM13 11h4v4h-4zM7 17h4v4H7z",
         "shipments" => "M1 4h14v12H1zM15 9h4l3 3v4h-7M5.5 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4M18.5 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4",
         "inspection" => "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14m5 12 5 5M8 11l2 2 4-4",
         "inspection_queue" => "M4 5h16M4 10h16M4 15h10M4 20h7M18 15l3 3-3 3",
         "counter" => "M3 10h18M5 10v9h14v-9M8 10V6h8v4M10 14h4",
+        "support" => "M3 13a9 9 0 0 1 18 0v5a2 2 0 0 1-2 2h-2v-7h4M3 13v5a2 2 0 0 0 2 2h2v-7H3",
+        "tickets" => "M3 7l9-4 9 4v10l-9 4-9-4V7Zm9 5v9M3 7l9 5 9-5M12 9v.01",
         "holds" => "M6 3h12v18H6zM10 8v8M14 8v8",
         "inspection_setup" => "m12 2 9 4v6c0 5-9 10-9 10S3 17 3 12V6l9-4ZM9 10h6M9 14h4",
         "insurance" => "m12 2 9 4v6c0 5-9 10-9 10S3 17 3 12V6l9-4ZM12 8v8M8 12h8",
@@ -140,6 +168,8 @@ IMPORTANT NOTES:
         "bundle_settings" => "M3 7h18v13H3zM3 7l3-4h12l3 4M9 13h6M12 10v6",
         "site" => "M3 3h18v18H3zM3 8h18M8 8v13",
         "services" => "m3 7 9-5 9 5-9 5-9-5Zm0 0v10l9 5 9-5V7M12 12v10",
+        "items_review" => "M4 5h11M4 10h11M4 15h7M15 15l2.5 2.5L22 13",
+        "item_catalogue" => "M4 4h16v16H4zM8 8h8M8 12h8M8 16h5",
         "audit" => "M4 3h16v18H4zM8 7h8M8 12h8M8 17h5",
         "activity" => "M3 12h4l3-8 4 16 3-8h4",
         "company" => "M4 21V5h10v16M14 10h6v11M2 21h20M8 9h2M8 13h2M8 17h2",

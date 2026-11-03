@@ -43,6 +43,8 @@ public sealed class PlatformSignInSteps
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly IPlatformSecuritySettingsRepository _security;
+
     public PlatformSignInSteps(
         IPlatformSignInChallengeRepository challenges,
         IPlatformUserRepository users,
@@ -51,7 +53,8 @@ public sealed class PlatformSignInSteps
         IPlatformRequestMetadata metadata,
         PlatformAuditTrail audit,
         IPlatformUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IPlatformSecuritySettingsRepository security)
     {
         _challenges = challenges ?? throw new ArgumentNullException(nameof(challenges));
         _users = users ?? throw new ArgumentNullException(nameof(users));
@@ -61,9 +64,18 @@ public sealed class PlatformSignInSteps
         _audit = audit ?? throw new ArgumentNullException(nameof(audit));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+        _security = security ?? throw new ArgumentNullException(nameof(security));
     }
 
     public DateTimeOffset UtcNow => _timeProvider.GetUtcNow();
+
+    // Require MFA = No (owner, 2026-10-22): a person with no second factor signs in with the password alone.
+    public async Task<bool> PasswordIsEnoughAsync(PlatformUser user, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(user);
+
+        return !user.HasSecondFactor && !PlatformSecuritySettings.Requires(await _security.GetAsync(cancellationToken));
+    }
 
     public string IssueChallenge(PlatformUser user, DateTimeOffset utcNow)
     {

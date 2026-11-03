@@ -28,6 +28,9 @@ public sealed record OperationsDeliveryStopRow(Guid Id, int Sequence, Guid Shipm
 
     public bool CodeChecked { get; init; }
 
+    // Slice 12B: delivered without a signal; the code was not accepted when the stop was sent.
+    public bool CodeUnconfirmed { get; init; }
+
     public bool FromSheet { get; init; }
 
     public decimal CashCollected { get; init; }

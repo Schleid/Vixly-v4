@@ -33,9 +33,18 @@ public sealed class ListMyOperationsInvoicesResponse
     // Slice 5F step 4: the customer may pay by card on Stripe's page.
     public bool CardOffered { get; private init; }
 
-    public static ListMyOperationsInvoicesResponse Success(IReadOnlyList<OperationsInvoice> invoices, IReadOnlyList<OperationsCreditNote> creditNotes, bool cardOffered = false)
+    // Zelle and bank transfer on the portal, when the company offers them there (owner, 2026-10-27).
+    public bool ZelleOffered { get; private init; }
+
+    public bool BankTransferOffered { get; private init; }
+
+    public static ListMyOperationsInvoicesResponse Success(IReadOnlyList<OperationsInvoice> invoices, IReadOnlyList<OperationsCreditNote> creditNotes, bool cardOffered = false,
+        bool zelleOffered = false, bool bankTransferOffered = false)
     {
-        return new ListMyOperationsInvoicesResponse { Succeeded = true, Invoices = invoices, CreditNotes = creditNotes, CardOffered = cardOffered };
+        return new ListMyOperationsInvoicesResponse
+        {
+            Succeeded = true, Invoices = invoices, CreditNotes = creditNotes, CardOffered = cardOffered, ZelleOffered = zelleOffered, BankTransferOffered = bankTransferOffered
+        };
     }
 
     public static ListMyOperationsInvoicesResponse Failure(Error error)

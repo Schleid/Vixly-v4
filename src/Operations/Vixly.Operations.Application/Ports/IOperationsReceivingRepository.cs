@@ -72,6 +72,9 @@ public interface IOperationsReceivingRepository
 
     Task<OperationsShipment?> GetShipmentAsync(Guid shipmentId, CancellationToken cancellationToken);
 
+    // Owner, 2026-10-28: the company's shipment with this tracking number (stored form, OperationsTrackingNumbers.Read).
+    Task<OperationsShipment?> FindShipmentByTrackingNumberAsync(string trackingNumber, CancellationToken cancellationToken);
+
     // Slice 4D step 2: cleared parcels of the warehouses whose shipping label was never printed, oldest first.
     Task<IReadOnlyList<OperationsParcel>> ListLabelsToPrintAsync(IReadOnlyCollection<Guid> warehouses, int take, CancellationToken cancellationToken);
 
@@ -108,6 +111,12 @@ public interface IOperationsReceivingRepository
 
     Task<IReadOnlyList<OperationsStorageLocation>> ListLocationsAsync(Guid warehouseId, CancellationToken cancellationToken);
 
+    // Parcel inventory (owner, 2026-10-22): how many parcels a list holds and what they weigh, over all its pages.
+    Task<(int Count, decimal WeightKg)> ParcelTotalsAsync(OperationsParcelFilter filter, CancellationToken cancellationToken);
+
+    // The numbers of a page's shipments, by id.
+    Task<IReadOnlyDictionary<Guid, string>> ShipmentNumbersAsync(IReadOnlyCollection<Guid> shipmentIds, CancellationToken cancellationToken);
+
     Task<OperationsStorageLocation?> GetLocationAsync(Guid locationId, CancellationToken cancellationToken);
 
     Task<IReadOnlyList<OperationsStorageLocation>> ListLocationsByIdAsync(IReadOnlyCollection<Guid> locationIds, CancellationToken cancellationToken);
@@ -118,6 +127,9 @@ public interface IOperationsReceivingRepository
     Task<OperationsParcel?> FindActiveParcelAsync(IReadOnlyCollection<Guid> warehouseIds, IReadOnlyCollection<string> carrierTrackingNumbers, CancellationToken cancellationToken);
 
     Task<OperationsParcel?> FindCustomerParcelByTrackingAsync(Guid customerId, string carrierTrackingNumber, CancellationToken cancellationToken);
+
+    // Owner, 2026-10-29 (S-2): the customer's package by its carrier's number, wherever it is now (the newest when it came twice).
+    Task<OperationsParcel?> FindCustomerParcelByCarrierNumberAsync(Guid customerId, string carrierTrackingNumber, CancellationToken cancellationToken);
 
     Task<(IReadOnlyList<OperationsParcel> Items, int TotalCount)> ListParcelsAsync(OperationsParcelFilter filter, int page, int pageSize, CancellationToken cancellationToken);
 

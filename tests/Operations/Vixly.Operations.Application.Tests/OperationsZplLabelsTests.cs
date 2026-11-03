@@ -62,12 +62,36 @@ public sealed class OperationsZplLabelsTests
 
         Assert.StartsWith("^XA^CI28^PW812^LL1218", zpl, StringComparison.Ordinal);
         Assert.Contains("^FDMIA > JER^FS", zpl, StringComparison.Ordinal);
-        Assert.Contains("^BCN,180,N,N,N^FDSH26000012^FS", zpl, StringComparison.Ordinal);
+        Assert.Contains("^BCN,150,N,N,N^FDSH26000012^FS", zpl, StringComparison.Ordinal);
         Assert.Contains("^FDPK26000001^FS", zpl, StringComparison.Ordinal);
         Assert.Contains("^FD2 / 4^FS", zpl, StringComparison.Ordinal);
-        Assert.Contains("^FDJérémieXZJR Pierre^FS", zpl, StringComparison.Ordinal);
+        Assert.Contains("^FDJÉRÉMIEXZJR PIERRE^FS", zpl, StringComparison.Ordinal);
         Assert.Single(zpl.Split("^XZ")[..^1]);
         Assert.DoesNotContain('~', zpl);
         Assert.StartsWith("^XA^CI28^PW1200", OperationsZplLabels.ShippingLabel(label, 300), StringComparison.Ordinal);
+    }
+
+    // Owner, 2026-10-31: the service's label code large, a box per mode, an express band; the shipment number in print only, never a barcode; no customer number.
+    [Theory]
+    [InlineData("air", false, "^FDAIR^FS", false)]
+    [InlineData("air", true, "^FDEXPRESS^FS", false)]
+    [InlineData("ocean", false, "^FDSEA^FS", true)]
+    [InlineData("ground", false, "^FDGROUND^FS", false)]
+    public void ShippingLabel_ShowsTheLabelCode_InTheBoxOfItsMode(string mode, bool express, string word, bool stripes)
+    {
+        Vixly.Operations.Application.Ports.OperationsShippingLabel label = new("Galeo", "SH26000012", "PK26000001", 1, 3, "FLL", "CAY", "x",
+            "Ana Pierre", "Les Cayes", true, "12.5 lb", "VX4829510733", null, "VXS", "Ocean", mode, express, "2026-10-31", "Fort Lauderdale", true, true);
+        string zpl = OperationsZplLabels.ShippingLabel(label, 203);
+
+        Assert.Contains("^FDVXS^FS", zpl, StringComparison.Ordinal);
+        Assert.Contains(word, zpl, StringComparison.Ordinal);
+        Assert.Contains("^FDShipment SH26000012^FS", zpl, StringComparison.Ordinal);
+        Assert.DoesNotContain("^FDSH26000012^FS", zpl, StringComparison.Ordinal);
+        Assert.Contains("^FDINSURED   CONSOL^FS", zpl, StringComparison.Ordinal);
+        Assert.DoesNotContain("Customer", zpl, StringComparison.Ordinal);
+        Assert.Contains("^FDPICKUP^FS", zpl, StringComparison.Ordinal);
+
+        Assert.Equal(express, zpl.Contains("^FDE X P R E S S^FS", StringComparison.Ordinal));
+        Assert.Equal(stripes, zpl.Contains("^GD", StringComparison.Ordinal));
     }
 }

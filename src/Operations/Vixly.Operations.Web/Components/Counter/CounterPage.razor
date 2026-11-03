@@ -37,7 +37,7 @@ IMPORTANT NOTES:
                                 <tr>
                                     <td><a href="/staff/counter/customers/@customer.Id">@customer.Name</a>@(customer.CompanyName is { } company ? " · " + company : null)</td>
                                     <td>@customer.Code</td>
-                                    <td>@customer.Phone</td>
+                                    <td>@Vixly.Shared.Localization.VixlyPhone.International(customer.Phone)</td>
                                     <td>@customer.Email</td>
                                     <td>@T["ui.customers.status." + customer.Status.ToString().ToLowerInvariant()]</td>
                                 </tr>

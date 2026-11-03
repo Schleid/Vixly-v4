@@ -30,6 +30,15 @@ public sealed record OperationsPublicSite(
 
     public bool PricingShown { get; init; }
 
+    // Vixly Lite (owner, 2026-10-30): the customer portal is in the company's plan (sign-in and account links show).
+    public bool PortalShown { get; init; } = true;
+
+    // Landing page marketing (owner, 2026-10-30): packages delivered from the company's records, rounded down; null below the minimum or when hidden.
+    public int? DeliveredPackages { get; init; }
+
+    // The testimonials the company shows, in its order; empty when it shows none.
+    public IReadOnlyList<OperationsSiteTestimonial> Testimonials { get; init; } = Array.Empty<OperationsSiteTestimonial>();
+
     // Countries in display order: those with locations or contacts, each once.
     public IReadOnlyList<string> Countries =>
         Locations.Select(location => location.CountryCode).Concat(Contacts.Select(contact => contact.CountryCode)).Distinct(StringComparer.Ordinal).ToList();

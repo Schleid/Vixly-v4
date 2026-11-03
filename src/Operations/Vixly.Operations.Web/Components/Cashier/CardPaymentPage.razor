@@ -1,4 +1,4 @@
-@*
+﻿@*
 =========================================================
 FILE: CardPaymentPage.razor
 
@@ -54,6 +54,11 @@ IMPORTANT NOTES:
                 <span class="ops-amount-currency">@Charge.CurrencyCode</span>
             </div>
         </div>
+        @* The lines added before the card wait for it (owner, 2026-10-26). *@
+        @if (Charge.OtherTotal > 0m)
+        {
+            <p class="ops-editor__notice" data-card-others>@VixlyText.Format(T, (Charge.Status == OperationsCardChargeStatus.Paid ? "ui.cards.others_recorded" : "ui.cards.others_waiting"), "amount", Charge.OtherTotal.ToString("N2", CultureInfo.CurrentCulture) + " " + Charge.CurrencyCode)</p>
+        }
 
         @switch (Charge.Status)
         {

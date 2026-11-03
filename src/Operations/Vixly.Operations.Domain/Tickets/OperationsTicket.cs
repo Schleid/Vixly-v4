@@ -13,6 +13,7 @@ namespace Vixly.Operations.Domain.Tickets;
 // RESPONSIBILITIES:
 // - What the customer knows, the carrier's proof of delivery, and the messages between the customer and staff
 // - Staff answer, link the package they found, and resolve it; the customer answers back
+// - Ticket desk (owner, 2026-10-29): a topic (the department), who opened it (customer or support agent), who took it, escalations sent
 //
 // IMPORTANT NOTES:
 // - Customers never search the warehouse: only staff look, and nothing of the warehouse is shown before staff link the package
@@ -70,6 +71,112 @@ public sealed class OperationsTicket : OperationsEntity
     public Guid? ParcelId { get; private set; }
 
     public DateTimeOffset? ResolvedUtc { get; private set; }
+
+    // =====================================================
+    // THE DESK (owner, 2026-10-29): topic, who opened it, who took it, escalations
+    // =====================================================
+    public const int TakeHoursDefault = 4;
+
+    public const int TakeHoursMax = 72;
+
+    public const int ResolveDaysDefault = 3;
+
+    public const int ResolveDaysMax = 30;
+
+    public OperationsTicketTopic Topic { get; private set; }
+
+    public OperationsTicketSource OpenedBy { get; private set; }
+
+    // The support agent who opened it during a call.
+    public Guid? AgentUserId { get; private set; }
+
+    // The shipment the caller asked about (an agent's ticket).
+    public Guid? ShipmentId { get; private set; }
+
+    public Guid? TakenByUserId { get; private set; }
+
+    public DateTimeOffset? TakenUtc { get; private set; }
+
+    // 1: the managers were told nobody took it; 2: told it is still not resolved. Each once.
+    public int EscalationsSent { get; private set; }
+
+    public bool FromCustomer => OpenedBy == OperationsTicketSource.Customer;
+
+    // A support agent's ticket from a call (design section 9): what the caller asked, for the topic's department; never shown to the customer.
+    public static OperationsTicket FromCall(Guid tenantId, Guid customerId, Guid warehouseId, Guid? shipmentId, Guid? parcelId, string reference, OperationsTicketTopic topic,
+        Guid agentUserId, string? text, DateTimeOffset utcNow)
+    {
+        string number = (reference ?? string.Empty).Trim();
+
+        if (customerId == Guid.Empty || warehouseId == Guid.Empty || agentUserId == Guid.Empty || (shipmentId is null && parcelId is null)
+            || number.Length is 0 or > OperationsReceivingLimits.TrackingNumberMaxLength)
+        {
+            throw new DomainException(OperationsTicketErrors.DetailsInvalid);
+        }
+
+        if (!Enum.IsDefined(topic))
+        {
+            throw new DomainException(OperationsTicketErrors.TopicInvalid);
+        }
+
+        OperationsTicket ticket = new(tenantId, utcNow)
+        {
+            CustomerId = customerId,
+            WarehouseId = warehouseId,
+            ShipmentId = shipmentId,
+            ParcelId = parcelId,
+            TrackingNumber = number,
+            Topic = topic,
+            OpenedBy = OperationsTicketSource.Agent,
+            AgentUserId = agentUserId,
+            Status = OperationsTicketStatus.Open
+        };
+        ticket._messages.Add(new OperationsTicketMessage(true, agentUserId, Words(text) ?? throw new DomainException(OperationsTicketErrors.MessageInvalid), utcNow));
+        return ticket;
+    }
+
+    // Someone of the department takes it (or gives it to a colleague): "I'm on it".
+    public void Take(Guid userId, DateTimeOffset utcNow)
+    {
+        (TakenByUserId, TakenUtc) = (userId, utcNow);
+        MarkAsModified(utcNow);
+    }
+
+    public void Release(DateTimeOffset utcNow)
+    {
+        (TakenByUserId, TakenUtc) = (null, null);
+        MarkAsModified(utcNow);
+    }
+
+    // Moved to another department; a customer's missing-package ticket keeps its package details.
+    public void Move(OperationsTicketTopic topic, DateTimeOffset utcNow)
+    {
+        Topic = Enum.IsDefined(topic) ? topic : throw new DomainException(OperationsTicketErrors.TopicInvalid);
+        (TakenByUserId, TakenUtc) = (null, null);
+        MarkAsModified(utcNow);
+    }
+
+    // The escalation step due now, or 0: nobody took it in time (1), or it is still not resolved (2).
+    public int EscalationDue(int takeHours, int resolveDays, DateTimeOffset utcNow)
+    {
+        if (Status == OperationsTicketStatus.Resolved)
+        {
+            return 0;
+        }
+
+        if (EscalationsSent < 2 && CreatedUtc <= utcNow.AddDays(-resolveDays))
+        {
+            return 2;
+        }
+
+        return EscalationsSent < 1 && TakenByUserId is null && CreatedUtc <= utcNow.AddHours(-takeHours) ? 1 : 0;
+    }
+
+    public void Escalated(int step, DateTimeOffset utcNow)
+    {
+        EscalationsSent = Math.Max(EscalationsSent, Math.Clamp(step, 0, 2));
+        MarkAsModified(utcNow);
+    }
 
     // The form that wrote last: the same form sent again changes nothing (ADR-0019).
     public string? LastCommandKey { get; private set; }
@@ -129,7 +236,10 @@ public sealed class OperationsTicket : OperationsEntity
     public void StaffReply(Guid userId, string? text, DateTimeOffset utcNow)
     {
         Add(true, userId, text, utcNow);
-        Status = Status == OperationsTicketStatus.Resolved ? Status : OperationsTicketStatus.Answered;
+
+        // An agent's ticket has no customer to wait for: a staff note keeps it open (ticket desk).
+        Status = Status == OperationsTicketStatus.Resolved || !FromCustomer ? Status : OperationsTicketStatus.Answered;
+        (TakenByUserId, TakenUtc) = TakenByUserId is null ? (userId, utcNow) : (TakenByUserId, TakenUtc);
     }
 
     // Resolved, with the package found (now the customer's) or with a last word.
@@ -147,6 +257,7 @@ public sealed class OperationsTicket : OperationsEntity
         }
 
         (Status, ResolvedUtc, ParcelId) = (OperationsTicketStatus.Resolved, utcNow, parcelId ?? ParcelId);
+        (TakenByUserId, TakenUtc) = TakenByUserId is null ? (userId, utcNow) : (TakenByUserId, TakenUtc);
         MarkAsModified(utcNow);
     }
 

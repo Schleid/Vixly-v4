@@ -1,0 +1,25 @@
+﻿@*
+=========================================================
+FILE: DriveQueueText.razor
+
+PURPOSE:
+The words the phone shows about stops kept on it (Slice 12B, owner H-4).
+
+RESPONSIBILITIES:
+- Hand ops-drive.js the route and its texts, in the person's language
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- {count} is replaced by the script
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<div hidden data-drive-text data-route="@(RouteId?.ToString() ?? string.Empty)"
+     data-waiting="@T["ui.drive.queue_waiting"]" data-sending="@T["ui.drive.queue_sending"]" data-waiting-one="@T["ui.drive.queue_one"]"
+     data-sent="@T["ui.drive.queue_sent"]" data-sign-in="@T["ui.drive.queue_sign_in"]"></div>
+
+@code {
+    // Empty on the list of routes: the script still sends what waits, from any route.
+    [Parameter] public Guid? RouteId { get; set; }
+}

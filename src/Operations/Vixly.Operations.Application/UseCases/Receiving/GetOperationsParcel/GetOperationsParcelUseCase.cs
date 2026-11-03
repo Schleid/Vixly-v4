@@ -122,7 +122,8 @@ public sealed class GetOperationsParcelUseCase
             settings?.DimensionUnit ?? OperationsDimensionUnit.Centimetre,
             await _reader.ShipmentAsync(parcel.ShipmentId, summaries.Count, cancellationToken),
             (await _inspections.ListLatestAsync(new[] { parcel.Id }, cancellationToken)).FirstOrDefault(),
-            parcel.ShipmentId is { } own && await _receiving.GetShipmentAsync(own, cancellationToken) is { } shipment && parcel.IsClearedIn(shipment));
+            // Owner, 2026-10-28 (option A): cleared, and its shipment paid, on account or collect (it has its tracking number).
+            parcel.ShipmentId is { } own && await _receiving.GetShipmentAsync(own, cancellationToken) is { TrackingNumber: not null } shipment && parcel.IsClearedIn(shipment));
 
         // Slice 4D step 3: the customer whose mailbox code is on the label (for staff to check), and the storage fee so far.
         Vixly.Operations.Domain.Customers.OperationsCustomer? labelCustomer = !parcel.IsIdentified && parcel.IsAtOrigin && parcel.LabelCode is { } labelCode
@@ -136,6 +137,6 @@ public sealed class GetOperationsParcelUseCase
             stored ? Vixly.Operations.Domain.Holds.OperationsStorageFees.Accrued(parcel.CreatedUtc, utcNow, freeDays, perDay) : 0m,
             stored ? Vixly.Operations.Domain.Holds.OperationsStorageFees.DaysCharged(parcel.CreatedUtc, utcNow, freeDays) : 0,
             settings?.CurrencyCode ?? Vixly.Operations.Domain.Settings.OperationsTenantSettings.DefaultCurrency,
-            access.Has(OperationsPermissions.CustomersView) || access.IsAdministrator);
+            (access.Has(OperationsPermissions.CustomersView) || access.Has(OperationsPermissions.CustomersLookup)) || access.IsAdministrator);
     }
 }

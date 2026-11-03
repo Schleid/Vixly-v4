@@ -20,7 +20,7 @@ IMPORTANT NOTES:
 <section class="pub-section pub-section--narrow">
     <h1>@T["public.register.title"]</h1>
     <RegistrationGate>
-        <RegistrationStart OfferToken="@Offer" Ended="@(Ended == 1)" />
+        <RegistrationStart OfferToken="@Offer" Plan="@Plan" Ended="@(Ended == 1)" />
     </RegistrationGate>
 </section>
 
@@ -30,4 +30,7 @@ IMPORTANT NOTES:
 
     [SupplyParameterFromQuery]
     public int? Ended { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Plan { get; set; }
 }

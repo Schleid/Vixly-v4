@@ -35,11 +35,15 @@ public sealed class UpdateMyOperationsCustomerUseCase
 
     private readonly IOperationsUnitOfWork _unitOfWork;
 
+    private readonly IOperationsCustomerRepository _customers;
+
     public UpdateMyOperationsCustomerUseCase(
         OperationsCustomerAccounts accounts,
         OperationsAuditTrail audit,
-        IOperationsUnitOfWork unitOfWork)
+        IOperationsUnitOfWork unitOfWork,
+        IOperationsCustomerRepository customers)
     {
+        _customers = customers ?? throw new ArgumentNullException(nameof(customers));
         _accounts = accounts ?? throw new ArgumentNullException(nameof(accounts));
         _audit = audit ?? throw new ArgumentNullException(nameof(audit));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
@@ -61,6 +65,13 @@ public sealed class UpdateMyOperationsCustomerUseCase
         if (!LanguageCode.TryCreate(request.Language, out LanguageCode? language) || language!.Value is not ("en" or "fr" or "es"))
         {
             return UpdateMyOperationsCustomerResponse.Failure(OperationsCustomerAuthErrors.LanguageInvalid);
+        }
+
+        // Owner, 2026-10-31: a banned customer's phone cannot move to another account.
+        if (!string.Equals(request.Phone?.Trim(), signedIn.Customer.Phone, StringComparison.Ordinal)
+            && await new OperationsBannedContacts(_customers).IsBannedAsync(null, request.Phone, cancellationToken))
+        {
+            return UpdateMyOperationsCustomerResponse.Failure(OperationsCustomerErrors.BannedContact);
         }
 
         try

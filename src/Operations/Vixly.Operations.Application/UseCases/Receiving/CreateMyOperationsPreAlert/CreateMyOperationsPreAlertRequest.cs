@@ -33,4 +33,7 @@ public sealed class CreateMyOperationsPreAlertRequest
     public decimal DeclaredValue { get; init; }
 
     public DateOnly? ExpectedDate { get; init; }
+
+    // Owner, 2026-11-01: the items, one per line; none: Contents and DeclaredValue as before.
+    public IReadOnlyList<Vixly.Operations.Application.Items.OperationsItemDraft> Items { get; init; } = Array.Empty<Vixly.Operations.Application.Items.OperationsItemDraft>();
 }

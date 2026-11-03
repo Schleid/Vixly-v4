@@ -28,4 +28,8 @@
     <InternalsVisibleTo Include="Vixly.Operations.Infrastructure.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Items\item-starter-list.json" LogicalName="Vixly.Operations.Infrastructure.Items.item-starter-list.json" />
+  </ItemGroup>
+
 </Project>

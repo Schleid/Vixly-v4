@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
 <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
 <resheader name="version"><value>2.0</value></resheader>
@@ -62,4 +62,9 @@
 <data name="spanish" xml:space="preserve"><value>Español</value></data>
 <data name="shortcut" xml:space="preserve"><value>Ctrl / ⌘ K</value></data>
 <data name="language" xml:space="preserve"><value>Langue</value></data>
+  <data name="help.link" xml:space="preserve"><value>Parcourir les articles d&apos;aide</value><comment>needs-review</comment></data>
+  <data name="help.html" xml:space="preserve"><value>&lt;p&gt;Trouvez des conseils pour la page que vous utilisez.&lt;/p&gt;&lt;h2 id=&quot;steps&quot;&gt;Étapes&lt;/h2&gt;&lt;ol&gt;&lt;li&gt;Ouvrez Aide dans l&apos;en-tête de la page.&lt;/li&gt;&lt;li&gt;Choisissez un article.&lt;/li&gt;&lt;/ol&gt;</value><comment>needs-review</comment></data>
+  <data name="help.label" xml:space="preserve"><value>Aide</value><comment>needs-review</comment></data>
+  <data name="help.related" xml:space="preserve"><value>Articles associés</value><comment>needs-review</comment></data>
+  <data name="help.title" xml:space="preserve"><value>Utiliser le centre d&apos;aide</value><comment>needs-review</comment></data>
 </root>

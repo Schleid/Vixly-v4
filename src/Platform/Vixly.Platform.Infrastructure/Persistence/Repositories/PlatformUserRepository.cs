@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Vixly.Platform.Application.Ports;
 using Vixly.Platform.Domain.Identity;
 using Vixly.Shared.Kernel.ValueObjects;
@@ -72,6 +73,34 @@ internal sealed class PlatformUserRepository : IPlatformUserRepository
     public Task<bool> AnyAsync(CancellationToken cancellationToken)
     {
         return _context.Users.AnyAsync(cancellationToken);
+    }
+
+    // A plain command: SQL Server refuses NEXT VALUE FOR inside the subquery EF would wrap around SqlQueryRaw.
+    public async Task<string> NextEmployeeNumberAsync(CancellationToken cancellationToken)
+    {
+        System.Data.Common.DbConnection connection = _context.Database.GetDbConnection();
+        bool opened = connection.State != System.Data.ConnectionState.Open;
+
+        if (opened)
+        {
+            await connection.OpenAsync(cancellationToken);
+        }
+
+        try
+        {
+            await using System.Data.Common.DbCommand command = connection.CreateCommand();
+            command.CommandText = "SELECT NEXT VALUE FOR [" + PlatformDatabase.Schema + "].[" + PlatformDatabase.EmployeeNumberSequence + "]";
+            command.Transaction = _context.Database.CurrentTransaction?.GetDbTransaction();
+
+            return PlatformEmployeeNumber.Format(Convert.ToInt64(await command.ExecuteScalarAsync(cancellationToken), System.Globalization.CultureInfo.InvariantCulture));
+        }
+        finally
+        {
+            if (opened)
+            {
+                await connection.CloseAsync();
+            }
+        }
     }
 
     public void Add(PlatformUser user)

@@ -46,6 +46,8 @@ public sealed class CreateOperationsCounterShipmentUseCase
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly Vixly.Operations.Application.Plans.OperationsShipmentCap _cap;
+
     public CreateOperationsCounterShipmentUseCase(
         OperationsCounterDesk desk,
         IOperationsCustomerRepository customers,
@@ -54,8 +56,10 @@ public sealed class CreateOperationsCounterShipmentUseCase
         OperationsNumbering numbering,
         OperationsCertificates certificates,
         IOperationsUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        Vixly.Operations.Application.Plans.OperationsShipmentCap cap)
     {
+        _cap = cap ?? throw new ArgumentNullException(nameof(cap));
         _desk = desk ?? throw new ArgumentNullException(nameof(desk));
         _customers = customers ?? throw new ArgumentNullException(nameof(customers));
         _intake = intake ?? throw new ArgumentNullException(nameof(intake));
@@ -120,6 +124,13 @@ public sealed class CreateOperationsCounterShipmentUseCase
         }
 
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();
+
+        // Shipment cap (owner, 2026-10-29): above 150 percent of the plan's shipments this month, after the one-time grace month.
+        if (await _cap.RefuseNewAsync(context.RequiredTenantId, utcNow, cancellationToken) is { } full)
+        {
+            return CreateOperationsCounterShipmentResponse.Failure(full);
+        }
+
         OperationsShipment shipment;
 
         try

@@ -7,7 +7,7 @@ Pay an invoice at the cashier (Slice 5F, F-4, C-3 to C-5): the amount owed, one 
 
 RESPONSIBILITIES:
 - Show the invoice's summary and what is owed
-- The tender rows: method, amount, cash given, reference
+- The payments added one by one (method, amount, cash given, reference), what is left, then one more or the card for the rest (owner, 2026-10-26)
 - Zelle: the warning, the terms in the customer's language, the acceptance, then the QR, tag, contact, amount and memo
 
 IMPORTANT NOTES:
@@ -30,29 +30,17 @@ IMPORTANT NOTES:
     @if (invoice.Owed > 0m)
     {
     <BillAccountPanel Invoice="invoice" Account="Account" Position="Position" />
-    @if (CardOffered)
+    @* Owner, 2026-10-27: freight collect is a payment term; chosen here while nothing is paid. *@
+    @if (settings.AllowCollect && invoice.Kind == OperationsInvoiceKind.Shipment && invoice.PaidTotal == 0m && invoice.PendingTotal == 0m && invoice.OnAccount == OperationsAccountCharge.None)
     {
-        @* Slice 5F step 4: a card through the company's Stripe account; recorded only once Stripe says it is paid. *@
-        <section class="ops-editor__panel ops-cashier__card" aria-labelledby="card-title">
-            <h2 id="card-title">@T["ui.cards.pay_title"]</h2>
-            <p class="ops-editor__hint">@T["ui.cards.pay_hint"]</p>
-            <div class="ops-editor__inline">
-                <form method="post" action="/staff/cashier/invoices/@invoice.Id/card">
-                    <AntiforgeryToken />
-                    <button type="submit" class="vx-button vx-button--primary">@T["ui.cards.payment_page"]</button>
-                </form>
-                @foreach (OperationsCardReaderRow reader in CardReaders)
-                {
-                    <form method="post" action="/staff/cashier/invoices/@invoice.Id/card">
-                        <AntiforgeryToken />
-                        <input type="hidden" name="reader" value="@reader.ReaderId" />
-                        <button type="submit" class="vx-button vx-button--secondary">@VixlyText.Format(T, "ui.cards.on_reader", "reader", reader.Label)</button>
-                    </form>
-                }
-            </div>
-        </section>
+        <FreightCollectPanel T="T" Action="@("/staff/cashier/invoices/" + invoice.Id + "/collect")" Collect="invoice.PayAtDestination" />
     }
-    <form method="post" action="/staff/cashier/invoices/@invoice.Id/pay" class="ops-editor__panel ops-editor__form ops-cashier__pay" aria-labelledby="tenders-title">
+    @* Payments added one by one, each off what is left (owner, 2026-10-26). The page keeps the list; the server checks it all again when the payment is taken.
+       A card is always last, for what is left: the other lines wait on the card charge and are recorded with it once Stripe approves it. *@
+    <form method="post" action="/staff/cashier/invoices/@invoice.Id/pay" class="ops-editor__panel ops-editor__form ops-cashier__pay" aria-labelledby="tenders-title"
+          data-tenders data-owed="@invoice.Owed.ToString("0.00", CultureInfo.InvariantCulture)"
+          data-text-amount="@T["ui.cashier.err_amount"]" data-text-more="@T["ui.cashier.err_more"]" data-text-given="@T["ui.cashier.err_given"]"
+          data-text-left="@T["ui.cashier.err_left"]" data-text-given-word="@T["ui.cashier.given_short"]" data-text-change="@T["ui.cashier.change_short"]">
         <AntiforgeryToken />
         <input type="hidden" name="key" value="@Key" />
         <h2 id="tenders-title">@VixlyText.Format(T, "ui.cashier.to_pay_now", "amount", OperationsInvoiceWords.Money(invoice.Owed, invoice.CurrencyCode))</h2>
@@ -61,28 +49,66 @@ IMPORTANT NOTES:
         {
             <p class="ops-editor__notice">@T["ui.cashier.cash_needs_drawer"] <a href="/staff/cashier/drawers">@T["ui.cashier.open_drawer"]</a></p>
         }
-        @for (int row = 1; row <= 3; row++)
-        {
-            int index = row;
-            <div class="ops-cashier__tender" data-row="@index">
-                <label>@T["ui.cashier.method"]
-                    <select name="method_@index">
-                        @foreach (OperationsPaymentMethod method in Methods)
-                        {
-                            <option value="@method">@OperationsPaymentWords.Method(T, method, Others)</option>
-                        }
-                    </select>
-                </label>
-                <label>@T["ui.cashier.amount"] <input name="amount_@index" inputmode="decimal" size="9" value="@(index == 1 ? invoice.Owed.ToString("0.00", CultureInfo.InvariantCulture) : null)" /></label>
-                <label>@T["ui.cashier.cash_given"] <input name="given_@index" inputmode="decimal" size="9" /></label>
-                <label>@T["ui.cashier.reference"] <input name="reference_@index" maxlength="60" size="14" /></label>
-            </div>
-        }
+        <dl class="ops-cashier__totals">
+            <div><dt>@T["ui.cashier.total_due"]</dt><dd>@invoice.Owed.ToString("N2", CultureInfo.CurrentCulture)</dd></div>
+            <div><dt>@T["ui.cashier.added"]</dt><dd data-tenders-added>@Entered.Sum(tender => tender.Amount).ToString("N2", CultureInfo.CurrentCulture)</dd></div>
+            <div><dt>@T["ui.cashier.left"]</dt><dd data-tenders-left>@(Math.Max(0m, invoice.Owed - Entered.Sum(tender => tender.Amount)).ToString("N2", CultureInfo.CurrentCulture))</dd></div>
+        </dl>
+        <ol class="ops-cashier__lines" data-tenders-list aria-live="polite">
+            @for (int index = 0; index < Entered.Count; index++)
+            {
+                OperationsTenderDraft line = Entered[index];
+                int row = index + 1;
+                <li data-tender data-method="@line.Method" data-amount="@line.Amount.ToString("0.00", CultureInfo.InvariantCulture)">
+                    <span>@OperationsPaymentWords.Method(T, line.Method, Others)@(line.Reference is { Length: > 0 } reference ? " · " + reference : null)@(line.CashGiven is { } given ? " · " + T["ui.cashier.given_short"] + " " + given.ToString("N2", CultureInfo.CurrentCulture) : null)</span>
+                    <strong>@line.Amount.ToString("N2", CultureInfo.CurrentCulture)</strong>
+                    <button type="button" class="vx-button vx-button--ghost" data-tender-remove aria-label="@T["ui.cashier.remove"]">×</button>
+                    <input type="hidden" name="method_@row" value="@line.Method" />
+                    <input type="hidden" name="amount_@row" value="@line.Amount.ToString("0.00", CultureInfo.InvariantCulture)" />
+                    <input type="hidden" name="given_@row" value="@line.CashGiven?.ToString("0.00", CultureInfo.InvariantCulture)" />
+                    <input type="hidden" name="reference_@row" value="@line.Reference" />
+                </li>
+            }
+        </ol>
+        <fieldset class="ops-cashier__tender" data-tenders-adder>
+            <legend>@T["ui.cashier.add_title"]</legend>
+            <label>@T["ui.cashier.method"]
+                <select name="method_new">
+                    @foreach (OperationsPaymentMethod method in Methods.Where(method => method != OperationsPaymentMethod.Card))
+                    {
+                        <option value="@method">@OperationsPaymentWords.Method(T, method, Others)</option>
+                    }
+                </select>
+            </label>
+            <label>@T["ui.cashier.amount"] <input name="amount_new" inputmode="decimal" size="9" value="@(Math.Max(0m, invoice.Owed - Entered.Sum(tender => tender.Amount)).ToString("0.00", CultureInfo.InvariantCulture))" /></label>
+            <label data-tender-given>@T["ui.cashier.cash_given"] <input name="given_new" inputmode="decimal" size="9" /></label>
+            <label data-tender-reference>@T["ui.cashier.reference"] <input name="reference_new" maxlength="60" size="14" /></label>
+            <button type="button" class="vx-button vx-button--secondary" data-tender-add data-remove-label="@T["ui.cashier.remove"]" hidden>@T["ui.cashier.add"]</button>
+            <p class="ops-editor__error" data-tender-error role="alert"></p>
+        </fieldset>
         @if (Methods.Contains(OperationsPaymentMethod.Zelle))
         {
             <ZelleTermsPanel T="T" Settings="settings" Invoice="invoice" HasQr="@(settings.ZelleQrKey is not null)" />
         }
-        <button type="submit" class="vx-button vx-button--primary">@T["ui.cashier.take"]</button>
+        <div class="ops-editor__actions">
+            <button type="submit" class="vx-button vx-button--primary" data-tenders-take>@T["ui.cashier.take"]</button>
+        </div>
+        @if (CardOffered)
+        {
+            @* Slice 5F step 4: a card through the company's Stripe account; recorded only once Stripe says it is paid. Always last, for what is left. *@
+            <section class="ops-cashier__card" aria-labelledby="card-title">
+                <h3 id="card-title">@T["ui.cards.rest_title"] <span data-tenders-left-again>@(Math.Max(0m, invoice.Owed - Entered.Sum(tender => tender.Amount)).ToString("N2", CultureInfo.CurrentCulture))</span> @invoice.CurrencyCode</h3>
+                <p class="ops-editor__notice">@T["ui.cards.one_card"]</p>
+                <p class="ops-editor__hint">@T["ui.cards.keep_cash"]</p>
+                <div class="ops-editor__inline">
+                    <button type="submit" class="vx-button vx-button--secondary" formaction="/staff/cashier/invoices/@invoice.Id/card" data-tenders-card>@T["ui.cards.payment_page"]</button>
+                    @foreach (OperationsCardReaderRow reader in CardReaders)
+                    {
+                        <button type="submit" class="vx-button vx-button--secondary" formaction="/staff/cashier/invoices/@invoice.Id/card" name="reader" value="@reader.ReaderId" data-tenders-card>@VixlyText.Format(T, "ui.cards.on_reader", "reader", reader.Label)</button>
+                    }
+                </div>
+            </section>
+        }
     </form>
     }
     else
@@ -125,6 +151,9 @@ IMPORTANT NOTES:
     [Parameter] public string? Error { get; set; }
 
     [Parameter] public string? Info { get; set; }
+
+    // The lines added before a refusal, shown again so nothing is typed twice (owner, 2026-10-26).
+    [Parameter] public IReadOnlyList<OperationsTenderDraft> Entered { get; set; } = Array.Empty<OperationsTenderDraft>();
 
     [Parameter] public IReadOnlyList<Vixly.Operations.Application.Screens.OperationsScreenRow> Screens { get; set; } = Array.Empty<Vixly.Operations.Application.Screens.OperationsScreenRow>();
 

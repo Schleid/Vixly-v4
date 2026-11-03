@@ -24,7 +24,7 @@ IMPORTANT NOTES:
         @if (Customer.CompanyName is { } company) { <p class="ops-counter__company">@company</p> }
         <dl class="ops-counter__contact">
             <div><dt>@T["ui.counter.code"]</dt><dd class="ops-counter__code">@(Customer.Code ?? "—")</dd></div>
-            <div><dt>@T["ui.counter.phone"]</dt><dd>@Customer.Phone</dd></div>
+            <div><dt>@T["ui.counter.phone"]</dt><dd>@Vixly.Shared.Localization.VixlyPhone.International(Customer.Phone)</dd></div>
             <div><dt>@T["ui.counter.email"]</dt><dd>@Customer.Email</dd></div>
             <div><dt>@T["ui.counter.since"]</dt><dd>@Standing.MemberSinceUtc.ToString("d", CultureInfo.CurrentCulture)</dd></div>
         </dl>

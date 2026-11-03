@@ -1,0 +1,12 @@
+/* Customer help keeps complete written instructions beside page-only examples. */
+.customer-help { max-width: 76ch; margin-inline: auto; overflow-wrap: anywhere; }
+.customer-help img { display: block; width: 100%; height: auto; border: 1px solid var(--vx-color-border); border-radius: var(--vx-radius-md); margin-block: 1rem; }
+.customer-help a:has(img) { cursor: zoom-in; }
+.customer-help form { display: flex; flex-wrap: wrap; gap: .75rem; margin-block: 1rem; }
+.customer-help form label { flex-basis: 100%; }
+.customer-help form input { flex: 1 1 12rem; min-width: 0; }
+.customer-help__topics li { margin-block: 1.25rem; }
+@media (max-width: 720px) {
+    .customer-portal__topbar { flex-wrap: wrap; height: auto; }
+    .customer-portal__topbar-actions { flex-wrap: wrap; justify-content: flex-end; max-width: 100%; gap: .5rem; }
+}

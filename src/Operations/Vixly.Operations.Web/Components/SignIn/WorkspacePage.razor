@@ -1,4 +1,4 @@
-@*
+﻿@*
 =========================================================
 FILE: WorkspacePage.razor
 
@@ -136,6 +136,10 @@ IMPORTANT NOTES:
                     @T["ui.checklist.title"]
                 </h2>
                 <span class="ops-workspace__checklist-pill">@Checklist.Count(i => i.Done) / @Checklist.Count</span>
+                @if (Can(Vixly.Operations.Domain.Access.OperationsPermissions.SettingsEdit))
+                {
+                    <VxHelpLink Href="/staff/help/setup-checklist" Label="@T["ui.help.setup"]" />
+                }
             </div>
             <ul class="ops-workspace__checklist">
                 @foreach (Vixly.Operations.Application.Settings.OperationsSetupItem item in Checklist)
@@ -149,9 +153,24 @@ IMPORTANT NOTES:
                         {
                             <a href="@item.Link" class="ops-workspace__checklist-link"><span class="ops-workspace__checklist-icon" aria-hidden="true">&#x25CB;</span> <span>@T["ui.checklist." + item.Code]</span> <span class="ops-workspace__checklist-arrow" aria-hidden="true">&rarr;</span></a>
                         }
+                        <Vixly.Operations.Web.Components.Help.OperationsHelpArticleLink Slug="@Vixly.Operations.Web.Features.Help.OperationsSetupHelpTopics.ForChecklist(item.Code)" />
                     </li>
                 }
             </ul>
+        </section>
+    }
+    @if (ShipmentCap is { } cap)
+    {
+        @* Shipment cap (owner, 2026-10-29): from 80 percent of the plan's shipments this month, for those who manage the settings. *@
+        <section class="ops-editor__notice ops-workspace-cap" role="status" aria-labelledby="cap-title">
+            <h2 id="cap-title">@T["ui.plan_cap.title"]</h2>
+            <p>@VixlyText.Format(T, "ui.plan_cap.used", new Dictionary<string, object> { ["used"] = cap.Used, ["cap"] = cap.Cap, ["month"] = cap.Month })</p>
+            @if (cap.Extra > 0)
+            {
+                <p>@VixlyText.Format(T, "ui.plan_cap.charged", new Dictionary<string, object> { ["cap"] = cap.Cap, ["price"] = cap.ExtraShipmentPrice.ToString("0.00", System.Globalization.CultureInfo.CurrentCulture) + " " + cap.CurrencyCode })</p>
+            }
+            <p>@(cap.Blocked ? T["ui.plan_cap.stopped"].Value : cap.GraceThisMonth || (cap.Level >= 150 && cap.GraceAvailable) ? T["ui.plan_cap.grace"].Value : VixlyText.Format(T, "ui.plan_cap.stop_at", "block", cap.BlockAt))</p>
+            <a href="/staff/billing" class="vx-button vx-button--secondary vx-button--sm">@T["ui.plan_cap.billing"]</a>
         </section>
     }
     @if (LowSupplies.Count > 0)
@@ -199,6 +218,9 @@ IMPORTANT NOTES:
     public IReadOnlyList<Vixly.Operations.Application.Settings.OperationsSetupItem> Checklist { get; set; } = Array.Empty<Vixly.Operations.Application.Settings.OperationsSetupItem>();
 
     [Parameter]
+    public Vixly.Operations.Application.Plans.OperationsShipmentCapStatus? ShipmentCap { get; set; }
+
+    [Parameter]
     public IReadOnlyList<Vixly.Operations.Application.Supplies.OperationsLowSupply> LowSupplies { get; set; } = Array.Empty<Vixly.Operations.Application.Supplies.OperationsLowSupply>();
 
     private string UserInitials => string.IsNullOrWhiteSpace(Name)
@@ -207,5 +229,5 @@ IMPORTANT NOTES:
 
     private bool Shows(string url) => OperationsNavigation.Groups
         .SelectMany(group => group.Items)
-        .Any(item => item.Url == url && OperationsNavigation.Visible(item.Permissions, Allowance));
+        .Any(item => item.Url == url && OperationsNavigation.Visible(item.Permissions, Allowance) && !Allowance.Hides(item.Url));
 }

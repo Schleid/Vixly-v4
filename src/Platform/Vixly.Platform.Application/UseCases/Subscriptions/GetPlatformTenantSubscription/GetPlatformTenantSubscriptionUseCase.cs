@@ -32,11 +32,15 @@ public sealed class GetPlatformTenantSubscriptionUseCase
 
     private readonly IPlatformTenantRepository _tenants;
 
+    private readonly IPlatformShipmentUsageRepository _usage;
+
     public GetPlatformTenantSubscriptionUseCase(
         PlatformSubscriptionAdministration administration,
         IPlatformSubscriptionQueries queries,
-        IPlatformTenantRepository tenants)
+        IPlatformTenantRepository tenants,
+        IPlatformShipmentUsageRepository usage)
     {
+        _usage = usage ?? throw new ArgumentNullException(nameof(usage));
         _administration = administration ?? throw new ArgumentNullException(nameof(administration));
         _tenants = tenants ?? throw new ArgumentNullException(nameof(tenants));
         _queries = queries ?? throw new ArgumentNullException(nameof(queries));
@@ -73,6 +77,12 @@ public sealed class GetPlatformTenantSubscriptionUseCase
         PlatformPlan? plan = subscription is null ? null : await _administration.Plans.GetAsync(subscription.PlatformPlanId, cancellationToken);
         PlatformPlanVersion? version = plan?.Versions.FirstOrDefault(item => item.Id == subscription!.PlanVersionId);
         IReadOnlyList<PlatformLimitItem> limits = await _administration.LimitsAsync(request.PlatformTenantId, version, names, cancellationToken);
+
+        // Shipment cap (owner, 2026-10-29): the latest month Operations reported, next to the cap.
+        if ((await _usage.ListLatestAsync(new[] { request.PlatformTenantId }, cancellationToken)).FirstOrDefault() is { } usage)
+        {
+            limits = limits.Select(item => item.Kind == PlatformPlanLimitKind.MaxShipmentsPerMonth ? item with { UsedThisMonth = usage.Shipments, UsedMonth = usage.Month } : item).ToArray();
+        }
 
         if (subscription is null || plan is null || version is null)
         {

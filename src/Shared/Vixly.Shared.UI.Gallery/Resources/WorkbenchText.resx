@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
 <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
 <resheader name="version"><value>2.0</value></resheader>
@@ -62,4 +62,9 @@
 <data name="spanish" xml:space="preserve"><value>Español</value></data>
 <data name="shortcut" xml:space="preserve"><value>Ctrl / ⌘ K</value></data>
 <data name="language" xml:space="preserve"><value>Language</value></data>
+  <data name="help.link" xml:space="preserve"><value>Browse help articles</value></data>
+  <data name="help.html" xml:space="preserve"><value>&lt;p&gt;Find guidance for the page you are using.&lt;/p&gt;&lt;h2 id=&quot;steps&quot;&gt;Steps&lt;/h2&gt;&lt;ol&gt;&lt;li&gt;Open Help from the page header.&lt;/li&gt;&lt;li&gt;Choose an article.&lt;/li&gt;&lt;/ol&gt;</value></data>
+  <data name="help.label" xml:space="preserve"><value>Help</value></data>
+  <data name="help.related" xml:space="preserve"><value>Related articles</value></data>
+  <data name="help.title" xml:space="preserve"><value>Use the help area</value></data>
 </root>

@@ -30,9 +30,16 @@ public sealed class ListOperationsDevicesResponse
     // The company's licences (owner, 2026-10-21); none when Platform could not count them.
     public OperationsDeviceSeats? Seats { get; private init; }
 
-    public static ListOperationsDevicesResponse Success(IReadOnlyList<OperationsDevice> devices, OperationsDeviceSeats? seats)
+    // Owner, R-6: the devices blocked after a sign-in from another country, until an administrator unblocks them.
+    public IReadOnlyList<Vixly.Operations.Domain.Identity.OperationsDeviceBlock> Blocks { get; private init; } = Array.Empty<Vixly.Operations.Domain.Identity.OperationsDeviceBlock>();
+
+    // Require MFA = No and no authenticator: the viewer confirms device actions with the password (owner, 2026-10-22).
+    public bool PasswordConfirms { get; private init; }
+
+    public static ListOperationsDevicesResponse Success(IReadOnlyList<OperationsDevice> devices, OperationsDeviceSeats? seats,
+        IReadOnlyList<Vixly.Operations.Domain.Identity.OperationsDeviceBlock> blocks, bool passwordConfirms = false)
     {
-        return new ListOperationsDevicesResponse { Succeeded = true, Devices = devices, Seats = seats };
+        return new ListOperationsDevicesResponse { Succeeded = true, Devices = devices, Seats = seats, Blocks = blocks, PasswordConfirms = passwordConfirms };
     }
 
     public static ListOperationsDevicesResponse Failure(Error error)

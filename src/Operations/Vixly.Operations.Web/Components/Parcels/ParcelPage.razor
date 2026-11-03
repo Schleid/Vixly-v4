@@ -127,6 +127,10 @@ IMPORTANT NOTES:
     }
     <ShipmentInstructionsPanel T="T" Shipment="Shipment" />
     <InspectionSummaryPanel T="T" Inspection="Inspection" />
+    @if (ItemsPanel is { Succeeded: true } items)
+    {
+        <Vixly.Operations.Web.Components.Items.ParcelItemsPanel ParcelId="Parcel.ParcelId" Items="items.Items" Catalogue="items.Catalogue" CanEdit="items.CanEdit" Missing="items.Missing" />
+    }
     <section class="ops-editor__panel" aria-labelledby="parcel-history">
         <h2 id="parcel-history">@T["ui.parcels.history"]</h2>
         <ol class="ops-parcel-history">
@@ -206,4 +210,7 @@ IMPORTANT NOTES:
     [Parameter] public string? Error { get; set; }
 
     [Parameter] public string? Info { get; set; }
+
+    // Owner, 2026-11-01: the items and their customs classification.
+    [Parameter] public Vixly.Operations.Application.UseCases.Items.GetOperationsParcelItems.GetOperationsParcelItemsResponse? ItemsPanel { get; set; }
 }

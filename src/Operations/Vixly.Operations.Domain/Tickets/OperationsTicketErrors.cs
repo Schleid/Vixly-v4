@@ -31,4 +31,12 @@ public static class OperationsTicketErrors
     public static Error AlreadyLinked { get; } = Error.Create("ops.tickets.already_linked");
 
     public static Error AnotherOpen { get; } = Error.Create("ops.tickets.another_open");
+
+    // Owner, 2026-10-29 (ticket desk): an agent's ticket needs what the caller asked; a topic must be known.
+    public static Error TopicInvalid { get; } = Error.Create("ops.tickets.topic_invalid");
+
+    public static Error NotInDepartment { get; } = Error.Create("ops.tickets.not_in_department");
+
+    public static Error LimitsInvalid { get; } = Error.Create("ops.tickets.limits_invalid",
+        ("maxHours", OperationsTicket.TakeHoursMax), ("maxDays", OperationsTicket.ResolveDaysMax));
 }

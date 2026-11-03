@@ -81,6 +81,6 @@ public sealed class GetOperationsCardPaymentUseCase
         OperationsPayment? payment = charge.PaymentId is { } paymentId ? await _payments.GetPaymentAsync(paymentId, cancellationToken) : null;
         OperationsCardReader? reader = charge.ReaderId is { } readerId ? await _store.GetReaderAsync(readerId, cancellationToken) : null;
         return GetOperationsCardPaymentResponse.Success(charge.Id, invoice.Id, invoice.Number, charge.Channel, charge.Status, charge.Amount, charge.CurrencyCode,
-            charge.Status == OperationsCardChargeStatus.Started ? charge.PageUrl : null, reader?.Label, payment?.Number, payment?.Id);
+            charge.Status == OperationsCardChargeStatus.Started ? charge.PageUrl : null, reader?.Label, payment?.Number, payment?.Id, charge.OtherTotal);
     }
 }

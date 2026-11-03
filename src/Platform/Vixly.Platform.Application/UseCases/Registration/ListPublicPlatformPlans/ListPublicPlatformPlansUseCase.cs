@@ -53,7 +53,9 @@ public sealed class ListPublicPlatformPlansUseCase
                 plan.Current.Limit(PlatformPlanLimitKind.MaxLicensedDevices),
                 plan.Current.Limit(PlatformPlanLimitKind.MaxWarehouses),
                 plan.Current.Features.Select(item => item.Feature).OrderBy(feature => feature).ToArray(),
-                plan.Current.TrialDays))
+                plan.Current.TrialDays,
+                plan.Current.Limit(PlatformPlanLimitKind.MaxShipmentsPerMonth),
+                plan.Current.ExtraShipmentPrice))
             .ToArray());
     }
 }

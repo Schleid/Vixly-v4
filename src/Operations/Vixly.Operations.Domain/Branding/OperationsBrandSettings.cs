@@ -11,6 +11,7 @@ namespace Vixly.Operations.Domain.Branding;
 // RESPONSIBILITIES:
 // - Validate colours against WCAG 2.2 AA (white text on primary 4.5:1, accent against white 3:1)
 // - Accept https links only
+// - Hold the theme and font of the website (website themes, step 1)
 //
 // IMPORTANT NOTES:
 // - Held twice by the brand: draft and published
@@ -44,6 +45,14 @@ public sealed class OperationsBrandSettings
 
     public Guid? HeroImageId { get; private set; }
 
+    public Guid? AirImageId { get; private set; }
+
+    public Guid? SeaImageId { get; private set; }
+
+    public OperationsSiteTheme Theme { get; private set; }
+
+    public OperationsSiteFont Font { get; private set; }
+
     public string? FacebookUrl { get; private set; }
 
     public string? InstagramUrl { get; private set; }
@@ -61,6 +70,13 @@ public sealed class OperationsBrandSettings
     public bool ShowSteps { get; private set; } = true;
 
     public bool ShowFaq { get; private set; }
+
+    // Landing page marketing (owner, 2026-10-30): each section shows only with real data behind it.
+    public bool ShowDelivered { get; private set; } = true;
+
+    public bool ShowRates { get; private set; } = true;
+
+    public bool ShowTestimonials { get; private set; } = true;
 
     public static OperationsBrandSettings Initial(string displayName)
     {
@@ -107,6 +123,25 @@ public sealed class OperationsBrandSettings
         return copy;
     }
 
+    // The marketing sections the company shows: packages delivered, rates with the estimate, customer testimonials.
+    public OperationsBrandSettings WithMarketing(bool showDelivered, bool showRates, bool showTestimonials)
+    {
+        OperationsBrandSettings copy = Copy();
+        copy.ShowDelivered = showDelivered;
+        copy.ShowRates = showRates;
+        copy.ShowTestimonials = showTestimonials;
+        return copy;
+    }
+
+    // Unknown values fall back to the defaults; the plan check is the use case's (W-4: a downgrade keeps what is published).
+    public OperationsBrandSettings WithLook(OperationsSiteTheme theme, OperationsSiteFont font)
+    {
+        OperationsBrandSettings copy = Copy();
+        copy.Theme = Enum.IsDefined(theme) ? theme : OperationsSiteTheme.Classic;
+        copy.Font = Enum.IsDefined(font) ? font : OperationsSiteFont.Default;
+        return copy;
+    }
+
     public OperationsBrandSettings WithImage(OperationsSiteImageKind kind, Guid imageId)
     {
         OperationsBrandSettings copy = Copy();
@@ -117,6 +152,8 @@ public sealed class OperationsBrandSettings
             case OperationsSiteImageKind.LogoDark: copy.LogoDarkImageId = imageId; break;
             case OperationsSiteImageKind.Favicon: copy.FaviconImageId = imageId; break;
             case OperationsSiteImageKind.Hero: copy.HeroImageId = imageId; break;
+            case OperationsSiteImageKind.Air: copy.AirImageId = imageId; break;
+            case OperationsSiteImageKind.Sea: copy.SeaImageId = imageId; break;
         }
 
         return copy;
@@ -132,6 +169,8 @@ public sealed class OperationsBrandSettings
             case OperationsSiteImageKind.LogoDark: copy.LogoDarkImageId = null; break;
             case OperationsSiteImageKind.Favicon: copy.FaviconImageId = null; break;
             case OperationsSiteImageKind.Hero: copy.HeroImageId = null; break;
+            case OperationsSiteImageKind.Air: copy.AirImageId = null; break;
+            case OperationsSiteImageKind.Sea: copy.SeaImageId = null; break;
         }
 
         return copy;
@@ -157,7 +196,19 @@ public sealed class OperationsBrandSettings
         return copy;
     }
 
-    public bool Uses(Guid imageId) => LogoImageId == imageId || LogoDarkImageId == imageId || FaviconImageId == imageId || HeroImageId == imageId;
+    public bool Uses(Guid imageId) => LogoImageId == imageId || LogoDarkImageId == imageId || FaviconImageId == imageId || HeroImageId == imageId
+        || AirImageId == imageId || SeaImageId == imageId;
+
+    public Guid? ImageId(OperationsSiteImageKind kind) => kind switch
+    {
+        OperationsSiteImageKind.Logo => LogoImageId,
+        OperationsSiteImageKind.LogoDark => LogoDarkImageId,
+        OperationsSiteImageKind.Favicon => FaviconImageId,
+        OperationsSiteImageKind.Hero => HeroImageId,
+        OperationsSiteImageKind.Air => AirImageId,
+        OperationsSiteImageKind.Sea => SeaImageId,
+        _ => null
+    };
 
     public OperationsBrandSettings Copy() => (OperationsBrandSettings)MemberwiseClone();
 

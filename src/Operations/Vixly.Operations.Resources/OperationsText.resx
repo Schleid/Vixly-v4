@@ -262,6 +262,20 @@ If you did not create this account, ignore this email.</value>
   <data name="email.customer.verification.subject" xml:space="preserve">
     <value>{company}: confirm your email</value>
   </data>
+  <data name="email.device_blocked.body" xml:space="preserve">
+    <value>Hello {name},
+
+The device "{device}" of {company} was used from another country ({country}) by {person} on {time}. It is registered in {registered}.
+
+The device is blocked: nobody can sign in from it until an administrator unblocks it. Open its page to review it:
+
+{link}
+
+If you do not know who used it, keep it blocked and release its licence.</value>
+  </data>
+  <data name="email.device_blocked.subject" xml:space="preserve">
+    <value>{company}: a device is blocked</value>
+  </data>
   <data name="email.owner_invitation.body" xml:space="preserve">
     <value>Hello {name},
 
@@ -286,6 +300,16 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="email.password_reset.subject" xml:space="preserve">
     <value>{company}: reset your password</value>
   </data>
+  <data name="email.report.body" xml:space="preserve">
+    <value>Hello {name},
+
+The scheduled report "{report}" ({period}) is attached.
+
+{company}</value>
+  </data>
+  <data name="email.report.subject" xml:space="preserve">
+    <value>{company}: {report}, {period}</value>
+  </data>
   <data name="ops.access.owner_only" xml:space="preserve">
     <value>Only the company owner can do this.</value>
   </data>
@@ -297,6 +321,33 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ops.access.step_up_required" xml:space="preserve">
     <value>Confirm with your authenticator app first.</value>
+  </data>
+  <data name="ops.api.delivery_not_found" xml:space="preserve">
+    <value>This delivery was not found.</value>
+  </data>
+  <data name="ops.api.endpoint_not_found" xml:space="preserve">
+    <value>This address was not found, or it is turned off.</value>
+  </data>
+  <data name="ops.api.events_required" xml:space="preserve">
+    <value>Choose at least one event.</value>
+  </data>
+  <data name="ops.api.feature_off" xml:space="preserve">
+    <value>The API and webhooks are not in your plan.</value>
+  </data>
+  <data name="ops.api.key_not_found" xml:space="preserve">
+    <value>This key was not found.</value>
+  </data>
+  <data name="ops.api.name_required" xml:space="preserve">
+    <value>Give the key a name (up to 80 characters).</value>
+  </data>
+  <data name="ops.api.too_many_endpoints" xml:space="preserve">
+    <value>There are already 10 addresses. Remove one first.</value>
+  </data>
+  <data name="ops.api.too_many_keys" xml:space="preserve">
+    <value>There are already 20 active keys. Revoke one first.</value>
+  </data>
+  <data name="ops.api.url_invalid" xml:space="preserve">
+    <value>Enter an HTTPS address on the public internet (not a private or local address).</value>
   </data>
   <data name="ops.arrivals.bundles_unopened" xml:space="preserve">
     <value>Open each bundle that ends here and scan its parcels first.</value>
@@ -337,6 +388,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ops.auth.country_needs_second_factor" xml:space="preserve">
     <value>This device is signing in from another country than the one it was registered in. That needs your second step (an authenticator app or a recovery code), and your account has none yet. Sign in from your usual place to set one up, or ask an administrator.</value>
   </data>
+  <data name="ops.auth.device_blocked" xml:space="preserve">
+    <value>This device is blocked because it was used from another country. A company administrator must unblock it before anyone can sign in from it.</value>
+  </data>
   <data name="ops.auth.link_invalid" xml:space="preserve">
     <value>This link is no longer valid. Ask for a new one.</value>
   </data>
@@ -369,6 +423,72 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ops.billing.refused" xml:space="preserve">
     <value>Billing is not available right now. Try again later.</value>
+  </data>
+  <data name="ops.bills.allocation_invalid" xml:space="preserve">
+    <value>Each share needs a dispatch or shipment number and an amount above zero, once each.</value>
+  </data>
+  <data name="ops.bills.allocation_not_found" xml:space="preserve">
+    <value>A share’s number is neither a dispatch nor a shipment.</value>
+  </data>
+  <data name="ops.bills.allocation_too_high" xml:space="preserve">
+    <value>The shares add up to more than the bill.</value>
+  </data>
+  <data name="ops.bills.amount_invalid" xml:space="preserve">
+    <value>Enter an amount above zero, to the cent.</value>
+  </data>
+  <data name="ops.bills.carrier_not_on_dispatch" xml:space="preserve">
+    <value>This carrier is not on that dispatch.</value>
+  </data>
+  <data name="ops.bills.changed" xml:space="preserve">
+    <value>The bill changed since you opened it. Read it again before deciding.</value>
+  </data>
+  <data name="ops.bills.dates_invalid" xml:space="preserve">
+    <value>The due date cannot be before the bill date, and a period is at most a year.</value>
+  </data>
+  <data name="ops.bills.not_approvable" xml:space="preserve">
+    <value>This bill is not waiting for approval.</value>
+  </data>
+  <data name="ops.bills.not_editable" xml:space="preserve">
+    <value>Only a bill not yet approved can be corrected.</value>
+  </data>
+  <data name="ops.bills.not_found" xml:space="preserve">
+    <value>That bill was not found.</value>
+  </data>
+  <data name="ops.bills.not_payable" xml:space="preserve">
+    <value>Only an approved bill can be paid.</value>
+  </data>
+  <data name="ops.bills.not_voidable" xml:space="preserve">
+    <value>A bill with a payment cannot be voided.</value>
+  </data>
+  <data name="ops.bills.own_bill" xml:space="preserve">
+    <value>Someone other than who entered the bill must approve or reject it.</value>
+  </data>
+  <data name="ops.bills.party_required" xml:space="preserve">
+    <value>Choose who sent the bill.</value>
+  </data>
+  <data name="ops.bills.payment_too_high" xml:space="preserve">
+    <value>That is more than is still owed on the bill.</value>
+  </data>
+  <data name="ops.bills.reason_required" xml:space="preserve">
+    <value>Give a reason.</value>
+  </data>
+  <data name="ops.bills.reference_required" xml:space="preserve">
+    <value>Enter their invoice number.</value>
+  </data>
+  <data name="ops.bills.reference_taken" xml:space="preserve">
+    <value>A bill with that number from this vendor is already entered.</value>
+  </data>
+  <data name="ops.bills.share_not_allowed" xml:space="preserve">
+    <value>A dispatch takes only its carriers’ bills, and a carrier’s bill goes on dispatches, not on a shipment.</value>
+  </data>
+  <data name="ops.bills.text_invalid" xml:space="preserve">
+    <value>A text is too long or has characters that are not allowed.</value>
+  </data>
+  <data name="ops.bills.vendor_invalid" xml:space="preserve">
+    <value>Give the vendor a name (up to 120 characters) and a category.</value>
+  </data>
+  <data name="ops.bills.vendor_name_taken" xml:space="preserve">
+    <value>Another vendor already has that name.</value>
   </data>
   <data name="ops.brand.accent_contrast_too_low" xml:space="preserve">
     <value>The accent colour is too light on white: buttons need a contrast of at least {minimum}:1.</value>
@@ -1639,6 +1759,27 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ops.receiving.warehouse_not_receiving" xml:space="preserve">
     <value>This warehouse does not receive packages.</value>
   </data>
+  <data name="ops.reports.not_found" xml:space="preserve">
+    <value>That report was not found.</value>
+  </data>
+  <data name="ops.reports.period_invalid" xml:space="preserve">
+    <value>Choose an end date on or after the start date, at most 13 months later.</value>
+  </data>
+  <data name="ops.reports.recipients_invalid" xml:space="preserve">
+    <value>Tick 1 to 10 people of your staff.</value>
+  </data>
+  <data name="ops.reports.rules_invalid" xml:space="preserve">
+    <value>Enter 0 to 72 hours, and 1 to 60 days for a service (or leave it empty).</value>
+  </data>
+  <data name="ops.reports.schedule_not_found" xml:space="preserve">
+    <value>That scheduled report was not found.</value>
+  </data>
+  <data name="ops.reports.too_many_schedules" xml:space="preserve">
+    <value>There are already 50 scheduled reports. Stop one first.</value>
+  </data>
+  <data name="ops.reports.warehouse_not_allowed" xml:space="preserve">
+    <value>You cannot see the reports of that warehouse.</value>
+  </data>
   <data name="ops.roles.grant_exists" xml:space="preserve">
     <value>This person already has this role there.</value>
   </data>
@@ -1951,6 +2092,33 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ops.supplies.warehouse_prices_invalid" xml:space="preserve">
     <value>A warehouse price must be for one of the company’s warehouses, at most two decimals.</value>
   </data>
+  <data name="ops.texts.channel_unavailable" xml:space="preserve">
+    <value>This way of receiving notices is not offered.</value>
+  </data>
+  <data name="ops.texts.consent_required" xml:space="preserve">
+    <value>Tick the box to agree to receive notices by text message.</value>
+  </data>
+  <data name="ops.texts.feature_off" xml:space="preserve">
+    <value>Notices by SMS and WhatsApp are not part of your plan.</value>
+  </data>
+  <data name="ops.texts.keys_invalid" xml:space="preserve">
+    <value>Twilio did not accept this account id and auth token. Paste them again from the Twilio console.</value>
+  </data>
+  <data name="ops.texts.not_connected" xml:space="preserve">
+    <value>No Twilio account is connected.</value>
+  </data>
+  <data name="ops.texts.provider_refused" xml:space="preserve">
+    <value>Twilio refused the message.</value>
+  </data>
+  <data name="ops.texts.provider_unavailable" xml:space="preserve">
+    <value>Twilio cannot be reached right now. Try again in a moment.</value>
+  </data>
+  <data name="ops.texts.sender_invalid" xml:space="preserve">
+    <value>A sender is a phone number in international form (+13055550123) or, for SMS, a messaging service id (MG…).</value>
+  </data>
+  <data name="ops.texts.template_invalid" xml:space="preserve">
+    <value>A WhatsApp template id starts with HX followed by 32 characters.</value>
+  </data>
   <data name="ops.tickets.already_linked" xml:space="preserve">
     <value>This ticket is already resolved with another package.</value>
   </data>
@@ -2209,6 +2377,33 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="site.track.title" xml:space="preserve">
     <value>Track a shipment</value>
   </data>
+  <data name="text.notice.ActionNeeded" xml:space="preserve">
+    <value>A package of yours needs your attention.</value>
+  </data>
+  <data name="text.notice.DeliveryCode" xml:space="preserve">
+    <value>Shipment {shipment} is out for delivery. Give the driver this code: {code}</value>
+  </data>
+  <data name="text.notice.OutForDelivery" xml:space="preserve">
+    <value>Shipment {shipment} is out for delivery today.</value>
+  </data>
+  <data name="text.notice.ParcelReceived" xml:space="preserve">
+    <value>We received a package for you.</value>
+  </data>
+  <data name="text.notice.PaymentNotReceived" xml:space="preserve">
+    <value>We have not received your payment yet.</value>
+  </data>
+  <data name="text.notice.PickupCode" xml:space="preserve">
+    <value>Pickup code for shipment {shipment}: {code}</value>
+  </data>
+  <data name="text.notice.PickupReminder" xml:space="preserve">
+    <value>Shipment {shipment} is still waiting for you at {place}.</value>
+  </data>
+  <data name="text.notice.ReadyForPickup" xml:space="preserve">
+    <value>Shipment {shipment} is ready for pickup at {place}.</value>
+  </data>
+  <data name="text.notice.ShipmentUpdate" xml:space="preserve">
+    <value>News about shipment {shipment}.</value>
+  </data>
   <data name="ui.access.back" xml:space="preserve">
     <value>Back to the start page</value>
   </data>
@@ -2355,6 +2550,156 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.activity.title" xml:space="preserve">
     <value>Sign-in activity</value>
+  </data>
+  <data name="ui.api.active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="ui.api.add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="ui.api.add_webhook" xml:space="preserve">
+    <value>Add an address</value>
+  </data>
+  <data name="ui.api.deliveries" xml:space="preserve">
+    <value>Latest deliveries</value>
+  </data>
+  <data name="ui.api.deliveries_none" xml:space="preserve">
+    <value>Nothing sent yet.</value>
+  </data>
+  <data name="ui.api.event" xml:space="preserve">
+    <value>Event</value>
+  </data>
+  <data name="ui.api.event.CustomerCreated" xml:space="preserve">
+    <value>New customers</value>
+  </data>
+  <data name="ui.api.event.InvoiceIssued" xml:space="preserve">
+    <value>Invoices issued</value>
+  </data>
+  <data name="ui.api.event.PaymentRecorded" xml:space="preserve">
+    <value>Payments recorded</value>
+  </data>
+  <data name="ui.api.event.Tracking" xml:space="preserve">
+    <value>Tracking events (received, departed, arrived, ready, delivered…)</value>
+  </data>
+  <data name="ui.api.events" xml:space="preserve">
+    <value>Events</value>
+  </data>
+  <data name="ui.api.intro" xml:space="preserve">
+    <value>Let your own programs read your customers, shipments, parcels, tracking, invoices and payments, and receive your events as they happen. Read only: nothing can be changed through the API.</value>
+  </data>
+  <data name="ui.api.key" xml:space="preserve">
+    <value>Key</value>
+  </data>
+  <data name="ui.api.key_made" xml:space="preserve">
+    <value>Key made.</value>
+  </data>
+  <data name="ui.api.key_name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ui.api.keys" xml:space="preserve">
+    <value>API keys</value>
+  </data>
+  <data name="ui.api.keys_hint" xml:space="preserve">
+    <value>Send a key in the Authorization header: Bearer followed by the key. Each key reads everything; revoke it at once if it leaks.</value>
+  </data>
+  <data name="ui.api.keys_none" xml:space="preserve">
+    <value>No key yet.</value>
+  </data>
+  <data name="ui.api.last_success" xml:space="preserve">
+    <value>Last delivered</value>
+  </data>
+  <data name="ui.api.last_used" xml:space="preserve">
+    <value>Last used</value>
+  </data>
+  <data name="ui.api.made" xml:space="preserve">
+    <value>Made</value>
+  </data>
+  <data name="ui.api.make_key" xml:space="preserve">
+    <value>Make a key</value>
+  </data>
+  <data name="ui.api.never" xml:space="preserve">
+    <value>Never</value>
+  </data>
+  <data name="ui.api.not_in_plan" xml:space="preserve">
+    <value>The API and webhooks are not in your plan. Your plan can be changed under Billing.</value>
+  </data>
+  <data name="ui.api.off" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="ui.api.off_failures" xml:space="preserve">
+    <value>Off: it failed for three days</value>
+  </data>
+  <data name="ui.api.on" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="ui.api.remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ui.api.resend" xml:space="preserve">
+    <value>Send again</value>
+  </data>
+  <data name="ui.api.result" xml:space="preserve">
+    <value>Result</value>
+  </data>
+  <data name="ui.api.revoke" xml:space="preserve">
+    <value>Revoke</value>
+  </data>
+  <data name="ui.api.revoked" xml:space="preserve">
+    <value>Revoked</value>
+  </data>
+  <data name="ui.api.secret" xml:space="preserve">
+    <value>Signing secret</value>
+  </data>
+  <data name="ui.api.shown_once" xml:space="preserve">
+    <value>Copy it now: it will not be shown again.</value>
+  </data>
+  <data name="ui.api.state" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="ui.api.status.Delivered" xml:space="preserve">
+    <value>Delivered</value>
+  </data>
+  <data name="ui.api.status.Failed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="ui.api.status.Pending" xml:space="preserve">
+    <value>Waiting</value>
+  </data>
+  <data name="ui.api.test" xml:space="preserve">
+    <value>Send a test event</value>
+  </data>
+  <data name="ui.api.test_delivered" xml:space="preserve">
+    <value>The test event was delivered (status {status}).</value>
+  </data>
+  <data name="ui.api.test_failed" xml:space="preserve">
+    <value>The test event was not delivered ({reason}). It will be tried again.</value>
+  </data>
+  <data name="ui.api.title" xml:space="preserve">
+    <value>API and webhooks</value>
+  </data>
+  <data name="ui.api.tries" xml:space="preserve">
+    <value>Tries</value>
+  </data>
+  <data name="ui.api.turn_off" xml:space="preserve">
+    <value>Turn off</value>
+  </data>
+  <data name="ui.api.turn_on" xml:space="preserve">
+    <value>Turn on</value>
+  </data>
+  <data name="ui.api.url" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="ui.api.webhook_added" xml:space="preserve">
+    <value>Address added. This is its signing secret.</value>
+  </data>
+  <data name="ui.api.webhooks" xml:space="preserve">
+    <value>Webhooks</value>
+  </data>
+  <data name="ui.api.webhooks_hint" xml:space="preserve">
+    <value>We post each event as JSON to your address, signed with your signing secret (headers webhook-id, webhook-timestamp and webhook-signature). Answer with a 2xx status; failures are tried again for about a day and a half. An address that fails for three days is turned off.</value>
+  </data>
+  <data name="ui.api.when" xml:space="preserve">
+    <value>When</value>
   </data>
   <data name="ui.app.name" xml:space="preserve">
     <value>Operations</value>
@@ -2600,7 +2945,7 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Label printers</value>
   </data>
   <data name="ui.audit.area.receiving" xml:space="preserve">
-    <value>Receiving</value>
+    <value>Warehouse reception</value>
   </data>
   <data name="ui.audit.area.roles" xml:space="preserve">
     <value>Roles</value>
@@ -2730,6 +3075,222 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.billing.trial_ends" xml:space="preserve">
     <value>Trial ends on {date}</value>
+  </data>
+  <data name="ui.bills.all" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="ui.bills.amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="ui.bills.amount_in" xml:space="preserve">
+    <value>Amount ({currency})</value>
+  </data>
+  <data name="ui.bills.approve" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="ui.bills.back" xml:space="preserve">
+    <value>Back to bills</value>
+  </data>
+  <data name="ui.bills.bill_title" xml:space="preserve">
+    <value>{party} · {reference}</value>
+  </data>
+  <data name="ui.bills.billed_on" xml:space="preserve">
+    <value>Bill date</value>
+  </data>
+  <data name="ui.bills.category" xml:space="preserve">
+    <value>For</value>
+  </data>
+  <data name="ui.bills.category.Customs" xml:space="preserve">
+    <value>Customs</value>
+  </data>
+  <data name="ui.bills.category.Freight" xml:space="preserve">
+    <value>Freight</value>
+  </data>
+  <data name="ui.bills.category.Handling" xml:space="preserve">
+    <value>Handling and delivery</value>
+  </data>
+  <data name="ui.bills.category.Other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="ui.bills.category.PartnerFee" xml:space="preserve">
+    <value>Partner fee</value>
+  </data>
+  <data name="ui.bills.category.Rent" xml:space="preserve">
+    <value>Rent</value>
+  </data>
+  <data name="ui.bills.category.Supplies" xml:space="preserve">
+    <value>Supplies bought</value>
+  </data>
+  <data name="ui.bills.category.Utilities" xml:space="preserve">
+    <value>Utilities</value>
+  </data>
+  <data name="ui.bills.correct" xml:space="preserve">
+    <value>Correct the bill</value>
+  </data>
+  <data name="ui.bills.decide" xml:space="preserve">
+    <value>Approve or send back</value>
+  </data>
+  <data name="ui.bills.decided_by" xml:space="preserve">
+    <value>Decided by</value>
+  </data>
+  <data name="ui.bills.done.approved" xml:space="preserve">
+    <value>The bill is approved.</value>
+  </data>
+  <data name="ui.bills.done.paid" xml:space="preserve">
+    <value>The payment is recorded.</value>
+  </data>
+  <data name="ui.bills.done.rejected" xml:space="preserve">
+    <value>The bill is sent back.</value>
+  </data>
+  <data name="ui.bills.done.saved" xml:space="preserve">
+    <value>The bill is saved.</value>
+  </data>
+  <data name="ui.bills.done.voided" xml:space="preserve">
+    <value>The bill is voided.</value>
+  </data>
+  <data name="ui.bills.due_on" xml:space="preserve">
+    <value>Due</value>
+  </data>
+  <data name="ui.bills.entered_by" xml:space="preserve">
+    <value>Entered by</value>
+  </data>
+  <data name="ui.bills.filter" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="ui.bills.method" xml:space="preserve">
+    <value>How</value>
+  </data>
+  <data name="ui.bills.method.BankTransfer" xml:space="preserve">
+    <value>Bank transfer</value>
+  </data>
+  <data name="ui.bills.method.Card" xml:space="preserve">
+    <value>Card</value>
+  </data>
+  <data name="ui.bills.method.Cash" xml:space="preserve">
+    <value>Cash</value>
+  </data>
+  <data name="ui.bills.method.Cheque" xml:space="preserve">
+    <value>Cheque</value>
+  </data>
+  <data name="ui.bills.method.Other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="ui.bills.method.Zelle" xml:space="preserve">
+    <value>Zelle</value>
+  </data>
+  <data name="ui.bills.need_approval" xml:space="preserve">
+    <value>Bills need someone else’s approval</value>
+  </data>
+  <data name="ui.bills.need_approval_hint" xml:space="preserve">
+    <value>Off: a bill counts in the costs as soon as it is entered.</value>
+  </data>
+  <data name="ui.bills.new" xml:space="preserve">
+    <value>New bill</value>
+  </data>
+  <data name="ui.bills.none" xml:space="preserve">
+    <value>No bill here.</value>
+  </data>
+  <data name="ui.bills.note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="ui.bills.overdue" xml:space="preserve">
+    <value>Overdue</value>
+  </data>
+  <data name="ui.bills.overhead" xml:space="preserve">
+    <value>Not put on any dispatch or shipment (general cost): {amount}</value>
+  </data>
+  <data name="ui.bills.owed" xml:space="preserve">
+    <value>Owed</value>
+  </data>
+  <data name="ui.bills.paid" xml:space="preserve">
+    <value>Paid</value>
+  </data>
+  <data name="ui.bills.paid_on" xml:space="preserve">
+    <value>Paid on</value>
+  </data>
+  <data name="ui.bills.party" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="ui.bills.party_kind.Carrier" xml:space="preserve">
+    <value>Carriers</value>
+  </data>
+  <data name="ui.bills.party_kind.Partner" xml:space="preserve">
+    <value>Partner agents</value>
+  </data>
+  <data name="ui.bills.party_kind.Vendor" xml:space="preserve">
+    <value>Other vendors</value>
+  </data>
+  <data name="ui.bills.payment_reference" xml:space="preserve">
+    <value>Reference (cheque, transfer)</value>
+  </data>
+  <data name="ui.bills.payments" xml:space="preserve">
+    <value>Payments made</value>
+  </data>
+  <data name="ui.bills.reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="ui.bills.record_payment" xml:space="preserve">
+    <value>Record a payment made</value>
+  </data>
+  <data name="ui.bills.reference" xml:space="preserve">
+    <value>Their number</value>
+  </data>
+  <data name="ui.bills.reject" xml:space="preserve">
+    <value>Send back (reason required)</value>
+  </data>
+  <data name="ui.bills.save" xml:space="preserve">
+    <value>Save the bill</value>
+  </data>
+  <data name="ui.bills.save_settings" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ui.bills.settings" xml:space="preserve">
+    <value>Approval</value>
+  </data>
+  <data name="ui.bills.share_number" xml:space="preserve">
+    <value>Dispatch or shipment number</value>
+  </data>
+  <data name="ui.bills.shares" xml:space="preserve">
+    <value>Put on dispatches or shipments</value>
+  </data>
+  <data name="ui.bills.shares_hint" xml:space="preserve">
+    <value>Type a dispatch number (its carrier cost, shared on its shipments by chargeable weight) or a shipment number (a cost of that shipment) and the amount. What is left is a general cost.</value>
+  </data>
+  <data name="ui.bills.state" xml:space="preserve">
+    <value>State</value>
+  </data>
+  <data name="ui.bills.status.Approved" xml:space="preserve">
+    <value>Approved, to pay</value>
+  </data>
+  <data name="ui.bills.status.Entered" xml:space="preserve">
+    <value>Waiting for approval</value>
+  </data>
+  <data name="ui.bills.status.Paid" xml:space="preserve">
+    <value>Paid</value>
+  </data>
+  <data name="ui.bills.status.Rejected" xml:space="preserve">
+    <value>Sent back</value>
+  </data>
+  <data name="ui.bills.status.Voided" xml:space="preserve">
+    <value>Voided</value>
+  </data>
+  <data name="ui.bills.still_owed" xml:space="preserve">
+    <value>Still owed</value>
+  </data>
+  <data name="ui.bills.title" xml:space="preserve">
+    <value>Bills</value>
+  </data>
+  <data name="ui.bills.to_approve" xml:space="preserve">
+    <value>Waiting for approval</value>
+  </data>
+  <data name="ui.bills.void" xml:space="preserve">
+    <value>Void this bill</value>
+  </data>
+  <data name="ui.bills.void_reason" xml:space="preserve">
+    <value>Voided because</value>
+  </data>
+  <data name="ui.bills.waits_for_approval" xml:space="preserve">
+    <value>Once saved, the bill waits for someone else to approve it.</value>
   </data>
   <data name="ui.boxes.back" xml:space="preserve">
     <value>Back to consolidated shipments</value>
@@ -3350,7 +3911,7 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Find</value>
   </data>
   <data name="ui.cashier.in_full" xml:space="preserve">
-    <value>Paid in full: the amounts must add up to exactly what is owed. Several methods may be combined.</value>
+    <value>Add each payment the customer makes: it comes off what is left. Take the payment when nothing is left.</value>
   </data>
   <data name="ui.cashier.method" xml:space="preserve">
     <value>Method</value>
@@ -3938,10 +4499,10 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Save your recovery codes</value>
   </data>
   <data name="ui.company.change" xml:space="preserve">
-    <value>Change the legal details</value>
+    <value>Change the legal name</value>
   </data>
   <data name="ui.company.change_hint" xml:space="preserve">
-    <value>Enter the new details, the reason and a proof (PDF, PNG or JPEG, 10 MB at most). Support checks it before the change applies.</value>
+    <value>Enter the new legal name, the reason and a proof (PDF, PNG or JPEG, 10 MB at most), such as the registration certificate. Support checks it before the change applies.</value>
   </data>
   <data name="ui.company.change_status.approved" xml:space="preserve">
     <value>Approved</value>
@@ -3971,10 +4532,10 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Company language</value>
   </data>
   <data name="ui.company.legal" xml:space="preserve">
-    <value>Legal details</value>
+    <value>Legal name</value>
   </data>
   <data name="ui.company.legal_hint" xml:space="preserve">
-    <value>These details appear on your invoices from your provider. To change them, send a request with proof below.</value>
+    <value>Only the legal name needs a request with proof; your provider checks it before it applies. Everything else you change below, directly.</value>
   </data>
   <data name="ui.company.legal_name" xml:space="preserve">
     <value>Legal name</value>
@@ -4319,7 +4880,7 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Above your limit, a person who may approve discounts types their email and the code from their authenticator app.</value>
   </data>
   <data name="ui.counter.supplies.approver_code" xml:space="preserve">
-    <value>Their code</value>
+    <value>Their code or password</value>
   </data>
   <data name="ui.counter.supplies.approver_email" xml:space="preserve">
     <value>Approver’s email</value>
@@ -4412,7 +4973,7 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>To cancel this order, a person with the right asks for the void of its invoice; once another person approves it, the order is cancelled and its stock comes back.</value>
   </data>
   <data name="ui.counter.title" xml:space="preserve">
-    <value>Front desk</value>
+    <value>Customer drop-off</value>
   </data>
   <data name="ui.counter.value" xml:space="preserve">
     <value>Value ({currency})</value>
@@ -5516,13 +6077,55 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Suspended</value>
   </data>
   <data name="ui.customers.status_hint" xml:space="preserve">
-    <value>Suspending or closing signs the customer out at once.</value>
+    <value>The customer is told by email, without the reason. The reason stays in the customer’s history.</value>
   </data>
   <data name="ui.customers.status_submit" xml:space="preserve">
     <value>Change the status</value>
   </data>
   <data name="ui.customers.title" xml:space="preserve">
     <value>Customers</value>
+  </data>
+  <data name="ui.dashboard.arriving" xml:space="preserve">
+    <value>Dispatches on their way here</value>
+  </data>
+  <data name="ui.dashboard.bills_overdue" xml:space="preserve">
+    <value>Bills past due</value>
+  </data>
+  <data name="ui.dashboard.bills_to_approve" xml:space="preserve">
+    <value>Bills to approve</value>
+  </data>
+  <data name="ui.dashboard.credit_charges" xml:space="preserve">
+    <value>Account charges to approve</value>
+  </data>
+  <data name="ui.dashboard.holds" xml:space="preserve">
+    <value>Parcels on hold</value>
+  </data>
+  <data name="ui.dashboard.invoices_overdue" xml:space="preserve">
+    <value>Invoices past due</value>
+  </data>
+  <data name="ui.dashboard.open_shipments" xml:space="preserve">
+    <value>Open shipments</value>
+  </data>
+  <data name="ui.dashboard.payments_to_verify" xml:space="preserve">
+    <value>Payments to verify</value>
+  </data>
+  <data name="ui.dashboard.ready_for_pickup" xml:space="preserve">
+    <value>Parcels ready for pickup</value>
+  </data>
+  <data name="ui.dashboard.tickets" xml:space="preserve">
+    <value>Open package tickets</value>
+  </data>
+  <data name="ui.dashboard.title" xml:space="preserve">
+    <value>Waiting for you</value>
+  </data>
+  <data name="ui.dashboard.to_dispatch" xml:space="preserve">
+    <value>Dispatches to depart</value>
+  </data>
+  <data name="ui.dashboard.to_inspect" xml:space="preserve">
+    <value>Parcels to inspect</value>
+  </data>
+  <data name="ui.dashboard.webhooks_off" xml:space="preserve">
+    <value>Webhook addresses turned off</value>
   </data>
   <data name="ui.declaration.accept" xml:space="preserve">
     <value>I accept the terms of this insurance.</value>
@@ -6166,6 +6769,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.dispatch.cost.at_departure" xml:space="preserve">
     <value>Worked out when the dispatch leaves</value>
   </data>
+  <data name="ui.dispatch.cost.billed" xml:space="preserve">
+    <value>Billed by the carriers</value>
+  </data>
   <data name="ui.dispatch.cost.computed" xml:space="preserve">
     <value>Worked out from the rates</value>
   </data>
@@ -6532,9 +7138,6 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.editor.branch.edit" xml:space="preserve">
     <value>Edit the branch</value>
   </data>
-  <data name="ui.editor.branch.side" xml:space="preserve">
-    <value>Role in shipping</value>
-  </data>
   <data name="ui.editor.branches" xml:space="preserve">
     <value>Branches</value>
   </data>
@@ -6664,6 +7267,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.editor.nav.activity" xml:space="preserve">
     <value>Sign-in activity</value>
   </data>
+  <data name="ui.editor.nav.api_settings" xml:space="preserve">
+    <value>API and webhooks</value>
+  </data>
   <data name="ui.editor.nav.arrivals" xml:space="preserve">
     <value>Arrivals</value>
   </data>
@@ -6672,6 +7278,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.editor.nav.billing" xml:space="preserve">
     <value>Billing</value>
+  </data>
+  <data name="ui.editor.nav.bills" xml:space="preserve">
+    <value>Bills</value>
   </data>
   <data name="ui.editor.nav.bundle_settings" xml:space="preserve">
     <value>Bundle settings</value>
@@ -6692,7 +7301,7 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Company</value>
   </data>
   <data name="ui.editor.nav.counter" xml:space="preserve">
-    <value>Front desk</value>
+    <value>Customer drop-off</value>
   </data>
   <data name="ui.editor.nav.credit" xml:space="preserve">
     <value>Credit accounts</value>
@@ -6763,11 +7372,20 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.editor.nav.pickup_settings" xml:space="preserve">
     <value>Pickup settings</value>
   </data>
+  <data name="ui.editor.nav.profit" xml:space="preserve">
+    <value>Profit</value>
+  </data>
   <data name="ui.editor.nav.quotes" xml:space="preserve">
     <value>Quotes</value>
   </data>
   <data name="ui.editor.nav.receiving" xml:space="preserve">
-    <value>Receiving</value>
+    <value>Warehouse reception</value>
+  </data>
+  <data name="ui.editor.nav.report_settings" xml:space="preserve">
+    <value>Report rules</value>
+  </data>
+  <data name="ui.editor.nav.reports" xml:space="preserve">
+    <value>Reports</value>
   </data>
   <data name="ui.editor.nav.roles" xml:space="preserve">
     <value>Roles</value>
@@ -6792,6 +7410,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.editor.nav.supplies_stock" xml:space="preserve">
     <value>Supplies stock</value>
+  </data>
+  <data name="ui.editor.nav.texts_settings" xml:space="preserve">
+    <value>Messages</value>
   </data>
   <data name="ui.editor.nav.verify" xml:space="preserve">
     <value>Payments to verify</value>
@@ -6862,15 +7483,6 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.editor.show_on_site" xml:space="preserve">
     <value>Show on the website</value>
   </data>
-  <data name="ui.editor.side.both" xml:space="preserve">
-    <value>Both</value>
-  </data>
-  <data name="ui.editor.side.destination" xml:space="preserve">
-    <value>Destination (where customers collect)</value>
-  </data>
-  <data name="ui.editor.side.origin" xml:space="preserve">
-    <value>Origin (where packages are received)</value>
-  </data>
   <data name="ui.editor.site.accent" xml:space="preserve">
     <value>Accent colour</value>
   </data>
@@ -6887,7 +7499,7 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Images</value>
   </data>
   <data name="ui.editor.site.images_hint" xml:space="preserve">
-    <value>PNG, JPEG or WebP, at most 1 MB. The favicon is square, at most 256 KB.</value>
+    <value>PNG, JPEG or WebP, at most 1 MB. The favicon is square, at most 256 KB. Blank margins around a logo are cut away when you upload it, so it shows as large as possible.</value>
   </data>
   <data name="ui.editor.site.plan_content" xml:space="preserve">
     <value>Your plan shows the default texts and no main image on your website. Your texts and images are kept and appear if you change plans.</value>
@@ -8812,6 +9424,15 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.licences.back" xml:space="preserve">
     <value>All licences</value>
   </data>
+  <data name="ui.licences.blocked" xml:space="preserve">
+    <value>Blocked</value>
+  </data>
+  <data name="ui.licences.blocked_text" xml:space="preserve">
+    <value>This device was used from {country} on {time}; it is registered in {registered}. Nobody can sign in from it until an administrator unblocks it. Unblock it only once you know who used it and why.</value>
+  </data>
+  <data name="ui.licences.blocked_title" xml:space="preserve">
+    <value>Blocked: used from another country</value>
+  </data>
   <data name="ui.licences.decide" xml:space="preserve">
     <value>Approve this device?</value>
   </data>
@@ -8862,6 +9483,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.licences.title" xml:space="preserve">
     <value>Licences</value>
+  </data>
+  <data name="ui.licences.unblock" xml:space="preserve">
+    <value>Unblock this device</value>
   </data>
   <data name="ui.manifest.arrives" xml:space="preserve">
     <value>Arrives</value>
@@ -8991,6 +9615,75 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.milestone.ReturnedToSender" xml:space="preserve">
     <value>Returned to sender</value>
+  </data>
+  <data name="ui.move.cancel" xml:space="preserve">
+    <value>Another package</value>
+  </data>
+  <data name="ui.move.done" xml:space="preserve">
+    <value>{package} is on shelf {shelf}. Scan the next package.</value>
+  </data>
+  <data name="ui.move.intro" xml:space="preserve">
+    <value>Scan a package, then the shelf it goes on.</value>
+  </data>
+  <data name="ui.move.next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="ui.move.package" xml:space="preserve">
+    <value>Package</value>
+  </data>
+  <data name="ui.move.shelf" xml:space="preserve">
+    <value>Shelf</value>
+  </data>
+  <data name="ui.move.submit" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="ui.move.title" xml:space="preserve">
+    <value>Move packages</value>
+  </data>
+  <data name="ui.onhand.any_shelf" xml:space="preserve">
+    <value>All shelves</value>
+  </data>
+  <data name="ui.onhand.any_zone" xml:space="preserve">
+    <value>All zones</value>
+  </data>
+  <data name="ui.onhand.days" xml:space="preserve">
+    <value>On hand for at least (days)</value>
+  </data>
+  <data name="ui.onhand.days_on_hand" xml:space="preserve">
+    <value>Days</value>
+  </data>
+  <data name="ui.onhand.filter" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="ui.onhand.held" xml:space="preserve">
+    <value>On hold</value>
+  </data>
+  <data name="ui.onhand.intro" xml:space="preserve">
+    <value>Every package physically in your warehouses, oldest first.</value>
+  </data>
+  <data name="ui.onhand.move" xml:space="preserve">
+    <value>Move packages</value>
+  </data>
+  <data name="ui.onhand.no_shelf" xml:space="preserve">
+    <value>no shelf</value>
+  </data>
+  <data name="ui.onhand.none" xml:space="preserve">
+    <value>Nothing on hand with these filters.</value>
+  </data>
+  <data name="ui.onhand.shelf" xml:space="preserve">
+    <value>Shelf</value>
+  </data>
+  <data name="ui.onhand.shipment" xml:space="preserve">
+    <value>Shipment</value>
+  </data>
+  <data name="ui.onhand.title" xml:space="preserve">
+    <value>Packages on hand</value>
+  </data>
+  <data name="ui.onhand.totals" xml:space="preserve">
+    <value>Packages: {count} · Weight: {weight}</value>
+  </data>
+  <data name="ui.onhand.unshelved" xml:space="preserve">
+    <value>Without a shelf</value>
   </data>
   <data name="ui.parcels.all_warehouses" xml:space="preserve">
     <value>All warehouses</value>
@@ -9274,6 +9967,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.permissions.area.audit" xml:space="preserve">
     <value>History</value>
   </data>
+  <data name="ui.permissions.area.bills" xml:space="preserve">
+    <value>Bills</value>
+  </data>
   <data name="ui.permissions.area.branches" xml:space="preserve">
     <value>Branches</value>
   </data>
@@ -9282,6 +9978,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.permissions.area.company" xml:space="preserve">
     <value>Company</value>
+  </data>
+  <data name="ui.permissions.area.costs" xml:space="preserve">
+    <value>Costs</value>
   </data>
   <data name="ui.permissions.area.credits" xml:space="preserve">
     <value>Credit notes</value>
@@ -9314,7 +10013,7 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Label printers</value>
   </data>
   <data name="ui.permissions.area.receiving" xml:space="preserve">
-    <value>Receiving</value>
+    <value>Warehouse reception</value>
   </data>
   <data name="ui.permissions.area.roles" xml:space="preserve">
     <value>Roles</value>
@@ -9339,6 +10038,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.permissions.ops.audit.view" xml:space="preserve">
     <value>See the history</value>
+  </data>
+  <data name="ui.permissions.ops.bills.approve" xml:space="preserve">
+    <value>Approve bills and record what was paid</value>
+  </data>
+  <data name="ui.permissions.ops.bills.enter" xml:space="preserve">
+    <value>Enter bills and vendors</value>
   </data>
   <data name="ui.permissions.ops.branches.manage" xml:space="preserve">
     <value>Manage the branches and contacts</value>
@@ -9369,6 +10074,9 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.permissions.ops.company.view" xml:space="preserve">
     <value>See the company details</value>
+  </data>
+  <data name="ui.permissions.ops.costs.view" xml:space="preserve">
+    <value>See costs and profit</value>
   </data>
   <data name="ui.permissions.ops.counter.serve" xml:space="preserve">
     <value>Serve customers at the counter</value>
@@ -9459,6 +10167,12 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.permissions.ops.receiving.receive" xml:space="preserve">
     <value>Receive packages and put them away</value>
+  </data>
+  <data name="ui.permissions.ops.reports.finance" xml:space="preserve">
+    <value>See finance reports and money figures</value>
+  </data>
+  <data name="ui.permissions.ops.reports.operations" xml:space="preserve">
+    <value>See operations, customer and carrier reports</value>
   </data>
   <data name="ui.permissions.ops.roles.create" xml:space="preserve">
     <value>Create roles</value>
@@ -9868,6 +10582,57 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.printers.title" xml:space="preserve">
     <value>Label printers of {warehouse}</value>
   </data>
+  <data name="ui.profit.carrier" xml:space="preserve">
+    <value>Carrier cost</value>
+  </data>
+  <data name="ui.profit.csv" xml:space="preserve">
+    <value>Download CSV</value>
+  </data>
+  <data name="ui.profit.estimated" xml:space="preserve">
+    <value>estimate</value>
+  </data>
+  <data name="ui.profit.from" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="ui.profit.how" xml:space="preserve">
+    <value>Shipments invoiced in the period. Revenue: the invoices without sales tax and without duties and local taxes collected for the government, less credits. Carrier cost: the share of each dispatch, from the carrier’s bill once approved, the estimate until then.</value>
+  </data>
+  <data name="ui.profit.margin" xml:space="preserve">
+    <value>Margin</value>
+  </data>
+  <data name="ui.profit.none" xml:space="preserve">
+    <value>No shipment invoiced in this period.</value>
+  </data>
+  <data name="ui.profit.not_dispatched" xml:space="preserve">
+    <value>not dispatched yet</value>
+  </data>
+  <data name="ui.profit.other" xml:space="preserve">
+    <value>Other costs</value>
+  </data>
+  <data name="ui.profit.panel" xml:space="preserve">
+    <value>Costs and profit</value>
+  </data>
+  <data name="ui.profit.profit" xml:space="preserve">
+    <value>Profit</value>
+  </data>
+  <data name="ui.profit.revenue" xml:space="preserve">
+    <value>Revenue</value>
+  </data>
+  <data name="ui.profit.shipment" xml:space="preserve">
+    <value>Shipment</value>
+  </data>
+  <data name="ui.profit.show" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="ui.profit.title" xml:space="preserve">
+    <value>Profit per shipment</value>
+  </data>
+  <data name="ui.profit.to" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="ui.profit.total" xml:space="preserve">
+    <value>Total ({count} shipments)</value>
+  </data>
   <data name="ui.quotes.consolidated" xml:space="preserve">
     <value>Consolidated</value>
   </data>
@@ -10139,7 +10904,7 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Warehouse receipts</value>
   </data>
   <data name="ui.receiving.title" xml:space="preserve">
-    <value>Receiving</value>
+    <value>Warehouse reception</value>
   </data>
   <data name="ui.receiving.warehouse" xml:space="preserve">
     <value>Warehouse</value>
@@ -10158,6 +10923,552 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.recovery.title" xml:space="preserve">
     <value>Use a recovery code</value>
+  </data>
+  <data name="ui.reports.about.activity" xml:space="preserve">
+    <value>Parcels received, inspected, held, departed, arrived, ready, picked up and delivered, each day.</value>
+  </data>
+  <data name="ui.reports.about.carrier_cost" xml:space="preserve">
+    <value>Per carrier: dispatches that departed, the estimated cost, what was billed and the difference.</value>
+  </data>
+  <data name="ui.reports.about.dwell" xml:space="preserve">
+    <value>For parcels that left in the period: days from received to departed (average, median, 90 % of parcels within).</value>
+  </data>
+  <data name="ui.reports.about.holds" xml:space="preserve">
+    <value>Holds opened in the period by reason, how many were released and how long they lasted.</value>
+  </data>
+  <data name="ui.reports.about.inactive_customers" xml:space="preserve">
+    <value>Customers who shipped before, but not in the chosen number of days.</value>
+  </data>
+  <data name="ui.reports.about.on_time" xml:space="preserve">
+    <value>Legs that departed by their planned time, and parcels made ready within their service’s target, by the rules in Settings → Report rules.</value>
+  </data>
+  <data name="ui.reports.about.payables" xml:space="preserve">
+    <value>What the company owes on bills entered or approved, by days past the due date.</value>
+  </data>
+  <data name="ui.reports.about.payments" xml:space="preserve">
+    <value>Payments taken, settled and still awaited, by method, warehouse or period.</value>
+  </data>
+  <data name="ui.reports.about.profit" xml:space="preserve">
+    <value>Revenue, carrier cost, other costs and profit of each shipment invoiced.</value>
+  </data>
+  <data name="ui.reports.about.receivables" xml:space="preserve">
+    <value>What each customer owes today, by days past the due date at the chosen day.</value>
+  </data>
+  <data name="ui.reports.about.sales" xml:space="preserve">
+    <value>Invoices issued (voided ones left out), by period, service, route, customer or warehouse.</value>
+  </data>
+  <data name="ui.reports.about.shipments" xml:space="preserve">
+    <value>Shipments created and booked, with their parcels and weight.</value>
+  </data>
+  <data name="ui.reports.about.signups" xml:space="preserve">
+    <value>Customers who signed up, and customers who booked at least one shipment.</value>
+  </data>
+  <data name="ui.reports.about.stock_age" xml:space="preserve">
+    <value>Parcels in each warehouse now (received, not yet departed), by days since they arrived; unclaimed ones apart.</value>
+  </data>
+  <data name="ui.reports.about.supplies_value" xml:space="preserve">
+    <value>Supplies on hand in each warehouse and their value at today’s price.</value>
+  </data>
+  <data name="ui.reports.about.taxes" xml:space="preserve">
+    <value>Tax on invoices issued, by kind and rate, less what credit notes gave back.</value>
+  </data>
+  <data name="ui.reports.about.top_customers" xml:space="preserve">
+    <value>The 50 customers with the most revenue (or weight) in the period.</value>
+  </data>
+  <data name="ui.reports.about.transit" xml:space="preserve">
+    <value>Hours from departure to arrival of the legs that arrived, per carrier and route.</value>
+  </data>
+  <data name="ui.reports.all_warehouses" xml:space="preserve">
+    <value>All my warehouses</value>
+  </data>
+  <data name="ui.reports.as_of" xml:space="preserve">
+    <value>As of {day}</value>
+  </data>
+  <data name="ui.reports.as_of_label" xml:space="preserve">
+    <value>As of</value>
+  </data>
+  <data name="ui.reports.back" xml:space="preserve">
+    <value>All reports</value>
+  </data>
+  <data name="ui.reports.by" xml:space="preserve">
+    <value>Rows</value>
+  </data>
+  <data name="ui.reports.by.Customer" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="ui.reports.by.Method" xml:space="preserve">
+    <value>Method</value>
+  </data>
+  <data name="ui.reports.by.Period" xml:space="preserve">
+    <value>Period</value>
+  </data>
+  <data name="ui.reports.by.Route" xml:space="preserve">
+    <value>Route</value>
+  </data>
+  <data name="ui.reports.by.Service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="ui.reports.by.Warehouse" xml:space="preserve">
+    <value>Warehouse</value>
+  </data>
+  <data name="ui.reports.column.active_customers" xml:space="preserve">
+    <value>Active customers</value>
+  </data>
+  <data name="ui.reports.column.amount" xml:space="preserve">
+    <value>Settled</value>
+  </data>
+  <data name="ui.reports.column.arrived" xml:space="preserve">
+    <value>Arrived</value>
+  </data>
+  <data name="ui.reports.column.average_days" xml:space="preserve">
+    <value>Average days</value>
+  </data>
+  <data name="ui.reports.column.average_hours" xml:space="preserve">
+    <value>Average hours</value>
+  </data>
+  <data name="ui.reports.column.basis" xml:space="preserve">
+    <value>Taxable amount</value>
+  </data>
+  <data name="ui.reports.column.billed" xml:space="preserve">
+    <value>Billed</value>
+  </data>
+  <data name="ui.reports.column.booked" xml:space="preserve">
+    <value>Booked</value>
+  </data>
+  <data name="ui.reports.column.created" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="ui.reports.column.credited" xml:space="preserve">
+    <value>Given back</value>
+  </data>
+  <data name="ui.reports.column.current" xml:space="preserve">
+    <value>Not yet due</value>
+  </data>
+  <data name="ui.reports.column.days_0_7" xml:space="preserve">
+    <value>0–7 days</value>
+  </data>
+  <data name="ui.reports.column.days_15_30" xml:space="preserve">
+    <value>15–30 days</value>
+  </data>
+  <data name="ui.reports.column.days_1_30" xml:space="preserve">
+    <value>1–30 days</value>
+  </data>
+  <data name="ui.reports.column.days_31_60" xml:space="preserve">
+    <value>31–60 days</value>
+  </data>
+  <data name="ui.reports.column.days_61_90" xml:space="preserve">
+    <value>61–90 days</value>
+  </data>
+  <data name="ui.reports.column.days_8_14" xml:space="preserve">
+    <value>8–14 days</value>
+  </data>
+  <data name="ui.reports.column.days_over_60" xml:space="preserve">
+    <value>Over 60 days</value>
+  </data>
+  <data name="ui.reports.column.days_over_90" xml:space="preserve">
+    <value>Over 90 days</value>
+  </data>
+  <data name="ui.reports.column.days_since" xml:space="preserve">
+    <value>Days since last shipment</value>
+  </data>
+  <data name="ui.reports.column.delivered" xml:space="preserve">
+    <value>Delivered</value>
+  </data>
+  <data name="ui.reports.column.delivery_failed" xml:space="preserve">
+    <value>Delivery failed</value>
+  </data>
+  <data name="ui.reports.column.departed" xml:space="preserve">
+    <value>Departed</value>
+  </data>
+  <data name="ui.reports.column.difference" xml:space="preserve">
+    <value>Billed minus estimate</value>
+  </data>
+  <data name="ui.reports.column.dispatches" xml:space="preserve">
+    <value>Dispatches</value>
+  </data>
+  <data name="ui.reports.column.estimated" xml:space="preserve">
+    <value>Estimated</value>
+  </data>
+  <data name="ui.reports.column.holds_opened" xml:space="preserve">
+    <value>Held</value>
+  </data>
+  <data name="ui.reports.column.inspected" xml:space="preserve">
+    <value>Inspected</value>
+  </data>
+  <data name="ui.reports.column.invoices" xml:space="preserve">
+    <value>Invoices</value>
+  </data>
+  <data name="ui.reports.column.items" xml:space="preserve">
+    <value>Items</value>
+  </data>
+  <data name="ui.reports.column.late" xml:space="preserve">
+    <value>Late</value>
+  </data>
+  <data name="ui.reports.column.legs" xml:space="preserve">
+    <value>Legs</value>
+  </data>
+  <data name="ui.reports.column.measured" xml:space="preserve">
+    <value>Measured</value>
+  </data>
+  <data name="ui.reports.column.median_days" xml:space="preserve">
+    <value>Median days</value>
+  </data>
+  <data name="ui.reports.column.median_hours" xml:space="preserve">
+    <value>Median hours</value>
+  </data>
+  <data name="ui.reports.column.net_tax" xml:space="preserve">
+    <value>Net tax</value>
+  </data>
+  <data name="ui.reports.column.new_customers" xml:space="preserve">
+    <value>New customers</value>
+  </data>
+  <data name="ui.reports.column.on_hand" xml:space="preserve">
+    <value>On hand</value>
+  </data>
+  <data name="ui.reports.column.on_time" xml:space="preserve">
+    <value>On time</value>
+  </data>
+  <data name="ui.reports.column.on_time_percent" xml:space="preserve">
+    <value>On time %</value>
+  </data>
+  <data name="ui.reports.column.opened" xml:space="preserve">
+    <value>Opened</value>
+  </data>
+  <data name="ui.reports.column.owed" xml:space="preserve">
+    <value>Owed</value>
+  </data>
+  <data name="ui.reports.column.p90_days" xml:space="preserve">
+    <value>90 % within (days)</value>
+  </data>
+  <data name="ui.reports.column.parcels" xml:space="preserve">
+    <value>Parcels</value>
+  </data>
+  <data name="ui.reports.column.payments" xml:space="preserve">
+    <value>Payments</value>
+  </data>
+  <data name="ui.reports.column.pending" xml:space="preserve">
+    <value>Awaited</value>
+  </data>
+  <data name="ui.reports.column.picked_up" xml:space="preserve">
+    <value>Picked up</value>
+  </data>
+  <data name="ui.reports.column.ready" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="ui.reports.column.received" xml:space="preserve">
+    <value>Received</value>
+  </data>
+  <data name="ui.reports.column.released" xml:space="preserve">
+    <value>Released</value>
+  </data>
+  <data name="ui.reports.column.revenue" xml:space="preserve">
+    <value>Revenue</value>
+  </data>
+  <data name="ui.reports.column.shipments" xml:space="preserve">
+    <value>Shipments</value>
+  </data>
+  <data name="ui.reports.column.subtotal" xml:space="preserve">
+    <value>Before tax</value>
+  </data>
+  <data name="ui.reports.column.tax" xml:space="preserve">
+    <value>Tax</value>
+  </data>
+  <data name="ui.reports.column.total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="ui.reports.column.unclaimed" xml:space="preserve">
+    <value>Unclaimed</value>
+  </data>
+  <data name="ui.reports.column.units" xml:space="preserve">
+    <value>Units</value>
+  </data>
+  <data name="ui.reports.column.value" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="ui.reports.column.weight" xml:space="preserve">
+    <value>Weight</value>
+  </data>
+  <data name="ui.reports.days" xml:space="preserve">
+    <value>Days without a shipment</value>
+  </data>
+  <data name="ui.reports.file.csv" xml:space="preserve">
+    <value>CSV</value>
+  </data>
+  <data name="ui.reports.file.pdf" xml:space="preserve">
+    <value>PDF</value>
+  </data>
+  <data name="ui.reports.file.xlsx" xml:space="preserve">
+    <value>Excel</value>
+  </data>
+  <data name="ui.reports.from" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="ui.reports.grace_hours" xml:space="preserve">
+    <value>A leg is late when it departs more than this many hours after its planned time</value>
+  </data>
+  <data name="ui.reports.grain" xml:space="preserve">
+    <value>By</value>
+  </data>
+  <data name="ui.reports.grain.Day" xml:space="preserve">
+    <value>Day</value>
+  </data>
+  <data name="ui.reports.grain.Month" xml:space="preserve">
+    <value>Month</value>
+  </data>
+  <data name="ui.reports.grain.Week" xml:space="preserve">
+    <value>Week</value>
+  </data>
+  <data name="ui.reports.group.Carriers" xml:space="preserve">
+    <value>Carriers and warehouse</value>
+  </data>
+  <data name="ui.reports.group.Customers" xml:space="preserve">
+    <value>Customers</value>
+  </data>
+  <data name="ui.reports.group.Finance" xml:space="preserve">
+    <value>Finance</value>
+  </data>
+  <data name="ui.reports.group.Operations" xml:space="preserve">
+    <value>Operations</value>
+  </data>
+  <data name="ui.reports.hold.AwaitingCustomerInformation" xml:space="preserve">
+    <value>Waiting for the customer</value>
+  </data>
+  <data name="ui.reports.hold.AwaitingShipment" xml:space="preserve">
+    <value>Waiting for a shipment</value>
+  </data>
+  <data name="ui.reports.hold.Damaged" xml:space="preserve">
+    <value>Damaged</value>
+  </data>
+  <data name="ui.reports.hold.InspectionDocuments" xml:space="preserve">
+    <value>Documents needed</value>
+  </data>
+  <data name="ui.reports.hold.InspectionFee" xml:space="preserve">
+    <value>Fee to pay</value>
+  </data>
+  <data name="ui.reports.hold.InspectionPermit" xml:space="preserve">
+    <value>Permit needed</value>
+  </data>
+  <data name="ui.reports.hold.InspectionValue" xml:space="preserve">
+    <value>Value to confirm</value>
+  </data>
+  <data name="ui.reports.hold.None" xml:space="preserve">
+    <value>No reason given</value>
+  </data>
+  <data name="ui.reports.hold.Other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="ui.reports.hold.Refused" xml:space="preserve">
+    <value>Refused</value>
+  </data>
+  <data name="ui.reports.hold.Unidentified" xml:space="preserve">
+    <value>Unidentified</value>
+  </data>
+  <data name="ui.reports.method.BankTransfer" xml:space="preserve">
+    <value>Bank transfer</value>
+  </data>
+  <data name="ui.reports.method.Card" xml:space="preserve">
+    <value>Card</value>
+  </data>
+  <data name="ui.reports.method.Cash" xml:space="preserve">
+    <value>Cash</value>
+  </data>
+  <data name="ui.reports.method.Cheque" xml:space="preserve">
+    <value>Cheque</value>
+  </data>
+  <data name="ui.reports.method.Other1" xml:space="preserve">
+    <value>Other method 1</value>
+  </data>
+  <data name="ui.reports.method.Other2" xml:space="preserve">
+    <value>Other method 2</value>
+  </data>
+  <data name="ui.reports.method.Other3" xml:space="preserve">
+    <value>Other method 3</value>
+  </data>
+  <data name="ui.reports.method.Zelle" xml:space="preserve">
+    <value>Zelle</value>
+  </data>
+  <data name="ui.reports.none" xml:space="preserve">
+    <value>Not set</value>
+  </data>
+  <data name="ui.reports.on_time.legs_air" xml:space="preserve">
+    <value>Air legs</value>
+  </data>
+  <data name="ui.reports.on_time.legs_ground" xml:space="preserve">
+    <value>Ground legs</value>
+  </data>
+  <data name="ui.reports.on_time.legs_ocean" xml:space="preserve">
+    <value>Ocean legs</value>
+  </data>
+  <data name="ui.reports.on_time.ready" xml:space="preserve">
+    <value>Ready after arrival</value>
+  </data>
+  <data name="ui.reports.period" xml:space="preserve">
+    <value>From {from} to {to}</value>
+  </data>
+  <data name="ui.reports.previous" xml:space="preserve">
+    <value>Period before</value>
+  </data>
+  <data name="ui.reports.previous_period" xml:space="preserve">
+    <value>Before: {from} to {to}</value>
+  </data>
+  <data name="ui.reports.ready_days" xml:space="preserve">
+    <value>Days after arrival</value>
+  </data>
+  <data name="ui.reports.ready_targets" xml:space="preserve">
+    <value>Days to be ready after arrival</value>
+  </data>
+  <data name="ui.reports.report.activity" xml:space="preserve">
+    <value>Warehouse activity</value>
+  </data>
+  <data name="ui.reports.report.carrier_cost" xml:space="preserve">
+    <value>Carrier cost</value>
+  </data>
+  <data name="ui.reports.report.dwell" xml:space="preserve">
+    <value>Days in the warehouse</value>
+  </data>
+  <data name="ui.reports.report.holds" xml:space="preserve">
+    <value>Holds</value>
+  </data>
+  <data name="ui.reports.report.inactive_customers" xml:space="preserve">
+    <value>Inactive customers</value>
+  </data>
+  <data name="ui.reports.report.on_time" xml:space="preserve">
+    <value>On time</value>
+  </data>
+  <data name="ui.reports.report.payables" xml:space="preserve">
+    <value>Payables by age</value>
+  </data>
+  <data name="ui.reports.report.payments" xml:space="preserve">
+    <value>Payments</value>
+  </data>
+  <data name="ui.reports.report.receivables" xml:space="preserve">
+    <value>Receivables by age</value>
+  </data>
+  <data name="ui.reports.report.sales" xml:space="preserve">
+    <value>Sales</value>
+  </data>
+  <data name="ui.reports.report.shipments" xml:space="preserve">
+    <value>Shipments</value>
+  </data>
+  <data name="ui.reports.report.signups" xml:space="preserve">
+    <value>New and active customers</value>
+  </data>
+  <data name="ui.reports.report.stock_age" xml:space="preserve">
+    <value>Parcels on the shelves</value>
+  </data>
+  <data name="ui.reports.report.supplies_value" xml:space="preserve">
+    <value>Supplies stock value</value>
+  </data>
+  <data name="ui.reports.report.taxes" xml:space="preserve">
+    <value>Taxes collected</value>
+  </data>
+  <data name="ui.reports.report.top_customers" xml:space="preserve">
+    <value>Top customers</value>
+  </data>
+  <data name="ui.reports.report.transit" xml:space="preserve">
+    <value>Transit times</value>
+  </data>
+  <data name="ui.reports.rules_intro" xml:space="preserve">
+    <value>These rules decide what the On time report counts as late. Leave a service empty not to measure it.</value>
+  </data>
+  <data name="ui.reports.rules_link" xml:space="preserve">
+    <value>When does something count as on time? Settings → Report rules.</value>
+  </data>
+  <data name="ui.reports.rules_title" xml:space="preserve">
+    <value>Report rules</value>
+  </data>
+  <data name="ui.reports.schedule.format" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="ui.reports.schedule.format.Csv" xml:space="preserve">
+    <value>CSV</value>
+  </data>
+  <data name="ui.reports.schedule.format.Xlsx" xml:space="preserve">
+    <value>Excel</value>
+  </data>
+  <data name="ui.reports.schedule.frequency" xml:space="preserve">
+    <value>How often</value>
+  </data>
+  <data name="ui.reports.schedule.frequency.Daily" xml:space="preserve">
+    <value>Every morning (yesterday)</value>
+  </data>
+  <data name="ui.reports.schedule.frequency.Monthly" xml:space="preserve">
+    <value>On the 1st (last month)</value>
+  </data>
+  <data name="ui.reports.schedule.frequency.Weekly" xml:space="preserve">
+    <value>Every Monday (last week)</value>
+  </data>
+  <data name="ui.reports.schedule.hint" xml:space="preserve">
+    <value>The report goes with these filters, for the day, week or month just past, to the staff you tick. Each person gets it as their own rights allow.</value>
+  </data>
+  <data name="ui.reports.schedule.last" xml:space="preserve">
+    <value>Last sent</value>
+  </data>
+  <data name="ui.reports.schedule.list" xml:space="preserve">
+    <value>Scheduled reports</value>
+  </data>
+  <data name="ui.reports.schedule.next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="ui.reports.schedule.recipients" xml:space="preserve">
+    <value>Send to</value>
+  </data>
+  <data name="ui.reports.schedule.report" xml:space="preserve">
+    <value>Report</value>
+  </data>
+  <data name="ui.reports.schedule.save" xml:space="preserve">
+    <value>Schedule</value>
+  </data>
+  <data name="ui.reports.schedule.saved" xml:space="preserve">
+    <value>Scheduled.</value>
+  </data>
+  <data name="ui.reports.schedule.stop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="ui.reports.schedule.title" xml:space="preserve">
+    <value>Email this report regularly</value>
+  </data>
+  <data name="ui.reports.service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="ui.reports.show" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="ui.reports.tax.Charges" xml:space="preserve">
+    <value>Charges</value>
+  </data>
+  <data name="ui.reports.tax.Freight" xml:space="preserve">
+    <value>Freight</value>
+  </data>
+  <data name="ui.reports.tax.Insurance" xml:space="preserve">
+    <value>Insurance</value>
+  </data>
+  <data name="ui.reports.tax.Supplies" xml:space="preserve">
+    <value>Supplies</value>
+  </data>
+  <data name="ui.reports.title" xml:space="preserve">
+    <value>Reports</value>
+  </data>
+  <data name="ui.reports.to" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="ui.reports.total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="ui.reports.truncated" xml:space="preserve">
+    <value>Only the first 500 rows are shown; the totals cover them all.</value>
+  </data>
+  <data name="ui.reports.warehouse" xml:space="preserve">
+    <value>Warehouse</value>
+  </data>
+  <data name="ui.reports.week_of" xml:space="preserve">
+    <value>Week of {day}</value>
+  </data>
+  <data name="ui.reports.what" xml:space="preserve">
+    <value>Item</value>
+  </data>
+  <data name="ui.reports.when" xml:space="preserve">
+    <value>Period</value>
   </data>
   <data name="ui.reset.done" xml:space="preserve">
     <value>Your password has been changed. Sign in with the new one.</value>
@@ -10205,7 +11516,7 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Reactivate</value>
   </data>
   <data name="ui.roles.reserved_hint" xml:space="preserve">
-    <value>Approving devices and the company details stay with the Owner and the Administrators.</value>
+    <value>The company details stay with the Owner and the Administrators.</value>
   </data>
   <data name="ui.roles.title" xml:space="preserve">
     <value>Roles</value>
@@ -10778,7 +12089,7 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Publish prices on the public website (the price lists marked to publish)</value>
   </data>
   <data name="ui.settings.require_second_factor" xml:space="preserve">
-    <value>Every staff member must use an authenticator app</value>
+    <value>When MFA is required: every staff member must use an authenticator app</value>
   </data>
   <data name="ui.settings.second_factor_hint" xml:space="preserve">
     <value>The Owner and Administrators always need one. With this on, everyone else sets one up at the next sign-in.</value>
@@ -11147,7 +12458,7 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
     <value>Every cleared parcel has its shipping label.</value>
   </data>
   <data name="ui.shipping_label.not_cleared" xml:space="preserve">
-    <value>Printed once the parcel is cleared: checked, with no hold, no inspection waiting, and in one of the customer’s shipments.</value>
+    <value>Printed once the parcel is cleared (checked, with no hold, no inspection waiting, and in one of the customer’s shipments) and its shipment is paid, charged to an account or collect.</value>
   </data>
   <data name="ui.shipping_label.print" xml:space="preserve">
     <value>Print the shipping label</value>
@@ -11938,6 +13249,138 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.tenant.unavailable.title" xml:space="preserve">
     <value>Please try again</value>
   </data>
+  <data name="ui.texts.account" xml:space="preserve">
+    <value>Twilio account</value>
+  </data>
+  <data name="ui.texts.account_name" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="ui.texts.account_sid" xml:space="preserve">
+    <value>Account SID (AC…)</value>
+  </data>
+  <data name="ui.texts.auth_token" xml:space="preserve">
+    <value>Auth token</value>
+  </data>
+  <data name="ui.texts.by_text" xml:space="preserve">
+    <value>By text</value>
+  </data>
+  <data name="ui.texts.channel" xml:space="preserve">
+    <value>By</value>
+  </data>
+  <data name="ui.texts.channel.Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="ui.texts.channel.Sms" xml:space="preserve">
+    <value>SMS</value>
+  </data>
+  <data name="ui.texts.channel.WhatsApp" xml:space="preserve">
+    <value>WhatsApp</value>
+  </data>
+  <data name="ui.texts.connect" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="ui.texts.disconnect" xml:space="preserve">
+    <value>Disconnect Twilio</value>
+  </data>
+  <data name="ui.texts.intro" xml:space="preserve">
+    <value>Your customers can choose to get your notices by SMS or WhatsApp instead of email. Messages go through your own Twilio account, from your own number; Twilio bills you directly. A notice that cannot be sent by text goes by email.</value>
+  </data>
+  <data name="ui.texts.log" xml:space="preserve">
+    <value>Recent messages</value>
+  </data>
+  <data name="ui.texts.log_none" xml:space="preserve">
+    <value>No message sent yet.</value>
+  </data>
+  <data name="ui.texts.none" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="ui.texts.not_in_plan" xml:space="preserve">
+    <value>Notices by SMS and WhatsApp are not part of your plan. Your plan can be changed under Company → Billing.</value>
+  </data>
+  <data name="ui.texts.notice" xml:space="preserve">
+    <value>Notice</value>
+  </data>
+  <data name="ui.texts.notice.ActionNeeded" xml:space="preserve">
+    <value>Package needs the customer</value>
+  </data>
+  <data name="ui.texts.notice.DeliveryCode" xml:space="preserve">
+    <value>Delivery code</value>
+  </data>
+  <data name="ui.texts.notice.OutForDelivery" xml:space="preserve">
+    <value>Out for delivery</value>
+  </data>
+  <data name="ui.texts.notice.ParcelReceived" xml:space="preserve">
+    <value>Package received</value>
+  </data>
+  <data name="ui.texts.notice.PaymentNotReceived" xml:space="preserve">
+    <value>Payment not received</value>
+  </data>
+  <data name="ui.texts.notice.PickupCode" xml:space="preserve">
+    <value>Pickup code</value>
+  </data>
+  <data name="ui.texts.notice.PickupReminder" xml:space="preserve">
+    <value>Pickup reminder</value>
+  </data>
+  <data name="ui.texts.notice.ReadyForPickup" xml:space="preserve">
+    <value>Ready for pickup</value>
+  </data>
+  <data name="ui.texts.notice.ShipmentUpdate" xml:space="preserve">
+    <value>Delay or problem</value>
+  </data>
+  <data name="ui.texts.notices" xml:space="preserve">
+    <value>Notices sent by text</value>
+  </data>
+  <data name="ui.texts.notices_hint" xml:space="preserve">
+    <value>Ticked notices go by SMS or WhatsApp to customers who chose it; the others by email. WhatsApp needs a template approved by Meta in your Twilio account for each notice, with variable 1 the company, variable 2 the text and variable 3 the link.</value>
+  </data>
+  <data name="ui.texts.result" xml:space="preserve">
+    <value>Result</value>
+  </data>
+  <data name="ui.texts.save_account" xml:space="preserve">
+    <value>Save the account</value>
+  </data>
+  <data name="ui.texts.save_notices" xml:space="preserve">
+    <value>Save the notices</value>
+  </data>
+  <data name="ui.texts.sms_from" xml:space="preserve">
+    <value>SMS from (number or MG…)</value>
+  </data>
+  <data name="ui.texts.status.Delivered" xml:space="preserve">
+    <value>Delivered</value>
+  </data>
+  <data name="ui.texts.status.Failed" xml:space="preserve">
+    <value>Not sent (email instead)</value>
+  </data>
+  <data name="ui.texts.status.OptedOut" xml:space="preserve">
+    <value>Customer replied STOP (email from now on)</value>
+  </data>
+  <data name="ui.texts.status.Sent" xml:space="preserve">
+    <value>Sent</value>
+  </data>
+  <data name="ui.texts.status.Undelivered" xml:space="preserve">
+    <value>Not delivered</value>
+  </data>
+  <data name="ui.texts.template" xml:space="preserve">
+    <value>WhatsApp template (HX…)</value>
+  </data>
+  <data name="ui.texts.title" xml:space="preserve">
+    <value>Messages by SMS and WhatsApp</value>
+  </data>
+  <data name="ui.texts.to" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="ui.texts.token" xml:space="preserve">
+    <value>Auth token</value>
+  </data>
+  <data name="ui.texts.token_keep" xml:space="preserve">
+    <value>Leave the token empty to keep the one already saved and change only the senders.</value>
+  </data>
+  <data name="ui.texts.whatsapp_from" xml:space="preserve">
+    <value>WhatsApp from (number)</value>
+  </data>
+  <data name="ui.texts.when" xml:space="preserve">
+    <value>When</value>
+  </data>
   <data name="ui.tickets.all_warehouses" xml:space="preserve">
     <value>All warehouses</value>
   </data>
@@ -12238,6 +13681,30 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   <data name="ui.undeclared.storage_fee_value" xml:space="preserve">
     <value>{amount} {currency} so far ({days} days)</value>
   </data>
+  <data name="ui.vendors.active" xml:space="preserve">
+    <value>In use</value>
+  </data>
+  <data name="ui.vendors.add" xml:space="preserve">
+    <value>Add a vendor</value>
+  </data>
+  <data name="ui.vendors.add_button" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="ui.vendors.contact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="ui.vendors.name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="ui.vendors.none" xml:space="preserve">
+    <value>No vendor yet. Carriers are under Carriers; partner agents on their warehouse.</value>
+  </data>
+  <data name="ui.vendors.save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ui.vendors.title" xml:space="preserve">
+    <value>Vendors</value>
+  </data>
   <data name="ui.verify.code_label" xml:space="preserve">
     <value>6-digit code from your authenticator app</value>
   </data>
@@ -12327,5 +13794,2126 @@ Your authenticator app is unchanged and will still be asked at sign-in. If you d
   </data>
   <data name="ui.workspace.title" xml:space="preserve">
     <value>Welcome</value>
+  </data>
+  <data name="ui.editor.nav.dock" xml:space="preserve">
+    <value>Carrier deliveries at the dock</value>
+  </data>
+  <data name="ui.parcels.state" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.settings.require_mfa" xml:space="preserve">
+    <value>Require MFA (a second step at sign-in)</value>
+  </data>
+  <data name="ui.settings.require_mfa_yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="ui.settings.require_mfa_no" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="ui.settings.require_mfa_hint" xml:space="preserve">
+    <value>Yes: the Owner and Administrators always use an authenticator app, and the rest of the staff too when the box below is ticked. No: nobody has to set one up; people without one sign in with their password and confirm sensitive actions with it, and people who set one up keep using it. Only the Owner or an Administrator can change this, after confirming it is them.</value>
+  </data>
+  <data name="ui.confirm.body_password" xml:space="preserve">
+    <value>This action needs your password again.</value>
+  </data>
+  <data name="ui.confirm.password" xml:space="preserve">
+    <value>Your password</value>
+  </data>
+  <data name="ui.quick.title" xml:space="preserve">
+    <value>Scan your badge</value>
+  </data>
+  <data name="ui.quick.subtitle" xml:space="preserve">
+    <value>Sign in on this device with your staff badge or your PIN.</value>
+  </data>
+  <data name="ui.quick.badge" xml:space="preserve">
+    <value>Badge</value>
+  </data>
+  <data name="ui.quick.submit" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="ui.quick.use_pin" xml:space="preserve">
+    <value>Use my PIN instead</value>
+  </data>
+  <data name="ui.quick.use_badge" xml:space="preserve">
+    <value>Scan a badge instead</value>
+  </data>
+  <data name="ui.quick.use_email" xml:space="preserve">
+    <value>Sign in with email and password</value>
+  </data>
+  <data name="ui.quick.link" xml:space="preserve">
+    <value>Sign in with a badge or PIN</value>
+  </data>
+  <data name="ui.quick.pin_title" xml:space="preserve">
+    <value>Sign in with your PIN</value>
+  </data>
+  <data name="ui.quick.pin_who" xml:space="preserve">
+    <value>Who are you?</value>
+  </data>
+  <data name="ui.quick.pin" xml:space="preserve">
+    <value>Your 4-digit PIN</value>
+  </data>
+  <data name="ui.quick.pin_someone_else" xml:space="preserve">
+    <value>Not you? Choose someone else</value>
+  </data>
+  <data name="ui.quick.pin_nobody" xml:space="preserve">
+    <value>Nobody can use a PIN on this device yet. Sign in once with your email and password, then set a PIN in My account.</value>
+  </data>
+  <data name="ui.quick.daily_title" xml:space="preserve">
+    <value>First sign-in of the day</value>
+  </data>
+  <data name="ui.quick.daily_password" xml:space="preserve">
+    <value>Once a day, confirm it is you with your password.</value>
+  </data>
+  <data name="ui.staff.badge_title" xml:space="preserve">
+    <value>Badge and PIN</value>
+  </data>
+  <data name="ui.staff.badge_in_use" xml:space="preserve">
+    <value>A badge printed on {date} is in use.</value>
+  </data>
+  <data name="ui.staff.badge_none" xml:space="preserve">
+    <value>No badge in use.</value>
+  </data>
+  <data name="ui.staff.pin_set" xml:space="preserve">
+    <value>A PIN is set.</value>
+  </data>
+  <data name="ui.staff.pin_none" xml:space="preserve">
+    <value>No PIN set.</value>
+  </data>
+  <data name="ui.staff.pin_locked" xml:space="preserve">
+    <value>The PIN is locked after five wrong tries. It works again after a sign-in with email and password.</value>
+  </data>
+  <data name="ui.staff.badge_print" xml:space="preserve">
+    <value>Print a badge</value>
+  </data>
+  <data name="ui.staff.badge_reprint" xml:space="preserve">
+    <value>Print a new badge</value>
+  </data>
+  <data name="ui.staff.badge_revoke" xml:space="preserve">
+    <value>Revoke the badge</value>
+  </data>
+  <data name="ui.staff.badge_hint" xml:space="preserve">
+    <value>A badge signs its holder in on the company’s registered devices. Printing a new one stops the old one at once. If a badge is lost, revoke it.</value>
+  </data>
+  <data name="ui.staff.done.badge_revoked" xml:space="preserve">
+    <value>The badge was revoked.</value>
+  </data>
+  <data name="ui.staff.done.pin" xml:space="preserve">
+    <value>Your PIN was saved.</value>
+  </data>
+  <data name="ui.account.pin" xml:space="preserve">
+    <value>PIN for the company’s devices</value>
+  </data>
+  <data name="ui.account.pin_hint" xml:space="preserve">
+    <value>Four digits, not all the same and not a run like 1234. On a registered device, your name and this PIN sign you in; once a day you also confirm with your authenticator or password.</value>
+  </data>
+  <data name="ui.account.new_pin" xml:space="preserve">
+    <value>New PIN</value>
+  </data>
+  <data name="ui.account.save_pin" xml:space="preserve">
+    <value>Save the PIN</value>
+  </data>
+  <data name="ops.auth.quick_device_required" xml:space="preserve">
+    <value>A badge or PIN works only on a device registered by the company.</value>
+  </data>
+  <data name="ops.auth.quick_failed" xml:space="preserve">
+    <value>That badge or PIN did not work. Try again, or sign in with your email.</value>
+  </data>
+  <data name="ops.auth.pin_locked" xml:space="preserve">
+    <value>This PIN is locked after five wrong tries. Sign in with your email and password to unlock it.</value>
+  </data>
+  <data name="ops.auth.quick_full_sign_in_first" xml:space="preserve">
+    <value>Sign in once with your email and password to set up your authenticator, then use your badge or PIN.</value>
+  </data>
+  <data name="ops.auth.password_wrong" xml:space="preserve">
+    <value>That password is not right.</value>
+  </data>
+  <data name="ops.staff.pin_invalid" xml:space="preserve">
+    <value>Choose four digits, not all the same and not a run like 1234.</value>
+  </data>
+  <data name="ops.staff.pin_needs_full_sign_in" xml:space="preserve">
+    <value>To set a PIN, sign in with your email and password first.</value>
+  </data>
+  <data name="ui.drive.queue_waiting" xml:space="preserve">
+    <value>{count} stop(s) saved on this phone, waiting for a signal.</value>
+  </data>
+  <data name="ui.drive.queue_sending" xml:space="preserve">
+    <value>Sending {count} stop(s) saved on this phone…</value>
+  </data>
+  <data name="ui.drive.queue_one" xml:space="preserve">
+    <value>Saved on this phone. It is sent as soon as there is a signal.</value>
+  </data>
+  <data name="ui.drive.queue_sent" xml:space="preserve">
+    <value>Sent.</value>
+  </data>
+  <data name="ui.drive.queue_sign_in" xml:space="preserve">
+    <value>Sign in again to send the stops saved on this phone. They stay on the phone until then.</value>
+  </data>
+  <data name="ui.delivery.code_unconfirmed" xml:space="preserve">
+    <value>Code not confirmed: recorded without a signal and not accepted</value>
+  </data>
+  <data name="ui.delivery.map_title" xml:space="preserve">
+    <value>Where the driver is</value>
+  </data>
+  <data name="ui.delivery.map_none" xml:space="preserve">
+    <value>The driver’s phone has not sent its position yet. It does while the route page is open on the phone.</value>
+  </data>
+  <data name="ui.delivery.map_next" xml:space="preserve">
+    <value>Next stop: {stop}, {address}.</value>
+  </data>
+  <data name="ui.delivery.map_seen" xml:space="preserve">
+    <value>Seen at {time}.</value>
+  </data>
+  <data name="ops.delivery.position_invalid" xml:space="preserve">
+    <value>The phone sent a position that cannot be right.</value>
+  </data>
+  <data name="ops.delivery.not_the_driver" xml:space="preserve">
+    <value>Only the route’s driver sends its position, while the route is out.</value>
+  </data>
+  <data name="ui.shelfcount.title" xml:space="preserve">
+    <value>Shelf count</value>
+  </data>
+  <data name="ui.shelfcount.start" xml:space="preserve">
+    <value>Count a shelf</value>
+  </data>
+  <data name="ui.shelfcount.intro" xml:space="preserve">
+    <value>Scan the shelf’s label, then every parcel on it. When you finish, you see what is missing and what is recorded elsewhere.</value>
+  </data>
+  <data name="ui.shelfcount.shelf" xml:space="preserve">
+    <value>Shelf</value>
+  </data>
+  <data name="ui.shelfcount.start_button" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="ui.shelfcount.latest" xml:space="preserve">
+    <value>Latest counts</value>
+  </data>
+  <data name="ui.shelfcount.none" xml:space="preserve">
+    <value>No shelf counted yet.</value>
+  </data>
+  <data name="ui.shelfcount.open" xml:space="preserve">
+    <value>In progress</value>
+  </data>
+  <data name="ui.shelfcount.summary" xml:space="preserve">
+    <value>{found} found, {missing} missing, {extra} recorded elsewhere, {unknown} unknown</value>
+  </data>
+  <data name="ui.shelfcount.of" xml:space="preserve">
+    <value>Count of shelf {shelf}</value>
+  </data>
+  <data name="ui.shelfcount.back" xml:space="preserve">
+    <value>← All shelf counts</value>
+  </data>
+  <data name="ui.shelfcount.progress" xml:space="preserve">
+    <value>{scanned} scanned; the records put {expected} parcel(s) on this shelf.</value>
+  </data>
+  <data name="ui.shelfcount.scan" xml:space="preserve">
+    <value>Scan a parcel</value>
+  </data>
+  <data name="ui.shelfcount.add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="ui.shelfcount.finish" xml:space="preserve">
+    <value>Finish the count</value>
+  </data>
+  <data name="ui.shelfcount.missing" xml:space="preserve">
+    <value>Missing</value>
+  </data>
+  <data name="ui.shelfcount.extra" xml:space="preserve">
+    <value>Recorded elsewhere</value>
+  </data>
+  <data name="ui.shelfcount.unknown" xml:space="preserve">
+    <value>Unknown codes</value>
+  </data>
+  <data name="ui.shelfcount.found" xml:space="preserve">
+    <value>Found</value>
+  </data>
+  <data name="ui.shelfcount.move_here" xml:space="preserve">
+    <value>Move here</value>
+  </data>
+  <data name="ui.shelfcount.done.scanned" xml:space="preserve">
+    <value>Added.</value>
+  </data>
+  <data name="ui.shelfcount.done.again" xml:space="preserve">
+    <value>Already scanned.</value>
+  </data>
+  <data name="ui.shelfcount.done.finished" xml:space="preserve">
+    <value>The count is finished.</value>
+  </data>
+  <data name="ui.shelfcount.done.moved" xml:space="preserve">
+    <value>The parcel is now on this shelf.</value>
+  </data>
+  <data name="ops.receiving.count_closed" xml:space="preserve">
+    <value>This count is already finished.</value>
+  </data>
+  <data name="ops.receiving.count_full" xml:space="preserve">
+    <value>A count holds at most {max} scans. Finish it and start another.</value>
+  </data>
+  <data name="ops.receiving.shelf_unknown" xml:space="preserve">
+    <value>No active shelf has this code in your warehouses.</value>
+  </data>
+  <data name="ui.printers.active" xml:space="preserve">
+    <value>In use</value>
+  </data>
+  <data name="ui.printers.phone_title" xml:space="preserve">
+    <value>Portable printers (phones)</value>
+  </data>
+  <data name="ui.printers.phone_hint" xml:space="preserve">
+    <value>A phone or handheld can print labels on a Bluetooth printer next to it with the free app {app}. Give the phone a name, then scan the code with the app within 10 minutes. The printer then appears here and can be chosen like the others.</value>
+  </data>
+  <data name="ui.printers.phone_name" xml:space="preserve">
+    <value>Name of the phone</value>
+  </data>
+  <data name="ui.printers.phone_add" xml:space="preserve">
+    <value>Add a phone</value>
+  </data>
+  <data name="ui.printers.phone_qr" xml:space="preserve">
+    <value>Code to scan with the app</value>
+  </data>
+  <data name="ui.printers.phone_code" xml:space="preserve">
+    <value>Or type this code in the app:</value>
+  </data>
+  <data name="ui.printers.phone_expires" xml:space="preserve">
+    <value>This code works once, until {time}.</value>
+  </data>
+  <data name="ui.printers.phone_printer" xml:space="preserve">
+    <value>portable printer of a phone, changed from the phone</value>
+  </data>
+  <data name="ops.printing.pairing_invalid" xml:space="preserve">
+    <value>This code is not valid any more. Make a new one on the Printers page.</value>
+  </data>
+  <data name="ops.printing.phone_printer" xml:space="preserve">
+    <value>A portable printer is added and changed from its phone.</value>
+  </data>
+  <data name="ui.maintenance.page_title" xml:space="preserve">
+    <value>Under maintenance</value>
+  </data>
+  <data name="ui.maintenance.page_body" xml:space="preserve">
+    <value>We are doing planned maintenance. We expect to be back by {time} (UTC).</value>
+  </data>
+  <data name="ui.maintenance.banner" xml:space="preserve">
+    <value>Planned maintenance from {start} to {end} (UTC): the site will be unavailable during this time.</value>
+  </data>
+  <data name="ui.editor.nav.inventory" xml:space="preserve">
+    <value>Inventory</value>
+  </data>
+  <data name="ui.inventory.tabs" xml:space="preserve">
+    <value>Inventory views</value>
+  </data>
+  <data name="ui.inventory.tab.on_hand" xml:space="preserve">
+    <value>On hand</value>
+  </data>
+  <data name="ui.inventory.tab.move" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="ui.inventory.tab.shelf_counts" xml:space="preserve">
+    <value>Shelf counts</value>
+  </data>
+  <data name="ui.inventory.tab.undeclared_counts" xml:space="preserve">
+    <value>Undeclared counts</value>
+  </data>
+  <data name="ui.inventory.tab.parcels" xml:space="preserve">
+    <value>All parcels</value>
+  </data>
+  <data name="ui.permissions.area.arrivals" xml:space="preserve">
+    <value>Arrivals</value>
+  </data>
+  <data name="ui.permissions.area.bundles" xml:space="preserve">
+    <value>Bundles</value>
+  </data>
+  <data name="ui.permissions.area.carriers" xml:space="preserve">
+    <value>Carriers</value>
+  </data>
+  <data name="ui.permissions.area.charges" xml:space="preserve">
+    <value>Prices</value>
+  </data>
+  <data name="ui.permissions.area.counter" xml:space="preserve">
+    <value>Counter</value>
+  </data>
+  <data name="ui.permissions.area.customs" xml:space="preserve">
+    <value>Customs</value>
+  </data>
+  <data name="ui.permissions.area.delivery" xml:space="preserve">
+    <value>Home delivery</value>
+  </data>
+  <data name="ui.permissions.area.dispatches" xml:space="preserve">
+    <value>Dispatches</value>
+  </data>
+  <data name="ui.permissions.area.events" xml:space="preserve">
+    <value>Events</value>
+  </data>
+  <data name="ui.permissions.area.insurance" xml:space="preserve">
+    <value>Insurance</value>
+  </data>
+  <data name="ui.permissions.area.pickup" xml:space="preserve">
+    <value>Pickup counter</value>
+  </data>
+  <data name="ui.permissions.area.quotes" xml:space="preserve">
+    <value>Quotes</value>
+  </data>
+  <data name="ui.permissions.area.reports" xml:space="preserve">
+    <value>Reports</value>
+  </data>
+  <data name="ui.permissions.area.shipments" xml:space="preserve">
+    <value>Shipments</value>
+  </data>
+  <data name="email.layout.button" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="email.layout.copy_link" xml:space="preserve">
+    <value>If the button does not work, copy this link into your browser:</value>
+  </data>
+  <data name="email.layout.footer" xml:space="preserve">
+    <value>This email was sent by {company}.</value>
+  </data>
+  <data name="email.customer.account_exists.button" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="email.customer.credit_statement.button" xml:space="preserve">
+    <value>See my statement</value>
+  </data>
+  <data name="email.customer.email_not_allowed.button" xml:space="preserve">
+    <value>Sign up</value>
+  </data>
+  <data name="email.customer.out_for_delivery.button" xml:space="preserve">
+    <value>Follow my shipment</value>
+  </data>
+  <data name="email.customer.out_for_delivery_code.button" xml:space="preserve">
+    <value>Follow my shipment</value>
+  </data>
+  <data name="email.customer.parcel_action_needed.button" xml:space="preserve">
+    <value>Answer now</value>
+  </data>
+  <data name="email.customer.parcel_final_notice.button" xml:space="preserve">
+    <value>Answer now</value>
+  </data>
+  <data name="email.customer.parcel_received.button" xml:space="preserve">
+    <value>See my package</value>
+  </data>
+  <data name="email.customer.parcel_reminder.button" xml:space="preserve">
+    <value>Answer now</value>
+  </data>
+  <data name="email.customer.password_reset.button" xml:space="preserve">
+    <value>Choose a new password</value>
+  </data>
+  <data name="email.customer.payment_not_received.button" xml:space="preserve">
+    <value>See my invoices</value>
+  </data>
+  <data name="email.customer.pickup_code.button" xml:space="preserve">
+    <value>See my shipment</value>
+  </data>
+  <data name="email.customer.pickup_final_notice.button" xml:space="preserve">
+    <value>See my shipment</value>
+  </data>
+  <data name="email.customer.pickup_reminder.button" xml:space="preserve">
+    <value>See my shipment</value>
+  </data>
+  <data name="email.customer.ready_for_pickup.button" xml:space="preserve">
+    <value>See my shipment</value>
+  </data>
+  <data name="email.customer.shipment_update.button" xml:space="preserve">
+    <value>Follow my shipment</value>
+  </data>
+  <data name="email.customer.ticket_answered.button" xml:space="preserve">
+    <value>Read the answer</value>
+  </data>
+  <data name="email.customer.verification.button" xml:space="preserve">
+    <value>Confirm my email</value>
+  </data>
+  <data name="email.device_blocked.button" xml:space="preserve">
+    <value>Review the device</value>
+  </data>
+  <data name="email.owner_invitation.button" xml:space="preserve">
+    <value>Choose my password</value>
+  </data>
+  <data name="email.password_reset.button" xml:space="preserve">
+    <value>Choose a new password</value>
+  </data>
+  <data name="ui.company.profile" xml:space="preserve">
+    <value>Company profile</value>
+  </data>
+  <data name="ui.company.profile_hint" xml:space="preserve">
+    <value>Saved at once, no approval needed. These details appear on your invoices from your provider and on your website.</value>
+  </data>
+  <data name="ui.company.new_legal_name" xml:space="preserve">
+    <value>New legal name</value>
+  </data>
+  <data name="ops.company.legal_name_needs_request" xml:space="preserve">
+    <value>The legal name changes only through a request with proof.</value>
+  </data>
+  <data name="ui.session.time_left" xml:space="preserve">
+    <value>Time left:</value>
+  </data>
+  <data name="ui.help.title" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="ui.help.summary" xml:space="preserve">
+    <value>Find guidance for your work in this company’s workspace.</value>
+  </data>
+  <data name="ui.help.search" xml:space="preserve">
+    <value>Search help</value>
+  </data>
+  <data name="ui.help.search_go" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="ui.help.results" xml:space="preserve">
+    <value>Search results</value>
+  </data>
+  <data name="ui.help.clear" xml:space="preserve">
+    <value>Show all help</value>
+  </data>
+  <data name="ui.help.back" xml:space="preserve">
+    <value>Back to help</value>
+  </data>
+  <data name="ui.help.related" xml:space="preserve">
+    <value>Related articles</value>
+  </data>
+  <data name="ui.help.empty" xml:space="preserve">
+    <value>No articles match your search.</value>
+  </data>
+  <data name="ui.help.context" xml:space="preserve">
+    <value>Help for this page</value>
+  </data>
+  <data name="ui.help.not_found" xml:space="preserve">
+    <value>Page not found</value>
+  </data>
+  <data name="ui.help.unavailable" xml:space="preserve">
+    <value>Help is temporarily unavailable.</value>
+  </data>
+  <data name="ui.help.setup" xml:space="preserve">
+    <value>Help with setup</value>
+  </data>
+  <data name="ui.help.section.getting-started" xml:space="preserve">
+    <value>Getting started</value>
+  </data>
+  <data name="ui.help.section.setting-up" xml:space="preserve">
+    <value>Setting up</value>
+  </data>
+  <data name="ui.help.section.receiving-and-checking" xml:space="preserve">
+    <value>Receiving and checking</value>
+  </data>
+  <data name="ui.help.section.at-the-counter" xml:space="preserve">
+    <value>At the counter</value>
+  </data>
+  <data name="ui.help.section.money" xml:space="preserve">
+    <value>Money</value>
+  </data>
+  <data name="ui.help.section.consolidation-and-dispatch" xml:space="preserve">
+    <value>Consolidation and dispatch</value>
+  </data>
+  <data name="ui.help.section.at-destination" xml:space="preserve">
+    <value>At destination</value>
+  </data>
+  <data name="ui.help.section.team-and-company" xml:space="preserve">
+    <value>Team and company</value>
+  </data>
+  <data name="ui.help.section.website-and-integrations" xml:space="preserve">
+    <value>Website and integrations</value>
+  </data>
+  <data name="ui.help.section.reports" xml:space="preserve">
+    <value>Reports</value>
+  </data>
+  <data name="ui.customers.home_address" xml:space="preserve">
+    <value>Home address</value>
+  </data>
+  <data name="ui.customers.no_address" xml:space="preserve">
+    <value>Not given yet: asked at the next sign-in.</value>
+  </data>
+  <data name="ui.cashier.total_due" xml:space="preserve">
+    <value>To pay</value>
+  </data>
+  <data name="ui.cashier.added" xml:space="preserve">
+    <value>Added</value>
+  </data>
+  <data name="ui.cashier.left" xml:space="preserve">
+    <value>Left to pay</value>
+  </data>
+  <data name="ui.cashier.add_title" xml:space="preserve">
+    <value>Add a payment</value>
+  </data>
+  <data name="ui.cashier.add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="ui.cashier.remove" xml:space="preserve">
+    <value>Remove this payment</value>
+  </data>
+  <data name="ui.cashier.given_short" xml:space="preserve">
+    <value>handed over</value>
+  </data>
+  <data name="ui.cashier.change_short" xml:space="preserve">
+    <value>change</value>
+  </data>
+  <data name="ui.cashier.err_amount" xml:space="preserve">
+    <value>Enter an amount.</value>
+  </data>
+  <data name="ui.cashier.err_more" xml:space="preserve">
+    <value>That is more than what is left to pay ({amount}).</value>
+  </data>
+  <data name="ui.cashier.err_given" xml:space="preserve">
+    <value>The cash handed over is less than the amount.</value>
+  </data>
+  <data name="ui.cashier.err_left" xml:space="preserve">
+    <value>{amount} is still left to pay: add another payment.</value>
+  </data>
+  <data name="ui.cards.rest_title" xml:space="preserve">
+    <value>Charge the rest by card:</value>
+  </data>
+  <data name="ui.cards.one_card" xml:space="preserve">
+    <value>One card per invoice: the card is charged last, for what is left after the other payments. Two different cards can't be used on the same invoice.</value>
+  </data>
+  <data name="ui.cards.keep_cash" xml:space="preserve">
+    <value>Keep the customer's cash in hand until the card is approved: the other payments are recorded only with the card.</value>
+  </data>
+  <data name="ui.cards.others_waiting" xml:space="preserve">
+    <value>Plus {amount} in the other payments, recorded when the card is approved.</value>
+  </data>
+  <data name="ui.cards.others_recorded" xml:space="preserve">
+    <value>Recorded with the other payments ({amount}).</value>
+  </data>
+  <data name="ops.cards.nothing_left" xml:space="preserve">
+    <value>The other payments already pay everything: there is nothing left for the card.</value>
+  </data>
+  <data name="ui.collect.title" xml:space="preserve">
+    <value>Where the customer pays</value>
+  </data>
+  <data name="ui.collect.now_on" xml:space="preserve">
+    <value>Pay at the destination (freight collect).</value>
+  </data>
+  <data name="ui.collect.now_off" xml:space="preserve">
+    <value>Paid here, before the shipment leaves.</value>
+  </data>
+  <data name="ui.collect.make_on" xml:space="preserve">
+    <value>Pay at the destination</value>
+  </data>
+  <data name="ui.collect.make_off" xml:space="preserve">
+    <value>Pay here instead</value>
+  </data>
+  <data name="ui.collect.reason" xml:space="preserve">
+    <value>Reason (optional)</value>
+  </data>
+  <data name="ui.collect.hint" xml:space="preserve">
+    <value>Possible while nothing is paid and no supplies are on it. Back to paying here only until a parcel leaves. The sender can still pay anytime on the portal.</value>
+  </data>
+  <data name="ui.collect.done.collect_on" xml:space="preserve">
+    <value>Now paid at the destination. Reprint the waybill: the payment term changed.</value>
+  </data>
+  <data name="ui.collect.done.collect_off" xml:space="preserve">
+    <value>Now paid here. Reprint the waybill: the payment term changed.</value>
+  </data>
+  <data name="ops.invoices.collect_not_possible" xml:space="preserve">
+    <value>Only a shipment's invoice that is still open can be paid at the destination.</value>
+  </data>
+  <data name="ops.invoices.collect_after_payment" xml:space="preserve">
+    <value>Something is already paid, waiting for confirmation or on the account: it can't change where the customer pays.</value>
+  </data>
+  <data name="ops.invoices.collect_with_supplies" xml:space="preserve">
+    <value>Supplies are paid here: a shipment with supplies can't be paid at the destination.</value>
+  </data>
+  <data name="ops.invoices.collect_departed" xml:space="preserve">
+    <value>A parcel has already left: the shipment stays paid at the destination.</value>
+  </data>
+  <data name="ops.inspection.parcel_not_queued" xml:space="preserve">
+    <value>This parcel was found, but it is not waiting for inspection: it may be finished already, or at a warehouse you don't cover.</value>
+  </data>
+  <data name="ops.settings.staff_idle_invalid" xml:space="preserve">
+    <value>Staff sign-out after inactivity must be between {min} and {max} minutes.</value>
+  </data>
+  <data name="ops.settings.customer_idle_invalid" xml:space="preserve">
+    <value>Customer sign-out after inactivity must be between {min} and {max} minutes.</value>
+  </data>
+  <data name="ops.settings.idle_warn_invalid" xml:space="preserve">
+    <value>The warning must come {min} to {max} minutes before the sign-out, and before the staff time ends.</value>
+  </data>
+  <data name="ui.settings.idle" xml:space="preserve">
+    <value>Sign-out after inactivity</value>
+  </data>
+  <data name="ui.settings.idle_staff" xml:space="preserve">
+    <value>Staff (minutes, 5 to 60)</value>
+  </data>
+  <data name="ui.settings.idle_customer" xml:space="preserve">
+    <value>Customers on the portal (minutes, 15 to 240)</value>
+  </data>
+  <data name="ui.settings.idle_warn" xml:space="preserve">
+    <value>Warn before (minutes, 1 to 5)</value>
+  </data>
+  <data name="ui.settings.idle_hint" xml:space="preserve">
+    <value>A person who does nothing for this long is signed out; a warning with a countdown comes first. A change applies from each person's next page.</value>
+  </data>
+  <data name="ui.payment_settings.portal" xml:space="preserve">
+    <value>Offer on the customer portal</value>
+  </data>
+  <data name="ui.payment_settings.portal_hint" xml:space="preserve">
+    <value>Customers see a Pay button on their unpaid invoices for each method ticked here, once it is set up: Zelle with its tag or email/phone, name and terms; bank transfer with its instructions; card with the connected account. Zelle and bank transfers wait in Payments to verify until finance confirms them. Cash and cheque are never offered there.</value>
+  </data>
+  <data name="ui.payment_settings.bank_en" xml:space="preserve">
+    <value>Instructions in English</value>
+  </data>
+  <data name="ui.payment_settings.bank_fr" xml:space="preserve">
+    <value>Instructions in French</value>
+  </data>
+  <data name="ui.payment_settings.bank_es" xml:space="preserve">
+    <value>Instructions in Spanish</value>
+  </data>
+  <data name="ui.payment_settings.bank_hint" xml:space="preserve">
+    <value>What customers are told for a bank transfer: the bank, the account holder, the account and routing numbers. The English text is required to offer it on the portal; changing it needs a fresh confirmation.</value>
+  </data>
+  <data name="ops.payments.zelle_name_required" xml:space="preserve">
+    <value>Write the name shown in Zelle before offering it on the customer portal.</value>
+  </data>
+  <data name="ops.payments.bank_instructions_required" xml:space="preserve">
+    <value>Write the bank transfer instructions in English before offering it on the customer portal.</value>
+  </data>
+  <data name="ops.payments.reference_required" xml:space="preserve">
+    <value>The payment reference is required.</value>
+  </data>
+  <data name="ui.payments_verify.from_portal" xml:space="preserve">
+    <value>Sent by the customer on the portal</value>
+  </data>
+  <data name="ui.labels.group" xml:space="preserve">
+    <value>Labels of this shipment</value>
+  </data>
+  <data name="ui.labels.print_all_ids" xml:space="preserve">
+    <value>Print all ID labels ({count})</value>
+  </data>
+  <data name="ui.labels.print_all_shipping" xml:space="preserve">
+    <value>Print all shipping labels ({count})</value>
+  </data>
+  <data name="ui.labels.printer" xml:space="preserve">
+    <value>Label printer</value>
+  </data>
+  <data name="ui.labels.send_to_printer" xml:space="preserve">
+    <value>Send all to printer</value>
+  </data>
+  <data name="ui.labels.sent" xml:space="preserve">
+    <value>{count} labels sent to the printer.</value>
+  </data>
+  <data name="ui.labels.sent_waiting" xml:space="preserve">
+    <value>{count} labels sent to the printer; {waiting} still waiting for inspection or a hold.</value>
+  </data>
+  <data name="ui.labels.id_label" xml:space="preserve">
+    <value>ID label</value>
+  </data>
+  <data name="ui.labels.shipping_label" xml:space="preserve">
+    <value>Shipping label</value>
+  </data>
+  <data name="ui.tracking_number" xml:space="preserve">
+    <value>Tracking number</value>
+  </data>
+  <data name="ui.tracking_number.after_payment" xml:space="preserve">
+    <value>Given once the shipment is paid</value>
+  </data>
+  <data name="ui.documents.tracking_number" xml:space="preserve">
+    <value>Tracking number: {number}</value>
+  </data>
+  <data name="ui.settings.prefix.tracking" xml:space="preserve">
+    <value>Tracking numbers (2 letters)</value>
+  </data>
+  <data name="ops.settings.tracking_prefix_invalid" xml:space="preserve">
+    <value>The tracking number letters are two letters A to Z.</value>
+  </data>
+  <data name="ui.company.document_logo" xml:space="preserve">
+    <value>Document logo</value>
+  </data>
+  <data name="ui.company.document_logo.on_documents" xml:space="preserve">
+    <value>On documents</value>
+  </data>
+  <data name="ui.company.document_logo.on_labels" xml:space="preserve">
+    <value>On shipping labels (black and white)</value>
+  </data>
+  <data name="ui.company.document_logo.saved" xml:space="preserve">
+    <value>Logo saved and in use</value>
+  </data>
+  <data name="ui.company.document_logo.by" xml:space="preserve">
+    <value>saved on {date} by {name}</value>
+  </data>
+  <data name="ui.company.document_logo.sample" xml:space="preserve">
+    <value>Sample page (PDF)</value>
+  </data>
+  <data name="ui.company.document_logo.sample_label" xml:space="preserve">
+    <value>Sample shipping label (PDF)</value>
+  </data>
+  <data name="ui.company.document_logo.none" xml:space="preserve">
+    <value>No document logo yet: documents and labels show the company name.</value>
+  </data>
+  <data name="ui.company.document_logo.file" xml:space="preserve">
+    <value>PNG file</value>
+  </data>
+  <data name="ui.company.document_logo.upload" xml:space="preserve">
+    <value>Upload logo</value>
+  </data>
+  <data name="ui.company.document_logo.replace" xml:space="preserve">
+    <value>Replace logo</value>
+  </data>
+  <data name="ui.company.document_logo.remove" xml:space="preserve">
+    <value>Remove logo</value>
+  </data>
+  <data name="ui.company.document_logo.hint" xml:space="preserve">
+    <value>A wide PNG works best, on a white or transparent background; at most 1 MB and 2000 × 2000 pixels. Labels print it in black and white. Saving or removing it asks for a fresh confirmation.</value>
+  </data>
+  <data name="ui.company.document_logo.sample_warehouse" xml:space="preserve">
+    <value>Main warehouse</value>
+  </data>
+  <data name="ui.company.document_logo.sample_person" xml:space="preserve">
+    <value>Sample</value>
+  </data>
+  <data name="ui.company.done.logo_saved" xml:space="preserve">
+    <value>Document logo saved. It now prints on your documents and labels.</value>
+  </data>
+  <data name="ui.company.done.logo_removed" xml:space="preserve">
+    <value>Document logo removed. Documents show the company name.</value>
+  </data>
+  <data name="ops.brand.document_logo_png_only" xml:space="preserve">
+    <value>The document logo must be a PNG file.</value>
+  </data>
+  <data name="ops.brand.document_logo_unreadable" xml:space="preserve">
+    <value>This PNG could not be read. Save it again without interlacing and try again.</value>
+  </data>
+  <data name="ui.quotes.print" xml:space="preserve">
+    <value>Print (PDF)</value>
+  </data>
+  <data name="ui.quotes.email" xml:space="preserve">
+    <value>Email to customer</value>
+  </data>
+  <data name="ui.quotes.done.emailed" xml:space="preserve">
+    <value>Quote {number} emailed to the customer, with its PDF.</value>
+  </data>
+  <data name="ops.charges.quote_not_valid" xml:space="preserve">
+    <value>This quote is withdrawn or past its date. Make a new one.</value>
+  </data>
+  <data name="ops.charges.quote_email_failed" xml:space="preserve">
+    <value>The email could not be sent. Try again in a moment.</value>
+  </data>
+  <data name="ui.quote.pdf.title" xml:space="preserve">
+    <value>QUOTE</value>
+  </data>
+  <data name="ui.quote.pdf.for" xml:space="preserve">
+    <value>Quote for</value>
+  </data>
+  <data name="ui.quote.pdf.route" xml:space="preserve">
+    <value>Route and service</value>
+  </data>
+  <data name="ui.quote.pdf.consolidated" xml:space="preserve">
+    <value>Consolidated</value>
+  </data>
+  <data name="ui.quote.pdf.insured" xml:space="preserve">
+    <value>Insured</value>
+  </data>
+  <data name="ui.quote.pdf.valid_until" xml:space="preserve">
+    <value>Valid until {date}</value>
+  </data>
+  <data name="ui.quote.pdf.pieces" xml:space="preserve">
+    <value>Pieces</value>
+  </data>
+  <data name="ui.quote.pdf.piece" xml:space="preserve">
+    <value>#</value>
+  </data>
+  <data name="ui.quote.pdf.contents" xml:space="preserve">
+    <value>Contents</value>
+  </data>
+  <data name="ui.quote.pdf.weight" xml:space="preserve">
+    <value>Weight</value>
+  </data>
+  <data name="ui.quote.pdf.size" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="ui.quote.pdf.value" xml:space="preserve">
+    <value>Declared value</value>
+  </data>
+  <data name="ui.quote.pdf.description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="ui.quote.pdf.amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="ui.quote.pdf.total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="ui.quote.pdf.terms" xml:space="preserve">
+    <value>This quote is valid until {date}. The final price is set when the parcels are received, weighed and measured.</value>
+  </data>
+  <data name="email.customer.quote.subject" xml:space="preserve">
+    <value>{company}: your quote {number}</value>
+  </data>
+  <data name="email.customer.quote.body" xml:space="preserve">
+    <value>Hello {name},
+
+Please find attached your quote {number}. It is valid until {date}.
+
+The final price is set when your parcels are received, weighed and measured.
+
+{company}</value>
+  </data>
+  <data name="ops.printing.not_paid" xml:space="preserve">
+    <value>Not paid yet: the shipping label prints once the shipment is paid, charged to an account or collect.</value>
+  </data>
+  <data name="ui.labels.after_payment" xml:space="preserve">
+    <value>After payment</value>
+  </data>
+  <data name="ui.labels.after_payment_hint" xml:space="preserve">
+    <value>Shipping labels print once the shipment is paid.</value>
+  </data>
+  <data name="ui.permissions.ops.devices.approve" xml:space="preserve">
+    <value>Approve new devices</value>
+  </data>
+  <data name="ui.permissions.ops.devices.release" xml:space="preserve">
+    <value>Release devices</value>
+  </data>
+  <data name="ui.roles.company_only" xml:space="preserve">
+    <value>company level only</value>
+  </data>
+  <data name="ui.roles.company_only_hint" xml:space="preserve">
+    <value>Permissions marked “company level only” work only when the role is given for the whole company. Given for a branch or a warehouse, they do nothing.</value>
+  </data>
+  <data name="ui.editor.branch.no_office" xml:space="preserve">
+    <value>No office</value>
+  </data>
+  <data name="ui.editor.branch.hint" xml:space="preserve">
+    <value>A branch is a country or market you serve, for example United States or Haiti. Your offices and warehouses there are its warehouses.</value>
+  </data>
+  <data name="ui.editor.branch.legal" xml:space="preserve">
+    <value>Legal identity in this country</value>
+  </data>
+  <data name="ui.editor.branch.legal_hint" xml:space="preserve">
+    <value>Printed on invoices issued in this branch. Leave empty to print the company’s own.</value>
+  </data>
+  <data name="ui.editor.branch.legal_name" xml:space="preserve">
+    <value>Legal name</value>
+  </data>
+  <data name="ui.editor.branch.tax_number" xml:space="preserve">
+    <value>Tax number</value>
+  </data>
+  <data name="ui.editor.branch.legal_notes" xml:space="preserve">
+    <value>Lines the country requires on invoices</value>
+  </data>
+  <data name="ui.editor.branch.office" xml:space="preserve">
+    <value>Main office (optional)</value>
+  </data>
+  <data name="ui.editor.branch.office_hint" xml:space="preserve">
+    <value>Leave empty if the branch has no office of its own. Only a branch with an office can show on your website.</value>
+  </data>
+  <data name="ops.locations.address_outside_country" xml:space="preserve">
+    <value>The office address must be in the branch’s country.</value>
+  </data>
+  <data name="ops.locations.warehouse_outside_country" xml:space="preserve">
+    <value>A warehouse must be in its branch’s country. Choose the branch of that country.</value>
+  </data>
+  <data name="ops.locations.legal_name_too_long" xml:space="preserve">
+    <value>The legal name is too long (at most {maxLength} characters).</value>
+  </data>
+  <data name="ops.locations.tax_number_too_long" xml:space="preserve">
+    <value>The tax number is too long (at most {maxLength} characters).</value>
+  </data>
+  <data name="ops.locations.legal_notes_too_long" xml:space="preserve">
+    <value>The invoice lines are too long (at most {maxLength} characters).</value>
+  </data>
+  <data name="ui.roles.standard.security_admin" xml:space="preserve">
+    <value>Security administrator</value>
+  </data>
+  <data name="ui.roles.standard.finance" xml:space="preserve">
+    <value>Finance</value>
+  </data>
+  <data name="ui.roles.standard.customer_service" xml:space="preserve">
+    <value>Customer service</value>
+  </data>
+  <data name="ui.roles.standard.branch_manager" xml:space="preserve">
+    <value>Branch manager</value>
+  </data>
+  <data name="ui.roles.standard.warehouse_manager" xml:space="preserve">
+    <value>Warehouse manager</value>
+  </data>
+  <data name="ui.roles.standard.counter_clerk" xml:space="preserve">
+    <value>Counter clerk</value>
+  </data>
+  <data name="ui.roles.standard.cashier" xml:space="preserve">
+    <value>Cashier</value>
+  </data>
+  <data name="ui.roles.standard.warehouse_worker" xml:space="preserve">
+    <value>Warehouse worker</value>
+  </data>
+  <data name="ui.roles.standard.driver" xml:space="preserve">
+    <value>Driver</value>
+  </data>
+  <data name="ui.permissions.ops.customers.lookup" xml:space="preserve">
+    <value>Look up a customer (exact phone, email or code)</value>
+  </data>
+  <data name="ui.customers.lookup.title" xml:space="preserve">
+    <value>Find a customer</value>
+  </data>
+  <data name="ui.customers.lookup.placeholder" xml:space="preserve">
+    <value>Full phone number, email or customer code</value>
+  </data>
+  <data name="ui.customers.lookup.hint" xml:space="preserve">
+    <value>Type the customer’s full phone number, email or customer code. The list of all customers is kept at company level.</value>
+  </data>
+  <data name="ui.customers.lookup.none" xml:space="preserve">
+    <value>No customer has exactly this phone number, email or code.</value>
+  </data>
+  <data name="ops.customers.lookup_limit" xml:space="preserve">
+    <value>You have looked up {limit} customers in the last hour. Try again later, or ask a colleague who has the customer list.</value>
+  </data>
+  <data name="ops.staff.outside.not_for_this_account" xml:space="preserve">
+    <value>The Owner, an Administrator or a partner's agent cannot be an outside account.</value>
+  </data>
+  <data name="ops.staff.outside.days_required" xml:space="preserve">
+    <value>Choose at least one working day.</value>
+  </data>
+  <data name="ops.staff.outside.hours_invalid" xml:space="preserve">
+    <value>Give both times, the start before the end, or neither.</value>
+  </data>
+  <data name="ops.staff.outside.ends_in_the_past" xml:space="preserve">
+    <value>The end date has already passed.</value>
+  </data>
+  <data name="ops.auth.outside_hours" xml:space="preserve">
+    <value>Your account works only during its working hours and until its end date. Ask your company if you need access now.</value>
+  </data>
+  <data name="ops.support.phone_invalid" xml:space="preserve">
+    <value>Type the caller's full phone number.</value>
+  </data>
+  <data name="ops.support.not_found" xml:space="preserve">
+    <value>Nothing found for this number for this caller.</value>
+  </data>
+  <data name="ops.support.caller_required" xml:space="preserve">
+    <value>A carrier's tracking number needs the caller's phone number first.</value>
+  </data>
+  <data name="ops.support.lookup_limit" xml:space="preserve">
+    <value>You have made {limit} lookups in the last hour. Try again later.</value>
+  </data>
+  <data name="ui.permissions.area.support" xml:space="preserve">
+    <value>Customer support</value>
+  </data>
+  <data name="ui.permissions.ops.support.lookup" xml:space="preserve">
+    <value>Answer callers about one shipment (phone, then tracking number)</value>
+  </data>
+  <data name="ui.roles.standard.support_agent" xml:space="preserve">
+    <value>Support agent</value>
+  </data>
+  <data name="ui.editor.nav.support" xml:space="preserve">
+    <value>Support calls</value>
+  </data>
+  <data name="ui.audit.area.lookups" xml:space="preserve">
+    <value>Customer lookups</value>
+  </data>
+  <data name="ui.audit.area.calls" xml:space="preserve">
+    <value>Support calls</value>
+  </data>
+  <data name="ui.staff.done.outside" xml:space="preserve">
+    <value>Outside account saved.</value>
+  </data>
+  <data name="ui.staff.outside.title" xml:space="preserve">
+    <value>Outside account</value>
+  </data>
+  <data name="ui.staff.outside.is_outside" xml:space="preserve">
+    <value>Outside account</value>
+  </data>
+  <data name="ui.staff.outside.until" xml:space="preserve">
+    <value>until {date}</value>
+  </data>
+  <data name="ui.staff.outside.no_end" xml:space="preserve">
+    <value>no end date</value>
+  </data>
+  <data name="ui.staff.outside.hint" xml:space="preserve">
+    <value>For people outside the company, such as a call centre's agents: they can only use Support calls, only on their days and hours, and until the end date.</value>
+  </data>
+  <data name="ui.staff.outside.make" xml:space="preserve">
+    <value>This is an outside account</value>
+  </data>
+  <data name="ui.staff.outside.ends_on" xml:space="preserve">
+    <value>End date</value>
+  </data>
+  <data name="ui.staff.outside.days" xml:space="preserve">
+    <value>Working days</value>
+  </data>
+  <data name="ui.staff.outside.from" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="ui.staff.outside.to" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="ui.staff.outside.hours_hint" xml:space="preserve">
+    <value>In the company's time zone. Leave both times empty for the whole day; 00:00 as the end means midnight.</value>
+  </data>
+  <data name="ui.staff.outside.day.mon" xml:space="preserve">
+    <value>Mon</value>
+  </data>
+  <data name="ui.staff.outside.day.tue" xml:space="preserve">
+    <value>Tue</value>
+  </data>
+  <data name="ui.staff.outside.day.wed" xml:space="preserve">
+    <value>Wed</value>
+  </data>
+  <data name="ui.staff.outside.day.thu" xml:space="preserve">
+    <value>Thu</value>
+  </data>
+  <data name="ui.staff.outside.day.fri" xml:space="preserve">
+    <value>Fri</value>
+  </data>
+  <data name="ui.staff.outside.day.sat" xml:space="preserve">
+    <value>Sat</value>
+  </data>
+  <data name="ui.staff.outside.day.sun" xml:space="preserve">
+    <value>Sun</value>
+  </data>
+  <data name="ui.support.title" xml:space="preserve">
+    <value>Support calls</value>
+  </data>
+  <data name="ui.support.no_print" xml:space="preserve">
+    <value>This page cannot be printed.</value>
+  </data>
+  <data name="ui.support.step_caller" xml:space="preserve">
+    <value>1. The caller's phone</value>
+  </data>
+  <data name="ui.support.phone" xml:space="preserve">
+    <value>Full phone number</value>
+  </data>
+  <data name="ui.support.find_caller" xml:space="preserve">
+    <value>Find the caller</value>
+  </data>
+  <data name="ui.support.new_call" xml:space="preserve">
+    <value>New call</value>
+  </data>
+  <data name="ui.support.good_standing" xml:space="preserve">
+    <value>Good standing</value>
+  </data>
+  <data name="ui.support.refer_to_billing" xml:space="preserve">
+    <value>Please refer to billing</value>
+  </data>
+  <data name="ui.support.no_account" xml:space="preserve">
+    <value>No account with this number. Continue with the tracking number: you will see the status only.</value>
+  </data>
+  <data name="ui.support.caller_hint" xml:space="preserve">
+    <value>Ask the caller for their phone number. Only their first name, last initial, code and standing are shown.</value>
+  </data>
+  <data name="ui.support.step_number" xml:space="preserve">
+    <value>2. The tracking number</value>
+  </data>
+  <data name="ui.support.number" xml:space="preserve">
+    <value>Tracking number</value>
+  </data>
+  <data name="ui.support.open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="ui.support.number_hint" xml:space="preserve">
+    <value>The company's tracking number, or the carrier's (Amazon, UPS, USPS...) for a package. It must be the caller's shipment or package.</value>
+  </data>
+  <data name="ui.support.number_hint_status" xml:space="preserve">
+    <value>Without a matching phone, only the status of a shipment is shown, by the company's tracking number.</value>
+  </data>
+  <data name="ui.support.status_only" xml:space="preserve">
+    <value>Status only: the caller's phone did not match this shipment.</value>
+  </data>
+  <data name="ui.support.package_received" xml:space="preserve">
+    <value>Package received on {date}</value>
+  </data>
+  <data name="ui.support.package_announced" xml:space="preserve">
+    <value>Package announced, not received yet</value>
+  </data>
+  <data name="ui.support.other_packages" xml:space="preserve">
+    <value>{count} other packages in the same shipment</value>
+  </data>
+  <data name="ui.support.on_hold" xml:space="preserve">
+    <value>On hold</value>
+  </data>
+  <data name="ui.support.no_milestones" xml:space="preserve">
+    <value>No movement yet.</value>
+  </data>
+  <data name="ui.support.destination" xml:space="preserve">
+    <value>Destination</value>
+  </data>
+  <data name="ui.support.amount_due" xml:space="preserve">
+    <value>Amount due</value>
+  </data>
+  <data name="ui.support.paid" xml:space="preserve">
+    <value>Paid</value>
+  </data>
+  <data name="ui.support.collect" xml:space="preserve">
+    <value>to pay at destination</value>
+  </data>
+  <data name="ui.support.not_invoiced" xml:space="preserve">
+    <value>Not invoiced yet</value>
+  </data>
+  <data name="ui.support.customer" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="ui.support.contact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="ui.support.city" xml:space="preserve">
+    <value>City</value>
+  </data>
+  <data name="ui.support.request_title" xml:space="preserve">
+    <value>Call ticket for staff</value>
+  </data>
+  <data name="ui.support.request_placeholder" xml:space="preserve">
+    <value>What the caller asks, for example: change the pickup person</value>
+  </data>
+  <data name="ui.support.request_open" xml:space="preserve">
+    <value>Open a call ticket</value>
+  </data>
+  <data name="ui.support.request_hint" xml:space="preserve">
+    <value>Staff act on it and answer the customer. You do not change anything yourself.</value>
+  </data>
+  <data name="ui.support.done.request" xml:space="preserve">
+    <value>Call ticket opened for staff.</value>
+  </data>
+  <data name="ui.editor.nav.tickets" xml:space="preserve">
+    <value>Tickets</value>
+  </data>
+  <data name="ui.tickets.topic" xml:space="preserve">
+    <value>Topic</value>
+  </data>
+  <data name="ui.tickets.topic.Package" xml:space="preserve">
+    <value>Missing or wrong package</value>
+  </data>
+  <data name="ui.tickets.topic.Billing" xml:space="preserve">
+    <value>Billing and payment</value>
+  </data>
+  <data name="ui.tickets.topic.PickupDelivery" xml:space="preserve">
+    <value>Pickup, delivery, recipient</value>
+  </data>
+  <data name="ui.tickets.topic.Claim" xml:space="preserve">
+    <value>Damage or claim</value>
+  </data>
+  <data name="ui.tickets.topic.Other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="ui.tickets.all_topics" xml:space="preserve">
+    <value>All topics</value>
+  </data>
+  <data name="ui.tickets.mine" xml:space="preserve">
+    <value>Taken by me</value>
+  </data>
+  <data name="ui.tickets.opened_by" xml:space="preserve">
+    <value>Opened by</value>
+  </data>
+  <data name="ui.tickets.taken_by" xml:space="preserve">
+    <value>Taken by</value>
+  </data>
+  <data name="ui.tickets.by_customer" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="ui.tickets.by_agent" xml:space="preserve">
+    <value>Support call</value>
+  </data>
+  <data name="ui.tickets.nobody" xml:space="preserve">
+    <value>Nobody yet</value>
+  </data>
+  <data name="ui.tickets.escalated" xml:space="preserve">
+    <value>Escalated</value>
+  </data>
+  <data name="ui.tickets.filter.new" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="ui.tickets.filter.taken" xml:space="preserve">
+    <value>Taken</value>
+  </data>
+  <data name="ui.tickets.filter.escalated" xml:space="preserve">
+    <value>Escalated</value>
+  </data>
+  <data name="ui.tickets.shipment" xml:space="preserve">
+    <value>Shipment</value>
+  </data>
+  <data name="ui.tickets.open_shipment" xml:space="preserve">
+    <value>Open the shipment</value>
+  </data>
+  <data name="ui.tickets.who" xml:space="preserve">
+    <value>Who handles it</value>
+  </data>
+  <data name="ui.tickets.take" xml:space="preserve">
+    <value>I'm on it</value>
+  </data>
+  <data name="ui.tickets.release" xml:space="preserve">
+    <value>Release it</value>
+  </data>
+  <data name="ui.tickets.give_to" xml:space="preserve">
+    <value>Give it to</value>
+  </data>
+  <data name="ui.tickets.give" xml:space="preserve">
+    <value>Give</value>
+  </data>
+  <data name="ui.tickets.move_to" xml:space="preserve">
+    <value>Move to</value>
+  </data>
+  <data name="ui.tickets.move" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="ui.tickets.note" xml:space="preserve">
+    <value>Add a note</value>
+  </data>
+  <data name="ui.tickets.note_hint" xml:space="preserve">
+    <value>Notes stay internal: the customer is not emailed about a support call's ticket. Answer the customer the usual way.</value>
+  </data>
+  <data name="ui.tickets.done.taken" xml:space="preserve">
+    <value>The ticket is taken.</value>
+  </data>
+  <data name="ui.tickets.done.released" xml:space="preserve">
+    <value>The ticket is released.</value>
+  </data>
+  <data name="ui.tickets.done.settings" xml:space="preserve">
+    <value>Escalation limits saved.</value>
+  </data>
+  <data name="ui.tickets.done.moved" xml:space="preserve">
+    <value>The ticket moved to the other department.</value>
+  </data>
+  <data name="ui.tickets.limits.title" xml:space="preserve">
+    <value>When managers are told</value>
+  </data>
+  <data name="ui.tickets.limits.take_hours" xml:space="preserve">
+    <value>Nobody took it after (hours)</value>
+  </data>
+  <data name="ui.tickets.limits.resolve_days" xml:space="preserve">
+    <value>Not resolved after (days)</value>
+  </data>
+  <data name="ui.tickets.limits.hint" xml:space="preserve">
+    <value>The managers of the ticket's department get one email at each step; the second one also goes to the Owner.</value>
+  </data>
+  <data name="ops.tickets.topic_invalid" xml:space="preserve">
+    <value>Choose a topic.</value>
+  </data>
+  <data name="ops.tickets.not_in_department" xml:space="preserve">
+    <value>This person is not in the ticket's department.</value>
+  </data>
+  <data name="ops.tickets.limits_invalid" xml:space="preserve">
+    <value>Use 1 to {maxHours} hours and 1 to {maxDays} days.</value>
+  </data>
+  <data name="ui.dashboard.billing_tickets" xml:space="preserve">
+    <value>Open billing tickets</value>
+  </data>
+  <data name="ui.dashboard.service_tickets" xml:space="preserve">
+    <value>Open customer service tickets</value>
+  </data>
+  <data name="email.ticket_not_taken.subject" xml:space="preserve">
+    <value>{company}: a ticket waits for someone</value>
+  </data>
+  <data name="email.ticket_not_taken.body" xml:space="preserve">
+    <value>Hello {name},
+
+A ticket about "{topic}" ({reference}), opened on {time}, has not been taken by anyone in your department yet.
+
+Open it to take it or give it to a colleague:
+
+{link}</value>
+  </data>
+  <data name="email.ticket_not_taken.button" xml:space="preserve">
+    <value>Open the ticket</value>
+  </data>
+  <data name="email.ticket_unresolved.subject" xml:space="preserve">
+    <value>{company}: a ticket is still not resolved</value>
+  </data>
+  <data name="email.ticket_unresolved.body" xml:space="preserve">
+    <value>Hello {name},
+
+A ticket about "{topic}" ({reference}), opened on {time}, is still not resolved.
+
+Open it to see where it stands:
+
+{link}</value>
+  </data>
+  <data name="email.ticket_unresolved.button" xml:space="preserve">
+    <value>Open the ticket</value>
+  </data>
+  <data name="ui.audit.area.support" xml:space="preserve">
+    <value>Support agents</value>
+  </data>
+  <data name="ui.audit.area.tickets" xml:space="preserve">
+    <value>Tickets</value>
+  </data>
+  <data name="ops.brand.theme_locked" xml:space="preserve">
+    <value>Your plan does not include website themes, fonts or the air and sea photos.</value>
+  </data>
+  <data name="site.hero.track" xml:space="preserve">
+    <value>Track a package</value>
+  </data>
+  <data name="site.figures.label" xml:space="preserve">
+    <value>At a glance</value>
+  </data>
+  <data name="site.figures.services" xml:space="preserve">
+    <value>Services</value>
+  </data>
+  <data name="site.figures.countries" xml:space="preserve">
+    <value>Countries</value>
+  </data>
+  <data name="site.figures.locations" xml:space="preserve">
+    <value>Locations</value>
+  </data>
+  <data name="site.route.title" xml:space="preserve">
+    <value>Follow every stage</value>
+  </data>
+  <data name="site.route.example" xml:space="preserve">
+    <value>Example</value>
+  </data>
+  <data name="site.cta.title" xml:space="preserve">
+    <value>Ready to ship with {company}?</value>
+  </data>
+  <data name="site.cta.text" xml:space="preserve">
+    <value>Create your account in a few minutes, or track a package now.</value>
+  </data>
+  <data name="site.services.more" xml:space="preserve">
+    <value>More services</value>
+  </data>
+  <data name="ui.editor.site.look" xml:space="preserve">
+    <value>Theme and font</value>
+  </data>
+  <data name="ui.editor.site.look_hint" xml:space="preserve">
+    <value>Preview each theme with your own content before you choose. Nothing changes on your website until you publish.</value>
+  </data>
+  <data name="ui.editor.site.look_locked" xml:space="preserve">
+    <value>Themes, fonts and the air and sea photos come with a higher plan. You can still preview each theme. What your website shows today stays as it is.</value>
+  </data>
+  <data name="ui.editor.site.theme" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="ui.editor.site.font" xml:space="preserve">
+    <value>Font</value>
+  </data>
+  <data name="ui.editor.site.try_theme" xml:space="preserve">
+    <value>Preview: {theme}</value>
+  </data>
+  <data name="ui.editor.theme.classic" xml:space="preserve">
+    <value>Classic</value>
+  </data>
+  <data name="ui.editor.theme.horizon" xml:space="preserve">
+    <value>Horizon</value>
+  </data>
+  <data name="ui.editor.theme.airsea" xml:space="preserve">
+    <value>Air &amp; Sea</value>
+  </data>
+  <data name="ui.editor.theme.classic.hint" xml:space="preserve">
+    <value>The standard page: main image beside the headline, then tracking, services, steps and locations.</value>
+  </data>
+  <data name="ui.editor.theme.horizon.hint" xml:space="preserve">
+    <value>A dark, bold opening with a route drawing, your key figures, and dark and light sections in turn.</value>
+  </data>
+  <data name="ui.editor.theme.airsea.hint" xml:space="preserve">
+    <value>A bright page with a large photo, air and ocean side by side, and your locations near the top. Upload your air and sea photos below.</value>
+  </data>
+  <data name="ui.editor.font.default" xml:space="preserve">
+    <value>Standard</value>
+  </data>
+  <data name="ui.editor.font.manrope" xml:space="preserve">
+    <value>Manrope</value>
+  </data>
+  <data name="ui.editor.font.plus-jakarta-sans" xml:space="preserve">
+    <value>Plus Jakarta Sans</value>
+  </data>
+  <data name="ui.editor.font.dm-sans" xml:space="preserve">
+    <value>DM Sans</value>
+  </data>
+  <data name="ui.editor.font.lora" xml:space="preserve">
+    <value>Lora (serif titles)</value>
+  </data>
+  <data name="ui.editor.image.air" xml:space="preserve">
+    <value>Air cargo photo</value>
+  </data>
+  <data name="ui.editor.image.sea" xml:space="preserve">
+    <value>Ocean cargo photo</value>
+  </data>
+  <data name="ui.editor.image.air_sea_hint" xml:space="preserve">
+    <value>Shown by the Air &amp; Sea theme. Until you upload your own photo, a simple illustration is shown.</value>
+  </data>
+  <data name="ops.shipments.plan_limit_reached" xml:space="preserve">
+    <value>Your plan's shipments for this month are used up (above 150%). Upgrade your plan to create new shipments; receiving, payments and releases keep working.</value>
+  </data>
+  <data name="ops.shipments.requests_paused" xml:space="preserve">
+    <value>New shipment requests are paused for now. Please contact us.</value>
+  </data>
+  <data name="ui.plan_cap.title" xml:space="preserve">
+    <value>Your plan's shipments this month</value>
+  </data>
+  <data name="ui.plan_cap.used" xml:space="preserve">
+    <value>{used} of {cap} shipments used in {month}.</value>
+  </data>
+  <data name="ui.plan_cap.charged" xml:space="preserve">
+    <value>Each shipment above {cap} is charged {price} on your next invoice.</value>
+  </data>
+  <data name="ui.plan_cap.stop_at" xml:space="preserve">
+    <value>New shipments stop at {block} this month unless you upgrade.</value>
+  </data>
+  <data name="ui.plan_cap.grace" xml:space="preserve">
+    <value>This is your one-time grace month: new shipments are not stopped, and each extra shipment is still charged. Next time they stop at 150%.</value>
+  </data>
+  <data name="ui.plan_cap.stopped" xml:space="preserve">
+    <value>New shipments at the counter and in the portal are stopped until you upgrade or the month ends. Receiving, payments, dispatch and releases keep working.</value>
+  </data>
+  <data name="ui.plan_cap.billing" xml:space="preserve">
+    <value>See your plan</value>
+  </data>
+  <data name="email.shipment_cap_near.subject" xml:space="preserve">
+    <value>{company}: 80% of your plan's shipments used</value>
+  </data>
+  <data name="email.shipment_cap_near.body" xml:space="preserve">
+    <value>Hello {name},
+
+{used} of your {cap} shipments for {month} are used. Above {cap}, each shipment is charged {price} on your next invoice, and new shipments stop at {block}.
+
+To raise your limit, ask for a larger plan. Your plan and invoices:
+
+{link}</value>
+  </data>
+  <data name="email.shipment_cap_reached.subject" xml:space="preserve">
+    <value>{company}: your plan's shipments for {month} are used</value>
+  </data>
+  <data name="email.shipment_cap_reached.body" xml:space="preserve">
+    <value>Hello {name},
+
+You have created {used} shipments in {month}, your plan's {cap}. From now on each shipment is charged {price} on your next invoice, and new shipments stop at {block}.
+
+To raise your limit, ask for a larger plan. Your plan and invoices:
+
+{link}</value>
+  </data>
+  <data name="email.shipment_cap_last.subject" xml:space="preserve">
+    <value>{company}: new shipments stop at {block} this month</value>
+  </data>
+  <data name="email.shipment_cap_last.body" xml:space="preserve">
+    <value>Hello {name},
+
+You have created {used} shipments in {month}; your plan includes {cap}. New shipments at the counter and in the portal stop at {block} unless you upgrade. Each shipment above {cap} is charged {price}.
+
+To raise your limit, ask for a larger plan. Your plan and invoices:
+
+{link}</value>
+  </data>
+  <data name="email.shipment_cap_grace.subject" xml:space="preserve">
+    <value>{company}: your one-time grace month</value>
+  </data>
+  <data name="email.shipment_cap_grace.body" xml:space="preserve">
+    <value>Hello {name},
+
+You have passed 150% of your plan's shipments in {month} ({used} of {cap}). This time new shipments are not stopped: this is your one-time grace month. Each shipment above {cap} is still charged {price}. Next time, new shipments stop at 150% until you upgrade.
+
+To raise your limit, ask for a larger plan. Your plan and invoices:
+
+{link}</value>
+  </data>
+  <data name="email.shipment_cap_stopped.subject" xml:space="preserve">
+    <value>{company}: new shipments are stopped for {month}</value>
+  </data>
+  <data name="email.shipment_cap_stopped.body" xml:space="preserve">
+    <value>Hello {name},
+
+You have reached {block} shipments in {month}, 150% of your plan's {cap}. New shipments at the counter and in the portal are stopped until you upgrade or the month ends. Receiving, payments, dispatch and releases keep working.
+
+To raise your limit, ask for a larger plan. Your plan and invoices:
+
+{link}</value>
+  </data>
+  <data name="ui.customers.new" xml:space="preserve">
+    <value>New customer</value>
+  </data>
+  <data name="ui.customers.new_hint" xml:space="preserve">
+    <value>Your plan has no customer portal, so you enter your customers here. They get a customer code at once and receive their notices by email.</value>
+  </data>
+  <data name="ui.customers.first_name" xml:space="preserve">
+    <value>First name</value>
+  </data>
+  <data name="ui.customers.last_name" xml:space="preserve">
+    <value>Last name</value>
+  </data>
+  <data name="ui.customers.company_name" xml:space="preserve">
+    <value>Company (optional)</value>
+  </data>
+  <data name="ui.customers.email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="ui.customers.language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="ui.customers.create" xml:space="preserve">
+    <value>Create the customer</value>
+  </data>
+  <data name="ops.customers.portal_unavailable" xml:space="preserve">
+    <value>The customer portal is not available for this company.</value>
+  </data>
+  <data name="ops.customers.entry_needs_no_portal" xml:space="preserve">
+    <value>Your customers register themselves on your portal, so they cannot be entered here.</value>
+  </data>
+  <data name="ops.shipments.insurance_unavailable" xml:space="preserve">
+    <value>Insurance is not included in your company's plan.</value>
+  </data>
+  <data name="ops.common.not_in_plan" xml:space="preserve">
+    <value>This is not included in your company's plan. Ask the Owner about a larger plan.</value>
+  </data>
+  <data name="site.figures.title" xml:space="preserve">
+    <value>Key figures</value>
+  </data>
+  <data name="site.figures.delivered" xml:space="preserve">
+    <value>packages delivered</value>
+  </data>
+  <data name="site.figures.time.air" xml:space="preserve">
+    <value>air freight delivery</value>
+  </data>
+  <data name="site.figures.time.ocean" xml:space="preserve">
+    <value>ocean freight delivery</value>
+  </data>
+  <data name="site.figures.pickup_point" xml:space="preserve">
+    <value>pickup point</value>
+  </data>
+  <data name="site.figures.pickup_points" xml:space="preserve">
+    <value>pickup points</value>
+  </data>
+  <data name="site.hero.promises" xml:space="preserve">
+    <value>Our promises</value>
+  </data>
+  <data name="site.story.time" xml:space="preserve">
+    <value>Delivery: {time}</value>
+  </data>
+  <data name="site.rates.title" xml:space="preserve">
+    <value>Clear prices</value>
+  </data>
+  <data name="site.rates.intro" xml:space="preserve">
+    <value>Our published prices by service. Estimate a package below; the final amount is on your invoice.</value>
+  </data>
+  <data name="site.rates.all" xml:space="preserve">
+    <value>See all prices</value>
+  </data>
+  <data name="site.rates.estimate_title" xml:space="preserve">
+    <value>Estimate your package</value>
+  </data>
+  <data name="site.rates.service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="site.rates.destination" xml:space="preserve">
+    <value>Pickup at</value>
+  </data>
+  <data name="site.rates.weight" xml:space="preserve">
+    <value>Weight ({unit})</value>
+  </data>
+  <data name="site.rates.estimate" xml:space="preserve">
+    <value>Estimate</value>
+  </data>
+  <data name="site.rates.result" xml:space="preserve">
+    <value>Estimated cost: {amount}</value>
+  </data>
+  <data name="site.rates.result_note" xml:space="preserve">
+    <value>An estimate from our published prices. Customs duties, taxes and insurance are not included.</value>
+  </data>
+  <data name="site.rates.not_priced" xml:space="preserve">
+    <value>We have no published price for this choice. Contact us for a quote.</value>
+  </data>
+  <data name="site.testimonials.title" xml:space="preserve">
+    <value>What our customers say</value>
+  </data>
+  <data name="site.testimonials.rating" xml:space="preserve">
+    <value>Rated {rating} out of 5</value>
+  </data>
+  <data name="site.why.title" xml:space="preserve">
+    <value>Why {company}</value>
+  </data>
+  <data name="ui.editor.site.showDelivered" xml:space="preserve">
+    <value>Show packages delivered (from your records, from 500)</value>
+  </data>
+  <data name="ui.editor.site.showRates" xml:space="preserve">
+    <value>Show rates and the estimate (Air &amp; Sea, when you publish prices)</value>
+  </data>
+  <data name="ui.editor.site.showTestimonials" xml:space="preserve">
+    <value>Show customer testimonials</value>
+  </data>
+  <data name="ui.editor.site.group.chip" xml:space="preserve">
+    <value>Promise chips under the headline</value>
+  </data>
+  <data name="ui.editor.site.group.time" xml:space="preserve">
+    <value>Delivery times</value>
+  </data>
+  <data name="ui.editor.site.group.figure" xml:space="preserve">
+    <value>Your own key figure</value>
+  </data>
+  <data name="ui.editor.site.group.story" xml:space="preserve">
+    <value>Air and ocean stories</value>
+  </data>
+  <data name="ui.editor.site.group.why" xml:space="preserve">
+    <value>Why choose us</value>
+  </data>
+  <data name="ui.editor.site.group.closing" xml:space="preserve">
+    <value>Closing call to action</value>
+  </data>
+  <data name="ui.editor.text.eyebrow" xml:space="preserve">
+    <value>Small line above the headline</value>
+  </data>
+  <data name="ui.editor.text.chip" xml:space="preserve">
+    <value>Promise</value>
+  </data>
+  <data name="ui.editor.text.time.air" xml:space="preserve">
+    <value>Air freight delivery time (e.g. 5 to 7 days)</value>
+  </data>
+  <data name="ui.editor.text.time.ocean" xml:space="preserve">
+    <value>Ocean freight delivery time</value>
+  </data>
+  <data name="ui.editor.text.figure.value" xml:space="preserve">
+    <value>Figure (e.g. $0)</value>
+  </data>
+  <data name="ui.editor.text.figure.label" xml:space="preserve">
+    <value>What it means (e.g. US address included)</value>
+  </data>
+  <data name="ui.editor.text.figure.since" xml:space="preserve">
+    <value>Under packages delivered (e.g. since 2019)</value>
+  </data>
+  <data name="ui.editor.text.story.air.title" xml:space="preserve">
+    <value>Air: title</value>
+  </data>
+  <data name="ui.editor.text.story.air.text" xml:space="preserve">
+    <value>Air: text</value>
+  </data>
+  <data name="ui.editor.text.story.air.point" xml:space="preserve">
+    <value>Air: promise</value>
+  </data>
+  <data name="ui.editor.text.story.ocean.title" xml:space="preserve">
+    <value>Ocean: title</value>
+  </data>
+  <data name="ui.editor.text.story.ocean.text" xml:space="preserve">
+    <value>Ocean: text</value>
+  </data>
+  <data name="ui.editor.text.story.ocean.point" xml:space="preserve">
+    <value>Ocean: promise</value>
+  </data>
+  <data name="ui.editor.text.why.heading" xml:space="preserve">
+    <value>Section title</value>
+  </data>
+  <data name="ui.editor.text.why.title" xml:space="preserve">
+    <value>Card title</value>
+  </data>
+  <data name="ui.editor.text.why.text" xml:space="preserve">
+    <value>Card text</value>
+  </data>
+  <data name="ui.editor.text.closing.title" xml:space="preserve">
+    <value>Closing title</value>
+  </data>
+  <data name="ui.editor.text.closing.text" xml:space="preserve">
+    <value>Closing text</value>
+  </data>
+  <data name="ui.editor.saved.testimonial" xml:space="preserve">
+    <value>Testimonials saved. The website shows the change at once.</value>
+  </data>
+  <data name="ui.testimonials.manage" xml:space="preserve">
+    <value>Customer testimonials</value>
+  </data>
+  <data name="ui.testimonials.title" xml:space="preserve">
+    <value>Customer testimonials</value>
+  </data>
+  <data name="ui.testimonials.back" xml:space="preserve">
+    <value>Back to your website</value>
+  </data>
+  <data name="ui.testimonials.list" xml:space="preserve">
+    <value>Testimonials</value>
+  </data>
+  <data name="ui.testimonials.hint" xml:space="preserve">
+    <value>Your website shows up to {count} shown testimonials, in this order, when testimonials are switched on.</value>
+  </data>
+  <data name="ui.testimonials.none" xml:space="preserve">
+    <value>No testimonials yet.</value>
+  </data>
+  <data name="ui.testimonials.quote" xml:space="preserve">
+    <value>What the customer said</value>
+  </data>
+  <data name="ui.testimonials.name" xml:space="preserve">
+    <value>Name as the customer agreed to show it</value>
+  </data>
+  <data name="ui.testimonials.place" xml:space="preserve">
+    <value>Place (optional)</value>
+  </data>
+  <data name="ui.testimonials.rating" xml:space="preserve">
+    <value>Rating</value>
+  </data>
+  <data name="ui.testimonials.source" xml:space="preserve">
+    <value>Where it was said (optional)</value>
+  </data>
+  <data name="ui.testimonials.source_hint" xml:space="preserve">
+    <value>Google, Facebook, at the counter…</value>
+  </data>
+  <data name="ui.testimonials.shown" xml:space="preserve">
+    <value>On the website</value>
+  </data>
+  <data name="ui.testimonials.yes" xml:space="preserve">
+    <value>Shown</value>
+  </data>
+  <data name="ui.testimonials.no" xml:space="preserve">
+    <value>Hidden</value>
+  </data>
+  <data name="ui.testimonials.show" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="ui.testimonials.hide" xml:space="preserve">
+    <value>Hide</value>
+  </data>
+  <data name="ui.testimonials.remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ui.testimonials.new" xml:space="preserve">
+    <value>Add a testimonial</value>
+  </data>
+  <data name="ui.testimonials.new_hint" xml:space="preserve">
+    <value>Use the customer’s own words. Only add a testimonial the customer agreed to have on your website.</value>
+  </data>
+  <data name="ui.testimonials.agreed" xml:space="preserve">
+    <value>The customer agreed to be quoted on our website</value>
+  </data>
+  <data name="ui.testimonials.add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="ops.brand.testimonial_name_required" xml:space="preserve">
+    <value>Enter the customer’s name as they agreed to show it.</value>
+  </data>
+  <data name="ops.brand.testimonial_quote_required" xml:space="preserve">
+    <value>Enter what the customer said.</value>
+  </data>
+  <data name="ops.brand.testimonial_too_long" xml:space="preserve">
+    <value>A testimonial field is too long.</value>
+  </data>
+  <data name="ops.brand.testimonial_rating_invalid" xml:space="preserve">
+    <value>The rating is from 1 to 5.</value>
+  </data>
+  <data name="ops.brand.testimonial_consent_required" xml:space="preserve">
+    <value>Confirm that the customer agreed to be quoted.</value>
+  </data>
+  <data name="ops.brand.testimonial_not_found" xml:space="preserve">
+    <value>This testimonial no longer exists.</value>
+  </data>
+  <data name="ops.brand.testimonial_limit_reached" xml:space="preserve">
+    <value>You have reached the limit of 30 testimonials. Remove one first.</value>
+  </data>
+  <data name="ui.customers.status.banned" xml:space="preserve">
+    <value>Banned</value>
+  </data>
+  <data name="ui.customers.action.suspended" xml:space="preserve">
+    <value>Suspend</value>
+  </data>
+  <data name="ui.customers.action.active" xml:space="preserve">
+    <value>Reactivate</value>
+  </data>
+  <data name="ui.customers.action.closed" xml:space="preserve">
+    <value>Close the account</value>
+  </data>
+  <data name="ui.customers.action.banned" xml:space="preserve">
+    <value>Ban (breaks our terms, permanent)</value>
+  </data>
+  <data name="ui.customers.suspended_until" xml:space="preserve">
+    <value>Reactivate automatically on (optional)</value>
+  </data>
+  <data name="ui.customers.suspended_until_on" xml:space="preserve">
+    <value>Suspended until {date}; reactivated automatically that day.</value>
+  </data>
+  <data name="ui.customers.reason_hint" xml:space="preserve">
+    <value>Why (kept internal)</value>
+  </data>
+  <data name="ui.customers.banned_final" xml:space="preserve">
+    <value>This customer is banned. The account cannot be reopened, and their email and phone cannot open a new account.</value>
+  </data>
+  <data name="ui.customers.shipments" xml:space="preserve">
+    <value>Shipments</value>
+  </data>
+  <data name="ui.customers.shipments_none" xml:space="preserve">
+    <value>No shipments yet.</value>
+  </data>
+  <data name="ui.customers.shipments_latest" xml:space="preserve">
+    <value>The 20 most recent shipments.</value>
+  </data>
+  <data name="ui.customers.shipment_number" xml:space="preserve">
+    <value>Shipment</value>
+  </data>
+  <data name="ui.customers.shipment_date" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="ui.customers.shipment_service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="ui.customers.shipment_route" xml:space="preserve">
+    <value>From → to</value>
+  </data>
+  <data name="ui.customers.shipment_parcels" xml:space="preserve">
+    <value>Parcels</value>
+  </data>
+  <data name="ui.customers.shipment_state" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.customers.shipment_state.waiting" xml:space="preserve">
+    <value>Waiting for instructions</value>
+  </data>
+  <data name="ui.customers.shipment_state.open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="ui.customers.shipment_state.booked" xml:space="preserve">
+    <value>Booked</value>
+  </data>
+  <data name="ui.customers.shipment_state.picked_up" xml:space="preserve">
+    <value>Picked up</value>
+  </data>
+  <data name="ui.customers.shipment_state.delivered" xml:space="preserve">
+    <value>Delivered</value>
+  </data>
+  <data name="ui.counter.standing.banned" xml:space="preserve">
+    <value>The account is banned: no new shipment or parcel.</value>
+  </data>
+  <data name="ops.customers.suspended_until_invalid" xml:space="preserve">
+    <value>The reactivation day must be after today, and only for a suspension.</value>
+  </data>
+  <data name="ops.customers.banned_contact" xml:space="preserve">
+    <value>This email or phone belongs to a banned customer and cannot be used for an account.</value>
+  </data>
+  <data name="email.customer.account_suspended.subject" xml:space="preserve">
+    <value>{company}: your account is suspended</value>
+  </data>
+  <data name="email.customer.account_suspended.body" xml:space="preserve">
+    <value>Hello {name},
+
+Your {company} account is suspended. While it is suspended you cannot sign in or send new shipments. Packages already in our care continue as usual.
+
+Please contact us to find out more.</value>
+  </data>
+  <data name="email.customer.account_suspended_until.subject" xml:space="preserve">
+    <value>{company}: your account is suspended until {until}</value>
+  </data>
+  <data name="email.customer.account_suspended_until.body" xml:space="preserve">
+    <value>Hello {name},
+
+Your {company} account is suspended until {until}. It will be active again that day. Until then you cannot sign in or send new shipments. Packages already in our care continue as usual.
+
+Please contact us to find out more.</value>
+  </data>
+  <data name="email.customer.account_reactivated.subject" xml:space="preserve">
+    <value>{company}: your account is active again</value>
+  </data>
+  <data name="email.customer.account_reactivated.body" xml:space="preserve">
+    <value>Hello {name},
+
+Your {company} account is active again. You can sign in here:
+
+{link}</value>
+  </data>
+  <data name="email.customer.account_reactivated.button" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="email.customer.account_closed.subject" xml:space="preserve">
+    <value>{company}: your account is closed</value>
+  </data>
+  <data name="email.customer.account_closed.body" xml:space="preserve">
+    <value>Hello {name},
+
+Your {company} account is closed. Packages already in our care will still be handled; please contact us about them.
+
+If you think this is a mistake, contact us.</value>
+  </data>
+  <data name="email.customer.account_banned.subject" xml:space="preserve">
+    <value>{company}: your account is closed</value>
+  </data>
+  <data name="email.customer.account_banned.body" xml:space="preserve">
+    <value>Hello {name},
+
+Your {company} account has been closed because our terms of service were not respected. It cannot be reopened. Packages already in our care will be released once any amount due is paid; please contact us about them.</value>
+  </data>
+  <data name="ui.services.label_code" xml:space="preserve">
+    <value>Label code</value>
+  </data>
+  <data name="ui.services.label_code_hint" xml:space="preserve">
+    <value>Exactly 3 letters, printed large on the shipping label so the warehouse can sort by eye.</value>
+  </data>
+  <data name="ops.services.label_code_invalid" xml:space="preserve">
+    <value>Enter a label code of exactly {length} letters, A to Z.</value>
+  </data>
+  <data name="ui.editor.nav.items_review" xml:space="preserve">
+    <value>Items to review</value>
+  </data>
+  <data name="ui.editor.nav.item_catalogue" xml:space="preserve">
+    <value>Item catalogue</value>
+  </data>
+  <data name="ui.items.title" xml:space="preserve">
+    <value>Items</value>
+  </data>
+  <data name="ui.items.missing" xml:space="preserve">
+    <value>{count} to complete</value>
+  </data>
+  <data name="ui.items.none" xml:space="preserve">
+    <value>Nothing declared yet.</value>
+  </data>
+  <data name="ui.items.hint" xml:space="preserve">
+    <value>The customer's words, quantity and value stay as declared. Add the description for documents, the customs code and the country of origin from the label ("Made in…"). Pick a description from the catalogue to fill its code.</value>
+  </data>
+  <data name="ui.items.declared" xml:space="preserve">
+    <value>Declared by the customer</value>
+  </data>
+  <data name="ui.items.quantity" xml:space="preserve">
+    <value>Qty</value>
+  </data>
+  <data name="ui.items.value_each" xml:space="preserve">
+    <value>Value of one</value>
+  </data>
+  <data name="ui.items.description" xml:space="preserve">
+    <value>Description on documents</value>
+  </data>
+  <data name="ui.items.code" xml:space="preserve">
+    <value>Customs code</value>
+  </data>
+  <data name="ui.items.code_hint" xml:space="preserve">
+    <value>6 to 10 digits, for example 6404.11</value>
+  </data>
+  <data name="ui.items.origin" xml:space="preserve">
+    <value>Origin</value>
+  </data>
+  <data name="ui.items.origin_hint" xml:space="preserve">
+    <value>Country of origin, two letters (CN, US, VN…)</value>
+  </data>
+  <data name="ui.items.unit" xml:space="preserve">
+    <value>Unit</value>
+  </data>
+  <data name="ui.items.unit.pieces" xml:space="preserve">
+    <value>Pieces</value>
+  </data>
+  <data name="ui.items.unit.pairs" xml:space="preserve">
+    <value>Pairs</value>
+  </data>
+  <data name="ui.items.unit.kilograms" xml:space="preserve">
+    <value>kg</value>
+  </data>
+  <data name="ui.items.unit.litres" xml:space="preserve">
+    <value>Litres</value>
+  </data>
+  <data name="ui.items.unit.sets" xml:space="preserve">
+    <value>Sets</value>
+  </data>
+  <data name="ui.items.add_to_catalogue" xml:space="preserve">
+    <value>Add to the catalogue</value>
+  </data>
+  <data name="ui.items.used" xml:space="preserve">
+    <value>used</value>
+  </data>
+  <data name="ui.items.save" xml:space="preserve">
+    <value>Save items</value>
+  </data>
+  <data name="ui.items.done" xml:space="preserve">
+    <value>Items saved.</value>
+  </data>
+  <data name="ui.items.review.title" xml:space="preserve">
+    <value>Items to review</value>
+  </data>
+  <data name="ui.items.review.hint" xml:space="preserve">
+    <value>Parcels at origin with an item that still needs its customs code or country of origin.</value>
+  </data>
+  <data name="ui.items.review.hint_required" xml:space="preserve">
+    <value>Parcels at origin with an item that still needs its customs code or country of origin. They cannot go into a bundle until it is done.</value>
+  </data>
+  <data name="ui.items.review.none" xml:space="preserve">
+    <value>Nothing to review.</value>
+  </data>
+  <data name="ui.items.review.parcel" xml:space="preserve">
+    <value>Parcel</value>
+  </data>
+  <data name="ui.items.review.warehouse" xml:space="preserve">
+    <value>Warehouse</value>
+  </data>
+  <data name="ui.items.review.received" xml:space="preserve">
+    <value>Received</value>
+  </data>
+  <data name="ui.items.review.missing" xml:space="preserve">
+    <value>To complete</value>
+  </data>
+  <data name="ui.items.review.no_items" xml:space="preserve">
+    <value>No items</value>
+  </data>
+  <data name="ui.items.rule.title" xml:space="preserve">
+    <value>Before bundling</value>
+  </data>
+  <data name="ui.items.rule.hint" xml:space="preserve">
+    <value>When this is on, a parcel received from that moment needs a customs code and a country of origin on every item before it goes into a bundle or a box, and before its dispatch closes. Parcels received earlier are never stopped.</value>
+  </data>
+  <data name="ui.items.rule.on_since" xml:space="preserve">
+    <value>Required since {date}.</value>
+  </data>
+  <data name="ui.items.rule.switch_on" xml:space="preserve">
+    <value>Require codes and origin</value>
+  </data>
+  <data name="ui.items.rule.switch_off" xml:space="preserve">
+    <value>Stop requiring them</value>
+  </data>
+  <data name="ui.items.catalogue.title" xml:space="preserve">
+    <value>Item catalogue</value>
+  </data>
+  <data name="ui.items.catalogue.count" xml:space="preserve">
+    <value>{count} items</value>
+  </data>
+  <data name="ui.items.catalogue.hint" xml:space="preserve">
+    <value>Everyday items with their customs code. When a customer's words match an item or its other words, the code is suggested. Change anything to fit your company.</value>
+  </data>
+  <data name="ui.items.catalogue.search" xml:space="preserve">
+    <value>Shoes, 6403, phone…</value>
+  </data>
+  <data name="ui.items.catalogue.find" xml:space="preserve">
+    <value>Find</value>
+  </data>
+  <data name="ui.items.catalogue.description" xml:space="preserve">
+    <value>Description on documents</value>
+  </data>
+  <data name="ui.items.catalogue.matches" xml:space="preserve">
+    <value>Also matches (words, commas between)</value>
+  </data>
+  <data name="ui.items.catalogue.used" xml:space="preserve">
+    <value>Used</value>
+  </data>
+  <data name="ui.items.catalogue.actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ui.items.catalogue.add" xml:space="preserve">
+    <value>Add the item</value>
+  </data>
+  <data name="ui.items.catalogue.save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ui.items.catalogue.remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="ui.counter.more_items" xml:space="preserve">
+    <value>More items in this box</value>
+  </data>
+  <data name="ui.counter.item" xml:space="preserve">
+    <value>Item</value>
+  </data>
+  <data name="ui.counter.item_quantity" xml:space="preserve">
+    <value>How many</value>
+  </data>
+  <data name="ui.counter.item_value" xml:space="preserve">
+    <value>Value of one ({currency})</value>
+  </data>
+  <data name="ui.counter.item_condition" xml:space="preserve">
+    <value>New or used</value>
+  </data>
+  <data name="ui.counter.item_new" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="ui.counter.item_used" xml:space="preserve">
+    <value>Used</value>
+  </data>
+  <data name="ops.items.words_required" xml:space="preserve">
+    <value>Describe each item in a few words (at most {maxLength} characters).</value>
+  </data>
+  <data name="ops.items.quantity_invalid" xml:space="preserve">
+    <value>Enter how many of each item, from 1.</value>
+  </data>
+  <data name="ops.items.value_invalid" xml:space="preserve">
+    <value>Enter the value of one item, from 0.</value>
+  </data>
+  <data name="ops.items.too_many" xml:space="preserve">
+    <value>A parcel can list at most {max} items.</value>
+  </data>
+  <data name="ops.items.code_invalid" xml:space="preserve">
+    <value>Enter a customs code of 6 to 10 digits, for example 6404.11.</value>
+  </data>
+  <data name="ops.items.origin_invalid" xml:space="preserve">
+    <value>Enter the country of origin as two letters, for example CN.</value>
+  </data>
+  <data name="ops.items.unit_invalid" xml:space="preserve">
+    <value>Choose a unit.</value>
+  </data>
+  <data name="ops.items.description_invalid" xml:space="preserve">
+    <value>Enter a description of at most {maxLength} characters, without &lt; or &gt;.</value>
+  </data>
+  <data name="ops.items.matches_invalid" xml:space="preserve">
+    <value>Enter the other words in at most {maxLength} characters, without &lt; or &gt;.</value>
+  </data>
+  <data name="ops.items.catalogue_full" xml:space="preserve">
+    <value>The catalogue is full ({max} items). Remove items you no longer use.</value>
+  </data>
+  <data name="ops.items.catalogue_not_found" xml:space="preserve">
+    <value>This catalogue item no longer exists.</value>
+  </data>
+  <data name="ops.items.not_found" xml:space="preserve">
+    <value>This item no longer exists. Open the parcel again.</value>
+  </data>
+  <data name="ops.items.incomplete" xml:space="preserve">
+    <value>Parcel {parcel} cannot go on yet: the item "{item}" needs its customs code and country of origin. Complete its items, then try again.</value>
   </data>
 </root>

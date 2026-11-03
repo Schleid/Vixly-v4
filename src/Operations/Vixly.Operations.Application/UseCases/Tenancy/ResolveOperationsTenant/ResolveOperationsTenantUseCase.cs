@@ -102,6 +102,6 @@ public sealed class ResolveOperationsTenantUseCase
             _ => OperationsTenantAccess.None
         };
 
-        return new OperationsTenantHost(state, tenantId, access, answer.CanonicalSlug, answer.DefaultLanguage, string.IsNullOrWhiteSpace(answer.Legal) ? "not_required" : answer.Legal);
+        return new OperationsTenantHost(state, tenantId, access, answer.CanonicalSlug, answer.DefaultLanguage, string.IsNullOrWhiteSpace(answer.Legal) ? "not_required" : answer.Legal, answer.TimeZone);
     }
 }

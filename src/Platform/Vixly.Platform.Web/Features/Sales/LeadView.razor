@@ -46,7 +46,7 @@ else if (Presenter.State.Lead is { } lead)
             @if (lead.Phone is { } phone)
             {
                 <dt>@T["ui.leads.phone"]</dt>
-                <dd>@phone</dd>
+                <dd>@Vixly.Shared.Localization.VixlyPhone.International(phone)</dd>
             }
             @if (lead.CountryCode is { } country)
             {

@@ -63,6 +63,15 @@ public sealed class OperationsUserSession : OperationsEntity
 
     public bool IsEnded => EndedUtc is not null;
 
+    // Slice 12A: started with a badge or a PIN on a licensed device. It never counts as a fresh second factor (step-up asks the code).
+    public bool IsQuick { get; private set; }
+
+    public void Quick()
+    {
+        IsQuick = true;
+        SecondFactorUtc = DateTimeOffset.MinValue;
+    }
+
     // Owner, 2026-10-21: where the sign-in happened (member activity; a country other than the device's is flagged).
     public Guid? DeviceId { get; private set; }
 
@@ -107,14 +116,17 @@ public sealed class OperationsUserSession : OperationsEntity
     // =====================================================
     // METHOD: VALIDITY
     // =====================================================
-    public OperationsSessionEndReason? ExpiryReasonAt(DateTimeOffset utcNow)
+    public OperationsSessionEndReason? ExpiryReasonAt(DateTimeOffset utcNow) => ExpiryReasonAt(utcNow, OperationsIdentityLimits.SessionIdleTimeout);
+
+    // The idle time is the company's (owner, 2026-10-27); the one above is the default.
+    public OperationsSessionEndReason? ExpiryReasonAt(DateTimeOffset utcNow, TimeSpan idleTimeout)
     {
         if (utcNow >= ExpiresUtc)
         {
             return OperationsSessionEndReason.AbsoluteLifetime;
         }
 
-        if (utcNow - LastSeenUtc >= OperationsIdentityLimits.SessionIdleTimeout)
+        if (utcNow - LastSeenUtc >= idleTimeout)
         {
             return OperationsSessionEndReason.IdleTimeout;
         }

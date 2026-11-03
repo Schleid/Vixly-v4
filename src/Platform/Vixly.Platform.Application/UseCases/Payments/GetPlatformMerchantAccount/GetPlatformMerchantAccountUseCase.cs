@@ -61,7 +61,16 @@ public sealed class GetPlatformMerchantAccountUseCase
                 status.Configured,
                 status.Mode,
                 status.ProblemCode,
-                await _payments.ReadyAsync(cancellationToken)),
+                await _payments.ReadyAsync(cancellationToken),
+                new PlatformCheckoutSettingsItem(
+                    account?.CheckoutDisplayName,
+                    account?.CheckoutLogoUrl,
+                    account?.CheckoutIconUrl,
+                    account?.CheckoutBackgroundColor,
+                    account?.CheckoutButtonColor,
+                    account?.StatementPrefix,
+                    account?.StatementSuffix,
+                    account?.StatementWording)),
             await _payments.HoldsAsync(context, PlatformPermissions.PaymentsConfigure, cancellationToken));
     }
 }

@@ -29,6 +29,17 @@ public static class OperationsInternalShipmentEndpoints
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
+        // Slice 12C (owner H-5): the private link of an "out for delivery" notice, without a customer session; the portal asks for its company.
+        endpoints.MapGet("/internal/v1/track/{token}", async (HttpContext http, string token,
+            Vixly.Operations.Application.UseCases.Customers.GetOperationsTrackedDelivery.GetOperationsTrackedDeliveryUseCase useCase,
+            Vixly.Operations.Infrastructure.Maps.OperationsMapTiles tiles, CancellationToken cancellationToken) =>
+        {
+            Vixly.Operations.Application.UseCases.Customers.GetOperationsTrackedDelivery.GetOperationsTrackedDeliveryResponse response = await useCase.ExecuteAsync(
+                OperationsInternalPackageEndpoints.Context(http),
+                new Vixly.Operations.Application.UseCases.Customers.GetOperationsTrackedDelivery.GetOperationsTrackedDeliveryRequest { Token = token }, cancellationToken);
+            return response.Driver is { } driver ? Results.Ok(Driver(driver, tiles)) : OperationsApiErrors.Problem(http, response.Error!);
+        }).WithMetadata(new OperationsInternalEndpointMetadata(OperationsCallerClaims.CustomerScope, true));
+
         RouteGroupBuilder shipments = endpoints.MapGroup("/internal/v1/customers/me/shipments")
             .WithMetadata(new OperationsInternalEndpointMetadata(OperationsCallerClaims.CustomerScope, true));
 
@@ -60,7 +71,8 @@ public static class OperationsInternalShipmentEndpoints
                 Instructions = Draft(body.Instructions),
                 // Slice 4D: a new package only when the customer typed one.
                 Package = body.Package is { } package && !string.IsNullOrWhiteSpace(package.TrackingNumber)
-                    ? new OperationsPackageDraft(package.Carrier, package.TrackingNumber, package.Store, package.Contents, package.DeclaredValue, package.ExpectedDate)
+                    ? new OperationsPackageDraft(package.Carrier, package.TrackingNumber, package.Store, package.Contents, package.DeclaredValue, package.ExpectedDate,
+                        OperationsInternalPackageEndpoints.Items(package.Items))
                     : null,
                 PreAlertIds = body.PreAlertIds ?? Array.Empty<Guid>(),
                 ParcelIds = body.ParcelIds ?? Array.Empty<Guid>(),
@@ -70,6 +82,24 @@ public static class OperationsInternalShipmentEndpoints
             return response.Succeeded
                 ? Results.Ok(new CustomerShipmentCreatedDto(response.ShipmentId, response.PreAlertId, response.ParcelId))
                 : OperationsApiErrors.Problem(http, response.Error!);
+        });
+
+        // Slice 12C (owner H-5): the driver bringing it today; 204 when it is not out for delivery.
+        shipments.MapGet("/{shipmentId:guid}/driver", async (HttpContext http, Guid shipmentId,
+            Vixly.Operations.Application.UseCases.Customers.GetMyOperationsShipmentDriver.GetMyOperationsShipmentDriverUseCase useCase,
+            Vixly.Operations.Infrastructure.Maps.OperationsMapTiles tiles, CancellationToken cancellationToken) =>
+        {
+            Vixly.Operations.Application.UseCases.Customers.GetMyOperationsShipmentDriver.GetMyOperationsShipmentDriverResponse response = await useCase.ExecuteAsync(
+                OperationsInternalPackageEndpoints.Context(http),
+                new Vixly.Operations.Application.UseCases.Customers.GetMyOperationsShipmentDriver.GetMyOperationsShipmentDriverRequest
+                {
+                    SessionToken = OperationsInternalPackageEndpoints.Session(http),
+                    ShipmentId = shipmentId
+                }, cancellationToken);
+
+            return !response.Succeeded ? OperationsApiErrors.Problem(http, response.Error!)
+                : response.Driver is { } driver ? Results.Ok(Driver(driver, tiles))
+                : Results.NoContent();
         });
 
         shipments.MapGet("/{shipmentId:guid}", async (HttpContext http, Guid shipmentId, GetMyOperationsShipmentUseCase useCase, CancellationToken cancellationToken) =>
@@ -179,4 +209,7 @@ public static class OperationsInternalShipmentEndpoints
         new(body?.Delivery, body?.BranchId, body?.Address?.Line1, body?.Address?.Line2, body?.Address?.City, body?.Address?.Region, body?.Address?.PostalCode, body?.Address?.CountryCode,
             body?.RecipientName, body?.RecipientPhone, body?.Consolidate ?? false, body?.Refrigerated ?? false, body?.Insured ?? false, body?.DestinationId,
             body?.InsuranceAccepted ?? false, body?.Service, body?.ParcelCount, body?.InsurancePlanId, body?.Collect ?? false);
+
+    private static CustomerDriverDto Driver(Vixly.Operations.Application.Delivery.OperationsDriverWhereabouts driver, Vixly.Operations.Infrastructure.Maps.OperationsMapTiles tiles) =>
+        new(driver.ShipmentNumber, driver.Delivered, driver.StopsAway, driver.Latitude, driver.Longitude, driver.TakenUtc, tiles.Enabled ? tiles.Attribution : null);
 }

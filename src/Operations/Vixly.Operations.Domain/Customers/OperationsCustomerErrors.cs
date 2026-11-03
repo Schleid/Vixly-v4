@@ -29,6 +29,12 @@ public static class OperationsCustomerErrors
 
     public static Error StatusChangeInvalid { get; } = Error.Create("ops.customers.status_change_invalid");
 
+    // Owner, 2026-10-31: a suspension may end by itself, on a day still to come.
+    public static Error SuspendedUntilInvalid { get; } = Error.Create("ops.customers.suspended_until_invalid");
+
+    // Owner, 2026-10-31: the email or phone belongs to a banned customer.
+    public static Error BannedContact { get; } = Error.Create("ops.customers.banned_contact");
+
     public static Error ReasonRequired { get; } = Error.Create("ops.customers.reason_required");
 
     public static Error NotPending { get; } = Error.Create("ops.customers.not_pending");
@@ -44,4 +50,12 @@ public static class OperationsCustomerErrors
     public static Error EmailUnavailable { get; } = Error.Create("ops.customers.email_unavailable");
 
     public static Error LinkInvalid { get; } = Error.Create("ops.customers.link_invalid");
+
+    // Owner, 2026-10-29 (design 4.4): too many customer lookups in the last hour.
+    public static Error LookupLimit { get; } = Error.Create("ops.customers.lookup_limit", ("limit", Vixly.Operations.Domain.Access.OperationsAccessLimits.CustomerLookupsPerHour));
+
+    // Vixly Lite (owner, 2026-10-30): the company's plan has no customer portal; staff enter customers themselves.
+    public static Error PortalUnavailable { get; } = Error.Create("ops.customers.portal_unavailable");
+
+    public static Error EnteredByStaffOnlyWithoutPortal { get; } = Error.Create("ops.customers.entry_needs_no_portal");
 }

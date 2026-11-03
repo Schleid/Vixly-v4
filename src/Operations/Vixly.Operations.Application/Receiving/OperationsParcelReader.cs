@@ -55,6 +55,8 @@ public sealed class OperationsParcelReader
         Dictionary<Guid, OperationsCustomer> customers = (await _customers.ListByIdsAsync(parcels.Where(parcel => parcel.CustomerId is not null).Select(parcel => parcel.CustomerId!.Value).Distinct().ToList(), cancellationToken))
             .ToDictionary(customer => customer.Id);
         Dictionary<Guid, OperationsWarehouse> warehouses = (await _locations.ListWarehousesAsync(cancellationToken)).ToDictionary(warehouse => warehouse.Id);
+        IReadOnlyDictionary<Guid, string> shipments = await _receiving.ShipmentNumbersAsync(
+            parcels.Where(parcel => parcel.ShipmentId is not null).Select(parcel => parcel.ShipmentId!.Value).Distinct().ToList(), cancellationToken);
         Dictionary<Guid, OperationsStorageLocation> shelves = (await _receiving.ListLocationsByIdAsync(parcels.Where(parcel => parcel.StorageLocationId is not null).Select(parcel => parcel.StorageLocationId!.Value).Distinct().ToList(), cancellationToken))
             .ToDictionary(location => location.Id);
 
@@ -67,7 +69,8 @@ public sealed class OperationsParcelReader
                 parcel.WeightKg, parcel.LengthCm, parcel.WidthCm, parcel.HeightCm, parcel.DeclaredContents, parcel.DeclaredValue, parcel.CurrencyCode,
                 parcel.Milestone, parcel.Flags, parcel.HoldReasons, parcel.CreatedUtc,
                 parcel.StorageLocationId is { } shelfId ? shelves.GetValueOrDefault(shelfId)?.Code : null, parcel.ShippingLabelUtc,
-                parcel.LabelName, parcel.LabelCode, parcel.LabelSender);
+                parcel.LabelName, parcel.LabelCode, parcel.LabelSender,
+                parcel.ShipmentId is { } shipmentId ? shipments.GetValueOrDefault(shipmentId) : null);
         }).ToList();
     }
 }

@@ -1,0 +1,54 @@
+﻿@*
+=========================================================
+FILE: ReportsPage.razor
+
+PURPOSE:
+Reports (Slice 11): the reports this person may run, by group.
+
+RESPONSIBILITIES:
+- Each report with a line on what it shows; profit per shipment linked for whoever may see costs
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.reports.title"]" Company="@Company" Section="reports" Error="@Error">
+    @foreach (OperationsReportGroup group in Enum.GetValues<OperationsReportGroup>())
+    {
+        List<OperationsReportDefinition> mine = Reports.Where(report => report.Group == group).ToList();
+        @if (mine.Count > 0 || (group == OperationsReportGroup.Finance && SeesProfit))
+        {
+            <section class="ops-editor__panel" aria-labelledby="group-@group" data-report-group="@group">
+                <h2 id="group-@group">@T["ui.reports.group." + group]</h2>
+                <ul class="ops-report__list">
+                    @foreach (OperationsReportDefinition report in mine)
+                    {
+                        <li><a href="/staff/reports/@report.Key">@T["ui.reports.report." + report.Key]</a> <span class="ops-editor__hint">@T["ui.reports.about." + report.Key]</span></li>
+                    }
+                    @if (group == OperationsReportGroup.Finance && SeesProfit)
+                    {
+                        <li><a href="/staff/profit">@T["ui.editor.nav.profit"]</a> <span class="ops-editor__hint">@T["ui.reports.about.profit"]</span></li>
+                    }
+                </ul>
+            </section>
+        }
+    }
+    <ReportSchedulesPanel Schedules="Schedules" Staff="Staff" />
+    <p class="ops-editor__hint"><a href="/staff/settings/reports">@T["ui.reports.rules_link"]</a></p>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsReportDefinition> Reports { get; set; } = Array.Empty<OperationsReportDefinition>();
+
+    [Parameter] public bool SeesProfit { get; set; }
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Reports.OperationsReportSchedule> Schedules { get; set; } = Array.Empty<Vixly.Operations.Domain.Reports.OperationsReportSchedule>();
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Identity.OperationsUser> Staff { get; set; } = Array.Empty<Vixly.Operations.Domain.Identity.OperationsUser>();
+
+    [Parameter] public string? Error { get; set; }
+}

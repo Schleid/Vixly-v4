@@ -1,0 +1,20 @@
+.control-help__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: var(--vx-space-4, 1rem);
+    padding: 0;
+    list-style: none;
+}
+
+.control-help__list li {
+    padding: var(--vx-space-4, 1rem);
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-md, 0.5rem);
+    background: var(--vx-color-surface);
+    overflow-wrap: anywhere;
+}
+
+.control-help__list p {
+    color: var(--vx-color-text-muted);
+    margin-bottom: 0;
+}

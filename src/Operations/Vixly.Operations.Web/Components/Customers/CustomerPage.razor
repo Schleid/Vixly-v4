@@ -1,18 +1,18 @@
-@*
+﻿@*
 =========================================================
 FILE: CustomerPage.razor
 
 PURPOSE:
-One customer: details, the packages coming to them, status and credit (Slice 2).
+One customer: details, the packages coming to them, their shipments and their account status (Slice 2).
 
 RESPONSIBILITIES:
 - Show the customer and the packages coming to them; never the mailbox's street address (owner, 2026-10-18)
-- Suspend, reactivate or close; allow or remove credit. The details are the customer's own (owner, 2026-10-18)
+- Suspend, reactivate, close, reopen or ban (owner, 2026-10-31); the customer's shipments. The details are the customer's own (owner, 2026-10-18)
 
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10); the endpoint loads the data
 - Compact label-over-value facts grid (Brief §3, §5)
-- Credit needs ops.customers.credit and step-up; the use cases decide
+- Credit is shown, never changed here (owner, 2026-10-31); the use cases decide
 =========================================================
 *@
 @inject IStringLocalizer<OperationsText> T
@@ -32,13 +32,12 @@ IMPORTANT NOTES:
             {
                 <p class="ops-record-header__subtitle">@statusReason</p>
             }
-        </div>
-        <div class="ops-record-header__actions">
-            @if (Customer.Code is { } customerCode)
+            @if (Customer.SuspendedUntil is { } until)
             {
-                <a class="vx-button vx-button--primary" href="/staff/counter?find=@customerCode">+ @T["ui.counter.new_shipment"]</a>
+                <p class="ops-record-header__subtitle">@VixlyText.Format(T, "ui.customers.suspended_until_on", "date", until.ToString("yyyy-MM-dd"))</p>
             }
         </div>
+        @* Owner, 2026-10-27: no "New shipment" here; shipments are made at the counter by the people allowed to. *@
     </div>
 
     <div class="ops-customer-tabs ops-compact-tabs" data-section-tabs="customer" data-tabs-label="@T["ui.customers.details"]">
@@ -99,36 +98,15 @@ IMPORTANT NOTES:
             <CustomerIncomingPackages T="T" CustomerCode="@Customer.Code" Packages="Incoming" />
         }
 
-        @if (CanManage)
+        @if (CanSeeShipments)
         {
-            <form method="post" action="/staff/customers/@Customer.CustomerId/status" class="ops-editor__panel ops-panel--restricted" style="margin-top: 1rem;">
-                <AntiforgeryToken />
-                <h2 style="margin-bottom: 0.5rem;">@T["ui.customers.status"]</h2>
-                <div class="ops-editor__inline-field">
-                    <label style="flex: 0 1 12rem;">@T["ui.customers.new_status"]
-                        <select name="status">
-                            @if (Customer.Status != OperationsCustomerStatus.Active) { <option value="active">@T["ui.customers.status.active"]</option> }
-                            @if (Customer.Status != OperationsCustomerStatus.Suspended) { <option value="suspended">@T["ui.customers.status.suspended"]</option> }
-                            @if (Customer.Status != OperationsCustomerStatus.Closed) { <option value="closed">@T["ui.customers.status.closed"]</option> }
-                        </select>
-                    </label>
-                    <label style="flex: 1 1 20rem;">@T["ui.customers.reason"] <input name="reason" maxlength="300" required placeholder="@T["ui.customers.reason"]" /></label>
-                    <button type="submit" class="vx-button vx-button--primary">@T["ui.customers.status_submit"]</button>
-                </div>
-            </form>
+            <CustomerShipments T="T" Shipments="Shipments" />
         }
 
-        @if (CanSetCredit)
+        @* Owner, 2026-10-31: credit accounts are opened and changed from Credit only, never from the customer page. *@
+        @if (CanManage)
         {
-            <section class="ops-editor__panel ops-panel--restricted" style="margin-top: 1rem;">
-                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-                    <div>
-                        <h2 style="margin: 0;">@T["ui.customers.credit"]</h2>
-                        <p class="ops-editor__hint" style="margin: 0.25rem 0 0 0;">@T["ui.customers.credit_account_hint"]</p>
-                    </div>
-                    <a class="vx-button vx-button--secondary" href="/staff/credit/customers/@Customer.CustomerId">@T["ui.customers.credit_account"]</a>
-                </div>
-            </section>
+            <CustomerStatusPanel T="T" Customer="Customer" CanBan="CanBan" />
         }
     </div>
 </EditorShell>
@@ -144,7 +122,11 @@ IMPORTANT NOTES:
 
     [Parameter] public bool CanManage { get; set; }
 
-    [Parameter] public bool CanSetCredit { get; set; }
+    [Parameter] public IReadOnlyList<OperationsCustomerShipmentRow> Shipments { get; set; } = Array.Empty<OperationsCustomerShipmentRow>();
+
+    [Parameter] public bool CanSeeShipments { get; set; }
+
+    [Parameter] public bool CanBan { get; set; }
 
     [Parameter] public string? Error { get; set; }
 

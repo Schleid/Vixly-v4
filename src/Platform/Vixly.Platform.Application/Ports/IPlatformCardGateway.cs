@@ -40,6 +40,9 @@ public interface IPlatformCardGateway
 
     Task DetachCardAsync(string paymentMethodId, CancellationToken cancellationToken);
 
+    // The wallet a card payment came through ("apple_pay", "google_pay"...); null for a plain card or another method.
+    Task<string?> GetWalletAsync(string paymentId, CancellationToken cancellationToken);
+
     // Throws DomainException(platform.payments.event_invalid) when the signature does not match.
     PlatformCardEvent ParseEvent(string payload, string? signature);
 }

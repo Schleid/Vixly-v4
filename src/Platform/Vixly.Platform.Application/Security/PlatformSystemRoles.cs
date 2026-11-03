@@ -65,7 +65,10 @@ public static class PlatformSystemRoles
                 PlatformPermissions.AuditView,
                 PlatformPermissions.LicensingView,
                 PlatformPermissions.LicensingManage,
-                PlatformPermissions.LegalView
+                PlatformPermissions.LegalView,
+                PlatformPermissions.JobsView,
+                PlatformPermissions.MaintenanceView,
+                PlatformPermissions.MaintenanceManage
             },
             [Administrator] = new[]
             {

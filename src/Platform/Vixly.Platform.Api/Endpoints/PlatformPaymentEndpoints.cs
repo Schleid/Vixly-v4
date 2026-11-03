@@ -130,7 +130,7 @@ public static class PlatformPaymentEndpoints
             http.Response.Headers.CacheControl = "no-store";
             GetRegistrationInvoiceResponse response = await useCase.ExecuteAsync(Anonymous, new GetRegistrationInvoiceRequest { AccessToken = Bearer(http) }, cancellationToken);
             return response.Succeeded ? Results.Ok(Info(response.Invoice!)) : errors.Problem(response.Error!);
-        }).RequireRateLimiting(PlatformApiRateLimits.Status);
+        }).RequireRateLimiting(PlatformApiRateLimits.RegistrationInvoice);
 
         endpoints.MapPost("/registration/checkout", async (
             HttpContext http,

@@ -17,8 +17,17 @@ public interface IOperationsLabelRenderer
     // The 2 x 1 inch parcel ID label as a PDF, for a station that prints from the browser.
     byte[] RenderParcelLabel(OperationsParcelLabel label);
 
+    // Owner, 2026-10-27: a shipment's ID labels in one PDF, one label per page.
+    byte[] RenderParcelLabels(IReadOnlyList<OperationsParcelLabel> labels);
+
+    // Slice 12A: a staff badge, credit-card size (85.6 x 54 mm).
+    byte[] RenderStaffBadge(Vixly.Operations.Application.Identity.OperationsStaffBadgeCard card);
+
     // Slice 4D step 2: the 4 x 6 inch shipping label as a PDF, for a station that prints from the browser.
     byte[] RenderShippingLabel(OperationsShippingLabel label);
+
+    // Owner, 2026-10-27: a shipment's shipping labels in one PDF, one label per page.
+    byte[] RenderShippingLabels(IReadOnlyList<OperationsShippingLabel> labels);
 
     // The warehouse receipt of a carrier delivery, for the driver to sign.
     byte[] RenderReceipt(OperationsReceiptDocument receipt);
@@ -35,6 +44,9 @@ public interface IOperationsLabelRenderer
     // Slice 5E: a Letter sheet of shelf labels for a supply (3 by 10), each with its name, its code as a barcode and its price.
     // Slice 5F: an invoice or one of its credit notes, on Letter paper.
     byte[] RenderInvoice(Vixly.Operations.Application.Billing.OperationsInvoiceDocument document);
+
+    // Owner, 2026-10-28: a quote to print or to email to the customer.
+    byte[] RenderQuote(Vixly.Operations.Application.Charges.OperationsQuoteDocument document);
 
     // Slice 5F step 2: the receipt of a payment.
     byte[] RenderPaymentReceipt(Vixly.Operations.Application.Billing.OperationsPaymentReceipt receipt);

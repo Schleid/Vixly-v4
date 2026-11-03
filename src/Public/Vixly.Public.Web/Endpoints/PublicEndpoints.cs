@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Vixly.Public.Web.Hosting;
 using Vixly.Public.Web.Platform;
+using Vixly.Public.Web.Features.Help;
 
 namespace Vixly.Public.Web.Endpoints;
 
@@ -32,12 +33,14 @@ public static class PublicEndpoints
             + string.Concat(PublicLanguage.Codes.Select(language => $"Disallow: /{language}/register\n"))
             + $"Sitemap: {site.Value.CanonicalBaseUrl.TrimEnd('/')}/sitemap.xml\n", "text/plain"));
 
-        endpoints.MapGet("/sitemap.xml", (IOptions<PublicSiteOptions> site) =>
+        endpoints.MapGet("/sitemap.xml", (IOptions<PublicSiteOptions> site, PublicHelpCatalogue help) =>
         {
             string root = site.Value.CanonicalBaseUrl.TrimEnd('/');
             StringBuilder xml = new("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:xhtml=\"http://www.w3.org/1999/xhtml\">\n");
 
-            foreach (string page in Pages)
+            IEnumerable<string> pages = Pages.Concat(new[] { "help" }).Concat(
+                help.Catalogue.Visible("en", PublicHelpCatalogue.Reader).Select(article => "help/" + article.Metadata.Slug));
+            foreach (string page in pages)
             {
                 foreach (string language in PublicLanguage.Codes)
                 {

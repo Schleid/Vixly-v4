@@ -35,5 +35,9 @@ internal sealed class OperationsTrackingEventConfiguration : IEntityTypeConfigur
 
         // Slice 6C: the copies of an event on a shipment, bundle or dispatch.
         builder.HasIndex(item => new { item.TenantId, item.CausedByEventId }).HasFilter("[CausedByEventId] IS NOT NULL");
+        // Slice 10: the company API and webhooks read in order of creation.
+        builder.HasIndex(item => new { item.TenantId, item.CreatedUtc });
+        // Slice 11: report counts by step and time.
+        builder.HasIndex(item => new { item.TenantId, item.Code, item.OccurredUtc }).IncludeProperties(item => new { item.SubjectKind, item.SubjectId, item.LocationCode });
     }
 }

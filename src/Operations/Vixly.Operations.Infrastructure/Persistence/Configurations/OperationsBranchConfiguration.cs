@@ -29,10 +29,15 @@ internal sealed class OperationsBranchConfiguration : IEntityTypeConfiguration<O
         builder.Property(item => item.Phone).HasMaxLength(OperationsLocationLimits.PhoneMaxLength).IsUnicode(false);
         builder.Property(item => item.Email).HasMaxLength(OperationsLocationLimits.EmailMaxLength);
         builder.Property(item => item.OpeningHours).HasMaxLength(OperationsLocationLimits.HoursMaxLength);
+        // Owner, 2026-10-29: a branch is a country, with its legal identity there; the office is optional.
+        builder.Property(item => item.CountryCode).HasMaxLength(2).IsFixedLength().IsUnicode(false).IsRequired();
+        builder.Property(item => item.LegalName).HasMaxLength(OperationsBranch.LegalNameMaxLength);
+        builder.Property(item => item.TaxNumber).HasMaxLength(OperationsBranch.TaxNumberMaxLength);
+        builder.Property(item => item.LegalNotes).HasMaxLength(OperationsBranch.LegalNotesMaxLength);
         builder.Ignore(item => item.IsPublic);
         builder.HasIndex(item => new { item.TenantId, item.Code }).IsUnique();
         builder.OwnsOne(item => item.Address, OperationsAddressMapping.Map);
-        builder.Navigation(item => item.Address).IsRequired();
+        builder.Navigation(item => item.Address).IsRequired(false);
 
     }
 }

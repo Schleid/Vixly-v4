@@ -14,9 +14,11 @@ namespace Vixly.Operations.Application.Devices;
 //
 // RESPONSIBILITIES:
 // - Verify the code of the signed-in user and spend its time step
+// - Require MFA = No (owner, 2026-10-22): a person with no authenticator confirms with the password
 //
 // IMPORTANT NOTES:
-// - The caller saves (the code cannot be used twice); passkeys and the 5-minute window arrive with 1D
+// - The caller saves (the code cannot be used twice)
+// - A person who set up an authenticator always uses it, whatever the company's rule
 // =========================================================
 public sealed class OperationsStepUp
 {
@@ -24,13 +26,27 @@ public sealed class OperationsStepUp
 
     private readonly TimeProvider _timeProvider;
 
-    public OperationsStepUp(IOperationsAuthenticatorCodes codes, TimeProvider timeProvider)
+    private readonly IOperationsSettingsRepository _settings;
+
+    private readonly IOperationsPasswordHasher _hasher;
+
+    public OperationsStepUp(IOperationsAuthenticatorCodes codes, TimeProvider timeProvider, IOperationsSettingsRepository settings, IOperationsPasswordHasher hasher)
     {
         _codes = codes ?? throw new ArgumentNullException(nameof(codes));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
     }
 
-    public Error? Check(OperationsUser user, string? code)
+    // True when this person confirms with the password: no authenticator, and the company does not require MFA.
+    public async Task<bool> PasswordConfirmsAsync(OperationsUser user, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(user);
+
+        return user.AuthenticatorApp is not { IsConfirmed: true } && (await _settings.FindAsync(cancellationToken))?.RequireMfa == false;
+    }
+
+    public async Task<Error?> CheckAsync(OperationsUser user, string? code, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(user);
 
@@ -41,7 +57,11 @@ public sealed class OperationsStepUp
 
         if (user.AuthenticatorApp is not { IsConfirmed: true } app)
         {
-            return OperationsAuthErrors.CodeInvalid;
+            return await PasswordConfirmsAsync(user, cancellationToken)
+                && user.Account.PasswordHash is { } hash
+                && _hasher.Verify(code, hash) != OperationsPasswordCheck.Failed
+                ? null
+                : OperationsAuthErrors.CodeInvalid;
         }
 
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();

@@ -37,7 +37,7 @@ Platform.Api, public host. Limits are per client IP.
 | `POST /registration/email`, `/resend`, `/plan` | Change a registration (access token) | 10 per hour |
 | `GET /registration/plans` | Plan catalogue | 60 per minute |
 | `GET /registration/promotions/{code}`, `POST /registration/offer` | Promotion and offer checks | 30 per minute |
-| `GET /registration/status`, `/registration/invoice` | Registration status and invoice (access token) | 60 per hour |
+| `GET /registration/status`, `/registration/invoice` | Registration status and invoice (access token) | 300 per hour each (raised 2026-10-25: the pay page polls both while the first invoice is prepared) |
 | `POST /registration/checkout`, `/registration/zelle` | Pay the first invoice | 20 per hour |
 | `GET /payment-links/{token}`, `POST /payment-links/{token}/checkout`, `/zelle` | Pay and save-card links | 60 per hour, 20 per hour |
 | `GET /payments/zelle/qr` | Zelle QR image | 60 per hour |

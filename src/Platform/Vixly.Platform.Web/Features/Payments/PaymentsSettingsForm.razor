@@ -5,7 +5,8 @@ FILE: PaymentsSettingsForm.razor
 PURPOSE:
 Payments settings: the card provider, its mode, whether its keys
 are configured on this host, the publishable key, accepted
-currencies, card payments on or off, and a connection check.
+currencies, card payments on or off, and a connection check;
+the checkout page look and the bank statement wording.
 
 IMPORTANT NOTES:
 - Feature component (ADR-0001): behaviour lives in the
@@ -103,9 +104,60 @@ IMPORTANT NOTES:
                 </form>
             </VxCard>
         </div>
+
+        <!-- Card 3: Checkout page look and bank statement -->
+        <VxCard Title="@T["ui.payments_settings.checkout"]">
+            <form id="payments-checkout" class="vx-form" @onsubmit="SaveCheckoutAsync">
+                <p class="vx-hint">@T["ui.payments_settings.checkout_help"]</p>
+                <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)" style="border: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem;">
+                    <div class="vx-field-compact">
+                        <label for="checkout-name">@T["ui.payments_settings.checkout_name"]</label>
+                        <input id="checkout-name" @bind="_checkoutName" maxlength="100" />
+                    </div>
+                    <div class="vx-field-compact">
+                        <label for="checkout-logo">@T["ui.payments_settings.checkout_logo"]</label>
+                        <input id="checkout-logo" type="url" @bind="_checkoutLogo" maxlength="500" placeholder="https://" aria-describedby="checkout-image-help" />
+                    </div>
+                    <div class="vx-field-compact">
+                        <label for="checkout-icon">@T["ui.payments_settings.checkout_icon"]</label>
+                        <input id="checkout-icon" type="url" @bind="_checkoutIcon" maxlength="500" placeholder="https://" aria-describedby="checkout-image-help" />
+                        <p id="checkout-image-help" class="vx-hint">@T["ui.payments_settings.checkout_image_help"]</p>
+                    </div>
+                    <div class="vx-field-compact">
+                        <label for="checkout-background">@T["ui.payments_settings.checkout_background"]</label>
+                        <input id="checkout-background" @bind="_checkoutBackground" maxlength="7" placeholder="#RRGGBB" aria-describedby="checkout-color-help" />
+                    </div>
+                    <div class="vx-field-compact">
+                        <label for="checkout-button">@T["ui.payments_settings.checkout_button"]</label>
+                        <input id="checkout-button" @bind="_checkoutButton" maxlength="7" placeholder="#RRGGBB" aria-describedby="checkout-color-help" />
+                        <p id="checkout-color-help" class="vx-hint">@T["ui.payments_settings.checkout_color_help"]</p>
+                    </div>
+                    <div class="vx-field-compact">
+                        <label for="statement-prefix">@T["ui.payments_settings.statement_prefix"]</label>
+                        <input id="statement-prefix" @bind="_statementPrefix" maxlength="10" aria-describedby="statement-prefix-help" />
+                        <p id="statement-prefix-help" class="vx-hint">@T["ui.payments_settings.statement_prefix_help"]</p>
+                    </div>
+                    <div class="vx-field-compact">
+                        <label for="statement-suffix">@T["ui.payments_settings.statement_suffix"]</label>
+                        <input id="statement-suffix" @bind="_statementSuffix" maxlength="20" aria-describedby="statement-suffix-help" />
+                        <p id="statement-suffix-help" class="vx-hint">@T["ui.payments_settings.statement_suffix_help"]</p>
+                    </div>
+                    <dl class="vx-facts">
+                        <dt>@T["ui.payments_settings.statement_wording"]</dt>
+                        <dd>@(account.Checkout?.StatementWording ?? T["ui.common.none"].Value)</dd>
+                    </dl>
+                </fieldset>
+                @if (Presenter.State.CanEdit)
+                {
+                    <div class="vx-actions" style="padding-top: 1rem; border-top: 1px solid var(--vx-color-border);">
+                        <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.payments_settings.save"]</VxButton>
+                    </div>
+                }
+            </form>
+        </VxCard>
         @if (Presenter.State.StepUpPending)
         {
-            <StepUpDialog OnConfirmed="SaveAsync" OnCancelled="Presenter.CancelStepUp" />
+            <StepUpDialog OnConfirmed="ConfirmedAsync" OnCancelled="Presenter.CancelStepUp" />
         }
     }
 </div>
@@ -119,6 +171,23 @@ IMPORTANT NOTES:
 
     private int _seen = -1;
 
+    private string? _checkoutName;
+
+    private string? _checkoutLogo;
+
+    private string? _checkoutIcon;
+
+    private string? _checkoutBackground;
+
+    private string? _checkoutButton;
+
+    private string? _statementPrefix;
+
+    private string? _statementSuffix;
+
+    // Which save asked for step-up, so the confirmed dialog repeats that one.
+    private bool _checkoutPending;
+
     protected override async Task OnParametersSetAsync()
     {
         await Presenter.LoadAsync();
@@ -127,8 +196,30 @@ IMPORTANT NOTES:
 
     private async Task SaveAsync()
     {
+        _checkoutPending = false;
         await Presenter.SaveAsync(_key, _currencies, _enabled);
         Sync();
+    }
+
+    private async Task SaveCheckoutAsync()
+    {
+        _checkoutPending = true;
+        await Presenter.SaveCheckoutAsync(new Vixly.Platform.Application.UseCases.Payments.UpdatePlatformCheckoutSettings.UpdatePlatformCheckoutSettingsRequest
+        {
+            DisplayName = _checkoutName,
+            LogoUrl = _checkoutLogo,
+            IconUrl = _checkoutIcon,
+            BackgroundColor = _checkoutBackground,
+            ButtonColor = _checkoutButton,
+            StatementPrefix = _statementPrefix,
+            StatementSuffix = _statementSuffix
+        });
+        Sync();
+    }
+
+    private Task ConfirmedAsync()
+    {
+        return _checkoutPending ? SaveCheckoutAsync() : SaveAsync();
     }
 
     private void Sync()
@@ -139,6 +230,13 @@ IMPORTANT NOTES:
             _key = account.PublishableKey;
             _currencies = string.Join(", ", account.Currencies);
             _enabled = account.CardPaymentsEnabled;
+            _checkoutName = account.Checkout?.DisplayName;
+            _checkoutLogo = account.Checkout?.LogoUrl;
+            _checkoutIcon = account.Checkout?.IconUrl;
+            _checkoutBackground = account.Checkout?.BackgroundColor;
+            _checkoutButton = account.Checkout?.ButtonColor;
+            _statementPrefix = account.Checkout?.StatementPrefix;
+            _statementSuffix = account.Checkout?.StatementSuffix;
         }
     }
 }

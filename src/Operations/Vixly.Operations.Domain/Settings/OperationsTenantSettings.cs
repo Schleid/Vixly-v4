@@ -80,8 +80,25 @@ public sealed class OperationsTenantSettings : OperationsEntity
     // Slice 4B: the company's IANA time zone; new prices start at midnight there.
     public string? TimeZone { get; private set; }
 
+    // Slice 11 (owner, 2026-10-22: on time is a company setting): a leg that departs more than this after its planned time is late.
+    public int DispatchGraceHours { get; private set; }
+
+    public const int DispatchGraceHoursLimit = 72;
+
     // Every staff member needs a second factor, not only the Owner and Administrators (D-O2).
     public bool RequireSecondFactorForAllStaff { get; private set; }
+
+    // Require MFA (owner, 2026-10-22). Yes: the Owner and Administrators always need a second factor, other staff when
+    // RequireSecondFactorForAllStaff. No: nobody is made to set one up; people who have one keep using it.
+    public bool RequireMfa { get; private set; } = true;
+
+    // Inactivity sign-out, set by the company's security administrator (owner, 2026-10-27); it was fixed in the code.
+    public int StaffIdleMinutes { get; private set; } = OperationsSettingsLimits.StaffIdleMinutesDefault;
+
+    public int CustomerIdleMinutes { get; private set; } = OperationsSettingsLimits.CustomerIdleMinutesDefault;
+
+    // How long before the sign-out the warning with its countdown shows, for staff and customers.
+    public int IdleWarnMinutes { get; private set; } = OperationsSettingsLimits.IdleWarnMinutesDefault;
 
     // Slice 5D (D-6): staff may change the insurance of an open shipment, with the customer's acceptance; the company's policy (owner, 2026-10-20).
     public bool StaffMayChangeInsurance { get; private set; } = true;
@@ -172,6 +189,25 @@ public sealed class OperationsTenantSettings : OperationsEntity
 
     public bool CreditStatements { get; private set; } = true;
 
+    // Slice 8: bills are approved by someone other than who entered them (default); off, a bill counts as soon as it is entered.
+    public bool BillsNeedApproval { get; private set; } = true;
+
+    // Slice 9: the notices sent by SMS or WhatsApp to customers who chose them (owner, 2026-10-22: the company picks the events); none by default.
+    public Vixly.Operations.Domain.Texts.OperationsTextNotices TextNotices { get; private set; }
+
+    public void ChangeTextNotices(Vixly.Operations.Domain.Texts.OperationsTextNotices notices, DateTimeOffset utcNow)
+    {
+        const Vixly.Operations.Domain.Texts.OperationsTextNotices all = (Vixly.Operations.Domain.Texts.OperationsTextNotices)511;
+        TextNotices = notices & all;
+        MarkAsModified(utcNow);
+    }
+
+    public void ChangeBills(bool needApproval, DateTimeOffset utcNow)
+    {
+        BillsNeedApproval = needApproval;
+        MarkAsModified(utcNow);
+    }
+
     public void ChangeCredit(int termsDays, Vixly.Operations.Domain.Billing.OperationsCreditOverLimit overLimit, bool statements, DateTimeOffset utcNow)
     {
         if (termsDays is < 0 or > Vixly.Operations.Domain.Billing.OperationsCreditAccount.MaxTermsDays || !Enum.IsDefined(overLimit))
@@ -213,6 +249,59 @@ public sealed class OperationsTenantSettings : OperationsEntity
     public string? ZelleTermsFr { get; private set; }
 
     public string? ZelleTermsEs { get; private set; }
+
+    // The customer portal (owner, 2026-10-27): the electronic methods the company offers there, each with its own switch.
+    // Zelle and bank transfer wait for finance; a card is paid at once. Cash and cheque are never offered there.
+    public bool PortalZelle { get; private set; }
+
+    public bool PortalBankTransfer { get; private set; }
+
+    public bool PortalCard { get; private set; }
+
+    // What customers are told to do for a bank transfer: the account, the bank, the reference to give.
+    public string? BankTransferInstructionsEn { get; private set; }
+
+    public string? BankTransferInstructionsFr { get; private set; }
+
+    public string? BankTransferInstructionsEs { get; private set; }
+
+    public string? BankTransferInstructions(string? language) => language switch
+    {
+        "fr" => BankTransferInstructionsFr ?? BankTransferInstructionsEn,
+        "es" => BankTransferInstructionsEs ?? BankTransferInstructionsEn,
+        _ => BankTransferInstructionsEn
+    };
+
+    // Shown on the portal only when switched on, accepted by the company and fully set up; the card also needs the connected account.
+    public bool OffersOnPortal(Vixly.Operations.Domain.Billing.OperationsPaymentMethod method, bool cardConnected) => method switch
+    {
+        Vixly.Operations.Domain.Billing.OperationsPaymentMethod.Zelle =>
+            PortalZelle && AcceptZelle && (ZelleTag is not null || ZelleContact is not null) && ZelleName is not null && ZelleTermsEn is not null,
+        Vixly.Operations.Domain.Billing.OperationsPaymentMethod.BankTransfer => PortalBankTransfer && AcceptBankTransfer && BankTransferInstructionsEn is not null,
+        Vixly.Operations.Domain.Billing.OperationsPaymentMethod.Card => PortalCard && AcceptCard && cardConnected,
+        _ => false
+    };
+
+    public void ChangePortal(bool zelle, bool bankTransfer, bool card, string? bankEn, string? bankFr, string? bankEs, DateTimeOffset utcNow)
+    {
+        Shared.Kernel.Errors.Error invalid = Vixly.Operations.Domain.Billing.OperationsPaymentErrors.TextInvalid;
+        string? Long(string? value) => Vixly.Operations.Domain.Billing.OperationsBillingLimits.Text(value, 2000, invalid);
+        (BankTransferInstructionsEn, BankTransferInstructionsFr, BankTransferInstructionsEs) = (Long(bankEn), Long(bankFr), Long(bankEs));
+
+        // Offered on the portal only once customers can be told whom to pay.
+        if (zelle && ZelleName is null)
+        {
+            throw new DomainException(Vixly.Operations.Domain.Billing.OperationsPaymentErrors.ZelleNameRequired);
+        }
+
+        if (bankTransfer && BankTransferInstructionsEn is null)
+        {
+            throw new DomainException(Vixly.Operations.Domain.Billing.OperationsPaymentErrors.BankInstructionsRequired);
+        }
+
+        (PortalZelle, PortalBankTransfer, PortalCard) = (zelle, bankTransfer, card);
+        MarkAsModified(utcNow);
+    }
 
     public bool Accepts(Vixly.Operations.Domain.Billing.OperationsPaymentMethod method) => method switch
     {
@@ -294,6 +383,82 @@ public sealed class OperationsTenantSettings : OperationsEntity
         return before;
     }
 
+    // Owner, 2026-10-29 (ticket desk): the managers are told when nobody takes a ticket in this many hours, and when it is still not resolved after this many days.
+    public int TicketTakeHours { get; private set; } = Vixly.Operations.Domain.Tickets.OperationsTicket.TakeHoursDefault;
+
+    public int TicketResolveDays { get; private set; } = Vixly.Operations.Domain.Tickets.OperationsTicket.ResolveDaysDefault;
+
+    public void ChangeTickets(int takeHours, int resolveDays, DateTimeOffset utcNow)
+    {
+        if (takeHours is < 1 or > Vixly.Operations.Domain.Tickets.OperationsTicket.TakeHoursMax || resolveDays is < 1 or > Vixly.Operations.Domain.Tickets.OperationsTicket.ResolveDaysMax)
+        {
+            throw new DomainException(Vixly.Operations.Domain.Tickets.OperationsTicketErrors.LimitsInvalid);
+        }
+
+        (TicketTakeHours, TicketResolveDays) = (takeHours, resolveDays);
+        MarkAsModified(utcNow);
+    }
+
+    // Shipment cap (owner, 2026-10-29): the warning already sent this month (80, 100, 125 or 150 percent), and the month the one-time grace was used.
+    public string? ShipmentCapNoticeMonth { get; private set; }
+
+    public int ShipmentCapNoticeLevel { get; private set; }
+
+    public string? ShipmentGraceMonth { get; private set; }
+
+    // True when this level is higher than any warning already sent this month; the caller then sends it.
+    public bool RecordShipmentCapNotice(string month, int level, DateTimeOffset utcNow)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(month);
+
+        if (ShipmentCapNoticeMonth == month && ShipmentCapNoticeLevel >= level)
+        {
+            return false;
+        }
+
+        (ShipmentCapNoticeMonth, ShipmentCapNoticeLevel) = (month, level);
+        MarkAsModified(utcNow);
+        return true;
+    }
+
+    // Owner, 2026-11-01: from this moment a parcel needs a customs code and a country of origin on every item before it goes into a bundle or leaves on a dispatch;
+    // parcels created earlier are exempt. None: not required.
+    public DateTimeOffset? ItemsRequiredSinceUtc { get; private set; }
+
+    // The starter item catalogue was loaded once; never again, even if the company removes every entry.
+    public bool ItemCatalogueLoaded { get; private set; }
+
+    public void RequireItems(bool required, DateTimeOffset utcNow)
+    {
+        if (required == ItemsRequiredSinceUtc.HasValue)
+        {
+            return;
+        }
+
+        ItemsRequiredSinceUtc = required ? utcNow : null;
+        MarkAsModified(utcNow);
+    }
+
+    public void ItemCatalogueWasLoaded(DateTimeOffset utcNow)
+    {
+        ItemCatalogueLoaded = true;
+        MarkAsModified(utcNow);
+    }
+
+    // Once per company (owner, C-6): the first month above 150 percent is not stopped.
+    public bool MayUseShipmentGrace(string month) => ShipmentGraceMonth is null || ShipmentGraceMonth == month;
+
+    public void UseShipmentGrace(string month, DateTimeOffset utcNow)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(month);
+
+        if (ShipmentGraceMonth is null)
+        {
+            ShipmentGraceMonth = month;
+            MarkAsModified(utcNow);
+        }
+    }
+
     public void ChangeSupplyStock(bool count, Vixly.Operations.Domain.Supplies.OperationsSupplyStockOut stockOut, DateTimeOffset utcNow)
     {
         SupplyStockOut = Enum.IsDefined(stockOut) ? stockOut : throw new DomainException(Vixly.Operations.Domain.Supplies.OperationsSupplyStockErrors.ChoiceInvalid);
@@ -328,6 +493,46 @@ public sealed class OperationsTenantSettings : OperationsEntity
 
     // Slice 6B: dispatches.
     public string DispatchPrefix { get; private set; }
+
+    // Owner, 2026-10-28: the two letters in front of the shipments' tracking numbers (VX by default; a white-label company may choose its own).
+    public string TrackingPrefix { get; private set; } = Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.DefaultPrefix;
+
+    // Owner, 2026-10-28: the logo on the company's documents (a PNG) and its black and white copy for labels; who put it there and when.
+    public Guid? DocumentLogoImageId { get; private set; }
+
+    public Guid? LabelLogoImageId { get; private set; }
+
+    public DateTimeOffset? DocumentLogoUtc { get; private set; }
+
+    public Guid? DocumentLogoByUserId { get; private set; }
+
+    public void ChangeDocumentLogo(Guid? logoImageId, Guid? labelImageId, Guid userId, DateTimeOffset utcNow)
+    {
+        if ((logoImageId is null) != (labelImageId is null))
+        {
+            throw new ArgumentException("The logo and its label copy go together.");
+        }
+
+        (DocumentLogoImageId, LabelLogoImageId, DocumentLogoUtc, DocumentLogoByUserId) = (logoImageId, labelImageId, utcNow, userId);
+        MarkAsModified(utcNow);
+    }
+
+    // Numbers already given keep their letters; only new ones change.
+    public void ChangeTrackingPrefix(string? prefix, DateTimeOffset utcNow)
+    {
+        string value = (prefix ?? string.Empty).Trim().ToUpperInvariant();
+
+        if (!Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.IsPrefix(value))
+        {
+            throw new DomainException(OperationsSettingsErrors.TrackingPrefixInvalid);
+        }
+
+        if (value != TrackingPrefix)
+        {
+            TrackingPrefix = value;
+            MarkAsModified(utcNow);
+        }
+    }
 
     // Slice 6C (E-3, E-5): the standard causes the company switched off (comma list), and whether customers get an email for a delay or an exception.
     public string? DisabledEventCauses { get; private set; }
@@ -515,6 +720,17 @@ public sealed class OperationsTenantSettings : OperationsEntity
         MarkAsModified(utcNow);
     }
 
+    public void ChangeReportRules(int dispatchGraceHours, DateTimeOffset utcNow)
+    {
+        if (dispatchGraceHours is < 0 or > DispatchGraceHoursLimit)
+        {
+            throw new DomainException(Vixly.Operations.Domain.Reports.OperationsReportErrors.RulesInvalid);
+        }
+
+        DispatchGraceHours = dispatchGraceHours;
+        MarkAsModified(utcNow);
+    }
+
     public void ChangeTimeZone(string? timeZone, DateTimeOffset utcNow)
     {
         TimeZone = Vixly.Operations.Domain.Locations.OperationsTimeZones.Optional(timeZone);
@@ -589,6 +805,34 @@ public sealed class OperationsTenantSettings : OperationsEntity
     public void RequireSecondFactor(bool forAllStaff, DateTimeOffset utcNow)
     {
         RequireSecondFactorForAllStaff = forAllStaff;
+        MarkAsModified(utcNow);
+    }
+
+    public void ChangeRequireMfa(bool requireMfa, DateTimeOffset utcNow)
+    {
+        RequireMfa = requireMfa;
+        MarkAsModified(utcNow);
+    }
+
+    public void ChangeIdle(int staffMinutes, int customerMinutes, int warnMinutes, DateTimeOffset utcNow)
+    {
+        if (staffMinutes is < OperationsSettingsLimits.StaffIdleMinutesMin or > OperationsSettingsLimits.StaffIdleMinutesMax)
+        {
+            throw new DomainException(OperationsSettingsErrors.StaffIdleInvalid);
+        }
+
+        if (customerMinutes is < OperationsSettingsLimits.CustomerIdleMinutesMin or > OperationsSettingsLimits.CustomerIdleMinutesMax)
+        {
+            throw new DomainException(OperationsSettingsErrors.CustomerIdleInvalid);
+        }
+
+        // The warning always comes before the sign-out: at most 5 minutes, and less than the shortest time.
+        if (warnMinutes is < OperationsSettingsLimits.IdleWarnMinutesMin or > OperationsSettingsLimits.IdleWarnMinutesMax || warnMinutes >= staffMinutes)
+        {
+            throw new DomainException(OperationsSettingsErrors.IdleWarnInvalid);
+        }
+
+        (StaffIdleMinutes, CustomerIdleMinutes, IdleWarnMinutes) = (staffMinutes, customerMinutes, warnMinutes);
         MarkAsModified(utcNow);
     }
 

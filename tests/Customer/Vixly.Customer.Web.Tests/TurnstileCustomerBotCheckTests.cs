@@ -42,6 +42,21 @@ public sealed class TurnstileCustomerBotCheckTests
         Assert.Contains("remoteip=203.0.113.5", handler.LastBody, StringComparison.Ordinal);
     }
 
+    // A tester inside the company network has a private address Cloudflare never saw: it is not sent (2026-10-22).
+    [Theory]
+    [InlineData("192.168.1.20")]
+    [InlineData("10.0.0.5")]
+    [InlineData("127.0.0.1")]
+    [InlineData("::1")]
+    [InlineData("fd00::5")]
+    public async Task PrivateAddresses_AreNotSent(string clientIp)
+    {
+        Answering handler = new(HttpStatusCode.OK, "{\"success\":true}");
+
+        Assert.True(await Check(handler, new CustomerBotCheckOptions { SecretKey = "s" }).VerifyAsync("token", clientIp, CancellationToken.None));
+        Assert.DoesNotContain("remoteip", handler.LastBody, StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task TurnedOff_LetsEveryoneThrough()
     {
@@ -49,7 +64,7 @@ public sealed class TurnstileCustomerBotCheckTests
     }
 
     private static TurnstileCustomerBotCheck Check(Answering handler, CustomerBotCheckOptions options) =>
-        new(new Factory(handler), Options.Create(options));
+        new(new Factory(handler), Options.Create(options), Microsoft.Extensions.Logging.Abstractions.NullLogger<TurnstileCustomerBotCheck>.Instance);
 
     private sealed class Factory(HttpMessageHandler handler) : IHttpClientFactory
     {

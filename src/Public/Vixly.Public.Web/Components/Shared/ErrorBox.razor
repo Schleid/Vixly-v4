@@ -16,10 +16,11 @@ IMPORTANT NOTES:
 @if (Error is not null)
 {
     <VxMessage Type="VxMessageType.Error">
-        @(Error.Code == PlatformApi.Unavailable || string.IsNullOrWhiteSpace(Error.Message) ? T["public.error.unavailable"].Value : Error.Message)
+        @(Error.Code == PlatformApi.Busy ? T["public.too_many"].Value
+            : Error.Code == PlatformApi.Unavailable || string.IsNullOrWhiteSpace(Error.Message) ? T["public.error.unavailable"].Value : Error.Message)
         @if (!string.IsNullOrEmpty(Error.CorrelationId))
         {
-            <span class="pub-hint">@VixlyText.Format(T, "public.error.reference", "id", Error.CorrelationId)</span>
+            <br /><span class="pub-hint">@VixlyText.Format(T, "public.error.reference", "id", Error.CorrelationId)</span>
         }
     </VxMessage>
 }

@@ -42,6 +42,16 @@ public sealed class OperationsPrintAgent : OperationsEntity
 
     public DateTimeOffset? LastSeenUtc { get; private set; }
 
+    // Slice 12E (owner H-6): Vixly Print on a phone; it prints only on its own portable printers.
+    public bool IsPhone { get; private set; }
+
+    public static OperationsPrintAgent RegisterPhone(Guid tenantId, Guid warehouseId, string? name, string keyHash, DateTimeOffset utcNow)
+    {
+        OperationsPrintAgent agent = Register(tenantId, warehouseId, name, keyHash, utcNow);
+        agent.IsPhone = true;
+        return agent;
+    }
+
     public static OperationsPrintAgent Register(Guid tenantId, Guid warehouseId, string? name, string keyHash, DateTimeOffset utcNow)
     {
         string text = name?.Trim() ?? string.Empty;

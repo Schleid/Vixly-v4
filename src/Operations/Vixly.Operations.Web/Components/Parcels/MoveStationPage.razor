@@ -1,0 +1,58 @@
+﻿@*
+=========================================================
+FILE: MoveStationPage.razor
+
+PURPOSE:
+The move station: scan a package, then the shelf it goes on (owner, 2026-10-22: every move is scanned, the package then the shelf).
+
+RESPONSIBILITIES:
+- Step one asks for the package; step two keeps it and asks for the shelf
+- Say what was moved where, then ask for the next package
+
+IMPORTANT NOTES:
+- Made for keyboard-wedge scanners: each scan ends with Enter and submits its own step, no script needed
+- Markup only. Text comes from OperationsText (L-10); the use case checks the right at the package's warehouse
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.move.title"]" Company="@Company" Section="inventory" Error="@Error">
+    <InventoryTabs Current="move" />
+    <p class="ops-editor__hint">@T["ui.move.intro"]</p>
+    @if (Done is { } done)
+    {
+        <p class="ops-editor__notice" role="status" data-done="true">@done</p>
+    }
+    <section class="ops-editor__panel">
+        <form method="post" action="/staff/parcels/move" class="ops-editor__inline">
+            <AntiforgeryToken />
+            <input type="hidden" name="key" value="@Key" />
+            @if (string.IsNullOrWhiteSpace(Package))
+            {
+                <label>@T["ui.move.package"] <input name="package" required maxlength="40" autocomplete="off" autocapitalize="characters" autofocus /></label>
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.move.next"]</button>
+            }
+            else
+            {
+                <input type="hidden" name="package" value="@Package" />
+                <p><strong>@T["ui.move.package"]</strong> <span class="ops-editor__code">@Package</span> · <a href="/staff/parcels/move">@T["ui.move.cancel"]</a></p>
+                <label>@T["ui.move.shelf"] <input name="shelf" required maxlength="40" autocomplete="off" autocapitalize="characters" autofocus /></label>
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.move.submit"]</button>
+            }
+        </form>
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    // The package scanned in step one, kept for step two.
+    [Parameter] public string? Package { get; set; }
+
+    [Parameter] public string? Done { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    // A fresh command key per form: a scan sent twice moves once (ADR-0019).
+    [Parameter] public string Key { get; set; } = string.Empty;
+}

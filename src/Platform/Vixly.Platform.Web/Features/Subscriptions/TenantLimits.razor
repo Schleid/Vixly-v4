@@ -41,8 +41,14 @@ IMPORTANT NOTES:
         </HeaderContent>
         <RowTemplate Context="limit">
             <td>@T[SubscriptionDisplay.LimitKey(limit.Kind)]</td>
-            <td>@limit.PlanValue</td>
-            <td>@limit.Effective</td>
+            <td>@Value(limit.Kind, limit.PlanValue)</td>
+            <td>
+                @Value(limit.Kind, limit.Effective)
+                @if (limit.UsedThisMonth is int used)
+                {
+                    <br /><span class="vx-hint">@VixlyText.Format(T, "ui.subscriptions.shipments_used", new Dictionary<string, object> { ["count"] = used, ["month"] = limit.UsedMonth ?? "-" })</span>
+                }
+            </td>
             <td>
                 @if (limit.OverrideValue is int value)
                 {
@@ -122,6 +128,10 @@ IMPORTANT NOTES:
 
     [Parameter, EditorRequired]
     public IReadOnlyList<PlatformLimitItem> Limits { get; set; } = Array.Empty<PlatformLimitItem>();
+
+    // Shipment cap (owner, 2026-10-29): 0 shipments a month means no cap.
+    private string Value(Vixly.Platform.Domain.Subscriptions.PlatformPlanLimitKind kind, int value) =>
+        kind == Vixly.Platform.Domain.Subscriptions.PlatformPlanLimitKind.MaxShipmentsPerMonth && value == 0 ? T["ui.plans.no_cap"].Value : value.ToString(System.Globalization.CultureInfo.CurrentCulture);
 
     [Parameter]
     public bool CanOverride { get; set; }

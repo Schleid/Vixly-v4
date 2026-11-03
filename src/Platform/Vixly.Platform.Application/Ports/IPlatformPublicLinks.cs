@@ -34,4 +34,7 @@ public interface IPlatformPublicLinks
 
     // The tenant host page where the Owner enrols a new second factor (D-O13); the token is after "#".
     string SecondFactorResetLink(string portalSlug, string token);
+
+    // A page of Vixly Control (absolute, on the Control base URL setting), e.g. "/invoices/{id}".
+    string ControlLink(string path);
 }

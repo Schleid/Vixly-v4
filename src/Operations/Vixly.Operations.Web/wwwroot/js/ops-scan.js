@@ -326,43 +326,19 @@
     setInterval(flush, 5000);
     showQueue();
 
-    // ---- camera: the browser's own reader where it has one, otherwise the bundled one
+    // ---- camera: ops-camera-reader.js (owner, 2026-10-27): a sharper camera, the formats the phone supports, a light
     document.querySelector("[data-camera]").addEventListener("click", async function () {
         if (state.camera) { stopCamera(); return; }
-        try {
-            var stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
-            video.srcObject = stream;
-            video.hidden = false;
-            await video.play();
-            state.camera = { stream: stream, running: true };
-            if ("BarcodeDetector" in window) {
-                var detector = new window.BarcodeDetector({ formats: ["code_128", "code_39", "ean_13", "upc_a", "itf", "data_matrix", "qr_code", "pdf417"] });
-                var loop = async function () {
-                    if (!state.camera || !state.camera.running) { return; }
-                    try {
-                        var found = await detector.detect(video);
-                        if (found.length > 0) { scan(found[0].rawValue); }
-                    } catch (error) { /* frame not ready */ }
-                    setTimeout(loop, 250);
-                };
-                loop();
-            } else if (window.ZXing && window.ZXing.BrowserMultiFormatReader) {
-                var reader = new window.ZXing.BrowserMultiFormatReader();
-                state.camera.reader = reader;
-                reader.decodeFromStream(stream, video, function (found) { if (found) { scan(found.getText()); } });
-            }
-        } catch (error) {
-            note(text("camera-denied"), "error");
-            stopCamera();
-        }
+        if (!window.VixlyCamera || !navigator.mediaDevices) { note(text("camera-denied"), "error"); return; }
+        video.hidden = false;
+        state.camera = { opening: true };
+        var handle = await window.VixlyCamera.open(video, scan, function (message) { note(message, "error"); });
+        if (!handle) { stopCamera(); return; }
+        state.camera = handle;
     });
 
     function stopCamera() {
-        if (state.camera) {
-            state.camera.running = false;
-            if (state.camera.reader) { state.camera.reader.reset(); }
-            if (state.camera.stream) { state.camera.stream.getTracks().forEach(function (track) { track.stop(); }); }
-        }
+        if (state.camera && state.camera.close) { state.camera.close(); }
         state.camera = null;
         video.hidden = true;
         video.srcObject = null;

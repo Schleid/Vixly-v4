@@ -47,7 +47,7 @@ public sealed class OperationsStaffDirectory
                     .Select(grant => new OperationsStaffGrant(grant.Id, grant.RoleId, roles[grant.RoleId].Name, roles[grant.RoleId].IsAdministrator, grant.Scope, grant.ScopeId,
                         grant.ScopeId is { } scope && places.TryGetValue(scope, out string? name) ? name : null, grant.GrantedUtc))
                     .ToList(),
-                user.PartnerWarehouseId is { } partner ? places.GetValueOrDefault(partner, string.Empty) : null))
+                user.PartnerWarehouseId is { } partner ? places.GetValueOrDefault(partner, string.Empty) : null) { Outside = user.OutsideHours })
             .ToList();
     }
 }

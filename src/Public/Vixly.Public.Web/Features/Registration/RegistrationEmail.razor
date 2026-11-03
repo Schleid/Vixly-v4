@@ -36,9 +36,9 @@ IMPORTANT NOTES:
         </div>
         <fieldset class="pub-field--full">
             <legend>@T["public.register.correct_email"]</legend>
-            <EditForm Model="Correction" FormName="register-email" OnSubmit="CorrectAsync" class="pub-form-inline">
+            <EditForm Model="Correction" FormName="register-email" OnSubmit="CorrectAsync" class="pub-form-inline pub-field--full">
                 <div class="vx-field pub-field--address">
-                    <label class="vx-label" for="reg-new-email">@T["public.register.correct_email"]</label>
+                    <label class="vx-label" for="reg-new-email">@T["public.register.new_email"]</label>
                     <InputText id="reg-new-email" type="email" class="vx-input" @bind-Value="Correction!.Email" required maxlength="254" />
                 </div>
                 <div class="pub-form__actions">

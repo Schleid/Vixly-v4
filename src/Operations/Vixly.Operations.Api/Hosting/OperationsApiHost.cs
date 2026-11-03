@@ -34,6 +34,12 @@ public static class OperationsApiHost
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+        // A missing setting names itself on a setup page instead of failing the start (owner, 2026-10-23).
+        if (Vixly.Shared.Hosting.Settings.VixlySettingsCheck.Run(builder, OperationsApiSettings.Site, OperationsApiSettings.All, configure) is { } setup)
+        {
+            return setup;
+        }
+
         // The visitor's address and browser come from Customer.Web's headers (Slice 2); registered before the default.
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<Vixly.Operations.Application.Ports.IOperationsRequestMetadata, OperationsApiRequestMetadata>();
@@ -60,6 +66,7 @@ public static class OperationsApiHost
 
         app.MapVixlyHealth();
         app.MapOperationsInternalTenantEndpoints();
+        app.MapOperationsInternalMaintenanceEndpoints();
         app.MapOperationsInternalCustomerEndpoints();
         app.MapOperationsInternalPackageEndpoints();
         app.MapOperationsInternalTicketEndpoints();

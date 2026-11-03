@@ -38,6 +38,22 @@ internal sealed class FakeSiteStore : IOperationsSiteRepository, IOperationsLoca
 
     public Task<OperationsSiteImage?> GetImageAsync(Guid imageId, CancellationToken cancellationToken) => Task.FromResult(Images.FirstOrDefault(image => image.Id == imageId));
 
+    public List<OperationsSiteTestimonial> Testimonials { get; } = new();
+
+    public int DeliveredPackages { get; set; }
+
+    public Task<IReadOnlyList<OperationsSiteTestimonial>> ListTestimonialsAsync(CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<OperationsSiteTestimonial>>(Testimonials.OrderBy(item => item.SortOrder).ToList());
+
+    public Task<OperationsSiteTestimonial?> GetTestimonialAsync(Guid testimonialId, CancellationToken cancellationToken) =>
+        Task.FromResult(Testimonials.FirstOrDefault(item => item.Id == testimonialId));
+
+    public void AddTestimonial(OperationsSiteTestimonial testimonial) => Testimonials.Add(testimonial);
+
+    public void RemoveTestimonial(OperationsSiteTestimonial testimonial) => Testimonials.Remove(testimonial);
+
+    public Task<int> CountDeliveredPackagesAsync(CancellationToken cancellationToken) => Task.FromResult(DeliveredPackages);
+
     public void Add(OperationsBranch branch) => Branches.Add(branch);
 
     public void Add(OperationsWarehouse warehouse) => Warehouses.Add(warehouse);

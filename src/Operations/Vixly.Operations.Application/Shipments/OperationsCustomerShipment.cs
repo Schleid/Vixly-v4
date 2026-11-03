@@ -51,6 +51,9 @@ public sealed record OperationsCustomerShipment(
 
     public bool Collect => Options.HasFlag(OperationsShipmentOptions.FreightCollect);
 
+    // Owner, 2026-10-28: given once paid, charged to the account or collect.
+    public string? TrackingNumber { get; init; }
+
     public static OperationsCustomerShipment Of(OperationsShipment shipment, string? originName, string? branchName, int announced, int arrived)
     {
         ArgumentNullException.ThrowIfNull(shipment);
@@ -61,7 +64,7 @@ public sealed record OperationsCustomerShipment(
             shipment.InsurancePlanId)
         {
             CollectorName = shipment.CollectorName, CollectorPhone = shipment.CollectorPhone, PickedUpUtc = shipment.PickedUpUtc,
-            DeliveredUtc = shipment.DeliveredUtc
+            DeliveredUtc = shipment.DeliveredUtc, TrackingNumber = shipment.TrackingNumber
         };
     }
 }

@@ -35,4 +35,9 @@ internal sealed class OperationsBrandRepository : IOperationsBrandRepository
         ArgumentNullException.ThrowIfNull(brand);
         _context.TenantBrands.Add(brand);
     }
+
+    public async Task<IReadOnlyList<Guid>> ListTenantIdsAsync(CancellationToken cancellationToken)
+    {
+        return await _context.TenantBrands.AsNoTracking().Select(brand => brand.TenantId).Distinct().ToListAsync(cancellationToken);
+    }
 }

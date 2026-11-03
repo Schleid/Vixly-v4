@@ -108,6 +108,15 @@ public sealed partial class OperationsInspectionHttpTests : IClassFixture<Operat
         Assert.Contains(batteries, queue, StringComparison.Ordinal);
         Assert.Contains(books, queue, StringComparison.Ordinal);
 
+        // A parcel checked and let go is found, but has no inspection waiting: the page says so rather than "not found" (owner, 2026-10-27).
+        (HttpResponseMessage _, string notQueued) = await owner.GetAsync("/staff/inspection/queue?code=" + glasses);
+        Assert.Contains("This parcel was found, but it is not waiting for inspection", notQueued, StringComparison.Ordinal);
+
+        // A number moved from V3 keeps its dashes; the label's barcode holds them and the scan, cleaned to letters and digits, still finds it (owner, 2026-10-27).
+        string moved = "V3-" + batteries[..2] + "-" + batteries[2..];
+        await RenumberAsync(tenant, batteries, moved);
+        batteries = moved;
+
         // Scanning the ID label opens its inspection; the page says what the list asks and that the declaration names it.
         string work = (await owner.GetAsync("/staff/inspection/queue?code=" + batteries)).Response.Headers.Location!.OriginalString;
         Assert.Matches("^/staff/inspection/queue/[0-9a-f-]{36}$", work);
@@ -182,6 +191,32 @@ public sealed partial class OperationsInspectionHttpTests : IClassFixture<Operat
         Assert.Equal(8, await context.RestrictedItems.CountAsync());
         OperationsParcel back = await context.Parcels.SingleAsync(item => item.Id == glassesId);
         Assert.Equal((OperationsMilestone.ReturnedToSender, OperationsHoldReasons.None), (back.Milestone, back.HoldReasons));
+    }
+
+    // "All warehouses" sends an empty warehouse; every page and form takes it as no warehouse, never as a bad request.
+    [SqlServerFact]
+    public async Task EmptyFilterFields_MeanAllWarehouses_OnEveryPage()
+    {
+        NewTenant("emptyco", "Empty Co");
+        using CookieClient owner = await OwnerAsync("emptyco");
+
+        foreach (string path in new[]
+        {
+            "/staff/shipments?warehouse=&view=&page=", "/staff/shipments/export?warehouse=", "/staff/tickets?warehouse=&status=open&page=",
+            "/staff/parcels/incoming?warehouse=&page=", "/staff/parcels/incoming/export?warehouse=", "/staff/inspection/queue?warehouse=&page=",
+            "/staff/holds?warehouse=&page=", "/staff/parcels?warehouse=&held=&page=", "/staff/parcels/unidentified?warehouse=&page=",
+            "/staff/parcels/labels?warehouse=&count=", "/staff/arrivals?warehouse=", "/staff/delivery?warehouse=", "/staff/pickup?warehouse=",
+            "/staff/supplies/stock?warehouse=", "/staff/scan?warehouse=",
+        })
+        {
+            (HttpResponseMessage response, string _) = await owner.GetAsync(path);
+            // A plan or a right may still refuse (403); a bad request or a crash may not.
+            Assert.True(response.StatusCode is not HttpStatusCode.BadRequest && (int)response.StatusCode < 500, path + " answered " + (int)response.StatusCode);
+        }
+
+        (HttpResponseMessage _, string counts) = await owner.GetAsync("/staff/parcels/counts");
+        (HttpResponseMessage started, string _) = await owner.PostAsync("/staff/parcels/counts", counts, ("warehouse", ""));
+        Assert.True(started.StatusCode is not HttpStatusCode.BadRequest && (int)started.StatusCode < 500, "stock count answered " + (int)started.StatusCode);
     }
 
     [SqlServerFact]
@@ -545,6 +580,15 @@ public sealed partial class OperationsInspectionHttpTests : IClassFixture<Operat
 
     private static string Key(string page) => Regex.Match(page, "name=\"key\" value=\"(?<key>[0-9a-f]{32})\"").Groups["key"].Value;
 
+    // Gives a parcel the kind of number V3 used, as the migration keeps it.
+    private async Task RenumberAsync(Guid tenant, string number, string moved)
+    {
+        await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();
+        scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+        Assert.Equal(1, await scope.ServiceProvider.GetRequiredService<OperationsDbContext>().Parcels.Where(item => item.Number == number)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(item => item.Number, moved)));
+    }
+
     private async Task<Guid> ParcelIdAsync(Guid tenant, string number)
     {
         await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();
@@ -597,7 +641,7 @@ public sealed partial class OperationsInspectionHttpTests : IClassFixture<Operat
         scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
         OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        OperationsBranch branch = OperationsBranch.Create(tenant, Details("MIA", "Miami"), OperationsBranchSide.Origin, now);
+        OperationsBranch branch = OperationsBranch.Create(tenant, Details("MIA", "Miami"), "US", OperationsBranchLegal.None, now);
         OperationsWarehouse warehouse = OperationsWarehouse.Create(tenant, branch.Id, Details("WH1", "Doral"), OperationsWarehouseRoles.Receiving, true, now);
         context.AddRange(branch, warehouse);
         await context.SaveChangesAsync();

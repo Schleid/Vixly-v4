@@ -49,8 +49,10 @@ public sealed class StartOperationsSupplyOrderUseCase
         IOperationsSettingsRepository settings,
         OperationsAuditTrail audit,
         IOperationsUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        Vixly.Operations.Application.Plans.OperationsPlanGate plan)
     {
+        _plan = plan ?? throw new ArgumentNullException(nameof(plan));
         _desk = desk ?? throw new ArgumentNullException(nameof(desk));
         _customers = customers ?? throw new ArgumentNullException(nameof(customers));
         _supplies = supplies ?? throw new ArgumentNullException(nameof(supplies));
@@ -59,6 +61,9 @@ public sealed class StartOperationsSupplyOrderUseCase
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
+
+    // Vixly Lite (owner, 2026-10-30): the modules in the company's plan.
+    private readonly Vixly.Operations.Application.Plans.OperationsPlanGate _plan;
 
     public async Task<StartOperationsSupplyOrderResponse> ExecuteAsync(
         OperationsAuthorizationContext context,
@@ -73,6 +78,11 @@ public sealed class StartOperationsSupplyOrderUseCase
         if (refused is not null)
         {
             return StartOperationsSupplyOrderResponse.Failure(refused);
+        }
+
+        if (!await _plan.IncludesAsync(Vixly.Operations.Application.Plans.OperationsPlanModules.Supplies, cancellationToken))
+        {
+            return StartOperationsSupplyOrderResponse.Failure(Vixly.Operations.Domain.Common.OperationsCommonErrors.NotInPlan);
         }
 
         // A customer in good standing only, as for a new shipment (owner, 2026-10-20).

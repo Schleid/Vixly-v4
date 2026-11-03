@@ -13,6 +13,7 @@
 // IMPORTANT NOTES:
 // - Codes are stable wire values: never rename one; add new ones at the end
 // - Each tenant chooses which services it offers (Operations)
+// - Default label codes (owner, 2026-10-31): each company may change its own; both ocean services share one
 // =========================================================
 public static class PlatformShippingServices
 {
@@ -28,11 +29,11 @@ public static class PlatformShippingServices
 
     public static IReadOnlyList<PlatformShippingServiceInfo> All { get; } = new[]
     {
-        new PlatformShippingServiceInfo(AirExpress, "air", 2, 3, 6000),
-        new PlatformShippingServiceInfo(AirStandard, "air", 4, 7, 6000),
-        new PlatformShippingServiceInfo(OceanConsolidated, "ocean", 14, 28, 1000),
-        new PlatformShippingServiceInfo(OceanFullContainer, "ocean", 14, 35, null),
-        new PlatformShippingServiceInfo(Ground, "ground", 3, 7, 5000)
+        new PlatformShippingServiceInfo(AirExpress, "air", 2, 3, 6000, "VXE"),
+        new PlatformShippingServiceInfo(AirStandard, "air", 4, 7, 6000, "VXA"),
+        new PlatformShippingServiceInfo(OceanConsolidated, "ocean", 14, 28, 1000, "VXS"),
+        new PlatformShippingServiceInfo(OceanFullContainer, "ocean", 14, 35, null, "VXS"),
+        new PlatformShippingServiceInfo(Ground, "ground", 3, 7, 5000, "VXG")
     };
 
     public static PlatformShippingServiceInfo? Find(string? code) => All.FirstOrDefault(service => service.Code == code);

@@ -30,7 +30,10 @@ public sealed record OperationsCustomerProfile(
     bool EmailVerified,
     DateTimeOffset CreatedUtc,
     DateTimeOffset? LastSignInUtc,
-    IReadOnlyList<OperationsMailboxAddress> Mailboxes)
+    IReadOnlyList<OperationsMailboxAddress> Mailboxes,
+    Vixly.Operations.Domain.Locations.OperationsPostalAddress? HomeAddress = null,
+    bool WelcomeTourPending = false,
+    DateTimeOffset? SuspendedUntil = null)
 {
     public string FullName => FirstName + " " + LastName;
 
@@ -40,6 +43,6 @@ public sealed record OperationsCustomerProfile(
 
         return new OperationsCustomerProfile(customer.Id, customer.Code, customer.FirstName, customer.LastName, customer.CompanyName, customer.Email.Value, customer.Phone,
             customer.PreferredLanguage.Value, customer.Status, customer.StatusReason, customer.CreditAllowed, customer.CreditReason, customer.EmailVerifiedUtc is not null,
-            customer.CreatedUtc, customer.LastSignInUtc, mailboxes);
+            customer.CreatedUtc, customer.LastSignInUtc, mailboxes, customer.HomeAddress, customer.WelcomeTourDismissedUtc is null, customer.SuspendedUntil);
     }
 }

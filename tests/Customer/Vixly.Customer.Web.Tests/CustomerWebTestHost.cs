@@ -50,8 +50,10 @@ internal sealed class CustomerWebTestHost : IAsyncDisposable
             new[]
             {
                 "--environment=Production",
+                "--VixlySettingsCheck:Enabled=false",
                 "--applicationName=Vixly.Customer.Web",
                 "--AllowedHosts=*",
+                "--TenantHosting:BaseDomains:0=techcrafters.ltd",
                 "--ConnectionStrings:Customer=Server=127.0.0.1,1;Database=None;User Id=none;Password=none;Connect Timeout=1;TrustServerCertificate=True",
                 "--CustomerOperations:CallerKeyId=k1",
                 "--CustomerOperations:CallerPrivateKey=" + Convert.ToBase64String(key.ExportPkcs8PrivateKey())

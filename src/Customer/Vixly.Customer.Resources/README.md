@@ -1,6 +1,6 @@
 # Vixly.Customer.Resources
 
-`.resx` text for the Customer plane in English, French and Spanish: error texts, enum labels, portal text.
+`.resx` text for the Customer plane in English, French and Spanish: error texts, enum labels, portal text. Embedded Markdown in `Help/{en,fr,es}/` holds the company-branded Customer help guides (ADR-0023).
 
 | | |
 |---|---|

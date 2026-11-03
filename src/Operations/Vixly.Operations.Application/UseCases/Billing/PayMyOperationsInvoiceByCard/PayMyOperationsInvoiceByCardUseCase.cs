@@ -63,7 +63,7 @@ public sealed class PayMyOperationsInvoiceByCardUseCase
             return PayMyOperationsInvoiceByCardResponse.Failure(OperationsBillingErrors.InvoiceNotFound);
         }
 
-        if (await _cards.SecretKeyAsync(cancellationToken) is not { } secret || !OperationsCardDesk.Offered(await _settings.FindAsync(cancellationToken), true))
+        if (await _cards.SecretKeyAsync(cancellationToken) is not { } secret || (await _settings.FindAsync(cancellationToken))?.OffersOnPortal(OperationsPaymentMethod.Card, true) != true)
         {
             return PayMyOperationsInvoiceByCardResponse.Failure(OperationsCardErrors.NotConnected);
         }

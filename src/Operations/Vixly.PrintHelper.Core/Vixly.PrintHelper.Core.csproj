@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Slice 12E (owner H-6): the logic of the phone print helper (Vixly Print), without any phone code, so it builds and is tested everywhere. -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\Contracts\Vixly.Contracts.Operations\Vixly.Contracts.Operations.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Vixly.PrintHelper.Core.Tests" />
+  </ItemGroup>
+
+</Project>

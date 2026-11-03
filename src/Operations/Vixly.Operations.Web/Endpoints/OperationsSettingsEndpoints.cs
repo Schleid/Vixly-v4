@@ -44,10 +44,10 @@ public static class OperationsSettingsEndpoints
             await PageAsync(http, get, brand, text, null, done is null ? null : texts["ui.staff.done.saved"].Value));
 
         staff.MapPost("/settings", async (HttpContext http, [FromForm] string? currencyCode, [FromForm] string? weightUnit, [FromForm] string? dimensionUnit,
-            [FromForm] bool? allowCollect, [FromForm] bool? allowCredit, [FromForm] bool? publicPricing, [FromForm] bool? pickup, [FromForm] bool? homeDelivery, [FromForm] bool? requireSecondFactor,
+            [FromForm] bool? allowCollect, [FromForm] bool? allowCredit, [FromForm] bool? publicPricing, [FromForm] bool? pickup, [FromForm] bool? homeDelivery, [FromForm] bool? requireSecondFactor, [FromForm] bool? requireMfa,
             [FromForm] string? shipmentPrefix, [FromForm] string? receivingPrefix, [FromForm] string? invoicePrefix, [FromForm] string? paymentPrefix, [FromForm] string? customerPrefix, [FromForm] string? parcelPrefix, [FromForm] string? supplyOrderPrefix,
-            [FromForm] string? creditNotePrefix, [FromForm] string? bundlePrefix, [FromForm] string? boxPrefix, [FromForm] string? dispatchPrefix,
-            [FromForm] string? timeZone, UpdateOperationsTenantSettingsUseCase update, GetOperationsTenantSettingsUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
+            [FromForm] string? creditNotePrefix, [FromForm] string? bundlePrefix, [FromForm] string? boxPrefix, [FromForm] string? dispatchPrefix, [FromForm] string? trackingPrefix,
+            [FromForm] string? timeZone, [FromForm] string? staffIdle, [FromForm] string? customerIdle, [FromForm] string? idleWarn, UpdateOperationsTenantSettingsUseCase update, GetOperationsTenantSettingsUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
         {
             UpdateOperationsTenantSettingsResponse response = await update.ExecuteAsync(OperationsCurrentUser.Context(http), new UpdateOperationsTenantSettingsRequest
             {
@@ -59,6 +59,7 @@ public static class OperationsSettingsEndpoints
                 PublicPricing = publicPricing == true,
                 DeliveryModes = (pickup == true ? OperationsDeliveryModes.Pickup : 0) | (homeDelivery == true ? OperationsDeliveryModes.HomeDelivery : 0),
                 RequireSecondFactorForAllStaff = requireSecondFactor == true,
+                RequireMfa = requireMfa,
                 ShipmentPrefix = shipmentPrefix ?? string.Empty,
                 ReceivingPrefix = receivingPrefix ?? string.Empty,
                 InvoicePrefix = invoicePrefix ?? string.Empty,
@@ -70,7 +71,11 @@ public static class OperationsSettingsEndpoints
                 BundlePrefix = bundlePrefix,
                 BoxPrefix = boxPrefix,
                 DispatchPrefix = dispatchPrefix,
-                TimeZone = timeZone ?? string.Empty
+                TrackingPrefix = trackingPrefix,
+                TimeZone = timeZone ?? string.Empty,
+                StaffIdleMinutes = Minutes(staffIdle),
+                CustomerIdleMinutes = Minutes(customerIdle),
+                IdleWarnMinutes = Minutes(idleWarn)
             }, http.RequestAborted);
 
             return response.Succeeded
@@ -93,7 +98,8 @@ public static class OperationsSettingsEndpoints
                 int.TryParse(form["min_" + service.Code], NumberStyles.Integer, CultureInfo.InvariantCulture, out int min) ? min : 0,
                 int.TryParse(form["max_" + service.Code], NumberStyles.Integer, CultureInfo.InvariantCulture, out int max) ? max : 0,
                 decimal.TryParse(form["divisor_" + service.Code], NumberStyles.Number, CultureInfo.InvariantCulture, out decimal divisor) ? divisor : null,
-                service.DefaultVolumetricDivisor is not null)).ToList();
+                service.DefaultVolumetricDivisor is not null,
+                form["code_" + service.Code].ToString())).ToList();
 
             SaveOperationsShippingServicesResponse response = await save.ExecuteAsync(OperationsCurrentUser.Context(http), new SaveOperationsShippingServicesRequest { Services = rows }, http.RequestAborted);
             return response.Succeeded ? Results.Redirect("/staff/services?done=1") : await ServicesPageAsync(http, list, brand, text, response.Error, null);
@@ -211,4 +217,8 @@ public static class OperationsSettingsEndpoints
             Info = info
         });
     }
+
+    // Inactivity minutes (owner, 2026-10-27): left out, the setting stays; anything not a whole number is refused by the range check.
+    private static int? Minutes(string? value) =>
+        value is null ? null : int.TryParse(value.Trim(), System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out int minutes) ? minutes : -1;
 }

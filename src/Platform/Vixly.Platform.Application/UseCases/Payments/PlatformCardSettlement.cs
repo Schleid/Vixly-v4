@@ -47,12 +47,14 @@ public sealed class PlatformCardSettlement
         PlatformInvoice invoice = await _payments.Billing.Invoices.GetAsync(charge.PlatformInvoiceId, cancellationToken)
             ?? throw new DomainException(PlatformBillingErrors.InvoiceNotFound);
 
+        await WalletAsync(charge, utcNow, cancellationToken);
+
         // The invoice may have been settled by hand meanwhile: apply what is due, refund the rest.
         decimal applied = invoice.Status == PlatformInvoiceStatus.Issued ? Math.Min(charge.Amount, invoice.Balance) : 0m;
 
         if (applied > 0m)
         {
-            PlatformInvoicePaymentResult result = await _applier.ApplyAsync(null, invoice, applied, PlatformPaymentMethod.Card, utcNow, charge.ProviderPaymentId, null, null, cancellationToken);
+            PlatformInvoicePaymentResult result = await _applier.ApplyAsync(null, invoice, applied, charge.Delayed ? PlatformPaymentMethod.BankDebit : PlatformPaymentMethod.Card, utcNow, charge.ProviderPaymentId, null, null, cancellationToken);
             charge.LinkPayment(result.Payment.Id, utcNow);
         }
 
@@ -67,6 +69,24 @@ public sealed class PlatformCardSettlement
         _payments.Audit(null, "platform.payments.card_charge_succeeded", null, nameof(PlatformInvoice), invoice.Id,
             new { number = invoice.Number, origin = charge.Origin.ToString(), amount = PlatformPaymentsLimits.Format(charge.Amount), currency = charge.CurrencyCode });
         return excess > 0m ? "applied_with_excess" : "applied";
+    }
+
+    // Apple Pay or Google Pay shows only as a card; the sales feed reports it as a wallet. Best effort: a provider failure leaves "card".
+    private async Task WalletAsync(PlatformCardTransaction charge, DateTimeOffset utcNow, CancellationToken cancellationToken)
+    {
+        if (charge.Delayed || charge.ProviderPaymentId is not { } paymentId)
+        {
+            return;
+        }
+
+        try
+        {
+            charge.RecordWallet(await _payments.Gateway.GetWalletAsync(paymentId, cancellationToken), utcNow);
+        }
+        catch (PlatformCardGatewayException)
+        {
+            // The payment is still recorded as a card payment.
+        }
     }
 
     public async Task<string> RefundSucceededAsync(PlatformCardTransaction refund, string? refundId, CancellationToken cancellationToken)

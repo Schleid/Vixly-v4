@@ -19,7 +19,11 @@ public static class PlanDisplay
 {
     public static IReadOnlyList<string> Features { get; } = new[]
     {
-        "homepage_content_customization", "portal_theme_customization", "custom_domain", "white_label_portal", "advanced_analytics", "data_export", "partner_agents"
+        "homepage_content_customization", "portal_theme_customization", "custom_domain", "white_label_portal", "advanced_analytics", "data_export", "partner_agents",
+        // Owner, 2026-10-23: text messages (SMS and WhatsApp), carrier data and the company API are sold in the plans too. QuickBooks is a later add-on.
+        "text_messages", "carrier_data", "tenant_api",
+        // Vixly Lite (owner, 2026-10-30): the modules a plan may leave out.
+        "customer_portal", "insurance", "credit_accounts", "supplies", "home_delivery", "support_desk", "payables"
     };
 
     public static bool Known(string code) => Features.Contains(code, StringComparer.Ordinal);

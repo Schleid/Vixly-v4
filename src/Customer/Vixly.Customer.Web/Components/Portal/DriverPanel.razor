@@ -1,0 +1,38 @@
+﻿@*
+=========================================================
+FILE: DriverPanel.razor
+
+PURPOSE:
+The driver bringing the shipment today (Slice 12C, owner H-5): the stops before it, and the map once it is next.
+
+RESPONSIBILITIES:
+- The words and the map's place; customer-driver-map.js refreshes both every 30 seconds
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly"
+- Tiles come through the site (/maps/tiles)
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Packages
+@using Vixly.Customer.Web.Portal
+@inject IStringLocalizer<CustomerText> T
+
+<section class="customer-driver" aria-labelledby="driver-title" data-driver-refresh="@Refresh" data-attribution="@Driver.MapAttribution"
+         data-lat="@Driver.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-lng="@Driver.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture)">
+    <h2 id="driver-title">@T["ui.driver.title"]</h2>
+    <p class="customer-portal__notice" data-driver-line>@CustomerDriverWords.Line(Driver, T)</p>
+    @if (Driver.MapAttribution is not null && !Driver.Delivered)
+    {
+        <link rel="stylesheet" href="/customer/lib/leaflet/leaflet.css" />
+        <div class="customer-driver__map" data-driver-map style="height: 280px;" hidden="@(Driver.Latitude is null)"></div>
+        <script src="/customer/lib/leaflet/leaflet.js" defer></script>
+    }
+    <script src="/customer/js/customer-driver-map.js?v=20261023-1" defer></script>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public CustomerDriverDto Driver { get; set; } = null!;
+
+    // Where the page asks again for the driver's place.
+    [Parameter, EditorRequired] public string Refresh { get; set; } = string.Empty;
+}

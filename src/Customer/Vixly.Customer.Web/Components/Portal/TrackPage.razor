@@ -1,0 +1,30 @@
+﻿@*
+=========================================================
+FILE: TrackPage.razor
+
+PURPOSE:
+The private link of an "out for delivery" notice (Slice 12C, owner H-5): the driver bringing the shipment today, without signing in.
+
+RESPONSIBILITIES:
+- The shipment's number, the driver's whereabouts and the way to sign in
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly"
+- The link works on the route's day only; the endpoint shows the message page otherwise
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Packages
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@VixlyText.Format(T, "ui.driver.track_title", "number", Driver.ShipmentNumber)" ReturnHere="@Refresh">
+    <DriverPanel Driver="@Driver" Refresh="@(Refresh + "/now")" />
+    <p><a class="vx-button vx-button--secondary" href="/customer/sign-in">@T["ui.driver.sign_in"]</a></p>
+</CustomerShell>
+
+@code {
+    [Parameter] public Vixly.Contracts.Operations.Customers.CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter, EditorRequired] public CustomerDriverDto Driver { get; set; } = null!;
+
+    [Parameter, EditorRequired] public string Refresh { get; set; } = string.Empty;
+}

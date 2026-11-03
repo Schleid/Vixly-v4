@@ -6,6 +6,7 @@ using Vixly.Customer.Web.Components;
 using Vixly.Customer.Web.Operations;
 using Vixly.Customer.Web.Tenancy;
 using Vixly.Shared.Hosting;
+using Vixly.Shared.Hosting.Maintenance;
 using Vixly.Shared.Localization;
 
 namespace Vixly.Customer.Web.Hosting;
@@ -37,6 +38,12 @@ public static class CustomerWebHost
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+        // A missing setting names itself on a setup page instead of failing the start (owner, 2026-10-23).
+        if (Vixly.Shared.Hosting.Settings.VixlySettingsCheck.Run(builder, CustomerWebSettings.Site, CustomerWebSettings.All, configure) is { } setup)
+        {
+            return setup;
+        }
+
         builder.Services.AddCustomerInfrastructure(builder.Configuration);
         builder.Services.AddVixlyForwardedHeaders(builder.Configuration);
         builder.Services.AddOptions<CustomerHostingOptions>().Bind(builder.Configuration.GetSection(CustomerHostingOptions.SectionName));
@@ -60,6 +67,8 @@ public static class CustomerWebHost
         builder.Services.AddHttpClient(Vixly.Customer.Web.Portal.TurnstileCustomerBotCheck.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(10));
         builder.Services.AddSingleton<Vixly.Customer.Web.Portal.ICustomerBotCheck, Vixly.Customer.Web.Portal.TurnstileCustomerBotCheck>();
         builder.Services.AddCustomerStatusPageLimits();
+        builder.Services.AddVixlyMaintenance(builder.Configuration);
+        builder.Services.AddScoped<Vixly.Shared.Hosting.Maintenance.IVixlyMaintenanceSource, Vixly.Customer.Web.Operations.CustomerMaintenanceSource>();
         builder.Services.AddLocalization();
         builder.Services.AddAntiforgery(options =>
         {
@@ -68,12 +77,13 @@ public static class CustomerWebHost
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         });
         builder.Services.AddRazorComponents();
+        builder.Services.AddSingleton<Vixly.Customer.Web.Features.Help.CustomerHelpCatalogue>();
 
         configure?.Invoke(builder);
 
         WebApplication app = builder.Build();
 
-        app.UseForwardedHeaders();
+        app.UseVixlyForwardedHeaders();
         app.UseVixlySecurityHeaders(Vixly.Customer.Web.Portal.CustomerPortalSecurity.ContentSecurityPolicy);
 
         if (!app.Environment.IsDevelopment())
@@ -96,7 +106,11 @@ public static class CustomerWebHost
 
             return next(http);
         });
+        // Before the tenant check: during maintenance nothing behind it may answer (Control backlog 2026-10-22).
+        app.UseVixlyMaintenance(CustomerMaintenancePages.SiteOf, CustomerMaintenancePages.Text, "/css/customer-status.css");
         app.UseMiddleware<CustomerTenantMiddleware>();
+        // Only fictional help media and normal public assets; the tenant gate still runs first.
+        app.UseStaticFiles();
         app.UseRequestLocalization(options =>
         {
             options.DefaultRequestCulture = new RequestCulture(VixlyCultures.Default);
@@ -113,8 +127,11 @@ public static class CustomerWebHost
         app.MapStaticAssets();
         app.MapVixlyHealth();
         Vixly.Customer.Web.Portal.CustomerPortalEndpoints.MapCustomerPortalEndpoints(app);
+        Vixly.Customer.Web.Portal.CustomerHelpEndpoints.MapCustomerHelpEndpoints(app);
+        Vixly.Customer.Web.Portal.CustomerTourEndpoints.MapCustomerTourEndpoints(app);
         Vixly.Customer.Web.Portal.CustomerPackageEndpoints.MapCustomerPackageEndpoints(app);
         Vixly.Customer.Web.Portal.CustomerShipmentEndpoints.MapCustomerShipmentEndpoints(app);
+        Vixly.Customer.Web.Portal.CustomerTrackEndpoints.MapCustomerTrackEndpoints(app);
         Vixly.Customer.Web.Portal.CustomerRateEndpoints.MapCustomerRateEndpoints(app);
         Vixly.Customer.Web.Portal.CustomerTicketEndpoints.MapCustomerTicketEndpoints(app);
         Vixly.Customer.Web.Portal.CustomerInvoiceEndpoints.MapCustomerInvoiceEndpoints(app);
@@ -127,6 +144,7 @@ public static class CustomerWebHost
             },
             CustomerCookies.Path + "/css/customer-status.css");
         app.MapRazorComponents<App>();
+        _ = app.Services.GetRequiredService<Vixly.Customer.Web.Features.Help.CustomerHelpCatalogue>();
 
         return app;
     }

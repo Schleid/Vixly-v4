@@ -36,11 +36,23 @@ internal sealed class OperationsCustomerConfiguration : IEntityTypeConfiguration
         builder.Property(item => item.CreditReason).HasMaxLength(OperationsCustomerLimits.ReasonMaxLength);
         builder.Property(item => item.PasswordHash).HasMaxLength(OperationsIdentityLimits.PasswordHashMaxLength).IsUnicode(false);
         builder.Ignore(item => item.FullName);
+        // The home address (owner, 2026-10-26): Home_* columns, all empty until the customer gives it.
+        builder.OwnsOne(item => item.HomeAddress, address =>
+        {
+            address.Property(item => item.Line1).HasColumnName("Home_Line1").HasMaxLength(Vixly.Operations.Domain.Locations.OperationsLocationLimits.AddressLineMaxLength);
+            address.Property(item => item.Line2).HasColumnName("Home_Line2").HasMaxLength(Vixly.Operations.Domain.Locations.OperationsLocationLimits.AddressLineMaxLength);
+            address.Property(item => item.City).HasColumnName("Home_City").HasMaxLength(Vixly.Operations.Domain.Locations.OperationsLocationLimits.CityMaxLength);
+            address.Property(item => item.Region).HasColumnName("Home_Region").HasMaxLength(Vixly.Operations.Domain.Locations.OperationsLocationLimits.RegionMaxLength);
+            address.Property(item => item.PostalCode).HasColumnName("Home_PostalCode").HasMaxLength(Vixly.Operations.Domain.Locations.OperationsLocationLimits.PostalCodeMaxLength);
+            address.Property(item => item.CountryCode).HasColumnName("Home_CountryCode").HasMaxLength(2).IsFixedLength().IsUnicode(false);
+        });
         builder.HasIndex(item => new { item.TenantId, item.Email }).IsUnique();
         // Review item 3: the check across companies (a work email is never a customer email) looks up by email alone.
         builder.HasIndex(item => item.Email).HasDatabaseName("IX_Customers_Email_AnyTenant");
         builder.HasIndex(item => new { item.TenantId, item.Code }).IsUnique().HasFilter("[Code] IS NOT NULL");
         builder.HasIndex(item => new { item.TenantId, item.LastName, item.FirstName });
         builder.HasIndex(item => new { item.TenantId, item.Phone });
+        // Slice 10: the company API and webhooks read in order of creation.
+        builder.HasIndex(item => new { item.TenantId, item.CreatedUtc });
     }
 }

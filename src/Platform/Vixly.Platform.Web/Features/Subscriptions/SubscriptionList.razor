@@ -61,6 +61,7 @@ else
             <th scope="col">@T["ui.subscriptions.status"]</th>
             <th scope="col">@T["ui.subscriptions.term"]</th>
             <th scope="col">@T["ui.subscriptions.licences"]</th>
+            <th scope="col">@T["ui.subscriptions.shipments"]</th>
             <th scope="col">@T["ui.subscriptions.period_amount"]</th>
             <th scope="col">@T["ui.subscriptions.renews"]</th>
             <th scope="col">@T["ui.subscriptions.notes"]</th>
@@ -71,6 +72,7 @@ else
             <td><VxStatusBadge Status="@SubscriptionDisplay.Badge(item.Status)" Text="@T[SubscriptionDisplay.StatusKey(item.Status)]" /></td>
             <td>@T[SubscriptionDisplay.TermKey(item.Term)]</td>
             <td class="vx-table__number">@item.Licences</td>
+            <td class="vx-table__number">@if (item.Shipments is int shipments) { @shipments <span class="vx-hint">@item.ShipmentsMonth</span> }</td>
             <td class="vx-table__number">@SubscriptionDisplay.Money(item.PeriodAmount, item.CurrencyCode)</td>
             <td>@SubscriptionDisplay.Date(item.Status == PlatformSubscriptionStatus.Trialing ? item.TrialEndsUtc : item.PeriodEndUtc)</td>
             <td>

@@ -27,4 +27,10 @@ No primitives yet: those remain Frontend/UI work.
 
 ## Workbench catalogue
 
+Help primitives (ADR-0023): `VxHelpLink` takes `Href` and a localized `Label`.
+`VxHelpArticle` takes `Title`, trusted catalogue `Html`, visible `Related` links
+(`VxHelpRelatedLink`) and `RelatedLabel`. It never loads articles or authorizes readers.
+The caller must use the checked help renderer and filter related articles.
+Gallery: `/primitives/help?lang=en` (also `fr`, `es`).
+
 VxMetricCard and VxLifecycleStepper, additive Progress status badges, compact table states and self-hosted Inter are described in [the shared verification record](../../../docs/shared/ENTERPRISE-WORKBENCH-2026-10-16.md). Primitive labels and workflow mappings remain consumer-owned. New APIs require C-1 owner/consumer review.

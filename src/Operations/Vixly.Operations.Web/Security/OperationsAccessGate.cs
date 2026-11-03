@@ -12,6 +12,7 @@ namespace Vixly.Operations.Web.Security;
 // RESPONSIBILITIES:
 // - Let reading pages through; send any change on a staff page to the "read-only" page
 // - Keep sign-in, sign-out, password reset and the Terms acceptance open
+// - Answer "not found" for the pages of a module the plan leaves out (Vixly Lite, owner 2026-10-30)
 //
 // IMPORTANT NOTES:
 // - Payment required and no subscription are treated like read-only until the billing pages arrive (1E); the tenant's customers are never affected
@@ -45,6 +46,17 @@ public sealed class OperationsAccessGate
             bool canPay = http.User.FindFirst(OperationsClaimTypes.Owner)?.Value == "1" || http.User.FindFirst(OperationsClaimTypes.Administrator)?.Value == "1";
             http.Response.Redirect(canPay ? "/staff/billing" : "/staff/limited", false, false);
             http.Response.StatusCode = StatusCodes.Status303SeeOther;
+            return;
+        }
+
+        // Vixly Lite (owner, 2026-10-30): the pages of a module the company's plan leaves out do not exist for it.
+        if (path.StartsWithSegments("/staff")
+            && OperationsTenantMiddleware.Host(http) is { TenantId: Guid planTenant }
+            && Vixly.Operations.Application.Plans.OperationsPlanModules.HiddenPages(
+                await http.RequestServices.GetRequiredService<Vixly.Operations.Application.Ports.IOperationsPlanFeatures>().GetAsync(planTenant, http.RequestAborted)) is { Count: > 0 } hidden
+            && Vixly.Operations.Application.Plans.OperationsPlanModules.Hides(hidden, path.Value ?? string.Empty))
+        {
+            http.Response.StatusCode = StatusCodes.Status404NotFound;
             return;
         }
 

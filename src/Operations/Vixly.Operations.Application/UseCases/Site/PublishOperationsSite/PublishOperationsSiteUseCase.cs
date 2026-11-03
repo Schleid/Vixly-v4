@@ -32,18 +32,22 @@ public sealed class PublishOperationsSiteUseCase
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly Vixly.Operations.Application.Messaging.OperationsOutboxWriter _outbox;
+
     public PublishOperationsSiteUseCase(
         IOperationsSiteRepository site,
         OperationsOwnerCheck owner,
         OperationsAuditTrail audit,
         IOperationsUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        Vixly.Operations.Application.Messaging.OperationsOutboxWriter outbox)
     {
         _site = site ?? throw new ArgumentNullException(nameof(site));
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
         _audit = audit ?? throw new ArgumentNullException(nameof(audit));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+        _outbox = outbox ?? throw new ArgumentNullException(nameof(outbox));
     }
 
     public async Task<PublishOperationsSiteResponse> ExecuteAsync(
@@ -68,6 +72,9 @@ public sealed class PublishOperationsSiteUseCase
 
         brand.Publish(_timeProvider.GetUtcNow());
         _audit.Record(context.UserId, "ops.site.published", nameof(OperationsTenantBrand), brand.Id, after: new { version = brand.PublishedVersion });
+        // Owner, 2026-10-28: the maintenance page at the edge shows the published name and logo.
+        _outbox.Write(Vixly.Operations.Application.Branding.OperationsEdgeBrandChanged.MessageType, brand.TenantId, brand.Id,
+            new Vixly.Operations.Application.Branding.OperationsEdgeBrandChanged(brand.PublishedVersion));
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken)
             ? PublishOperationsSiteResponse.Success(brand.PublishedVersion)

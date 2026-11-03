@@ -17,12 +17,34 @@ namespace Vixly.Operations.Infrastructure.Security;
 // =========================================================
 internal sealed class OperationsSecretProtector : IOperationsSecretProtector
 {
+    private readonly IDataProtectionProvider _provider;
+
     private readonly IDataProtector _protector;
 
     public OperationsSecretProtector(IDataProtectionProvider provider)
     {
-        ArgumentNullException.ThrowIfNull(provider);
+        _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         _protector = provider.CreateProtector("Vixly.Operations.PickupCode.v1");
+    }
+
+    public string Protect(string value, string purpose)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(purpose);
+        return _provider.CreateProtector(purpose).Protect(value ?? throw new ArgumentNullException(nameof(value)));
+    }
+
+    public string? Unprotect(string protectedValue, string purpose)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(purpose);
+
+        try
+        {
+            return _provider.CreateProtector(purpose).Unprotect(protectedValue);
+        }
+        catch (System.Security.Cryptography.CryptographicException)
+        {
+            return null;
+        }
     }
 
     public string Protect(string value) => _protector.Protect(value ?? throw new ArgumentNullException(nameof(value)));

@@ -1,0 +1,169 @@
+{
+  "captions": {
+    "what-vixly-does": {
+      "scene": "overview",
+      "text": [
+        "1 shows the main navigation; 2 points to the action that starts sign-up when registration is open.",
+        "1 montre la navigation principale ; 2 indique l’action qui lance l’inscription lorsqu’elle est ouverte.",
+        "1 muestra la navegación principal; 2 señala la acción para iniciar el registro cuando está abierto."
+      ]
+    },
+    "choose-a-plan": {
+      "scene": "plans",
+      "text": [
+        "1 marks the plan’s licence, device and warehouse details; 2 points to the button for choosing that plan.",
+        "1 indique les détails du forfait concernant les licences, appareils et entrepôts ; 2 pointe vers le bouton de sélection.",
+        "1 marca los detalles de licencias, dispositivos y almacenes; 2 señala el botón para elegir ese plan."
+      ]
+    },
+    "licences-and-devices": {
+      "scene": "plans",
+      "text": [
+        "1 marks the limits to compare with your device needs; 2 points to the action that carries your plan choice into sign-up.",
+        "1 indique les limites à comparer à vos besoins en appareils ; 2 pointe vers l’action qui transmet votre choix à l’inscription.",
+        "1 marca los límites que debe comparar con sus necesidades; 2 señala la acción que lleva el plan elegido al registro."
+      ]
+    },
+    "sign-up-overview": {
+      "scene": "company",
+      "text": [
+        "1 marks company details; 2 the billing address; 3 the owner; 4 the workspace address name; 5 acceptance of the terms; 6 submission.",
+        "1 indique les coordonnées de l’entreprise ; 2 l’adresse de facturation ; 3 le propriétaire ; 4 le nom d’adresse ; 5 l’acceptation des conditions ; 6 l’envoi.",
+        "1 marca los datos de la empresa; 2 la dirección de facturación; 3 el propietario; 4 el nombre de dirección; 5 la aceptación de condiciones; 6 el envío."
+      ]
+    },
+    "company-details": {
+      "scene": "company",
+      "text": [
+        "1 marks company details; 2 the address and its confirmation; 3 the owner’s contacts; 4 the workspace address name; 5 terms acceptance; 6 the account-creation button.",
+        "1 indique les coordonnées de l’entreprise ; 2 l’adresse et sa confirmation ; 3 les contacts du propriétaire ; 4 le nom d’adresse ; 5 l’acceptation des conditions ; 6 le bouton de création.",
+        "1 marca los datos de la empresa; 2 la dirección y su confirmación; 3 los contactos del propietario; 4 el nombre de dirección; 5 la aceptación de condiciones; 6 el botón de creación."
+      ]
+    },
+    "confirm-your-email": {
+      "scene": "email",
+      "extra": "verify",
+      "text": [
+        "1 points to resending the email; 2 marks the address-correction field. In the second image, 1 points to the confirmation button reached from your email link.",
+        "1 pointe vers le renvoi du courriel ; 2 indique le champ de correction de l’adresse. Dans la seconde image, 1 indique le bouton de confirmation atteint depuis le lien reçu.",
+        "1 señala el reenvío del correo; 2 marca el campo para corregir la dirección. En la segunda imagen, 1 señala el botón de confirmación al abrir el enlace recibido."
+      ]
+    },
+    "choose-your-plan-at-sign-up": {
+      "scene": "plan-choice",
+      "text": [
+        "1 marks the plan options; 2 billing frequency; 3 licence count; 4 the optional promotion field; 5 the button to continue.",
+        "1 indique les forfaits ; 2 la fréquence de facturation ; 3 le nombre de licences ; 4 le champ de promotion facultatif ; 5 le bouton pour continuer.",
+        "1 marca los planes; 2 la frecuencia de facturación; 3 el número de licencias; 4 el campo de promoción opcional; 5 el botón para continuar."
+      ]
+    },
+    "pay-to-start": {
+      "scene": "first-invoice",
+      "text": [
+        "1 marks the company and invoice to check; 2 the card-payment section; 3 the action that continues to hosted checkout. No card number is entered on this screen.",
+        "1 indique l’entreprise et la facture à vérifier ; 2 la rubrique du paiement par carte ; 3 l’action qui mène au paiement hébergé. Aucun numéro de carte n’est saisi sur cet écran.",
+        "1 marca la empresa y la factura que debe revisar; 2 la sección de tarjeta; 3 la acción que lleva al pago alojado. No se introduce ningún número de tarjeta en esta pantalla."
+      ]
+    },
+    "after-sign-up": {
+      "scene": "workspace-ready",
+      "text": [
+        "1 marks the account-created message; 2 identifies the workspace address in the progress text. Continue from the setup email when it arrives.",
+        "1 indique le message de création du compte ; 2 repère l’adresse de l’espace dans le texte de suivi. Poursuivez depuis le courriel de configuration lorsqu’il arrive.",
+        "1 marca el mensaje de cuenta creada; 2 identifica la dirección del espacio en el texto de avance. Continúe desde el correo de configuración cuando llegue."
+      ]
+    },
+    "sign-up-by-invitation": {
+      "scene": "offer",
+      "text": [
+        "1 marks the agreed offer details; 2 its partly hidden email restriction; 3 the owner-email field; 4 the button that submits the completed registration form.",
+        "1 indique les conditions convenues ; 2 la restriction à une adresse partiellement masquée ; 3 le courriel du propriétaire ; 4 le bouton d’envoi du formulaire rempli.",
+        "1 marca las condiciones acordadas; 2 la restricción de correo parcialmente oculta; 3 el correo del propietario; 4 el botón para enviar el formulario completo."
+      ]
+    },
+    "sign-up-questions": {
+      "scene": "email",
+      "text": [
+        "For email problems, 1 points to sending another link and 2 marks the field for correcting the owner’s address. Read the page message before choosing an action.",
+        "En cas de problème de courriel, 1 indique le renvoi du lien et 2 le champ de correction de l’adresse du propriétaire. Lisez le message avant de choisir une action.",
+        "Para problemas con el correo, 1 señala el reenvío del enlace y 2 marca el campo para corregir la dirección del propietario. Lea el mensaje antes de actuar."
+      ]
+    },
+    "pay-an-invoice-link": {
+      "scene": "invoice",
+      "text": [
+        "1 marks the company and invoice balance; 2 the card-payment section; 3 the button to continue. The provider’s own checkout opens after that action.",
+        "1 indique l’entreprise et le solde de la facture ; 2 la rubrique du paiement par carte ; 3 le bouton pour continuer. Le paiement du prestataire s’ouvre après cette action.",
+        "1 marca la empresa y el saldo de la factura; 2 la sección de tarjeta; 3 el botón para continuar. Después se abre el pago del proveedor."
+      ]
+    },
+    "save-a-card": {
+      "scene": "save-card",
+      "text": [
+        "1 marks the save-card section; 2 points to continuing to the provider. Review any automatic-payment choice before leaving this page.",
+        "1 indique la rubrique d’enregistrement de carte ; 2 pointe vers le passage chez le prestataire. Vérifiez le choix de paiement automatique avant de quitter cette page.",
+        "1 marca la sección para guardar una tarjeta; 2 señala cómo continuar al proveedor. Revise cualquier opción de pago automático antes de salir."
+      ]
+    },
+    "pay-by-zelle": {
+      "scene": "zelle",
+      "text": [
+        "1 marks recipient information; 2 the amount sent; 3 the date sent; 4 the sender; 5 the bank confirmation code; 6 the reporting button. A report still needs staff confirmation.",
+        "1 indique le destinataire ; 2 le montant envoyé ; 3 la date ; 4 l’expéditeur ; 5 le code de confirmation bancaire ; 6 le bouton de déclaration. Le personnel doit encore confirmer le paiement.",
+        "1 marca el destinatario; 2 el importe enviado; 3 la fecha; 4 el remitente; 5 el código de confirmación bancaria; 6 el botón para informar. El personal todavía debe confirmar el pago."
+      ]
+    },
+    "terms-and-privacy": {
+      "scene": "legal",
+      "text": [
+        "1 points to downloading the current terms; 2 marks the included policies and their download links. Review the version beside each document.",
+        "1 pointe vers le téléchargement des conditions actuelles ; 2 indique les politiques incluses et leurs liens de téléchargement. Vérifiez la version de chaque document.",
+        "1 señala la descarga de las condiciones actuales; 2 marca las políticas incluidas y sus enlaces de descarga. Revise la versión junto a cada documento."
+      ]
+    },
+    "contact-sales": {
+      "scene": "contact",
+      "text": [
+        "1 marks your company name; 2 your reply email; 3 the optional message; 4 the send button. Use your own contact details when completing the form.",
+        "1 indique le nom de votre entreprise ; 2 votre courriel de réponse ; 3 le message facultatif ; 4 le bouton d’envoi. Utilisez vos propres coordonnées lorsque vous remplissez le formulaire.",
+        "1 marca el nombre de su empresa; 2 el correo para la respuesta; 3 el mensaje opcional; 4 el botón de envío. Utilice sus propios datos al completar el formulario."
+      ]
+    }
+  },
+  "languages": [
+    "en",
+    "fr",
+    "es"
+  ],
+  "headings": [
+    "On this screen",
+    "Sur cet écran",
+    "En esta pantalla"
+  ],
+  "notes": [
+    "Illustrative screen with fictional demo data. Prices, dates and available choices may differ. Select the image to open it at full size.",
+    "Écran illustratif avec des données fictives. Les prix, dates et choix disponibles peuvent varier. Sélectionnez l’image pour l’ouvrir en grand.",
+    "Pantalla ilustrativa con datos ficticios. Los precios, fechas y opciones disponibles pueden variar. Seleccione la imagen para verla a tamaño completo."
+  ],
+  "sceneNames": {
+    "overview": ["Public navigation and sign-up", "Navigation publique et inscription", "Navegación pública y registro"],
+    "plans": ["Plan comparison and selection", "Comparaison et choix du forfait", "Comparación y selección del plan"],
+    "company": ["Company sign-up form", "Formulaire d’inscription de l’entreprise", "Formulario de registro de empresa"],
+    "email": ["Email status, resend and correction", "Suivi, renvoi et correction du courriel", "Estado, reenvío y corrección del correo"],
+    "verify": ["Email confirmation button", "Bouton de confirmation du courriel", "Botón de confirmación del correo"],
+    "plan-choice": ["Plan, billing period and licences", "Forfait, période de facturation et licences", "Plan, período de facturación y licencias"],
+    "first-invoice": ["First invoice and payment action", "Première facture et action de paiement", "Primera factura y acción de pago"],
+    "workspace-ready": ["Account creation and workspace handoff", "Création du compte et accès à l’espace", "Creación de cuenta y acceso al espacio"],
+    "invoice": ["Invoice details and card checkout", "Détails de la facture et paiement par carte", "Detalles de factura y pago con tarjeta"],
+    "save-card": ["Save-card checkout action", "Action d’enregistrement de carte", "Acción para guardar una tarjeta"],
+    "zelle": ["Zelle recipient and payment report", "Destinataire Zelle et déclaration de paiement", "Destinatario Zelle e informe del pago"],
+    "legal": ["Terms and privacy downloads", "Téléchargement des conditions et de la confidentialité", "Descargas de condiciones y privacidad"],
+    "contact": ["Sales contact form", "Formulaire de contact commercial", "Formulario de contacto de ventas"],
+    "offer": ["Invitation terms and owner email", "Conditions de l’invitation et courriel du propriétaire", "Condiciones de invitación y correo del propietario"]
+  },
+  "alts": [
+    "Annotated screen showing where to act",
+    "Écran annoté indiquant où agir",
+    "Pantalla anotada que indica dónde actuar"
+  ]
+}

@@ -71,7 +71,13 @@ public sealed class PutAwayOperationsParcelUseCase
             return PutAwayOperationsParcelResponse.Failure(OperationsAccessErrors.SignInRequired);
         }
 
-        if (await _tracking.GetParcelAsync(request.ParcelId, cancellationToken) is not { WarehouseId: { } warehouseId } parcel
+        // By scan: the package's number from its label (owner, 2026-10-22); the number finds its id, the parcel is then loaded to be changed.
+        Guid parcelId = request.ParcelId != Guid.Empty
+            ? request.ParcelId
+            : Scanned(request.ParcelCode) is { } scanned && await _receiving.FindParcelByNumberAsync(scanned, cancellationToken) is { } numbered ? numbered.Id : Guid.Empty;
+        OperationsParcel? found = parcelId == Guid.Empty ? null : await _tracking.GetParcelAsync(parcelId, cancellationToken);
+
+        if (found is not { WarehouseId: { } warehouseId } parcel
             || await _scope.CoveredAsync(access, OperationsPermissions.ParcelsView, warehouseId, cancellationToken) is not { } warehouse)
         {
             return PutAwayOperationsParcelResponse.Failure(OperationsReceivingErrors.ParcelNotFound);
@@ -91,7 +97,7 @@ public sealed class PutAwayOperationsParcelUseCase
 
         if (await _tracking.FindStoredByKeyAsync(key, cancellationToken) is { } earlier && earlier.SubjectId == parcel.Id)
         {
-            return PutAwayOperationsParcelResponse.Success(parcel.Id);
+            return PutAwayOperationsParcelResponse.Success(parcel.Id, parcel.Number);
         }
 
         // Only while the parcel is at its origin warehouse (review L4).
@@ -100,7 +106,14 @@ public sealed class PutAwayOperationsParcelUseCase
             return PutAwayOperationsParcelResponse.Failure(OperationsReceivingErrors.ParcelClosed);
         }
 
-        if (await _receiving.GetLocationAsync(request.StorageLocationId, cancellationToken) is not { IsActive: true } location || location.WarehouseId != warehouse.Id)
+        // By scan: the shelf's code from its label, in this warehouse.
+        OperationsStorageLocation? shelf = request.StorageLocationId != Guid.Empty
+            ? await _receiving.GetLocationAsync(request.StorageLocationId, cancellationToken)
+            : Scanned(request.ShelfCode) is { } shelfCode
+                ? (await _receiving.ListLocationsAsync(warehouse.Id, cancellationToken)).FirstOrDefault(item => string.Equals(item.Code, shelfCode, StringComparison.OrdinalIgnoreCase))
+                : null;
+
+        if (shelf is not { IsActive: true } location || location.WarehouseId != warehouse.Id)
         {
             return PutAwayOperationsParcelResponse.Failure(OperationsReceivingErrors.LocationInactive);
         }
@@ -121,13 +134,23 @@ public sealed class PutAwayOperationsParcelUseCase
 
         if (await _unitOfWork.SaveChangesAsync(cancellationToken))
         {
-            return PutAwayOperationsParcelResponse.Success(parcel.Id);
+            return PutAwayOperationsParcelResponse.Success(parcel.Id, parcel.Number, location.Code);
         }
 
         // The same form sent twice at once: the other request saved it (ADR-0019, review M2).
         _unitOfWork.DiscardChanges();
         return await _tracking.FindStoredByKeyAsync(key, cancellationToken) is { } raced && raced.SubjectId == parcel.Id
-            ? PutAwayOperationsParcelResponse.Success(parcel.Id)
+            ? PutAwayOperationsParcelResponse.Success(parcel.Id, parcel.Number, location.Code)
             : PutAwayOperationsParcelResponse.Failure(OperationsCommonErrors.ConcurrencyConflict);
+    }
+
+    // =====================================================
+    // METHOD: SCANNED
+    // =====================================================
+    // A scanner types the label and Enter; spaces and case are ignored, nothing longer than a code is looked up.
+    private static string? Scanned(string? code)
+    {
+        string text = new((code ?? string.Empty).Where(character => !char.IsWhiteSpace(character)).ToArray());
+        return text.Length is > 0 and <= 40 ? text.ToUpperInvariant() : null;
     }
 }

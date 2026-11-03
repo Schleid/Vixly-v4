@@ -1,4 +1,4 @@
-﻿# Stage 2: Public site - design
+# Stage 2: Public site - design
 
 | | |
 |---|---|
@@ -99,3 +99,22 @@ Pages use Shared.UI primitives and `--vx-*` tokens (ADR-0013), with a public lay
 | D-U3 | Contact form sent to Vixly (Platform stores leads, emails sales, console list) |
 | D-U4 | **Hold sign-up until Stage 3.** The site goes live with marketing, plans, contact, legal and the pay pages. The sign-up pages are built and tested now but switched off. Exception (2026-10-16): a company invited with a Sales offer link can sign up; Platform enforces it (`PlatformTenants:RegistrationInviteOnly`) |
 | D-U5, D-U6 | As proposed (language in the URL; Control builds, Frontend/UI restyles) |
+
+## 10. In-app help (H1, ADR-0023)
+
+Public owns anonymous help at `/en/help`, `/fr/help`, `/es/help` and each address plus `/{Slug}`.
+Articles are embedded under `Vixly.Public.Web/Help/<lang>/<section>/` and checked at startup.
+There are no Public reader permissions or conditions; help remains reachable with general sign-up closed.
+
+| Anonymous endpoint | Policy | Caching |
+|---|---|---|
+| `GET /{en,fr,es}/help` | `public-help-read`: 120 requests per minute per visitor IP | Ten minutes for successful reads without a search query or Set-Cookie |
+| `GET /{en,fr,es}/help?q=...` | `public-help-read` | Not cached; noindex |
+| `GET /{en,fr,es}/help/{Slug}` | `public-help-read` | Ten minutes for successful reads without Set-Cookie; unknown articles return the normal 404 |
+
+Header/footer links open the help home; the header question-mark opens the article for the current application route.
+Email-link visitor tokens are matched as route parameters and never copied into help addresses.
+The sitemap includes every help address with en/fr/es alternates. The language switcher preserves article slugs.
+The 16 articles and their French/Spanish drafts are verified under `docs/help/HELP-1-VERIFICATION.md`.
+
+Public help Version 2 (ADR-0023 Amendment 1) adds 42 localized annotated page captures under `/help/media/v2/`, referenced by the existing 48 article files. Each screenshot has numbered outlines/arrows, a localized caption and alternative text, and opens at full size. Text-only Version 1 is preserved in `docs/help/archive/public-v1/`. Capture provenance and V2 checks are in `docs/help/HELP-1-V2-VERIFICATION.md`. The capture fixture is a development build tool and is never part of the deployed site's routes or API transport.

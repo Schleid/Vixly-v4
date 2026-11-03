@@ -1,7 +1,9 @@
 ﻿using System.Net;
 using System.Text.RegularExpressions;
+using Vixly.Contracts.Operations.Billing;
 using Vixly.Contracts.Operations.Common;
 using Vixly.Contracts.Operations.Customers;
+using Vixly.Contracts.Operations.Packages;
 
 namespace Vixly.Customer.Web.Tests;
 
@@ -75,10 +77,15 @@ public sealed partial class CustomerAccountHttpTests : IAsyncLifetime
     [Fact]
     public async Task SignIn_SetsTheSessionCookie_AndHomeShowsTheMailbox()
     {
+        // The first sign-in asks for the home address once (owner, 2026-10-26).
+        CustomerAddressDto? given = null;
         _host.Operations.Customers = call => call switch
         {
             { Method: "POST", Path: "sessions" } when call.Field("password") == "Correct horse 42" => (HttpStatusCode.OK, new CustomerSessionDto("session-1", Ana())),
-            { Method: "GET", Path: "me" } when call.Session == "session-1" => (HttpStatusCode.OK, Ana()),
+            { Method: "GET", Path: "me" } when call.Session == "session-1" => (HttpStatusCode.OK, Ana() with { HomeAddress = given }),
+            { Method: "PUT", Path: "me/address" } when call.Session == "session-1" && call.Field("city") == "Les Cayes" =>
+                (HttpStatusCode.OK, Ana() with { HomeAddress = given = new CustomerAddressDto(call.Field("line1"), null, "Les Cayes", "Sud", null, call.Field("countryCode")) }),
+            { Method: "PUT", Path: "me/address" } => (HttpStatusCode.BadRequest, Error("ops.locations.city_required")),
             _ => (HttpStatusCode.Unauthorized, Error("ops.customers.session_required"))
         };
 
@@ -87,6 +94,17 @@ public sealed partial class CustomerAccountHttpTests : IAsyncLifetime
         Assert.Equal(HttpStatusCode.Redirect, signIn.StatusCode);
         Assert.Equal("session-1", _cookies["__Secure-vx4-customer"]);
 
+        (HttpResponseMessage first, _) = await GetAsync("/customer/");
+        Assert.Equal(HttpStatusCode.Redirect, first.StatusCode);
+        Assert.Equal("/customer/address", first.Headers.Location?.OriginalString);
+        (_, string form) = await GetAsync("/customer/address");
+        Assert.Contains("Before you start, tell us where you live", form, StringComparison.Ordinal);
+        string refused = await ReadAsync(await PostFormAsync("/customer/address", "/customer/address", new() { ["line1"] = "12 Rue Geffrard", ["city"] = "", ["country"] = "HT" }));
+        Assert.Contains("12 Rue Geffrard", refused, StringComparison.Ordinal);
+        HttpResponseMessage saved = await PostFormAsync("/customer/address", "/customer/address", new() { ["line1"] = "12 Rue Geffrard", ["city"] = "Les Cayes", ["region"] = "Sud", ["country"] = "HT" });
+        Assert.Equal(HttpStatusCode.Redirect, saved.StatusCode);
+        Assert.Equal("HT", given?.CountryCode);
+
         (_, string home) = await GetAsync("/customer/");
 
         Assert.Contains("Hello Ana", home, StringComparison.Ordinal);
@@ -94,6 +112,100 @@ public sealed partial class CustomerAccountHttpTests : IAsyncLifetime
         Assert.Contains("Ana Pierre C00042", home, StringComparison.Ordinal);
         Assert.Contains("8400 NW 25th St", home, StringComparison.Ordinal);
         AssertNoVixly(home);
+    }
+
+    // Owner, 2026-10-27: the company sets the customers' inactivity sign-out; the portal warns with a countdown, then signs out.
+    [Fact]
+    public async Task Inactivity_FollowsTheCompanysTime_WarnsFirst_AndSignsOutWithAMessage()
+    {
+        _host.Operations.Brand = _host.Operations.Brand with { IdleMinutes = 90, IdleWarnMinutes = 3 };
+        _host.Operations.Customers = call => call switch
+        {
+            { Method: "POST", Path: "sessions" } => (HttpStatusCode.OK, new CustomerSessionDto("session-9", Ana())),
+            { Method: "GET", Path: "me" } when call.Session == "session-9" => (HttpStatusCode.OK, Ana() with { HomeAddress = new CustomerAddressDto("12 Rue Geffrard", null, "Les Cayes", "Sud", null, "HT") }),
+            { Method: "DELETE" } => (HttpStatusCode.NoContent, null!),
+            _ => (HttpStatusCode.Unauthorized, Error("ops.customers.session_required"))
+        };
+
+        (_, string signedOut) = await GetAsync("/customer/sign-in");
+        Assert.DoesNotContain("data-idle-end", signedOut, StringComparison.Ordinal);
+
+        await PostFormAsync("/customer/sign-in", "/customer/sign-in", new() { ["email"] = "ana@example.com", ["password"] = "Correct horse 42" });
+        (_, string home) = await GetAsync("/customer/");
+        Assert.Contains("data-idle-warn=\"5220\" data-idle-end=\"5400\"", home, StringComparison.Ordinal);
+        Assert.Contains("js/customer-session.js", home, StringComparison.Ordinal);
+        Assert.Contains("Stay signed in", home, StringComparison.Ordinal);
+        Assert.Contains("data-sign-out", home, StringComparison.Ordinal);
+        AssertNoVixly(home);
+
+        Assert.Equal(HttpStatusCode.NoContent, (await SendAsync(HttpMethod.Get, "/customer/session/keepalive", null)).StatusCode);
+
+        HttpResponseMessage idle = await PostFormAsync("/customer/", "/customer/sign-out", new() { ["reason"] = "idle" });
+        Assert.Equal("/customer/sign-in?done=idle", idle.Headers.Location?.OriginalString);
+        Assert.False(_cookies.ContainsKey("__Secure-vx4-customer"));
+        (_, string message) = await GetAsync("/customer/sign-in?done=idle");
+        Assert.Contains("You were signed out after a period of inactivity", message, StringComparison.Ordinal);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await SendAsync(HttpMethod.Get, "/customer/session/keepalive", null)).StatusCode);
+    }
+
+    // Owner, 2026-10-27: a Pay button for each way the company offers on the portal; Zelle and bank transfer are reported and wait for the company.
+    [Fact]
+    public async Task Invoices_OfferThePortalMethods_AndAReportedPaymentWaits()
+    {
+        Guid unpaid = Guid.NewGuid();
+        Guid paid = Guid.NewGuid();
+        bool offered = true;
+        string? reported = null;
+        _host.Operations.Customers = call => call switch
+        {
+            { Method: "POST", Path: "sessions" } => (HttpStatusCode.OK, new CustomerSessionDto("session-7", Ana())),
+            { Method: "GET", Path: "me" } => (HttpStatusCode.OK, Ana() with { HomeAddress = new CustomerAddressDto("1 Rue A", null, "Les Cayes", "Sud", null, "HT") }),
+            { Method: "GET", Path: "me/credit" } => (HttpStatusCode.OK, new CustomerCreditAccountDto(false, "none", 0m, 0, "USD", 0m, 0m, 0m, Array.Empty<CustomerCreditItemDto>())),
+            { Method: "GET", Path: "me/invoices" } => (HttpStatusCode.OK, new CustomerInvoicesDto(new[]
+            {
+                new CustomerInvoiceDto(unpaid, "INV26000001", "shipment", "SH26000001", new DateOnly(2026, 10, 26), "USD", 20m, 0m, 20m, false, Array.Empty<CustomerCreditNoteDto>()),
+                new CustomerInvoiceDto(paid, "INV26000002", "shipment", "SH26000002", new DateOnly(2026, 10, 26), "USD", 9m, 0m, 0m, false, Array.Empty<CustomerCreditNoteDto>(), "paid")
+            }, false, offered, offered)),
+            { Method: "GET" } when call.Path == "me/invoices/" + unpaid + "/pay/zelle" =>
+                (HttpStatusCode.OK, new CustomerPayDto("INV26000001", "INV26000001", 20m, "USD", "Write the invoice number in the memo.", "@andes", null, "Andes Courier", false)),
+            { Method: "POST" } when call.Path == "me/invoices/" + unpaid + "/pay/zelle" && call.Body?.GetProperty("termsAccepted").GetBoolean() != true =>
+                (HttpStatusCode.BadRequest, Error("ops.payments.zelle_terms_required")),
+            { Method: "POST" } when call.Path == "me/invoices/" + unpaid + "/pay/zelle" =>
+                (HttpStatusCode.OK, new CustomerPayReportDto("INV26000001", reported = "PAY26000001")),
+            _ => (HttpStatusCode.Unauthorized, Error("ops.customers.session_required"))
+        };
+        await PostFormAsync("/customer/sign-in", "/customer/sign-in", new() { ["email"] = "ana@example.com", ["password"] = "Correct horse 42" });
+
+        (_, string list) = await GetAsync("/customer/invoices");
+        Assert.Contains("href=\"/customer/invoices/" + unpaid + "/pay\"", list, StringComparison.Ordinal);
+        Assert.DoesNotContain("/customer/invoices/" + paid + "/pay", list, StringComparison.Ordinal);
+
+        (_, string choose) = await GetAsync("/customer/invoices/" + unpaid + "/pay");
+        Assert.Contains("Pay by Zelle", choose, StringComparison.Ordinal);
+        Assert.Contains("Pay by bank transfer", choose, StringComparison.Ordinal);
+        Assert.DoesNotContain("Pay by card", choose, StringComparison.Ordinal);
+
+        (_, string zelle) = await GetAsync("/customer/invoices/" + unpaid + "/pay/zelle");
+        Assert.Contains("@andes", zelle, StringComparison.Ordinal);
+        Assert.Contains("Andes Courier", zelle, StringComparison.Ordinal);
+        Assert.Contains("Write the invoice number in the memo.", zelle, StringComparison.Ordinal);
+        AssertNoVixly(zelle);
+
+        string refused = await ReadAsync(await PostFormAsync("/customer/invoices/" + unpaid + "/pay/zelle", "/customer/invoices/" + unpaid + "/pay/zelle", new() { ["reference"] = "ZL-778" }));
+        Assert.Contains("Accept the Zelle terms first.", refused, StringComparison.Ordinal);
+        Assert.Contains("value=\"ZL-778\"", refused, StringComparison.Ordinal);
+
+        HttpResponseMessage sent = await PostFormAsync("/customer/invoices/" + unpaid + "/pay/zelle", "/customer/invoices/" + unpaid + "/pay/zelle",
+            new() { ["reference"] = "ZL-778", ["terms"] = "true" });
+        Assert.Equal("/customer/invoices?done=reported&number=INV26000001", sent.Headers.Location?.OriginalString);
+        Assert.Equal("PAY26000001", reported);
+        (_, string after) = await GetAsync("/customer/invoices?done=reported&number=INV26000001");
+        Assert.Contains("Your payment for invoice INV26000001 is waiting for confirmation", after, StringComparison.Ordinal);
+
+        // Nothing offered on the portal: no Pay button.
+        offered = false;
+        (_, string none) = await GetAsync("/customer/invoices");
+        Assert.DoesNotContain("/pay\"", none, StringComparison.Ordinal);
     }
 
     [Fact]

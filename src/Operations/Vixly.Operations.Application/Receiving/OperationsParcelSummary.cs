@@ -39,4 +39,5 @@ public sealed record OperationsParcelSummary(
     DateTimeOffset? ShippingLabelUtc = null,
     string? LabelName = null,
     string? LabelCode = null,
-    string? LabelSender = null);
+    string? LabelSender = null,
+    string? ShipmentNumber = null);

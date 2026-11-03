@@ -33,12 +33,16 @@ public sealed class GetMyOperationsAccountUseCase
 
     private readonly OperationsStaffDirectory _directory;
 
+    private readonly Vixly.Operations.Application.Devices.OperationsStepUp _stepUp;
+
     public GetMyOperationsAccountUseCase(
         OperationsAccess access,
         IOperationsRoleRepository roles,
         IOperationsSessionRepository sessions,
-        OperationsStaffDirectory directory)
+        OperationsStaffDirectory directory,
+        Vixly.Operations.Application.Devices.OperationsStepUp stepUp)
     {
+        _stepUp = stepUp ?? throw new ArgumentNullException(nameof(stepUp));
         _access = access ?? throw new ArgumentNullException(nameof(access));
         _roles = roles ?? throw new ArgumentNullException(nameof(roles));
         _sessions = sessions ?? throw new ArgumentNullException(nameof(sessions));
@@ -64,6 +68,9 @@ public sealed class GetMyOperationsAccountUseCase
             .Select(session => new OperationsSessionSummary(session.Id, session.CreatedUtc, session.LastSeenUtc, session.IpAddress, session.UserAgent, session.Id == context.SessionId))
             .ToList();
 
-        return GetMyOperationsAccountResponse.Success(me[0], access.User.UnusedRecoveryCodeCount, sessions, access.User.HasSecondFactor && await _access.IsFreshAsync(context, cancellationToken));
+        bool passwordConfirms = await _stepUp.PasswordConfirmsAsync(access.User, cancellationToken);
+
+        return GetMyOperationsAccountResponse.Success(me[0], access.User.UnusedRecoveryCodeCount, sessions,
+            (access.User.HasSecondFactor || passwordConfirms) && await _access.IsFreshAsync(context, cancellationToken), passwordConfirms);
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Vixly.Public.Web.Hosting;
 using Vixly.Public.Web.Platform;
+using Microsoft.AspNetCore.Routing;
 
 namespace Vixly.Public.Web.Tests;
 
@@ -38,18 +39,30 @@ internal sealed class PublicSiteTestHost : IAsyncDisposable
 
     public StubPlatformState Platform { get; }
 
+    public IServiceProvider Services => _app.Services;
+
     public ECDsa CallerKey { get; }
+
+    public IReadOnlySet<string> Routes => ((IEndpointRouteBuilder)_app).DataSources
+        .SelectMany(source => source.Endpoints).OfType<RouteEndpoint>()
+        .Select(endpoint => endpoint.RoutePattern.RawText ?? string.Empty).ToHashSet(StringComparer.Ordinal);
 
     public static async Task<PublicSiteTestHost> StartAsync(bool registrationOpen = false)
     {
         StubPlatformState platform = new();
         ECDsa callerKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
 
+        DirectoryInfo? root = new(AppContext.BaseDirectory);
+        while (root is not null && !File.Exists(Path.Combine(root.FullName, "AGENTS.md"))) root = root.Parent;
+        if (root is null) throw new InvalidOperationException("Repository root not found.");
+
         WebApplication app = PublicSiteHost.Build(
             new[]
             {
                 "--environment=Production",
+                "--VixlySettingsCheck:Enabled=false",
                 "--applicationName=Vixly.Public.Web",
+                "--contentRoot=" + Path.Combine(root.FullName, "src/Public/Vixly.Public.Web"),
                 "--AllowedHosts=vixly.techcrafters.ltd",
                 "--PublicSite:PlatformApiBaseUrl=https://platform.test/",
                 "--PublicSite:CanonicalBaseUrl=" + BaseAddress,
@@ -62,6 +75,7 @@ internal sealed class PublicSiteTestHost : IAsyncDisposable
             builder =>
             {
                 builder.WebHost.UseTestServer();
+                builder.WebHost.UseStaticWebAssets();
                 builder.Services.AddSingleton<IStartupFilter, VisitorAddressStartupFilter>();
                 builder.Services.AddSingleton<IDataProtectionProvider>(new EphemeralDataProtectionProvider());
                 builder.Services.AddHttpClient<PlatformApi>().ConfigurePrimaryHttpMessageHandler(() => new StubPlatformHandler(platform));

@@ -14,6 +14,9 @@
 // - A form with a bot check (.cf-turnstile) is not sent until
 //   the check has answered; its [data-vx-bot-check-message]
 //   is shown instead. Platform still checks every answer
+// - An empty input[data-vx-time-zone] gets the browser's IANA
+//   time zone when its form is sent (sign-up: the company's time
+//   zone; the server falls back to the address)
 // - Live (interactive) console pages do not load this file:
 //   their components guard clicks on the server
 // =========================================================
@@ -56,8 +59,29 @@
         return pending;
     }
 
+    function fillTimeZone(form) {
+        var inputs = form.querySelectorAll("input[data-vx-time-zone]");
+        if (!inputs.length) {
+            return;
+        }
+        var zone = "";
+        try {
+            zone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+        } catch (e) {
+            zone = "";
+        }
+        for (var i = 0; i < inputs.length; i++) {
+            if (!inputs[i].value) {
+                inputs[i].value = zone;
+            }
+        }
+    }
+
     document.addEventListener("submit", function (event) {
         var form = event.target;
+        if (form instanceof HTMLFormElement) {
+            fillTimeZone(form);
+        }
         if (!(form instanceof HTMLFormElement) || event.defaultPrevented || form.hasAttribute("data-vx-allow-repeat")) {
             return;
         }

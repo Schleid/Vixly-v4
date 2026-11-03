@@ -3,6 +3,7 @@ using Vixly.Platform.Application.Identity;
 using Vixly.Platform.Application.UseCases.MyAccount.BeginPasskeyStepUp;
 using Vixly.Platform.Application.UseCases.MyAccount.ConfirmSecondFactor;
 using Vixly.Platform.Application.UseCases.MyAccount.ConfirmSecondFactorWithPasskey;
+using Vixly.Platform.Application.UseCases.MyAccount.GetStepUpOptions;
 using Vixly.Shared.Kernel.Errors;
 
 namespace Vixly.Platform.Web.Features.StepUp;
@@ -31,10 +32,13 @@ public sealed class StepUpPresenter : PlatformPresenter<StepUpState>
 
     private readonly ConfirmSecondFactorWithPasskeyUseCase _confirmPasskey;
 
+    private readonly GetStepUpOptionsUseCase _options;
+
     public StepUpPresenter(
         ConfirmSecondFactorUseCase confirm,
         BeginPasskeyStepUpUseCase beginPasskey,
         ConfirmSecondFactorWithPasskeyUseCase confirmPasskey,
+        GetStepUpOptionsUseCase options,
         PlatformUseCaseScope scope,
         ILogger<StepUpPresenter> logger)
         : base(scope, StepUpState.Initial, logger)
@@ -42,6 +46,22 @@ public sealed class StepUpPresenter : PlatformPresenter<StepUpState>
         _confirm = confirm ?? throw new ArgumentNullException(nameof(confirm));
         _beginPasskey = beginPasskey ?? throw new ArgumentNullException(nameof(beginPasskey));
         _confirmPasskey = confirmPasskey ?? throw new ArgumentNullException(nameof(confirmPasskey));
+        _options = options ?? throw new ArgumentNullException(nameof(options));
+    }
+
+    // Require MFA = No and no second factor: the dialog asks for the password (owner, 2026-10-22).
+    public async Task LoadAsync()
+    {
+        bool passwordOnly = false;
+        Error? error = await RunUseCaseAsync(async (context, cancellationToken) =>
+        {
+            GetStepUpOptionsResponse response = await _options.ExecuteAsync(context, new GetStepUpOptionsRequest(), cancellationToken);
+            passwordOnly = response.Succeeded && response.PasswordOnly;
+
+            return response.Error;
+        });
+
+        SetState(State with { PasswordOnly = passwordOnly, Error = error, SessionEnded = PlatformAuthErrors.SessionEnded.Equals(error) });
     }
 
     public async Task<PlatformPasskeyStart?> BeginPasskeyAsync()
@@ -98,7 +118,7 @@ public sealed class StepUpPresenter : PlatformPresenter<StepUpState>
         {
             ConfirmSecondFactorResponse response = await _confirm.ExecuteAsync(
                 context,
-                new ConfirmSecondFactorRequest { Code = code ?? string.Empty, UseRecoveryCode = State.UseRecoveryCode },
+                new ConfirmSecondFactorRequest { Code = code ?? string.Empty, UseRecoveryCode = State.UseRecoveryCode && !State.PasswordOnly, UsePassword = State.PasswordOnly },
                 cancellationToken);
             confirmed = response.Succeeded;
 

@@ -49,7 +49,10 @@ IMPORTANT NOTES:
                 </article>
             }
         }
-        <p><a class="site-button" href="/customer/sign-up">@T["site.nav.sign_up"]</a></p>
+        @if (Page.Site.PortalShown)
+        {
+            <p><a class="site-button" href="/customer/sign-up">@T["site.nav.sign_up"]</a></p>
+        }
     </section>
 </SiteShell>
 

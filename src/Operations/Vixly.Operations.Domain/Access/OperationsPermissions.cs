@@ -49,7 +49,13 @@ public static class OperationsPermissions
     public const string BrandPublish = "ops.brand.publish";
     public const string AuditView = "ops.audit.view";
     public const string CustomersView = "ops.customers.view";
+
+    // Owner, 2026-10-29 (branches and roles design, 4.4): find one customer by their exact phone, email or code, at any level; the list stays with the company.
+    public const string CustomersLookup = "ops.customers.lookup";
     public const string CustomersManage = "ops.customers.manage";
+
+    // Owner, 2026-10-29 (design section 9): answer a caller about one shipment, by their phone and its tracking number; nothing else.
+    public const string SupportLookup = "ops.support.lookup";
     // Slice 5F step 2b (K-1): the credit department's right: open and manage credit accounts, decide charges above a limit.
     public const string CustomersCredit = "ops.customers.credit";
 
@@ -142,6 +148,18 @@ public static class OperationsPermissions
 
     public const string DeliveryDrive = "ops.delivery.drive";
 
+    // Slice 8: see the costs and the profit per shipment; enter bills (and vendors); approve bills and record what was paid. Company-wide.
+    public const string CostsView = "ops.costs.view";
+
+    public const string BillsEnter = "ops.bills.enter";
+
+    public const string BillsApprove = "ops.bills.approve";
+
+    // Slice 11 (owner, 2026-10-22): see the reports; money figures need the finance right. Given per warehouse or company-wide.
+    public const string ReportsOperations = "ops.reports.operations";
+
+    public const string ReportsFinance = "ops.reports.finance";
+
     public static IReadOnlyList<string> All { get; } = new[]
     {
         StaffView, StaffInvite, StaffEdit, StaffLock, StaffSuspend, StaffReactivate, StaffDeactivate, StaffResetSecondFactor, StaffEndSessions,
@@ -153,7 +171,8 @@ public static class OperationsPermissions
         ServicesView, ServicesManage,
         BrandView, BrandEdit, BrandPublish,
         AuditView,
-        CustomersView, CustomersManage, CustomersCredit,
+        CustomersView, CustomersLookup, CustomersManage, CustomersCredit,
+        SupportLookup,
         ReceivingReceive, ParcelsView, ParcelsAssign, InspectionCheck, PrintersManage,
         InspectionConfigure, InspectionPerform, HoldsManage,
         ChargesConfigure, QuotesCreate,
@@ -169,11 +188,32 @@ public static class OperationsPermissions
         EventsView, EventsAdd,
         ArrivalsReceive, CustomsRecord,
         PickupRelease,
-        DeliveryPlan, DeliveryDrive
+        DeliveryPlan, DeliveryDrive,
+        CostsView, BillsEnter, BillsApprove,
+        ReportsOperations, ReportsFinance
     };
 
     // Held only by the system roles; a tenant role can never include them.
-    public static IReadOnlyList<string> SystemOnly { get; } = new[] { CompanyEditContacts, CompanyRequestChange, DevicesApprove, DevicesRelease };
+    // Owner, 2026-10-29 (R-3): approving and releasing devices left this list; the company decides who does it.
+    public static IReadOnlyList<string> SystemOnly { get; } = new[] { CompanyEditContacts, CompanyRequestChange };
+
+    // Owner, 2026-10-29 (branches and roles design, 4.2): these count only in a role given for the whole company.
+    // Given at a branch or a warehouse, they do nothing: staff, roles, devices, company setup, website and audit stay with the company.
+    public static IReadOnlyList<string> CompanyOnly { get; } = new[]
+    {
+        StaffView, StaffInvite, StaffEdit, StaffLock, StaffSuspend, StaffReactivate, StaffDeactivate, StaffResetSecondFactor, StaffEndSessions,
+        RolesView, RolesCreate, RolesEdit, RolesEditPermissions, RolesGrant,
+        DevicesView, DevicesApprove, DevicesRelease,
+        SettingsEdit, CompanyEditContacts, CompanyRequestChange,
+        BranchesManage, WarehousesManage, ServicesManage, ChargesConfigure, CarriersManage, InspectionConfigure,
+        BrandEdit, BrandPublish, AuditView,
+        CustomersView, SupportLookup
+    };
+
+    // Owner, 2026-10-29 (S-5): an outside account holds nothing but the support lookup, whatever its roles say.
+    public static IReadOnlyList<string> Outside { get; } = new[] { SupportLookup };
+
+    public static bool IsCompanyOnly(string? code) => code is not null && CompanyOnly.Contains(code, StringComparer.Ordinal);
 
     // Slice 7 step 4 (R-8): a partner agent works at its own partner-operated warehouse only: receive, customs, release and deliver.
     // Taking payments is added only where the company lets that partner handle money (a setting of the warehouse).

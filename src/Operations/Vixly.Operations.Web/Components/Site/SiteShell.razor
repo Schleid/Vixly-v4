@@ -18,7 +18,7 @@ IMPORTANT NOTES:
 @inject Vixly.Shared.Hosting.Maintenance.VixlyMaintenanceMonitor Maintenance
 
 <!DOCTYPE html>
-<html lang="@Page.Language" data-theme="light">
+<html lang="@Page.Language" data-theme="light" data-site-theme="@OperationsSiteLooks.Slug(Settings.Theme)" data-site-font="@OperationsSiteLooks.Slug(Settings.Font)">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -51,7 +51,11 @@ IMPORTANT NOTES:
         <meta name="robots" content="noindex" />
     }
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-theme.css" />
-    <link rel="stylesheet" href="/css/tenant-site.css?v=20261029-1" />
+    @if (OperationsSiteLooks.File(Settings.Font) is { } font)
+    {
+        <link rel="preload" href="@font" as="font" type="font/woff2" crossorigin />
+    }
+    <link rel="stylesheet" href="/css/tenant-site.css?v=20261030-1" />
     <style>:root { --site-primary: @Settings.PrimaryColour; --site-accent: @Settings.AccentColour; }</style>
     <script type="application/ld+json">@((MarkupString)OperationsSiteJsonLd.Build(Page, Description))</script>
 </head>
@@ -80,8 +84,12 @@ IMPORTANT NOTES:
             <a href="@(Page.Home)#track">@T["site.nav.track"]</a>
             <a href="@(Page.Home)/locations">@T["site.nav.locations"]</a>
             @if (Page.Site.PricingShown) { <a href="@(Page.Home)/pricing">@T["site.nav.pricing"]</a> }
-            <a class="site-button site-button--ghost" href="/customer/sign-in">@T["site.nav.sign_in"]</a>
-            <a class="site-button" href="/customer/sign-up">@T["site.nav.sign_up"]</a>
+            @* Vixly Lite (owner, 2026-10-30): no customer portal in the plan, no sign-in links. *@
+            @if (Page.Site.PortalShown)
+            {
+                <a class="site-button site-button--ghost" href="/customer/sign-in">@T["site.nav.sign_in"]</a>
+                <a class="site-button" href="/customer/sign-up">@T["site.nav.sign_up"]</a>
+            }
         </nav>
         <nav class="site-languages" aria-label="@T["ui.language"]">
             @foreach (string language in OperationsSiteLanguages.All)

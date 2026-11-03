@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
@@ -386,7 +386,7 @@
     <value>{days}-day free trial</value>
   </data>
   <data name="public.plans.choose" xml:space="preserve">
-    <value>Choose this plan</value>
+    <value>Get started</value>
   </data>
   <data name="public.plans.tax_note" xml:space="preserve">
     <value>Prices are before tax.</value>
@@ -819,5 +819,78 @@
   </data>
   <data name="public.plans.feature.partner_agents" xml:space="preserve">
     <value>Partner agents</value>
+  </data>
+  <data name="public.plans.feature.text_messages" xml:space="preserve">
+    <value>Notices by SMS and WhatsApp</value>
+  </data>
+  <data name="public.plans.feature.quick_books_sync" xml:space="preserve">
+    <value>QuickBooks Online sync</value>
+  </data>
+  <data name="public.plans.feature.tenant_api" xml:space="preserve">
+    <value>API and webhooks</value>
+  </data>
+  <data name="public.plans.feature.carrier_data" xml:space="preserve">
+    <value>Carrier data (automatic dates)</value>
+  </data>
+  <data name="public.register.new_email" xml:space="preserve">
+    <value>New email address</value>
+  </data>
+  <data name="public.pay.preparing" xml:space="preserve">
+    <value>We are preparing your invoice. This page refreshes on its own in a few seconds.</value>
+  </data>
+  <data name="nav.help" xml:space="preserve"><value>Help</value></data>
+  <data name="footer.help" xml:space="preserve"><value>Help</value></data>
+  <data name="ui.help.title" xml:space="preserve"><value>Vixly help</value></data>
+  <data name="ui.help.summary" xml:space="preserve"><value>Find out what Vixly does and get help with plans, sign-up and payments.</value></data>
+  <data name="ui.help.context" xml:space="preserve"><value>Help for this page</value></data>
+  <data name="ui.help.back" xml:space="preserve"><value>Back to help</value></data>
+  <data name="ui.help.related" xml:space="preserve"><value>Related articles</value></data>
+  <data name="ui.help.search" xml:space="preserve"><value>Search help</value></data>
+  <data name="ui.help.search_go" xml:space="preserve"><value>Search</value></data>
+  <data name="ui.help.results" xml:space="preserve"><value>Search results</value></data>
+  <data name="ui.help.empty" xml:space="preserve"><value>No matching articles. Try a different word.</value></data>
+  <data name="ui.help.clear" xml:space="preserve"><value>Browse all articles</value></data>
+  <data name="ui.help.section.getting-started" xml:space="preserve"><value>Getting started</value></data>
+  <data name="ui.help.section.sign-up" xml:space="preserve"><value>Signing up</value></data>
+  <data name="ui.help.section.paying" xml:space="preserve"><value>Paying</value></data>
+  <data name="ui.help.section.terms-and-contact" xml:space="preserve"><value>Terms and contact</value></data>
+  <data name="ui.maintenance.page_title" xml:space="preserve">
+    <value>Under maintenance</value>
+  </data>
+  <data name="ui.maintenance.page_body" xml:space="preserve">
+    <value>We are doing planned maintenance. We expect to be back by {time} (UTC).</value>
+  </data>
+  <data name="ui.maintenance.banner" xml:space="preserve">
+    <value>Planned maintenance from {start} to {end} (UTC): the site will be unavailable during this time.</value>
+  </data>
+  <data name="public.pay.preparing_slow" xml:space="preserve">
+    <value>Your invoice is taking longer than usual. Nothing is lost: come back to this page in a few minutes, or press the button below.</value>
+  </data>
+  <data name="public.pay.refresh" xml:space="preserve">
+    <value>Check again</value>
+  </data>
+  <data name="public.plans.shipments" xml:space="preserve">
+    <value>Up to {count} shipments a month, then {price} each</value>
+  </data>
+  <data name="public.plans.feature.customer_portal" xml:space="preserve">
+    <value>Customer portal and mailbox address</value>
+  </data>
+  <data name="public.plans.feature.insurance" xml:space="preserve">
+    <value>Shipment insurance</value>
+  </data>
+  <data name="public.plans.feature.credit_accounts" xml:space="preserve">
+    <value>Customer credit accounts</value>
+  </data>
+  <data name="public.plans.feature.supplies" xml:space="preserve">
+    <value>Supplies sales and stock</value>
+  </data>
+  <data name="public.plans.feature.home_delivery" xml:space="preserve">
+    <value>Home delivery with drivers</value>
+  </data>
+  <data name="public.plans.feature.support_desk" xml:space="preserve">
+    <value>Support agents and ticket desk</value>
+  </data>
+  <data name="public.plans.feature.payables" xml:space="preserve">
+    <value>Bills and profit per shipment</value>
   </data>
 </root>

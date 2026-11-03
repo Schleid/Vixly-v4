@@ -28,7 +28,7 @@ namespace Vixly.Operations.Infrastructure.Documents;
 // =========================================================
 internal static class OperationsManifestLayout
 {
-    public static byte[] RenderDispatch(OperationsDispatchManifest manifest, IStringLocalizer<OperationsText> text)
+    public static byte[] RenderDispatch(OperationsDispatchManifest manifest, IStringLocalizer<OperationsText> text, byte[]? logo = null)
     {
         ArgumentNullException.ThrowIfNull(manifest);
         ArgumentNullException.ThrowIfNull(text);
@@ -41,7 +41,7 @@ internal static class OperationsManifestLayout
             {
                 row.RelativeItem().Column(column =>
                 {
-                    column.Item().Text(manifest.CompanyName).FontSize(14).SemiBold();
+                    OperationsDocumentBrand.Head(column, logo, manifest.CompanyName, 14);
                     column.Item().Text(manifest.OriginCode + " → " + manifest.DestinationCode + " · " + manifest.ServiceCode);
 
                     if (manifest.CutoffUtc is { } cutoff)
@@ -113,7 +113,7 @@ internal static class OperationsManifestLayout
         })).GeneratePdf();
     }
 
-    public static byte[] RenderBundle(OperationsBundleManifest manifest, IStringLocalizer<OperationsText> text)
+    public static byte[] RenderBundle(OperationsBundleManifest manifest, IStringLocalizer<OperationsText> text, byte[]? logo = null)
     {
         ArgumentNullException.ThrowIfNull(manifest);
         ArgumentNullException.ThrowIfNull(text);
@@ -125,7 +125,7 @@ internal static class OperationsManifestLayout
             {
                 row.RelativeItem().Column(column =>
                 {
-                    column.Item().Text(manifest.CompanyName).FontSize(14).SemiBold();
+                    OperationsDocumentBrand.Head(column, logo, manifest.CompanyName, 14);
                     column.Item().Text(manifest.OriginCode + " → " + manifest.DestinationCode + " · " + manifest.ServiceCode);
 
                     if (manifest.DispatchNumber is { } dispatch)

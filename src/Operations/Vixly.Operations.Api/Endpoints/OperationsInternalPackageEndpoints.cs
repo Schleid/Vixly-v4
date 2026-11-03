@@ -65,7 +65,8 @@ public static class OperationsInternalPackageEndpoints
                 DeclaredValue = body.DeclaredValue,
                 ExpectedDate = body.ExpectedDate,
                 ShipmentId = body.ShipmentId,
-                WarehouseId = body.WarehouseId
+                WarehouseId = body.WarehouseId,
+                Items = Items(body.Items)
             }, cancellationToken);
 
             return response.Succeeded ? Results.Ok(new CustomerPreAlertCreatedDto(response.PreAlertId, response.ParcelId)) : OperationsApiErrors.Problem(http, response.Error!);
@@ -154,6 +155,11 @@ public static class OperationsInternalPackageEndpoints
         return endpoints;
     }
 
+    // Owner, 2026-11-01: the customer's items, as declared.
+    internal static IReadOnlyList<Vixly.Operations.Application.Items.OperationsItemDraft> Items(IReadOnlyList<CustomerItemBody>? items) =>
+        items?.Select(item => new Vixly.Operations.Application.Items.OperationsItemDraft(item.Words, item.Quantity, item.ValueEach, item.Used)).ToList()
+        ?? new List<Vixly.Operations.Application.Items.OperationsItemDraft>();
+
     internal static CustomerPreAlertDto PreAlert(OperationsPreAlertView preAlert) =>
         new(preAlert.PreAlertId, preAlert.Carrier, preAlert.TrackingNumber, preAlert.Store, preAlert.Contents, preAlert.DeclaredValue, preAlert.CurrencyCode, preAlert.ExpectedDate,
             preAlert.CreatedUtc, preAlert.ShipmentId, preAlert.WarehouseId);
@@ -167,7 +173,7 @@ public static class OperationsInternalPackageEndpoints
             shipment.Options.HasFlag(OperationsShipmentOptions.Consolidate), shipment.Options.HasFlag(OperationsShipmentOptions.Refrigerated), shipment.Options.HasFlag(OperationsShipmentOptions.Insured),
             shipment.Announced, shipment.Arrived, shipment.CreatedUtc, shipment.DestinationId, shipment.ServiceCode, shipment.OriginId, shipment.ParcelCount, shipment.Booked,
             shipment.BookedTotal, shipment.BookedCurrency, shipment.InsurancePlanId, shipment.CollectorName, shipment.CollectorPhone, shipment.PickedUpUtc,
-            shipment.DeliveredUtc, shipment.Collect);
+            shipment.DeliveredUtc, shipment.Collect, shipment.TrackingNumber is { } tracking ? OperationsTrackingNumbers.Format(tracking) : null);
 
     internal static CustomerParcelDto Parcel(OperationsCustomerParcel parcel, OperationsWeightUnit weight, OperationsDimensionUnit dimension) =>
         new(parcel.ParcelId, parcel.Number, parcel.Carrier, parcel.CarrierTrackingNumber, parcel.DeclaredContents, parcel.DeclaredValue, parcel.CurrencyCode,

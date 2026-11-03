@@ -22,6 +22,9 @@ public static class OperationsCommonErrors
 
     public static Error ConcurrencyConflict { get; } = Error.Create("ops.common.concurrency_conflict");
 
+    // Vixly Lite (owner, 2026-10-30): the work belongs to a module the company's plan leaves out.
+    public static Error NotInPlan { get; } = Error.Create("ops.common.not_in_plan");
+
     public static Error RequestInvalid { get; } = Error.Create("ops.common.request_invalid");
 
     public static Error PlatformUnavailable { get; } = Error.Create("ops.common.platform_unavailable");

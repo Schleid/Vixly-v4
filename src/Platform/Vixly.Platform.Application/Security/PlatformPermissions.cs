@@ -146,6 +146,12 @@ public static class PlatformPermissions
 
     public const string CollectionsConfigure = "platform.collections.configure";
 
+    public const string JobsView = "platform.jobs.view";
+
+    public const string MaintenanceView = "platform.maintenance.view";
+
+    public const string MaintenanceManage = "platform.maintenance.manage";
+
     public const string LicensingView = "platform.licensing.view";
 
     public const string LicensingManage = "platform.licensing.manage";
@@ -237,7 +243,10 @@ public static class PlatformPermissions
         LegalRemind,
         LegalRecordAcceptance,
         LeadsView,
-        LeadsManage
+        LeadsManage,
+        JobsView,
+        MaintenanceView,
+        MaintenanceManage
     };
 
     public static IReadOnlyCollection<string> All { get; } = new HashSet<string>(Catalogue, StringComparer.Ordinal);

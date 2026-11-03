@@ -15,7 +15,7 @@
 public sealed record OperationsLocationDetails(
     string Code,
     string Name,
-    OperationsPostalAddress Address,
+    OperationsPostalAddress? Address,
     string? Phone,
     string? Email,
     string? OpeningHours,

@@ -27,4 +27,15 @@ public interface IPlatformSubscriptionMailer
         string currencyCode,
         DateTimeOffset effectiveUtc,
         CancellationToken cancellationToken);
+
+    // 7 days before an annual renewal charged to a saved card; statementWording is null when not set.
+    Task SendRenewalReminderAsync(
+        PlatformTenant tenant,
+        PlatformTenantContact recipient,
+        string planName,
+        DateTimeOffset renewsUtc,
+        string cardBrand,
+        string cardLast4,
+        string? statementWording,
+        CancellationToken cancellationToken);
 }

@@ -152,7 +152,7 @@ public sealed class StartOperationsDeliveryRouteUseCase
             foreach (OperationsShipment shipment in view.Shipments.Values)
             {
                 _outbox.Write(OperationsOutForDeliveryNotice.MessageType, route.TenantId, shipment.Id, new OperationsOutForDeliveryNotice(shipment.CustomerId, request.PortalSlug,
-                    shipment.Number ?? string.Empty, withCode));
+                    shipment.NumberForCustomer, withCode));
             }
         }
 

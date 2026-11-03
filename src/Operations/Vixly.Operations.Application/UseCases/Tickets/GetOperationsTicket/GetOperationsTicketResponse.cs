@@ -39,9 +39,21 @@ public sealed class GetOperationsTicketResponse
 
     public bool CanAnswer { get; private init; }
 
-    public static GetOperationsTicketResponse Success(OperationsTicket? ticket, OperationsWarehouse? warehouse, string? customerCode, string? customerName, IReadOnlyList<OperationsParcelSummary> lookalikes, bool canAnswer)
+    // Ticket desk (owner, 2026-10-29): the agent who opened it, who took it, and the department's people it can be given to.
+    public string? AgentName { get; private init; }
+
+    public string? TakenByName { get; private init; }
+
+    public IReadOnlyList<(Guid Id, string Name)> Handlers { get; private init; } = Array.Empty<(Guid, string)>();
+
+    public static GetOperationsTicketResponse Success(OperationsTicket ticket, OperationsWarehouse warehouse, string? customerCode, string? customerName,
+        IReadOnlyList<OperationsParcelSummary> lookalikes, bool canAnswer, string? agentName, string? takenByName, IReadOnlyList<(Guid Id, string Name)> handlers)
     {
-        return new GetOperationsTicketResponse { Succeeded = true, Ticket = ticket, Warehouse = warehouse, CustomerCode = customerCode, CustomerName = customerName, Lookalikes = lookalikes, CanAnswer = canAnswer };
+        return new GetOperationsTicketResponse
+        {
+            Succeeded = true, Ticket = ticket, Warehouse = warehouse, CustomerCode = customerCode, CustomerName = customerName, Lookalikes = lookalikes, CanAnswer = canAnswer,
+            AgentName = agentName, TakenByName = takenByName, Handlers = handlers
+        };
     }
 
     public static GetOperationsTicketResponse Failure(Error error)

@@ -25,14 +25,14 @@ public sealed class FindOperationsCounterCustomersUseCase
 {
     private readonly OperationsCounterDesk _desk;
 
-    private readonly IOperationsCustomerRepository _customers;
+    private readonly Vixly.Operations.Application.Customers.OperationsCustomerLookups _lookups;
 
     public FindOperationsCounterCustomersUseCase(
         OperationsCounterDesk desk,
-        IOperationsCustomerRepository customers)
+        Vixly.Operations.Application.Customers.OperationsCustomerLookups lookups)
     {
         _desk = desk ?? throw new ArgumentNullException(nameof(desk));
-        _customers = customers ?? throw new ArgumentNullException(nameof(customers));
+        _lookups = lookups ?? throw new ArgumentNullException(nameof(lookups));
     }
 
     public async Task<FindOperationsCounterCustomersResponse> ExecuteAsync(
@@ -43,7 +43,7 @@ public sealed class FindOperationsCounterCustomersUseCase
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(request);
 
-        (OperationsAccessView? _, IReadOnlyList<OperationsWarehouse> _, Error? refused) = await _desk.OpenAsync(context, cancellationToken);
+        (OperationsAccessView? access, IReadOnlyList<OperationsWarehouse> _, Error? refused) = await _desk.OpenAsync(context, cancellationToken);
 
         if (refused is not null)
         {
@@ -57,7 +57,10 @@ public sealed class FindOperationsCounterCustomersUseCase
             return FindOperationsCounterCustomersResponse.Success(Array.Empty<OperationsCounterCustomer>());
         }
 
-        IReadOnlyList<OperationsCustomer> found = await _customers.FindForCounterAsync(text, 10, cancellationToken);
-        return FindOperationsCounterCustomersResponse.Success(found.Select(OperationsCounterCustomer.Of).ToList());
+        // Owner, 2026-10-29: recorded, and limited per hour (design 4.4).
+        (IReadOnlyList<OperationsCustomer> found, Error? limit) = await _lookups.FindAsync(access!, text, 10, cancellationToken);
+        return limit is not null
+            ? FindOperationsCounterCustomersResponse.Failure(limit)
+            : FindOperationsCounterCustomersResponse.Success(found.Select(OperationsCounterCustomer.Of).ToList());
     }
 }

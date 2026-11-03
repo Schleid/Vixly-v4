@@ -47,5 +47,9 @@ internal sealed class OperationsPaymentConfiguration : IEntityTypeConfiguration<
         builder.HasIndex(payment => new { payment.TenantId, payment.RequestKey }).IsUnique();
         builder.HasIndex(payment => new { payment.TenantId, payment.InvoiceId });
         builder.HasIndex(payment => new { payment.TenantId, payment.WarehouseId, payment.Pending });
+        // Slice 10: the company API and webhooks read in order of creation.
+        builder.HasIndex(payment => new { payment.TenantId, payment.CreatedUtc });
+        // Slice 11: reports by day taken.
+        builder.HasIndex(payment => new { payment.TenantId, payment.TakenUtc });
     }
 }

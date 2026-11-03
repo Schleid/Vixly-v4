@@ -22,10 +22,12 @@ IMPORTANT NOTES:
     {
         <p>@T["site.locations.none"]</p>
     }
+    @* Countries side by side, each with its locations stacked: no empty half page (owner, 2026-10-25). *@
+    <div class="site-countries">
     @foreach (string country in Page.Site.Countries)
     {
         <div class="site-country" id="country-@country.ToLowerInvariant()">
-            <h3><span aria-hidden="true">@OperationsCountries.Flag(country)</span> @OperationsCountries.Name(T, country)</h3>
+            <h3><CountryFlag Code="@country" /> @OperationsCountries.Name(T, country)</h3>
             <ul class="site-cards">
                 @foreach (OperationsPublicLocation location in Page.Site.Locations.Where(item => item.CountryCode == country))
                 {
@@ -60,6 +62,7 @@ IMPORTANT NOTES:
             </ul>
         </div>
     }
+    </div>
 </section>
 
 @code {

@@ -8,6 +8,7 @@ using Vixly.Operations.Web.Endpoints;
 using Vixly.Operations.Web.Security;
 using Vixly.Operations.Web.Tenancy;
 using Vixly.Shared.Hosting;
+using Vixly.Shared.Hosting.Maintenance;
 using Vixly.Shared.Localization;
 
 namespace Vixly.Operations.Web.Hosting;
@@ -38,15 +39,33 @@ public static class OperationsWebHost
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+        // A missing setting names itself on a setup page instead of failing the start (owner, 2026-10-23).
+        if (Vixly.Shared.Hosting.Settings.VixlySettingsCheck.Run(builder, OperationsWebSettings.Site, OperationsWebSettings.All, configure) is { } setup)
+        {
+            return setup;
+        }
+
         builder.Services.AddOperationsInfrastructure(builder.Configuration, "Vixly.V4.Operations.Web");
         builder.Services.AddVixlyForwardedHeaders(builder.Configuration);
         builder.Services.AddOptions<OperationsHostingOptions>().Bind(builder.Configuration.GetSection(OperationsHostingOptions.SectionName));
         builder.Services.AddHostedService<OperationsOutboxWorker>();
+        builder.Services.AddHostedService<OperationsWebhookWorker>();
+        builder.Services.AddHostedService<OperationsReportScheduleWorker>();
         builder.Services.AddHostedService<OperationsPlatformFeedWorker>();
         builder.Services.AddSingleton<OperationsUnclaimedWorker>();
         builder.Services.AddHostedService(provider => provider.GetRequiredService<OperationsUnclaimedWorker>());
+        // Owner, 2026-10-29 (ticket desk): managers told about tickets that wait too long.
+        builder.Services.AddSingleton<OperationsTicketEscalationWorker>();
+        builder.Services.AddHostedService(provider => provider.GetRequiredService<OperationsTicketEscalationWorker>());
+        builder.Services.AddSingleton<OperationsShipmentCapWorker>();
+        builder.Services.AddHostedService(provider => provider.GetRequiredService<OperationsShipmentCapWorker>());
+        builder.Services.AddSingleton<OperationsHousekeepingWorker>();
+        builder.Services.AddHostedService(provider => provider.GetRequiredService<OperationsHousekeepingWorker>());
         builder.Services.AddSingleton<OperationsStatementWorker>();
         builder.Services.AddHostedService(provider => provider.GetRequiredService<OperationsStatementWorker>());
+        // Owner, 2026-10-28: company brands for the Cloudflare Worker's maintenance page, every night.
+        builder.Services.AddSingleton<OperationsEdgeBrandWorker>();
+        builder.Services.AddHostedService(provider => provider.GetRequiredService<OperationsEdgeBrandWorker>());
 
         if (builder.Environment.IsDevelopment())
         {
@@ -59,10 +78,16 @@ public static class OperationsWebHost
         builder.Services.AddOperationsRateLimits();
         builder.Services.AddMemoryCache();
         builder.Services.AddHttpContextAccessor();
+        builder.Services.AddVixlyMaintenance(builder.Configuration);
+        builder.Services.AddScoped<Vixly.Shared.Hosting.Maintenance.IVixlyMaintenanceSource, OperationsMaintenanceSource>();
         builder.Services.AddScoped<IOperationsRequestMetadata, OperationsHttpRequestMetadata>();
         builder.Services.AddScoped<OperationsErrorText>();
         builder.Services.AddScoped<Vixly.Operations.Web.Security.OperationsAllowed>();
         builder.Services.AddScoped<StaffPages>();
+        HashSet<string> helpRoutes = new(StringComparer.Ordinal);
+        builder.Services.AddSingleton(_ => new Vixly.Operations.Web.Features.Help.OperationsHelpCatalogue(helpRoutes));
+        builder.Services.AddScoped<Vixly.Operations.Web.Features.Help.IOperationsHelpReaderSource, Vixly.Operations.Web.Features.Help.OperationsHelpReaderSource>();
+        builder.Services.AddScoped<Vixly.Operations.Web.Features.Help.OperationsHelpPresenter>();
         builder.Services.AddAuthentication(OperationsSessionAuthenticationHandler.SchemeName)
             .AddScheme<AuthenticationSchemeOptions, OperationsSessionAuthenticationHandler>(OperationsSessionAuthenticationHandler.SchemeName, null);
         builder.Services.AddAuthorization();
@@ -73,7 +98,6 @@ public static class OperationsWebHost
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         });
         builder.Services.AddRazorComponents();
-        builder.Services.AddScoped<Vixly.Operations.Web.Features.SignIn.LoginBrand.OperationsLoginBrandPresenter>();
 
         configure?.Invoke(builder);
 
@@ -81,9 +105,10 @@ public static class OperationsWebHost
 
         // Before the forwarded headers: the country is read only from a trusted proxy (owner, 2026-10-21).
         app.UseVixlyClientCountry();
-        app.UseForwardedHeaders();
+        app.UseVixlyForwardedHeaders();
         app.UseOperationsDevelopmentCustomerProxy();
         app.UseVixlySecurityHeaders();
+        app.UseOperationsCameraPages();
 
         if (!app.Environment.IsDevelopment())
         {
@@ -92,6 +117,8 @@ public static class OperationsWebHost
 
         app.UseVixlyClientDisconnects();
         app.UseHttpsRedirection();
+        // Before the tenant check: during maintenance nothing behind it may answer (Control backlog 2026-10-22).
+        app.UseVixlyMaintenance(OperationsMaintenancePages.Site, OperationsMaintenancePages.Text, "/css/ops-status.css");
         app.UseMiddleware<OperationsTenantMiddleware>();
         app.UseRateLimiter();
         app.UseRequestLocalization(options =>
@@ -110,19 +137,26 @@ public static class OperationsWebHost
         app.UseMiddleware<OperationsAccessGate>();
         app.UseAuthorization();
         app.UseAntiforgery();
+        app.UseMiddleware<OperationsBlankFields>();
 
         app.MapStaticAssets();
         app.MapVixlyHealth();
         app.MapOperationsAuthEndpoints();
+        app.MapOperationsQuickSignInEndpoints();
+        app.MapOperationsMapEndpoints();
+        app.MapOperationsShelfCountEndpoints();
         app.MapOperationsSiteEndpoints();
         app.MapOperationsEditorEndpoints();
         app.MapOperationsDeviceEndpoints();
         app.MapOperationsPasswordEndpoints();
         app.MapOperationsAccountEndpoints();
         app.MapOperationsStaffEndpoints();
+        app.MapOperationsHelpEndpoints();
         app.MapOperationsSettingsEndpoints();
+        app.MapOperationsItemEndpoints();
         app.MapOperationsCompanyEndpoints();
         app.MapOperationsCustomerEndpoints();
+        app.MapOperationsSupportEndpoints();
         app.MapOperationsParcelEndpoints();
         app.MapOperationsIncomingEndpoints();
         app.MapOperationsShippingLabelEndpoints();
@@ -142,6 +176,11 @@ public static class OperationsWebHost
         app.MapOperationsCashierEndpoints();
         app.MapOperationsCardEndpoints();
         app.MapOperationsScreenEndpoints();
+        app.MapOperationsPayablesEndpoints();
+        app.MapOperationsTextEndpoints();
+        app.MapOperationsPublicApiEndpoints();
+        app.MapOperationsApiSettingsEndpoints();
+        app.MapOperationsReportEndpoints();
         app.MapOperationsBundleEndpoints();
         app.MapOperationsDispatchEndpoints();
         app.MapOperationsEventEndpoints();
@@ -161,6 +200,11 @@ public static class OperationsWebHost
             },
             "/css/ops-status.css");
         app.MapRazorComponents<App>();
+
+        foreach (Microsoft.AspNetCore.Routing.RouteEndpoint endpoint in ((IEndpointRouteBuilder)app).DataSources
+            .SelectMany(source => source.Endpoints).OfType<Microsoft.AspNetCore.Routing.RouteEndpoint>())
+            if (endpoint.RoutePattern.RawText is { } route) helpRoutes.Add(route);
+        _ = app.Services.GetRequiredService<Vixly.Operations.Web.Features.Help.OperationsHelpCatalogue>();
 
         return app;
     }

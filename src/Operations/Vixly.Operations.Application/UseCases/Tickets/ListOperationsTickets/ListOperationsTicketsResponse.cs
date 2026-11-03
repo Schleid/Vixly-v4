@@ -33,9 +33,18 @@ public sealed class ListOperationsTicketsResponse
 
     public IReadOnlyList<OperationsWarehouse> Warehouses { get; private init; } = Array.Empty<OperationsWarehouse>();
 
-    public static ListOperationsTicketsResponse Success(IReadOnlyList<OperationsTicket> tickets, int totalCount, IReadOnlyList<OperationsWarehouse> warehouses)
+    // Ticket desk: the topics the person sees, and the names of who took each ticket.
+    public IReadOnlyList<OperationsTicketTopic> Topics { get; private init; } = Array.Empty<OperationsTicketTopic>();
+
+    public IReadOnlyDictionary<Guid, string> People { get; private init; } = new Dictionary<Guid, string>();
+
+    // The escalation limits: hours before nobody-took-it, days before not-resolved.
+    public (int TakeHours, int ResolveDays) Limits { get; private init; } = (OperationsTicket.TakeHoursDefault, OperationsTicket.ResolveDaysDefault);
+
+    public static ListOperationsTicketsResponse Success(IReadOnlyList<OperationsTicket> tickets, int totalCount, IReadOnlyList<OperationsWarehouse> warehouses,
+        IReadOnlyList<OperationsTicketTopic> topics, IReadOnlyDictionary<Guid, string> people, (int TakeHours, int ResolveDays) limits)
     {
-        return new ListOperationsTicketsResponse { Succeeded = true, Tickets = tickets, TotalCount = totalCount, Warehouses = warehouses };
+        return new ListOperationsTicketsResponse { Succeeded = true, Tickets = tickets, TotalCount = totalCount, Warehouses = warehouses, Topics = topics, People = people, Limits = limits };
     }
 
     public static ListOperationsTicketsResponse Failure(Error error)

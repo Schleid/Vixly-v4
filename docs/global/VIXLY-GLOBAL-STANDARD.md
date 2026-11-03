@@ -18,7 +18,7 @@ V4 is built from scratch. It is not built on top of the legacy system. Where leg
 
 | Component | What it is | Deployables | Owner | Stage |
 |---|---|---|---|---|
-| Platform (Control plane) | Tenants, subscriptions, plans, entitlements, platform billing, Vixly's shipping-service catalogue, tenant activity | `Platform.Web` (staff console), `Platform.Api`, `Platform.Worker` (Windows Service, ADR-0007) | Control team | 1 |
+| Platform (Control plane) | Tenants, subscriptions, plans, entitlements, platform billing, Vixly's shipping-service catalogue, tenant activity | `Platform.Web` (staff console, also runs the Platform jobs: ADR-0007 Amendment 1), `Platform.Api`; `Platform.Worker` (Windows Service) is the later option | Control team | 1 |
 | Operations | Shipments, parcels, bundles, dispatch, invoices, credit, tracking, tenant staff accounts (ADR-0003) | `Operations.Web` (staff / warehouse), `Operations.Api` (internal) | Operations team | 3 |
 | Customer | A customer's own view of their invoices, shipments and tracking | `Customer.Web` | Customer team | 3, with Operations (ADR-0017) |
 | Edge | Reverse proxy: tenant resolution and path routing | `Vixly.Edge` | Control team | 5 |
@@ -27,18 +27,24 @@ V4 is built from scratch. It is not built on top of the legacy system. Where leg
 
 **One hostname per tenant.** A tenant is served from one hostname, `{slug}.<base domain>` and a custom domain later (hostnames below). Customers never get a different domain: a customer reaches the portal at `{tenant-host}/customer`. Edge resolves the hostname to a tenant (through the Platform API) and routes `/customer/**` to `Customer.Web` and everything else to `Operations.Web`. The Platform console and the Public site are not tenant-hostname surfaces and Edge does not front them. Custom-domain resolution is designed in the legacy repo (`ControlPlane/docs/custom-domains/002-custom-domain-technical-design.md`) but not built; Edge ships with slug resolution and is structured so custom-domain resolution slots in without a rewrite.
 
-**Hostnames.** V4 runs on `techcrafters.ltd` until tenants migrate from V3, so no V3 cookie (V3 writes domain-wide `.vixly.ltd` cookies) ever reaches V4 (ADR-0010).
+**Hostnames.** V4 production runs on `vixly.ltd` from the start (ADR-0010 Amendment 1, owner 2026-10-23). V3 and V4 share the names during the move: a Cloudflare Worker sends each company to V3 or V4 (H-3). V4's cookies are all host-only `__Host-vx4-*`, so V3's domain-wide `.vixly.ltd` cookies never collide with them.
 
-| Purpose | Until migration | After the last tenant migrates |
+| Purpose | Production | Staging (owner, 2026-10-18) |
 |---|---|---|
-| Public site and sign-up | `vixly.techcrafters.ltd` | `vixly.ltd` |
-| Platform console (behind Cloudflare Access) | `vixly-control.techcrafters.ltd` | `control.vixly.ltd` |
-| Platform API | `vixly-api.techcrafters.ltd` | `api.vixly.ltd` or internal only |
-| Tenant host (Edge → Operations, Customer at `/customer`) | `{slug}.techcrafters.ltd` | `{slug}.vixly.ltd` |
-| Staging (owner, 2026-10-18) | `vixly.freedns.org` (public site), `control.vixly.freedns.org` (console), `api.vixly.freedns.org` (API), `ops-internal.vixly.freedns.org` (Operations internal API), `{slug}.vixly.freedns.org` (tenants, wildcard DNS); `ASPNETCORE_ENVIRONMENT=Staging` loads `appsettings.Staging.json` | unchanged |
+| Public site and sign-up | `vixly.ltd` (and `www.vixly.ltd`) | `vixly.freeddns.org` |
+| Platform console (behind Cloudflare Access) | `control.vixly.ltd` | `control.vixly.freeddns.org` |
+| Platform API | `api.vixly.ltd` | `api.vixly.freeddns.org` |
+| Operations internal API | `ops-internal.vixly.ltd` | `ops-internal.vixly.freeddns.org` |
+| Company host (Operations, Customer at `/customer`) | `{slug}.vixly.ltd` | `{slug}.vixly.freeddns.org` (wildcard DNS) |
+
+Staging sets `ASPNETCORE_ENVIRONMENT=Staging`, which loads `appsettings.Staging.json`.
 
 - **H-1** Base domains are configuration, never code: `TenantHosting:BaseDomains` and `PlatformHosting`. No hostname literal in source. Links in emails and PDFs are built from this configuration.
 - **H-2** Registration rejects reserved slugs: `www`, `mail`, `vixly`, `vixly-control`, `vixly-api`, `control`, `api`, `admin`, `edge`, `status`, `staging`, `vixly-ops-internal`, `ops-internal`, anything ending `-staging`, and any name TechCrafters already uses in DNS. The list is configuration with this set as its floor.
+- **H-3** Behind the Cloudflare Worker of the side-by-side rollout (project document *V4 side-by-side rollout on vixly.ltd*), the company address arrives in `X-Forwarded-Host`.
+  - It is used only for a host in `Hosting:EdgeHosts`, only from `Hosting:TrustedProxyNetworks`, and only when `X-Vixly-Edge` matches `Hosting:EdgeSecret`. The secret is an environment variable of at least 32 characters (`VixlyEdgeHost`).
+  - `AllowedHosts` lists the origin's own name, because host filtering checks the address as received.
+  - Without these settings nothing is forwarded.
 
 **White label (ADR-0012, amended 2026-10-14).** White label belongs to the Operations plane: tenant-facing surfaces (Operations, Customer, the tenant landing page, tenant emails and documents) show the tenant's brand, never "Vixly". Tenant text uses `{brandName}`, the brand is Operations data exposed through `Contracts.Operations`, theming is presets plus allowlisted tokens through one `ThemeProvider`, and a plan entitlement from `Contracts.Platform` decides what a tenant may change. The Platform plane (Control) is proprietary to TechCrafters: never white-labelled, never offered to anyone; it runs plans, billing and collections. The Public site is always Vixly.
 
@@ -53,6 +59,7 @@ V4/
 ├── AGENTS.md  README.md  .gitignore  .editorconfig
 ├── docs/
 │   ├── global/          this document
+│   ├── help/            staged in-app help plan, design and verification (ADR-0023)
 │   ├── architecture/    evidence and reference
 │   ├── decisions/       ADRs
 │   └── platform/ operations/ customer/ public/ edge/ shared/    per-plane documents
@@ -63,7 +70,7 @@ V4/
 │   ├── Public/          Vixly.Public.Web
 │   ├── Edge/            Vixly.Edge
 │   ├── Contracts/       Vixly.Contracts.Platform, Vixly.Contracts.Operations
-│   ├── Shared/          Vixly.Shared.{Kernel,Localization,UI,UI.Gallery,PlatformServices*}
+│   ├── Shared/          Vixly.Shared.{Kernel,Localization,Help,UI,UI.Gallery,PlatformServices*}
 │   └── Hybrid/          reserved (V2+; the legacy Hybrid roadmap phases are retired, ADR-0010)
 ├── tests/               one test project per source project, plus tests/Architecture
 └── build/               ci/ and scripts/
@@ -86,13 +93,14 @@ Enforced by `tests/Architecture/Vixly.Architecture.Tests`. A violation fails the
 | `*.Domain` | `Vixly.Shared.Kernel` only |
 | `*.Application` | its own `Domain`, `Shared.Kernel`, and other planes' `Contracts` (behind ports) |
 | `*.Infrastructure` | its own `Application` and `Domain`, `Contracts`, its own `Resources` and `Shared.Localization` (to render emails and documents) |
-| `*.Api`, `*.Web`, `*.Worker` | its own `Application`; `Infrastructure` for the composition root only (`Program.cs` / DI registration, never in pages or controllers); its own `Contracts`; its own `Resources` and `Shared.Localization`; `Shared.UI` (Web only) |
-| `Vixly.Public.Web` | `Contracts.Platform`, `Shared.UI`, `Shared.Hosting`, `Shared.Localization` (ADR-0015) |
+| `*.Api`, `*.Web`, `*.Worker` | its own `Application`; `Infrastructure` for the composition root only (`Program.cs` / DI registration, never in pages or controllers); its own `Contracts`; its own `Resources` and `Shared.Localization`; `Shared.UI` and `Shared.Help` (Web only, ADR-0023) |
+| `Vixly.Public.Web` | `Contracts.Platform`, `Shared.UI`, `Shared.Hosting`, `Shared.Localization` (ADR-0015), `Shared.Help` (ADR-0023) |
 | `Vixly.Edge` | `Contracts.Platform`, `Shared.Kernel` |
-| `*.Resources` | `Shared.Kernel` only |
+| `*.Resources` | `Shared.Kernel` only; may embed Markdown help files (ADR-0023), still no code beyond the marker type |
 | `Shared.Localization` | `Shared.Kernel` and ASP.NET Core localization only |
 | `Contracts.*` | BCL only |
 | `Shared.Kernel` | BCL only |
+| `Shared.Help` | BCL and Markdig only; no ASP.NET Core or plane dependencies (ADR-0023) |
 | `Shared.UI` | ASP.NET Core components and FluentUI only |
 
 `*.Domain` and `*.Application` never reference any `*.Resources` project or `Shared.Localization`: user-facing text is produced only in the presentation, API and rendering layers (5.5).
@@ -273,6 +281,8 @@ English is the source and the fallback; French and Spanish are first-class. Rule
 - **L-9** All text columns are `nvarchar`. Searchable text uses an accent-insensitive collation. User-visible text is never compared with `ToLower()`.
 - **L-10** The build fails when: a key is missing in any language; a value is empty; placeholder names differ between languages; a declared `Error` has no text; Domain or Application references a resource or localization assembly; or markup contains literal text. Machine-drafted fr and es text is allowed with the resource comment `needs-review`; it passes the build and fails the release gate until a native reviewer clears it.
 
+- **L-11** Long-form help lives in embedded Markdown files under `Help/<lang>/`, one article per language, with the front matter of [HELP-0](../help/HELP-0-FOUNDATION-DESIGN.md). Labels stay in `.resx`. The build fails on the checks of ADR-0023 item 7.
+
 ## 6. Security baseline
 
 Every item is mandatory. Findings from the legacy audit are cited so the reason survives.
@@ -349,6 +359,7 @@ Plane teams own the presenters and state of their feature components (`*Presente
 - [ ] Any new anonymous endpoint has a rate-limit policy and is listed in the plane document.
 - [ ] No secrets, no raw error echo, no hard-coded colors.
 - [ ] Localization (5.5): every new user-facing string exists in en, fr and es; failures are `Error` codes; no literal text in markup.
+- [ ] Help articles describing changed behaviour are updated in the same pull request (ADR-0023).
 - [ ] The plane document in `docs/<plane>/` is updated.
 
 ## 12. Build order and verification gates
@@ -384,4 +395,4 @@ A plane is verified, and the next one opens, only when:
 | O-5 | V4 hardening beyond legacy: typed authorization context for every plane, null-check on every constructor dependency, `init` on every Request. | **Resolved** by ADR-0002: applied as written in 5.2 |
 | O-9 | Plane databases: shared or separate | **Resolved** by ADR-0010: either, by configuration (D-1) |
 | O-10 | Table naming with schemas | **Resolved** by ADR-0010: classes prefixed, tables unprefixed in the plane schema (4.1) |
-| O-11 | V4 hostnames until migration | **Resolved** by ADR-0010: `techcrafters.ltd` (section 1) |
+| O-11 | V4 hostnames until migration | **Resolved** by ADR-0010 Amendment 1 (2026-10-23): `vixly.ltd` from the start, behind the Worker (section 1) |

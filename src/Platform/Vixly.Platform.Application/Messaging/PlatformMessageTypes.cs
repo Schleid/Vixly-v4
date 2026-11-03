@@ -56,6 +56,8 @@ public static class PlatformMessageTypes
 
     public const string SalesLeadReceived = "platform.sales.lead_received.v1";
 
+    public const string SalesFeedAlert = "platform.sales_feed.alert.v1";
+
     public const string TenantCompanyChangeSubmitted = "platform.tenant.company_change_submitted.v1";
 
     public const string TenantCompanyChangeDecided = "platform.tenant.company_change_decided.v1";
@@ -74,4 +76,7 @@ public static class PlatformMessageTypes
     public const string DeviceReleased = "platform.device.released.v1";
 
     public const string DeviceRevoked = "platform.device.revoked.v1";
+
+    // For the Cloudflare Worker (owner, 2026-10-28): a maintenance window was published, cancelled or ended early.
+    public const string EdgeMaintenanceChanged = "platform.edge.maintenance_changed.v1";
 }

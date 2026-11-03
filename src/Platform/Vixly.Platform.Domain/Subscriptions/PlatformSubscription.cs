@@ -92,6 +92,9 @@ public sealed class PlatformSubscription : AuditableEntity
 
     public decimal? SetupFeeOverride { get; private set; }
 
+    // The period end the renewal reminder was sent for (once per renewal, 2026-11-02).
+    public DateTimeOffset? RenewalRemindedForUtc { get; private set; }
+
     public IReadOnlyList<PlatformSubscriptionDiscount> Discounts => _discounts;
 
     public IReadOnlyList<PlatformOneTimeCharge> Charges => _charges;
@@ -156,6 +159,19 @@ public sealed class PlatformSubscription : AuditableEntity
     // =====================================================
     // Unpaid (Pending payment or Blocked): read-only for the period in settings, then payment
     // required. Suspended (account) and Ended: none. Customers are never affected (D-C4).
+    // Returns false when the reminder for this period end was already sent.
+    public bool MarkRenewalReminded(DateTimeOffset utcNow)
+    {
+        if (PeriodEndUtc is not { } periodEnd || RenewalRemindedForUtc == periodEnd)
+        {
+            return false;
+        }
+
+        RenewalRemindedForUtc = periodEnd;
+        MarkAsModified(utcNow);
+        return true;
+    }
+
     public PlatformSubscriptionAccess AccessAt(DateTimeOffset utcNow, PlatformSubscriptionAccessRules rules)
     {
         ArgumentNullException.ThrowIfNull(rules);
@@ -859,6 +875,45 @@ public sealed class PlatformSubscription : AuditableEntity
                 ["from"] = before.ToString(CultureInfo.InvariantCulture),
                 ["to"] = SetupFeeFor(version).ToString(CultureInfo.InvariantCulture),
                 ["currency"] = version.CurrencyCode
+            });
+    }
+
+    // Shipment cap (owner, 2026-10-29): added by Platform itself when a month closes, so no staff member is named.
+    public PlatformSubscriptionEvent AddShipmentCharge(string month, int extraShipments, decimal pricePerShipment, string currencyCode, DateTimeOffset utcNow)
+    {
+        RequireNotEnded();
+
+        if (extraShipments <= 0 || pricePerShipment <= 0m)
+        {
+            throw new DomainException(PlatformDiscountErrors.AmountInvalid);
+        }
+
+        decimal amount = decimal.Round(extraShipments * pricePerShipment, PlatformSubscriptionLimits.MoneyScale, MidpointRounding.AwayFromZero);
+
+        if (amount <= 0m || amount > PlatformSubscriptionLimits.MaxPrice)
+        {
+            throw new DomainException(PlatformDiscountErrors.AmountInvalid);
+        }
+
+        string text = "Extra shipments " + month + ": " + extraShipments.ToString(CultureInfo.InvariantCulture)
+            + " x " + pricePerShipment.ToString("0.00##", CultureInfo.InvariantCulture) + " " + currencyCode;
+        PlatformOneTimeCharge charge = new(Id, text, amount, currencyCode, "Shipments above the plan's monthly cap", null, utcNow);
+        _charges.Add(charge);
+        MarkAsModified(utcNow);
+
+        return PlatformSubscriptionEvent.Record(
+            this,
+            PlatformSubscriptionEventCodes.ShipmentsCharged,
+            Status,
+            null,
+            utcNow,
+            null,
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["month"] = month,
+                ["extra"] = extraShipments.ToString(CultureInfo.InvariantCulture),
+                ["amount"] = amount.ToString(CultureInfo.InvariantCulture),
+                ["currency"] = currencyCode
             });
     }
 

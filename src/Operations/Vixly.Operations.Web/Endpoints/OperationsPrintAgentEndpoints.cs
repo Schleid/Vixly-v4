@@ -43,7 +43,7 @@ public static class OperationsPrintAgentEndpoints
             http.Response.Headers.CacheControl = "no-store";
 
             return response.Succeeded
-                ? Results.Ok(response.Jobs.Select(job => new PrintJobDto(job.JobId, job.Connection == OperationsPrinterConnection.Installed ? "installed" : "network", job.Address, job.Payload, job.ExpiresInSeconds)).ToList())
+                ? Results.Ok(response.Jobs.Select(job => new PrintJobDto(job.JobId, job.Connection switch { OperationsPrinterConnection.Installed => "installed", OperationsPrinterConnection.Bluetooth => "bluetooth", _ => "network" }, job.Address, job.Payload, job.ExpiresInSeconds)).ToList())
                 : Results.Unauthorized();
         });
 
@@ -63,6 +63,43 @@ public static class OperationsPrintAgentEndpoints
             }, http.RequestAborted);
 
             return response.Succeeded ? Results.NoContent() : Results.Unauthorized();
+        });
+
+        // Slice 12E (owner H-6): Vixly Print joins with the one-time code of the Printers page, then saves the portable printer next to it.
+        endpoints.MapPost("/agent/v1/pair", async (HttpContext http, [FromBody] PhonePairBody body,
+            Vixly.Operations.Application.UseCases.Printing.PairOperationsPrintAgent.PairOperationsPrintAgentUseCase pair) =>
+        {
+            if (Context(http) is not { } context)
+            {
+                return Results.NotFound();
+            }
+
+            Vixly.Operations.Application.UseCases.Printing.PairOperationsPrintAgent.PairOperationsPrintAgentResponse response = await pair.ExecuteAsync(context,
+                new Vixly.Operations.Application.UseCases.Printing.PairOperationsPrintAgent.PairOperationsPrintAgentRequest { Code = body.Code, DeviceName = body.Device }, http.RequestAborted);
+            http.Response.Headers.CacheControl = "no-store";
+            return response.Succeeded ? Results.Ok(new PhonePairDto(response.AgentId, response.Key, response.WarehouseName)) : Results.BadRequest();
+        }).RequireRateLimiting(Vixly.Operations.Web.Hosting.OperationsRateLimits.SignIn);
+
+        endpoints.MapPost("/agent/v1/printers", async (HttpContext http, [FromBody] PhonePrinterBody body,
+            Vixly.Operations.Application.UseCases.Printing.SaveOperationsPhonePrinter.SaveOperationsPhonePrinterUseCase save) =>
+        {
+            if (Context(http) is not { } context)
+            {
+                return Results.NotFound();
+            }
+
+            Vixly.Operations.Application.UseCases.Printing.SaveOperationsPhonePrinter.SaveOperationsPhonePrinterResponse response = await save.ExecuteAsync(context,
+                new Vixly.Operations.Application.UseCases.Printing.SaveOperationsPhonePrinter.SaveOperationsPhonePrinterRequest
+                {
+                    AgentKey = Key(http),
+                    Name = body.Name,
+                    Address = body.Address,
+                    Dpi = body.Dpi,
+                    Media = body.Media == "shipping" ? OperationsLabelMedia.ShippingLabel : OperationsLabelMedia.IdLabel,
+                    Active = body.Active
+                }, http.RequestAborted);
+            return response.Succeeded ? Results.Ok(new PhonePrinterDto(response.PrinterId))
+                : response.Error?.Code == OperationsPrintingErrors.AgentNotFound.Code ? Results.Unauthorized() : Results.BadRequest();
         });
 
         return endpoints;

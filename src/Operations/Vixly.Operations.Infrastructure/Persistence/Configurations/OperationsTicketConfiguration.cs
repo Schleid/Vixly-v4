@@ -18,6 +18,7 @@ namespace Vixly.Operations.Infrastructure.Persistence.Configurations;
 //
 // IMPORTANT NOTES:
 // - A row version, so a customer and staff writing at once never overwrite each other
+// - Ticket desk (owner, 2026-10-29): topic, who opened it, the agent, the shipment, who took it, escalations sent
 // =========================================================
 internal sealed class OperationsTicketConfiguration : IEntityTypeConfiguration<OperationsTicket>
 {
@@ -43,7 +44,10 @@ internal sealed class OperationsTicketConfiguration : IEntityTypeConfiguration<O
         builder.Navigation(item => item.Messages).UsePropertyAccessMode(PropertyAccessMode.Field);
         builder.HasIndex(item => new { item.TenantId, item.CustomerId, item.CreatedUtc });
         // One ticket not yet resolved per customer and package (a report sent twice opens the first).
-        builder.HasIndex(item => new { item.TenantId, item.CustomerId, item.TrackingNumber }).IsUnique().HasFilter("[Status] <> 3");
+        // An agent's tickets (ticket desk, 2026-10-29) are not the customer's: only the customer's own are one per package.
+        builder.HasIndex(item => new { item.TenantId, item.CustomerId, item.TrackingNumber }).IsUnique().HasFilter("[Status] <> 3 AND [OpenedBy] = 0");
+        builder.HasIndex(item => new { item.TenantId, item.Topic, item.Status, item.CreatedUtc });
+        builder.Ignore(item => item.FromCustomer);
         builder.HasIndex(item => new { item.TenantId, item.WarehouseId, item.Status, item.CreatedUtc });
         builder.HasOne<OperationsCustomer>().WithMany().HasForeignKey(item => item.CustomerId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<OperationsWarehouse>().WithMany().HasForeignKey(item => item.WarehouseId).OnDelete(DeleteBehavior.Restrict);

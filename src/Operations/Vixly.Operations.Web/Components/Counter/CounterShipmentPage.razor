@@ -1,4 +1,4 @@
-@*
+﻿@*
 =========================================================
 FILE: CounterShipmentPage.razor
 
@@ -33,9 +33,19 @@ IMPORTANT NOTES:
         <div><dt>@T["ui.counter.recipient"]</dt><dd>@Shipment.RecipientName</dd></div>
         <div><dt>@T["ui.counter.parcels"]</dt><dd><strong>@VixlyText.Format(T, "ui.counter.parcels_of", new Dictionary<string, object> { ["entered"] = Parcels.Count, ["count"] = Shipment.ParcelCount?.ToString(CultureInfo.CurrentCulture) ?? "—" })</strong></dd></div>
         <div><dt>@T["ui.counter.status"]</dt><dd><strong>@(Shipment.Status == OperationsShipmentStatus.Booked ? T["ui.counter.status.booked"].Value : T["ui.counter.status.open"].Value)</strong></dd></div>
+        @if (Shipment.Status == OperationsShipmentStatus.Booked)
+        {
+            @* Owner, 2026-10-28: given once paid, charged to the account or collect. *@
+            <div><dt>@T["ui.tracking_number"]</dt><dd><strong class="ops-editor__code">@(Shipment.TrackingNumber is { } tracking ? Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.Format(tracking) : T["ui.tracking_number.after_payment"].Value)</strong></dd></div>
+        }
         @* Owner, 2026-10-20: close the shipment and go back to the customer's shipments. *@
         <a class="vx-button vx-button--secondary ops-counter__close" href="/staff/counter/customers/@Customer.Id" accesskey="x">@T["ui.counter.close_shipment"]</a>
     </dl>
+    @* Owner, 2026-10-27: freight collect at the counter, for people who take payments, while the shipment is open. *@
+    @if (CollectOffered && Shipment.CanServe && Shipment.Status == OperationsShipmentStatus.Open)
+    {
+        <Vixly.Operations.Web.Components.Cashier.FreightCollectPanel T="T" Action="@("/staff/counter/shipments/" + Shipment.Id + "/collect")" Collect="Shipment.FreightCollect" />
+    }
             <section class="ops-editor__panel" aria-labelledby="counter-parcels">
                 <h2 id="counter-parcels">@T["ui.counter.parcels"]</h2>
                 @if (CanAdd)
@@ -49,6 +59,20 @@ IMPORTANT NOTES:
                         <label>@VixlyText.Format(T, "ui.counter.height", "unit", Length) <input name="height" inputmode="decimal" required size="5" value="@Shown(Entered?.Height)" /></label>
                         <label>@T["ui.counter.contents"] <input name="contents" maxlength="200" required size="28" value="@Entered?.Contents" /></label>
                         <label>@VixlyText.Format(T, "ui.counter.value", "currency", CurrencyCode) <input name="value" inputmode="decimal" required size="8" value="@Shown(Entered?.Value)" /></label>
+                        @* Owner, 2026-11-01: more items the customer names for this box; the first is the contents and value above. *@
+                        <details class="ops-counter__items" open="@(Entered?.MoreItems.Count > 0)">
+                            <summary>@T["ui.counter.more_items"]</summary>
+                            @for (int row = 0; row < 4; row++)
+                            {
+                                Vixly.Operations.Application.Items.OperationsItemDraft? more = Entered is { } entered && row < entered.MoreItems.Count ? entered.MoreItems[row] : null;
+                                <div class="ops-counter__item">
+                                    <label>@T["ui.counter.item"] <input name="more_words" maxlength="200" size="22" value="@more?.Words" /></label>
+                                    <label>@T["ui.counter.item_quantity"] <input name="more_qty" inputmode="numeric" size="3" placeholder="1" value="@more?.Quantity.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)" /></label>
+                                    <label>@VixlyText.Format(T, "ui.counter.item_value", "currency", CurrencyCode) <input name="more_value" inputmode="decimal" size="7" value="@Shown(more?.ValueEach)" /></label>
+                                    <label>@T["ui.counter.item_condition"] <select name="more_used"><option value="new">@T["ui.counter.item_new"]</option><option value="used" selected="@(more?.Used == true)">@T["ui.counter.item_used"]</option></select></label>
+                                </div>
+                            }
+                        </details>
                         <button type="submit" class="vx-button vx-button--primary">@T["ui.counter.add_parcel"]</button>
                     </form>
                 }
@@ -59,6 +83,10 @@ IMPORTANT NOTES:
                 }
                 @if (Parcels.Count > 0)
                 {
+                    @* Owner, 2026-10-27: every label of the shipment at once; each line keeps its own. *@
+                    <Vixly.Operations.Web.Components.Shipments.ShipmentLabelsBar ShipmentId="Shipment.Id" Back="counter" ParcelCount="Parcels.Count"
+                        ShippingOffered="@(Shipment.Status == OperationsShipmentStatus.Booked && Shipment.TrackingNumber is not null)"
+                        ShippingWaitsForPayment="@(Shipment.Status == OperationsShipmentStatus.Booked && Shipment.TrackingNumber is null)" Printers="Printers" />
                     <OperationsTableViewport Label="@T["ui.counter.parcels"]">
                         <table class="ops-editor__table">
                             <thead><tr><th scope="col">@T["ui.counter.parcel"]</th><th scope="col" class="ops-editor__number">@VixlyText.Format(T, "ui.counter.weight", "unit", Weight)</th><th scope="col">@VixlyText.Format(T, "ui.counter.size", "unit", Length)</th><th scope="col">@T["ui.counter.contents"]</th><th scope="col" class="ops-editor__number">@VixlyText.Format(T, "ui.counter.value", "currency", CurrencyCode)</th><th scope="col">@T["ui.counter.label"]</th></tr></thead>
@@ -71,7 +99,7 @@ IMPORTANT NOTES:
                                         <td>@Size(parcel)</td>
                                         <td>@parcel.DeclaredContents</td>
                                         <td class="ops-editor__number">@(parcel.DeclaredValue?.ToString("N2", CultureInfo.CurrentCulture))</td>
-                                        <td><a href="/staff/parcels/@parcel.Id/label" download>@T["ui.counter.print_label"]</a></td>
+                                        <td><a href="/staff/parcels/@parcel.Id/label" target="_blank" rel="noopener">@T["ui.counter.print_label"]</a></td>
                                     </tr>
                                 }
                             </tbody>
@@ -88,7 +116,7 @@ IMPORTANT NOTES:
                 }
             </section>
         @* Slice 5E (S-11 to S-13): supplies while the shipment is processed; none once it is final. *@
-        @if (Supplies is not null || (Shipment.CanServe && Shipment.Status == OperationsShipmentStatus.Open))
+        @if (SuppliesOn && (Supplies is not null || (Shipment.CanServe && Shipment.Status == OperationsShipmentStatus.Open)))
         {
             <CounterSuppliesPanel T="T" Sale="Supplies" AddAction="@("/staff/counter/shipments/" + Shipment.Id + "/supplies")" ShipmentId="Shipment.Id"
                 Changeable="@(Shipment.CanServe && Shipment.Status == OperationsShipmentStatus.Open)" Hint="@T["ui.counter.supplies.before_last"].Value" />
@@ -144,6 +172,9 @@ IMPORTANT NOTES:
 </EditorShell>
 
 @code {
+    // Owner, 2026-10-27: the warehouse's label printers, for "Print all".
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Printing.OperationsLabelPrinter> Printers { get; set; } = Array.Empty<Vixly.Operations.Domain.Printing.OperationsLabelPrinter>();
+
     [Parameter] public string? Company { get; set; }
 
     [Parameter] public OperationsCounterCustomer Customer { get; set; } = null!;
@@ -152,6 +183,9 @@ IMPORTANT NOTES:
 
     // Slice 5E: the supplies added to it.
     [Parameter] public OperationsSupplySale? Supplies { get; set; }
+
+    // Vixly Lite (owner, 2026-10-30): supplies are in the company's plan.
+    [Parameter] public bool SuppliesOn { get; set; } = true;
 
     [Parameter] public OperationsCounterStanding Standing { get; set; } = null!;
 
@@ -191,6 +225,8 @@ IMPORTANT NOTES:
     [Parameter] public string? Error { get; set; }
 
     [Parameter] public string? Info { get; set; }
+
+    [Parameter] public bool CollectOffered { get; set; }
 
     [Parameter] public IReadOnlyList<Vixly.Operations.Application.Screens.OperationsScreenRow> Screens { get; set; } = Array.Empty<Vixly.Operations.Application.Screens.OperationsScreenRow>();
 

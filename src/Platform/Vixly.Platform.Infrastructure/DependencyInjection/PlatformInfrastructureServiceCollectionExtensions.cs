@@ -97,7 +97,14 @@ public static class PlatformInfrastructureServiceCollectionExtensions
         services.AddScoped<IPlatformTenantRegistrationRepository, PlatformTenantRegistrationRepository>();
         services.AddScoped<IPlatformOutboxRepository, PlatformOutboxRepository>();
         services.AddScoped<IPlatformPublishedEventRepository, PlatformPublishedEventRepository>();
+        services.AddScoped<IPlatformJobRunRepository, PlatformJobRunRepository>();
+        services.AddScoped<IPlatformJobQueries, PlatformJobQueries>();
+        services.AddScoped<IPlatformMaintenanceRepository, PlatformMaintenanceRepository>();
         services.AddScoped<IPlatformSalesLeadRepository, PlatformSalesLeadRepository>();
+        services.AddScoped<IPlatformSignInCleanupRepository, PlatformSignInCleanupRepository>();
+        services.AddScoped<IPlatformSecuritySettingsRepository, PlatformSecuritySettingsRepository>();
+        services.AddMemoryCache();
+        services.AddScoped<IPlatformIdleTimesReader, Vixly.Platform.Infrastructure.Persistence.PlatformIdleTimesReader>();
         services.AddScoped<IPlatformTenantChangeRepository, PlatformTenantChangeRepository>();
         services.AddScoped<IPlatformLeadMailer, SmtpPlatformLeadMailer>();
         services.AddScoped<IPlatformTenantQueries, PlatformTenantQueries>();
@@ -105,6 +112,7 @@ public static class PlatformInfrastructureServiceCollectionExtensions
         services.AddScoped<IPlatformPlanRepository, PlatformPlanRepository>();
         services.AddScoped<IPlatformSubscriptionRepository, PlatformSubscriptionRepository>();
         services.AddScoped<IPlatformLimitOverrideRepository, PlatformLimitOverrideRepository>();
+        services.AddScoped<IPlatformShipmentUsageRepository, PlatformShipmentUsageRepository>();
         services.AddScoped<IPlatformSalesSettingsRepository, PlatformSalesSettingsRepository>();
         services.AddScoped<IPlatformPromotionRepository, PlatformPromotionRepository>();
         services.AddScoped<IPlatformOfferRepository, PlatformOfferRepository>();
@@ -149,6 +157,15 @@ public static class PlatformInfrastructureServiceCollectionExtensions
         services.AddScoped<IPlatformBillingDocuments, Vixly.Platform.Infrastructure.Documents.QuestPdfPlatformBillingDocuments>();
         AddPayments(services, configuration);
         services.AddHttpClient<IPlatformBotCheck, TurnstilePlatformBotCheck>(client => client.Timeout = TimeSpan.FromSeconds(10));
+        services.AddOptions<Vixly.Platform.Infrastructure.Edge.PlatformEdgeOptions>().Bind(configuration.GetSection(Vixly.Platform.Infrastructure.Edge.PlatformEdgeOptions.SectionName));
+        services.AddHttpClient<IPlatformEdgeClient, Vixly.Platform.Infrastructure.Edge.PlatformEdgeClient>(client => client.Timeout = TimeSpan.FromSeconds(15));
+
+        // Sales feed to TechOS (contract version 1, 2026-11-02).
+        services.AddScoped<IPlatformSalesFeedRepository, PlatformSalesFeedRepository>();
+        services.AddScoped<IPlatformSalesFeedMailer, SmtpPlatformSalesFeedMailer>();
+        services.AddOptions<Vixly.Platform.Infrastructure.SalesFeed.PlatformSalesFeedOptions>().Bind(configuration.GetSection(Vixly.Platform.Infrastructure.SalesFeed.PlatformSalesFeedOptions.SectionName));
+        int salesFeedTimeout = configuration.GetValue<int?>(Vixly.Platform.Infrastructure.SalesFeed.PlatformSalesFeedOptions.SectionName + ":TimeoutSeconds") ?? 30;
+        services.AddHttpClient<IPlatformSalesFeedClient, Vixly.Platform.Infrastructure.SalesFeed.PlatformSalesFeedClient>(client => client.Timeout = TimeSpan.FromSeconds(Math.Clamp(salesFeedTimeout, 5, 120)));
 
         services.AddHealthChecks()
             .AddDbContextCheck<PlatformDbContext>("platform-database", tags: new[] { "ready" })

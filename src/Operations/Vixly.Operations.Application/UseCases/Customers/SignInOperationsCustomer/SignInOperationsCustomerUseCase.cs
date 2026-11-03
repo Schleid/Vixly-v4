@@ -77,7 +77,7 @@ public sealed class SignInOperationsCustomerUseCase
 
         // Unknown, closed, suspended and locked customers get the same answer as a wrong password.
         if (customer?.PasswordHash is null || customer.IsLockedOut(utcNow)
-            || customer.Status is OperationsCustomerStatus.Suspended or OperationsCustomerStatus.Closed)
+            || customer.Status is OperationsCustomerStatus.Suspended or OperationsCustomerStatus.Closed or OperationsCustomerStatus.Banned)
         {
             _hasher.Verify(request.Password ?? string.Empty, TimingEqualiser);
             return SignInOperationsCustomerResponse.Failure(OperationsCustomerAuthErrors.SignInFailed);

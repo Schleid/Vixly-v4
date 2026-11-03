@@ -30,6 +30,16 @@ public sealed class OperationsCustomerDomainTests
     private static readonly string Hash = new('a', 64);
 
     [Fact]
+    public void WelcomeTourDismissalIsRememberedAndIdempotent()
+    {
+        OperationsCustomer customer = SignUp();
+        Assert.Null(customer.WelcomeTourDismissedUtc);
+        customer.DismissWelcomeTour(Now);
+        customer.DismissWelcomeTour(Now.AddDays(1));
+        Assert.Equal(Now, customer.WelcomeTourDismissedUtc);
+    }
+
+    [Fact]
     public void SignUp_WaitsForTheEmail_AndConfirmationGivesTheCodeOnce()
     {
         OperationsCustomer customer = SignUp();
@@ -98,8 +108,39 @@ public sealed class OperationsCustomerDomainTests
         customer.ChangeStatus(OperationsCustomerStatus.Closed, "Moved away", Now);
 
         Assert.Equal("Moved away", customer.StatusReason);
-        Assert.Equal(OperationsCustomerErrors.StatusChangeInvalid.Code, Assert.Throws<DomainException>(() => customer.ChangeStatus(OperationsCustomerStatus.Active, "Back", Now)).Error.Code);
         Assert.Equal(OperationsCustomerErrors.StatusChangeInvalid.Code, Assert.Throws<DomainException>(() => SignUp().ChangeStatus(OperationsCustomerStatus.Suspended, "Spam", Now)).Error.Code);
+
+        // Owner, 2026-10-31: a closed account can be reopened; a banned one never.
+        customer.ChangeStatus(OperationsCustomerStatus.Active, "Back", Now);
+        customer.ChangeStatus(OperationsCustomerStatus.Banned, "Fraud", Now);
+        Assert.False(customer.CanSignIn(Now));
+        Assert.Equal(OperationsCustomerErrors.StatusChangeInvalid.Code, Assert.Throws<DomainException>(() => customer.ChangeStatus(OperationsCustomerStatus.Active, "Sorry", Now)).Error.Code);
+        Assert.Equal(OperationsCustomerErrors.StatusChangeInvalid.Code, Assert.Throws<DomainException>(() => customer.ChangeStatus(OperationsCustomerStatus.Closed, "Again", Now)).Error.Code);
+    }
+
+    // Owner, 2026-10-31: a suspension may end by itself on a day still to come.
+    [Fact]
+    public void Suspension_EndsByItselfOnItsDay()
+    {
+        OperationsCustomer customer = Active();
+
+        Assert.Equal(OperationsCustomerErrors.SuspendedUntilInvalid.Code,
+            Assert.Throws<DomainException>(() => customer.ChangeStatus(OperationsCustomerStatus.Suspended, "Late", Now, Now.AddDays(-1))).Error.Code);
+        Assert.Equal(OperationsCustomerErrors.SuspendedUntilInvalid.Code,
+            Assert.Throws<DomainException>(() => customer.ChangeStatus(OperationsCustomerStatus.Closed, "Late", Now, Now.AddDays(3))).Error.Code);
+        Assert.Equal(OperationsCustomerStatus.Active, customer.Status);
+
+        customer.ChangeStatus(OperationsCustomerStatus.Suspended, "Unpaid", Now, Now.AddDays(3));
+        Assert.False(customer.LiftSuspension("Ended", Now.AddDays(2)));
+        Assert.Equal(OperationsCustomerStatus.Suspended, customer.Status);
+
+        Assert.True(customer.LiftSuspension("Ended", Now.AddDays(3)));
+        Assert.Equal(OperationsCustomerStatus.Active, customer.Status);
+        Assert.Null(customer.SuspendedUntil);
+
+        // Suspended without a day: only lifted by hand.
+        customer.ChangeStatus(OperationsCustomerStatus.Suspended, "Check", Now);
+        Assert.False(customer.LiftSuspension("Ended", Now.AddYears(1)));
     }
 
     [Fact]

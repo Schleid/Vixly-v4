@@ -1,0 +1,129 @@
+{
+  "version": 2,
+  "captured": "2026-10-27",
+  "capture": "browser document only",
+  "fixture": "build/CustomerHelpCapture",
+  "viewport": {
+    "width": 1280,
+    "height": 960
+  },
+  "images": [
+    {
+      "file": "en-mailbox.png",
+      "language": "en",
+      "scene": "mailbox",
+      "page": "/customer/",
+      "marked": [
+        ".customer-portal__code",
+        ".customer-portal__mailbox"
+      ],
+      "sha256": "dcf02d7d5b41191a2004194a606961957bcc2f7a2d32296905eaa27306228704"
+    },
+    {
+      "file": "en-announce.png",
+      "language": "en",
+      "scene": "announce",
+      "page": "/customer/packages/new",
+      "marked": [
+        ".customer-prealert-form .customer-field-duo:first-of-type",
+        "input[name=\"tracking\"]",
+        "textarea[name=\"contents\"]",
+        ".customer-prealert-form button[type=\"submit\"]"
+      ],
+      "sha256": "264535f84f84b272be420046064cbb9fb411ec009337247f877196dd1f9d6061"
+    },
+    {
+      "file": "en-shipment.png",
+      "language": "en",
+      "scene": "shipment",
+      "page": "/customer/packages/shipments/new",
+      "marked": [
+        ".customer-destination-fieldset",
+        "input[name=\"parcelCount\"]",
+        ".customer-recipient-fieldset",
+        ".customer-options-grid",
+        ".customer-packages-choice-grid",
+        ".customer-shipment-form button[type=\"submit\"]"
+      ],
+      "sha256": "c33446686a5e86bdca89db674ec665464fbe1cd618c77f07a9c1e4fec57a812f"
+    },
+    {
+      "file": "fr-mailbox.png",
+      "language": "fr",
+      "scene": "mailbox",
+      "page": "/customer/",
+      "marked": [
+        ".customer-portal__code",
+        ".customer-portal__mailbox"
+      ],
+      "sha256": "cf37a5a1a91a2ea81c2b6b7a3deb46cc41c8ba582746f2a44908e2006f854eab"
+    },
+    {
+      "file": "fr-announce.png",
+      "language": "fr",
+      "scene": "announce",
+      "page": "/customer/packages/new",
+      "marked": [
+        ".customer-prealert-form .customer-field-duo:first-of-type",
+        "input[name=\"tracking\"]",
+        "textarea[name=\"contents\"]",
+        ".customer-prealert-form button[type=\"submit\"]"
+      ],
+      "sha256": "3a6c6ed15c17d23b588d286eb80992d6f527ad3a292e73ca1cf120ec22bf5385"
+    },
+    {
+      "file": "fr-shipment.png",
+      "language": "fr",
+      "scene": "shipment",
+      "page": "/customer/packages/shipments/new",
+      "marked": [
+        ".customer-destination-fieldset",
+        "input[name=\"parcelCount\"]",
+        ".customer-recipient-fieldset",
+        ".customer-options-grid",
+        ".customer-packages-choice-grid",
+        ".customer-shipment-form button[type=\"submit\"]"
+      ],
+      "sha256": "8dc7d5ec8425f2ace969d812d36ef14488d3e37135f9ee373fe7f18d1546fa4b"
+    },
+    {
+      "file": "es-mailbox.png",
+      "language": "es",
+      "scene": "mailbox",
+      "page": "/customer/",
+      "marked": [
+        ".customer-portal__code",
+        ".customer-portal__mailbox"
+      ],
+      "sha256": "bf6a9587b142c4ecf0ea272f74a85dca7e23909e7f92d6fcc42f60bd1de494a2"
+    },
+    {
+      "file": "es-announce.png",
+      "language": "es",
+      "scene": "announce",
+      "page": "/customer/packages/new",
+      "marked": [
+        ".customer-prealert-form .customer-field-duo:first-of-type",
+        "input[name=\"tracking\"]",
+        "textarea[name=\"contents\"]",
+        ".customer-prealert-form button[type=\"submit\"]"
+      ],
+      "sha256": "13c5f9e98c58fb8e77c37ab95ed8c21ba50d9a1637f739829860ed85544d4542"
+    },
+    {
+      "file": "es-shipment.png",
+      "language": "es",
+      "scene": "shipment",
+      "page": "/customer/packages/shipments/new",
+      "marked": [
+        ".customer-destination-fieldset",
+        "input[name=\"parcelCount\"]",
+        ".customer-recipient-fieldset",
+        ".customer-options-grid",
+        ".customer-packages-choice-grid",
+        ".customer-shipment-form button[type=\"submit\"]"
+      ],
+      "sha256": "a220ccf39d29206c76377dc3f30cb39d35e60cfe3eef0d599f292b866b38cd2e"
+    }
+  ]
+}

@@ -47,4 +47,7 @@ public sealed class StartFormModel
     public bool AcceptedTerms { get; set; }
 
     public string? OfferToken { get; set; }
+
+    // The browser's IANA time zone, filled when the form is sent (vixly-forms.js); Platform falls back to the address.
+    public string? TimeZone { get; set; }
 }

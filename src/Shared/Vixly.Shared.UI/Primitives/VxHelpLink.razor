@@ -1,0 +1,18 @@
+﻿@* =========================================================
+   FILE: VxHelpLink.razor
+
+   PURPOSE:
+   Displays the application's contextual help address.
+
+   RESPONSIBILITIES:
+   - Render a keyboard-accessible help link.
+
+   IMPORTANT NOTES:
+   - The caller supplies the localized label and resolved address.
+   ========================================================= *@
+<a class="vx-help-link" href="@Href" aria-label="@Label" title="@Label"><span aria-hidden="true">?</span></a>
+
+@code {
+    [Parameter, EditorRequired] public string Href { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+}

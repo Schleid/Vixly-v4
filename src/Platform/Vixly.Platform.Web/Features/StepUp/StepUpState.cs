@@ -15,7 +15,7 @@ namespace Vixly.Platform.Web.Features.StepUp;
 // IMPORTANT NOTES:
 // - Immutable; the presenter replaces it
 // =========================================================
-public sealed record StepUpState(bool UseRecoveryCode, Error? Error, bool SessionEnded)
+public sealed record StepUpState(bool UseRecoveryCode, Error? Error, bool SessionEnded, bool PasswordOnly = false)
 {
     public static StepUpState Initial { get; } = new(false, null, false);
 }

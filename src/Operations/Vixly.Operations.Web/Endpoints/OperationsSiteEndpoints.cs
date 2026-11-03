@@ -28,7 +28,7 @@ namespace Vixly.Operations.Web.Endpoints;
 //
 // IMPORTANT NOTES:
 // - Everything describes the tenant, never Vixly
-// - The draft shows only to the signed-in Owner with ?preview=1, never cached
+// - The draft shows only to the signed-in Owner with ?preview=1, never cached; &theme=horizon (or classic, airsea) shows it in another theme without saving
 // - Tracking shows milestones only (ADR-0021) and is rate limited
 // =========================================================
 public static class OperationsSiteEndpoints
@@ -45,11 +45,27 @@ public static class OperationsSiteEndpoints
             return Results.Redirect("/" + (OperationsSiteLanguages.IsSiteLanguage(language) ? language : OperationsSiteLanguages.All[0]));
         });
 
-        endpoints.MapGet("/" + Language, (HttpContext http, string language, bool? preview, GetOperationsPublicSiteUseCase useCase, GetOperationsPublicPricingUseCase pricing) =>
-            RenderAsync<SiteHomePage>(http, language, string.Empty, preview == true, useCase, pricing, null));
+        // Landing page rates (owner, 2026-10-30): the estimate form sends service, destination and weight to the home page itself (works without script).
+        endpoints.MapGet("/" + Language, async (HttpContext http, string language, bool? preview, string? theme, string? service, Guid? destination, decimal? weight,
+            GetOperationsPublicSiteUseCase useCase, GetOperationsPublicPricingUseCase pricing,
+            Vixly.Operations.Application.UseCases.Site.EstimateOperationsPublicShipment.EstimateOperationsPublicShipmentUseCase estimator) =>
+        {
+            OperationsSiteEstimate? estimate = null;
 
-        endpoints.MapGet("/" + Language + "/locations", (HttpContext http, string language, bool? preview, GetOperationsPublicSiteUseCase useCase, GetOperationsPublicPricingUseCase pricing) =>
-            RenderAsync<SiteLocationsPage>(http, language, "/locations", preview == true, useCase, pricing, null));
+            if (weight is not null)
+            {
+                Vixly.Operations.Application.UseCases.Site.EstimateOperationsPublicShipment.EstimateOperationsPublicShipmentResponse answer = await estimator.ExecuteAsync(
+                    OperationsCurrentUser.Context(http),
+                    new Vixly.Operations.Application.UseCases.Site.EstimateOperationsPublicShipment.EstimateOperationsPublicShipmentRequest { Service = service, DestinationId = destination, Weight = weight },
+                    http.RequestAborted);
+                estimate = new OperationsSiteEstimate(service, destination, weight, answer.Estimate);
+            }
+
+            return await RenderAsync<SiteHomePage>(http, language, string.Empty, preview == true, useCase, pricing, null, theme: theme, home: true, estimate: estimate);
+        });
+
+        endpoints.MapGet("/" + Language + "/locations", (HttpContext http, string language, bool? preview, string? theme, GetOperationsPublicSiteUseCase useCase, GetOperationsPublicPricingUseCase pricing) =>
+            RenderAsync<SiteLocationsPage>(http, language, "/locations", preview == true, useCase, pricing, null, theme: theme));
 
         // The prices the company publishes (owner, 2026-10-21); not found while it does not.
         endpoints.MapGet("/" + Language + "/pricing", (HttpContext http, string language, bool? preview, GetOperationsPublicSiteUseCase useCase, GetOperationsPublicPricingUseCase pricing) =>
@@ -122,18 +138,22 @@ public static class OperationsSiteEndpoints
 
     // The Pricing page reads the whole price list; every other page asks only whether the menu shows Pricing (review of 94e28f4).
     private static async Task<IResult> RenderAsync<TPage>(HttpContext http, string language, string path, bool preview, GetOperationsPublicSiteUseCase useCase,
-        GetOperationsPublicPricingUseCase pricing, Dictionary<string, object?>? extra, bool pricingPage = false)
+        GetOperationsPublicPricingUseCase pricing, Dictionary<string, object?>? extra, bool pricingPage = false, string? theme = null, bool home = false,
+        OperationsSiteEstimate? estimate = null)
         where TPage : Microsoft.AspNetCore.Components.IComponent
     {
         GetOperationsPublicSiteResponse response = await useCase.ExecuteAsync(
-            OperationsCurrentUser.Context(http), new GetOperationsPublicSiteRequest { Language = language, Preview = preview }, http.RequestAborted);
+            OperationsCurrentUser.Context(http), new GetOperationsPublicSiteRequest { Language = language, Preview = preview, Theme = preview ? OperationsSiteLooks.Theme(theme) : null, Home = home }, http.RequestAborted);
 
         if (!response.Succeeded || response.Site is null)
         {
             return Results.NotFound();
         }
 
-        GetOperationsPublicPricingResponse prices = await pricing.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsPublicPricingRequest { Full = pricingPage }, http.RequestAborted);
+        // The Air & Sea home page shows the rates when the company chose to (owner, 2026-10-30).
+        bool homeRates = home && response.Site.Settings is { Theme: Vixly.Operations.Domain.Branding.OperationsSiteTheme.AirSea, ShowRates: true };
+        GetOperationsPublicPricingResponse prices = await pricing.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsPublicPricingRequest { Full = pricingPage || homeRates },
+            http.RequestAborted);
 
         if (pricingPage && !prices.Shown)
         {
@@ -142,7 +162,7 @@ public static class OperationsSiteEndpoints
 
         http.Response.Headers.CacheControl = response.Site.IsPreview ? "private, no-store" : "public, max-age=60";
         Dictionary<string, object?> parameters = extra ?? new Dictionary<string, object?>();
-        parameters["Page"] = new OperationsSitePage(response.Site with { PricingShown = prices.Shown, Pricing = prices.Pricing }, language, Origin(http), path);
+        parameters["Page"] = new OperationsSitePage(response.Site with { PricingShown = prices.Shown, Pricing = prices.Pricing }, language, Origin(http), path) { Estimate = estimate };
 
         return new RazorComponentResult<TPage>(parameters);
     }

@@ -1,0 +1,51 @@
+﻿@using Vixly.Customer.Web.Features.Help
+@using Vixly.Shared.UI.Primitives
+@inject IStringLocalizer<CustomerText> T
+@* =========================================================
+   FILE: CustomerHelpBrowser.razor
+   PURPOSE:
+   Shows short customer instructions, search and annotated images.
+   RESPONSIBILITIES:
+   - Render only the current reader's already-filtered content.
+   IMPORTANT NOTES:
+   - Signed-out readers see a sign-in action and no private guides.
+   ========================================================= *@
+<section class="customer-help">
+@if (!State.SignedIn)
+{
+    <p>@T["ui.help.sign_in"]</p>
+    <a class="vx-button vx-button--primary" href="/customer/sign-in">@T["ui.sign_in.submit"]</a>
+}
+else if (State.NotFound)
+{
+    <p>@T["ui.help.not_found"]</p>
+    <a href="/customer/help">@T["ui.help.back"]</a>
+}
+else if (State.Article is { } article)
+{
+    <p><a href="/customer/help">@T["ui.help.back"]</a></p>
+    <VxHelpArticle Title="@article.Metadata.Title" Html="@State.Html" RelatedLabel="@T["ui.help.related"]"
+        Related="@State.Related.Select(item => new VxHelpRelatedLink(item.Metadata.Title, CustomerHelpCatalogue.Address(item.Language, item.Metadata.Slug))).ToArray()" />
+}
+else
+{
+    <p>@T["ui.help.intro"]</p>
+    <p><a href="/customer/tour" class="vx-button vx-button--secondary">@T["ui.tour.replay"]</a></p>
+    <form method="get" action="/customer/help" role="search">
+        <label for="help-query">@T["ui.help.search"]</label>
+        <input id="help-query" name="q" type="search" maxlength="160" value="@State.Query" />
+        <button class="vx-button vx-button--primary" type="submit">@T["ui.help.search"]</button>
+    </form>
+    @if (State.Articles.Count == 0) { <p>@T["ui.help.empty"]</p> }
+    <ol class="customer-help__topics">
+        @foreach (var item in State.Articles.OrderBy(item => item.Metadata.Order))
+        {
+            <li><a href="@CustomerHelpCatalogue.Address(item.Language, item.Metadata.Slug)">@item.Metadata.Title</a><p>@item.Metadata.Summary</p></li>
+        }
+    </ol>
+}
+</section>
+
+@code {
+    [Parameter, EditorRequired] public CustomerHelpState State { get; set; } = null!;
+}

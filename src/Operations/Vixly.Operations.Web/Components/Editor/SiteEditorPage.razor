@@ -49,6 +49,7 @@ IMPORTANT NOTES:
                     <a class="vx-button vx-button--secondary" href="/@(language)?preview=true" target="_blank" rel="noopener">@T["ui.editor.site.preview"] @language.ToUpperInvariant()</a>
                 }
             </div>
+            <SiteThemePreviews Language="@Language" />
         </section>
 
         <form method="post" action="/staff/site?language=@Language" class="ops-editor__panel ops-site-brand-panel">
@@ -87,6 +88,8 @@ IMPORTANT NOTES:
             </div>
             <p class="ops-editor__hint">@T["ui.editor.site.contrast_hint"]</p>
 
+            <SiteLookPanel Draft="@Draft" Features="@Features" />
+
             <fieldset class="ops-site-fieldset">
                 <legend>@T["ui.editor.site.sections"]</legend>
                 <div class="ops-site-checkbox-grid">
@@ -97,6 +100,8 @@ IMPORTANT NOTES:
                     }
                     <label class="ops-site-checkbox"><input type="checkbox" name="showSteps" value="true" checked="@Draft.ShowSteps" /> <span>@T["ui.editor.site.show_steps"]</span></label>
                     <label class="ops-site-checkbox"><input type="checkbox" name="showFaq" value="true" checked="@Draft.ShowFaq" /> <span>@T["ui.editor.site.show_faq"]</span></label>
+                    @foreach ((string name, bool on) in Marketing) { <label class="ops-site-checkbox"><input type="checkbox" name="@name" value="true" checked="@on" /> <span>@T["ui.editor.site." + name]</span></label> }
+                    <a class="ops-site-checkbox" href="/staff/site/testimonials">@T["ui.testimonials.manage"] <span aria-hidden="true">→</span></a>
                 </div>
             </fieldset>
 
@@ -124,7 +129,7 @@ IMPORTANT NOTES:
             @foreach (var group in OperationsSiteTextKeys.All.GroupBy(item => item.Key.Contains('.') ? item.Key.Split('.')[0] : "intro"))
             {
                 <details class="ops-content-group" open="@(group.Key == "intro")">
-                    <summary>@T[group.Key switch { "service" => "site.services.title", "step" => "site.steps.title", "faq" => "site.faq.title", _ => "ui.editor.site.texts" }] <span>@group.Count()</span></summary>
+                    <summary>@T[OperationsEditorForms.GroupLabel(group.Key)] <span>@group.Count()</span></summary>
                     <div class="ops-content-group__fields">
                     @foreach ((string key, int max) in group)
                     {
@@ -151,13 +156,17 @@ IMPORTANT NOTES:
                 <p class="ops-editor__hint">@T["ui.editor.site.images_hint"]</p>
             </div>
             <div class="ops-site-images-grid">
-                @foreach (OperationsSiteImageKind kind in Enum.GetValues<OperationsSiteImageKind>())
+                @foreach (OperationsSiteImageKind kind in OperationsEditorForms.SiteImageKinds.Where(kind => Features.ThemeCustomization || kind is not (OperationsSiteImageKind.Air or OperationsSiteImageKind.Sea) || OperationsEditorForms.ImageId(Draft, kind) is not null))
                 {
                     string item = kind.ToString().ToLowerInvariant();
                     Guid? current = OperationsEditorForms.ImageId(Draft, kind);
                     <div class="ops-site-image-card">
                         <div class="ops-site-image-card__header">
                             <h3>@T["ui.editor.image." + item]</h3>
+                            @if (kind is OperationsSiteImageKind.Air or OperationsSiteImageKind.Sea)
+                            {
+                                <p class="ops-editor__hint">@T["ui.editor.image.air_sea_hint"]</p>
+                            }
                             @if (current is { } id && Can(OperationsPermissions.BrandEdit))
                             {
                                 <form method="post" action="/staff/site/image/@item/remove" class="ops-site-image-card__remove-form">
@@ -178,12 +187,12 @@ IMPORTANT NOTES:
                                 </span>
                             }
                         </div>
-                        @if (Can(OperationsPermissions.BrandEdit))
+                        @if (Can(OperationsPermissions.BrandEdit) && (Features.ThemeCustomization || kind is not (OperationsSiteImageKind.Air or OperationsSiteImageKind.Sea)))
                         {
                             <form method="post" action="/staff/site/image/@item" enctype="multipart/form-data" class="ops-site-image-card__upload-form">
                                 <AntiforgeryToken />
                                 <div class="ops-site-image-card__upload-row">
-                                    <input type="file" name="file" accept="image/png,image/jpeg,image/webp" class="ops-site-image-card__file-input" required />
+                                    <input type="file" name="file" accept="image/png,image/jpeg,image/webp" class="ops-site-image-card__file-input" required data-trim-margins="@(kind is OperationsSiteImageKind.Logo or OperationsSiteImageKind.LogoDark ? "true" : null)" />
                                     <button type="submit" class="vx-button vx-button--primary ops-site-image-card__upload-btn">@T["ui.editor.upload"]</button>
                                 </div>
                             </form>
@@ -200,6 +209,12 @@ IMPORTANT NOTES:
     {
         ("facebook", Draft.FacebookUrl), ("instagram", Draft.InstagramUrl), ("x", Draft.XUrl),
         ("linkedin", Draft.LinkedInUrl), ("youtube", Draft.YouTubeUrl), ("tiktok", Draft.TikTokUrl)
+    };
+
+    // Landing page marketing (owner, 2026-10-30): the sections the company switches on.
+    private IEnumerable<(string, bool)> Marketing => Draft is null ? Array.Empty<(string, bool)>() : new[]
+    {
+        ("showDelivered", Draft.ShowDelivered), ("showRates", Draft.ShowRates), ("showTestimonials", Draft.ShowTestimonials)
     };
 
     private string? Value(string key) => Texts.TryGetValue(key, out string? value) ? value : null;

@@ -109,4 +109,14 @@ public static class PlatformSubscriptionErrors
 
     public static Error OverrideClosed { get; } =
         Error.Create("platform.subscriptions.override_closed");
+
+    // Shipment cap (owner, 2026-10-29).
+    public static Error UsageMonthInvalid { get; } =
+        Error.Create("platform.subscriptions.usage_month_invalid");
+
+    public static Error UsageCountInvalid { get; } =
+        Error.Create("platform.subscriptions.usage_count_invalid");
+
+    public static Error UsageAlreadyCharged { get; } =
+        Error.Create("platform.subscriptions.usage_already_charged");
 }

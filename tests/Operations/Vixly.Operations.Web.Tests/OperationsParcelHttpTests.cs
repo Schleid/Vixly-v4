@@ -67,6 +67,52 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
 
     public async Task DisposeAsync() => await _host.DisposeAsync();
 
+    // Owner, 2026-10-22 (parcel inventory, basic): what is on hand, oldest first, with totals; every move scanned, the package then the shelf.
+    [SqlServerFact]
+    public async Task OnHand_ListsWhatIsInTheWarehouse_AndTheMoveStationShelvesItByScan()
+    {
+        Guid tenant = NewTenant("shelfco", "Shelf Co");
+        using CookieClient owner = await OwnerAsync("shelfco");
+        Guid warehouse = await WarehouseAsync(tenant);
+        (Guid ana, string anaCode) = await CustomerAsync(tenant, "ana@example.com");
+        await PreAlertAsync(tenant, ana, "1Z999AA10123456770", "Shoes");
+        await PreAlertAsync(tenant, ana, "1Z999AA10123456771", "Books");
+        (string station, Guid delivery) = await OpenAsync(owner, warehouse, "UPS");
+        string first = (await ScanOkAsync(owner, station, delivery, "1Z999AA10123456770")).GetProperty("number").GetString()!;
+        string second = (await ScanOkAsync(owner, station, delivery, "1Z999AA10123456771")).GetProperty("number").GetString()!;
+        (HttpResponseMessage _, string shelves) = await owner.GetAsync("/staff/locations/warehouse/" + warehouse + "/storage");
+        await owner.PostAsync("/staff/locations/warehouse/" + warehouse + "/storage", shelves, ("code", "B-01"), ("zone", "storage"));
+
+        // Both on hand, oldest first, without a shelf yet; the totals count them.
+        (HttpResponseMessage listed, string onHand) = await owner.GetAsync("/staff/parcels/on-hand");
+        Assert.Equal(HttpStatusCode.OK, listed.StatusCode);
+        Assert.True(onHand.IndexOf(first, StringComparison.Ordinal) < onHand.IndexOf(second, StringComparison.Ordinal), "oldest first");
+        Assert.Contains("Packages: 2 ·", onHand, StringComparison.Ordinal);
+        Assert.Contains(anaCode, onHand, StringComparison.Ordinal);
+        (HttpResponseMessage _, string unshelved) = await owner.GetAsync("/staff/parcels/on-hand?unshelved=true&warehouse=&zone=&days=");
+        Assert.Contains("Packages: 2 ·", unshelved, StringComparison.Ordinal);
+
+        // The move station: the package, then the shelf, each scan with Enter.
+        (HttpResponseMessage _, string move) = await owner.GetAsync("/staff/parcels/move");
+        (HttpResponseMessage _, string step2) = await owner.PostAsync("/staff/parcels/move", move, ("package", first.ToLowerInvariant()), ("key", NewKey()));
+        Assert.Contains("value=\"" + first.ToLowerInvariant() + "\"", step2, StringComparison.Ordinal);
+        string key = NewKey();
+        (HttpResponseMessage _, string moved) = await owner.PostAsync("/staff/parcels/move", step2, ("package", first.ToLowerInvariant()), ("shelf", "b-01"), ("key", key));
+        Assert.Contains(first + " is on shelf B-01.", moved, StringComparison.Ordinal);
+        (HttpResponseMessage _, string unknownShelf) = await owner.PostAsync("/staff/parcels/move", step2, ("package", second), ("shelf", "Z-99"), ("key", NewKey()));
+        Assert.DoesNotContain("is on shelf", unknownShelf, StringComparison.Ordinal);
+        Assert.Contains("value=\"" + second + "\"", unknownShelf, StringComparison.Ordinal);
+
+        // On the shelf now: one left without a shelf, and the shelf filter finds the other.
+        (HttpResponseMessage _, string left) = await owner.GetAsync("/staff/parcels/on-hand?unshelved=true");
+        Assert.True(left.Contains("Packages: 1 ·", StringComparison.Ordinal), Regex.Match(left, "data-totals=\"true\">(?<t>[^<]+)").Groups["t"].Value);
+        Assert.Contains(second, left, StringComparison.Ordinal);
+        Assert.DoesNotContain(">" + first + "<", left, StringComparison.Ordinal);
+        (HttpResponseMessage _, string inStorage) = await owner.GetAsync("/staff/parcels/on-hand?zone=storage");
+        Assert.Contains(">" + first + "<", inStorage, StringComparison.Ordinal);
+        Assert.Contains("B-01", inStorage, StringComparison.Ordinal);
+    }
+
     [SqlServerFact]
     public async Task Dock_ScansCarrierBarcodes_OneLabelPerScan_AndClosesTheDeliveryWithAReceipt()
     {
@@ -138,7 +184,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         // Staff read where the shipment goes, as the customer wrote it (owner, 2026-10-18).
         Assert.Contains("Where the shipment goes", firstPage, StringComparison.Ordinal);
         Assert.Contains("12 Rue Capois, Port-au-Prince, HT", firstPage, StringComparison.Ordinal);
-        Assert.Contains("Ana Pierre · +50937123456", firstPage, StringComparison.Ordinal);
+        Assert.Contains("Ana Pierre · <a href=\"tel:+50937123456\" class=\"ops-phone-link\">+509 3712-3456</a>", firstPage, StringComparison.Ordinal);
         (HttpResponseMessage _, string secondPage) = await owner.GetAsync("/staff/parcels/" + second);
         Assert.Contains("9400111899223397846256", secondPage, StringComparison.Ordinal);
         Assert.Contains("Vitamins", secondPage, StringComparison.Ordinal);
@@ -435,8 +481,9 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         (HttpResponseMessage _, string form) = await owner.GetAsync("/staff/inspection/" + cleared);
         Assert.Contains("name=\"shippingPrinter\"", form, StringComparison.Ordinal);
         Assert.DoesNotContain("Dock 1", form, StringComparison.Ordinal);
+        // Owner, 2026-10-28 (option A): cleared but not paid: the station inspects it and prints no shipping label.
         (HttpResponseMessage labelled, string _) = await StationCheckAsync(owner, cleared, form, shippingPrinter);
-        Assert.StartsWith("/staff/inspection?done=labelled", labelled.Headers.Location?.OriginalString, StringComparison.Ordinal);
+        Assert.StartsWith("/staff/inspection?done=checked", labelled.Headers.Location?.OriginalString, StringComparison.Ordinal);
         (HttpResponseMessage _, string waitingForm) = await owner.GetAsync("/staff/inspection/" + waiting);
         (HttpResponseMessage notLabelled, string _) = await StationCheckAsync(owner, waiting, waitingForm, shippingPrinter);
         Assert.StartsWith("/staff/inspection?done=checked", notLabelled.Headers.Location?.OriginalString, StringComparison.Ordinal);
@@ -448,12 +495,8 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
             OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
             OperationsParcel first = await context.Parcels.SingleAsync(item => item.Id == cleared);
-            Assert.NotNull(first.ShippingLabelUtc);
-            shipmentNumber = (await context.Shipments.SingleAsync(item => item.Id == first.ShipmentId)).Number!;
-            Assert.StartsWith("SH", shipmentNumber, StringComparison.Ordinal);
-            string zpl = Assert.Single(await context.Set<Vixly.Operations.Domain.Printing.OperationsPrintJob>().Where(item => item.PrinterId == shippingPrinter).ToListAsync()).Payload;
-            Assert.Contains("^FD" + shipmentNumber + "^FS", zpl, StringComparison.Ordinal);
-            Assert.Contains("1 / 1", zpl, StringComparison.Ordinal);
+            Assert.Null(first.ShippingLabelUtc);
+            Assert.Empty(await context.Set<Vixly.Operations.Domain.Printing.OperationsPrintJob>().Where(item => item.PrinterId == shippingPrinter).ToListAsync());
             Assert.Null((await context.Parcels.SingleAsync(item => item.Id == waiting)).ShippingLabelUtc);
         }
 
@@ -477,12 +520,32 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             Assert.True(await services.GetRequiredService<IOperationsUnitOfWork>().SaveChangesAsync(CancellationToken.None));
         }
 
+        // Both cleared, still not paid: not in the labels to print, and the shipping label is refused.
+        (HttpResponseMessage _, string unpaidList) = await owner.GetAsync("/staff/parcels/labels");
+        Assert.DoesNotContain("/staff/parcels/" + waiting, unpaidList, StringComparison.Ordinal);
+        (HttpResponseMessage _, string unpaidPage) = await owner.GetAsync("/staff/parcels/" + cleared);
+        Assert.Contains("ops.printing.not_paid", (await owner.PostAsync("/staff/parcels/" + cleared + "/shipping-label", unpaidPage, ("printer", shippingPrinter.ToString())))
+            .Response.Headers.Location?.OriginalString, StringComparison.Ordinal);
+
+        // Paid: the shipment has its tracking number, and both labels wait in the labels to print.
+        string tracking = Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.Make("VX", new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 });
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            Guid paidId = (await context.Parcels.SingleAsync(item => item.Id == cleared)).ShipmentId!.Value;
+            await context.Shipments.Where(item => item.Id == paidId).ExecuteUpdateAsync(set => set
+                .SetProperty(item => item.Status, Vixly.Operations.Domain.Shipments.OperationsShipmentStatus.Booked)
+                .SetProperty(item => item.TrackingNumber, tracking));
+        }
+
         (HttpResponseMessage _, string list) = await owner.GetAsync("/staff/parcels/labels");
         Assert.Contains("/staff/parcels/" + waiting, list, StringComparison.Ordinal);
+        Assert.Contains("/staff/parcels/" + cleared, list, StringComparison.Ordinal);
         Assert.Contains("Print them all", list, StringComparison.Ordinal);
-        Assert.DoesNotContain("/staff/parcels/" + cleared + "\"", list, StringComparison.Ordinal);
         (HttpResponseMessage all, string _) = await owner.PostAsync("/staff/parcels/labels/print", list, ("warehouse", warehouse.ToString()), ("printer", shippingPrinter.ToString()));
-        Assert.Contains("done=all_printed&count=1", all.Headers.Location?.OriginalString, StringComparison.Ordinal);
+        Assert.Contains("done=all_printed&count=2", all.Headers.Location?.OriginalString, StringComparison.Ordinal);
         (HttpResponseMessage _, string empty) = await owner.GetAsync("/staff/parcels/labels?warehouse=" + warehouse);
         Assert.Contains("Every cleared parcel has its shipping label.", empty, StringComparison.Ordinal);
 
@@ -498,6 +561,9 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             List<string> jobs = await context.Set<Vixly.Operations.Domain.Printing.OperationsPrintJob>().Where(item => item.PrinterId == shippingPrinter).Select(item => item.Payload).ToListAsync();
             Assert.Equal(2, jobs.Count);
             Assert.Contains(jobs, job => job.Contains("2 / 2", StringComparison.Ordinal));
+            Assert.All(jobs, job => Assert.Contains("^FD" + tracking + "^FS", job, StringComparison.Ordinal));
+            shipmentNumber = (await context.Shipments.SingleAsync(item => item.TrackingNumber == tracking)).Number!;
+            Assert.StartsWith("SH", shipmentNumber, StringComparison.Ordinal);
         }
     }
 
@@ -777,7 +843,8 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         Assert.Contains(await NumberAsync("789900112277"), holds, StringComparison.Ordinal);
         Assert.Contains(await NumberAsync("TBA302775533110"), holds, StringComparison.Ordinal);
         (HttpResponseMessage _, string labels) = await owner.GetAsync("/staff/parcels/labels");
-        Assert.Contains(await NumberAsync("1Z999AA10123456701"), labels, StringComparison.Ordinal);
+        // Owner, 2026-10-28 (option A): cleared but unpaid shipments wait for payment before their shipping labels.
+        Assert.DoesNotContain(await NumberAsync("1Z999AA10123456701"), labels, StringComparison.Ordinal);
         Assert.DoesNotContain(await NumberAsync("TBA301884422190"), labels, StringComparison.Ordinal);
         (HttpResponseMessage _, string queue) = await owner.GetAsync("/staff/inspection/queue");
         Assert.Contains(await NumberAsync("771234567891"), queue, StringComparison.Ordinal);
@@ -857,7 +924,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         Assert.Equal(HttpStatusCode.Redirect, (await owner.PostAsync("/staff/insurance/policies/new", form, ("scope", "CompanyOperations"), ("kind", "FreightForwarderLiability"),
             ("insurer", "Gulfstream Mutual"), ("number", "FFL-1"), ("currency", "USD"))).Response.StatusCode);
         (HttpResponseMessage _, string withBoth) = await owner.GetAsync("/staff/insurance");
-        Guid operations = Guid.Parse(Regex.Match(withBoth, "href=\"/staff/insurance/policies/(?<id>[0-9a-f-]{36})\">Gulfstream Mutual FFL-1").Groups["id"].Value);
+        Guid operations = Guid.Parse(Regex.Match(withBoth, "href=\"/staff/insurance/policies/(?<id>[0-9a-f-]{36})\"><strong>Gulfstream Mutual FFL-1").Groups["id"].Value);
         (HttpResponseMessage _, string scopeRefused) = await owner.PostAsync("/staff/insurance/covers/Air", withBoth, ("policy", operations.ToString()));
         Assert.Contains("A cover sold to customers sits only under a policy for customers", scopeRefused, StringComparison.Ordinal);
 
@@ -924,7 +991,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
             DateTimeOffset now = DateTimeOffset.UtcNow;
             OperationsBranch haiti = OperationsBranch.Create(tenant, new OperationsLocationDetails("PAP", "Port-au-Prince",
-                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsBranchSide.Destination, now);
+                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), "HT", OperationsBranchLegal.None, now);
             OperationsWarehouse pickup = OperationsWarehouse.Create(tenant, haiti.Id, new OperationsLocationDetails("PAP1", "Capois",
                 OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsWarehouseRoles.PickupPoint, false, now);
             context.AddRange(haiti, pickup);
@@ -991,6 +1058,46 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         (HttpResponseMessage _, string booked) = await owner.GetAsync(shipmentPath + "?done=booked");
         Assert.Contains("The last parcel is in: the shipment is final.", WebUtility.HtmlDecode(booked), StringComparison.Ordinal);
         Assert.DoesNotContain(shipmentPath + "/parcels\"", booked, StringComparison.Ordinal);
+
+        // Owner, 2026-10-27: every ID label of the shipment at once, one per page; each line keeps its own.
+        string labels = "/staff/shipments/" + shipmentId + "/labels";
+        Assert.Contains("Print all ID labels (2)", booked, StringComparison.Ordinal);
+        Assert.Contains("action=\"" + labels + "\"", booked, StringComparison.Ordinal);
+        Assert.DoesNotContain("Send all to printer", booked, StringComparison.Ordinal);
+        (HttpResponseMessage allIds, string allIdsPdf) = await owner.PostAsync(labels, booked, ("kind", "id"));
+        Assert.Equal("application/pdf", allIds.Content.Headers.ContentType?.MediaType);
+        Assert.Equal(2, Regex.Matches(allIdsPdf, "/Type\\s*/Page[^s]").Count);
+
+        // Owner, 2026-10-28 (option A): not paid yet, so no shipping labels: the bar says they print after payment, and a direct request is refused.
+        Assert.Contains("Shipping labels print once the shipment is paid.", booked, StringComparison.Ordinal);
+        Assert.DoesNotContain("Print all shipping labels", booked, StringComparison.Ordinal);
+        (HttpResponseMessage unpaid, string _) = await owner.PostAsync(labels, booked, ("kind", "shipping"), ("back", "counter"));
+        Assert.Equal(shipmentPath + "?error=ops.printing.not_paid", unpaid.Headers.Location?.OriginalString);
+        Assert.Contains("Not paid yet: the shipping label prints once the shipment is paid", (await owner.GetAsync(unpaid.Headers.Location!.OriginalString)).Html, StringComparison.Ordinal);
+
+        // With an ID-label printer in the warehouse: all of them sent at once, as one print job each.
+        string printersPath = "/staff/locations/warehouse/" + warehouse + "/printers";
+        (HttpResponseMessage _, string printersPage) = await owner.GetAsync(printersPath);
+        await owner.PostAsync(printersPath + "/", printersPage, ("name", "Counter 1"), ("connection", "network"), ("address", "10.0.0.51:9100"), ("dpi", "203"), ("media", "id"));
+        (HttpResponseMessage _, string withPrinter) = await owner.GetAsync(shipmentPath);
+        Assert.Contains("Send all to printer", withPrinter, StringComparison.Ordinal);
+        Guid counterPrinter = Guid.Parse(Regex.Match(withPrinter, "<option value=\"(?<id>[0-9a-f-]{36})\">Counter 1</option>").Groups["id"].Value);
+        (HttpResponseMessage sent, string _) = await owner.PostAsync(labels, withPrinter, ("kind", "id"), ("printer", counterPrinter.ToString()), ("back", "counter"));
+        Assert.Equal(shipmentPath + "?done=labels_sent&count=2&waiting=0", sent.Headers.Location?.OriginalString);
+        (HttpResponseMessage _, string sentPage) = await owner.GetAsync(sent.Headers.Location!.OriginalString);
+        Assert.Contains("2 labels sent to the printer.", sentPage, StringComparison.Ordinal);
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            Assert.Equal(2, await context.PrintJobs.CountAsync(job => job.PrinterId == counterPrinter));
+        }
+
+        // The staff shipment page offers the same, and each parcel's own ID label.
+        (HttpResponseMessage _, string staffShipment) = await owner.GetAsync("/staff/shipments/" + shipmentId);
+        Assert.Contains("Print all ID labels (2)", staffShipment, StringComparison.Ordinal);
+        Assert.Equal(2, Regex.Matches(staffShipment, "href=\"/staff/parcels/[0-9a-f-]{36}/label\"").Count);
 
         // More boxes need a new shipment.
         (HttpResponseMessage _, string third) = await owner.PostAsync(shipmentPath + "/parcels", afterFirst, ("key", Guid.NewGuid().ToString("N")),
@@ -1125,7 +1232,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
             DateTimeOffset now = DateTimeOffset.UtcNow.AddMinutes(-1);
             OperationsBranch haiti = OperationsBranch.Create(tenant, new OperationsLocationDetails("PAP", "Port-au-Prince",
-                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsBranchSide.Destination, now);
+                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), "HT", OperationsBranchLegal.None, now);
             OperationsWarehouse pickup = OperationsWarehouse.Create(tenant, haiti.Id, new OperationsLocationDetails("PAP1", "Capois",
                 OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsWarehouseRoles.PickupPoint, false, now);
             context.AddRange(haiti, pickup);
@@ -1266,7 +1373,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
             DateTimeOffset now = DateTimeOffset.UtcNow.AddMinutes(-1);
             OperationsBranch haiti = OperationsBranch.Create(tenant, new OperationsLocationDetails("PAP", "Port-au-Prince",
-                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsBranchSide.Destination, now);
+                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), "HT", OperationsBranchLegal.None, now);
             OperationsWarehouse pickup = OperationsWarehouse.Create(tenant, haiti.Id, new OperationsLocationDetails("PAP1", "Capois",
                 OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsWarehouseRoles.PickupPoint, false, now);
             context.AddRange(haiti, pickup);
@@ -1395,7 +1502,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
             DateTimeOffset now = DateTimeOffset.UtcNow.AddMinutes(-1);
             OperationsBranch haiti = OperationsBranch.Create(tenant, new OperationsLocationDetails("PAP", "Port-au-Prince",
-                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsBranchSide.Destination, now);
+                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), "HT", OperationsBranchLegal.None, now);
             OperationsWarehouse pickup = OperationsWarehouse.Create(tenant, haiti.Id, new OperationsLocationDetails("PAP1", "Capois",
                 OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsWarehouseRoles.PickupPoint, false, now);
             context.AddRange(haiti, pickup);
@@ -1409,6 +1516,12 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             Vixly.Operations.Domain.Supplies.OperationsSupplyMovement received = Vixly.Operations.Domain.Supplies.OperationsSupplyMovement.Received(tenant, t.Id, warehouse, 5, null, null, null, Guid.NewGuid(), Guid.NewGuid(), now);
             stock.Apply(received, now);
             context.AddRange(t, stock, received);
+
+            // Owner, 2026-10-29 (B-4): the invoice prints the legal identity of the branch it is issued in.
+            Guid originBranchId = (await context.Warehouses.SingleAsync(item => item.Id == warehouse)).BranchId;
+            OperationsBranch origin = await context.Branches.SingleAsync(item => item.Id == originBranchId);
+            origin.Update(new OperationsLocationDetails(origin.Code, origin.Name, origin.Address, origin.Phone, origin.Email, origin.OpeningHours, origin.ShowOnSite), origin.CountryCode,
+                new OperationsBranchLegal("Northwind Freight Florida LLC", "EIN 12-3456789", "Licensed ocean intermediary."), origin.Status, now);
             await context.SaveChangesAsync();
             (destination, tape) = (pickup.Id, t.Id);
         }
@@ -1447,7 +1560,9 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             Assert.Equal((number, Vixly.Operations.Domain.Billing.OperationsInvoiceKind.Shipment, warehouse, anaCode), (invoice.Number, invoice.Kind, invoice.WarehouseId, invoice.Party.CustomerCode));
             Assert.Equal(9.00m, invoice.Lines.Where(line => line.SupplyId == tape).Sum(line => line.Amount));
             // Only the supplies are taxed (7% of 9.00); the freight is what the shipment was booked at.
-            Assert.Equal((0.63m, shipment.BookedTotal + 9.63m, "TX-778", "Pay at the counter."), (invoice.TaxTotal, invoice.Total, invoice.Party.TaxNumber, invoice.Note));
+            Assert.Equal((0.63m, shipment.BookedTotal + 9.63m, "EIN 12-3456789", "Pay at the counter.\nLicensed ocean intermediary."),
+                (invoice.TaxTotal, invoice.Total, invoice.Party.TaxNumber, invoice.Note));
+            Assert.Equal("Northwind Freight Florida LLC", invoice.Party.CompanyName);
             invoiceId = invoice.Id;
         }
 
@@ -1557,7 +1672,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
             DateTimeOffset now = DateTimeOffset.UtcNow.AddMinutes(-1);
             OperationsBranch haiti = OperationsBranch.Create(tenant, new OperationsLocationDetails("PAP", "Port-au-Prince",
-                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsBranchSide.Destination, now);
+                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), "HT", OperationsBranchLegal.None, now);
             OperationsWarehouse pickup = OperationsWarehouse.Create(tenant, haiti.Id, new OperationsLocationDetails("PAP1", "Capois",
                 OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsWarehouseRoles.PickupPoint, false, now);
             context.AddRange(haiti, pickup);
@@ -1627,6 +1742,17 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         Vixly.Operations.Domain.Billing.OperationsInvoice billed = (await InvoicesAsync())[first];
         Assert.Equal((Vixly.Operations.Domain.Billing.OperationsPaymentState.OnAccount, true), (billed.PaymentState, billed.Released));
         Assert.Equal(DateOnly.FromDateTime(DateTime.UtcNow).AddDays(15), billed.DueOn);
+
+        // Owner, 2026-10-28: charged to the account is a payment: the shipment gets its tracking number; the one still owed does not.
+        async Task<string?> TrackingAsync(Guid shipmentId)
+        {
+            await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            return await scope.ServiceProvider.GetRequiredService<OperationsDbContext>().Shipments.Where(item => item.Id == shipmentId).Select(item => item.TrackingNumber).SingleAsync();
+        }
+
+        Assert.NotNull(await TrackingAsync(first));
+        Assert.Null(await TrackingAsync(second));
         Assert.Contains("On account", WebUtility.HtmlDecode((await owner.GetAsync("/staff/shipments")).Html), StringComparison.Ordinal);
 
         // The second goes above the limit: it waits; the owner asked, so a finance person decides.
@@ -1697,7 +1823,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
             DateTimeOffset now = DateTimeOffset.UtcNow.AddMinutes(-1);
             OperationsBranch haiti = OperationsBranch.Create(tenant, new OperationsLocationDetails("PAP", "Port-au-Prince",
-                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsBranchSide.Destination, now);
+                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), "HT", OperationsBranchLegal.None, now);
             OperationsWarehouse pickup = OperationsWarehouse.Create(tenant, haiti.Id, new OperationsLocationDetails("PAP1", "Capois",
                 OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsWarehouseRoles.PickupPoint, false, now);
             Vixly.Operations.Domain.Settings.OperationsShippingServiceSetup air = Vixly.Operations.Domain.Settings.OperationsShippingServiceSetup.Create(tenant, "air_standard", now);
@@ -1895,7 +2021,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
             DateTimeOffset now = DateTimeOffset.UtcNow.AddMinutes(-1);
             OperationsBranch haiti = OperationsBranch.Create(tenant, new OperationsLocationDetails("PAP", "Port-au-Prince",
-                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsBranchSide.Destination, now);
+                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), "HT", OperationsBranchLegal.None, now);
             OperationsWarehouse pickup = OperationsWarehouse.Create(tenant, haiti.Id, new OperationsLocationDetails("PAP1", "Capois",
                 OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsWarehouseRoles.PickupPoint, false, now);
             Vixly.Operations.Domain.Settings.OperationsShippingServiceSetup air = Vixly.Operations.Domain.Settings.OperationsShippingServiceSetup.Create(tenant, "air_standard", now);
@@ -2073,6 +2199,97 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             Assert.Equal(("X20261021000001", Vixly.Operations.Domain.Dispatch.OperationsDispatchDocuments.CommercialInvoice | Vixly.Operations.Domain.Dispatch.OperationsDispatchDocuments.PackingList),
                 (costed.ExportReference, costed.Documents));
         }
+        // Slice 8: the carrier's bill, entered by one person and approved by another, replaces the estimate in the shipment's cost; paid up to its amount.
+        string billDay = DateTime.UtcNow.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+        string carrierId = carrier[^36..];
+        (HttpResponseMessage _, string newBill) = await owner.GetAsync("/staff/bills/new");
+        Assert.Contains("Sky Cargo", newBill, StringComparison.Ordinal);
+        (string, string)[] billFields = { ("party", "Carrier:" + carrierId), ("reference", "SC-1001"), ("category", "Freight"), ("billedOn", billDay), ("dueOn", billDay), ("amount", "120.00"),
+            ("share_number_0", dispatchNumber), ("share_amount_0", "110") };
+        Assert.Contains("A share’s number is neither a dispatch nor a shipment.", WebUtility.HtmlDecode((await owner.PostAsync("/staff/bills/new", newBill,
+            billFields.Take(6).Append(("share_number_0", "DSP-NOPE")).Append(("share_amount_0", "10")).ToArray())).Html), StringComparison.Ordinal);
+        string billPath = (await owner.PostAsync("/staff/bills/new", newBill, billFields)).Response.Headers.Location?.OriginalString ?? string.Empty;
+        Assert.Matches("^/staff/bills/[0-9a-f-]{36}\\?done=saved$", billPath);
+        billPath = billPath[..billPath.IndexOf('?', StringComparison.Ordinal)];
+        Assert.Contains("A bill with that number from this vendor is already entered.", WebUtility.HtmlDecode((await owner.PostAsync("/staff/bills/new", newBill, billFields)).Html),
+            StringComparison.Ordinal);
+        (HttpResponseMessage _, string ownBill) = await owner.GetAsync(billPath);
+        Assert.DoesNotContain("/decide", ownBill, StringComparison.Ordinal);
+        Assert.Contains("The bill changed since you opened it.", WebUtility.HtmlDecode((await owner.PostAsync(billPath + "/decide", ownBill, ("approve", "true"), ("version", "1"))).Html),
+            StringComparison.Ordinal);
+
+        async Task<(decimal? Billed, decimal Share)> CostAsync()
+        {
+            await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            return ((await context.Dispatches.AsNoTracking().SingleAsync(item => item.Number == dispatchNumber)).BilledTotal,
+                (await context.DispatchShipments.AsNoTracking().SingleAsync()).CostShare!.Value);
+        }
+
+        Assert.Equal(((decimal?)null, 75m), await CostAsync());
+        using CookieClient finance = await PersonAsync(owner, "dispatchco", "Finance", "fin", "ops.bills.approve", "ops.costs.view");
+        (HttpResponseMessage _, string toApprove) = await finance.GetAsync(billPath);
+        Assert.Equal(billPath + "?done=approved", (await finance.PostAsync(billPath + "/decide", toApprove, ("approve", "true"), ("version", BillVersion(toApprove)))).Response.Headers.Location?.OriginalString);
+        Assert.Equal(((decimal?)110m, 110m), await CostAsync());
+        Assert.Contains("110.00 USD", WebUtility.HtmlDecode((await owner.GetAsync(dispatchPath)).Html), StringComparison.Ordinal);
+        (HttpResponseMessage _, string toPay) = await finance.GetAsync(billPath);
+        Assert.Contains("That is more than is still owed on the bill.", WebUtility.HtmlDecode((await finance.PostAsync(billPath + "/pay", toPay, ("paidOn", billDay), ("amount", "200"),
+            ("method", "BankTransfer"))).Html), StringComparison.Ordinal);
+        Assert.Equal(billPath + "?done=paid", (await finance.PostAsync(billPath + "/pay", toPay, ("paidOn", billDay), ("amount", "120.00"), ("method", "Cheque"), ("reference", "CHQ 512")))
+            .Response.Headers.Location?.OriginalString);
+        Assert.Contains("data-bill-status=\"Paid\"", (await finance.GetAsync(billPath)).Html, StringComparison.Ordinal);
+        Assert.DoesNotContain("/void", (await finance.GetAsync(billPath)).Html, StringComparison.Ordinal);
+
+        // Another vendor's bill put on the shipment itself (a customs broker): a direct cost of that shipment; the profit counts both.
+        (HttpResponseMessage _, string vendorsPage) = await owner.GetAsync("/staff/vendors");
+        Assert.Equal("/staff/vendors?done=saved", (await owner.PostAsync("/staff/vendors", vendorsPage, ("name", "Port Brokers"), ("category", "Customs"))).Response.Headers.Location
+            ?.OriginalString);
+        Guid shipmentForCost;
+        string shipmentNumber;
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            Vixly.Operations.Domain.Dispatch.OperationsDispatchShipment row = await context.DispatchShipments.AsNoTracking().SingleAsync();
+            shipmentForCost = row.ShipmentId;
+            shipmentNumber = (await context.Shipments.AsNoTracking().SingleAsync(item => item.Id == row.ShipmentId)).Number!;
+        }
+
+        (HttpResponseMessage _, string brokerForm) = await owner.GetAsync("/staff/bills/new");
+        string broker = Regex.Match(brokerForm, "value=\"(?<v>Vendor:[0-9a-f-]{36})\"").Groups["v"].Value;
+        Assert.Contains("A dispatch takes only its carriers’ bills", WebUtility.HtmlDecode((await owner.PostAsync("/staff/bills/new", brokerForm, ("party", broker), ("reference", "PB-76"),
+            ("category", "Customs"), ("billedOn", billDay), ("dueOn", billDay), ("amount", "40.00"), ("share_number_0", dispatchNumber), ("share_amount_0", "15"))).Html), StringComparison.Ordinal);
+        string brokerPath = (await owner.PostAsync("/staff/bills/new", brokerForm, ("party", broker), ("reference", "PB-77"), ("category", "Customs"), ("billedOn", billDay), ("dueOn", billDay),
+            ("amount", "40.00"), ("share_number_0", shipmentNumber.ToLowerInvariant()), ("share_amount_0", "15"))).Response.Headers.Location?.OriginalString ?? string.Empty;
+        brokerPath = brokerPath[..brokerPath.IndexOf('?', StringComparison.Ordinal)];
+        (HttpResponseMessage _, string brokerPage) = await finance.GetAsync(brokerPath);
+        await finance.PostAsync(brokerPath + "/decide", brokerPage, ("approve", "true"), ("version", BillVersion(brokerPage)));
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            Vixly.Operations.Application.Payables.OperationsShipmentProfit profit = Assert.Single(await scope.ServiceProvider
+                .GetRequiredService<Vixly.Operations.Application.Payables.OperationsProfitCalculator>().ForAsync(new[] { shipmentForCost }, CancellationToken.None));
+            Assert.Equal((110m, 15m, false), (profit.CarrierCost, profit.DirectCost, profit.Estimated));
+        }
+
+        Assert.Equal(HttpStatusCode.OK, (await finance.GetAsync("/staff/profit")).Response.StatusCode);
+        Assert.Contains("Profit per shipment", WebUtility.HtmlDecode((await finance.GetAsync("/staff/profit")).Html), StringComparison.Ordinal);
+        Assert.Equal("text/csv", (await finance.GetAsync("/staff/profit/export")).Response.Content.Headers.ContentType?.MediaType);
+
+        // Voided (nothing paid), the broker's bill stops counting.
+        (HttpResponseMessage _, string brokerVoid) = await finance.GetAsync(brokerPath);
+        Assert.Equal(brokerPath + "?done=voided", (await finance.PostAsync(brokerPath + "/void", brokerVoid, ("reason", "Entered twice"))).Response.Headers.Location?.OriginalString);
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            Assert.Equal(0m, Assert.Single(await scope.ServiceProvider.GetRequiredService<Vixly.Operations.Application.Payables.OperationsProfitCalculator>()
+                .ForAsync(new[] { shipmentForCost }, CancellationToken.None)).DirectCost);
+        }
+
         Assert.Contains("A dispatch that has left cannot be cancelled.", WebUtility.HtmlDecode((await owner.PostAsync(dispatchPath + "/cancel", dispatchPage, ("reason", "Late"))).Html),
             StringComparison.Ordinal);
         Assert.Equal(dispatchPath + "?done=arrived", (await owner.PostAsync(dispatchPath + "/legs/" + leg + "/arrive", dispatchPage)).Response.Headers.Location?.OriginalString);
@@ -2134,7 +2351,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
             DateTimeOffset now = DateTimeOffset.UtcNow.AddMinutes(-1);
             OperationsBranch haiti = OperationsBranch.Create(tenant, new OperationsLocationDetails("PAP", "Port-au-Prince",
-                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsBranchSide.Destination, now);
+                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), "HT", OperationsBranchLegal.None, now);
             OperationsWarehouse pickup = OperationsWarehouse.Create(tenant, haiti.Id, new OperationsLocationDetails("PAP1", "Capois",
                 OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsWarehouseRoles.PickupPoint, false, now);
             Vixly.Operations.Domain.Settings.OperationsShippingServiceSetup air = Vixly.Operations.Domain.Settings.OperationsShippingServiceSetup.Create(tenant, "air_standard", now);
@@ -2271,7 +2488,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
             DateTimeOffset now = DateTimeOffset.UtcNow.AddMinutes(-1);
             OperationsBranch haiti = OperationsBranch.Create(tenant, new OperationsLocationDetails("PAP", "Port-au-Prince",
-                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsBranchSide.Destination, now);
+                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), "HT", OperationsBranchLegal.None, now);
             OperationsWarehouse pickup = OperationsWarehouse.Create(tenant, haiti.Id, new OperationsLocationDetails("PAP1", "Capois",
                 OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsWarehouseRoles.PickupPoint, false, now);
             context.AddRange(haiti, pickup);
@@ -2436,6 +2653,79 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         string fourthSession = "cs_test_" + fourthPath[^36..].Replace("-", string.Empty, StringComparison.Ordinal);
         Assert.False(_host.Cards.Payments[fourthSession].Over);
 
+        // Owner, 2026-10-26: payments added one by one, the card last for the rest. The cash waits for the card and needs the cashier's drawer.
+        (Guid fifth, decimal fifthOwed) = await InvoiceAsync(4);
+        string fifthPath = "/staff/cashier/invoices/" + fifth;
+        (HttpResponseMessage _, string fifthPage) = await owner.GetAsync(fifthPath);
+        Assert.Contains("data-tenders-card", fifthPage, StringComparison.Ordinal);
+        Assert.Contains("Two different cards can't be used on the same invoice.", WebUtility.HtmlDecode(fifthPage), StringComparison.Ordinal);
+        (HttpResponseMessage noDrawer, string refusedSplit) = await owner.PostAsync(fifthPath + "/card", fifthPage, ("method_1", "Cash"), ("amount_1", "1.00"), ("given_1", "5.00"));
+        Assert.Equal(HttpStatusCode.OK, noDrawer.StatusCode);
+        Assert.Contains("Open your cash drawer at this warehouse", WebUtility.HtmlDecode(refusedSplit), StringComparison.Ordinal);
+        Assert.Contains("name=\"amount_1\" value=\"1.00\"", refusedSplit, StringComparison.Ordinal);
+        (HttpResponseMessage _, string drawers) = await owner.GetAsync("/staff/cashier/drawers");
+        await owner.PostAsync("/staff/cashier/drawers/open", drawers, ("warehouse", warehouse.ToString()), ("float", "100"));
+        Assert.Contains("there is nothing left for the card", (await owner.PostAsync(fifthPath + "/card", fifthPage, ("method_1", "Cash"),
+            ("amount_1", fifthOwed.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)))).Html, StringComparison.Ordinal);
+        string splitPath = (await owner.PostAsync(fifthPath + "/card", fifthPage, ("method_1", "Cash"), ("amount_1", "1.00"), ("given_1", "5.00"))).Response.Headers.Location!.OriginalString;
+        string splitSession = "cs_test_" + splitPath[^36..].Replace("-", string.Empty, StringComparison.Ordinal);
+        Assert.Equal(fifthOwed - 1.00m, _host.Cards.Asked[splitSession].Amount);
+        Assert.Contains("Plus 1.00 USD in the other payments, recorded when the card is approved.", WebUtility.HtmlDecode((await owner.GetAsync(splitPath)).Html), StringComparison.Ordinal);
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            Assert.False(await context.Payments.AnyAsync(item => item.InvoiceId == fifth));
+        }
+
+        _host.Cards.Pay(splitSession);
+        Assert.Contains("Paid by card", WebUtility.HtmlDecode((await owner.GetAsync(splitPath)).Html), StringComparison.Ordinal);
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            Vixly.Operations.Domain.Billing.OperationsPayment split = await context.Payments.AsNoTracking().SingleAsync(item => item.InvoiceId == fifth);
+            Assert.Equal(new[] { Vixly.Operations.Domain.Billing.OperationsPaymentMethod.Cash, Vixly.Operations.Domain.Billing.OperationsPaymentMethod.Card },
+                split.Tenders.Select(tender => tender.Method).ToArray());
+            Assert.Equal(4.00m, split.Change);
+            Assert.NotNull(split.DrawerId);
+            Assert.Equal(0m, (await context.Invoices.AsNoTracking().SingleAsync(item => item.Id == fifth)).Owed);
+        }
+
+        // Owner, 2026-10-27: the cashier makes a shipment pay at the destination, and back, while nothing is paid; only when the company allows it.
+        (Guid sixth, decimal _) = await InvoiceAsync(5);
+        string sixthPath = "/staff/cashier/invoices/" + sixth;
+        Assert.DoesNotContain("data-collect=", (await owner.GetAsync(sixthPath)).Html, StringComparison.Ordinal);
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            Vixly.Operations.Domain.Settings.OperationsTenantSettings settings = await context.TenantSettings.SingleAsync();
+            settings.ChangeWork(settings.WeightUnit, settings.DimensionUnit, true, settings.AllowCredit, settings.DeliveryModes, DateTimeOffset.UtcNow);
+            await context.SaveChangesAsync();
+        }
+
+        (HttpResponseMessage _, string sixthPage) = await owner.GetAsync(sixthPath);
+        Assert.Contains("data-collect=\"off\"", sixthPage, StringComparison.Ordinal);
+        Assert.Equal(sixthPath + "?done=collect_on", (await owner.PostAsync(sixthPath + "/collect", sixthPage, ("collect", "true"), ("reason", "Pays in Haiti"))).Response.Headers.Location?.OriginalString);
+        string collectPage = WebUtility.HtmlDecode((await owner.GetAsync(sixthPath + "?done=collect_on")).Html);
+        Assert.Contains("Reprint the waybill", collectPage, StringComparison.Ordinal);
+        Assert.Contains("data-collect=\"on\"", collectPage, StringComparison.Ordinal);
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            Vixly.Operations.Domain.Billing.OperationsInvoice collected = await context.Invoices.AsNoTracking().SingleAsync(item => item.Id == sixth);
+            Assert.True(collected.PayAtDestination);
+            Assert.True((await context.Shipments.AsNoTracking().SingleAsync(item => item.Id == collected.ShipmentId)).FreightCollect);
+        }
+
+        Assert.Equal(sixthPath + "?done=collect_off", (await owner.PostAsync(sixthPath + "/collect", collectPage, ("collect", "false"))).Response.Headers.Location?.OriginalString);
+
         // Cards turned off: not offered at the cashier.
         (HttpResponseMessage _, string again) = await owner.GetAsync("/staff/settings/payments");
         await owner.PostAsync("/staff/settings/payments/card/accept", again, ("accept", "false"));
@@ -2471,7 +2761,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
             DateTimeOffset now = DateTimeOffset.UtcNow.AddMinutes(-1);
             OperationsBranch haiti = OperationsBranch.Create(tenant, new OperationsLocationDetails("PAP", "Port-au-Prince",
-                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsBranchSide.Destination, now);
+                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), "HT", OperationsBranchLegal.None, now);
             OperationsWarehouse pickup = OperationsWarehouse.Create(tenant, haiti.Id, new OperationsLocationDetails("PAP1", "Capois",
                 OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsWarehouseRoles.PickupPoint, false, now);
             context.AddRange(haiti, pickup);
@@ -2514,6 +2804,9 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         string Money(decimal amount) => amount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
         Assert.Contains("Unpaid", WebUtility.HtmlDecode((await owner.GetAsync("/staff/shipments")).Html), StringComparison.Ordinal);
 
+        // Owner, 2026-10-28: no tracking number while the shipment is unpaid.
+        Assert.Contains("Given once the shipment is paid", WebUtility.HtmlDecode((await owner.GetAsync(shipmentPath)).Html), StringComparison.Ordinal);
+
         // The cashier finds the customer by code; cash needs an open drawer.
         string cashier = WebUtility.HtmlDecode((await owner.GetAsync("/staff/cashier?find=" + anaCode)).Html);
         Assert.Contains("/staff/cashier/invoices/" + invoiceId, cashier, StringComparison.Ordinal);
@@ -2537,6 +2830,42 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         Assert.Contains("Change to give: 10.00 USD", WebUtility.HtmlDecode((await owner.GetAsync(paymentPath)).Html), StringComparison.Ordinal);
         Assert.Equal("application/pdf", (await owner.GetAsync(paymentPath + "/receipt")).Response.Content.Headers.ContentType?.MediaType);
         Assert.Contains(">Paid<", WebUtility.HtmlDecode((await owner.GetAsync("/staff/shipments")).Html).Replace(" Paid", "Paid", StringComparison.Ordinal), StringComparison.Ordinal);
+
+        // Paid: the shipment has its tracking number (VX, random, with its check digit), shown at the counter and tracked on the company's website.
+        string tracking;
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            Vixly.Operations.Domain.Shipments.OperationsShipment paidShipment = await scope.ServiceProvider.GetRequiredService<OperationsDbContext>().Shipments
+                .SingleAsync(item => item.Id == Guid.Parse(ShipmentId(shipmentPath)));
+            tracking = paidShipment.TrackingNumber!;
+            Assert.StartsWith("VX", tracking, StringComparison.Ordinal);
+            Assert.Equal(tracking, Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.Read(tracking));
+        }
+
+        string shown = Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.Format(tracking);
+        Assert.Contains(shown, WebUtility.HtmlDecode((await owner.GetAsync(shipmentPath)).Html), StringComparison.Ordinal);
+        string tracked = WebUtility.HtmlDecode(await (await _host.Client("cashco.techcrafters.ltd").GetAsync("/en/track?number=" + Uri.EscapeDataString(shown.ToLowerInvariant()))).Content.ReadAsStringAsync());
+        Assert.Contains(shown, tracked, StringComparison.Ordinal);
+        Assert.Contains("Booked", tracked, StringComparison.Ordinal);
+        Assert.DoesNotContain("Jean Baptiste", tracked, StringComparison.Ordinal);
+        // A shipment paid before tracking numbers existed gets one from the housekeeping round.
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().EnterSystem();
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            Guid paidId = Guid.Parse(ShipmentId(shipmentPath));
+            await context.Shipments.IgnoreQueryFilters().Where(item => item.Id == paidId)
+                .ExecuteUpdateAsync(set => set.SetProperty(item => item.TrackingNumber, (string?)null));
+            Assert.True(await scope.ServiceProvider.GetRequiredService<Vixly.Operations.Application.Ports.IOperationsTrackingNumberBackfill>().RunAsync(500, DateTimeOffset.UtcNow, CancellationToken.None) >= 1);
+            tracking = (await context.Shipments.IgnoreQueryFilters().AsNoTracking().SingleAsync(item => item.Id == paidId)).TrackingNumber!;
+            Assert.Equal(tracking, Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.Read(tracking));
+        }
+
+        string wrongDigit = tracking[..^1] + (tracking[^1] == '0' ? '1' : '0');
+        Assert.Contains("No shipment matches this number", WebUtility.HtmlDecode(await (await _host.Client("cashco.techcrafters.ltd").GetAsync("/en/track?number=" + wrongDigit)).Content.ReadAsStringAsync()),
+            StringComparison.Ordinal);
 
         // A credit note of 2.00 approved by finance is given back in cash from the owner's drawer.
         using CookieClient finance = await PersonAsync(owner, "cashco", "Finance", "fin", "ops.invoices.view", "ops.credits.approve", "ops.payments.confirm");
@@ -2615,6 +2944,41 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
     }
 
     // A staff member with a role of these permissions for the whole company.
+    // Vixly Lite (owner, 2026-10-30): the pages of the modules the plan leaves out answer 404 and leave the menu;
+    // without the customer portal staff enter customers, with it they cannot.
+    [SqlServerFact]
+    public async Task Lite_ModulesLeftOut_AreGone_AndStaffEnterCustomers()
+    {
+        Guid tenant = NewTenant("liteco", "Lite Co");
+        using CookieClient owner = await OwnerAsync("liteco");
+
+        _host.Features.Tenants[tenant] = OperationsPlanFeatures.All with { ModulesOff = Vixly.Operations.Application.Plans.OperationsPlanModules.All.ToHashSet(StringComparer.Ordinal) };
+
+        Assert.Equal(HttpStatusCode.NotFound, (await owner.GetAsync("/staff/insurance")).Response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await owner.GetAsync("/staff/bills")).Response.StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await owner.GetAsync("/staff/settings/credit")).Response.StatusCode);
+
+        string list = (await owner.GetAsync("/staff/customers")).Html;
+        Assert.DoesNotContain("href=\"/staff/insurance\"", list, StringComparison.Ordinal);
+        Assert.Contains("href=\"/staff/customers/new\"", list, StringComparison.Ordinal);
+
+        (HttpResponseMessage _, string form) = await owner.GetAsync("/staff/customers/new");
+        (HttpResponseMessage created, string _) = await owner.PostAsync("/staff/customers/new", form, ("firstName", "Rose"), ("lastName", "Pierre"), ("email", "rose.lite@example.com"),
+            ("phone", "+13055550142"), ("language", "fr"));
+        Assert.StartsWith("/staff/customers/", created.Headers.Location?.OriginalString, StringComparison.Ordinal);
+
+        // The same email twice: refused.
+        Assert.DoesNotContain("/staff/customers/", (await owner.PostAsync("/staff/customers/new", form, ("firstName", "Rose"), ("lastName", "Pierre"),
+            ("email", "rose.lite@example.com"), ("phone", "+13055550142"), ("language", "fr"))).Response.Headers.Location?.OriginalString ?? string.Empty, StringComparison.Ordinal);
+
+        // With the portal, customers register themselves.
+        _host.Features.Tenants[tenant] = OperationsPlanFeatures.All;
+        Assert.DoesNotContain("href=\"/staff/customers/new\"", (await owner.GetAsync("/staff/customers")).Html, StringComparison.Ordinal);
+        Assert.Null((await owner.PostAsync("/staff/customers/new", form, ("firstName", "Max"), ("lastName", "Paul"), ("email", "max.lite@example.com"),
+            ("phone", "+13055550143"), ("language", "en"))).Response.Headers.Location);
+        Assert.Equal(HttpStatusCode.OK, (await owner.GetAsync("/staff/insurance")).Response.StatusCode);
+    }
+
     private async Task<CookieClient> PersonAsync(CookieClient owner, string slug, string roleName, string mailbox, params string[] permissions)
     {
         (HttpResponseMessage _, string form) = await owner.GetAsync("/staff/roles/new");
@@ -2653,7 +3017,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
             DateTimeOffset now = DateTimeOffset.UtcNow.AddMinutes(-1);
             OperationsBranch haiti = OperationsBranch.Create(tenant, new OperationsLocationDetails("PAP", "Port-au-Prince",
-                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsBranchSide.Destination, now);
+                OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), "HT", OperationsBranchLegal.None, now);
             OperationsWarehouse pickup = OperationsWarehouse.Create(tenant, haiti.Id, new OperationsLocationDetails("PAP1", "Capois",
                 OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsWarehouseRoles.PickupPoint, false, now);
             context.AddRange(haiti, pickup);
@@ -2841,7 +3205,420 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         Assert.Contains("action=\"/screen/pair\"", (await tablet.GetAsync("/screen")).Html, StringComparison.Ordinal);
     }
 
+    // Slice 9: the company's own Twilio account; notices go by SMS or WhatsApp to customers who chose it, for the notices the company picked, else by email;
+    // STOP takes the customer back to email; the plan decides; the token is never shown.
+    [SqlServerFact]
+    public async Task Texts_TheCompanysTwilio_SendsTheNoticesItPicked_ToCustomersWhoChoseThem()
+    {
+        Guid tenant = NewTenant("textco", "Text Co");
+        (CookieClient owner, string _) = await OwnerWithKeyAsync("textco");
+        using CookieClient _owner = owner;
+        (Guid ana, string _) = await CustomerAsync(tenant, "ana.texts@example.com");
+        string sid = "AC" + new string('1', 32);
+        string token = _host.Texts.AcceptedToken;
+
+        _host.Features.Tenants[tenant] = new OperationsPlanFeatures(true, true) { TextMessages = false };
+        Assert.Contains("data-not-in-plan", (await owner.GetAsync("/staff/settings/messages")).Html, StringComparison.Ordinal);
+        _host.Features.Tenants[tenant] = OperationsPlanFeatures.All;
+
+        (HttpResponseMessage _, string page) = await owner.GetAsync("/staff/settings/messages");
+        Assert.Contains("Twilio did not accept", WebUtility.HtmlDecode((await owner.PostAsync("/staff/settings/messages/connect", page, ("accountSid", sid),
+            ("authToken", new string('f', 32)), ("smsFrom", "+13055550123"))).Html), StringComparison.Ordinal);
+        Assert.Equal("/staff/settings/messages?done=1", (await owner.PostAsync("/staff/settings/messages/connect", page, ("accountSid", sid), ("authToken", token),
+            ("smsFrom", "+13055550123"), ("whatsAppFrom", "+13055550199"))).Response.Headers.Location?.OriginalString);
+        string connected = (await owner.GetAsync("/staff/settings/messages")).Html;
+        Assert.Contains("Text Co Twilio", connected, StringComparison.Ordinal);
+        Assert.DoesNotContain(token, connected, StringComparison.Ordinal);
+        string template = "HX" + new string('2', 32);
+        Assert.Equal("/staff/settings/messages?done=1#notices", (await owner.PostAsync("/staff/settings/messages/notices", connected, ("notice", "ReadyForPickup"),
+            ("notice", "PickupCode"), ("template_ReadyForPickup", template))).Response.Headers.Location?.OriginalString);
+
+        async Task SendAsync(Vixly.Operations.Domain.Texts.OperationsNoticeChannel channel, OperationsCustomerMailKind kind)
+        {
+            await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            Vixly.Operations.Domain.Customers.OperationsCustomer customer = await context.Customers.SingleAsync(item => item.Id == ana);
+
+            if (customer.NoticeChannel != channel)
+            {
+                customer.ChangeNoticeChannel(channel, DateTimeOffset.UtcNow);
+                await context.SaveChangesAsync();
+            }
+
+            await scope.ServiceProvider.GetRequiredService<Vixly.Operations.Application.Customers.OperationsCustomerAccounts>().SendAsync(customer, kind,
+                "https://textco.techcrafters.ltd/customer/shipments", new Dictionary<string, string>(StringComparer.Ordinal) { ["shipment"] = "S-100", ["place"] = "Capois", ["code"] = "4821" },
+                new Dictionary<string, string>(StringComparer.Ordinal), CancellationToken.None);
+        }
+
+        int mails = _host.CustomerMailer.Sent.Count;
+        await SendAsync(Vixly.Operations.Domain.Texts.OperationsNoticeChannel.Sms, OperationsCustomerMailKind.ReadyForPickup);
+        (string from, string _, string body) = Assert.Single(_host.Texts.Sms);
+        Assert.Equal("+13055550123", from);
+        Assert.Equal("Text Co: Shipment S-100 is ready for pickup at Capois. https://textco.techcrafters.ltd/customer/shipments", body);
+        Assert.Equal(mails, _host.CustomerMailer.Sent.Count);
+        Assert.Equal("https://textco.techcrafters.ltd/hooks/twilio", Assert.Single(_host.Texts.Callbacks));
+
+        // A code goes by email as well: a text Twilio accepts can still fail to arrive.
+        await SendAsync(Vixly.Operations.Domain.Texts.OperationsNoticeChannel.Sms, OperationsCustomerMailKind.PickupCode);
+        Assert.Equal(2, _host.Texts.Sms.Count);
+        Assert.Equal(mails + 1, _host.CustomerMailer.Sent.Count);
+        mails++;
+
+        // A notice the company does not send by text: by email.
+        await SendAsync(Vixly.Operations.Domain.Texts.OperationsNoticeChannel.Sms, OperationsCustomerMailKind.ParcelReceived);
+        Assert.Equal(mails + 1, _host.CustomerMailer.Sent.Count);
+
+        // WhatsApp with the approved template; a notice without one goes by email.
+        await SendAsync(Vixly.Operations.Domain.Texts.OperationsNoticeChannel.WhatsApp, OperationsCustomerMailKind.ReadyForPickup);
+        (string _, string _, string usedTemplate, IReadOnlyList<string> variables) = Assert.Single(_host.Texts.WhatsApp);
+        Assert.Equal((template, "Text Co"), (usedTemplate, variables[0]));
+        await SendAsync(Vixly.Operations.Domain.Texts.OperationsNoticeChannel.WhatsApp, OperationsCustomerMailKind.PickupCode);
+        Assert.Equal(mails + 2, _host.CustomerMailer.Sent.Count);
+
+        // STOP: the email goes instead, and the customer is back on email for the next ones.
+        _host.Texts.RefuseNextWith = "21610";
+        await SendAsync(Vixly.Operations.Domain.Texts.OperationsNoticeChannel.Sms, OperationsCustomerMailKind.PickupCode);
+        Assert.Equal(mails + 3, _host.CustomerMailer.Sent.Count);
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            Assert.Equal(Vixly.Operations.Domain.Texts.OperationsNoticeChannel.Email, (await context.Customers.AsNoTracking().SingleAsync(item => item.Id == ana)).NoticeChannel);
+            Assert.Equal(new[] { Vixly.Operations.Domain.Texts.OperationsTextStatus.Sent, Vixly.Operations.Domain.Texts.OperationsTextStatus.Sent,
+                    Vixly.Operations.Domain.Texts.OperationsTextStatus.Sent, Vixly.Operations.Domain.Texts.OperationsTextStatus.OptedOut },
+                (await context.TextMessages.AsNoTracking().OrderBy(item => item.CreatedUtc).Select(item => item.Status).ToListAsync()).ToArray());
+        }
+
+        string log = (await owner.GetAsync("/staff/settings/messages")).Html;
+        Assert.Contains("data-text-status=\"OptedOut\"", log, StringComparison.Ordinal);
+        Assert.Contains("data-text-status=\"Sent\"", log, StringComparison.Ordinal);
+
+        // Twilio's reports, signed with the company's token over its address: delivered; then a number that cannot get texts takes the customer back to email.
+        async Task<HttpStatusCode> ReportAsync(string sid, string status, string? error, string? signWith)
+        {
+            List<KeyValuePair<string, string>> form = new() { new("MessageSid", sid), new("MessageStatus", status), new("AccountSid", sid.Length > 0 ? "AC" + new string('1', 32) : "") };
+
+            if (error is not null)
+            {
+                form.Add(new("ErrorCode", error));
+            }
+
+            string data = "https://textco.techcrafters.ltd/hooks/twilio" + string.Concat(form.OrderBy(item => item.Key, StringComparer.Ordinal).Select(item => item.Key + item.Value));
+            using HttpClient twilio = _host.Client("textco.techcrafters.ltd");
+            using HttpRequestMessage request = new(HttpMethod.Post, "/hooks/twilio") { Content = new FormUrlEncodedContent(form) };
+
+            if (signWith is not null)
+            {
+#pragma warning disable CA5350 // Twilio's rule.
+                request.Headers.Add("X-Twilio-Signature", Convert.ToBase64String(System.Security.Cryptography.HMACSHA1.HashData(System.Text.Encoding.UTF8.GetBytes(signWith),
+                    System.Text.Encoding.UTF8.GetBytes(data))));
+#pragma warning restore CA5350
+            }
+
+            return (await twilio.SendAsync(request)).StatusCode;
+        }
+
+        string first = "SM" + 1.ToString("D32", System.Globalization.CultureInfo.InvariantCulture);
+        string second = "SM" + 2.ToString("D32", System.Globalization.CultureInfo.InvariantCulture);
+        Assert.Equal(HttpStatusCode.Forbidden, await ReportAsync(first, "delivered", null, null));
+        Assert.Equal(HttpStatusCode.Forbidden, await ReportAsync(first, "delivered", null, new string('f', 32)));
+        Assert.Equal(HttpStatusCode.OK, await ReportAsync(first, "delivered", null, token));
+        Assert.Equal(HttpStatusCode.OK, await ReportAsync(first, "undelivered", "30003", token));
+
+        await SendAsync(Vixly.Operations.Domain.Texts.OperationsNoticeChannel.Sms, OperationsCustomerMailKind.ParcelReceived);
+        Assert.Equal(HttpStatusCode.OK, await ReportAsync(second, "undelivered", "30006", token));
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            Dictionary<string, (Vixly.Operations.Domain.Texts.OperationsTextStatus, string?)> lines = await context.TextMessages.AsNoTracking().Where(item => item.ProviderId != null)
+                .ToDictionaryAsync(item => item.ProviderId!, item => (item.Status, item.ErrorCode));
+            Assert.Equal((Vixly.Operations.Domain.Texts.OperationsTextStatus.Delivered, (string?)null), lines[first]);
+            Assert.Equal((Vixly.Operations.Domain.Texts.OperationsTextStatus.Undelivered, "30006"), lines[second]);
+            Assert.Equal(Vixly.Operations.Domain.Texts.OperationsNoticeChannel.Email, (await context.Customers.AsNoTracking().SingleAsync(item => item.Id == ana)).NoticeChannel);
+        }
+    }
+
+    // Slice 10: the company API (read, with keys bound to the company) and signed webhooks, queued from what happened, tried again, tested by hand.
+    [SqlServerFact]
+    public async Task Api_KeysReadTheCompanysData_AndWebhooksDeliverSignedEvents()
+    {
+        Guid tenant = NewTenant("apico", "Api Co");
+        NewTenant("otherapi", "Other Api");
+        (CookieClient owner, string _) = await OwnerWithKeyAsync("apico");
+        using CookieClient _owner = owner;
+
+        _host.Features.Tenants[tenant] = new OperationsPlanFeatures(true, true) { TenantApi = false };
+        Assert.Contains("data-not-in-plan", (await owner.GetAsync("/staff/settings/api")).Html, StringComparison.Ordinal);
+        _host.Features.Tenants[tenant] = OperationsPlanFeatures.All;
+
+        (HttpResponseMessage _, string page) = await owner.GetAsync("/staff/settings/api");
+        string made = (await owner.PostAsync("/staff/settings/api/keys", page, ("name", "ERP"))).Html;
+        string token = System.Text.RegularExpressions.Regex.Match(made, "data-secret[^>]*>(ak_[^<]+)<").Groups[1].Value;
+        Assert.StartsWith("ak_", token, StringComparison.Ordinal);
+        Assert.DoesNotContain(token, (await owner.GetAsync("/staff/settings/api")).Html, StringComparison.Ordinal);
+
+        async Task<(HttpStatusCode Status, System.Text.Json.JsonElement Json)> ApiAsync(string path, string? key, string host = "apico.techcrafters.ltd")
+        {
+            using HttpClient client = _host.Client(host);
+            using HttpRequestMessage request = new(HttpMethod.Get, path);
+
+            if (key is not null)
+            {
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", key);
+            }
+
+            using HttpResponseMessage response = await client.SendAsync(request);
+            string body = await response.Content.ReadAsStringAsync();
+            return (response.StatusCode, System.Text.Json.JsonDocument.Parse(body.Length == 0 ? "{}" : body).RootElement.Clone());
+        }
+
+        (Guid ana, string _) = await CustomerAsync(tenant, "ana.api@example.com");
+        (Guid ben, string _) = await CustomerAsync(tenant, "ben.api@example.com");
+        (Guid cy, string _) = await CustomerAsync(tenant, "cy.api@example.com");
+
+        (HttpStatusCode anonymous, System.Text.Json.JsonElement refused) = await ApiAsync("/api/v1/customers", null);
+        Assert.Equal((HttpStatusCode.Unauthorized, "unauthorized"), (anonymous, refused.GetProperty("error").GetProperty("code").GetString()));
+        Assert.Equal(HttpStatusCode.Unauthorized, (await ApiAsync("/api/v1/customers", token[..^1] + (token[^1] == 'A' ? 'B' : 'A'))).Status);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await ApiAsync("/api/v1/customers", token, "otherapi.techcrafters.ltd")).Status);
+
+        // Oldest first, two a page, the cursor to the next: every customer once.
+        (HttpStatusCode first, System.Text.Json.JsonElement one) = await ApiAsync("/api/v1/customers?limit=2", token);
+        Assert.Equal(HttpStatusCode.OK, first);
+        Assert.Equal(2, one.GetProperty("data").GetArrayLength());
+        string cursor = one.GetProperty("nextCursor").GetString()!;
+        System.Text.Json.JsonElement two = (await ApiAsync("/api/v1/customers?limit=2&cursor=" + Uri.EscapeDataString(cursor), token)).Json;
+        Assert.Equal(System.Text.Json.JsonValueKind.Null, two.GetProperty("nextCursor").ValueKind);
+        Assert.Equal(new[] { ana, ben, cy }.OrderBy(id => id).ToArray(), one.GetProperty("data").EnumerateArray().Concat(two.GetProperty("data").EnumerateArray())
+            .Select(item => item.GetProperty("id").GetGuid()).OrderBy(id => id).ToArray());
+        Assert.DoesNotContain("password", one.ToString(), StringComparison.OrdinalIgnoreCase);
+
+        (HttpStatusCode single, System.Text.Json.JsonElement anaJson) = await ApiAsync("/api/v1/customers/" + ana, token);
+        Assert.Equal((HttpStatusCode.OK, "ana.api@example.com"), (single, anaJson.GetProperty("data").GetProperty("email").GetString()));
+        Assert.Equal(HttpStatusCode.NotFound, (await ApiAsync("/api/v1/customers/" + Guid.NewGuid(), token)).Status);
+        Assert.Equal(HttpStatusCode.NotFound, (await ApiAsync("/api/v1/secrets", token)).Status);
+
+        foreach (string resource in new[] { "shipments", "parcels", "tracking", "invoices", "payments" })
+        {
+            Assert.Equal(HttpStatusCode.OK, (await ApiAsync("/api/v1/" + resource, token)).Status);
+        }
+
+        _host.Features.Tenants[tenant] = new OperationsPlanFeatures(true, true) { TenantApi = false };
+        Assert.Equal("not_in_plan", (await ApiAsync("/api/v1/customers", token)).Json.GetProperty("error").GetProperty("code").GetString());
+        _host.Features.Tenants[tenant] = OperationsPlanFeatures.All;
+
+        // Webhooks: a private address refused; a public one added, its secret shown once.
+        string apiPage = (await owner.GetAsync("/staff/settings/api")).Html;
+        Assert.Contains("public internet", WebUtility.HtmlDecode((await owner.PostAsync("/staff/settings/api/webhooks", apiPage, ("url", "https://10.0.0.5/in"),
+            ("events", "CustomerCreated"))).Html), StringComparison.Ordinal);
+        string added = (await owner.PostAsync("/staff/settings/api/webhooks", apiPage, ("url", "https://hooks.example.com/in"), ("events", "CustomerCreated"),
+            ("events", "Tracking"))).Html;
+        string secret = System.Text.RegularExpressions.Regex.Match(added, "data-secret[^>]*>(whsec_[^<]+)<").Groups[1].Value;
+        Assert.StartsWith("whsec_", secret, StringComparison.Ordinal);
+
+        // The address starts now: the customers before it are not sent; one made after it goes out signed, written with the customer itself.
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        (Guid dee, string _) = await CustomerAsync(tenant, "dee.api@example.com");
+        Guid deeEvent;
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            deeEvent = (await scope.ServiceProvider.GetRequiredService<OperationsDbContext>().ApiEvents.SingleAsync(item => item.SourceId == dee)).Id;
+        }
+
+        async Task RoundAsync() => await Vixly.Operations.Web.Hosting.OperationsWebhookWorker.RunOnceAsync(_host.Services.GetRequiredService<IServiceScopeFactory>(),
+            Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance, CancellationToken.None);
+
+        _host.Webhooks.NextStatuses.Enqueue(500);
+        await RoundAsync();
+        Assert.Single(_host.Webhooks.Posts);
+        Assert.Contains("data-delivery-status=\"Pending\"", (await owner.GetAsync("/staff/settings/api")).Html, StringComparison.Ordinal);
+
+        // Tried again when due (moved forward here, as the minute passes).
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            await context.WebhookDeliveries.ExecuteUpdateAsync(set => set.SetProperty(item => item.NextAttemptUtc, now.AddSeconds(-1)));
+        }
+
+        await RoundAsync();
+        Assert.Equal(2, _host.Webhooks.Posts.Count);
+        (string url, IReadOnlyDictionary<string, string> headers, string body) = _host.Webhooks.Posts.Last();
+        Assert.Equal("https://hooks.example.com/in", url);
+        Assert.Equal("evt_" + deeEvent.ToString("N"), headers["webhook-id"]);
+        byte[] mac = System.Security.Cryptography.HMACSHA256.HashData(Convert.FromBase64String(secret["whsec_".Length..]),
+            System.Text.Encoding.UTF8.GetBytes(headers["webhook-id"] + "." + headers["webhook-timestamp"] + "." + body));
+        Assert.Equal("v1," + Convert.ToBase64String(mac), headers["webhook-signature"]);
+        System.Text.Json.JsonElement sent = System.Text.Json.JsonDocument.Parse(body).RootElement;
+        Assert.Equal(("customer.created", "dee.api@example.com"), (sent.GetProperty("type").GetString(), sent.GetProperty("data").GetProperty("email").GetString()));
+
+        // Nothing new: nothing sent; delivered once (the event id is the receiver's guard against repeats).
+        await RoundAsync();
+        Assert.Equal(2, _host.Webhooks.Posts.Count);
+        string log = (await owner.GetAsync("/staff/settings/api")).Html;
+        Assert.Contains("data-delivery-status=\"Delivered\"", log, StringComparison.Ordinal);
+        Assert.DoesNotContain(secret, log, StringComparison.Ordinal);
+
+        // A test event at once, from the page.
+        Guid endpointId;
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            endpointId = (await scope.ServiceProvider.GetRequiredService<OperationsDbContext>().WebhookEndpoints.SingleAsync()).Id;
+        }
+
+        string tested = WebUtility.HtmlDecode((await owner.PostAsync("/staff/settings/api/webhooks/" + endpointId + "/test", log)).Html);
+        Assert.True(tested.Contains("was delivered (status 200)", StringComparison.Ordinal), tested.Length > 3000 ? tested[^3000..] : tested);
+        Assert.Equal("webhook.test", System.Text.Json.JsonDocument.Parse(_host.Webhooks.Posts.Last().Body).RootElement.GetProperty("type").GetString());
+
+        // Turned off: no test; revoked key: refused.
+        Assert.Equal("/staff/settings/api?done=1#webhooks", (await owner.PostAsync("/staff/settings/api/webhooks/" + endpointId + "/switch?action=off", tested))
+            .Response.Headers.Location?.OriginalString);
+        Guid keyId;
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            keyId = (await scope.ServiceProvider.GetRequiredService<OperationsDbContext>().ApiKeys.SingleAsync()).Id;
+        }
+
+        await owner.PostAsync("/staff/settings/api/keys/" + keyId + "/revoke", tested);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await ApiAsync("/api/v1/customers", token)).Status);
+    }
+
+    // Slice 11: every report runs (operations, finance, customers, carriers and warehouse), counts in the warehouse's day, compares with the period before,
+    // downloads as CSV, Excel and PDF; finance needs its right and money stays hidden without it; the on-time rules are company settings.
+    [SqlServerFact]
+    public async Task Reports_ShowTheCompanysFigures_ToWhoMaySeeThem()
+    {
+        Guid tenant = NewTenant("reportco", "Report Co");
+        (CookieClient owner, string _) = await OwnerWithKeyAsync("reportco");
+        using CookieClient _owner = owner;
+        Guid warehouse = await WarehouseAsync(tenant);
+        (Guid ana, string _) = await CustomerAsync(tenant, "ana.report@example.com");
+        await CustomerAsync(tenant, "ben.report@example.com");
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+
+        // Two parcels received three days ago at WH1; one departed an hour ago (and a voided receipt that never counts).
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            Dictionary<string, string> at = new(StringComparer.Ordinal) { ["warehouse"] = "WH1" };
+            OperationsTrackingEvent Event(Guid parcel, string code, DateTimeOffset when, IReadOnlyDictionary<string, string> arguments, string key) =>
+                OperationsTrackingEvent.Record(tenant, new OperationsTrackingDraft(OperationsTrackingSubject.Parcel, parcel, code, arguments, when, "report-test:" + key, OperationsTrackingActor.Staff,
+                    OperationsTrackingSource.Scan) { LocationCode = "WH1", TimeZone = "UTC", ActorUserId = Guid.NewGuid() }, now);
+            Guid first = Guid.NewGuid();
+            Guid second = Guid.NewGuid();
+            context.AddRange(Event(first, OperationsTrackingCodes.ReceivedAtOrigin, now.AddDays(-3), at, "r1"), Event(second, OperationsTrackingCodes.ReceivedAtOrigin, now.AddDays(-3), at, "r2"),
+                Event(first, OperationsTrackingCodes.DepartedOrigin, now.AddHours(-1), new Dictionary<string, string>(StringComparer.Ordinal) { ["mode"] = "air" }, "d1"));
+            await context.SaveChangesAsync();
+        }
+
+        (HttpResponseMessage _, string menu) = await owner.GetAsync("/staff/reports");
+        foreach (string group in new[] { "Operations", "Finance", "Customers", "Carriers" })
+        {
+            Assert.Contains("data-report-group=\"" + group + "\"", menu, StringComparison.Ordinal);
+        }
+
+        Assert.Contains("href=\"/staff/profit\"", menu, StringComparison.Ordinal);
+
+        // The home page: what waits, by role, each counter opening its list.
+        string home = (await owner.GetAsync("/staff")).Html;
+        Assert.Contains("data-counter=\"holds\"", home, StringComparison.Ordinal);
+        Assert.Contains("data-counter=\"bills_to_approve\"", home, StringComparison.Ordinal);
+        Assert.Contains("href=\"/staff/inspection/queue\"", home, StringComparison.Ordinal);
+
+        // Every report runs, with its table, totals and files.
+        foreach (Vixly.Operations.Application.Reports.OperationsReportDefinition report in Vixly.Operations.Application.Reports.OperationsReportCatalog.All)
+        {
+            (HttpResponseMessage response, string html) = await owner.GetAsync("/staff/reports/" + report.Key);
+            Assert.True(response.StatusCode == HttpStatusCode.OK && html.Contains("data-report=\"" + report.Key + "\"", StringComparison.Ordinal), report.Key + ": " + html[^Math.Min(2000, html.Length)..]);
+            Assert.Contains("data-report-total", html, StringComparison.Ordinal);
+        }
+
+        DateOnly today = DateOnly.FromDateTime(now.UtcDateTime);
+        string iso(DateOnly day) => day.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+        string activity = (await owner.GetAsync("/staff/reports/activity?from=" + iso(today.AddDays(-6)) + "&to=" + iso(today) + "&grain=week")).Html;
+        System.Text.RegularExpressions.Match total = System.Text.RegularExpressions.Regex.Match(activity, "data-report-total><th scope=\"row\">[^<]*</th><td[^>]*>(?<received>[^<]*)</td><td[^>]*>[^<]*</td><td[^>]*>[^<]*</td><td[^>]*>(?<departed>[^<]*)</td>");
+        Assert.Equal(("2", "1"), (total.Groups["received"].Value.Trim(), total.Groups["departed"].Value.Trim()));
+        Assert.Contains("data-report-previous", activity, StringComparison.Ordinal);
+        Assert.Contains("data-chart=\"line\"", activity, StringComparison.Ordinal);
+
+        string dwell = (await owner.GetAsync("/staff/reports/dwell")).Html;
+        Assert.Contains("Doral", dwell, StringComparison.Ordinal);
+
+        string signups = (await owner.GetAsync("/staff/reports/signups")).Html;
+        Assert.Matches("data-report-total><th scope=\"row\">[^<]*</th><td[^>]*>2</td>", signups);
+
+        // Files.
+        (HttpResponseMessage csv, string csvText) = await owner.GetAsync("/staff/reports/activity/export?format=csv&from=" + iso(today.AddDays(-6)) + "&to=" + iso(today));
+        Assert.Equal("text/csv", csv.Content.Headers.ContentType?.MediaType);
+        Assert.Contains("\"Received\"", csvText, StringComparison.Ordinal);
+        (HttpResponseMessage xlsx, string _) = await owner.GetAsync("/staff/reports/sales/export?format=xlsx");
+        Assert.Equal("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", xlsx.Content.Headers.ContentType?.MediaType);
+        (HttpResponseMessage pdf, string _) = await owner.GetAsync("/staff/reports/receivables/export?format=pdf");
+        Assert.Equal("application/pdf", pdf.Content.Headers.ContentType?.MediaType);
+
+        // Wrong periods are refused; 13 months at most.
+        Assert.Contains("13 months", WebUtility.HtmlDecode((await owner.GetAsync("/staff/reports/sales?from=" + iso(today.AddMonths(-14)) + "&to=" + iso(today))).Html), StringComparison.Ordinal);
+
+        // The rules are company settings.
+        (HttpResponseMessage _, string rules) = await owner.GetAsync("/staff/settings/reports");
+        Assert.Equal("/staff/settings/reports?done=1", (await owner.PostAsync("/staff/settings/reports", rules, ("graceHours", "6"))).Response.Headers.Location?.OriginalString);
+        Assert.Contains("value=\"6\"", (await owner.GetAsync("/staff/settings/reports")).Html, StringComparison.Ordinal);
+        Assert.Contains("72 hours", WebUtility.HtmlDecode((await owner.PostAsync("/staff/settings/reports", rules, ("graceHours", "99"))).Html), StringComparison.Ordinal);
+
+        // Operations right only: no finance reports, no money in the others.
+        CookieClient planner = await PersonAsync(owner, "reportco", "Planner", "planner", Vixly.Operations.Domain.Access.OperationsPermissions.ReportsOperations);
+        using CookieClient _planner = planner;
+        string plannerMenu = (await planner.GetAsync("/staff/reports")).Html;
+        Assert.DoesNotContain("data-report-group=\"Finance\"", plannerMenu, StringComparison.Ordinal);
+        Assert.DoesNotContain("data-report=\"sales\"", (await planner.GetAsync("/staff/reports/sales")).Html, StringComparison.Ordinal);
+        string top = (await planner.GetAsync("/staff/reports/top_customers")).Html;
+        Assert.Contains("data-report=\"top_customers\"", top, StringComparison.Ordinal);
+        Assert.DoesNotContain(">Revenue<", top, StringComparison.Ordinal);
+        Assert.Equal(HttpStatusCode.Forbidden, (await planner.GetAsync("/staff/reports/sales/export?format=csv")).Response.StatusCode);
+        Assert.DoesNotContain("data-counters", (await planner.GetAsync("/staff")).Html, StringComparison.Ordinal);
+
+        // Scheduled: emailed to staff, each as their own rights allow (the planner has no finance right: no sales for them).
+        string salesPage = (await owner.GetAsync("/staff/reports/sales")).Html;
+        System.Text.RegularExpressions.MatchCollection people = System.Text.RegularExpressions.Regex.Matches(salesPage, "name=\"recipients\" value=\"(?<id>[0-9a-f-]{36})\"");
+        Assert.Equal(2, people.Count);
+        Assert.Contains("Tick 1 to 10", WebUtility.HtmlDecode((await owner.PostAsync("/staff/reports/sales/schedule", salesPage, ("frequency", "Weekly"), ("format", "Xlsx"))).Html),
+            StringComparison.Ordinal);
+        Assert.Equal("/staff/reports/sales?done=1", (await owner.PostAsync("/staff/reports/sales/schedule", salesPage, ("frequency", "Weekly"), ("format", "Xlsx"),
+            ("recipients", people[0].Groups["id"].Value), ("recipients", people[1].Groups["id"].Value))).Response.Headers.Location?.OriginalString);
+        Assert.Contains("data-schedule=\"sales\"", (await owner.GetAsync("/staff/reports")).Html, StringComparison.Ordinal);
+        Assert.Equal(0, await Vixly.Operations.Web.Hosting.OperationsReportScheduleWorker.RunOnceAsync(_host.Services.GetRequiredService<IServiceScopeFactory>(),
+            Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance, now, CancellationToken.None));
+        Assert.Equal(1, await Vixly.Operations.Web.Hosting.OperationsReportScheduleWorker.RunOnceAsync(_host.Services.GetRequiredService<IServiceScopeFactory>(),
+            Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance, now.AddDays(8), CancellationToken.None));
+        Vixly.Operations.Application.Ports.OperationsReportMail mail = Assert.Single(_host.Reports.Sent);
+        Assert.Equal(("Report Co", "Sales"), (mail.CompanyName, mail.ReportTitle));
+        Assert.EndsWith(".xlsx", mail.FileName, StringComparison.Ordinal);
+        Assert.Equal((byte)'P', mail.Content[0]);
+
+        // Sent: not again until the next week.
+        Assert.Equal(0, await Vixly.Operations.Web.Hosting.OperationsReportScheduleWorker.RunOnceAsync(_host.Services.GetRequiredService<IServiceScopeFactory>(),
+            Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance, now.AddDays(8), CancellationToken.None));
+        string scheduled = (await owner.GetAsync("/staff/reports")).Html;
+        Guid scheduleId = Guid.Parse(System.Text.RegularExpressions.Regex.Match(scheduled, "/staff/reports/schedules/(?<id>[0-9a-f-]{36})/remove").Groups["id"].Value);
+        Assert.Equal("/staff/reports?done=1", (await owner.PostAsync("/staff/reports/schedules/" + scheduleId + "/remove", scheduled)).Response.Headers.Location?.OriginalString);
+        Assert.DoesNotContain("data-schedule=", (await owner.GetAsync("/staff/reports")).Html, StringComparison.Ordinal);
+        _ = ana;
+        _ = warehouse;
+    }
+
     private static string Key() => Guid.NewGuid().ToString("N");
+
+    private static string BillVersion(string page) => Regex.Match(page, "name=\"version\" value=\"(?<v>[0-9]+)\"").Groups["v"].Value;
 
     // A front-desk clerk: serves at the counter, approves no discount.
     private async Task<CookieClient> ClerkAsync(CookieClient owner, string slug)
@@ -2955,7 +3732,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
 
         // The print program's key is shown once.
         (HttpResponseMessage _, string registered) = await owner.PostAsync(printers + "/agents", listed, ("name", "Dock PC 1"));
-        string key = Regex.Match(registered, "<code>(?<key>vxpa\\.[^<]+)</code>").Groups["key"].Value;
+        string key = Regex.Match(registered, "<code[^>]*>(?<key>vxpa\\.[^<]+)</code>").Groups["key"].Value;
         Assert.NotEmpty(key);
         (HttpResponseMessage _, string later) = await owner.GetAsync(printers);
         Assert.DoesNotContain(key, later, StringComparison.Ordinal);
@@ -3251,7 +4028,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
         OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        OperationsBranch branch = OperationsBranch.Create(tenant, Details("MIA", "Miami"), OperationsBranchSide.Origin, now);
+        OperationsBranch branch = OperationsBranch.Create(tenant, Details("MIA", "Miami"), "US", OperationsBranchLegal.None, now);
         OperationsWarehouse warehouse = OperationsWarehouse.Create(tenant, branch.Id, Details("WH1", "Doral"), OperationsWarehouseRoles.Receiving, true, now);
         context.AddRange(branch, warehouse);
         await context.SaveChangesAsync();
@@ -3738,7 +4515,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         }
 
         (HttpResponseMessage _, string done) = await owner.GetAsync(path + here);
-        Assert.Contains("collected by Marie Joseph", WebUtility.HtmlDecode(done), StringComparison.Ordinal);
+        Assert.Contains("<strong>Marie Joseph</strong>", WebUtility.HtmlDecode(done), StringComparison.Ordinal);
         Assert.DoesNotContain("/release", done, StringComparison.Ordinal);
         Assert.DoesNotContain(shipment.ToString(), (await owner.GetAsync("/staff/pickup?warehouse=" + destination)).Html, StringComparison.Ordinal);
 
@@ -3864,7 +4641,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         Assert.Contains(second.ToString(), deskPage, StringComparison.Ordinal);
         string driverId = Regex.Match(deskPage, "<option value=\"(?<id>[0-9a-f-]{36})\">Driver Person</option>").Groups["id"].Value;
         Assert.NotEmpty(driverId);
-        string today = Regex.Match(deskPage, "name=\"date\" value=\"(?<day>[0-9-]{10})\"").Groups["day"].Value;
+        string today = Regex.Match(deskPage, "name=\"date\"[^>]*value=\"(?<day>[0-9-]{10})\"").Groups["day"].Value;
         Assert.Contains("Choose a driver who may drive", WebUtility.HtmlDecode((await owner.PostAsync("/staff/delivery", deskPage, ("warehouse", destination.ToString()), ("key", Key()),
             ("date", today), ("shipments", first.ToString()))).Html), StringComparison.Ordinal);
         string planKey = Key();
@@ -3992,7 +4769,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             ("key", Key()))).Response.Headers.Location?.OriginalString);
         (HttpResponseMessage _, string billedDesk) = await owner.GetAsync(desk);
         Assert.Contains("Collect 10.00", WebUtility.HtmlDecode(billedDesk), StringComparison.Ordinal);
-        string today = Regex.Match(billedDesk, "name=\"date\" value=\"(?<day>[0-9-]{10})\"").Groups["day"].Value;
+        string today = Regex.Match(billedDesk, "name=\"date\"[^>]*value=\"(?<day>[0-9-]{10})\"").Groups["day"].Value;
         string route = Regex.Match((await owner.PostAsync("/staff/delivery", billedDesk, ("warehouse", destination.ToString()), ("key", Key()), ("date", today), ("driverName", "Paul Hired"),
             ("shipments", paid.ToString()), ("shipments", refused.ToString()))).Response.Headers.Location?.OriginalString ?? string.Empty, "^/staff/delivery/routes/[0-9a-f-]{36}").Value;
         Assert.NotEmpty(route);
@@ -4094,7 +4871,11 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             Vixly.Operations.Domain.Billing.OperationsInvoice invoice = await context.Invoices.AsNoTracking().SingleAsync(item => item.ShipmentId == shipment);
             Assert.True(invoice.PayAtDestination);
             Assert.Equal(Vixly.Operations.Domain.Billing.OperationsPaymentState.Unpaid, invoice.PaymentState);
-            Assert.True((await context.Shipments.AsNoTracking().SingleAsync(item => item.Id == shipment)).FreightCollect);
+            Vixly.Operations.Domain.Shipments.OperationsShipment collected = await context.Shipments.AsNoTracking().SingleAsync(item => item.Id == shipment);
+            Assert.True(collected.FreightCollect);
+
+            // Owner, 2026-10-28: collect counts as settled here: the shipment has its tracking number although nothing is paid yet.
+            Assert.NotNull(Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.Read(collected.TrackingNumber));
         }
 
         // A prepaid shipment not paid stays at the origin.
@@ -4113,6 +4894,82 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         Assert.Contains("Every invoice of the shipment is paid first", WebUtility.HtmlDecode((await owner.PostAsync(path + "/release", page, ("warehouse", destination.ToString()),
             ("collector", "Recipient"), ("idKind", "Passport"), ("idLast", "A123"), ("signature", "data:image/png;base64," + Convert.ToBase64String(Png())), ("key", Key()))).Html),
             StringComparison.Ordinal);
+    }
+
+    // Owner, 2026-11-01: items classified on the parcel page from the catalogue (loaded once with the starter list); the worklist; switched on, the rule stops
+    // bundling a new parcel until its items have a customs code and an origin, while a parcel received before the rule goes in.
+    [SqlServerFact]
+    public async Task Items_ClassifiedFromTheCatalogue_AndRequiredBeforeBundling_ForNewParcelsOnly()
+    {
+        Guid tenant = NewTenant("itemco", "Item Co");
+        (CookieClient owner, string _) = await OwnerWithKeyAsync("itemco");
+        using CookieClient _owner = owner;
+        Guid origin = await WarehouseAsync(tenant);
+        (Guid ana, string _) = await CustomerAsync(tenant, "ana.items@example.com");
+        (Guid destination, Guid _) = await DestinationsAsync(tenant, clearsCustoms: false, withHub: false);
+        (Guid _, List<OperationsParcel> old, string _) = await BundledShipmentAsync(tenant, owner, ana, origin, destination, 1, bundle: false);
+
+        // The catalogue: the starter list the first time, never again once the company removed an item.
+        (HttpResponseMessage _, string catalogue) = await owner.GetAsync("/staff/settings/items");
+        Assert.Contains("Shoes, leather upper", catalogue, StringComparison.Ordinal);
+        List<Vixly.Operations.Domain.Items.OperationsItemCatalogueEntry> entries = await CatalogueAsync(tenant);
+        Assert.True(entries.Count >= 100);
+        Vixly.Operations.Domain.Items.OperationsItemCatalogueEntry sandals = entries.Single(entry => entry.Description == "Sandals, rubber or plastic");
+        Assert.Equal("/staff/settings/items?done=1", (await owner.PostAsync("/staff/settings/items/" + sandals.Id + "/remove", catalogue)).Response.Headers.Location?.OriginalString);
+        await owner.GetAsync("/staff/settings/items");
+        Assert.Equal(entries.Count - 1, (await CatalogueAsync(tenant)).Count);
+
+        // Switched on: from now, items need a customs code and an origin before bundling.
+        Assert.Equal("/staff/settings/items?done=1", (await owner.PostAsync("/staff/settings/items/rule", catalogue, ("required", "true"))).Response.Headers.Location?.OriginalString);
+        Assert.Contains("Required since", (await owner.GetAsync("/staff/settings/items")).Html, StringComparison.Ordinal);
+        (Guid _, List<OperationsParcel> fresh, string _) = await BundledShipmentAsync(tenant, owner, ana, origin, destination, 1, bundle: false);
+
+        // "Shoes" at the counter: matched to the catalogue (code suggested), the origin still to read on the item.
+        (HttpResponseMessage _, string review) = await owner.GetAsync("/staff/items");
+        Assert.Contains(fresh[0].Number!, review, StringComparison.Ordinal);
+        (HttpResponseMessage _, string parcelPage) = await owner.GetAsync("/staff/parcels/" + fresh[0].Id);
+        Assert.Contains("6404.19", parcelPage, StringComparison.Ordinal);
+        string itemId = Regex.Match(parcelPage, "name=\"item_id\" value=\"(?<id>[0-9a-f-]{36})\"").Groups["id"].Value;
+        Assert.NotEmpty(itemId);
+
+        // Bundling: the new parcel stops, naming its item; the parcel received before the rule goes in.
+        (HttpResponseMessage _, string deskPage) = await owner.GetAsync("/staff/bundles");
+        string bundlePath = Regex.Match((await owner.PostAsync("/staff/bundles", deskPage, ("key", Key()), ("warehouse", origin.ToString()), ("destination", "w:" + destination.ToString("N")),
+            ("service", "air_standard"), ("basis", "Free"))).Response.Headers.Location?.OriginalString ?? string.Empty, "^/staff/bundles/[0-9a-f-]{36}").Value;
+        (HttpResponseMessage _, string fill) = await owner.GetAsync(bundlePath + "/fill");
+        Assert.Contains("needs its customs code and country of origin", WebUtility.HtmlDecode((await owner.PostAsync(bundlePath + "/scan", fill, ("key", Key()),
+            ("code", fresh[0].Number!))).Html), StringComparison.Ordinal);
+        Assert.Null((await ParcelRowAsync(tenant, fresh[0].Id)).BundleId);
+        await owner.PostAsync(bundlePath + "/scan", fill, ("key", Key()), ("code", old[0].Number!));
+        Assert.NotNull((await ParcelRowAsync(tenant, old[0].Id)).BundleId);
+
+        // Classified on the parcel page: a wrong code is refused, then the origin read on the item completes it.
+        Assert.Contains("6 to 10 digits", WebUtility.HtmlDecode((await owner.PostAsync("/staff/parcels/" + fresh[0].Id + "/items", parcelPage, ("item_id", itemId),
+            ("description", "Shoes, textile upper"), ("code", "64"), ("origin", "cn"), ("unit", "Pairs"))).Html), StringComparison.Ordinal);
+        Assert.Equal("/staff/parcels/" + fresh[0].Id + "?done=items#items", (await owner.PostAsync("/staff/parcels/" + fresh[0].Id + "/items", parcelPage, ("item_id", itemId),
+            ("description", "Shoes, textile upper"), ("code", ""), ("origin", "cn"), ("unit", "Pairs"))).Response.Headers.Location?.OriginalString);
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            Vixly.Operations.Domain.Items.OperationsParcelItem item = await context.ParcelItems.AsNoTracking().SingleAsync(row => row.ParcelId == fresh[0].Id);
+            Assert.Equal("Shoes", item.Words);
+            Assert.Equal("640419", item.HsCode);
+            Assert.Equal("CN", item.OriginCountryCode);
+            Assert.Equal(Vixly.Operations.Domain.Items.OperationsItemUnit.Pairs, item.Unit);
+        }
+
+        Assert.DoesNotContain(fresh[0].Number!, (await owner.GetAsync("/staff/items")).Html, StringComparison.Ordinal);
+        await owner.PostAsync(bundlePath + "/scan", fill, ("key", Key()), ("code", fresh[0].Number!));
+        Assert.NotNull((await ParcelRowAsync(tenant, fresh[0].Id)).BundleId);
+    }
+
+    private async Task<List<Vixly.Operations.Domain.Items.OperationsItemCatalogueEntry>> CatalogueAsync(Guid tenant)
+    {
+        await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();
+        scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+        return await scope.ServiceProvider.GetRequiredService<OperationsDbContext>().ItemCatalogue.AsNoTracking().ToListAsync();
     }
 
     // The bundle's list (owner, 2026-10-21): built from the computer, confirmed by scans; entered, scanned and missing; a parcel off the list refused; no closing while
@@ -4177,7 +5034,7 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
         DateTimeOffset now = DateTimeOffset.UtcNow.AddMinutes(-1);
         OperationsBranch haiti = OperationsBranch.Create(tenant, new OperationsLocationDetails("PAP", "Port-au-Prince",
-            OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsBranchSide.Destination, now);
+            OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), "HT", OperationsBranchLegal.None, now);
         OperationsWarehouse pickup = OperationsWarehouse.Create(tenant, haiti.Id, new OperationsLocationDetails("PAP1", "Capois",
             OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), null, null, null, true), OperationsWarehouseRoles.PickupPoint, false, now);
         OperationsWarehouse? hub = withHub
@@ -4328,5 +5185,214 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();
         scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
         return await scope.ServiceProvider.GetRequiredService<OperationsDbContext>().OutboxMessages.AsNoTracking().CountAsync(item => item.Type == type && item.TenantId == tenant);
+    }
+
+    // Slice 12B (owner H-4): the phone sends each stop to /sync, now or later. Sent without a signal, a code that is not accepted keeps the stop (marked for the desk);
+    // sent at once, it is refused as before. The phone's time is kept within the route's start and now; a resend changes nothing.
+    [SqlServerFact]
+    public async Task Driver_SendsStopsFromThePhone_LaterWithoutASignal_TheCodeIsMarkedNotRefused()
+    {
+        Guid tenant = NewTenant("offlineco", "Offline Co");
+        (CookieClient owner, string _) = await OwnerWithKeyAsync("offlineco");
+        using CookieClient _owner = owner;
+        Guid origin = await WarehouseAsync(tenant);
+        (Guid ana, string _) = await CustomerAsync(tenant, "ana.offline@example.com");
+        (Guid destination, Guid _) = await DestinationsAsync(tenant, clearsCustoms: false, withHub: false, deliversHome: true);
+        (Guid first, List<OperationsParcel> firstParcels, string firstBundle) = await BundledShipmentAsync(tenant, owner, ana, origin, destination, 1, home: true);
+        (Guid second, List<OperationsParcel> secondParcels, string secondBundle) = await BundledShipmentAsync(tenant, owner, ana, origin, destination, 1, home: true);
+
+        foreach ((string bundle, OperationsParcel parcel) in new[] { (firstBundle, firstParcels[0]), (secondBundle, secondParcels[0]) })
+        {
+            string dispatchPath = await SentAsync(owner, origin, destination, bundle);
+            string arrival = "/staff/arrivals/" + dispatchPath[^36..];
+            (HttpResponseMessage _, string arrivalPage) = await owner.GetAsync(arrival + "?warehouse=" + destination);
+            await owner.PostAsync(arrival + "/scan", arrivalPage, ("warehouse", destination.ToString()), ("code", parcel.Number!));
+        }
+
+        (HttpResponseMessage _, string settingsPage) = await owner.GetAsync("/staff/settings/delivery");
+        await owner.PostAsync("/staff/settings/delivery", settingsPage, ("recording", "Phone"), ("tries", "2"), ("afterFailed", "WaitForPickup"), ("proofs", "Code"), ("emails", "true"));
+        using CookieClient driver = await PersonAsync(owner, "offlineco", "Driver", "driver.offline", "ops.delivery.drive");
+        (HttpResponseMessage _, string deskPage) = await owner.GetAsync("/staff/delivery?warehouse=" + destination);
+        string driverId = Regex.Match(deskPage, "<option value=\"(?<id>[0-9a-f-]{36})\">Driver Person</option>").Groups["id"].Value;
+        string today = Regex.Match(deskPage, "name=\"date\"[^>]*value=\"(?<day>[0-9-]{10})\"").Groups["day"].Value;
+        string route = Regex.Match((await owner.PostAsync("/staff/delivery", deskPage, ("warehouse", destination.ToString()), ("key", Key()), ("date", today), ("driver", driverId),
+            ("shipments", first.ToString()), ("shipments", second.ToString()))).Response.Headers.Location?.OriginalString ?? string.Empty, "^/staff/delivery/routes/[0-9a-f-]{36}").Value;
+        (HttpResponseMessage _, string routePage) = await driver.GetAsync(route);
+        await driver.PostAsync(route + "/start", routePage);
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            IOperationsOutboxHandler handler = scope.ServiceProvider.GetServices<IOperationsOutboxHandler>()
+                .Single(item => item.MessageType == Vixly.Operations.Application.Delivery.OperationsOutForDeliveryNotice.MessageType);
+
+            foreach (OperationsOutboxMessage message in await context.OutboxMessages.AsNoTracking()
+                .Where(item => item.TenantId == tenant && item.Type == Vixly.Operations.Application.Delivery.OperationsOutForDeliveryNotice.MessageType).ToListAsync())
+            {
+                await handler.HandleAsync(message, CancellationToken.None);
+            }
+        }
+
+        // Slice 12C (owner H-5): the notice carries a private link for the day; the driver's phone sends its position, the map reads it; nobody else's position is kept.
+        Assert.All(_host.CustomerMailer.Sent.Where(item => item.Kind == OperationsCustomerMailKind.OutForDeliveryCode), mail => Assert.Contains("/customer/track/", mail.Link, StringComparison.Ordinal));
+        string link = _host.CustomerMailer.Sent.Last(item => item.Kind == OperationsCustomerMailKind.OutForDeliveryCode).Link;
+        (HttpResponseMessage _, string mapPage) = await driver.GetAsync(route);
+        Assert.Contains("ops-drive-location.js", mapPage, StringComparison.Ordinal);
+        Assert.Contains("\"ok\":true", (await driver.PostAsync(route + "/position", mapPage, ("lat", "18.539300"), ("lng", "-72.335000"), ("accuracy", "12"))).Html, StringComparison.Ordinal);
+        Assert.Contains("\"stop\":true", (await owner.PostAsync(route + "/position", (await owner.GetAsync(route)).Html, ("lat", "1"), ("lng", "1"))).Html, StringComparison.Ordinal);
+        (HttpResponseMessage _, string map) = await owner.GetAsync(route + "/map");
+        Assert.Contains("18.5393", map, StringComparison.Ordinal);
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            Vixly.Operations.Application.UseCases.Customers.GetOperationsTrackedDelivery.GetOperationsTrackedDeliveryResponse tracked = await scope.ServiceProvider
+                .GetRequiredService<Vixly.Operations.Application.UseCases.Customers.GetOperationsTrackedDelivery.GetOperationsTrackedDeliveryUseCase>()
+                .ExecuteAsync(Vixly.Operations.Application.Security.OperationsAuthorizationContext.ForTenant(tenant),
+                    new Vixly.Operations.Application.UseCases.Customers.GetOperationsTrackedDelivery.GetOperationsTrackedDeliveryRequest { Token = link[(link.IndexOf("/track/", StringComparison.Ordinal) + 7)..] },
+                    CancellationToken.None);
+            Assert.True(tracked.Succeeded);
+            Assert.False(tracked.Driver!.Delivered);
+            Assert.True(tracked.Driver.StopsAway is 0 or 1);
+            Assert.False((await scope.ServiceProvider.GetRequiredService<Vixly.Operations.Application.UseCases.Customers.GetOperationsTrackedDelivery.GetOperationsTrackedDeliveryUseCase>()
+                .ExecuteAsync(Vixly.Operations.Application.Security.OperationsAuthorizationContext.ForTenant(tenant),
+                    new Vixly.Operations.Application.UseCases.Customers.GetOperationsTrackedDelivery.GetOperationsTrackedDeliveryRequest { Token = "not-a-link" }, CancellationToken.None)).Succeeded);
+        }
+
+        // The phone's page carries the stops' texts and script.
+        (HttpResponseMessage _, string outPage) = await driver.GetAsync(route);
+        Assert.Contains("data-drive-text", outPage, StringComparison.Ordinal);
+        Assert.Contains("/js/ops-drive.js", outPage, StringComparison.Ordinal);
+        Assert.Contains("/js/ops-drive.js", (await driver.GetAsync("/staff/drive")).Html, StringComparison.Ordinal);
+        List<string> stops = Regex.Matches(outPage, route + "/stops/(?<id>[0-9a-f-]{36})\"").Select(match => match.Groups["id"].Value).Distinct().ToList();
+        Assert.Equal(2, stops.Count);
+
+        // Sent at once with a wrong code: refused, as on the page.
+        (HttpResponseMessage _, string refused) = await driver.PostAsync(route + "/stops/" + stops[0] + "/sync", outPage, ("outcome", "delivered"), ("receiver", "Jean Baptiste"),
+            ("code", "000000"), ("queued", "0"));
+        Assert.Contains("\"ok\":false", refused, StringComparison.Ordinal);
+
+        // Sent later, recorded without a signal: kept, marked, at the time of the route's start (the phone's clock was wrong).
+        (string, string)[] later = { ("outcome", "delivered"), ("receiver", "Jean Baptiste"), ("code", "000000"), ("queued", "1"), ("happenedUtc", "2000-01-01T00:00:00Z") };
+        Assert.Contains("\"ok\":true", (await driver.PostAsync(route + "/stops/" + stops[0] + "/sync", outPage, later)).Html, StringComparison.Ordinal);
+        Assert.Contains("\"ok\":true", (await driver.PostAsync(route + "/stops/" + stops[0] + "/sync", outPage, later)).Html, StringComparison.Ordinal);
+
+        // The other with the right code, at once: checked.
+        string code = _host.CustomerMailer.Sent.Last(item => item.Kind == OperationsCustomerMailKind.OutForDeliveryCode && item.Extra["shipment"].Length > 0
+            && item.Extra["shipment"] != _host.CustomerMailer.Sent.First(mail => mail.Kind == OperationsCustomerMailKind.OutForDeliveryCode).Extra["shipment"]).Extra["code"];
+        string firstCode = _host.CustomerMailer.Sent.First(item => item.Kind == OperationsCustomerMailKind.OutForDeliveryCode).Extra["code"];
+        (HttpResponseMessage _, string other) = await driver.PostAsync(route + "/stops/" + stops[1] + "/sync", outPage, ("outcome", "delivered"), ("receiver", "Marie Joseph"),
+            ("code", code), ("queued", "0"));
+        if (!other.Contains("\"ok\":true", StringComparison.Ordinal))
+        {
+            other = (await driver.PostAsync(route + "/stops/" + stops[1] + "/sync", outPage, ("outcome", "delivered"), ("receiver", "Marie Joseph"), ("code", firstCode), ("queued", "0"))).Html;
+        }
+
+        Assert.Contains("\"ok\":true", other, StringComparison.Ordinal);
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
+            Vixly.Operations.Domain.Delivery.OperationsDeliveryRoute row = await context.DeliveryRoutes.AsNoTracking().SingleAsync();
+            List<Vixly.Operations.Domain.Delivery.OperationsDeliveryStop> done = await context.DeliveryStops.AsNoTracking().ToListAsync();
+            Vixly.Operations.Domain.Delivery.OperationsDeliveryStop marked = done.Single(item => item.Id == Guid.Parse(stops[0]));
+            Assert.True(marked.CodeUnconfirmed);
+            Assert.False(marked.CodeChecked);
+            Assert.Equal(row.StartedUtc, marked.DoneUtc);
+            Vixly.Operations.Domain.Delivery.OperationsDeliveryStop checkedStop = done.Single(item => item.Id == Guid.Parse(stops[1]));
+            Assert.True(checkedStop.CodeChecked);
+            Assert.False(checkedStop.CodeUnconfirmed);
+        }
+
+        Assert.Contains("Code not confirmed", (await owner.GetAsync(route)).Html, StringComparison.Ordinal);
+    }
+
+    // Slice 12D (owner H-7): the basic shelf count: found, missing, recorded elsewhere (moved here from the count), unknown; the camera is allowed on the station pages.
+    // Slice 12E (owner H-6): a phone joins with its one-time code, saves its portable printer, and only that phone gets its labels.
+    [SqlServerFact]
+    public async Task ShelfCount_FindsWhatIsMissingAndMisplaced_AndAPhonePrintsOnItsOwnPrinterOnly()
+    {
+        Guid tenant = NewTenant("countco", "Count Co");
+        using CookieClient owner = await OwnerAsync("countco");
+        Guid warehouse = await WarehouseAsync(tenant);
+        (Guid ana, string _) = await CustomerAsync(tenant, "ana.count@example.com");
+        await PreAlertAsync(tenant, ana, "1Z999AA10123456790", "Shoes");
+        await PreAlertAsync(tenant, ana, "1Z999AA10123456791", "Books");
+        await PreAlertAsync(tenant, ana, "1Z999AA10123456792", "Toys");
+        (string station, Guid delivery) = await OpenAsync(owner, warehouse, "UPS");
+        string first = (await ScanOkAsync(owner, station, delivery, "1Z999AA10123456790")).GetProperty("number").GetString()!;
+        string second = (await ScanOkAsync(owner, station, delivery, "1Z999AA10123456791")).GetProperty("number").GetString()!;
+        string third = (await ScanOkAsync(owner, station, delivery, "1Z999AA10123456792")).GetProperty("number").GetString()!;
+        (HttpResponseMessage _, string shelves) = await owner.GetAsync("/staff/locations/warehouse/" + warehouse + "/storage");
+        await owner.PostAsync("/staff/locations/warehouse/" + warehouse + "/storage", shelves, ("code", "C-01"), ("zone", "storage"));
+        (HttpResponseMessage _, string move) = await owner.GetAsync("/staff/parcels/move");
+
+        foreach (string parcel in new[] { first, second })
+        {
+            await owner.PostAsync("/staff/parcels/move", move, ("package", parcel), ("shelf", "C-01"), ("key", NewKey()));
+        }
+
+        // Start by scanning the shelf; the page may use the camera.
+        (HttpResponseMessage listed, string countsPage) = await owner.GetAsync("/staff/parcels/shelf-counts");
+        Assert.Contains("camera=(self)", string.Join(";", listed.Headers.GetValues("Permissions-Policy")), StringComparison.Ordinal);
+        Assert.Contains("ops-camera-field.js", countsPage, StringComparison.Ordinal);
+        Assert.Contains("No active shelf has this code", (await owner.PostAsync("/staff/parcels/shelf-counts/", countsPage, ("shelf", "Z-99"))).Html, StringComparison.Ordinal);
+        (HttpResponseMessage started, string _) = await owner.PostAsync("/staff/parcels/shelf-counts/", countsPage, ("shelf", "c-01"));
+        string count = started.Headers.Location!.OriginalString;
+        Assert.Matches("^/staff/parcels/shelf-counts/[0-9a-f-]{36}$", count);
+        Assert.Equal(count, (await owner.PostAsync("/staff/parcels/shelf-counts/", countsPage, ("shelf", "C-01"))).Response.Headers.Location?.OriginalString);
+
+        // Scan: the first, the first again, the third (on hand, no shelf) and a code that is no parcel; the second is not found.
+        (HttpResponseMessage _, string open) = await owner.GetAsync(count);
+        Assert.Contains("the records put 2 parcel(s) on this shelf", open, StringComparison.Ordinal);
+        Assert.Equal(count + "?done=scanned", (await owner.PostAsync(count + "/scan", open, ("code", "]C0" + first.ToLowerInvariant()))).Response.Headers.Location?.OriginalString);
+        Assert.Equal(count + "?done=again", (await owner.PostAsync(count + "/scan", open, ("code", first))).Response.Headers.Location?.OriginalString);
+        await owner.PostAsync(count + "/scan", open, ("code", third));
+        await owner.PostAsync(count + "/scan", open, ("code", "NOPE123"));
+        Assert.Equal(count + "?done=finished", (await owner.PostAsync(count + "/finish", open)).Response.Headers.Location?.OriginalString);
+
+        (HttpResponseMessage _, string done) = await owner.GetAsync(count);
+        Assert.Contains("1 found, 1 missing, 1 recorded elsewhere, 1 unknown", done, StringComparison.Ordinal);
+        Assert.Matches("data-list=\"missing\">(?:(?!</ul>).)*" + second, done);
+        Assert.Matches("data-list=\"extra\">(?:(?!</ul>).)*" + third, done);
+        Assert.Matches("data-list=\"unknown\">(?:(?!</ul>).)*NOPE123", done);
+        Assert.Contains("This count is already finished.", (await owner.PostAsync(count + "/scan", done, ("code", second))).Html, StringComparison.Ordinal);
+
+        // Move the misplaced one here: it is now on the shelf.
+        Assert.Equal(count + "?done=moved", (await owner.PostAsync(count + "/move", done, ("parcel", third))).Response.Headers.Location?.OriginalString);
+        Assert.Contains(">" + third + "<", (await owner.GetAsync("/staff/parcels/on-hand?zone=storage")).Html, StringComparison.Ordinal);
+
+        // A phone joins with the one-time code shown on the Printers page; the code works once.
+        string printers = "/staff/locations/warehouse/" + warehouse + "/printers";
+        (HttpResponseMessage _, string printersPage) = await owner.GetAsync(printers);
+        (HttpResponseMessage _, string paired) = await owner.PostAsync(printers + "/agents/phone", printersPage, ("name", "Paul phone"));
+        string code = Regex.Match(paired, "data-pairing-code>(?<code>[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4})<").Groups["code"].Value;
+        Assert.NotEmpty(code);
+        Assert.Contains("data:image/svg+xml;base64,", paired, StringComparison.Ordinal);
+        using HttpClient anonymous = Agent("countco", "none");
+        HttpResponseMessage joined = await anonymous.PostAsJsonAsync("/agent/v1/pair", new PhonePairBody(code.ToLowerInvariant().Replace("-", string.Empty, StringComparison.Ordinal), "Pixel 8"));
+        Assert.Equal(HttpStatusCode.OK, joined.StatusCode);
+        PhonePairDto phone = (await joined.Content.ReadFromJsonAsync<PhonePairDto>())!;
+        Assert.Equal(HttpStatusCode.BadRequest, (await anonymous.PostAsJsonAsync("/agent/v1/pair", new PhonePairBody(code, "Other"))).StatusCode);
+
+        // It saves the printer next to it; the desk sees it and may choose it, but cannot change it.
+        using HttpClient app = Agent("countco", phone.Key);
+        HttpResponseMessage savedPrinter = await app.PostAsJsonAsync("/agent/v1/printers", new PhonePrinterBody("ZQ520", "AC:3F:A4:12:34:56", 203, "id", true));
+        Assert.Equal(HttpStatusCode.OK, savedPrinter.StatusCode);
+        Guid portable = (await savedPrinter.Content.ReadFromJsonAsync<PhonePrinterDto>())!.PrinterId;
+        Assert.Equal(portable, (await (await app.PostAsJsonAsync("/agent/v1/printers", new PhonePrinterBody("ZQ520 dock", "AC:3F:A4:12:34:56", 203, "id", true))).Content
+            .ReadFromJsonAsync<PhonePrinterDto>())!.PrinterId);
+        (HttpResponseMessage _, string withPhone) = await owner.GetAsync(printers);
+        Assert.Contains("data-phone-printer", withPhone, StringComparison.Ordinal);
+        Assert.Contains("Paul phone · Pixel 8", withPhone, StringComparison.Ordinal);
+
+        // Its labels go to that phone only, as Bluetooth jobs; a computer's print program never gets them.
+        (HttpResponseMessage _, string desk) = await owner.PostAsync(printers + "/agents", withPhone, ("name", "Dock PC"));
+        using HttpClient computer = Agent("countco", Regex.Match(desk, "<code[^>]*>(?<key>vxpa\\.[^<]+)</code>").Groups["key"].Value);
+        Assert.Equal(printers + "?done=tested", (await owner.PostAsync(printers + "/" + portable + "/test", withPhone)).Response.Headers.Location?.OriginalString);
+        Assert.Empty(await JobsAsync(computer));
+        PrintJobDto job = Assert.Single(await JobsAsync(app));
+        Assert.Equal(("bluetooth", "AC:3F:A4:12:34:56"), (job.Connection, job.Address));
+        Assert.Equal(HttpStatusCode.Unauthorized, (await computer.PostAsJsonAsync("/agent/v1/printers", new PhonePrinterBody("X", "AA:BB", 203, "id", true))).StatusCode);
     }
 }

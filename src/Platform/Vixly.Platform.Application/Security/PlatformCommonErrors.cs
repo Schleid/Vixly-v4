@@ -35,6 +35,11 @@ public static class PlatformCommonErrors
     public static Error RequestInvalid { get; } =
         Error.Create("platform.common.request_invalid");
 
+    // Owner, 2026-10-23: the person is saved, but the invitation email did not leave (mail settings); Resend invitation sends it once fixed.
+    public static Error InvitationSavedMailFailed { get; } = Error.Create("platform.users.invitation_saved_mail_failed");
+
+    public static Error InvitationMailFailed { get; } = Error.Create("platform.users.invitation_mail_failed");
+
     public static Error EmailAlreadyUsed { get; } =
         Error.Create("platform.common.email_already_used");
 

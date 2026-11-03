@@ -205,7 +205,7 @@ public sealed class PlatformPasskeyTests
             Ceremonies(),
             _crypto,
             _store,
-            new PlatformSignInSteps(_store, _store, _store, _crypto, _store, Audit(), _store, _clock),
+            new PlatformSignInSteps(_store, _store, _store, _crypto, _store, Audit(), _store, _clock, new FakeSecuritySettings()),
             Audit(),
             _store);
     }
@@ -222,7 +222,7 @@ public sealed class PlatformPasskeyTests
 
     private PlatformStepUpSteps StepUpSteps()
     {
-        return new PlatformStepUpSteps(_store, _store, Audit(), _store, _clock);
+        return new PlatformStepUpSteps(_store, _store, Audit(), _store, _clock, new FakeSecuritySettings());
     }
 
     private PlatformPasskeyCeremonies Ceremonies()

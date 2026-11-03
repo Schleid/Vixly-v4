@@ -82,7 +82,7 @@ public sealed class GetOperationsShipmentUseCase
         }
 
         Vixly.Operations.Domain.Customers.OperationsCustomer? customer = await _customers.GetAsync(shipment.CustomerId, cancellationToken);
-        bool named = access.Has(OperationsPermissions.CustomersView) || access.IsAdministrator;
+        bool named = (access.Has(OperationsPermissions.CustomersView) || access.Has(OperationsPermissions.CustomersLookup)) || access.IsAdministrator;
         IReadOnlyList<OperationsParcel> parcels = await _receiving.ListShipmentParcelsAsync(shipment.Id, cancellationToken);
         IReadOnlyList<Vixly.Operations.Domain.Receiving.OperationsPreAlert> preAlerts = (await _receiving.ListShipmentPreAlertsAsync(shipment.Id, cancellationToken))
             .Where(preAlert => preAlert.Status == Vixly.Operations.Domain.Receiving.OperationsPreAlertStatus.Open).ToList();

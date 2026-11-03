@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Slice 12E (owner H-6): the phone print helper. It joins a warehouse with the one-time code of the Printers page and prints that
+    phone's labels on the Bluetooth printer next to it. Everything else stays in the browser.
+    Needs the .NET MAUI workloads (android, ios) and, to publish, the store accounts; it is not part of Vixly.Operations.slnx.
+    A white-label company's own copy: dotnet publish -p:PrintHelperAppName="Galeo Print" -p:PrintHelperAppId=net.galeologistics.print
+  -->
+  <PropertyGroup>
+    <TargetFrameworks>net10.0-android;net10.0-ios</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <PrintHelperAppName Condition="'$(PrintHelperAppName)' == ''">Vixly Print</PrintHelperAppName>
+    <PrintHelperAppId Condition="'$(PrintHelperAppId)' == ''">ltd.techcrafters.vixlyprint</PrintHelperAppId>
+    <ApplicationTitle>$(PrintHelperAppName)</ApplicationTitle>
+    <ApplicationId>$(PrintHelperAppId)</ApplicationId>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">26.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" Color="#1F4E79" />
+    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#1F4E79" BaseSize="128,128" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vixly.PrintHelper.Core\Vixly.PrintHelper.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Maui.Controls" />
+    <PackageReference Include="Plugin.BLE" />
+    <PackageReference Include="ZXing.Net.Maui.Controls" />
+  </ItemGroup>
+
+</Project>

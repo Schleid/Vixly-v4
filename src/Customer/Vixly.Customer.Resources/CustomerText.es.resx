@@ -245,6 +245,12 @@
   <data name="ops.shipments.waiting" xml:space="preserve">
     <value>Estos paquetes esperan un envío: ponga cada uno en uno de sus envíos, o cree uno.</value>
   </data>
+  <data name="ops.texts.channel_unavailable" xml:space="preserve">
+    <value>Esta forma de recibir avisos no está disponible.</value>
+  </data>
+  <data name="ops.texts.consent_required" xml:space="preserve">
+    <value>Marque la casilla para aceptar recibir avisos por mensaje.</value>
+  </data>
   <data name="ops.tickets.another_open" xml:space="preserve">
     <value>Tiene otro reporte abierto sobre este paquete; escriba allí.</value>
   </data>
@@ -966,7 +972,7 @@
     <value>También puede elegir su envío más tarde, desde sus paquetes.</value>
   </data>
   <data name="ui.prealert.store" xml:space="preserve">
-    <value>Tienda</value>
+    <value>Tienda de compra</value>
   </data>
   <data name="ui.prealert.submit" xml:space="preserve">
     <value>Avisar</value>
@@ -1027,6 +1033,24 @@
   </data>
   <data name="ui.profile.change_password" xml:space="preserve">
     <value>Cambiar la contraseña</value>
+  </data>
+  <data name="ui.profile.notices" xml:space="preserve">
+    <value>Cómo le enviamos los avisos</value>
+  </data>
+  <data name="ui.profile.notices.email" xml:space="preserve">
+    <value>Por correo</value>
+  </data>
+  <data name="ui.profile.notices.sms" xml:space="preserve">
+    <value>Por SMS</value>
+  </data>
+  <data name="ui.profile.notices.whatsapp" xml:space="preserve">
+    <value>Por WhatsApp</value>
+  </data>
+  <data name="ui.profile.notices_consent" xml:space="preserve">
+    <value>Acepto recibir los avisos de {company} sobre mis paquetes y envíos por mensaje al {phone}. Pueden aplicarse tarifas de mensajes y datos.</value>
+  </data>
+  <data name="ui.profile.notices_stop" xml:space="preserve">
+    <value>Responda STOP a cualquier SMS para detenerlos; los avisos llegarán entonces por correo. Puede cambiar esto aquí en cualquier momento.</value>
   </data>
   <data name="ui.profile.password" xml:space="preserve">
     <value>Contraseña</value>
@@ -1654,5 +1678,266 @@
   </data>
   <data name="ui.verify.title" xml:space="preserve">
     <value>Confirme su correo</value>
+  </data>
+  <data name="ui.driver.title" xml:space="preserve">
+    <value>En reparto hoy</value>
+  </data>
+  <data name="ui.driver.next" xml:space="preserve">
+    <value>Su entrega es la próxima parada del conductor.</value>
+  </data>
+  <data name="ui.driver.stops_away" xml:space="preserve">
+    <value>El conductor está a {count} parada(s).</value>
+  </data>
+  <data name="ui.driver.delivered" xml:space="preserve">
+    <value>Entregado.</value>
+  </data>
+  <data name="ui.driver.track_title" xml:space="preserve">
+    <value>Envío {number}</value>
+  </data>
+  <data name="ui.driver.sign_in" xml:space="preserve">
+    <value>Inicie sesión para ver sus envíos</value>
+  </data>
+  <data name="ui.driver.link_old_title" xml:space="preserve">
+    <value>Este enlace ya no es válido</value>
+  </data>
+  <data name="ui.driver.link_old" xml:space="preserve">
+    <value>Un enlace de entrega solo funciona el día de la entrega. Inicie sesión para seguir sus envíos.</value>
+  </data>
+  <data name="ui.maintenance.page_title" xml:space="preserve">
+    <value>En mantenimiento</value>
+  </data>
+  <data name="ui.maintenance.page_body" xml:space="preserve">
+    <value>Estamos realizando un mantenimiento planificado. Esperamos volver hacia las {time} (UTC).</value>
+  </data>
+  <data name="ui.maintenance.banner" xml:space="preserve">
+    <value>Mantenimiento planificado del {start} al {end} (UTC): el sitio no estará disponible durante ese tiempo.</value>
+  </data>
+  <data name="ui.address.title" xml:space="preserve">
+    <value>Su dirección</value>
+  </data>
+  <data name="ui.address.intro" xml:space="preserve">
+    <value>Antes de empezar, díganos dónde vive. Se guarda en su cuenta y nos ayuda a contactarle sobre sus envíos.</value>
+  </data>
+  <data name="ui.address.save" xml:space="preserve">
+    <value>Guardar y continuar</value>
+  </data>
+  <data name="ui.address.choose_country" xml:space="preserve">
+    <value>Elija un país</value>
+  </data>
+  <data name="ui.profile.address" xml:space="preserve">
+    <value>Dirección de domicilio</value>
+  </data>
+  <data name="ui.help.title" xml:space="preserve"><value>Ayuda</value><comment>needs-review</comment></data>
+  <data name="ui.help.sign_in" xml:space="preserve"><value>Inicie sesión para consultar las instrucciones de su cuenta.</value><comment>needs-review</comment></data>
+  <data name="ui.help.not_found" xml:space="preserve"><value>No se encontró esta guía.</value><comment>needs-review</comment></data>
+  <data name="ui.help.back" xml:space="preserve"><value>Volver a la ayuda</value><comment>needs-review</comment></data>
+  <data name="ui.help.related" xml:space="preserve"><value>Pasos siguientes</value><comment>needs-review</comment></data>
+  <data name="ui.help.intro" xml:space="preserve"><value>Empiece aquí: encuentre su dirección de recepción, anuncie un paquete y cree un envío.</value><comment>needs-review</comment></data>
+  <data name="ui.help.search" xml:space="preserve"><value>Buscar en la ayuda</value><comment>needs-review</comment></data>
+  <data name="ui.help.empty" xml:space="preserve"><value>No hay guías coincidentes. Pruebe otra palabra.</value><comment>needs-review</comment></data>
+  <data name="ui.session.idle_warning" xml:space="preserve">
+    <value>Ha estado inactivo un tiempo. Por su seguridad, su sesión se cerrará pronto.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.session.time_left" xml:space="preserve">
+    <value>Tiempo restante:</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.session.stay" xml:space="preserve">
+    <value>Seguir conectado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sign_in.idle" xml:space="preserve">
+    <value>Su sesión se cerró tras un periodo de inactividad. Inicie sesión de nuevo para continuar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.invoices.pay" xml:space="preserve">
+    <value>Pagar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.title" xml:space="preserve">
+    <value>Pagar esta factura</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.choose" xml:space="preserve">
+    <value>Elija cómo desea pagar.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.method.zelle" xml:space="preserve">
+    <value>Pagar con Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.method.bank_transfer" xml:space="preserve">
+    <value>Pagar por transferencia</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.method.card" xml:space="preserve">
+    <value>Pagar con tarjeta</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.back" xml:space="preserve">
+    <value>Volver a las facturas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.zelle_qr" xml:space="preserve">
+    <value>Código QR de Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.zelle_tag" xml:space="preserve">
+    <value>Etiqueta de Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.zelle_contact" xml:space="preserve">
+    <value>Correo o teléfono</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.zelle_name" xml:space="preserve">
+    <value>Nombre que aparece</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.amount" xml:space="preserve">
+    <value>Monto a enviar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.memo" xml:space="preserve">
+    <value>Escriba en el memo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.memo_hint" xml:space="preserve">
+    <value>Envíe exactamente este monto y escriba el número de factura en el memo o la referencia, para que el pago se asocie a su factura.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.accept_terms" xml:space="preserve">
+    <value>He leído y acepto estas condiciones.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.reference.zelle" xml:space="preserve">
+    <value>Número de confirmación de Zelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.reference.bank_transfer" xml:space="preserve">
+    <value>Referencia de la transferencia</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.sent" xml:space="preserve">
+    <value>He enviado el pago</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.wait_hint" xml:space="preserve">
+    <value>Su factura indica "en espera de confirmación" hasta que la empresa reciba el dinero.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.pay.reported" xml:space="preserve">
+    <value>Gracias. Su pago de la factura {number} espera la confirmación de la empresa.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.payments.zelle_terms_required" xml:space="preserve">
+    <value>Acepte primero las condiciones de Zelle.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.payments.method_not_accepted" xml:space="preserve">
+    <value>Este medio de pago no se ofrece.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.payments.reference_required" xml:space="preserve">
+    <value>Escriba el número de confirmación o la referencia de su pago.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.payments.text_invalid" xml:space="preserve">
+    <value>Este texto es demasiado largo o contiene caracteres no permitidos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tour.step" xml:space="preserve"><value>Paso {step} de 3</value><comment>needs-review</comment></data>
+  <data name="ui.tour.title.1" xml:space="preserve"><value>Su dirección de recepción</value><comment>needs-review</comment></data>
+  <data name="ui.tour.body.1" xml:space="preserve"><value>Utilice esta dirección completa y su código de cliente al comprar en línea. Es la dirección del almacén, no su domicilio. Si no aparece, contacte con su empresa antes de comprar.</value><comment>needs-review</comment></data>
+  <data name="ui.tour.title.2" xml:space="preserve"><value>Anuncie su paquete</value><comment>needs-review</comment></data>
+  <data name="ui.tour.body.2" xml:space="preserve"><value>Introduzca aquí el seguimiento del transportista, no el número de pedido. Añada tienda, contenido y valor cuando esté listo para anunciar el paquete.</value><comment>needs-review</comment></data>
+  <data name="ui.tour.title.3" xml:space="preserve"><value>Elija adónde enviar sus mercancías</value><comment>needs-review</comment></data>
+  <data name="ui.tour.body.3" xml:space="preserve"><value>Un envío da instrucciones para el siguiente trayecto. Elija destino final y recogida o domicilio, compruebe el destinatario y seleccione los paquetes correspondientes.</value><comment>needs-review</comment></data>
+  <data name="ui.tour.no_submit" xml:space="preserve"><value>Esto es solo una visita guiada. No necesita completar ni enviar estos formularios.</value><comment>needs-review</comment></data>
+  <data name="ui.tour.next" xml:space="preserve"><value>Siguiente</value><comment>needs-review</comment></data>
+  <data name="ui.tour.skip" xml:space="preserve"><value>Omitir visita</value><comment>needs-review</comment></data>
+  <data name="ui.tour.finish" xml:space="preserve"><value>Finalizar</value><comment>needs-review</comment></data>
+  <data name="ui.tour.replay" xml:space="preserve"><value>Ver la visita guiada</value><comment>needs-review</comment></data>
+  <data name="ui.tour.save_failed" xml:space="preserve"><value>No pudimos guardar su preferencia. Vuelva a intentar Omitir visita o Finalizar.</value><comment>needs-review</comment></data>
+  <data name="ui.shipments.tracking_number" xml:space="preserve">
+    <value>Número de rastreo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.shipments.track_link" xml:space="preserve">
+    <value>Rastrear</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.shipments.tracking_after_payment" xml:space="preserve">
+    <value>Se asigna cuando el envío está pagado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.shipments.requests_paused" xml:space="preserve">
+    <value>Las nuevas solicitudes de envío están en pausa por ahora. Comuníquese con nosotros.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.customers.portal_unavailable" xml:space="preserve">
+    <value>Las cuentas en línea no están disponibles. Comuníquese con nosotros.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.shipments.insurance_unavailable" xml:space="preserve">
+    <value>El seguro no se ofrece para los envíos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.customers.banned_contact" xml:space="preserve">
+    <value>Este número de teléfono no puede usarse para una cuenta. Contáctenos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.prealert.items" xml:space="preserve">
+    <value>Qué hay dentro</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.prealert.items_hint" xml:space="preserve">
+    <value>Indique cada artículo con sus propias palabras, la cantidad y el valor de una unidad. Deje en blanco las filas que no use.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.prealert.item" xml:space="preserve">
+    <value>Artículo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.prealert.item_example" xml:space="preserve">
+    <value>Zapatillas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.prealert.quantity" xml:space="preserve">
+    <value>Cantidad</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.prealert.value_each" xml:space="preserve">
+    <value>Valor de una unidad (USD)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.prealert.condition" xml:space="preserve">
+    <value>Nuevo o usado</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.words_required" xml:space="preserve">
+    <value>Describa cada artículo en pocas palabras (como máximo {maxLength} caracteres).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.quantity_invalid" xml:space="preserve">
+    <value>Indique la cantidad de cada artículo, desde 1.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.value_invalid" xml:space="preserve">
+    <value>Indique el valor de una unidad, desde 0.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.too_many" xml:space="preserve">
+    <value>Un paquete puede tener como máximo {max} artículos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.prealert.condition_new" xml:space="preserve">
+    <value>Nuevo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.prealert.condition_used" xml:space="preserve">
+    <value>Usado</value>
+    <comment>needs-review</comment>
   </data>
 </root>

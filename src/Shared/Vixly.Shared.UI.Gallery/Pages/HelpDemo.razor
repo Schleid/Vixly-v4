@@ -1,0 +1,25 @@
+﻿@page "/primitives/help"
+@using Vixly.Shared.UI.Gallery.Resources
+@* =========================================================
+   FILE: HelpDemo.razor
+
+   PURPOSE:
+   Previews shared help primitives with localized sample content.
+
+   RESPONSIBILITIES:
+   - Compose deterministic help link and article fixtures.
+
+   IMPORTANT NOTES:
+   - No application help routes or reader authorization are implemented here.
+   ========================================================= *@
+<div class="gallery-section">
+    <VxHelpLink Href="@($"/primitives/help?lang={Language}")" Label="@WorkbenchLabels.Get("help.label", Language)" />
+    <VxHelpArticle Title="@WorkbenchLabels.Get("help.title", Language)"
+                   Html="@WorkbenchLabels.Get("help.html", Language)"
+                   Related="@(new[] { new VxHelpRelatedLink(WorkbenchLabels.Get("help.link", Language), $"/primitives/help?lang={Language}") })"
+                   RelatedLabel="@WorkbenchLabels.Get("help.related", Language)" />
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "lang")] public string Language { get; set; } = "en";
+}

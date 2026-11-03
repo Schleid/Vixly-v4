@@ -3,10 +3,12 @@
 FILE: CompanyPage.razor
 
 PURPOSE:
-The company's account at Vixly: legal details, contacts and change requests.
+The company's account: its profile, contacts, and legal name change requests.
 
 RESPONSIBILITIES:
-- Render the company's account at Vixly: legal details, contacts and change requests
+- Show the legal name and company code; let the owner edit the rest of the profile directly (2026-10-25)
+- Contacts, language and time zone
+- Legal name change requests, with a reason and proof
 
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10); values come from the endpoint
@@ -25,31 +27,36 @@ IMPORTANT NOTES:
         <dl class="ops-facts-grid">
             <div class="ops-facts-grid__item ops-facts-grid__item--span2">
                 <dt>@T["ui.company.legal_name"]</dt>
-                <dd><strong>@View.Company.Details.LegalName</strong> @(View.Company.Details.TradingName is { Length: > 0 } trading ? "(" + trading + ")" : null)</dd>
-            </div>
-            <div class="ops-facts-grid__item">
-                <dt>@T["ui.editor.email"]</dt>
-                <dd>@View.Company.Details.Email</dd>
-            </div>
-            <div class="ops-facts-grid__item">
-                <dt>@T["ui.company.phone"]</dt>
-                <dd>@View.Company.Details.Phone</dd>
-            </div>
-            <div class="ops-facts-grid__item ops-facts-grid__item--span2">
-                <dt>@T["ui.editor.address.line1"]</dt>
-                <dd>@Address(View.Company.Details.Address)</dd>
+                <dd><strong>@View.Company.Details.LegalName</strong></dd>
             </div>
             <div class="ops-facts-grid__item">
                 <dt>@T["ui.company.code"]</dt>
                 <dd><code>@View.Company.TenantCode</code></dd>
             </div>
         </dl>
-         
-
-
-
         <p class="ops-editor__hint">@T["ui.company.legal_hint"]</p>
     </section>
+
+    <form method="post" action="/staff/company/profile" class="ops-editor__panel">
+        <AntiforgeryToken />
+        <h2>@T["ui.company.profile"]</h2>
+        <fieldset disabled="@(!View.CanRequestChange)" class="ops-form-grid">
+            <label>@T["ui.company.trading_name"] <input name="tradingName" value="@View.Company.Details.TradingName" maxlength="200" /></label>
+            <label>@T["ui.editor.email"] <input type="email" name="email" value="@View.Company.Details.Email" maxlength="254" required /></label>
+            <label>@T["ui.company.phone"] <input type="tel" name="phone" value="@View.Company.Details.Phone" maxlength="40" required /></label>
+            <label>@T["ui.editor.address.line1"] <input name="line1" value="@View.Company.Details.Address.Line1" maxlength="200" required /></label>
+            <label>@T["ui.editor.address.line2"] <input name="line2" value="@View.Company.Details.Address.Line2" maxlength="200" /></label>
+            <label>@T["ui.editor.address.city"] <input name="city" value="@View.Company.Details.Address.City" maxlength="100" required /></label>
+            <label>@T["ui.editor.address.region"] <input name="region" value="@View.Company.Details.Address.StateProvince" maxlength="100" /></label>
+            <label>@T["ui.editor.address.postal_code"] <input name="postalCode" value="@View.Company.Details.Address.PostalCode" maxlength="20" /></label>
+            <CountrySelect Name="country" Value="@View.Company.Details.Address.CountryCode" />
+        </fieldset>
+        <p class="ops-editor__hint">@T["ui.company.profile_hint"]</p>
+        @if (View.CanRequestChange)
+        {
+            <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></p>
+        }
+    </form>
 
     <form method="post" action="/staff/company/contacts" class="ops-editor__panel">
         <AntiforgeryToken />
@@ -57,7 +64,7 @@ IMPORTANT NOTES:
             <h2>@T["ui.company.contacts"]</h2>
             @if (Contact("owner") is { } owner)
             {
-                <p>@T["ui.company.role.owner"]: <strong>@owner.Name</strong> · @owner.Email @owner.Phone</p>
+                <p>@T["ui.company.role.owner"]: <strong>@owner.Name</strong> · @owner.Email @Vixly.Shared.Localization.VixlyPhone.International(owner.Phone, View.Company.Details.Address.CountryCode)</p>
             }
             @foreach (string role in new[] { "billing", "technical" })
             {
@@ -92,7 +99,7 @@ IMPORTANT NOTES:
         @if (View.Change is { } change)
         {
             <p>@T["ui.company.change_status." + change.Status] · @change.SubmittedUtc.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) · @change.SubmittedByName</p>
-            <p>@change.Proposed.LegalName · @Address(change.Proposed.Address)</p>
+            <p>@change.Proposed.LegalName</p>
             @if (change.DecisionNote is { Length: > 0 } note) { <p class="ops-editor__hint">@note</p> }
             @if (change.Status == "pending" && View.CanRequestChange)
             {
@@ -107,22 +114,19 @@ IMPORTANT NOTES:
             <form method="post" action="/staff/company/change" enctype="multipart/form-data" class="ops-form-grid">
                 <AntiforgeryToken />
                 <p class="ops-editor__hint">@T["ui.company.change_hint"]</p>
-                <label>@T["ui.company.legal_name"] <input name="legalName" value="@View.Company.Details.LegalName" maxlength="200" required /></label>
-                <label>@T["ui.company.trading_name"] <input name="tradingName" value="@View.Company.Details.TradingName" maxlength="200" /></label>
-                <label>@T["ui.editor.email"] <input type="email" name="email" value="@View.Company.Details.Email" maxlength="254" required /></label>
-                <label>@T["ui.company.phone"] <input name="phone" value="@View.Company.Details.Phone" maxlength="40" required /></label>
-                <label>@T["ui.editor.address.line1"] <input name="line1" value="@View.Company.Details.Address.Line1" maxlength="200" required /></label>
-                <label>@T["ui.editor.address.line2"] <input name="line2" value="@View.Company.Details.Address.Line2" maxlength="200" /></label>
-                <label>@T["ui.editor.address.city"] <input name="city" value="@View.Company.Details.Address.City" maxlength="100" required /></label>
-                <label>@T["ui.editor.address.region"] <input name="region" value="@View.Company.Details.Address.StateProvince" maxlength="100" /></label>
-                <label>@T["ui.editor.address.postal_code"] <input name="postalCode" value="@View.Company.Details.Address.PostalCode" maxlength="20" /></label>
-                <label>@T["ui.editor.country"] <input name="country" value="@View.Company.Details.Address.CountryCode" maxlength="2" required /></label>
+                <label>@T["ui.company.new_legal_name"] <input name="legalName" value="@View.Company.Details.LegalName" maxlength="200" required /></label>
                 <label>@T["ui.company.reason"] <textarea name="reason" maxlength="1000" required></textarea></label>
                 <label>@T["ui.company.proof"] <input type="file" name="proof" accept="application/pdf,image/png,image/jpeg" required /></label>
                 <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.company.send_change"]</button></p>
             </form>
         }
     </section>
+
+    @* Owner, 2026-10-28: the logo on documents and labels. *@
+    @if (DocumentLogo is not null)
+    {
+        <DocumentLogoPanel Logo="DocumentLogo" />
+    }
 </EditorShell>
 
 @code {
@@ -136,12 +140,11 @@ IMPORTANT NOTES:
 
     [Parameter, EditorRequired] public OperationsCompanyView View { get; set; } = null!;
 
+    [Parameter] public Vixly.Operations.Application.UseCases.Company.GetOperationsDocumentLogo.GetOperationsDocumentLogoResponse? DocumentLogo { get; set; }
+
     [Parameter] public string? Error { get; set; }
 
     [Parameter] public string? Info { get; set; }
 
     private OperationsCompanyContact? Contact(string role) => View.Company.Contacts.FirstOrDefault(contact => contact.Role == role);
-
-    private static string Address(OperationsCompanyAddress address) =>
-        string.Join(", ", new[] { address.Line1, address.Line2, address.City, address.StateProvince, address.PostalCode, address.CountryCode }.Where(part => !string.IsNullOrWhiteSpace(part)));
 }

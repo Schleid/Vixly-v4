@@ -17,6 +17,9 @@ namespace Vixly.Operations.Domain.Billing;
 // - Paid never on the browser's word: Stripe's webhook or a check against Stripe (P-4)
 // - One started charge per invoice at a time (unique filtered index); a new one cancels the old
 // - The money Stripe took for an invoice that no longer owed it is kept as PaidNotApplied for staff to refund
+// - With other methods first (owner, 2026-10-26): the card charges only what is left, and the other lines wait on the charge;
+//   they become one payment with the card when Stripe confirms it, and nothing at all when the card is declined or abandoned.
+//   One card per payment: the card is always the last line.
 // =========================================================
 public sealed class OperationsCardCharge : OperationsEntity
 {
@@ -72,7 +75,22 @@ public sealed class OperationsCardCharge : OperationsEntity
 
     public DateTimeOffset? EndedUtc { get; private set; }
 
-    public static OperationsCardCharge Start(Guid tenantId, OperationsInvoice invoice, OperationsCardChannel channel, Guid? startedBy, Guid? readerId, bool live, DateTimeOffset utcNow)
+    // The lines added before the card, recorded with it once Stripe confirms the card.
+    // Null when stored empty (a charge from before, or a card for everything): read as no lines.
+    private IReadOnlyList<OperationsTenderDraft>? _otherTenders;
+
+    public IReadOnlyList<OperationsTenderDraft> OtherTenders
+    {
+        get => _otherTenders ?? Array.Empty<OperationsTenderDraft>();
+        private set => _otherTenders = value;
+    }
+
+    public bool ZelleTermsAccepted { get; private set; }
+
+    public decimal OtherTotal => OtherTenders.Sum(tender => tender.Amount);
+
+    public static OperationsCardCharge Start(Guid tenantId, OperationsInvoice invoice, OperationsCardChannel channel, Guid? startedBy, Guid? readerId, bool live, DateTimeOffset utcNow,
+        IReadOnlyList<OperationsTenderDraft>? others = null, bool zelleTermsAccepted = false)
     {
         ArgumentNullException.ThrowIfNull(invoice);
         invoice.EnsureIssued();
@@ -82,8 +100,12 @@ public sealed class OperationsCardCharge : OperationsEntity
             throw new DomainException(OperationsPaymentErrors.NothingOwed);
         }
 
+        List<OperationsTenderDraft> before = (others ?? Array.Empty<OperationsTenderDraft>()).Where(tender => tender.Amount != 0m).ToList();
+        CheckOthers(before, invoice.Owed, channel, zelleTermsAccepted);
+        decimal amount = invoice.Owed - before.Sum(tender => tender.Amount);
+
         // Stripe cannot take a fraction of a yen (review): such an amount is paid another way.
-        if (ZeroDecimal.Contains(invoice.CurrencyCode, StringComparer.OrdinalIgnoreCase) && decimal.Truncate(invoice.Owed) != invoice.Owed)
+        if (ZeroDecimal.Contains(invoice.CurrencyCode, StringComparer.OrdinalIgnoreCase) && decimal.Truncate(amount) != amount)
         {
             throw new DomainException(OperationsPaymentErrors.AmountInvalid);
         }
@@ -100,12 +122,51 @@ public sealed class OperationsCardCharge : OperationsEntity
             WarehouseId = invoice.WarehouseId,
             Channel = channel,
             Status = OperationsCardChargeStatus.Started,
-            Amount = invoice.Owed,
+            Amount = amount,
+            OtherTenders = before,
+            ZelleTermsAccepted = zelleTermsAccepted && before.Any(tender => tender.Method == OperationsPaymentMethod.Zelle),
             CurrencyCode = invoice.CurrencyCode,
             StartedByUserId = startedBy,
             ReaderId = readerId,
             Live = live
         };
+    }
+
+    // The lines before the card: the same rules as a payment, checked again when it is recorded; the card is left something to charge.
+    private static void CheckOthers(List<OperationsTenderDraft> before, decimal owed, OperationsCardChannel channel, bool zelleTermsAccepted)
+    {
+        if (before.Count == 0)
+        {
+            return;
+        }
+
+        if (channel == OperationsCardChannel.Portal || before.Count + 1 > OperationsPayment.MaxTenders
+            || before.Any(tender => !Enum.IsDefined(tender.Method) || tender.Method == OperationsPaymentMethod.Card || tender.Amount < 0m || decimal.Round(tender.Amount, 2) != tender.Amount))
+        {
+            throw new DomainException(OperationsPaymentErrors.AmountInvalid);
+        }
+
+        if (before.Sum(tender => tender.Amount) >= owed)
+        {
+            throw new DomainException(OperationsCardErrors.NothingLeftForCard);
+        }
+
+        List<OperationsTenderDraft> cash = before.Where(tender => tender.Method == OperationsPaymentMethod.Cash).ToList();
+
+        if (cash.Count > 1)
+        {
+            throw new DomainException(OperationsPaymentErrors.OneCashTender);
+        }
+
+        if (cash.Count == 1 && cash[0].CashGiven is { } given && (given < cash[0].Amount || decimal.Round(given, 2) != given))
+        {
+            throw new DomainException(OperationsPaymentErrors.CashGivenTooLow);
+        }
+
+        if (before.Any(tender => tender.Method == OperationsPaymentMethod.Zelle) && !zelleTermsAccepted)
+        {
+            throw new DomainException(OperationsPaymentErrors.ZelleTermsRequired);
+        }
     }
 
     public void Sent(string? checkoutSessionId, string? paymentIntentId, string? pageUrl, DateTimeOffset utcNow)

@@ -52,7 +52,7 @@ public sealed class OperationsTenantSiteDatabaseTests : IClassFixture<Operations
         });
 
         await using OperationsDbContext read = _database.NewContext(tenant);
-        OperationsSiteRepository repository = new(read);
+        OperationsSiteRepository repository = new(read, new Microsoft.Extensions.Caching.Memory.MemoryCache(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions()));
         OperationsTenantBrand found = (await repository.FindBrandAsync(CancellationToken.None))!;
 
         Assert.Equal("Northwind Cargo", found.DisplayName);
@@ -71,7 +71,7 @@ public sealed class OperationsTenantSiteDatabaseTests : IClassFixture<Operations
     {
         Guid first = Guid.NewGuid();
         Guid second = Guid.NewGuid();
-        OperationsBranch branch = OperationsBranch.Create(first, Details("PAP", "HT"), OperationsBranchSide.Destination, Now);
+        OperationsBranch branch = OperationsBranch.Create(first, Details("PAP", "HT"), "HT", OperationsBranchLegal.None, Now);
         OperationsWarehouse warehouse = OperationsWarehouse.Create(first, branch.Id, Details("FLL", "US"), OperationsWarehouseRoles.Receiving | OperationsWarehouseRoles.PickupPoint, true, Now);
 
         await Save(first, context =>
@@ -80,7 +80,7 @@ public sealed class OperationsTenantSiteDatabaseTests : IClassFixture<Operations
             context.Warehouses.Add(warehouse);
             context.CountryContacts.Add(OperationsCountryContact.Create(first, "HT", "Sales", new[] { "+50922223333", "+50922223334" }, "+50933334444", "info@northwind.example", "Mon-Sat", 1, Now));
         });
-        await Save(second, context => context.Branches.Add(OperationsBranch.Create(second, Details("PAP", "HT"), OperationsBranchSide.Both, Now)));
+        await Save(second, context => context.Branches.Add(OperationsBranch.Create(second, Details("PAP", "HT"), "HT", OperationsBranchLegal.None, Now)));
 
         await using OperationsDbContext asFirst = _database.NewContext(first);
         OperationsLocationRepository locations = new(asFirst);
@@ -98,7 +98,7 @@ public sealed class OperationsTenantSiteDatabaseTests : IClassFixture<Operations
         Assert.Empty(await asSecond.Warehouses.ToListAsync());
         Assert.Empty(await asSecond.CountryContacts.ToListAsync());
 
-        await Assert.ThrowsAsync<DbUpdateException>(() => Save(first, context => context.Branches.Add(OperationsBranch.Create(first, Details("PAP", "HT"), OperationsBranchSide.Both, Now))));
+        await Assert.ThrowsAsync<DbUpdateException>(() => Save(first, context => context.Branches.Add(OperationsBranch.Create(first, Details("PAP", "HT"), "HT", OperationsBranchLegal.None, Now))));
     }
 
     [Fact]

@@ -13,4 +13,5 @@
 // - Wire type: add fields at the end, never rename (ADR-0014)
 // =========================================================
 public sealed record CustomerPreAlertBody(string? Carrier, string? TrackingNumber, string? Store, string? Contents, decimal DeclaredValue, DateOnly? ExpectedDate, Guid? ShipmentId = null,
-    Guid? WarehouseId = null);
+    Guid? WarehouseId = null,
+    IReadOnlyList<CustomerItemBody>? Items = null);

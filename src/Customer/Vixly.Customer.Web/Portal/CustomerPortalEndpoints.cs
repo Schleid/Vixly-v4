@@ -48,7 +48,7 @@ public static class CustomerPortalEndpoints
             return context.HttpContext.Features.Get<IAntiforgeryValidationFeature>() is { IsValid: false } ? Results.BadRequest() : await next(context);
         });
 
-        portal.MapGet("/", async (HttpContext http, string? done, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
+        portal.MapGet("/", async (HttpContext http, string? done, int? tour, bool? tourError, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
         {
             if (Tenant(http) is not { } tenant)
             {
@@ -61,9 +61,16 @@ public static class CustomerPortalEndpoints
             {
                 CustomerCall<CustomerProfileDto> me = await api.GetMeAsync(tenant, session, http, http.RequestAborted);
 
+                // The first sign-in asks for the home address once (owner, 2026-10-26).
+                if (me.Value is { HomeAddress: null })
+                {
+                    return Results.Redirect("/customer/address");
+                }
+
                 if (me.Value is { } customer)
                 {
-                    return Page<HomePage>(new { Brand = brand, Customer = customer, Info = done is null ? null : text["ui.done." + (done == "welcome" ? "welcome" : "saved")].Value });
+                    return Page<HomePage>(new { Brand = brand, Customer = customer, TourStep = customer.WelcomeTourPending || tour == 1 ? 1 : 0,
+                        TourError = tourError == true, Info = done is null ? null : text["ui.done." + (done == "welcome" ? "welcome" : "saved")].Value });
                 }
 
                 CustomerSessionCookie.Delete(http.Response);
@@ -72,8 +79,25 @@ public static class CustomerPortalEndpoints
             return Page<SignInPage>(new { Brand = brand });
         });
 
-        portal.MapGet("/sign-in", async (HttpContext http, CustomerOperationsApi api) =>
-            Tenant(http) is { } tenant ? Page<SignInPage>(new { Brand = await api.GetBrandAsync(tenant, http.RequestAborted) }) : Results.NotFound());
+        // done=idle: signed out after the company's inactivity time (owner, 2026-10-27).
+        portal.MapGet("/sign-in", async (HttpContext http, string? done, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
+            Tenant(http) is { } tenant
+                ? Page<SignInPage>(new { Brand = await api.GetBrandAsync(tenant, http.RequestAborted), Info = done == "idle" ? text["ui.sign_in.idle"].Value : null })
+                : Results.NotFound());
+
+        // "Stay signed in" in the inactivity warning: a call that counts as activity; 401 once the session is gone.
+        portal.MapGet("/session/keepalive", async (HttpContext http, CustomerOperationsApi api) =>
+        {
+            if (Tenant(http) is not { } tenant || CustomerSessionCookie.Read(http.Request) is not { } session)
+            {
+                return Results.StatusCode(StatusCodes.Status401Unauthorized);
+            }
+
+            http.Response.Headers.CacheControl = "no-store";
+            return (await api.GetMeAsync(tenant, session, http, http.RequestAborted)).Value is null
+                ? Results.StatusCode(StatusCodes.Status401Unauthorized)
+                : Results.NoContent();
+        });
 
         portal.MapPost("/sign-in", async (HttpContext http, [FromForm] string? email, [FromForm] string? password, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
         {
@@ -95,7 +119,7 @@ public static class CustomerPortalEndpoints
             });
         }).RequireRateLimiting(CustomerRateLimits.SignIn);
 
-        portal.MapPost("/sign-out", async (HttpContext http, CustomerOperationsApi api) =>
+        portal.MapPost("/sign-out", async (HttpContext http, [FromForm] string? reason, CustomerOperationsApi api) =>
         {
             if (Tenant(http) is { } tenant && CustomerSessionCookie.Read(http.Request) is { } session)
             {
@@ -103,7 +127,7 @@ public static class CustomerPortalEndpoints
             }
 
             CustomerSessionCookie.Delete(http.Response);
-            return Results.Redirect("/customer/sign-in");
+            return Results.Redirect(reason == "idle" ? "/customer/sign-in?done=idle" : "/customer/sign-in");
         });
 
         portal.MapGet("/sign-up", async (HttpContext http, CustomerOperationsApi api, IOptions<CustomerBotCheckOptions> bot) =>
@@ -210,6 +234,45 @@ public static class CustomerPortalEndpoints
                 : await MessageAsync(http, api, text["ui.link.invalid.title"], Describe(text, call), "/customer/forgot-password", text["ui.forgot.link"]);
         }).RequireRateLimiting(CustomerRateLimits.Link);
 
+        // The home address: asked once after sign-in, changed on the profile page (owner, 2026-10-26).
+        portal.MapGet("/address", async (HttpContext http, CustomerOperationsApi api) =>
+        {
+            Guid tenant = Tenant(http) ?? throw new InvalidOperationException("No tenant.");
+
+            if (CustomerSessionCookie.Read(http.Request) is not { } session
+                || (await api.GetMeAsync(tenant, session, http, http.RequestAborted)).Value is not { } customer)
+            {
+                CustomerSessionCookie.Delete(http.Response);
+                return Results.Redirect("/customer/sign-in");
+            }
+
+            return Page<AddressPage>(new { Brand = await api.GetBrandAsync(tenant, http.RequestAborted), Entered = customer.HomeAddress });
+        });
+
+        portal.MapPost("/address", async (HttpContext http, [FromForm] string? line1, [FromForm] string? line2, [FromForm] string? city, [FromForm] string? region,
+            [FromForm] string? postalCode, [FromForm] string? country, [FromForm] string? from, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
+        {
+            Guid tenant = Tenant(http) ?? throw new InvalidOperationException("No tenant.");
+
+            if (CustomerSessionCookie.Read(http.Request) is not { } session)
+            {
+                return Results.Redirect("/customer/sign-in");
+            }
+
+            Vixly.Contracts.Operations.Packages.CustomerAddressDto entered = new(line1, line2, city, region, postalCode, country);
+            CustomerCall<CustomerProfileDto> call = await api.ChangeAddressAsync(tenant, session, entered, http, http.RequestAborted);
+            bool fromProfile = from == "profile";
+
+            if (call.Succeeded)
+            {
+                return Results.Redirect(fromProfile ? "/customer/profile?done=1" : "/customer/");
+            }
+
+            return fromProfile
+                ? await ProfileAsync(http, api, text, Describe(text, call), null)
+                : Page<AddressPage>(new { Brand = await api.GetBrandAsync(tenant, http.RequestAborted), Entered = entered, Error = Describe(text, call) });
+        });
+
         portal.MapGet("/profile", async (HttpContext http, string? done, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
             await ProfileAsync(http, api, text, null, done is null ? null : text["ui.done.saved"].Value));
 
@@ -235,6 +298,20 @@ public static class CustomerPortalEndpoints
             }
 
             return await ProfileAsync(http, api, text, Describe(text, call), null);
+        });
+
+        // Operations Slice 9: the channel of the company's notices, with the customer's consent to texts.
+        portal.MapPost("/profile/notices", async (HttpContext http, [FromForm] string? channel, [FromForm] bool? consent, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
+        {
+            Guid tenant = Tenant(http) ?? throw new InvalidOperationException("No tenant.");
+
+            if (CustomerSessionCookie.Read(http.Request) is not { } session)
+            {
+                return Results.Redirect("/customer/sign-in");
+            }
+
+            CustomerCall<object> call = await api.ChangeNoticesAsync(tenant, session, new CustomerNoticesBody(channel, consent == true), http, http.RequestAborted);
+            return call.Succeeded ? Results.Redirect("/customer/profile?done=1#notices") : await ProfileAsync(http, api, text, Describe(text, call), null);
         });
 
         portal.MapPost("/profile/password", async (HttpContext http, [FromForm] string? currentPassword, [FromForm] string? newPassword, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
@@ -288,7 +365,8 @@ public static class CustomerPortalEndpoints
             return Results.Redirect("/customer/sign-in");
         }
 
-        return Page<ProfilePage>(new { Brand = await api.GetBrandAsync(tenant, http.RequestAborted), Customer = customer, Error = error, Info = info });
+        CustomerNoticesDto? notices = (await api.GetNoticesAsync(tenant, session, http, http.RequestAborted)).Value;
+        return Page<ProfilePage>(new { Brand = await api.GetBrandAsync(tenant, http.RequestAborted), Customer = customer, Notices = notices, Error = error, Info = info });
     }
 
     private static async Task<IResult> MessageAsync(HttpContext http, CustomerOperationsApi api, string title, string? body, string link, string linkText) =>

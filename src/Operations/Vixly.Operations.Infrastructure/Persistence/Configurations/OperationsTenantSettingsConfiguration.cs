@@ -37,6 +37,7 @@ internal sealed class OperationsTenantSettingsConfiguration : IEntityTypeConfigu
         builder.Property(item => item.DisabledEventCauses).HasMaxLength(400).IsUnicode(false);
         builder.Property(item => item.DestinationStorageFeePerDay).HasPrecision(12, 2);
         builder.Property(item => item.DispatchPrefix).HasMaxLength(OperationsSettingsLimits.PrefixMaxLength).IsUnicode(false).IsRequired().HasDefaultValue("DSP");
+        builder.Property(item => item.TrackingPrefix).HasMaxLength(2).IsUnicode(false).IsRequired().HasDefaultValue(Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.DefaultPrefix);
         builder.Property(item => item.BundleTypes).HasMaxLength((Vixly.Operations.Domain.Bundles.OperationsBundleLimits.TypeMaxLength + 1) * Vixly.Operations.Domain.Bundles.OperationsBundleLimits.MaxTypes);
         builder.Property(item => item.TaxName).HasMaxLength(Vixly.Operations.Domain.Billing.OperationsBillingLimits.TaxNameMaxLength);
         builder.Property(item => item.TaxNumber).HasMaxLength(Vixly.Operations.Domain.Billing.OperationsBillingLimits.TaxNumberMaxLength);
@@ -61,6 +62,9 @@ internal sealed class OperationsTenantSettingsConfiguration : IEntityTypeConfigu
         builder.Property(item => item.SupplyDiscountLinePercent).HasPrecision(5, 2);
         builder.Property(item => item.SupplyDiscountOrderPercent).HasPrecision(5, 2);
         builder.Property(item => item.InspectionPercent).HasDefaultValue(OperationsTenantSettings.DefaultInspectionPercent).HasSentinel(-1);
+        builder.Property(item => item.ShipmentCapNoticeMonth).HasMaxLength(7).IsUnicode(false);
+        builder.Property(item => item.ShipmentGraceMonth).HasMaxLength(7).IsUnicode(false);
+        builder.Property(item => item.ItemCatalogueLoaded).HasDefaultValue(false);
         builder.Property(item => item.UnclaimedDays).HasDefaultValue(Vixly.Operations.Domain.Holds.OperationsHoldLimits.DefaultUnclaimedDays).HasSentinel(-1);
 
         // Slice 4D step 3: free days and the storage fee per day (none by default).

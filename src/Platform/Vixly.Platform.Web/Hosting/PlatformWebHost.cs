@@ -46,6 +46,16 @@ public static class PlatformWebHost
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+        // A missing setting names itself on a setup page instead of failing the start (owner, 2026-10-23).
+        // The console commands (first SuperUser, demo companies) need only the database; they skip the check.
+        bool command = args.Contains(PlatformFirstSuperUserCommand.Switch, StringComparer.OrdinalIgnoreCase)
+            || args.Contains(PlatformDemoTenantsCommand.Switch, StringComparer.OrdinalIgnoreCase);
+
+        if (!command && Vixly.Shared.Hosting.Settings.VixlySettingsCheck.Run(builder, PlatformWebSettings.Site, PlatformWebSettings.All, configure) is { } setup)
+        {
+            return setup;
+        }
+
         builder.Services.AddPlatformInfrastructure(builder.Configuration, "Vixly.V4.Platform.Web");
         builder.Services.AddPlatformApplication();
         builder.Services.AddVixlyForwardedHeaders(builder.Configuration);
@@ -64,11 +74,14 @@ public static class PlatformWebHost
         builder.Services.AddScoped<PlatformCurrentUser>();
         builder.Services.AddScoped<PlatformErrorText>();
         builder.Services.AddPlatformPresenters();
+        builder.Services.AddSingleton<Vixly.Platform.Web.Features.Help.PlatformHelpCatalogue>();
+        builder.Services.AddScoped<Vixly.Platform.Web.Features.Help.PlatformHelpPresenter>();
         builder.Services.AddHostedService<PlatformSystemRoleStartup>();
         builder.Services.AddOptions<PlatformOutboxOptions>().Bind(builder.Configuration.GetSection(PlatformOutboxOptions.SectionName));
         builder.Services.AddHostedService<PlatformOutboxWorker>();
         builder.Services.AddOptions<PlatformSubscriptionClockOptions>().Bind(builder.Configuration.GetSection(PlatformSubscriptionClockOptions.SectionName));
         builder.Services.AddHostedService<PlatformSubscriptionClockWorker>();
+        builder.Services.AddHostedService<PlatformSalesFeedWorker>();
 
         if (builder.Environment.IsDevelopment())
         {
@@ -91,7 +104,7 @@ public static class PlatformWebHost
 
         // Before the forwarded headers: the country is read only from a trusted proxy (owner, 2026-10-21).
         app.UseVixlyClientCountry();
-        app.UseForwardedHeaders();
+        app.UseVixlyForwardedHeaders();
         app.UseVixlySecurityHeaders();
 
         if (!app.Environment.IsDevelopment())
@@ -113,6 +126,8 @@ public static class PlatformWebHost
         });
 
         app.UseAuthorization();
+        app.UseWhen(http => http.Request.Path.StartsWithSegments("/help"), branch =>
+            branch.UseStatusCodePagesWithReExecute("/help-not-found", createScopeForStatusCodePages: true));
         app.UseRateLimiter();
         app.UseAntiforgery();
 
@@ -131,6 +146,8 @@ public static class PlatformWebHost
             },
             "/css/vixly.css");
         app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+
+        _ = app.Services.GetRequiredService<Vixly.Platform.Web.Features.Help.PlatformHelpCatalogue>();
 
         return app;
     }

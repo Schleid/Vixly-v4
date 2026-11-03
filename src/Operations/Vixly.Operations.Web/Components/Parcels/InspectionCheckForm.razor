@@ -23,7 +23,7 @@ IMPORTANT NOTES:
             <p class="ops-inspection__customer">@(Parcel.CustomerCode ?? T["ui.hold.Unidentified"].Value)</p>
             <dl>
                 @if (Parcel.CustomerName is not null) { <dt>@T["ui.staff.name"]</dt><dd>@Parcel.CustomerName</dd> }
-                @if (CustomerPhone is not null) { <dt>@T["ui.customers.phone"]</dt><dd>@CustomerPhone</dd> }
+                @if (CustomerPhone is not null) { <dt>@T["ui.customers.phone"]</dt><dd>@Vixly.Shared.Localization.VixlyPhone.International(CustomerPhone)</dd> }
                 <dt>@T["ui.parcels.tracking"]</dt><dd class="ops-editor__code">@Parcel.CarrierTrackingNumber</dd>
                 <dt>@T["ui.parcels.contents"]</dt><dd>@(Parcel.DeclaredContents ?? T["ui.parcels.not_declared"].Value)</dd>
                 @if (Parcel.HoldReasons != OperationsHoldReasons.None) { <dt>@T["ui.parcels.holds"]</dt><dd>@string.Join(", ", Enum.GetValues<OperationsHoldReasons>().Where(reason => reason != OperationsHoldReasons.None && Parcel.HoldReasons.HasFlag(reason)).Select(reason => T["ui.hold." + reason].Value))</dd> }

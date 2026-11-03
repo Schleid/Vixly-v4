@@ -209,7 +209,7 @@ public sealed class PlatformPaymentsClock
             case PlatformCardOutcome.Cancelled:
                 charge.Cancel(utcNow);
                 break;
-            case PlatformCardOutcome.Failed when !checkout:
+            case PlatformCardOutcome.Failed when !checkout || charge.Delayed:
             case PlatformCardOutcome.RequiresAction when !checkout:
                 _payments.ApplyChargeResult(charge, invoice, result);
                 break;

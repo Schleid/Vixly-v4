@@ -28,7 +28,7 @@ namespace Vixly.Operations.Infrastructure.Documents;
 // =========================================================
 internal static class OperationsInvoiceLayout
 {
-    public static byte[] Render(OperationsInvoiceDocument document, IStringLocalizer<OperationsText> text, Func<string, string> barcode)
+    public static byte[] Render(OperationsInvoiceDocument document, IStringLocalizer<OperationsText> text, Func<string, string> barcode, byte[]? logo = null)
     {
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(text);
@@ -49,7 +49,7 @@ internal static class OperationsInvoiceLayout
             {
                 row.RelativeItem().Column(column =>
                 {
-                    column.Item().Text(invoice.Party.CompanyName).FontSize(15).SemiBold();
+                    OperationsDocumentBrand.Head(column, logo, invoice.Party.CompanyName, 15);
                     column.Item().Text(invoice.Party.WarehouseName);
 
                     if (invoice.Party.TaxNumber is { } taxNumber)
@@ -86,6 +86,12 @@ internal static class OperationsInvoiceLayout
                     {
                         about.Item().Text(Word(invoice.Kind switch { OperationsInvoiceKind.Shipment => "shipment", OperationsInvoiceKind.Destination => "destination", _ => "order" })).FontSize(9).SemiBold();
                         about.Item().Text(invoice.Reference);
+
+                        // Owner, 2026-10-28: the shipment's tracking number, once it is paid, on account or collect.
+                        if (document.TrackingNumber is { } tracking)
+                        {
+                            about.Item().Text(VixlyText.Format(text, "ui.documents.tracking_number", "number", Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.Format(tracking))).SemiBold();
+                        }
 
                         if (invoice.Route is { } route)
                         {

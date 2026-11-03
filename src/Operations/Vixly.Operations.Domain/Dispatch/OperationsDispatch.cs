@@ -125,6 +125,21 @@ public sealed class OperationsDispatch : OperationsEntity
 
     public string? CostCurrencyCode { get; private set; }
 
+    // Slice 8: what the carriers billed for this dispatch so far (approved bills' shares), and whether every carrier on its legs has billed.
+    public decimal? BilledTotal { get; private set; }
+
+    public bool BilledComplete { get; private set; }
+
+    // The cost the shipments carry (review): the carriers' bills once every carrier of the dispatch has billed; the estimate (or the dispatcher's
+    // correction) until then; what was billed so far when there is no estimate at all.
+    public decimal? CostUsed => BilledComplete ? BilledTotal : CostTotal ?? BilledTotal;
+
+    public void Billed(decimal? total, bool complete, DateTimeOffset utcNow)
+    {
+        (BilledTotal, BilledComplete) = (total, total is not null && complete);
+        MarkAsModified(utcNow);
+    }
+
     // Step 2 (D-6): what the Shipper's Letter of Instruction says beyond the dispatch itself.
     public bool ChargesCollect { get; private set; }
 

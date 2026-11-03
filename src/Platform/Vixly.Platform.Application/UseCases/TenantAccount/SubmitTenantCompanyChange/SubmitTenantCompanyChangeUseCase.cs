@@ -10,7 +10,7 @@ namespace Vixly.Platform.Application.UseCases.TenantAccount.SubmitTenantCompanyC
 // FILE: SubmitTenantCompanyChangeUseCase.cs
 //
 // PURPOSE:
-// Lets the tenant owner ask TechCrafters to change the company’s legal details, with proof (B12, D-T8).
+// Lets the tenant owner ask TechCrafters to change the company’s legal name, with proof (B12, D-T8).
 //
 // RESPONSIBILITIES:
 // - Check who may act first, then run the rule
@@ -19,7 +19,8 @@ namespace Vixly.Platform.Application.UseCases.TenantAccount.SubmitTenantCompanyC
 // IMPORTANT NOTES:
 // - Owner only, with a checked second factor (the token’s step-up claim)
 // - One pending request per tenant
-// - Legal details change only this way once the tenant exists
+// - The legal name changes only this way once the tenant exists. Since 2026-10-25 a request carries the legal name
+//   only: the rest of the profile is the company's own (UpdateTenantCompanyProfile) and is kept as it is
 // =========================================================
 public sealed class SubmitTenantCompanyChangeUseCase
 {
@@ -62,9 +63,10 @@ public sealed class SubmitTenantCompanyChangeUseCase
 
         try
         {
+            PlatformCompanyDetails current = tenant.Company;
             change = PlatformTenantChangeRequest.Submit(
                 tenant,
-                request.Company.ToDetails(),
+                PlatformCompanyDetails.Create(request.Company.LegalName, current.TradingName, current.Email, current.Phone, current.Address),
                 request.Reason,
                 request.ProofFileName,
                 request.ProofContent,

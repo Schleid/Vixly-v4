@@ -82,7 +82,7 @@ public sealed class ReleaseOperationsDeviceUseCase
             return ReleaseOperationsDeviceResponse.Failure(OperationsCommonErrors.RequestInvalid);
         }
 
-        if (_stepUp.Check(user, request.Code) is { } stepUpRefused)
+        if (await _stepUp.CheckAsync(user, request.Code, cancellationToken) is { } stepUpRefused)
         {
             return ReleaseOperationsDeviceResponse.Failure(stepUpRefused);
         }

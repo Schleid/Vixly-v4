@@ -68,6 +68,9 @@ public sealed class OperationsSessionAuthenticationHandler : AuthenticationHandl
             return AuthenticateResult.NoResult();
         }
 
+        // The company's inactivity times, for the page's warning and sign-out (owner, 2026-10-27).
+        Context.Items[OperationsIdlePage.Item] = session.IdleTimes;
+
         ClaimsIdentity identity = new(
             new[]
             {

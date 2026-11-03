@@ -84,6 +84,12 @@ public sealed class PlatformPublicLinks : IPlatformPublicLinks
         return Portal(portalSlug) + "/account/second-factor-reset#" + Uri.EscapeDataString(token);
     }
 
+    public string ControlLink(string path)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+        return _hosting.ConsoleBaseUrl.Trim().TrimEnd('/') + "/" + path.TrimStart('/');
+    }
+
     private string Portal(string portalSlug)
     {
         string template = _tenants.PortalUrlTemplate?.Trim() ?? string.Empty;

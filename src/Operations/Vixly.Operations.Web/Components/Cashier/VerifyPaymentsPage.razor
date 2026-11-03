@@ -29,6 +29,11 @@ IMPORTANT NOTES:
                 <li>
                     <strong>@T["ui.payments.method." + tender.Method] · @OperationsInvoiceWords.Money(tender.Amount, payment.CurrencyCode)</strong>
                     · @payment.Number · @payment.TakenUtc.ToString("g", CultureInfo.CurrentCulture)
+                    @if (payment.TakenByUserId is null)
+                    {
+                        @* Owner, 2026-10-27: reported by the customer on the portal, not taken at a desk. *@
+                        <span class="ops-editor__status" data-status="draft">@T["ui.payments_verify.from_portal"]</span>
+                    }
                     @if (Invoices.TryGetValue(payment.InvoiceId, out OperationsInvoice? invoice))
                     {
                         <span> · @invoice.Number · @invoice.Reference · @OperationsBillingRows.Customer(invoice)</span>

@@ -37,11 +37,29 @@ public sealed class GetOperationsMenuResponse
 
     public bool HasAny(IEnumerable<string> permissions) => permissions.Any(Permissions.Contains);
 
-    public static GetOperationsMenuResponse Success(IReadOnlySet<string> permissions, bool isOwner, bool isAdministrator)
+    // Vixly Lite (owner, 2026-10-30): the staff pages of the modules the plan leaves out.
+    public IReadOnlyList<string> HiddenPages { get; private init; } = Array.Empty<string>();
+
+    public bool Hides(string url) => Vixly.Operations.Application.Plans.OperationsPlanModules.Hides(HiddenPages, url);
+
+    // Vixly Lite: without the customer portal, staff enter customers themselves.
+    public bool PortalOff { get; private init; }
+
+    // The modules the plan leaves out (OperationsPlanModules codes).
+    public IReadOnlySet<string> ModulesOff { get; private init; } = new HashSet<string>(StringComparer.Ordinal);
+
+    public bool Includes(string module) => !ModulesOff.Contains(module);
+
+    public static GetOperationsMenuResponse Success(IReadOnlySet<string> permissions, bool isOwner, bool isAdministrator, IReadOnlyList<string>? hiddenPages = null, bool portalOff = false,
+        IReadOnlySet<string>? modulesOff = null)
     {
         ArgumentNullException.ThrowIfNull(permissions);
 
-        return new GetOperationsMenuResponse { Succeeded = true, Permissions = permissions, IsOwner = isOwner, IsAdministrator = isAdministrator };
+        return new GetOperationsMenuResponse
+        {
+            Succeeded = true, Permissions = permissions, IsOwner = isOwner, IsAdministrator = isAdministrator, HiddenPages = hiddenPages ?? Array.Empty<string>(), PortalOff = portalOff,
+            ModulesOff = modulesOff ?? new HashSet<string>(StringComparer.Ordinal)
+        };
     }
 
     public static GetOperationsMenuResponse Failure(Error error)

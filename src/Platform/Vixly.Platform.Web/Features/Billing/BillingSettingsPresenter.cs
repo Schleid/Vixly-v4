@@ -112,7 +112,8 @@ public sealed class BillingSettingsPresenter : PlatformPresenter<BillingSettings
 
     public Task SaveLogoAsync(byte[] content, string contentType)
     {
-        return SaveAsync("ui.billing_settings.logo_saved", async (context, cancellationToken) => (await _logo.ExecuteAsync(
+        // Owner, 2026-10-28: an empty file removes the logo, and the page says so.
+        return SaveAsync(content.Length == 0 ? "ui.billing_settings.logo_removed" : "ui.billing_settings.logo_saved", async (context, cancellationToken) => (await _logo.ExecuteAsync(
             context, new SetPlatformCompanyLogoRequest { Content = content, ContentType = contentType }, cancellationToken)).Error);
     }
 

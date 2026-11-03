@@ -17,6 +17,7 @@ namespace Vixly.Operations.Application.Security;
 // - The Owner holds everything everywhere; the Administrator role is tenant-wide
 // - A branch grant covers the branch and its warehouses
 // - A partner agent (R-8) holds only the partner's access, at its warehouse, never company-wide
+// - An outside account (S-5) holds only the support lookup
 // =========================================================
 public sealed class OperationsAccessView
 {
@@ -53,17 +54,31 @@ public sealed class OperationsAccessView
     // The role Platform knows (design section 3).
     public string PlatformRole => IsOwner ? "owner" : IsAdministrator ? "admin" : "staff";
 
-    public bool Has(string permission) => IsOwner || Grants.Any(item => item.Role.Holds(permission)) || Partner?.Holds(permission) == true;
+    public bool IsOutside => User.IsOutside;
+
+    // Vixly Lite (owner, 2026-10-30): the permissions of the modules the company's plan leaves out, refused even to the Owner.
+    public IReadOnlySet<string> PlanWithheld { get; init; } = new HashSet<string>(StringComparer.Ordinal);
+
+    public bool Has(string permission) => Allowed(permission) && (IsOwner || Grants.Any(item => Holds(item, permission)) || Partner?.Holds(permission) == true);
 
     public bool HasTenantWide(string permission) =>
-        IsOwner || Grants.Any(item => item.Grant.Scope == OperationsRoleScope.Tenant && item.Role.Holds(permission));
+        Allowed(permission) && (IsOwner || Grants.Any(item => item.Grant.Scope == OperationsRoleScope.Tenant && item.Role.Holds(permission)));
 
     public bool CoversBranch(string permission, Guid branchId) =>
-        HasTenantWide(permission) || Grants.Any(item => item.Grant.Scope == OperationsRoleScope.Branch && item.Grant.ScopeId == branchId && item.Role.Holds(permission));
+        HasTenantWide(permission) || (Allowed(permission) && Grants.Any(item => item.Grant.Scope == OperationsRoleScope.Branch && item.Grant.ScopeId == branchId && Holds(item, permission)));
 
     public bool CoversWarehouse(string permission, Guid warehouseId, Guid branchId) =>
-        CoversBranch(permission, branchId) || Grants.Any(item => item.Grant.Scope == OperationsRoleScope.Warehouse && item.Grant.ScopeId == warehouseId && item.Role.Holds(permission))
+        CoversBranch(permission, branchId)
+        || (Allowed(permission) && Grants.Any(item => item.Grant.Scope == OperationsRoleScope.Warehouse && item.Grant.ScopeId == warehouseId && Holds(item, permission)))
         || (Partner is { } partner && partner.WarehouseId == warehouseId && partner.Holds(permission));
+
+    // Owner, 2026-10-29 (S-5): an outside account (a call centre) holds only the support lookup, whatever its roles say.
+    private bool Allowed(string permission) =>
+        !PlanWithheld.Contains(permission) && (!User.IsOutside || Vixly.Operations.Domain.Access.OperationsPermissions.Outside.Contains(permission, StringComparer.Ordinal));
+
+    // Owner, 2026-10-29: a company-only permission counts only in a grant for the whole company.
+    private static bool Holds((OperationsRoleGrant Grant, OperationsRole Role) item, string permission) =>
+        item.Role.Holds(permission) && (item.Grant.Scope == OperationsRoleScope.Tenant || !Vixly.Operations.Domain.Access.OperationsPermissions.IsCompanyOnly(permission));
 
     // Everything a role holds must be held by the granter in that scope (design section 3).
     public bool CanGrant(OperationsRole role, OperationsRoleScope scope, Guid? scopeId, Guid? branchOfWarehouse)

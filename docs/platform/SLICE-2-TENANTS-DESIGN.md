@@ -150,7 +150,7 @@ Merged from V3: `GetTenants`, `SearchTenantByPhone` → `ListPlatformTenants`; `
 | `POST /registration` | 5 per hour per client IP; bot check (D-T12) |
 | `POST /registration/verify` | 10 per hour per client IP; single-use token, 24 hours |
 | `POST /registration/email`, `POST /registration/resend` | 10 per hour per client IP and 3 per hour per registration; access token required |
-| `GET /registration/status` | 60 per hour per client IP; access token required |
+| `GET /registration/status` | 300 per hour per client IP (60 until 2026-10-25); access token required |
 
 Request bodies are capped at 16 KB. Responses carry error codes plus resolved text in the caller's `Accept-Language` (plane section 7, Slice 9 rule applied early).
 

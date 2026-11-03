@@ -52,6 +52,9 @@ public sealed class OperationsDeliveryStop : OperationsEntity
 
     public bool CodeChecked { get; private set; }
 
+    // Slice 12B: recorded without a signal and the code typed was not accepted when it was sent; the desk follows up.
+    public bool CodeUnconfirmed { get; private set; }
+
     // Entered by staff from the printed run sheet: the signature is on the paper (R-12).
     public bool FromSheet { get; private set; }
 
@@ -74,6 +77,18 @@ public sealed class OperationsDeliveryStop : OperationsEntity
 
     public bool IsDone => Status != OperationsStopStatus.Pending;
 
+    // Slice 12C (owner H-5): the hash of the private link in the "out for delivery" notice; it shows this stop's driver, on the route's day only.
+    public string? TrackTokenHash { get; private set; }
+
+    public void Track(string tokenHash, DateTimeOffset utcNow)
+    {
+        TrackTokenHash = OperationsTokenLength(tokenHash);
+        MarkAsModified(utcNow);
+    }
+
+    private static string OperationsTokenLength(string hash) =>
+        hash is { Length: 64 } && hash.All(char.IsAsciiHexDigitLower) ? hash : throw new ArgumentException("A SHA-256 hash in lower-case hex is required.", nameof(hash));
+
     public static OperationsDeliveryStop Create(Guid tenantId, Guid routeId, Guid shipmentId, int sequence, int parcelCount, DateTimeOffset utcNow) =>
         new(tenantId, utcNow) { RouteId = routeId, ShipmentId = shipmentId, Sequence = sequence, ParcelCount = parcelCount, Status = OperationsStopStatus.Pending };
 
@@ -84,7 +99,7 @@ public sealed class OperationsDeliveryStop : OperationsEntity
     }
 
     public void Deliver(string? receiverName, OperationsPickupIdKind? idKind, string? idLast, string? signatureKey, string? photoKey, bool codeChecked, bool fromSheet, decimal cash,
-        Guid userId, DateTimeOffset utcNow, IReadOnlyCollection<Guid>? invoices = null)
+        Guid userId, DateTimeOffset utcNow, IReadOnlyCollection<Guid>? invoices = null, bool codeUnconfirmed = false)
     {
         if (IsDone)
         {
@@ -114,6 +129,7 @@ public sealed class OperationsDeliveryStop : OperationsEntity
         (Status, ReceiverName, IdKind, IdLast, SignatureKey, PhotoKey, CodeChecked, FromSheet, CashCollected, DoneUtc, DoneByUserId) =
             (OperationsStopStatus.Delivered, name, idKind, last, signatureKey, photoKey, codeChecked, fromSheet, cash, utcNow, userId);
         CollectedInvoices = cash > 0m && invoices is { Count: > 0 } ? string.Join(",", invoices.Take(10).Select(id => id.ToString("N"))) : null;
+        CodeUnconfirmed = codeUnconfirmed && !codeChecked;
         MarkAsModified(utcNow);
     }
 

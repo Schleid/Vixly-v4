@@ -75,6 +75,20 @@ public sealed class OperationsReceivingInfrastructureTests : IDisposable
         Assert.Equal("%PDF", System.Text.Encoding.ASCII.GetString(pdf, 0, 4));
     }
 
+    // Owner, 2026-10-31: every mode's box draws, the express band included, without overflowing the 4 x 6 page.
+    [Theory]
+    [InlineData("air", false)]
+    [InlineData("air", true)]
+    [InlineData("ocean", false)]
+    [InlineData("ground", false)]
+    public void ShippingLabel_WithItsLabelCode_IsOnePage(string mode, bool express)
+    {
+        byte[] pdf = Renderer().RenderShippingLabel(new Vixly.Operations.Application.Ports.OperationsShippingLabel("Harbour Freight", "SH26000001", "PK26000001", 1, 2, "MIA",
+            "JER", "x", "Ana Pierre", "Jérémie", false, "12 lb", "VX4829510733", null, "VXS", "Ocean consolidated", mode, express, "2026-10-31", "Miami", true, true));
+        Assert.Equal("%PDF", System.Text.Encoding.ASCII.GetString(pdf, 0, 4));
+        Assert.Single(System.Text.RegularExpressions.Regex.Matches(System.Text.Encoding.Latin1.GetString(pdf), @"/Type\s*/Page[^s]"));
+    }
+
     // A long delivery runs over several pages.
     [Fact]
     public void Receipt_IsAPdf_OverSeveralPages()

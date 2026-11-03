@@ -33,9 +33,13 @@ internal sealed class QuestPdfOperationsLabelRenderer : IOperationsLabelRenderer
 {
     private readonly IStringLocalizer<OperationsText> _text;
 
-    public QuestPdfOperationsLabelRenderer(IOptions<OperationsDocumentOptions> options, IStringLocalizer<OperationsText> text)
+    // Null outside the host (the infrastructure tests): documents show the company name.
+    private readonly OperationsDocumentLogos? _logos;
+
+    public QuestPdfOperationsLabelRenderer(IOptions<OperationsDocumentOptions> options, IStringLocalizer<OperationsText> text, OperationsDocumentLogos? logos = null)
     {
         _text = text ?? throw new ArgumentNullException(nameof(text));
+        _logos = logos;
         string license = options?.Value.QuestPdfLicense ?? string.Empty;
         QuestPDF.Settings.License = Enum.TryParse(license, ignoreCase: true, out LicenseType type) ? type : LicenseType.Community;
     }
@@ -43,10 +47,28 @@ internal sealed class QuestPdfOperationsLabelRenderer : IOperationsLabelRenderer
     public byte[] RenderParcelLabel(OperationsParcelLabel label)
     {
         ArgumentNullException.ThrowIfNull(label);
+        return Document.Create(document => ParcelLabelPage(document, label)).GeneratePdf();
+    }
+
+    // Owner, 2026-10-27: every ID label of a shipment in one document, one label per page, printed at once.
+    public byte[] RenderParcelLabels(IReadOnlyList<OperationsParcelLabel> labels)
+    {
+        ArgumentNullException.ThrowIfNull(labels);
+        return Document.Create(document =>
+        {
+            foreach (OperationsParcelLabel label in labels)
+            {
+                ParcelLabelPage(document, label);
+            }
+        }).GeneratePdf();
+    }
+
+    private static void ParcelLabelPage(IDocumentContainer document, OperationsParcelLabel label)
+    {
         string barcode = BarcodeSvg(label.ParcelNumber, 4);
         string code = string.IsNullOrWhiteSpace(label.CustomerCode) ? Vixly.Operations.Application.Printing.OperationsZplLabels.Unidentified : label.CustomerCode;
 
-        return Document.Create(document => document.Page(page =>
+        document.Page(page =>
         {
             page.Size(new PageSize(2 * 72, 1 * 72));
             page.Margin(4);
@@ -58,6 +80,28 @@ internal sealed class QuestPdfOperationsLabelRenderer : IOperationsLabelRenderer
                 column.Item().Text(label.ParcelNumber).FontSize(7);
                 column.Item().Text(code).FontSize(code.Length > 8 ? 11 : 16).Bold();
             });
+        });
+    }
+
+    // Slice 12A: the badge card. The code is printed under its barcode only in part, so a photo of the card is not enough to type it.
+    public byte[] RenderStaffBadge(Vixly.Operations.Application.Identity.OperationsStaffBadgeCard card)
+    {
+        ArgumentNullException.ThrowIfNull(card);
+        string barcode = BarcodeSvg(card.Code, 5);
+
+        return Document.Create(document => document.Page(page =>
+        {
+            page.Size(new PageSize(85.6f, 54f, Unit.Millimetre));
+            page.Margin(4, Unit.Millimetre);
+            page.DefaultTextStyle(text => text.FontSize(8).FontColor("#000000"));
+            page.Content().Column(column =>
+            {
+                column.Spacing(2);
+                column.Item().Text(card.CompanyName).FontSize(9).SemiBold().ClampLines(1);
+                column.Item().PaddingTop(2).Text(card.PersonName).FontSize(13).Bold().ClampLines(2);
+                column.Item().PaddingTop(4).Height(16, Unit.Millimetre).Svg(barcode).FitArea();
+                column.Item().AlignRight().Text("\u2026" + card.Code[^4..]).FontSize(6).FontColor("#555555");
+            });
         })).GeneratePdf();
     }
 
@@ -65,33 +109,166 @@ internal sealed class QuestPdfOperationsLabelRenderer : IOperationsLabelRenderer
     public byte[] RenderShippingLabel(OperationsShippingLabel label)
     {
         ArgumentNullException.ThrowIfNull(label);
-        string shipmentBarcode = BarcodeSvg(label.ShipmentNumber, 4);
-        string parcelBarcode = BarcodeSvg(label.ParcelNumber, 3);
+        return Document.Create(document => ShippingLabelPage(document, label)).GeneratePdf();
+    }
 
-        return Document.Create(document => document.Page(page =>
+    // Owner, 2026-10-27: the shipping labels of a shipment in one document, one per page, printed at once.
+    public byte[] RenderShippingLabels(IReadOnlyList<OperationsShippingLabel> labels)
+    {
+        ArgumentNullException.ThrowIfNull(labels);
+        return Document.Create(document =>
+        {
+            foreach (OperationsShippingLabel label in labels)
+            {
+                ShippingLabelPage(document, label);
+            }
+        }).GeneratePdf();
+    }
+
+    // Owner, 2026-10-31: the same layout as the ZPL label: logo and ship date; the route beside the service's label code in its box (air solid,
+    // ocean striped, ground outlined; express banded); the recipient; the tracking barcode; weight, flags and piece; the parcel barcode with its
+    // number; the shipment number at the foot. No customer number and no contents (owner, 2026-10-31).
+    private void ShippingLabelPage(IDocumentContainer document, OperationsShippingLabel label)
+    {
+        // Owner, 2026-10-28: the tracking number is the label's main barcode once the shipment is paid, on account or collect.
+        // Owner, 2026-11-01: wide enough to fill the row at about 54 points high.
+        string shipmentBarcode = BarcodeSvg(label.TrackingNumber ?? label.ShipmentNumber, 5);
+        string parcelBarcode = BarcodeSvg(label.ParcelNumber, 3);
+        byte[]? labelLogo = _logos?.Label;
+        const string Black = "#000000";
+        const string White = "#FFFFFF";
+        const float Rule = 2.2f;
+
+        document.Page(page =>
         {
             page.Size(new PageSize(4 * 72, 6 * 72));
-            page.Margin(14);
-            page.DefaultTextStyle(text => text.FontSize(10).FontColor("#000000"));
+            page.Margin(0);
+            page.DefaultTextStyle(text => text.FontSize(9).FontColor(Black));
             page.Content().Column(column =>
             {
-                column.Spacing(6);
-                column.Item().Text(label.CompanyName).FontSize(10).SemiBold();
-                column.Item().Text(label.OriginCode + " > " + label.DestinationCode).FontSize(34).Bold();
-                column.Item().LineHorizontal(1.5f);
-                column.Item().Text(label.RecipientName).FontSize(14).SemiBold();
-                column.Item().Text(label.RecipientCity + " · " + (label.Pickup ? "PICKUP" : "HOME")).FontSize(13);
-                column.Item().Row(row =>
+                if (label.Express)
                 {
-                    row.RelativeItem().Text((label.ServiceCode?.Replace('_', ' ').ToUpperInvariant() ?? "-") + "   " + label.Weight).FontSize(11);
-                    row.AutoItem().Text(string.Create(CultureInfo.InvariantCulture, $"{label.Piece} / {label.Pieces}")).FontSize(14).Bold();
+                    column.Item().Background(Black).PaddingVertical(2).AlignCenter().Text("E X P R E S S").FontSize(12).Bold().FontColor(White);
+                }
+
+                column.Item().BorderBottom(Rule).PaddingHorizontal(11).PaddingVertical(6).Row(row =>
+                {
+                    row.RelativeItem().AlignMiddle().Column(brand => OperationsDocumentBrand.Label(brand, labelLogo, label.CompanyName, 12));
+                    row.AutoItem().AlignMiddle().AlignRight().Column(right =>
+                    {
+                        right.Item().AlignRight().Text(label.ShipDate is { } date ? "Ship date " + date : string.Empty).FontSize(8);
+                        right.Item().AlignRight().Text(label.OriginName ?? label.OriginCode).FontSize(8);
+                    });
                 });
-                column.Item().PaddingTop(4).Height(70).Svg(shipmentBarcode).FitArea();
-                column.Item().Text(label.ShipmentNumber).FontSize(11);
-                column.Item().PaddingTop(4).Height(50).Svg(parcelBarcode).FitArea();
-                column.Item().Text(label.ParcelNumber).FontSize(10);
+                column.Item().BorderBottom(Rule).Height(92).Row(row =>
+                {
+                    row.RelativeItem().PaddingHorizontal(11).AlignMiddle().Column(route =>
+                    {
+                        route.Item().Height(36).AlignMiddle().ScaleToFit().Text(label.OriginCode + " → " + label.DestinationCode).FontSize(30).Bold();
+                        route.Item().PaddingTop(4).Text(label.ServiceName ?? string.Empty).FontSize(11).SemiBold().ClampLines(1);
+                    });
+                    row.ConstantItem(100).Element(box => ServiceBox(box, label));
+                });
+                column.Item().BorderBottom(Rule).PaddingHorizontal(11).PaddingVertical(6).Column(to =>
+                {
+                    to.Item().Text("TO").FontSize(7);
+                    to.Item().Text(label.RecipientName.ToUpperInvariant()).FontSize(17).Bold().ClampLines(1);
+                    to.Item().Row(city =>
+                    {
+                        city.RelativeItem().Text(label.RecipientCity).FontSize(15).SemiBold().ClampLines(1);
+                        city.ConstantItem(70).AlignMiddle().Background(label.Pickup ? Black : White).Border(1.5f).BorderColor(Black).PaddingVertical(2)
+                            .AlignCenter().Text(label.Pickup ? "PICKUP" : "HOME").FontSize(10).Bold().FontColor(label.Pickup ? White : Black);
+                    });
+                });
+                column.Item().BorderBottom(Rule).PaddingHorizontal(11).PaddingVertical(6).Column(main =>
+                {
+                    main.Item().Svg(shipmentBarcode).FitWidth();
+                    main.Item().PaddingTop(2).AlignCenter().Text(label.TrackingNumber is { } tracking
+                        ? Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.Format(tracking)
+                        : label.ShipmentNumber).FontSize(15).Bold();
+                });
+                column.Item().BorderBottom(Rule).PaddingHorizontal(11).PaddingVertical(5).Row(row =>
+                {
+                    row.RelativeItem().Column(weight =>
+                    {
+                        weight.Item().Text("Weight").FontSize(8).SemiBold();
+                        weight.Item().Text(label.Weight).FontSize(15).Bold();
+                    });
+                    row.RelativeItem().AlignCenter().AlignMiddle().Text(string.Join("   ",
+                        new[] { label.Insured ? "INSURED" : null, label.Consolidated ? "CONSOL" : null }.Where(flag => flag is not null))).FontSize(10).Bold();
+                    row.RelativeItem().AlignRight().Column(piece =>
+                    {
+                        piece.Item().AlignRight().Text("Piece").FontSize(8).SemiBold();
+                        piece.Item().AlignRight().Text(string.Create(CultureInfo.InvariantCulture, $"{label.Piece} / {label.Pieces}")).FontSize(20).Bold();
+                    });
+                });
+                column.Item().PaddingHorizontal(11).PaddingVertical(6).Column(parcel =>
+                {
+                    parcel.Item().Height(40).AlignLeft().Svg(parcelBarcode).FitHeight();
+                    parcel.Item().PaddingTop(2).Text(label.ParcelNumber).FontSize(12).Bold();
+                });
             });
-        })).GeneratePdf();
+
+            // Owner, 2026-10-31: the shipment number at the foot of the label, in print only, never as a barcode.
+            page.Footer().PaddingHorizontal(11).PaddingBottom(8).AlignRight().Text("Shipment " + label.ShipmentNumber).FontSize(13).Bold();
+        });
+    }
+
+    // The service's label code, large: air solid, ocean striped (the code on black plates), ground outlined.
+    private static void ServiceBox(IContainer box, OperationsShippingLabel label)
+    {
+        if (label.LabelCode is not { } code)
+        {
+            return;
+        }
+
+        string mode = label.ServiceMode ?? string.Empty;
+        string word = label.Express ? "EXPRESS" : mode switch { "ocean" => "SEA", "ground" => "GROUND", _ => "AIR" };
+
+        if (mode == "ground")
+        {
+            box.BorderLeft(2.2f).AlignCenter().AlignMiddle().Column(text =>
+            {
+                text.Item().AlignCenter().Text(code).FontSize(36).Bold();
+                text.Item().AlignCenter().Text(word).FontSize(9).Bold().LetterSpacing(0.1f);
+            });
+            return;
+        }
+
+        if (mode == "ocean")
+        {
+            box.Layers(layers =>
+            {
+                layers.Layer().Svg(Stripes(100, 92)).FitArea();
+                layers.PrimaryLayer().AlignCenter().AlignMiddle().Column(text =>
+                {
+                    text.Item().AlignCenter().Background("#000000").PaddingHorizontal(4).Text(code).FontSize(36).Bold().FontColor("#FFFFFF");
+                    text.Item().AlignCenter().Background("#000000").PaddingHorizontal(4).Text(word).FontSize(9).Bold().LetterSpacing(0.1f).FontColor("#FFFFFF");
+                });
+            });
+            return;
+        }
+
+        box.Background("#000000").AlignCenter().AlignMiddle().Column(text =>
+        {
+            text.Item().AlignCenter().Text(code).FontSize(36).Bold().FontColor("#FFFFFF");
+            text.Item().AlignCenter().Text(word).FontSize(9).Bold().LetterSpacing(0.1f).FontColor("#FFFFFF");
+        });
+    }
+
+    // Black stripes at 45 degrees on white, for the ocean box.
+    private static string Stripes(int width, int height)
+    {
+        StringBuilder svg = new();
+        svg.Append(CultureInfo.InvariantCulture, $"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{width}\" height=\"{height}\" viewBox=\"0 0 {width} {height}\">");
+        svg.Append(CultureInfo.InvariantCulture, $"<defs><clipPath id=\"box\"><rect width=\"{width}\" height=\"{height}\"/></clipPath></defs><g clip-path=\"url(#box)\">");
+
+        for (int line = 0; line < width + height + 20; line += 14)
+        {
+            svg.Append(CultureInfo.InvariantCulture, $"<line x1=\"{line}\" y1=\"-10\" x2=\"{line - height - 20}\" y2=\"{height + 10}\" stroke=\"#000\" stroke-width=\"5\"/>");
+        }
+
+        return svg.Append("</g></svg>").ToString();
     }
 
     public byte[] RenderReceipt(OperationsReceiptDocument receipt)
@@ -106,7 +283,7 @@ internal sealed class QuestPdfOperationsLabelRenderer : IOperationsLabelRenderer
             page.DefaultTextStyle(text => text.FontSize(10).FontColor("#1F2933"));
             page.Header().Column(column =>
             {
-                column.Item().Text(receipt.CompanyName).FontSize(16).SemiBold();
+                OperationsDocumentBrand.Head(column, _logos?.Logo, receipt.CompanyName, 16);
                 column.Item().Text(VixlyText.Format(_text, "ui.receipt.title", "number", receipt.ReceiptNumber)).FontSize(13);
                 column.Item().PaddingTop(4).Text(receipt.WarehouseCode + " · " + receipt.WarehouseName);
             });
@@ -200,7 +377,7 @@ internal sealed class QuestPdfOperationsLabelRenderer : IOperationsLabelRenderer
             {
                 row.RelativeItem().Column(column =>
                 {
-                    column.Item().Text(document.CompanyName).FontSize(15).SemiBold();
+                    OperationsDocumentBrand.Head(column, _logos?.Logo, document.CompanyName, 15);
                     column.Item().Text(Word(invoice ? "invoice_title" : "packing_title")).FontSize(13);
                     column.Item().Text(Word("number") + " " + document.ShipmentNumber + " · " + Word("date") + " " + document.IssuedOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
                 });
@@ -374,7 +551,7 @@ internal sealed class QuestPdfOperationsLabelRenderer : IOperationsLabelRenderer
             {
                 row.RelativeItem().Column(column =>
                 {
-                    column.Item().Text(certificate.CompanyName).FontSize(15).SemiBold();
+                    OperationsDocumentBrand.Head(column, _logos?.Logo, certificate.CompanyName, 15);
                     column.Item().Text(Word("title")).FontSize(13);
                     column.Item().Text(Word("number") + " " + certificate.CertificateNumber + " · " + Word("issued") + " " + certificate.IssuedOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
                     column.Item().Text(Word("status." + certificate.Status)).SemiBold();
@@ -454,7 +631,7 @@ internal sealed class QuestPdfOperationsLabelRenderer : IOperationsLabelRenderer
             {
                 row.RelativeItem().Column(column =>
                 {
-                    column.Item().Text(declaration.CompanyName).FontSize(15).SemiBold();
+                    OperationsDocumentBrand.Head(column, _logos?.Logo, declaration.CompanyName, 15);
                     column.Item().Text(Word("title")).FontSize(13);
                     column.Item().Text(Word("shipment") + " " + declaration.ShipmentNumber + " · " + declaration.IssuedOn.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
                 });
@@ -586,10 +763,13 @@ internal sealed class QuestPdfOperationsLabelRenderer : IOperationsLabelRenderer
 
     // Slice 5F: an invoice or a credit note.
     public byte[] RenderInvoice(Vixly.Operations.Application.Billing.OperationsInvoiceDocument document) =>
-        OperationsInvoiceLayout.Render(document ?? throw new ArgumentNullException(nameof(document)), _text, number => BarcodeSvg(number, 6));
+        OperationsInvoiceLayout.Render(document ?? throw new ArgumentNullException(nameof(document)), _text, number => BarcodeSvg(number, 6), _logos?.Logo);
+
+    public byte[] RenderQuote(Vixly.Operations.Application.Charges.OperationsQuoteDocument document) =>
+        OperationsQuoteLayout.Render(document ?? throw new ArgumentNullException(nameof(document)), _text, number => BarcodeSvg(number, 4), _logos?.Logo);
 
     public byte[] RenderPaymentReceipt(Vixly.Operations.Application.Billing.OperationsPaymentReceipt receipt) =>
-        OperationsPaymentReceiptLayout.Render(receipt ?? throw new ArgumentNullException(nameof(receipt)), _text, number => BarcodeSvg(number, 6));
+        OperationsPaymentReceiptLayout.Render(receipt ?? throw new ArgumentNullException(nameof(receipt)), _text, number => BarcodeSvg(number, 6), _logos?.Logo);
 
     public byte[] RenderBundleLabel(Vixly.Operations.Application.Bundles.OperationsBundleLabel label) =>
         OperationsBundleLabelLayout.Render(label ?? throw new ArgumentNullException(nameof(label)), _text, number => BarcodeSvg(number, 4));
@@ -598,22 +778,22 @@ internal sealed class QuestPdfOperationsLabelRenderer : IOperationsLabelRenderer
         OperationsBundleLabelLayout.Render(label ?? throw new ArgumentNullException(nameof(label)), _text, number => BarcodeSvg(number, 4));
 
     public byte[] RenderDispatchManifest(Vixly.Operations.Application.Dispatch.OperationsDispatchManifest manifest) =>
-        OperationsManifestLayout.RenderDispatch(manifest ?? throw new ArgumentNullException(nameof(manifest)), _text);
+        OperationsManifestLayout.RenderDispatch(manifest ?? throw new ArgumentNullException(nameof(manifest)), _text, _logos?.Logo);
 
     public byte[] RenderBundleManifest(Vixly.Operations.Application.Dispatch.OperationsBundleManifest manifest) =>
-        OperationsManifestLayout.RenderBundle(manifest ?? throw new ArgumentNullException(nameof(manifest)), _text);
+        OperationsManifestLayout.RenderBundle(manifest ?? throw new ArgumentNullException(nameof(manifest)), _text, _logos?.Logo);
 
     public byte[] RenderHouseWaybills(IReadOnlyList<Vixly.Operations.Application.Dispatch.OperationsHouseWaybill> waybills) =>
-        OperationsWaybillLayout.RenderHouseWaybills(waybills ?? throw new ArgumentNullException(nameof(waybills)), _text);
+        OperationsWaybillLayout.RenderHouseWaybills(waybills ?? throw new ArgumentNullException(nameof(waybills)), _text, _logos?.Logo);
 
     public byte[] RenderShipperLetter(Vixly.Operations.Application.Dispatch.OperationsShipperLetter letter) =>
-        OperationsWaybillLayout.RenderShipperLetter(letter ?? throw new ArgumentNullException(nameof(letter)), _text);
+        OperationsWaybillLayout.RenderShipperLetter(letter ?? throw new ArgumentNullException(nameof(letter)), _text, _logos?.Logo);
 
     public byte[] RenderRunSheet(Vixly.Operations.Application.Delivery.OperationsRunSheet sheet) =>
-        OperationsRunSheetLayout.Render(sheet ?? throw new ArgumentNullException(nameof(sheet)), _text);
+        OperationsRunSheetLayout.Render(sheet ?? throw new ArgumentNullException(nameof(sheet)), _text, _logos?.Logo);
 
     public byte[] RenderCreditStatement(Vixly.Operations.Application.Billing.OperationsCreditStatement statement) =>
-        OperationsCreditStatementLayout.Render(statement ?? throw new ArgumentNullException(nameof(statement)), _text);
+        OperationsCreditStatementLayout.Render(statement ?? throw new ArgumentNullException(nameof(statement)), _text, _logos?.Logo);
 
     // A stored signature that cannot be read is left out rather than failing the page (Slice 5D).
     private static Image? Picture(byte[]? content)

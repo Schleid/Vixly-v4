@@ -192,42 +192,7 @@ IMPORTANT NOTES:
     </section>
     @if (Returns.Count > 0)
     {
-        <section class="ops-editor__panel" aria-labelledby="returns-title">
-            <h2 id="returns-title" class="ops-section-title">@T["ui.delivery.returns"]</h2>
-            <p class="ops-editor__hint">@T["ui.delivery.returns_hint"]</p>
-            <OperationsTableViewport Label="@T["ui.delivery.returns"]">
-                <table class="ops-editor__table ops-table--compact">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="ops-editor__identity-cell">@T["ui.pickup.parcel"]</th>
-                            <th scope="col">@T["ui.pickup.shipment"]</th>
-                            <th scope="col">@T["ui.pickup.recipient"]</th>
-                            <th scope="col" class="ops-editor__number">@T["ui.delivery.tries"]</th>
-                            <th scope="col" class="ops-editor__action-col">@T["ui.delivery.return_action"]</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (OperationsDeliveryReturnRow row in Returns)
-                        {
-                            <tr>
-                                <td class="ops-editor__identity-cell ops-editor__code">@row.Number</td>
-                                <td class="ops-editor__code">@row.ShipmentNumber</td>
-                                <td>@row.RecipientName</td>
-                                <td class="ops-editor__number">@row.Tries</td>
-                                <td>
-                                    <form method="post" action="/staff/delivery/returns/@row.ParcelId" class="ops-editor__inline">
-                                        <AntiforgeryToken />
-                                        <input type="hidden" name="warehouse" value="@WarehouseId" />
-                                        <label><span class="vx-visually-hidden">@T["ui.delivery.note"]</span><input name="note" class="ops-field__control" maxlength="@OperationsDeliveryStop.NoteMaxLength" placeholder="@T["ui.delivery.note"]" /></label>
-                                        <button type="submit" class="vx-button vx-button--secondary">@T["ui.delivery.returned_button"]</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </OperationsTableViewport>
-        </section>
+        <DeliveryReturnsPanel Returns="@Returns" WarehouseId="@WarehouseId" />
     }
 </EditorShell>
 

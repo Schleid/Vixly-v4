@@ -19,7 +19,6 @@ using Vixly.Operations.Application.UseCases.Insurance.SaveOperationsInsurancePol
 using Vixly.Operations.Application.UseCases.Insurance.SaveOperationsLiabilityTerms;
 using Vixly.Operations.Application.UseCases.Locations.SaveOperationsBranch;
 using Vixly.Operations.Application.UseCases.Locations.SaveOperationsWarehouse;
-using Vixly.Operations.Application.UseCases.Printing.GetOperationsShippingLabel;
 using Vixly.Operations.Application.UseCases.Receiving.AssignOperationsParcel;
 using Vixly.Operations.Application.UseCases.Receiving.CheckOperationsParcel;
 using Vixly.Operations.Application.UseCases.Receiving.CloseOperationsDelivery;
@@ -138,12 +137,12 @@ public sealed class OperationsDemoScenario
     private async Task MainAsync(CancellationToken ct)
     {
         await SettingsAsync("USD", OperationsWeightUnit.Pound, OperationsDimensionUnit.Inch, "America/New_York", ct);
-        Guid miami = await BranchAsync("MIAMI", "Miami", "8400 NW 25th St", "Doral", "FL", "33122", "US", OperationsBranchSide.Origin, ct);
-        Guid haiti = await BranchAsync("PAPOFF", "Port-au-Prince", "12 Rue Capois", "Port-au-Prince", null, null, "HT", OperationsBranchSide.Destination, ct);
-        Guid cayes = await BranchAsync("CAYOFF", "Les Cayes", "45 Rue Geffrard", "Les Cayes", null, null, "HT", OperationsBranchSide.Destination, ct);
-        Guid jeremie = await BranchAsync("JEROFF", "Jérémie", "8 Rue Stenio Vincent", "Jérémie", null, null, "HT", OperationsBranchSide.Destination, ct);
-        Guid dominican = await BranchAsync("SDQOFF", "Santo Domingo", "Av. 27 de Febrero 210", "Santo Domingo", null, null, "DO", OperationsBranchSide.Destination, ct);
-        Guid peru = await BranchAsync("LIMOFF", "Lima", "Av. Larco 1150", "Miraflores", "Lima", null, "PE", OperationsBranchSide.Destination, ct);
+        Guid miami = await BranchAsync("MIAMI", "Miami", "8400 NW 25th St", "Doral", "FL", "33122", "US", ct);
+        Guid haiti = await BranchAsync("PAPOFF", "Port-au-Prince", "12 Rue Capois", "Port-au-Prince", null, null, "HT", ct);
+        Guid cayes = await BranchAsync("CAYOFF", "Les Cayes", "45 Rue Geffrard", "Les Cayes", null, null, "HT", ct);
+        Guid jeremie = await BranchAsync("JEROFF", "Jérémie", "8 Rue Stenio Vincent", "Jérémie", null, null, "HT", ct);
+        Guid dominican = await BranchAsync("SDQOFF", "Santo Domingo", "Av. 27 de Febrero 210", "Santo Domingo", null, null, "DO", ct);
+        Guid peru = await BranchAsync("LIMOFF", "Lima", "Av. Larco 1150", "Miraflores", "Lima", null, "PE", ct);
 
         Guid mia = await WarehouseAsync(miami, "MIA", "Doral receiving", "8400 NW 25th St", "Doral", "FL", "33122", "US",
             OperationsWarehouseRoles.Receiving | OperationsWarehouseRoles.Storage, false, null, null, "America/New_York", ct);
@@ -269,9 +268,7 @@ public sealed class OperationsDemoScenario
         await CheckAsync(fromUps["1Z999AA10123454421"], "intact", 2.2m, 13m, 9m, 5m, ct);
         await CheckAsync(fromAmazon["TBA309911002244"], "intact", 1.1m, 9m, 6m, 2m, ct);
 
-        // Ana's shoes: cleared, the shipping label printed and stuck on, then shelved. Her dresses: cleared, label still to print.
-        await Use<GetOperationsShippingLabelUseCase>(async useCase => Ok(await useCase.ExecuteAsync(_staff,
-            new GetOperationsShippingLabelRequest { ParcelId = fromAmazon["TBA301884422190"] }, ct), "shipping label"));
+        // Ana's shoes and dresses: cleared and shelved; their shipping labels print once her shipment is paid (owner, 2026-10-28, option A).
         await ShelveAsync(fromAmazon["TBA301884422190"], shelves["A-01-1"], ct);
         await ShelveAsync(fromAmazon["TBA302775533110"], shelves["H-01"], ct);
 
@@ -342,8 +339,8 @@ public sealed class OperationsDemoScenario
     private async Task SecondAsync(CancellationToken ct)
     {
         await SettingsAsync("USD", OperationsWeightUnit.Kilogram, OperationsDimensionUnit.Centimetre, "America/Lima", ct);
-        Guid miami = await BranchAsync("MIAMI", "Miami", "2200 NW 72nd Ave", "Miami", "FL", "33122", "US", OperationsBranchSide.Origin, ct);
-        Guid lima = await BranchAsync("LIMOFF", "Lima", "Av. Arequipa 3500", "San Isidro", "Lima", null, "PE", OperationsBranchSide.Destination, ct);
+        Guid miami = await BranchAsync("MIAMI", "Miami", "2200 NW 72nd Ave", "Miami", "FL", "33122", "US", ct);
+        Guid lima = await BranchAsync("LIMOFF", "Lima", "Av. Arequipa 3500", "San Isidro", "Lima", null, "PE", ct);
         Guid mia = await WarehouseAsync(miami, "MIA", "Miami receiving", "2200 NW 72nd Ave", "Miami", "FL", "33122", "US",
             OperationsWarehouseRoles.Receiving | OperationsWarehouseRoles.Storage, false, null, null, "America/New_York", ct);
         Guid lim = await WarehouseAsync(lima, "LIM", "San Isidro office", "Av. Arequipa 3500", "San Isidro", "Lima", null, "PE",
@@ -378,13 +375,13 @@ public sealed class OperationsDemoScenario
             TimeZone = timeZone
         }, ct), "settings"));
 
-    private Task<Guid> BranchAsync(string code, string name, string line1, string city, string? region, string? postalCode, string country, OperationsBranchSide side,
+    private Task<Guid> BranchAsync(string code, string name, string line1, string city, string? region, string? postalCode, string country,
         CancellationToken ct) =>
         Use<SaveOperationsBranchUseCase, Guid>(async useCase =>
         {
             SaveOperationsBranchResponse response = await useCase.ExecuteAsync(_staff, new SaveOperationsBranchRequest
             {
-                Code = code, Name = name, Line1 = line1, City = city, Region = region, PostalCode = postalCode, CountryCode = country, Side = side,
+                Code = code, Name = name, Line1 = line1, City = city, Region = region, PostalCode = postalCode, CountryCode = country,
                 Status = OperationsLocationStatus.Active, ShowOnSite = true, Phone = "+13055550100"
             }, ct);
             Ok(response.Succeeded, response.Error, "branch " + code);

@@ -26,4 +26,10 @@ public sealed record PlatformPublicPlan(
     int MaxLicensedDevices,
     int MaxWarehouses,
     IReadOnlyList<string> Features,
-    int? TrialDays);
+    int? TrialDays)
+{
+    // Shipment cap (owner, 2026-10-29): 0 means no cap; the price of each shipment above it.
+    public int MaxShipmentsPerMonth { get; init; }
+
+    public decimal ExtraShipmentPrice { get; init; }
+}

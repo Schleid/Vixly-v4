@@ -174,64 +174,75 @@ public static class OperationsDeliveryEndpoints
         staff.MapPost("/delivery/routes/{routeId:guid}/stops/{stopId:guid}", async (HttpContext http, Guid routeId, Guid stopId, RecordOperationsDeliveryStopUseCase record,
             GetOperationsDeliveryRouteUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
         {
-            IFormCollection form = await http.Request.ReadFormAsync(http.RequestAborted);
-            byte[]? signature = null;
-            string drawn = form["signature"].ToString();
+            (RecordOperationsDeliveryStopRequest? request, Error? invalid) = await ReadStopAsync(http, routeId, stopId);
 
-            if (drawn.Length is > 0 and <= SignatureFieldMax && drawn.StartsWith("data:image/png;base64,", StringComparison.Ordinal))
+            if (request is null)
             {
-                try
-                {
-                    signature = Convert.FromBase64String(drawn["data:image/png;base64,".Length..]);
-                }
-                catch (FormatException)
-                {
-                    signature = Array.Empty<byte>();
-                }
-            }
-            else if (drawn.Length > 0)
-            {
-                signature = Array.Empty<byte>();
+                return await RouteAsync(http, routeId, invalid, null, get, brand, errors);
             }
 
-            byte[]? photo = null;
-
-            if (form.Files.GetFile("photo") is { Length: > 0 } file)
-            {
-                if (file.Length > PhotoMaxBytes)
-                {
-                    return await RouteAsync(http, routeId, OperationsPickupErrors.PhotoRequired, null, get, brand, errors);
-                }
-
-                using MemoryStream buffer = new();
-                await file.CopyToAsync(buffer, http.RequestAborted);
-                photo = buffer.ToArray();
-            }
-
-            if (!Amount(form["cash"].ToString(), out decimal? cash))
-            {
-                return await RouteAsync(http, routeId, OperationsDeliveryErrors.CashInvalid, null, get, brand, errors);
-            }
-
-            RecordOperationsDeliveryStopResponse response = await record.ExecuteAsync(OperationsCurrentUser.Context(http), new RecordOperationsDeliveryStopRequest
-            {
-                RouteId = routeId,
-                StopId = stopId,
-                Delivered = form["outcome"].ToString() == "delivered",
-                ReceiverName = form["receiver"].ToString(),
-                IdKind = Enum.TryParse(form["idKind"].ToString(), false, out OperationsPickupIdKind idKind) && Enum.IsDefined(idKind) ? idKind : null,
-                IdLast = form["idLast"].ToString(),
-                Signature = signature is { Length: > 0 } ? signature : signature is null ? null : new byte[] { 0 },
-                Photo = photo,
-                Code = form["code"].ToString(),
-                Cash = cash,
-                Failure = form["failure"].ToString(),
-                Note = form["note"].ToString(),
-                PortalSlug = OperationsStaffResults.PortalSlug(http)
-            }, http.RequestAborted);
+            RecordOperationsDeliveryStopResponse response = await record.ExecuteAsync(OperationsCurrentUser.Context(http), request, http.RequestAborted);
             return response.Succeeded
                 ? Results.Redirect("/staff/delivery/routes/" + routeId + "?done=recorded#stop-" + stopId.ToString("N"))
                 : await RouteAsync(http, routeId, response.Error, null, get, brand, errors);
+        }).WithMetadata(new Vixly.Operations.Web.Hosting.OperationsUploadLimit(PhotoMaxBytes + SignatureFieldMax + (64 * 1024)))
+            .WithFormOptions(multipartBodyLengthLimit: PhotoMaxBytes + SignatureFieldMax + (64 * 1024));
+
+        // Slice 12C (owner H-5): the driver's phone sends where it is while the route is out; the map reads the way so far.
+        staff.MapPost("/delivery/routes/{routeId:guid}/position", async (HttpContext http, Guid routeId,
+            Vixly.Operations.Application.UseCases.Delivery.RecordOperationsDriverPosition.RecordOperationsDriverPositionUseCase record) =>
+        {
+            IFormCollection form = await http.Request.ReadFormAsync(http.RequestAborted);
+            System.Globalization.CultureInfo invariant = System.Globalization.CultureInfo.InvariantCulture;
+
+            if (!decimal.TryParse(form["lat"].ToString(), System.Globalization.NumberStyles.Float, invariant, out decimal latitude)
+                || !decimal.TryParse(form["lng"].ToString(), System.Globalization.NumberStyles.Float, invariant, out decimal longitude))
+            {
+                return Results.Json(new { ok = false, stop = true });
+            }
+
+            Vixly.Operations.Application.UseCases.Delivery.RecordOperationsDriverPosition.RecordOperationsDriverPositionResponse response = await record.ExecuteAsync(
+                OperationsCurrentUser.Context(http), new Vixly.Operations.Application.UseCases.Delivery.RecordOperationsDriverPosition.RecordOperationsDriverPositionRequest
+                {
+                    RouteId = routeId,
+                    Latitude = latitude,
+                    Longitude = longitude,
+                    AccuracyMeters = int.TryParse(form["accuracy"].ToString(), System.Globalization.NumberStyles.Integer, invariant, out int accuracy) ? accuracy : 0,
+                    TakenUtc = DateTimeOffset.TryParse(form["at"].ToString(), invariant, System.Globalization.DateTimeStyles.AssumeUniversal, out DateTimeOffset at) ? at : null
+                }, http.RequestAborted);
+
+            // Not the driver, or the route is back: the phone stops sending.
+            return Results.Json(new { ok = response.Succeeded, stop = !response.Succeeded });
+        });
+
+        staff.MapGet("/delivery/routes/{routeId:guid}/map", async (HttpContext http, Guid routeId,
+            Vixly.Operations.Application.UseCases.Delivery.GetOperationsRouteMap.GetOperationsRouteMapUseCase get) =>
+        {
+            Vixly.Operations.Application.UseCases.Delivery.GetOperationsRouteMap.GetOperationsRouteMapResponse response = await get.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Delivery.GetOperationsRouteMap.GetOperationsRouteMapRequest { RouteId = routeId }, http.RequestAborted);
+            http.Response.Headers.CacheControl = "no-store";
+
+            return response.Map is { } map
+                ? Results.Json(new
+                {
+                    points = map.Points.Select(point => new { lat = point.Latitude, lng = point.Longitude, accuracy = point.AccuracyMeters, at = point.TakenUtc }),
+                    next = map.NextStop,
+                    address = map.NextAddress
+                })
+                : Results.NotFound();
+        });
+
+        // Slice 12B (owner H-4): the same stop sent by the phone, now or later; answers in JSON so the phone keeps or drops it.
+        staff.MapPost("/delivery/routes/{routeId:guid}/stops/{stopId:guid}/sync", async (HttpContext http, Guid routeId, Guid stopId, RecordOperationsDeliveryStopUseCase record,
+            OperationsErrorText errors) =>
+        {
+            (RecordOperationsDeliveryStopRequest? request, Error? invalid) = await ReadStopAsync(http, routeId, stopId);
+            RecordOperationsDeliveryStopResponse? response = request is null ? null : await record.ExecuteAsync(OperationsCurrentUser.Context(http), request, http.RequestAborted);
+            http.Response.Headers.CacheControl = "no-store";
+
+            return response?.Succeeded == true
+                ? Results.Json(new { ok = true })
+                : Results.Json(new { ok = false, error = errors.Describe(response?.Error ?? invalid) });
         }).WithMetadata(new Vixly.Operations.Web.Hosting.OperationsUploadLimit(PhotoMaxBytes + SignatureFieldMax + (64 * 1024)))
             .WithFormOptions(multipartBodyLengthLimit: PhotoMaxBytes + SignatureFieldMax + (64 * 1024));
 
@@ -328,6 +339,69 @@ public static class OperationsDeliveryEndpoints
         });
     }
 
+    // The stop's form: the outcome, the proofs, the cash and, from the phone (Slice 12B), when it happened.
+    private static async Task<(RecordOperationsDeliveryStopRequest? Request, Error? Invalid)> ReadStopAsync(HttpContext http, Guid routeId, Guid stopId)
+    {
+        IFormCollection form = await http.Request.ReadFormAsync(http.RequestAborted);
+        string drawn = form["signature"].ToString();
+        byte[]? signature = null;
+        if (drawn.Length is > 0 and <= SignatureFieldMax && drawn.StartsWith("data:image/png;base64,", StringComparison.Ordinal))
+        {
+            try
+            {
+                signature = Convert.FromBase64String(drawn["data:image/png;base64,".Length..]);
+            }
+            catch (FormatException)
+            {
+                signature = Array.Empty<byte>();
+            }
+        }
+        else if (drawn.Length > 0)
+        {
+            signature = Array.Empty<byte>();
+        }
+
+        byte[]? photo = null;
+
+        if (form.Files.GetFile("photo") is { Length: > 0 } file)
+        {
+            if (file.Length > PhotoMaxBytes)
+            {
+                return (null, OperationsPickupErrors.PhotoRequired);
+            }
+
+            using MemoryStream buffer = new();
+            await file.CopyToAsync(buffer, http.RequestAborted);
+            photo = buffer.ToArray();
+        }
+
+        if (!Amount(form["cash"].ToString(), out decimal? cash))
+        {
+            return (null, OperationsDeliveryErrors.CashInvalid);
+        }
+
+
+        return (new RecordOperationsDeliveryStopRequest
+        {
+            RouteId = routeId,
+            StopId = stopId,
+            Delivered = form["outcome"].ToString() == "delivered",
+            ReceiverName = form["receiver"].ToString(),
+            IdKind = Enum.TryParse(form["idKind"].ToString(), false, out OperationsPickupIdKind idKind) && Enum.IsDefined(idKind) ? idKind : null,
+            IdLast = form["idLast"].ToString(),
+            Signature = signature is { Length: > 0 } ? signature : signature is null ? null : new byte[] { 0 },
+            Photo = photo,
+            Code = form["code"].ToString(),
+            Cash = cash,
+            Failure = form["failure"].ToString(),
+            Note = form["note"].ToString(),
+            PortalSlug = OperationsStaffResults.PortalSlug(http),
+            HappenedUtc = DateTimeOffset.TryParse(form["happenedUtc"].ToString(), System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.AssumeUniversal, out DateTimeOffset happened) ? happened : null,
+            Queued = form["queued"].ToString() == "1"
+        }, null);
+    }
+
     private static async Task<IResult> RouteAsync(HttpContext http, Guid routeId, Error? error, string? info, GetOperationsDeliveryRouteUseCase get, GetOperationsSignInBrandUseCase brand,
         OperationsErrorText errors)
     {
@@ -338,8 +412,13 @@ public static class OperationsDeliveryEndpoints
             return Results.NotFound();
         }
 
+        // Slice 12C: the route page may read the phone's position (only the driver's page sends it, while the route is out).
+        http.Items[Vixly.Shared.Hosting.VixlySecurityHeaders.PermissionsPolicyItem] = "camera=(), microphone=(), geolocation=(self), payment=()";
+        Vixly.Operations.Infrastructure.Maps.OperationsMapTiles tiles = http.RequestServices.GetRequiredService<Vixly.Operations.Infrastructure.Maps.OperationsMapTiles>();
+
         return OperationsStaffResults.Page<DeliveryRoutePage>(http, new
         {
+            MapAttribution = tiles.Enabled ? tiles.Attribution : null,
             Company = await OperationsStaffResults.CompanyAsync(http, brand),
             RouteId = routeId,
             response.Number,

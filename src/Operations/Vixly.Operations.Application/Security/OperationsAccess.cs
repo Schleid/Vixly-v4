@@ -21,6 +21,7 @@ namespace Vixly.Operations.Application.Security;
 // - Only active accounts act; inactive roles grant nothing
 // - Step-up: the session confirmed a second factor within 5 minutes
 // - A partner agent (Slice 7 step 4, R-8) holds no role: the partner's access at its warehouse, while the plan includes it
+// - An outside account (S-5) works only during its hours and until its end date
 // =========================================================
 public sealed class OperationsAccess
 {
@@ -32,13 +33,16 @@ public sealed class OperationsAccess
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly IOperationsSettingsRepository _settings;
+
     private readonly IOperationsLocationRepository _locations;
 
     private readonly IOperationsPlanFeatures _features;
 
     public OperationsAccess(IOperationsUserRepository users, IOperationsRoleRepository roles, IOperationsSessionRepository sessions, TimeProvider timeProvider,
-        IOperationsLocationRepository locations, IOperationsPlanFeatures features)
+        IOperationsLocationRepository locations, IOperationsPlanFeatures features, IOperationsSettingsRepository settings)
     {
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _locations = locations ?? throw new ArgumentNullException(nameof(locations));
         _features = features ?? throw new ArgumentNullException(nameof(features));
         _users = users ?? throw new ArgumentNullException(nameof(users));
@@ -51,6 +55,19 @@ public sealed class OperationsAccess
     {
         ArgumentNullException.ThrowIfNull(context);
 
+        // Slice 11 (review): a scheduled job's context is never a signed-in person here.
+        return context.IsScheduledWork ? null : await ViewAsync(context, cancellationToken);
+    }
+
+    // Only for the use cases a schedule runs on a person's behalf (the scheduled reports): their rights now, without a session.
+    public async Task<OperationsAccessView?> LoadScheduledAsync(OperationsAuthorizationContext context, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        return context.IsScheduledWork ? await ViewAsync(context, cancellationToken) : await LoadAsync(context, cancellationToken);
+    }
+
+    private async Task<OperationsAccessView?> ViewAsync(OperationsAuthorizationContext context, CancellationToken cancellationToken)
+    {
         OperationsUser? user = context.UserId is { } userId ? await _users.GetAsync(userId, cancellationToken) : null;
 
         if (user is null || !user.Account.IsActive)
@@ -58,9 +75,19 @@ public sealed class OperationsAccess
             return null;
         }
 
+        // Owner, 2026-10-29 (S-5): an outside account outside its hours, or after its end date, does nothing; its open session stops working at once.
+        if (!await MayWorkNowAsync(user, cancellationToken))
+        {
+            return null;
+        }
+
+        IReadOnlySet<string> withheld = context.TenantId is { } tenantId
+            ? Vixly.Operations.Application.Plans.OperationsPlanModules.WithheldPermissions(await _features.GetAsync(tenantId, cancellationToken))
+            : new HashSet<string>(StringComparer.Ordinal);
+
         if (user.PartnerWarehouseId is { } partnerWarehouseId)
         {
-            return new OperationsAccessView(user, Array.Empty<(OperationsRoleGrant, OperationsRole)>(), await PartnerScopeAsync(context, partnerWarehouseId, cancellationToken));
+            return new OperationsAccessView(user, Array.Empty<(OperationsRoleGrant, OperationsRole)>(), await PartnerScopeAsync(context, partnerWarehouseId, cancellationToken)) { PlanWithheld = withheld };
         }
 
         IReadOnlyList<OperationsRoleGrant> grants = (await _roles.ListGrantsAsync(user.Id, cancellationToken)).Where(grant => grant.IsActive).ToList();
@@ -71,7 +98,7 @@ public sealed class OperationsAccess
         return new OperationsAccessView(user, grants
             .Where(grant => roles.ContainsKey(grant.RoleId))
             .Select(grant => (grant, roles[grant.RoleId]))
-            .ToList());
+            .ToList()) { PlanWithheld = withheld };
     }
 
     public async Task<(OperationsAccessView? View, Error? Refused)> RequireAsync(OperationsAuthorizationContext context, string permission, bool stepUp, CancellationToken cancellationToken)
@@ -91,7 +118,9 @@ public sealed class OperationsAccess
         }
 
         // A user without a second factor can never step up: they enrol one first (design section 3).
-        return stepUp && (!view.User.HasSecondFactor || !await IsFreshAsync(context, cancellationToken)) ? (view, OperationsAccessErrors.StepUpRequired) : (view, null);
+        // Require MFA = No (owner, 2026-10-22): they confirm with the password instead.
+        bool canStepUp = view.User.HasSecondFactor || (await _settings.FindAsync(cancellationToken))?.RequireMfa == false;
+        return stepUp && (!canStepUp || !await IsFreshAsync(context, cancellationToken)) ? (view, OperationsAccessErrors.StepUpRequired) : (view, null);
     }
 
     // Open only while the plan includes partner agents (fails closed: no answer from Platform, no access) and the warehouse is run by a partner.
@@ -106,6 +135,20 @@ public sealed class OperationsAccess
         }
 
         return new OperationsPartnerScope(warehouseId, true, warehouse.PartnerHandlesMoney);
+    }
+
+    // Owner, 2026-10-29 (S-5): every account may work now, except an outside one outside its hours or after its end date, in the company's time zone.
+    public async Task<bool> MayWorkNowAsync(OperationsUser user, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(user);
+
+        if (!user.IsOutside)
+        {
+            return true;
+        }
+
+        string? zone = (await _settings.FindAsync(cancellationToken))?.TimeZone;
+        return user.MayWorkAt(OperationsTimeZones.Local(_timeProvider.GetUtcNow(), zone));
     }
 
     public async Task<bool> IsFreshAsync(OperationsAuthorizationContext context, CancellationToken cancellationToken)

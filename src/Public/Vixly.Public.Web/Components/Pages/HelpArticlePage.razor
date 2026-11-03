@@ -1,0 +1,22 @@
+﻿@page "/en/help/{Slug}"
+@page "/fr/help/{Slug}"
+@page "/es/help/{Slug}"
+@attribute [EnableRateLimiting(PublicRateLimits.Help)]
+@attribute [OutputCache(PolicyName = "public-help")]
+@* =========================================================
+   FILE: HelpArticlePage.razor
+
+   PURPOSE:
+   Routes a stable Public help slug to the help feature.
+
+   RESPONSIBILITIES:
+   - Pass the article identity to its feature component.
+
+   IMPORTANT NOTES:
+   - Unknown slugs return the application's normal 404 content.
+   ========================================================= *@
+<Vixly.Public.Web.Features.Help.PublicHelpBrowser Slug="@Slug" />
+
+@code {
+    [Parameter] public string Slug { get; set; } = string.Empty;
+}

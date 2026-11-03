@@ -23,6 +23,7 @@ namespace Vixly.Operations.Application.UseCases.Cashier.SaveOperationsPaymentSet
 // IMPORTANT NOTES:
 // - ops.settings.edit (company-wide)
 // - Zelle is offered only with a tag or an email or phone, and its terms in English
+// - The customer portal (owner, 2026-10-27): Zelle, bank transfer and card each switched on; changing the bank instructions needs a fresh second factor, like Zelle's payee
 // =========================================================
 public sealed class SaveOperationsPaymentSettingsUseCase
 {
@@ -83,7 +84,10 @@ public sealed class SaveOperationsPaymentSettingsUseCase
         bool payee = request.ZelleQr is { Length: > 0 } || request.RemoveZelleQr
             || !string.Equals(Trimmed(request.ZelleTag), settings.ZelleTag, StringComparison.Ordinal)
             || !string.Equals(Trimmed(request.ZelleContact), settings.ZelleContact, StringComparison.Ordinal)
-            || !string.Equals(Trimmed(request.ZelleName), settings.ZelleName, StringComparison.Ordinal);
+            || !string.Equals(Trimmed(request.ZelleName), settings.ZelleName, StringComparison.Ordinal)
+            || !string.Equals(Trimmed(request.BankTransferInstructionsEn), settings.BankTransferInstructionsEn, StringComparison.Ordinal)
+            || !string.Equals(Trimmed(request.BankTransferInstructionsFr), settings.BankTransferInstructionsFr, StringComparison.Ordinal)
+            || !string.Equals(Trimmed(request.BankTransferInstructionsEs), settings.BankTransferInstructionsEs, StringComparison.Ordinal);
 
         if (payee && (await _access.RequireAsync(context, OperationsPermissions.SettingsEdit, true, cancellationToken)).Refused is { } stepUp)
         {
@@ -112,6 +116,8 @@ public sealed class SaveOperationsPaymentSettingsUseCase
         {
             settings.ChangeZelle(request.ZelleTag, request.ZelleContact, request.ZelleName, request.ZelleTermsEn, request.ZelleTermsFr, request.ZelleTermsEs, utcNow);
             settings.ChangePayments(request.Cash, request.Zelle, request.Cheque, request.BankTransfer, request.Other1, request.Other2, request.Other3, utcNow);
+            settings.ChangePortal(request.PortalZelle, request.PortalBankTransfer, request.PortalCard, request.BankTransferInstructionsEn, request.BankTransferInstructionsFr,
+                request.BankTransferInstructionsEs, utcNow);
 
             if (newPicture is not null || request.RemoveZelleQr)
             {
@@ -131,7 +137,8 @@ public sealed class SaveOperationsPaymentSettingsUseCase
         _audit.Record(access!.User.Id, "ops.payments.settings_saved", nameof(OperationsTenantSettings), settings.Id, before: before, after: new
         {
             cash = settings.AcceptCash, zelle = settings.AcceptZelle, cheque = settings.AcceptCheque, transfer = settings.AcceptBankTransfer,
-            others = new[] { settings.OtherMethod1, settings.OtherMethod2, settings.OtherMethod3 }, payee = Zelle(settings), picture = pictureHash
+            others = new[] { settings.OtherMethod1, settings.OtherMethod2, settings.OtherMethod3 }, payee = Zelle(settings), picture = pictureHash,
+            portal = new { zelle = settings.PortalZelle, transfer = settings.PortalBankTransfer, card = settings.PortalCard }
         });
 
         if (!await _unitOfWork.SaveChangesAsync(cancellationToken))
@@ -156,6 +163,7 @@ public sealed class SaveOperationsPaymentSettingsUseCase
 
     private static object Zelle(OperationsTenantSettings settings) => new
     {
-        cash = settings.AcceptCash, zelle = settings.AcceptZelle, tag = settings.ZelleTag, contact = settings.ZelleContact, name = settings.ZelleName, picture = settings.ZelleQrKey
+        cash = settings.AcceptCash, zelle = settings.AcceptZelle, tag = settings.ZelleTag, contact = settings.ZelleContact, name = settings.ZelleName, picture = settings.ZelleQrKey,
+        bank = settings.BankTransferInstructionsEn
     };
 }

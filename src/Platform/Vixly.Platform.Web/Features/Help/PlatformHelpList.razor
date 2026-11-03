@@ -1,0 +1,34 @@
+﻿@using Vixly.Shared.Help
+@inject IStringLocalizer<PlatformText> T
+@* =========================================================
+   FILE: PlatformHelpList.razor
+
+   PURPOSE:
+   Lists visible Control help titles and summaries.
+
+   RESPONSIBILITIES:
+   - Render a localized empty result when nothing matches.
+
+   IMPORTANT NOTES:
+   - Permission filtering belongs to the presenter.
+   ========================================================= *@
+@if (Articles.Count == 0)
+{
+    <p>@T["ui.help.empty"]</p>
+}
+else
+{
+    <ul class="control-help__list">
+        @foreach (HelpArticle article in Articles)
+        {
+            <li>
+                <a href="@PlatformHelpCatalogue.Address(article.Language, article.Metadata.Slug)">@article.Metadata.Title</a>
+                <p>@article.Metadata.Summary</p>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<HelpArticle> Articles { get; set; } = [];
+}

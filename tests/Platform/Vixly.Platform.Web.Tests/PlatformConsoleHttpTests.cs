@@ -87,12 +87,29 @@ public sealed class PlatformConsoleHttpTests
         Assert.Contains("__RequestVerificationToken", page, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public async Task SignInPage_AfterTheIdleSignOut_SaysWhy_AndAnAnonymousPageHasNoIdleTimer()
+    {
+        await using PlatformConsoleHost host = await PlatformConsoleHost.StartAsync();
+
+        string idle = await host.Client().GetStringAsync("/sign-in?done=idle");
+        string plain = await host.Client().GetStringAsync("/sign-in");
+
+        Assert.Contains("signed out after 5 minutes without activity", idle, StringComparison.Ordinal);
+        Assert.DoesNotContain("without activity", plain, StringComparison.Ordinal);
+        Assert.DoesNotContain("data-idle-warning", plain, StringComparison.Ordinal);
+    }
+
     [Theory]
     [InlineData("/users")]
     [InlineData("/tenants")]
     [InlineData("/tenants/registrations")]
     [InlineData("/leads")]
     [InlineData("/tenants/changes")]
+    [InlineData("/jobs")]
+    [InlineData("/maintenance")]
+    [InlineData("/payments/settings")]
+    [InlineData("/sales-feed")]
     public async Task ProtectedPage_SendsAnAnonymousVisitorToSignIn(string path)
     {
         await using PlatformConsoleHost host = await PlatformConsoleHost.StartAsync();

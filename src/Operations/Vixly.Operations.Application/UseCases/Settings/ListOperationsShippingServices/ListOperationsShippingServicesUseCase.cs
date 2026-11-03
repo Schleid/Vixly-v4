@@ -62,9 +62,11 @@ public sealed class ListOperationsShippingServicesUseCase
 
         List<OperationsShippingServiceRow> rows = PlatformShippingServices.All.Select(service => setups.TryGetValue(service.Code, out OperationsShippingServiceSetup? setup)
             ? new OperationsShippingServiceRow(service.Code, service.Mode, setup.Offered, setup.Label, setup.MinDays, setup.MaxDays,
-                setup.VolumetricDivisor is { } stored ? OperationsUnits.ToShownDivisor(stored, settings.DimensionUnit, settings.WeightUnit) : null, service.DefaultVolumetricDivisor is not null)
+                setup.VolumetricDivisor is { } stored ? OperationsUnits.ToShownDivisor(stored, settings.DimensionUnit, settings.WeightUnit) : null, service.DefaultVolumetricDivisor is not null,
+                setup.LabelCode ?? service.DefaultLabelCode)
             : new OperationsShippingServiceRow(service.Code, service.Mode, false, null, service.DefaultMinDays, service.DefaultMaxDays,
-                service.DefaultVolumetricDivisor is { } divisor ? OperationsUnits.ToShownDivisor(divisor, settings.DimensionUnit, settings.WeightUnit) : null, service.DefaultVolumetricDivisor is not null))
+                service.DefaultVolumetricDivisor is { } divisor ? OperationsUnits.ToShownDivisor(divisor, settings.DimensionUnit, settings.WeightUnit) : null, service.DefaultVolumetricDivisor is not null,
+                service.DefaultLabelCode))
             .ToList();
 
         string unit = (settings.DimensionUnit == OperationsDimensionUnit.Inch ? "in3" : "cm3") + "/" + (settings.WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg");

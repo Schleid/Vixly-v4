@@ -30,6 +30,12 @@ public sealed class UpdateOperationsSiteDraftRequest
 
     public bool ShowFaq { get; init; }
 
+    public bool ShowDelivered { get; init; }
+
+    public bool ShowRates { get; init; }
+
+    public bool ShowTestimonials { get; init; }
+
     public string? FacebookUrl { get; init; }
 
     public string? InstagramUrl { get; init; }
@@ -41,6 +47,11 @@ public sealed class UpdateOperationsSiteDraftRequest
     public string? YouTubeUrl { get; init; }
 
     public string? TikTokUrl { get; init; }
+
+    // Website themes, step 1: null leaves the draft's theme or font as it is (a locked editor sends neither).
+    public OperationsSiteTheme? Theme { get; init; }
+
+    public OperationsSiteFont? Font { get; init; }
 
     public string Language { get; init; } = "en";
 

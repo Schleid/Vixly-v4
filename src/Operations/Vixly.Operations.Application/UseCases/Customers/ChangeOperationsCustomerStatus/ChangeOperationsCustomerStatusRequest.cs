@@ -21,4 +21,10 @@ public sealed class ChangeOperationsCustomerStatusRequest
     public OperationsCustomerStatus Status { get; init; }
 
     public string Reason { get; init; } = string.Empty;
+
+    // Owner, 2026-10-31: a suspension may end by itself at the start of this day, in the company's time zone.
+    public DateOnly? SuspendedUntil { get; init; }
+
+    // For the email to the customer: the company's portal address.
+    public string? PortalSlug { get; init; }
 }

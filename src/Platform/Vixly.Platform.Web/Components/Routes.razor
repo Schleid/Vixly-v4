@@ -15,7 +15,7 @@ IMPORTANT NOTES:
 *@
 @inject PlatformInteractiveRequest Request
 
-<Router AppAssembly="typeof(Program).Assembly">
+<Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Vixly.Platform.Web.Components.Pages.HelpNotFoundPage)">
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
             <NotAuthorized>

@@ -50,6 +50,13 @@ public static class OperationsPaymentErrors
 
     public static Error ZelleIncomplete { get; } = Error.Create("ops.payments.zelle_incomplete");
 
+    // The customer portal (owner, 2026-10-27).
+    public static Error ZelleNameRequired { get; } = Error.Create("ops.payments.zelle_name_required");
+
+    public static Error BankInstructionsRequired { get; } = Error.Create("ops.payments.bank_instructions_required");
+
+    public static Error ReferenceRequired { get; } = Error.Create("ops.payments.reference_required");
+
     public static Error PictureInvalid { get; } = Error.Create("ops.payments.picture_invalid");
 
     public static Error MethodNameInvalid { get; } = Error.Create("ops.payments.method_name_invalid");

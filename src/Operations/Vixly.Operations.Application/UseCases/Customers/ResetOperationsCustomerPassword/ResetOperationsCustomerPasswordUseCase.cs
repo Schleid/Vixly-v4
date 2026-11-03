@@ -70,7 +70,7 @@ public sealed class ResetOperationsCustomerPasswordUseCase
         DateTimeOffset utcNow = _accounts.UtcNow;
 
         if (token is null || customer is null || token.Purpose == OperationsCustomerTokenPurpose.Verification
-            || customer.Status is OperationsCustomerStatus.Suspended or OperationsCustomerStatus.Closed)
+            || customer.Status is OperationsCustomerStatus.Suspended or OperationsCustomerStatus.Closed or OperationsCustomerStatus.Banned)
         {
             return ResetOperationsCustomerPasswordResponse.Failure(OperationsCustomerErrors.LinkInvalid);
         }

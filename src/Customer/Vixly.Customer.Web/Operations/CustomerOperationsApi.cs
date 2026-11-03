@@ -91,8 +91,22 @@ public sealed class CustomerOperationsApi
     public Task<CustomerCall<CustomerProfileDto>> GetMeAsync(Guid tenantId, string session, HttpContext http, CancellationToken cancellationToken) =>
         SendAsync<CustomerProfileDto>(HttpMethod.Get, "internal/v1/customers/me", tenantId, session, null, http, cancellationToken);
 
+    public Task<CustomerCall<object>> DismissWelcomeTourAsync(Guid tenantId, string session, HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<object>(HttpMethod.Post, "internal/v1/customers/me/tour/dismiss", tenantId, session, null, http, cancellationToken);
+
     public Task<CustomerCall<CustomerProfileDto>> UpdateMeAsync(Guid tenantId, string session, CustomerProfileBody body, HttpContext http, CancellationToken cancellationToken) =>
         SendAsync<CustomerProfileDto>(HttpMethod.Put, "internal/v1/customers/me", tenantId, session, body, http, cancellationToken);
+
+    // The home address, asked at the first sign-in (owner, 2026-10-26).
+    public Task<CustomerCall<CustomerProfileDto>> ChangeAddressAsync(Guid tenantId, string session, Vixly.Contracts.Operations.Packages.CustomerAddressDto body, HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<CustomerProfileDto>(HttpMethod.Put, "internal/v1/customers/me/address", tenantId, session, body, http, cancellationToken);
+
+    // Operations Slice 9: how the customer gets notices.
+    public Task<CustomerCall<CustomerNoticesDto>> GetNoticesAsync(Guid tenantId, string session, HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<CustomerNoticesDto>(HttpMethod.Get, "internal/v1/customers/me/notices", tenantId, session, null, http, cancellationToken);
+
+    public Task<CustomerCall<object>> ChangeNoticesAsync(Guid tenantId, string session, CustomerNoticesBody body, HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<object>(HttpMethod.Put, "internal/v1/customers/me/notices", tenantId, session, body, http, cancellationToken);
 
     public Task<CustomerCall<object>> ChangePasswordAsync(Guid tenantId, string session, CustomerPasswordChangeBody body, HttpContext http, CancellationToken cancellationToken) =>
         SendAsync<object>(HttpMethod.Post, "internal/v1/customers/me/password", tenantId, session, body, http, cancellationToken);
@@ -131,6 +145,14 @@ public sealed class CustomerOperationsApi
 
     public Task<CustomerCall<CustomerShipmentDetailDto>> GetShipmentAsync(Guid tenantId, string session, Guid shipmentId, HttpContext http, CancellationToken cancellationToken) =>
         SendAsync<CustomerShipmentDetailDto>(HttpMethod.Get, "internal/v1/customers/me/shipments/" + shipmentId, tenantId, session, null, http, cancellationToken);
+
+    // Slice 12C (owner H-5): the driver bringing the shipment today (no value: not out for delivery).
+    public Task<CustomerCall<CustomerDriverDto>> GetDriverAsync(Guid tenantId, string session, Guid shipmentId, HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<CustomerDriverDto>(HttpMethod.Get, "internal/v1/customers/me/shipments/" + shipmentId + "/driver", tenantId, session, null, http, cancellationToken);
+
+    // Slice 12C: the private link of an "out for delivery" notice, without signing in.
+    public Task<CustomerCall<CustomerDriverDto>> GetTrackedAsync(Guid tenantId, string token, HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<CustomerDriverDto>(HttpMethod.Get, "internal/v1/track/" + Uri.EscapeDataString(token), tenantId, null, null, http, cancellationToken);
 
     public Task<CustomerCall<object>> ChangeShipmentAsync(Guid tenantId, string session, Guid shipmentId, CustomerShipmentInstructionsBody body, HttpContext http, CancellationToken cancellationToken) =>
         SendAsync<object>(HttpMethod.Put, "internal/v1/customers/me/shipments/" + shipmentId, tenantId, session, body, http, cancellationToken);
@@ -186,6 +208,45 @@ public sealed class CustomerOperationsApi
         HttpContext http, CancellationToken cancellationToken) =>
         SendAsync<Vixly.Contracts.Operations.Billing.CustomerCardStartDto>(HttpMethod.Post, "internal/v1/customers/me/invoices/" + invoiceId + "/card", tenantId, session,
             new Vixly.Contracts.Operations.Billing.CustomerCardStartBody(returnUrlPrefix), http, cancellationToken);
+
+    // Owner, 2026-10-27: pay by Zelle or bank transfer; the method is zelle or bank_transfer.
+    public Task<CustomerCall<Vixly.Contracts.Operations.Billing.CustomerPayDto>> GetPayAsync(Guid tenantId, string session, Guid invoiceId, string method, HttpContext http,
+        CancellationToken cancellationToken) =>
+        SendAsync<Vixly.Contracts.Operations.Billing.CustomerPayDto>(HttpMethod.Get, "internal/v1/customers/me/invoices/" + invoiceId + "/pay/" + Uri.EscapeDataString(method), tenantId,
+            session, null, http, cancellationToken);
+
+    public Task<CustomerCall<Vixly.Contracts.Operations.Billing.CustomerPayReportDto>> ReportPayAsync(Guid tenantId, string session, Guid invoiceId, string method,
+        Vixly.Contracts.Operations.Billing.CustomerPayReportBody body, HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<Vixly.Contracts.Operations.Billing.CustomerPayReportDto>(HttpMethod.Post, "internal/v1/customers/me/invoices/" + invoiceId + "/pay/" + Uri.EscapeDataString(method),
+            tenantId, session, body, http, cancellationToken);
+
+    // The company's Zelle QR picture, for the customer paying by Zelle.
+    public async Task<(byte[] Content, string ContentType)?> GetZelleQrAsync(Guid tenantId, string session, HttpContext http, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using HttpRequestMessage request = new(HttpMethod.Get, "internal/v1/customers/me/invoices/zelle-qr");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _signer.Sign(tenantId, null));
+            request.Headers.TryAddWithoutValidation(OperationsCallerClaims.SessionHeader, session);
+
+            if (http.Connection.RemoteIpAddress is { } address)
+            {
+                request.Headers.Add(OperationsCallerClaims.ClientIpHeader, address.ToString());
+            }
+
+            using HttpResponseMessage response = await _http.CreateClient(HttpClientName).SendAsync(request, cancellationToken);
+            string? type = response.Content.Headers.ContentType?.MediaType;
+
+            return response.IsSuccessStatusCode && type is "image/jpeg" or "image/png"
+                ? (await response.Content.ReadAsByteArrayAsync(cancellationToken), type)
+                : null;
+        }
+        catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException && !cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogWarning(exception, "Operations could not be reached for the Zelle picture.");
+            return null;
+        }
+    }
 
     public Task<CustomerCall<Vixly.Contracts.Operations.Billing.CustomerCardPaymentDto>> GetCardPaymentAsync(Guid tenantId, string session, Guid chargeId, HttpContext http,
         CancellationToken cancellationToken) =>
@@ -318,6 +379,51 @@ public sealed class CustomerOperationsApi
         {
             _logger.LogWarning(exception, "Operations could not be reached for {Path}.", path);
             return new CustomerCall<T>(null, null, true);
+        }
+    }
+
+    // =====================================================
+    // METHOD: MAINTENANCE (Control backlog 2026-10-22)
+    // Null when Operations cannot be reached: the portal stays open.
+    // =====================================================
+    public async Task<IReadOnlyList<OperationsMaintenanceWindowDto>?> GetMaintenanceAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            using HttpRequestMessage request = new(HttpMethod.Get, "internal/v1/maintenance");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _signer.Sign(null, null));
+            using HttpResponseMessage response = await _http.CreateClient(HttpClientName).SendAsync(request, cancellationToken);
+
+            return response.StatusCode == HttpStatusCode.OK
+                ? await response.Content.ReadFromJsonAsync<OperationsMaintenanceWindowDto[]>(cancellationToken)
+                : null;
+        }
+        catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException or System.Text.Json.JsonException or InvalidOperationException
+            && !cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogWarning(exception, "Operations could not be reached for the maintenance windows.");
+            return null;
+        }
+    }
+
+    public async Task<DateTimeOffset?> CheckMaintenancePassAsync(string token, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using HttpRequestMessage request = new(HttpMethod.Post, "internal/v1/maintenance/pass");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _signer.Sign(null, null));
+            request.Content = JsonContent.Create(new OperationsMaintenancePassDto(token, null));
+            using HttpResponseMessage response = await _http.CreateClient(HttpClientName).SendAsync(request, cancellationToken);
+
+            return response.StatusCode == HttpStatusCode.OK && await response.Content.ReadFromJsonAsync<OperationsMaintenancePassDto>(cancellationToken) is { EndsUtc: { } endsUtc }
+                ? endsUtc
+                : null;
+        }
+        catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException or System.Text.Json.JsonException or InvalidOperationException
+            && !cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogWarning(exception, "Operations could not be reached to check a maintenance pass.");
+            return null;
         }
     }
 

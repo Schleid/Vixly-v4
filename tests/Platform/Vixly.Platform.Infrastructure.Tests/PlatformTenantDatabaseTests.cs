@@ -100,7 +100,8 @@ public sealed class PlatformTenantDatabaseTests : IClassFixture<PlatformDatabase
         await using (PlatformDbContext context = _database.NewContext())
         {
             PlatformTenant tenant = await context.Tenants.AsNoTracking().SingleAsync(item => item.Id == tenantId);
-            Assert.Equal(("Northwind Logistics Ltd.", null, "Unit 4"), (tenant.Company.LegalName, tenant.Company.TradingName, tenant.Company.Address.Line2));
+            // 2026-10-25: an approved request changes the legal name only; the rest of the profile stays the company's own.
+            Assert.Equal(("Northwind Logistics Ltd.", "Northwind", null), (tenant.Company.LegalName, tenant.Company.TradingName, tenant.Company.Address.Line2));
             Assert.Equal(PlatformTenantStatus.Active, tenant.Status);
             Assert.Equal(new[] { "enterprise", "pilot" }, tenant.Tags.Select(tag => tag.Value).Order(StringComparer.Ordinal));
             Assert.Equal("owner@northwind.example", tenant.ContactFor(PlatformTenantContactRole.Owner).Email.Value);

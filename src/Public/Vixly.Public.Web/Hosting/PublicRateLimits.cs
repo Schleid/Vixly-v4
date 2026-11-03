@@ -11,13 +11,13 @@ namespace Vixly.Public.Web.Hosting;
 // FILE: PublicRateLimits.cs
 //
 // PURPOSE:
-// Limits on the public site's own form posts, per visitor IP (Stage 2, S-6).
+// Limits the public site's form posts and help reads per visitor IP (S-6).
 //
 // RESPONSIBILITIES:
-// - Name and add the form-post policies
+// - Name and add the form-post and help-read policies
 //
 // IMPORTANT NOTES:
-// - Only POST requests count; reading a page is never limited here
+// - Existing form policies count POST only; help has a separate read policy
 // - Platform.Api applies its own limits per visitor IP as well
 // =========================================================
 public static class PublicRateLimits
@@ -29,6 +29,8 @@ public static class PublicRateLimits
     public const string Registration = "public-registration";
 
     public const string Pay = "public-pay";
+
+    public const string Help = "public-help-read";
 
     public static IServiceCollection AddPublicRateLimits(this IServiceCollection services)
     {
@@ -48,6 +50,9 @@ public static class PublicRateLimits
             Add(options, Start, 5);
             Add(options, Registration, 30);
             Add(options, Pay, 20);
+            options.AddPolicy(Help, http => RateLimitPartition.GetFixedWindowLimiter(
+                http.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions { PermitLimit = 120, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
         });
 
         return services;

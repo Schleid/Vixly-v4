@@ -8,6 +8,7 @@ Settings → Payments (Slice 5F, C-1 and P-8): the methods the company accepts a
 RESPONSIBILITIES:
 - The methods on or off and the names of the company's other methods
 - Zelle: the QR picture, tag, email or phone, name and terms in three languages
+- The customer portal (owner, 2026-10-27): Zelle, bank transfer and card switched on there; the bank transfer instructions in three languages
 
 IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10)
@@ -35,6 +36,15 @@ IMPORTANT NOTES:
                 <div><label><span class="ops-label-text">@T["ui.payment_settings.other"] 3</span><input name="other3" value="@settings.OtherMethod3" maxlength="30" /></label></div>
             </div>
             <p class="ops-editor__hint">@T["ui.payment_settings.other_hint"]</p>
+        </fieldset>
+        <fieldset class="ops-editor__panel ops-setting-card" disabled="@(!CanEdit)" style="margin-top: 1rem;">
+            <legend>@T["ui.payment_settings.portal"]</legend>
+            <div class="ops-checkbox-group" style="margin-bottom: 0.5rem;">
+                <label class="ops-checkbox-label"><input type="checkbox" name="portalZelle" value="true" checked="@settings.PortalZelle" /> <span>@T["ui.payments.method.Zelle"]</span></label>
+                <label class="ops-checkbox-label"><input type="checkbox" name="portalTransfer" value="true" checked="@settings.PortalBankTransfer" /> <span>@T["ui.payments.method.BankTransfer"]</span></label>
+                <label class="ops-checkbox-label"><input type="checkbox" name="portalCard" value="true" checked="@settings.PortalCard" /> <span>@T["ui.payments.method.Card"]</span></label>
+            </div>
+            <p class="ops-editor__hint">@T["ui.payment_settings.portal_hint"]</p>
         </fieldset>
         <fieldset class="ops-editor__panel ops-setting-card" disabled="@(!CanEdit)" style="margin-top: 1rem;">
             <legend>@T["ui.payments.method.Zelle"]</legend>
@@ -66,6 +76,15 @@ IMPORTANT NOTES:
                 <div><label><span class="ops-label-text">@T["ui.payment_settings.terms_es"]</span><textarea name="termsEs" rows="3" maxlength="2000">@settings.ZelleTermsEs</textarea></label></div>
             </div>
             <p class="ops-editor__hint">@T["ui.payment_settings.zelle_hint"]</p>
+        </fieldset>
+        <fieldset class="ops-editor__panel ops-setting-card" disabled="@(!CanEdit)" style="margin-top: 1rem;">
+            <legend>@T["ui.payments.method.BankTransfer"]</legend>
+            <div class="ops-charges-trio">
+                <div><label><span class="ops-label-text">@T["ui.payment_settings.bank_en"]</span><textarea name="bankEn" rows="4" maxlength="2000">@settings.BankTransferInstructionsEn</textarea></label></div>
+                <div><label><span class="ops-label-text">@T["ui.payment_settings.bank_fr"]</span><textarea name="bankFr" rows="4" maxlength="2000">@settings.BankTransferInstructionsFr</textarea></label></div>
+                <div><label><span class="ops-label-text">@T["ui.payment_settings.bank_es"]</span><textarea name="bankEs" rows="4" maxlength="2000">@settings.BankTransferInstructionsEs</textarea></label></div>
+            </div>
+            <p class="ops-editor__hint">@T["ui.payment_settings.bank_hint"]</p>
             @if (CanEdit)
             {
                 <div style="margin-top: 1rem; display: flex; justify-content: flex-start;">

@@ -34,6 +34,16 @@ public static class OperationsSiteTextKeys
 
     public const int FaqItems = 6;
 
+    // Landing page marketing (owner, 2026-10-30): promise chips, story checklists and "why us" cards.
+    public const int Chips = 3;
+
+    public const int StoryPoints = 4;
+
+    public const int WhyCards = 4;
+
+    // The services with a delivery time in the key figures and a story panel.
+    public static IReadOnlyList<string> StoryServices { get; } = new[] { "air", "ocean" };
+
     public static int? MaxLength(string key) => Limits.TryGetValue(key, out int max) ? max : null;
 
     private static Dictionary<string, int> Build()
@@ -43,8 +53,39 @@ public static class OperationsSiteTextKeys
             [Headline] = 90,
             [Intro] = 300,
             [MetaDescription] = 160,
-            [FooterAbout] = 300
+            [FooterAbout] = 300,
+            ["eyebrow"] = 60,
+            ["figure.value"] = 20,
+            ["figure.label"] = 60,
+            ["figure.since"] = 30,
+            ["why.heading"] = 90,
+            ["closing.title"] = 90,
+            ["closing.text"] = 200
         };
+
+        for (int chip = 1; chip <= Chips; chip++)
+        {
+            limits["chip." + chip] = 40;
+        }
+
+        // Not StoryServices: this runs while the static fields are being set, before that list exists.
+        foreach (string service in new[] { "air", "ocean" })
+        {
+            limits["time." + service] = 30;
+            limits["story." + service + ".title"] = 90;
+            limits["story." + service + ".text"] = 300;
+
+            for (int point = 1; point <= StoryPoints; point++)
+            {
+                limits["story." + service + ".point." + point] = 100;
+            }
+        }
+
+        for (int card = 1; card <= WhyCards; card++)
+        {
+            limits["why." + card + ".title"] = 60;
+            limits["why." + card + ".text"] = 200;
+        }
 
         foreach (string service in new[] { "air", "ocean", "consolidation", "mailbox", "door_to_door", "pickup" })
         {

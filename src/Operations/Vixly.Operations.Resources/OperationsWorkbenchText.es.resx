@@ -92,4 +92,24 @@
   <data name="company" xml:space="preserve">
     <value>Empresa</value>
   </data>
+  <data name="front_office" xml:space="preserve">
+    <value>Atención al cliente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="warehouse_operations" xml:space="preserve">
+    <value>Operaciones de almacén</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="back_office" xml:space="preserve">
+    <value>Administración</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="technical" xml:space="preserve">
+    <value>Técnico</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="support" xml:space="preserve">
+    <value>Soporte</value>
+    <comment>needs-review</comment>
+  </data>
 </root>

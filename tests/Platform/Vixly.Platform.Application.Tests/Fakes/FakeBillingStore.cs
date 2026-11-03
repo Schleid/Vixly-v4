@@ -120,9 +120,12 @@ internal sealed class FakeBillingStore :
 
     public List<string?> PayLinks { get; } = new();
 
-    public Task SendDocumentAsync(PlatformTenant tenant, PlatformTenantContact recipient, PlatformInvoice invoice, PlatformBillingDocument document, string? payLink, CancellationToken cancellationToken)
+    public List<string?> Statements { get; } = new();
+
+    public Task SendDocumentAsync(PlatformTenant tenant, PlatformTenantContact recipient, PlatformInvoice invoice, PlatformBillingDocument document, string? payLink, string? statementWording, CancellationToken cancellationToken)
     {
         PayLinks.Add(payLink);
+        Statements.Add(statementWording);
         Mailed.Add(recipient.Email.Value + ":" + document.Number);
         return Task.CompletedTask;
     }

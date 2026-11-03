@@ -104,6 +104,13 @@ internal sealed class FakePlatformStore :
         return Task.FromResult(Users.Any(user => user.Email == email));
     }
 
+    public long LastEmployeeNumber { get; set; }
+
+    public Task<string> NextEmployeeNumberAsync(CancellationToken cancellationToken)
+    {
+        return Task.FromResult(PlatformEmployeeNumber.Format(++LastEmployeeNumber));
+    }
+
     public Task<int> CountOtherActiveSuperUsersAsync(Guid excludedUserId, CancellationToken cancellationToken)
     {
         return Task.FromResult(Users.Count(user => user.Id != excludedUserId && user.IsActiveSuperUser));
@@ -243,8 +250,16 @@ internal sealed class FakePlatformStore :
         ResetRequests.Add(request);
     }
 
+    // Owner, 2026-10-23: a mail server that refuses (the person is still saved).
+    public bool MailFails { get; set; }
+
     public Task SendInvitationAsync(PlatformUser user, string token, CancellationToken cancellationToken)
     {
+        if (MailFails)
+        {
+            throw new InvalidOperationException("The mail server refused the message.");
+        }
+
         SentMail.Add(("invitation", user.Id, token));
         return Task.CompletedTask;
     }

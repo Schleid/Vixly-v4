@@ -31,12 +31,16 @@ public sealed class ListOperationsMemberActivityUseCase
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly IOperationsIdleTimesReader _idle;
+
     public ListOperationsMemberActivityUseCase(
         OperationsAccess access,
         IOperationsSessionRepository sessions,
         IOperationsUserRepository users,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IOperationsIdleTimesReader idle)
     {
+        _idle = idle ?? throw new ArgumentNullException(nameof(idle));
         _access = access ?? throw new ArgumentNullException(nameof(access));
         _sessions = sessions ?? throw new ArgumentNullException(nameof(sessions));
         _users = users ?? throw new ArgumentNullException(nameof(users));
@@ -69,15 +73,17 @@ public sealed class ListOperationsMemberActivityUseCase
         }
 
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();
-        return ListOperationsMemberActivityResponse.Success(items.Select(item => Line(item, names.GetValueOrDefault(item.UserId), utcNow)).ToList(), total);
+        TimeSpan idle = (await IdleTimesAsync(cancellationToken)).Staff;
+        return ListOperationsMemberActivityResponse.Success(items.Select(item => Line(item, names.GetValueOrDefault(item.UserId), utcNow, idle)).ToList(), total);
     }
 
     public const int PageSize = 50;
 
     // A session nobody ended stops at the first of its idle and absolute limits: shown as ended there, never as still signed in.
-    private static OperationsActivityLine Line(OperationsUserSession session, string? name, DateTimeOffset utcNow)
+    // The idle time is the company's (owner, 2026-10-27).
+    private static OperationsActivityLine Line(OperationsUserSession session, string? name, DateTimeOffset utcNow, TimeSpan idle)
     {
-        DateTimeOffset idleAt = session.LastSeenUtc + OperationsIdentityLimits.SessionIdleTimeout;
+        DateTimeOffset idleAt = session.LastSeenUtc + idle;
         (DateTimeOffset limit, string reason) = idleAt < session.ExpiresUtc ? (idleAt, "idle_timeout") : (session.ExpiresUtc, "absolute_lifetime");
         (DateTimeOffset? outUtc, string? ended) = session.EndedUtc is { } endedUtc
             ? (endedUtc, Snake(session.EndReason?.ToString() ?? nameof(OperationsSessionEndReason.SignedOut)))
@@ -91,4 +97,7 @@ public sealed class ListOperationsMemberActivityUseCase
 
     private static string Snake(string value) =>
         string.Concat(value.Select((letter, index) => index > 0 && char.IsUpper(letter) ? "_" + char.ToLowerInvariant(letter) : char.ToLowerInvariant(letter).ToString()));
+
+    private async Task<Vixly.Operations.Application.Identity.OperationsIdleTimes> IdleTimesAsync(CancellationToken cancellationToken) =>
+        await _idle.GetAsync(cancellationToken);
 }

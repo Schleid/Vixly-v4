@@ -21,4 +21,7 @@ public sealed record OperationsCustomerMail(OperationsCustomerMailKind Kind, str
 
     // Slice 6C: resource keys the mailer words in the customer's language.
     public IReadOnlyDictionary<string, string> Worded { get; init; } = new Dictionary<string, string>(StringComparer.Ordinal);
+
+    // Owner, 2026-10-28: a file sent with the email (the quote's PDF).
+    public (string Name, string ContentType, byte[] Content)? Attachment { get; init; }
 }

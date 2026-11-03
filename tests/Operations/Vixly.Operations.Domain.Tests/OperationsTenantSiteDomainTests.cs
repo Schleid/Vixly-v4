@@ -137,15 +137,29 @@ public sealed class OperationsTenantSiteDomainTests
         Assert.Equal(100, image.Content.Length);
     }
 
+    // Owner, 2026-10-29: a branch is a country, with an optional office in it and an optional legal identity there.
     [Fact]
-    public void Warehouse_KeepsTheCountryOfItsOwnAddress()
+    public void Branch_IsACountry_WithAnOptionalOfficeInIt_AndItsLegalIdentity()
     {
-        OperationsBranch haiti = OperationsBranch.Create(Tenant, Details("PAP", "Port-au-Prince", "HT"), OperationsBranchSide.Destination, Now);
-        OperationsWarehouse miami = OperationsWarehouse.Create(Tenant, haiti.Id, Details("FLL", "Fort Lauderdale", "us"), OperationsWarehouseRoles.Receiving, true, Now);
+        OperationsBranch haiti = OperationsBranch.Create(Tenant, new OperationsLocationDetails("HT", "Haiti", null, null, null, null, true), " ht ",
+            new OperationsBranchLegal(" Galeo Haïti SA ", "NIF 000-111", "Art. 12"), Now);
 
-        Assert.Equal("HT", haiti.Address.CountryCode);
-        Assert.Equal("US", miami.Address.CountryCode);
-        Assert.True(miami.IsPublic);
+        Assert.Equal("HT", haiti.CountryCode);
+        Assert.Null(haiti.Address);
+        Assert.False(haiti.IsPublic);
+        Assert.Equal(("Galeo Haïti SA", "NIF 000-111", "Art. 12"), (haiti.LegalName, haiti.TaxNumber, haiti.LegalNotes));
+
+        haiti.Update(Details("HT", "Haiti", "HT"), "HT", OperationsBranchLegal.None, OperationsLocationStatus.Active, Now);
+        Assert.Equal("HT", haiti.Address!.CountryCode);
+        Assert.True(haiti.IsPublic);
+        Assert.Null(haiti.LegalName);
+
+        Assert.Equal("ops.locations.address_outside_country",
+            Assert.Throws<DomainException>(() => haiti.Update(Details("HT", "Haiti", "US"), "HT", OperationsBranchLegal.None, OperationsLocationStatus.Active, Now)).Error.Code);
+        Assert.Equal("ops.locations.country_invalid",
+            Assert.Throws<DomainException>(() => OperationsBranch.Create(Tenant, Details("XX", "Nowhere", "HT"), null, OperationsBranchLegal.None, Now)).Error.Code);
+        Assert.Equal("ops.locations.legal_notes_too_long",
+            Assert.Throws<DomainException>(() => haiti.Update(Details("HT", "Haiti", "HT"), "HT", new OperationsBranchLegal(null, null, new string('x', 501)), OperationsLocationStatus.Active, Now)).Error.Code);
     }
 
     [Fact]

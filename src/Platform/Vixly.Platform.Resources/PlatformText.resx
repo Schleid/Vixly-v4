@@ -7945,7 +7945,7 @@ Open it in the console: {link}</value>
     <value>The change is rejected. The tenant has been told.</value>
   </data>
   <data name="ui.tenants.company_locked" xml:space="preserve">
-    <value>Legal details change only when the tenant sends a request with proof.</value>
+    <value>The company keeps its own profile from its workspace. Its legal name changes only when it sends a request with proof.</value>
   </data>
   <data name="ui.tenants.edit_settings" xml:space="preserve">
     <value>Edit settings</value>
@@ -8280,5 +8280,779 @@ If no one at {company} asked for this, contact us right away at {support}.</valu
   </data>
   <data name="ui.plans.feature.partner_agents" xml:space="preserve">
     <value>Partner agents</value>
+  </data>
+  <data name="ui.plans.feature.text_messages" xml:space="preserve">
+    <value>Notices by SMS and WhatsApp</value>
+  </data>
+  <data name="ui.plans.feature.quick_books_sync" xml:space="preserve">
+    <value>QuickBooks Online sync</value>
+  </data>
+  <data name="ui.plans.feature.tenant_api" xml:space="preserve">
+    <value>API and webhooks</value>
+  </data>
+  <data name="ui.plans.feature.carrier_data" xml:space="preserve">
+    <value>Carrier data (automatic dates)</value>
+  </data>
+  <data name="platform.payments.invoice_preparing" xml:space="preserve">
+    <value>Your invoice is being prepared. Try again in a few seconds.</value>
+  </data>
+  <data name="ui.stepup.intro_password" xml:space="preserve">
+    <value>Enter your password to continue.</value>
+  </data>
+  <data name="ui.stepup.password_label" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="ui.security.title" xml:space="preserve">
+    <value>Sign-in security</value>
+  </data>
+  <data name="ui.security.help" xml:space="preserve">
+    <value>Applies to everyone who signs in to Control.</value>
+  </data>
+  <data name="ui.security.require_mfa" xml:space="preserve">
+    <value>Require MFA (a second step at sign-in)</value>
+  </data>
+  <data name="ui.security.require_mfa_yes" xml:space="preserve">
+    <value>Everyone must set up an authenticator app or a passkey and use it at every sign-in.</value>
+  </data>
+  <data name="ui.security.require_mfa_no" xml:space="preserve">
+    <value>Nobody has to set one up. People without one sign in with their password and confirm sensitive actions with it; people who set one up keep using it.</value>
+  </data>
+  <data name="ui.security.updated" xml:space="preserve">
+    <value>Changed by {name}, {time}</value>
+  </data>
+  <data name="ui.security.superuser_only" xml:space="preserve">
+    <value>Only a SuperUser can change this.</value>
+  </data>
+  <data name="ui.security.saved" xml:space="preserve">
+    <value>Sign-in security saved.</value>
+  </data>
+  <data name="ui.audit.action.platform.security.require_mfa_changed" xml:space="preserve">
+    <value>Changed Require MFA</value>
+  </data>
+  <data name="ui.audit.target.PlatformSecuritySettings" xml:space="preserve">
+    <value>Sign-in security</value>
+  </data>
+  <data name="nav.help" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="ui.help.title" xml:space="preserve">
+    <value>Control help</value>
+  </data>
+  <data name="ui.help.summary" xml:space="preserve">
+    <value>Find guidance for your work in Vixly Control.</value>
+  </data>
+  <data name="ui.help.search" xml:space="preserve">
+    <value>Search help</value>
+  </data>
+  <data name="ui.help.search_go" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="ui.help.results" xml:space="preserve">
+    <value>Search results</value>
+  </data>
+  <data name="ui.help.clear" xml:space="preserve">
+    <value>Show all help</value>
+  </data>
+  <data name="ui.help.back" xml:space="preserve">
+    <value>Back to help</value>
+  </data>
+  <data name="ui.help.related" xml:space="preserve">
+    <value>Related articles</value>
+  </data>
+  <data name="ui.help.empty" xml:space="preserve">
+    <value>No articles match your search.</value>
+  </data>
+  <data name="ui.help.context" xml:space="preserve">
+    <value>Help for this page</value>
+  </data>
+  <data name="ui.help.not_found" xml:space="preserve">
+    <value>Page not found</value>
+  </data>
+  <data name="ui.help.section.getting-started" xml:space="preserve">
+    <value>Getting started</value>
+  </data>
+  <data name="ui.help.section.companies" xml:space="preserve">
+    <value>Companies</value>
+  </data>
+  <data name="ui.help.section.commercial" xml:space="preserve">
+    <value>Plans and subscriptions</value>
+  </data>
+  <data name="ui.help.section.billing-and-payments" xml:space="preserve">
+    <value>Billing and payments</value>
+  </data>
+  <data name="ui.help.section.licences-and-devices" xml:space="preserve">
+    <value>Licences and devices</value>
+  </data>
+  <data name="ui.help.section.legal" xml:space="preserve">
+    <value>Legal terms</value>
+  </data>
+  <data name="ui.help.section.team-and-security" xml:space="preserve">
+    <value>Team and security</value>
+  </data>
+  <data name="ui.help.section.settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="platform.users.invitation_saved_mail_failed" xml:space="preserve">
+    <value>The person was saved, but the invitation email could not be sent. Check the mail settings, then use Resend invitation on their page.</value>
+  </data>
+  <data name="platform.users.invitation_mail_failed" xml:space="preserve">
+    <value>The invitation email could not be sent. Check the mail settings and try again.</value>
+  </data>
+  <data name="ui.audit.action.platform.users.invitation_mail_failed" xml:space="preserve">
+    <value>Invitation email not sent</value>
+  </data>
+  <data name="ui.permission.platform.jobs.view" xml:space="preserve">
+    <value>View background jobs and their runs</value>
+  </data>
+  <data name="ui.permission_area.jobs" xml:space="preserve">
+    <value>Background jobs</value>
+  </data>
+  <data name="ui.jobs.title" xml:space="preserve">
+    <value>Jobs</value>
+  </data>
+  <data name="ui.jobs.intro" xml:space="preserve">
+    <value>Control runs these jobs every hour. Each run is kept 90 days. A failed step does not stop the next ones.</value>
+  </data>
+  <data name="ui.jobs.latest" xml:space="preserve">
+    <value>Latest run of each job</value>
+  </data>
+  <data name="ui.jobs.history" xml:space="preserve">
+    <value>Run history</value>
+  </data>
+  <data name="ui.jobs.job" xml:space="preserve">
+    <value>Job</value>
+  </data>
+  <data name="ui.jobs.last_run" xml:space="preserve">
+    <value>Last run</value>
+  </data>
+  <data name="ui.jobs.last_success" xml:space="preserve">
+    <value>Last success</value>
+  </data>
+  <data name="ui.jobs.failed_recently" xml:space="preserve">
+    <value>Failures, last 24 hours</value>
+  </data>
+  <data name="ui.jobs.outcome" xml:space="preserve">
+    <value>Outcome</value>
+  </data>
+  <data name="ui.jobs.started" xml:space="preserve">
+    <value>Started</value>
+  </data>
+  <data name="ui.jobs.duration" xml:space="preserve">
+    <value>Duration</value>
+  </data>
+  <data name="ui.jobs.handled" xml:space="preserve">
+    <value>Items handled</value>
+  </data>
+  <data name="ui.jobs.never" xml:space="preserve">
+    <value>Never ran</value>
+  </data>
+  <data name="ui.jobs.succeeded" xml:space="preserve">
+    <value>Succeeded</value>
+  </data>
+  <data name="ui.jobs.failed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="ui.jobs.unfinished" xml:space="preserve">
+    <value>Not finished</value>
+  </data>
+  <data name="ui.jobs.seconds" xml:space="preserve">
+    <value>{seconds} s</value>
+  </data>
+  <data name="ui.jobs.count" xml:space="preserve">
+    <value>{count} runs</value>
+  </data>
+  <data name="ui.jobs.empty" xml:space="preserve">
+    <value>No runs yet.</value>
+  </data>
+  <data name="ui.jobs.all_jobs" xml:space="preserve">
+    <value>All jobs</value>
+  </data>
+  <data name="ui.jobs.all_runs" xml:space="preserve">
+    <value>All runs</value>
+  </data>
+  <data name="ui.jobs.failures_only" xml:space="preserve">
+    <value>Failures only</value>
+  </data>
+  <data name="ui.jobs.job.subscriptions" xml:space="preserve">
+    <value>Subscriptions: trials, renewals and changes due</value>
+  </data>
+  <data name="ui.jobs.job.billing" xml:space="preserve">
+    <value>Billing: invoices past due</value>
+  </data>
+  <data name="ui.jobs.job.payments" xml:space="preserve">
+    <value>Card payments: automatic charges and refunds</value>
+  </data>
+  <data name="ui.jobs.job.collections" xml:space="preserve">
+    <value>Collections: reminders, retries and blocks</value>
+  </data>
+  <data name="ui.jobs.job.licensing" xml:space="preserve">
+    <value>Licensing: device requests that ran out</value>
+  </data>
+  <data name="ui.jobs.job.legal" xml:space="preserve">
+    <value>Terms: notices and reminders</value>
+  </data>
+  <data name="ui.jobs.job.event_feed" xml:space="preserve">
+    <value>Event feed: old events removed</value>
+  </data>
+  <data name="ui.jobs.job.leads" xml:space="preserve">
+    <value>Contact requests: closed ones removed after 24 months</value>
+  </data>
+  <data name="ui.jobs.job.sign_in_cleanup" xml:space="preserve">
+    <value>Sign-in clean-up</value>
+  </data>
+  <data name="ui.jobs.job.job_run_cleanup" xml:space="preserve">
+    <value>Job history clean-up</value>
+  </data>
+  <data name="platform.maintenance.times_invalid" xml:space="preserve">
+    <value>The end must be after the start, and the start must be now or later, within a year.</value>
+  </data>
+  <data name="platform.maintenance.too_long" xml:space="preserve">
+    <value>A maintenance window lasts at most 7 days.</value>
+  </data>
+  <data name="platform.maintenance.sites_required" xml:space="preserve">
+    <value>Choose at least one site.</value>
+  </data>
+  <data name="platform.maintenance.notice_invalid" xml:space="preserve">
+    <value>The advance notice is 0 to 168 hours.</value>
+  </data>
+  <data name="platform.maintenance.message_too_long" xml:space="preserve">
+    <value>A message has at most 500 characters.</value>
+  </data>
+  <data name="platform.maintenance.already_over" xml:space="preserve">
+    <value>This maintenance window is already over or cancelled.</value>
+  </data>
+  <data name="platform.maintenance.window_not_found" xml:space="preserve">
+    <value>This maintenance window was not found.</value>
+  </data>
+  <data name="ui.permission.platform.maintenance.view" xml:space="preserve">
+    <value>View maintenance windows</value>
+  </data>
+  <data name="ui.permission.platform.maintenance.manage" xml:space="preserve">
+    <value>Publish, cancel and end maintenance windows</value>
+  </data>
+  <data name="ui.permission_area.maintenance" xml:space="preserve">
+    <value>Maintenance</value>
+  </data>
+  <data name="ui.audit.action.platform.maintenance.scheduled" xml:space="preserve">
+    <value>Maintenance published</value>
+  </data>
+  <data name="ui.audit.action.platform.maintenance.stopped" xml:space="preserve">
+    <value>Maintenance cancelled or ended</value>
+  </data>
+  <data name="ui.maintenance.title" xml:space="preserve">
+    <value>Maintenance</value>
+  </data>
+  <data name="ui.maintenance.intro" xml:space="preserve">
+    <value>Publish when the sites close for maintenance. They show a notice before and a maintenance page during the window. Control itself never closes.</value>
+  </data>
+  <data name="ui.maintenance.open" xml:space="preserve">
+    <value>Coming and running</value>
+  </data>
+  <data name="ui.maintenance.past" xml:space="preserve">
+    <value>Past windows</value>
+  </data>
+  <data name="ui.maintenance.starts" xml:space="preserve">
+    <value>Starts</value>
+  </data>
+  <data name="ui.maintenance.ends" xml:space="preserve">
+    <value>Ends</value>
+  </data>
+  <data name="ui.maintenance.starts_utc" xml:space="preserve">
+    <value>Starts (UTC)</value>
+  </data>
+  <data name="ui.maintenance.ends_utc" xml:space="preserve">
+    <value>Ends (UTC)</value>
+  </data>
+  <data name="ui.maintenance.sites" xml:space="preserve">
+    <value>Sites closed</value>
+  </data>
+  <data name="ui.maintenance.site.public" xml:space="preserve">
+    <value>Public site</value>
+  </data>
+  <data name="ui.maintenance.site.companies" xml:space="preserve">
+    <value>Company websites</value>
+  </data>
+  <data name="ui.maintenance.site.customers" xml:space="preserve">
+    <value>Customer portals</value>
+  </data>
+  <data name="ui.maintenance.site.staff" xml:space="preserve">
+    <value>Staff workspaces</value>
+  </data>
+  <data name="ui.maintenance.control_stays_open" xml:space="preserve">
+    <value>Control stays open, so you can end the window at any time.</value>
+  </data>
+  <data name="ui.maintenance.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.maintenance.status.scheduled" xml:space="preserve">
+    <value>Scheduled</value>
+  </data>
+  <data name="ui.maintenance.status.announced" xml:space="preserve">
+    <value>Announced</value>
+  </data>
+  <data name="ui.maintenance.status.running" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="ui.maintenance.status.finished" xml:space="preserve">
+    <value>Finished</value>
+  </data>
+  <data name="ui.maintenance.status.cancelled" xml:space="preserve">
+    <value>Cancelled</value>
+  </data>
+  <data name="ui.maintenance.ended_early" xml:space="preserve">
+    <value>Ended early</value>
+  </data>
+  <data name="ui.maintenance.message" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="ui.maintenance.message_en" xml:space="preserve">
+    <value>Message in English</value>
+  </data>
+  <data name="ui.maintenance.message_fr" xml:space="preserve">
+    <value>Message in French</value>
+  </data>
+  <data name="ui.maintenance.message_es" xml:space="preserve">
+    <value>Message in Spanish</value>
+  </data>
+  <data name="ui.maintenance.message_help" xml:space="preserve">
+    <value>Optional. Shown on company sites and portals too: do not write "Vixly" there.</value>
+  </data>
+  <data name="ui.maintenance.notice_hours" xml:space="preserve">
+    <value>Advance notice (hours)</value>
+  </data>
+  <data name="ui.maintenance.notice_hours_help" xml:space="preserve">
+    <value>The sites show a notice banner this many hours before the start.</value>
+  </data>
+  <data name="ui.maintenance.new" xml:space="preserve">
+    <value>Publish a maintenance window</value>
+  </data>
+  <data name="ui.maintenance.publish" xml:space="preserve">
+    <value>Publish</value>
+  </data>
+  <data name="ui.maintenance.cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="ui.maintenance.end_now" xml:space="preserve">
+    <value>End now</value>
+  </data>
+  <data name="ui.maintenance.actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="ui.maintenance.scheduled" xml:space="preserve">
+    <value>The maintenance window is published.</value>
+  </data>
+  <data name="ui.maintenance.stopped" xml:space="preserve">
+    <value>The maintenance window is cancelled or ended.</value>
+  </data>
+  <data name="ui.maintenance.pass_intro" xml:space="preserve">
+    <value>To get through during the window, open this address on any site it closes:</value>
+  </data>
+  <data name="ui.maintenance.pass_once" xml:space="preserve">
+    <value>Copy it now: it is shown only once.</value>
+  </data>
+  <data name="ui.maintenance.none_open" xml:space="preserve">
+    <value>No maintenance is planned.</value>
+  </data>
+  <data name="ui.maintenance.none_past" xml:space="preserve">
+    <value>No past maintenance.</value>
+  </data>
+  <data name="email.layout.button" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="email.layout.copy_link" xml:space="preserve">
+    <value>If the button does not work, copy this link into your browser:</value>
+  </data>
+  <data name="email.layout.footer_support" xml:space="preserve">
+    <value>Questions? Write to {support}.</value>
+  </data>
+  <data name="email.layout.footer_company" xml:space="preserve">
+    <value>Vixly · Tech Crafters LLC · 501 N Dixie Hwy, Suite 3004, Hallandale Beach, FL 33009, USA</value>
+  </data>
+  <data name="email.invitation.button" xml:space="preserve">
+    <value>Choose my password</value>
+  </data>
+  <data name="email.registration.button" xml:space="preserve">
+    <value>Confirm my email</value>
+  </data>
+  <data name="email.reset.button" xml:space="preserve">
+    <value>Choose a new password</value>
+  </data>
+  <data name="email.save_card.button" xml:space="preserve">
+    <value>Save my card</value>
+  </data>
+  <data name="email.card_failed.button" xml:space="preserve">
+    <value>Pay the invoice</value>
+  </data>
+  <data name="email.card_action_required.button" xml:space="preserve">
+    <value>Confirm the payment</value>
+  </data>
+  <data name="email.licensing.first_device.button" xml:space="preserve">
+    <value>Set up this device</value>
+  </data>
+  <data name="email.licensing.recovery.button" xml:space="preserve">
+    <value>Continue the recovery</value>
+  </data>
+  <data name="email.licensing.second_factor_link.button" xml:space="preserve">
+    <value>Set up my authenticator</value>
+  </data>
+  <data name="email.licensing.welcome.button" xml:space="preserve">
+    <value>Open the staff sign-in</value>
+  </data>
+  <data name="email.legal.published.button" xml:space="preserve">
+    <value>Read and accept</value>
+  </data>
+  <data name="email.legal.reminder.button" xml:space="preserve">
+    <value>Read and accept</value>
+  </data>
+  <data name="email.legal.overdue.button" xml:space="preserve">
+    <value>Accept now</value>
+  </data>
+  <data name="email.legal.notice.button" xml:space="preserve">
+    <value>Read the terms</value>
+  </data>
+  <data name="platform.tenant_changes.legal_name_needs_request" xml:space="preserve">
+    <value>The legal name changes only through a request with proof.</value>
+  </data>
+  <data name="ui.audit.action.platform.tenants.company_profile_updated" xml:space="preserve">
+    <value>Company profile updated by the company</value>
+  </data>
+  <data name="ui.session.idle_warning" xml:space="preserve">
+    <value>You will be signed out soon because nothing happened for a while.</value>
+  </data>
+  <data name="ui.session.time_left" xml:space="preserve">
+    <value>Time left:</value>
+  </data>
+  <data name="ui.session.stay" xml:space="preserve">
+    <value>Stay signed in</value>
+  </data>
+  <data name="ui.session.signed_out_idle" xml:space="preserve">
+    <value>You were signed out after 5 minutes without activity. Sign in again to continue.</value>
+  </data>
+  <data name="platform.identity.idle_invalid" xml:space="preserve">
+    <value>Sign-out after inactivity must be between {min} and {max} minutes.</value>
+  </data>
+  <data name="platform.identity.idle_warn_invalid" xml:space="preserve">
+    <value>The warning must come {min} to {max} minutes before the sign-out.</value>
+  </data>
+  <data name="ui.audit.action.platform.security.idle_changed" xml:space="preserve">
+    <value>Inactivity sign-out changed</value>
+  </data>
+  <data name="ui.security.idle" xml:space="preserve">
+    <value>Sign-out after inactivity</value>
+  </data>
+  <data name="ui.security.idle_minutes" xml:space="preserve">
+    <value>Sign out after (minutes, 5 to 30)</value>
+  </data>
+  <data name="ui.security.idle_warn" xml:space="preserve">
+    <value>Warn before (minutes, 1 to 5)</value>
+  </data>
+  <data name="ui.security.idle_save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ui.security.idle_hint" xml:space="preserve">
+    <value>Control staff who do nothing for this long are signed out; a warning with a countdown comes first. A change applies within a minute.</value>
+  </data>
+  <data name="ui.security.idle_admin_only" xml:space="preserve">
+    <value>Only the security administrator changes these times.</value>
+  </data>
+  <data name="ui.billing_settings.logo_profile_first" xml:space="preserve">
+    <value>Save the company profile first, then add the logo here.</value>
+  </data>
+  <data name="ui.billing_settings.logo_upload" xml:space="preserve">
+    <value>Upload a logo</value>
+  </data>
+  <data name="ui.billing_settings.logo_replace" xml:space="preserve">
+    <value>Replace the logo</value>
+  </data>
+  <data name="ui.billing_settings.logo_remove" xml:space="preserve">
+    <value>Remove the logo</value>
+  </data>
+  <data name="ui.billing_settings.logo_removed" xml:space="preserve">
+    <value>Logo removed. Documents show the company name.</value>
+  </data>
+  <data name="ui.jobs.job.edge_sync" xml:space="preserve">
+    <value>Maintenance sent to Cloudflare</value>
+  </data>
+  <data name="ui.maintenance.pass_staff" xml:space="preserve">
+    <value>For a staff workspace, open it under /staff:</value>
+  </data>
+  <data name="ui.plans.limit.max_shipments_per_month" xml:space="preserve">
+    <value>Shipments per month</value>
+  </data>
+  <data name="ui.plans.extra_shipment_price" xml:space="preserve">
+    <value>Price per extra shipment</value>
+  </data>
+  <data name="ui.plans.shipments_hint" xml:space="preserve">
+    <value>0 means no cap. Above the cap each shipment is charged at this price on the next invoice; above 150% new shipments stop until the company upgrades (once per company, the first month is not stopped).</value>
+  </data>
+  <data name="ui.plans.shipments_cap" xml:space="preserve">
+    <value>{count} a month, then {price} each</value>
+  </data>
+  <data name="ui.plans.no_cap" xml:space="preserve">
+    <value>No cap</value>
+  </data>
+  <data name="ui.subscriptions.shipments_used" xml:space="preserve">
+    <value>{count} shipments in {month}</value>
+  </data>
+  <data name="ui.subscription_history.shipments_charged" xml:space="preserve">
+    <value>Extra shipments charged for {month}: {extra}, {amount} {currency}</value>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.shipments_charged" xml:space="preserve">
+    <value>Extra shipments charged</value>
+  </data>
+  <data name="platform.subscriptions.usage_month_invalid" xml:space="preserve">
+    <value>The month must look like 2026-10.</value>
+  </data>
+  <data name="platform.subscriptions.usage_count_invalid" xml:space="preserve">
+    <value>The number of shipments is not valid.</value>
+  </data>
+  <data name="platform.subscriptions.usage_already_charged" xml:space="preserve">
+    <value>This month was already charged.</value>
+  </data>
+  <data name="ui.plans.feature.customer_portal" xml:space="preserve">
+    <value>Customer portal and mailbox</value>
+  </data>
+  <data name="ui.plans.feature.insurance" xml:space="preserve">
+    <value>Insurance</value>
+  </data>
+  <data name="ui.plans.feature.credit_accounts" xml:space="preserve">
+    <value>Customer credit accounts</value>
+  </data>
+  <data name="ui.plans.feature.supplies" xml:space="preserve">
+    <value>Supplies and stock</value>
+  </data>
+  <data name="ui.plans.feature.home_delivery" xml:space="preserve">
+    <value>Home delivery and drivers</value>
+  </data>
+  <data name="ui.plans.feature.support_desk" xml:space="preserve">
+    <value>Support agents and ticket desk</value>
+  </data>
+  <data name="ui.plans.feature.payables" xml:space="preserve">
+    <value>Bills and profit per shipment</value>
+  </data>
+  <data name="ui.subscriptions.shipments" xml:space="preserve">
+    <value>Shipments (month)</value>
+  </data>
+  <data name="ui.payments.method.bank_debit" xml:space="preserve">
+    <value>Bank account (ACH)</value>
+  </data>
+  <data name="platform.payments.checkout_setting_invalid" xml:space="preserve">
+    <value>Check the checkout page settings: images need an https address, colours look like #1A2B3C, the name is at most 100 characters.</value>
+  </data>
+  <data name="platform.payments.statement_suffix_invalid" xml:space="preserve">
+    <value>The statement wording uses letters, digits, spaces, dots and dashes only, with at least one letter; the prefix has 2 to 20 characters and the whole line at most 22.</value>
+  </data>
+  <data name="email.receipt.statement" xml:space="preserve">
+    <value>This payment appears on your card statement as {wording}.</value>
+  </data>
+  <data name="ui.payments_settings.checkout" xml:space="preserve">
+    <value>Checkout page and bank statement</value>
+  </data>
+  <data name="ui.payments_settings.checkout_help" xml:space="preserve">
+    <value>How the card provider's checkout page looks for these payments, and how charges read on statements. Empty fields keep the provider dashboard's branding.</value>
+  </data>
+  <data name="ui.payments_settings.checkout_name" xml:space="preserve">
+    <value>Name shown on the checkout page</value>
+  </data>
+  <data name="ui.payments_settings.checkout_logo" xml:space="preserve">
+    <value>Logo address</value>
+  </data>
+  <data name="ui.payments_settings.checkout_icon" xml:space="preserve">
+    <value>Icon address</value>
+  </data>
+  <data name="ui.payments_settings.checkout_image_help" xml:space="preserve">
+    <value>Absolute https addresses of PNG or JPG images the provider downloads.</value>
+  </data>
+  <data name="ui.payments_settings.checkout_background" xml:space="preserve">
+    <value>Background colour</value>
+  </data>
+  <data name="ui.payments_settings.checkout_button" xml:space="preserve">
+    <value>Button colour</value>
+  </data>
+  <data name="ui.payments_settings.checkout_color_help" xml:space="preserve">
+    <value>Six-digit hex colours, for example #1A2B3C.</value>
+  </data>
+  <data name="ui.payments_settings.statement_prefix" xml:space="preserve">
+    <value>Statement prefix (set at the provider)</value>
+  </data>
+  <data name="ui.payments_settings.statement_prefix_help" xml:space="preserve">
+    <value>The account's shortened descriptor in the provider dashboard, for example TECHCRAFT (2 to 10 characters). Used only to tell customers how the charge reads.</value>
+  </data>
+  <data name="ui.payments_settings.statement_suffix" xml:space="preserve">
+    <value>Statement suffix</value>
+  </data>
+  <data name="ui.payments_settings.statement_suffix_help" xml:space="preserve">
+    <value>Added to every card charge, for example VIXLY.</value>
+  </data>
+  <data name="ui.payments_settings.statement_wording" xml:space="preserve">
+    <value>Card statements read</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.checkout_settings_updated" xml:space="preserve">
+    <value>Checkout page and statement settings changed</value>
+  </data>
+  <data name="ui.audit.action.platform.payments.bank_payment_processing" xml:space="preserve">
+    <value>Bank account payment started</value>
+  </data>
+  <data name="email.renewal_reminder.subject" xml:space="preserve">
+    <value>Your {plan} subscription renews in 7 days</value>
+  </data>
+  <data name="email.renewal_reminder.body" xml:space="preserve">
+    <value>Hello {name},
+
+The annual {plan} subscription of {company} renews on {date}. We will charge the saved {brand} card ending in {last4}.
+
+To change the card or stop the renewal, contact us at {support} before that date.
+
+Vixly</value>
+  </data>
+  <data name="email.renewal_reminder.statement" xml:space="preserve">
+    <value>The charge will appear on your card statement as {wording}.</value>
+  </data>
+  <data name="ui.jobs.job.sales_feed" xml:space="preserve">
+    <value>Sales feed to TechOS</value>
+  </data>
+  <data name="ui.jobs.job.renewal_reminders" xml:space="preserve">
+    <value>Renewal reminders</value>
+  </data>
+  <data name="ui.sales_feed.title" xml:space="preserve">
+    <value>Sales feed</value>
+  </data>
+  <data name="ui.sales_feed.intro" xml:space="preserve">
+    <value>Every Vixly sale is sent to TechOS as a signed event: invoices, payments, reversals, credits, subscription changes and daily totals.</value>
+  </data>
+  <data name="ui.sales_feed.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="ui.sales_feed.configured" xml:space="preserve">
+    <value>Sending</value>
+  </data>
+  <data name="ui.sales_feed.on" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="ui.sales_feed.off" xml:space="preserve">
+    <value>Off: address or secret not set on this server (events wait)</value>
+  </data>
+  <data name="ui.sales_feed.stopped" xml:space="preserve">
+    <value>Stopped by TechOS's answer</value>
+  </data>
+  <data name="ui.sales_feed.last_success" xml:space="preserve">
+    <value>Last answer from TechOS</value>
+  </data>
+  <data name="ui.sales_feed.failing_since" xml:space="preserve">
+    <value>Failing since</value>
+  </data>
+  <data name="ui.sales_feed.next_attempt" xml:space="preserve">
+    <value>Next attempt</value>
+  </data>
+  <data name="ui.sales_feed.pending" xml:space="preserve">
+    <value>Waiting to be sent</value>
+  </data>
+  <data name="ui.sales_feed.parked" xml:space="preserve">
+    <value>Rejected by TechOS</value>
+  </data>
+  <data name="ui.sales_feed.sent" xml:space="preserve">
+    <value>Received by TechOS</value>
+  </data>
+  <data name="ui.sales_feed.retry" xml:space="preserve">
+    <value>Try again now</value>
+  </data>
+  <data name="ui.sales_feed.retried" xml:space="preserve">
+    <value>The feed starts again at its next run.</value>
+  </data>
+  <data name="ui.sales_feed.parked_title" xml:space="preserve">
+    <value>Rejected events</value>
+  </data>
+  <data name="ui.sales_feed.parked_help" xml:space="preserve">
+    <value>TechOS refused these events; the others were sent normally. Fix the cause, then send them again unchanged. When the event itself was incomplete, use Correct and send: Vixly writes it again from its records under a new number and the rejected one is kept as replaced.</value>
+  </data>
+  <data name="ui.sales_feed.sequence" xml:space="preserve">
+    <value>No.</value>
+  </data>
+  <data name="ui.sales_feed.type" xml:space="preserve">
+    <value>Event</value>
+  </data>
+  <data name="ui.sales_feed.occurred" xml:space="preserve">
+    <value>Happened</value>
+  </data>
+  <data name="ui.sales_feed.error" xml:space="preserve">
+    <value>TechOS's error</value>
+  </data>
+  <data name="ui.sales_feed.answered" xml:space="preserve">
+    <value>Answered</value>
+  </data>
+  <data name="ui.sales_feed.send_again" xml:space="preserve">
+    <value>Send again</value>
+  </data>
+  <data name="ui.sales_feed.sent_again" xml:space="preserve">
+    <value>The event will be sent again at the next run.</value>
+  </data>
+  <data name="platform.sales_feed.event_not_found" xml:space="preserve">
+    <value>This event no longer exists.</value>
+  </data>
+  <data name="platform.sales_feed.not_parked" xml:space="preserve">
+    <value>Only rejected events can be sent again.</value>
+  </data>
+  <data name="platform.sales_feed.event_invalid" xml:space="preserve">
+    <value>The sale event is not valid.</value>
+  </data>
+  <data name="ui.audit.action.platform.sales_feed.event_sent_again" xml:space="preserve">
+    <value>Sales feed event sent again</value>
+  </data>
+  <data name="ui.audit.action.platform.sales_feed.retried" xml:space="preserve">
+    <value>Sales feed started again</value>
+  </data>
+  <data name="email.sales_feed.subject.parked" xml:space="preserve">
+    <value>Sales feed: TechOS rejected events</value>
+  </data>
+  <data name="email.sales_feed.subject.stopped" xml:space="preserve">
+    <value>Sales feed stopped: check the TechOS settings</value>
+  </data>
+  <data name="email.sales_feed.subject.no_answer" xml:space="preserve">
+    <value>Sales feed: no answer from TechOS for 24 hours</value>
+  </data>
+  <data name="email.sales_feed.body.parked" xml:space="preserve">
+    <value>Hello {name},
+
+TechOS rejected {count} sale event(s) ({code}). The other events were sent normally.
+
+See TechOS's error and send them again: {link}</value>
+  </data>
+  <data name="email.sales_feed.body.stopped" xml:space="preserve">
+    <value>Hello {name},
+
+TechOS refused the sales feed ({code}): the address, the secret or the source name is wrong. Sending has stopped; {count} event(s) are kept and wait.
+
+Fix the PlatformSales__TechOs__Url or PlatformSales__TechOs__Secret environment variable, then press Try again now: {link}</value>
+  </data>
+  <data name="email.sales_feed.body.no_answer" xml:space="preserve">
+    <value>Hello {name},
+
+TechOS has not taken the sales feed for 24 hours (last answer: {code}). {count} event(s) wait; sending goes on with pauses.
+
+Details: {link}</value>
+  </data>
+  <data name="ui.sales_feed.setting.url_missing" xml:space="preserve">
+    <value>PlatformSales__TechOs__Url is not set in this site's application pool.</value>
+  </data>
+  <data name="ui.sales_feed.setting.url_not_https" xml:space="preserve">
+    <value>PlatformSales__TechOs__Url must be a full address starting with https://.</value>
+  </data>
+  <data name="ui.sales_feed.setting.url_no_path" xml:space="preserve">
+    <value>PlatformSales__TechOs__Url is only the site: it must be TechOS's full event address, for example https://techcrafters.ltd/api/sales-sources/vixly/events.</value>
+  </data>
+  <data name="ui.sales_feed.setting.secret_missing" xml:space="preserve">
+    <value>PlatformSales__TechOs__Secret is not set in this site's application pool.</value>
+  </data>
+  <data name="ui.sales_feed.setting.source_missing" xml:space="preserve">
+    <value>PlatformSales:TechOs:Source is missing: this server's appsettings.json predates the sales feed. Copy the new appsettings.json or set PlatformSales__TechOs__Source to vixly.</value>
+  </data>
+  <data name="ui.sales_feed.rebuild" xml:space="preserve">
+    <value>Correct and send</value>
+  </data>
+  <data name="ui.sales_feed.rebuilt" xml:space="preserve">
+    <value>The event was written again from Vixly's records and will be sent at the next run.</value>
+  </data>
+  <data name="platform.sales_feed.rebuild_not_possible" xml:space="preserve">
+    <value>This event cannot be written again: its record no longer exists, or it is a daily total.</value>
   </data>
 </root>

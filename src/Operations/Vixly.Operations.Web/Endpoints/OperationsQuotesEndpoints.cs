@@ -38,7 +38,8 @@ public static class OperationsQuotesEndpoints
 
         staff.MapGet("/quotes", async (HttpContext http, string? done, string? number, PriceOperationsShipmentUseCase price, ListOperationsQuotesUseCase list,
             GetOperationsSignInBrandUseCase brand, OperationsErrorText errors, IStringLocalizer<OperationsText> text) =>
-            await QuotesAsync(http, new OperationsQuoteForm(), null, done == "saved" && number is { Length: <= 20 } ? Vixly.Shared.Localization.VixlyText.Format(text, "ui.quotes.done.saved", "number", number) : null,
+            await QuotesAsync(http, new OperationsQuoteForm(), null, number is { Length: <= 20 } && done is "saved" or "emailed"
+                ? Vixly.Shared.Localization.VixlyText.Format(text, "ui.quotes.done." + done, "number", number) : null,
                 price, list, brand, errors, rate: false));
 
         // The quotes list with statuses (owner, 2026-10-20).
@@ -71,7 +72,9 @@ public static class OperationsQuotesEndpoints
                 UtcNow = response.UtcNow,
                 Denied = !response.Succeeded,
                 Error = errors.Describe(response.Error),
-                Info = done == "withdrawn" ? text["ui.quotes.done.withdrawn"].Value : null
+                Info = done == "withdrawn" ? text["ui.quotes.done.withdrawn"].Value
+                    : done == "emailed" ? Vixly.Shared.Localization.VixlyText.Format(text, "ui.quotes.done.emailed", "number", http.Request.Query["number"].ToString() is { Length: > 0 and <= 20 } shown ? shown : string.Empty)
+                    : null
             });
         });
 
@@ -105,6 +108,35 @@ public static class OperationsQuotesEndpoints
             return response.Succeeded
                 ? Results.Redirect("/staff/quotes?done=saved&number=" + Uri.EscapeDataString(response.Number))
                 : await QuotesAsync(http, form, response.Error, null, price, list, brand, errors, rate: true);
+        });
+
+        // Owner, 2026-10-28: the quote's PDF in the customer's language, to print; and emailed to the customer with the PDF.
+        staff.MapGet("/quotes/{quoteId:guid}/pdf", async (HttpContext http, Guid quoteId,
+            Vixly.Operations.Application.UseCases.Charges.GetOperationsQuoteDocument.GetOperationsQuoteDocumentUseCase get) =>
+        {
+            Vixly.Operations.Application.UseCases.Charges.GetOperationsQuoteDocument.GetOperationsQuoteDocumentResponse response = await get.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Charges.GetOperationsQuoteDocument.GetOperationsQuoteDocumentRequest { QuoteId = quoteId }, http.RequestAborted);
+
+            if (!response.Succeeded)
+            {
+                return Results.NotFound();
+            }
+
+            http.Response.Headers.CacheControl = "private, no-store";
+            http.Response.Headers.XContentTypeOptions = "nosniff";
+            http.Response.Headers.ContentDisposition = "inline; filename=\"" + response.FileName + "\"";
+            return Results.File(response.Content, "application/pdf");
+        });
+
+        staff.MapPost("/quotes/{quoteId:guid}/email", async (HttpContext http, Guid quoteId, [FromForm] string? from,
+            Vixly.Operations.Application.UseCases.Charges.EmailOperationsQuote.EmailOperationsQuoteUseCase email, PriceOperationsShipmentUseCase price,
+            ListOperationsQuotesUseCase list, GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
+        {
+            Vixly.Operations.Application.UseCases.Charges.EmailOperationsQuote.EmailOperationsQuoteResponse response = await email.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Charges.EmailOperationsQuote.EmailOperationsQuoteRequest { QuoteId = quoteId }, http.RequestAborted);
+            return response.Succeeded
+                ? Results.Redirect((from == "list" ? "/staff/quotes/list?done=emailed&number=" : "/staff/quotes?done=emailed&number=") + Uri.EscapeDataString(response.Number))
+                : await QuotesAsync(http, new OperationsQuoteForm(), response.Error, null, price, list, brand, errors, rate: false);
         });
 
         staff.MapPost("/quotes/{quoteId:guid}/withdraw", async (HttpContext http, Guid quoteId, [FromForm] string? from, WithdrawOperationsQuoteUseCase withdraw, PriceOperationsShipmentUseCase price,

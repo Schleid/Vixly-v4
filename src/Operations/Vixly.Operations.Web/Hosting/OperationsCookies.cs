@@ -26,6 +26,9 @@ public static class OperationsCookies
     // Slice 5F step 3: a customer screen's own secret (kept 400 days, the most a browser keeps a cookie).
     public const string Screen = "__Host-vx4-screen";
 
+    // Slice 12A: this device starts at the badge screen (set by the first badge or PIN sign-in, kept 400 days).
+    public const string Quick = "__Host-vx4-quick";
+
     // Between the password and the second factor (5 minutes).
     public const string SignIn = "__Host-vx4-ops-signin";
 

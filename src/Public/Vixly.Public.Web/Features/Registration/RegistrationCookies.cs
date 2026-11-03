@@ -21,6 +21,9 @@ public static class RegistrationCookies
 
     public const string Offer = "__Host-vx4-offer";
 
+    // The plan picked on the plans page, kept until the plan step (a code only, checked by Platform there).
+    public const string Plan = "__Host-vx4-plan";
+
     public static string? Read(HttpContext? http, string name)
     {
         string? value = http?.Request.Cookies[name];

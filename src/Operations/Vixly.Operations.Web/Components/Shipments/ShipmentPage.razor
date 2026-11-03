@@ -55,6 +55,11 @@ IMPORTANT NOTES:
             {
                 <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.parcel_count"]</dt><dd>@VixlyText.Format(T, "ui.shipments_desk.parcels_of", new Dictionary<string, object> { ["entered"] = Parcels.Count, ["count"] = declared })</dd></div>
             }
+            @if (Shipment.IsBooked)
+            {
+                @* Owner, 2026-10-28: given once paid, charged to the account or collect. *@
+                <div class="ops-fact-cell"><dt>@T["ui.tracking_number"]</dt><dd class="ops-editor__code">@(Shipment.TrackingNumber is { } tracking ? Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.Format(tracking) : T["ui.tracking_number.after_payment"].Value)</dd></div>
+            }
             @if (Shipment.BookedTotal is { } total)
             {
                 <div class="ops-fact-cell"><dt>@T["ui.shipments_desk.amount_final"]</dt><dd class="ops-editor__number">@total.ToString("N2", System.Globalization.CultureInfo.CurrentCulture) @Shipment.BookedCurrencyCode</dd></div>
@@ -81,6 +86,10 @@ IMPORTANT NOTES:
         }
         else
         {
+            @* Owner, 2026-10-27: every label of the shipment at once; each line keeps its own. *@
+            <ShipmentLabelsBar ShipmentId="Shipment.Id" Back="shipment" ParcelCount="Parcels.Count" ClearedCount="@Parcels.Count(row => row.Cleared)"
+                ShippingOffered="@(Shipment.TrackingNumber is not null && Parcels.Any(row => row.Cleared))"
+                ShippingWaitsForPayment="@(Shipment.IsBooked && Shipment.TrackingNumber is null)" Printers="Printers" />
             <OperationsTableViewport Label="@T["ui.shipments_desk.parcels"]">
                 <table class="ops-editor__table">
                     <thead><tr><th scope="col">@T["ui.shipments_desk.number"]</th><th scope="col">@T["ui.shipments_desk.contents"]</th><th scope="col">@T["ui.shipments_desk.weight"]</th><th scope="col">@T["ui.shipments_desk.chargeable"]</th><th scope="col">@T["ui.shipments_desk.stage"]</th><th scope="col">@T["ui.shipments_desk.label"]</th></tr></thead>
@@ -93,7 +102,18 @@ IMPORTANT NOTES:
                                 <td>@Weight(row.Parcel.WeightKg)</td>
                                 <td>@Weight(row.ChargeableKg)</td>
                                 <td>@(row.Parcel.Milestone is { } milestone ? T["ui.milestone." + milestone].Value : null)@(row.Cleared ? " · " + T["ui.shipments_desk.cleared"].Value : row.Parcel.HoldReasons != OperationsHoldReasons.None ? " · " + T["ui.shipments_desk.on_hold"].Value : null)</td>
-                                <td>@(row.Parcel.ShippingLabelUtc is not null ? T["ui.shipments_desk.printed"].Value : row.Cleared ? T["ui.shipments_desk.to_print"].Value : "—")</td>
+                                <td>
+                                    @(row.Parcel.ShippingLabelUtc is not null ? T["ui.shipments_desk.printed"].Value : row.Cleared && Shipment.TrackingNumber is null ? T["ui.labels.after_payment"].Value : row.Cleared ? T["ui.shipments_desk.to_print"].Value : "—")
+                                    <a href="/staff/parcels/@row.Parcel.Id/label" target="_blank" rel="noopener">@T["ui.labels.id_label"]</a>
+                                    @* Owner, 2026-10-28 (option A): the shipping label only once the shipment is paid, on account or collect. *@
+                                    @if (row.Cleared && Shipment.TrackingNumber is not null)
+                                    {
+                                        <form method="post" action="/staff/parcels/@row.Parcel.Id/shipping-label/pdf" target="_blank" class="ops-editor__inline">
+                                            <AntiforgeryToken />
+                                            <button type="submit" class="vx-button vx-button--subtle">@T["ui.labels.shipping_label"]</button>
+                                        </form>
+                                    }
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -140,6 +160,9 @@ IMPORTANT NOTES:
     [Parameter] public IReadOnlyList<OperationsPreAlert> PreAlerts { get; set; } = Array.Empty<OperationsPreAlert>();
 
     [Parameter] public IReadOnlyList<OperationsShipmentParcel> Parcels { get; set; } = Array.Empty<OperationsShipmentParcel>();
+
+    // Owner, 2026-10-27: the warehouse's label printers, for "Print all".
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Printing.OperationsLabelPrinter> Printers { get; set; } = Array.Empty<Vixly.Operations.Domain.Printing.OperationsLabelPrinter>();
 
     [Parameter] public IReadOnlyList<string> Services { get; set; } = Array.Empty<string>();
 

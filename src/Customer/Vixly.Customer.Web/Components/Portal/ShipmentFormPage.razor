@@ -22,7 +22,7 @@ IMPORTANT NOTES:
 @using Vixly.Contracts.Operations.Packages
 @inject IStringLocalizer<CustomerText> T
 
-<CustomerShell Brand="@Brand" Title="@(ShipmentId is null ? T["ui.shipments.new"] : T["ui.shipments.edit"])" SignedIn="true" Error="@Error" ReturnHere="@Here">
+<CustomerShell Brand="@Brand" Title="@(ShipmentId is null ? T["ui.shipments.new"] : T["ui.shipments.edit"])" SignedIn="true" Error="@Error" ReturnHere="@Here" TourStep="@TourStep">
     @if (Choices is { } choices)
     {
         <div class="customer-portal__with-estimate">
@@ -181,6 +181,7 @@ IMPORTANT NOTES:
     [Parameter] public CustomerPreAlertBody? Package { get; set; }
 
     [Parameter] public string? Error { get; set; }
+    [Parameter] public int TourStep { get; set; }
 
     // The form's reference: the same form sent twice creates one shipment (ADR-0019).
     private readonly string Key = Guid.NewGuid().ToString("N");

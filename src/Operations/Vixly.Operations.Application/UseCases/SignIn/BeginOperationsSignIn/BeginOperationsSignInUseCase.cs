@@ -42,6 +42,8 @@ public sealed class BeginOperationsSignInUseCase
 
     private readonly OperationsAccess _access;
 
+    private readonly OperationsDeviceBlocking _blocking;
+
     public BeginOperationsSignInUseCase(
         IOperationsUserRepository users,
         IOperationsPasswordHasher hasher,
@@ -49,8 +51,10 @@ public sealed class BeginOperationsSignInUseCase
         OperationsAuditTrail audit,
         IOperationsUnitOfWork unitOfWork,
         IOperationsDeviceClient devices,
-        OperationsAccess access)
+        OperationsAccess access,
+        OperationsDeviceBlocking blocking)
     {
+        _blocking = blocking ?? throw new ArgumentNullException(nameof(blocking));
         _access = access ?? throw new ArgumentNullException(nameof(access));
         _users = users ?? throw new ArgumentNullException(nameof(users));
         _hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
@@ -112,22 +116,37 @@ public sealed class BeginOperationsSignInUseCase
             return BeginOperationsSignInResponse.Failure(OperationsAuthErrors.PartnerAgentsOff);
         }
 
+        // Owner, 2026-10-29 (S-5): an outside account signs in only during its hours and until its end date.
+        if (!await _access.MayWorkNowAsync(user, cancellationToken))
+        {
+            _audit.Record(null, "ops.auth.outside_hours_refused", nameof(OperationsUser), user.Id);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return BeginOperationsSignInResponse.Failure(OperationsAuthErrors.OutsideHours);
+        }
+
         // =====================================================
         // WHERE (owner, 2026-10-21): the licensed device, and a country other than the one it was registered in
         // =====================================================
         OperationsSignInPlace place = await PlaceAsync(context, request, cancellationToken);
 
-        if (place.CountryChanged)
+        // Owner, R-6 (2026-10-21): a blocked device signs nobody in until a company administrator unblocks it.
+        if (place.DeviceId is { } placeDevice && await _blocking.IsBlockedAsync(placeDevice, cancellationToken))
+        {
+            _audit.Record(null, "ops.auth.device_blocked_refused", nameof(OperationsUser), user.Id, arguments: new { device = place.DeviceNumber });
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return BeginOperationsSignInResponse.Failure(OperationsAuthErrors.DeviceBlocked);
+        }
+
+        // Owner, R-6: "if the laptop is stolen, the user might have his email open also": used from another country than its own, the device is blocked
+        // and the administrators told; no code or email lets the person through.
+        if (place.CountryChanged && place.DeviceId is { } changedDevice)
         {
             _audit.Record(user.Id, "ops.auth.country_changed", nameof(OperationsUser), user.Id,
                 arguments: new { device = place.DeviceNumber, registered = place.RegisteredCountry, country = place.Country });
-
-            // A second factor confirms it; without one set up there is nothing to confirm with (setting one up here would let the password alone through).
-            if (!user.HasSecondFactor)
-            {
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-                return BeginOperationsSignInResponse.Failure(OperationsAuthErrors.CountryNeedsSecondFactor);
-            }
+            await _blocking.BlockAsync(context.RequiredTenantId, changedDevice, place.DeviceName, place.DeviceNumber, place.RegisteredCountry ?? string.Empty,
+                place.Country ?? string.Empty, user.Id, request.PortalSlug, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return BeginOperationsSignInResponse.Failure(OperationsAuthErrors.DeviceBlocked);
         }
 
         // =====================================================

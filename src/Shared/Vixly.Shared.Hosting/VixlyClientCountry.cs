@@ -36,8 +36,13 @@ public static partial class VixlyClientCountry
     {
         ArgumentNullException.ThrowIfNull(app);
 
+        VixlyIisHop? hop = app.ApplicationServices.GetService<VixlyIisHop>();
+
         return app.Use((http, next) =>
         {
+            // Out of process, the peer is IIS until its hop is undone.
+            hop?.Apply(http);
+
             if (Trusted(http) && Code(http.Request.Headers["CF-IPCountry"].ToString()) is { } country)
             {
                 http.Items[Key] = country;

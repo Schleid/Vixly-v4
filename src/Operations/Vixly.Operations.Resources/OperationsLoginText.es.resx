@@ -82,4 +82,8 @@
     <value>personal@empresa.com</value>
     <comment>needs-review</comment>
   </data>
+  <data name="subtitle_company" xml:space="preserve">
+    <value>Inicia sesión en el espacio de trabajo de {company}.</value>
+    <comment>needs-review</comment>
+  </data>
 </root>

@@ -83,18 +83,38 @@ public static class OperationsCardEndpoints
         });
 
         // The cashier: Stripe's payment page (QR code) by default, or a reader of the invoice's warehouse.
-        staff.MapPost("/cashier/invoices/{invoiceId:guid}/card", async (HttpContext http, Guid invoiceId, [FromForm] Guid? reader, StartOperationsCardPaymentUseCase start) =>
+        // The card charges what is left after the payments the cashier added; those wait for the card (owner, 2026-10-26).
+        staff.MapPost("/cashier/invoices/{invoiceId:guid}/card", async (HttpContext http, Guid invoiceId, StartOperationsCardPaymentUseCase start,
+            Vixly.Operations.Application.UseCases.Cashier.GetOperationsCashierInvoice.GetOperationsCashierInvoiceUseCase get, GetOperationsSignInBrandUseCase brand,
+            OperationsErrorText errors) =>
         {
+            IFormCollection form = await http.Request.ReadFormAsync(http.RequestAborted);
+            Guid? reader = Guid.TryParse(form["reader"], out Guid chosen) ? chosen : null;
+
+            if (OperationsCashierEndpoints.Tenders(form, withNewRow: false) is not { } others)
+            {
+                return await OperationsCashierEndpoints.InvoiceAsync(http, invoiceId, OperationsPaymentErrors.AmountInvalid, get, brand, errors,
+                    entered: OperationsCashierEndpoints.Tenders(form, false, lenient: true));
+            }
+
             StartOperationsCardPaymentResponse response = await start.ExecuteAsync(OperationsCurrentUser.Context(http), new StartOperationsCardPaymentRequest
             {
                 InvoiceId = invoiceId,
                 Channel = reader is null ? OperationsCardChannel.PaymentPage : OperationsCardChannel.Reader,
                 ReaderId = reader,
-                ReturnUrlPrefix = "https://" + http.Request.Host.Value + "/staff/cashier/card/"
+                ReturnUrlPrefix = "https://" + http.Request.Host.Value + "/staff/cashier/card/",
+                Others = others,
+                ZelleTermsAccepted = others.Count > 0 && form["zelleTerms"] == "true"
             }, http.RequestAborted);
-            return response.Succeeded
-                ? Results.Redirect("/staff/cashier/card/" + response.ChargeId)
-                : Results.Redirect("/staff/cashier/invoices/" + invoiceId + "?card=" + Uri.EscapeDataString(response.Error?.Code ?? string.Empty));
+
+            if (response.Succeeded)
+            {
+                return Results.Redirect("/staff/cashier/card/" + response.ChargeId);
+            }
+
+            return others.Count == 0
+                ? Results.Redirect("/staff/cashier/invoices/" + invoiceId + "?card=" + Uri.EscapeDataString(response.Error?.Code ?? string.Empty))
+                : await OperationsCashierEndpoints.InvoiceAsync(http, invoiceId, response.Error, get, brand, errors, entered: others);
         });
 
         staff.MapGet("/cashier/card/{chargeId:guid}", async (HttpContext http, Guid chargeId, GetOperationsCardPaymentUseCase get, GetOperationsSignInBrandUseCase brand,

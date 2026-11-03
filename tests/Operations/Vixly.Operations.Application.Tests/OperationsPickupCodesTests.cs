@@ -47,6 +47,11 @@ public sealed class OperationsPickupCodesTests
 
         public string? Unprotect(string protectedValue) =>
             protectedValue.StartsWith("p:", StringComparison.Ordinal) ? System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(protectedValue[2..])) : null;
+
+        public string Protect(string value, string purpose) => purpose + ":" + Protect(value);
+
+        public string? Unprotect(string protectedValue, string purpose) =>
+            protectedValue.StartsWith(purpose + ":", StringComparison.Ordinal) ? Unprotect(protectedValue[(purpose.Length + 1)..]) : null;
     }
 
     private sealed class MovingClock : TimeProvider

@@ -44,8 +44,8 @@ public sealed class PublicCallerSigner : IDisposable
             return;
         }
 
-        _key = ECDsa.Create();
-        _key.ImportPkcs8PrivateKey(Convert.FromBase64String(site.CallerPrivateKey), out _);
+        // Hex or base64 PKCS#8; anything but a P-256 key is refused.
+        _key = Vixly.Shared.Kernel.Security.VixlyCallerKey.Import(site.CallerPrivateKey);
         _keyId = site.CallerKeyId;
     }
 

@@ -21,14 +21,14 @@ namespace Vixly.Operations.Application.UseCases.Tickets.AnswerOperationsTicket;
 // - Run the rule and return a response; never throw for an expected refusal
 //
 // IMPORTANT NOTES:
-// - Needs ops.parcels.assign for the ticket's warehouse
-// - The customer gets an email with a link to the ticket
+// - Needs the ticket's department at its warehouse (ops.parcels.assign for a package ticket)
+// - The customer gets an email with a link to the ticket, only for the tickets they opened
 // =========================================================
 public sealed class AnswerOperationsTicketUseCase
 {
     private readonly OperationsOwnerCheck _owner;
 
-    private readonly OperationsReceivingScope _scope;
+    private readonly Vixly.Operations.Application.Tickets.OperationsTicketScope _scope;
 
     private readonly IOperationsTicketRepository _tickets;
 
@@ -44,7 +44,7 @@ public sealed class AnswerOperationsTicketUseCase
 
     public AnswerOperationsTicketUseCase(
         OperationsOwnerCheck owner,
-        OperationsReceivingScope scope,
+        Vixly.Operations.Application.Tickets.OperationsTicketScope scope,
         IOperationsTicketRepository tickets,
         IOperationsTrackingRepository tracking,
         OperationsOutboxWriter outbox,
@@ -76,12 +76,14 @@ public sealed class AnswerOperationsTicketUseCase
         }
 
         if (await _tickets.GetAsync(request.TicketId, cancellationToken) is not { } ticket
-            || await _scope.CoveredAsync(access, OperationsPermissions.ParcelsView, ticket.WarehouseId, cancellationToken) is not { } warehouse)
+            || await _scope.SeenAsync(access, ticket, cancellationToken) is not { } warehouse)
         {
             return AnswerOperationsTicketResponse.Failure(OperationsTicketErrors.NotFound);
         }
 
-        if (!access.CoversWarehouse(OperationsPermissions.ParcelsAssign, warehouse.Id, warehouse.BranchId))
+        // Ticket desk (owner, 2026-10-29): the ticket's department answers it; a package only links to a customer's missing-package ticket.
+        if (!Vixly.Operations.Application.Tickets.OperationsTicketDepartments.Answers(access, ticket.Topic, warehouse)
+            || (request.ParcelId is not null && (ticket.Topic != OperationsTicketTopic.Package || !ticket.FromCustomer)))
         {
             return AnswerOperationsTicketResponse.Failure(OperationsAccessErrors.PermissionRequired);
         }
@@ -123,7 +125,11 @@ public sealed class AnswerOperationsTicketUseCase
         }
 
         ticket.Keyed(request.CommandKey);
-        _outbox.Write(Vixly.Operations.Application.Tickets.OperationsTicketNotice.MessageType, context.RequiredTenantId, ticket.Id, new Vixly.Operations.Application.Tickets.OperationsTicketNotice(ticket.CustomerId, ticket.Id, request.PortalSlug));
+        // The customer is emailed only about the tickets they opened; an agent's ticket stays internal.
+        if (ticket.FromCustomer)
+        {
+            _outbox.Write(Vixly.Operations.Application.Tickets.OperationsTicketNotice.MessageType, context.RequiredTenantId, ticket.Id, new Vixly.Operations.Application.Tickets.OperationsTicketNotice(ticket.CustomerId, ticket.Id, request.PortalSlug));
+        }
         _audit.Record(access.User.Id, request.Resolve ? "ops.tickets.resolved" : "ops.tickets.answered", nameof(OperationsTicket), ticket.Id, after: new { parcel = request.ParcelId });
 
         if (await _unitOfWork.SaveChangesAsync(cancellationToken))

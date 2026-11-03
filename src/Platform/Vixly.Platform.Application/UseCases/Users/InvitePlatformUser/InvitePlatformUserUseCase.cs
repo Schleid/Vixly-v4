@@ -19,7 +19,8 @@ namespace Vixly.Platform.Application.UseCases.Users.InvitePlatformUser;
 // - Require platform.users.create; inviting with an authority
 //   above Standard also needs platform.users.change_authority
 //   (SuperUsers only)
-// - Create the user (Invited) and a 72-hour invitation link
+// - Create the user (Invited) with the next employee number
+//   (TC-0001 ...) and a 72-hour invitation link
 // - Audit, commit, then send the invitation email
 //
 // IMPORTANT NOTES:
@@ -100,7 +101,7 @@ public sealed class InvitePlatformUserUseCase
                 email,
                 LanguageCode.Create(request.PreferredLanguage),
                 request.AuthorityLevel,
-                request.EmployeeNumber,
+                await _users.NextEmployeeNumberAsync(cancellationToken),
                 string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : PhoneNumber.Create(request.PhoneNumber),
                 _timeProvider.GetUtcNow());
         }
@@ -125,7 +126,18 @@ public sealed class InvitePlatformUserUseCase
             return InvitePlatformUserResponse.Failure(PlatformCommonErrors.ConcurrencyConflict);
         }
 
-        await _mailer.SendInvitationAsync(user, token.Value, cancellationToken);
+        // Owner, 2026-10-23: a mail server refusing must not look like the invitation failed: the person is saved; say so, and keep the failure in the history.
+        try
+        {
+            await _mailer.SendInvitationAsync(user, token.Value, cancellationToken);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            _audit.Record(context.PlatformUserId, "platform.users.invitation_mail_failed", PlatformPermissions.UsersCreate, nameof(PlatformUser), user.Id,
+                after: new { error = exception.GetType().Name });
+            await _unitOfWork.SaveChangesAsync(CancellationToken.None);
+            return InvitePlatformUserResponse.Failure(PlatformCommonErrors.InvitationSavedMailFailed);
+        }
 
         return InvitePlatformUserResponse.Success(user.Id);
     }

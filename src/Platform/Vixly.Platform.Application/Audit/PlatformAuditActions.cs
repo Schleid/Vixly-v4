@@ -39,6 +39,7 @@ public static class PlatformAuditActions
         "platform.account.sessions_ended",
         "platform.users.invited",
         "platform.users.invitation_resent",
+        "platform.users.invitation_mail_failed",
         "platform.users.password_reset_sent",
         "platform.users.locked",
         "platform.users.suspended",
@@ -115,6 +116,7 @@ public static class PlatformAuditActions
         "platform.discounts.rejected",
         "platform.discounts.ended",
         "platform.subscriptions.charge_added",
+        "platform.subscriptions.shipments_charged",
         "platform.subscriptions.charge_cancelled",
         "platform.subscriptions.setup_fee_changed",
         "platform.subscriptions.activated_nothing_due",
@@ -138,6 +140,8 @@ public static class PlatformAuditActions
         "platform.offers.link_replaced",
         "platform.offers.used",
         "platform.sales_settings.updated",
+        "platform.security.require_mfa_changed",
+        "platform.security.idle_changed",
         "platform.billing.invoice_issued",
         "platform.billing.payment_recorded",
         "platform.billing.payment_reversed",
@@ -223,9 +227,12 @@ public static class PlatformAuditActions
         "platform.leads.received",
         "platform.leads.status_changed",
         "platform.tenants.company_change_submitted",
+        "platform.tenants.company_profile_updated",
         "platform.tenants.company_change_withdrawn",
         "platform.tenants.company_change_approved",
-        "platform.tenants.company_change_rejected"
+        "platform.tenants.company_change_rejected",
+        "platform.maintenance.scheduled",
+        "platform.maintenance.stopped"
     };
 
     private static readonly HashSet<string> Known = new(Catalogue, StringComparer.Ordinal);

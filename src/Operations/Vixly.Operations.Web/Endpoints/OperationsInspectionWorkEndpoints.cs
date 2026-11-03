@@ -128,7 +128,7 @@ public static class OperationsInspectionWorkEndpoints
                 if (found.Succeeded)
                 {
                     ListOperationsInspectionQueueResponse all = await list.ExecuteAsync(OperationsCurrentUser.Context(http), new ListOperationsInspectionQueueRequest { Page = 1, ParcelId = found.ParcelId }, http.RequestAborted);
-                    error = all.Error ?? OperationsInspectionErrors.NotFound;
+                    error = all.Error ?? OperationsInspectionErrors.ParcelNotQueued;
 
                     if (all.Items.FirstOrDefault(item => item.Parcel.ParcelId == found.ParcelId) is { } match)
                     {

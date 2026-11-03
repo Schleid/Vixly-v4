@@ -61,4 +61,22 @@ internal sealed class OperationsPrintingRepository : IOperationsPrintingReposito
 
     public Task<OperationsPrintJob?> GetJobAsync(Guid jobId, CancellationToken cancellationToken) =>
         _context.PrintJobs.FirstOrDefaultAsync(item => item.Id == jobId, cancellationToken);
+
+    public async Task<IReadOnlyList<OperationsPrintJob>> ListWaitingJobsForAsync(Guid warehouseId, Guid? phoneAgentId, DateTimeOffset utcNow, int max, CancellationToken cancellationToken)
+    {
+        DateTimeOffset oldest = utcNow - OperationsPrintJob.FreshFor;
+        return await (from job in _context.PrintJobs
+                      join printer in _context.LabelPrinters on job.PrinterId equals printer.Id
+                      where job.WarehouseId == warehouseId && job.Status == OperationsPrintJobStatus.Pending && job.CreatedUtc > oldest && printer.AgentId == phoneAgentId
+                      orderby job.CreatedUtc
+                      select job).Take(max).ToListAsync(cancellationToken);
+    }
+
+    public void Add(OperationsPrintPairing pairing) => _context.PrintPairings.Add(pairing ?? throw new ArgumentNullException(nameof(pairing)));
+
+    public Task<OperationsPrintPairing?> FindPairingAsync(string codeHash, CancellationToken cancellationToken) =>
+        _context.PrintPairings.FirstOrDefaultAsync(item => item.CodeHash == codeHash, cancellationToken);
+
+    public Task<OperationsLabelPrinter?> FindPhonePrinterAsync(Guid agentId, string address, CancellationToken cancellationToken) =>
+        _context.LabelPrinters.FirstOrDefaultAsync(item => item.AgentId == agentId && item.Address == address, cancellationToken);
 }

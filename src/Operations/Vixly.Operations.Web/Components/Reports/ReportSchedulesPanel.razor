@@ -1,0 +1,52 @@
+﻿@*
+=========================================================
+FILE: ReportSchedulesPanel.razor
+
+PURPOSE:
+The scheduled exports (Slice 11) on the Reports page.
+
+RESPONSIBILITIES:
+- Each schedule: report, frequency, file, recipients, next run, last sent; Stop
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+@if (Schedules.Count > 0)
+{
+    <section class="ops-editor__panel" aria-labelledby="schedules-title" data-schedules>
+        <h2 id="schedules-title">@T["ui.reports.schedule.list"]</h2>
+        <OperationsTableViewport Label="@T["ui.reports.schedule.list"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col">@T["ui.reports.schedule.report"]</th><th scope="col">@T["ui.reports.schedule.frequency"]</th><th scope="col">@T["ui.reports.schedule.format"]</th><th scope="col">@T["ui.reports.schedule.recipients"]</th><th scope="col">@T["ui.reports.schedule.next"]</th><th scope="col">@T["ui.reports.schedule.last"]</th><th scope="col"></th></tr></thead>
+                <tbody>
+                    @foreach (OperationsReportSchedule schedule in Schedules)
+                    {
+                        <tr data-schedule="@schedule.ReportKey">
+                            <td><a href="/staff/reports/@schedule.ReportKey">@T["ui.reports.report." + schedule.ReportKey]</a></td>
+                            <td>@T["ui.reports.schedule.frequency." + schedule.Frequency]</td>
+                            <td>@T["ui.reports.schedule.format." + schedule.Format]</td>
+                            <td>@string.Join(", ", schedule.Recipients.Select(id => Staff.FirstOrDefault(person => person.Id == id)?.FullName ?? "—"))</td>
+                            <td>@schedule.NextRunUtc.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)</td>
+                            <td>@(schedule.LastSentUtc?.ToLocalTime().ToString("g", CultureInfo.CurrentCulture) ?? "—")</td>
+                            <td>
+                                <form method="post" action="/staff/reports/schedules/@schedule.Id/remove" class="ops-editor__inline">
+                                    <AntiforgeryToken />
+                                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.reports.schedule.stop"]</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    </section>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<OperationsReportSchedule> Schedules { get; set; } = Array.Empty<OperationsReportSchedule>();
+
+    [Parameter] public IReadOnlyList<OperationsUser> Staff { get; set; } = Array.Empty<OperationsUser>();
+}

@@ -38,7 +38,7 @@ IMPORTANT NOTES:
         <ul class="ops-cashier__matches">
             @foreach (OperationsCustomer match in Matches)
             {
-                <li><a href="/staff/cashier?customer=@match.Id">@match.FirstName @match.LastName</a>@(match.Code is { } code ? " · " + code : string.Empty) · @match.Phone</li>
+                <li><a href="/staff/cashier?customer=@match.Id">@match.FirstName @match.LastName</a>@(match.Code is { } code ? " · " + code : string.Empty) · @Vixly.Shared.Localization.VixlyPhone.International(match.Phone)</li>
             }
         </ul>
     }

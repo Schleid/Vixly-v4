@@ -43,6 +43,8 @@ Each slice goes through all layers (Domain, Application, Infrastructure, Api, We
 | 11 | Reporting | Operational KPIs, aging, profit, scheduled exports | (none) | 9 |
 | 12 | Handheld and driver apps | .NET MAUI scan and driver apps on the outbox with an offline queue (O-4, O-5) | Branded customer app (later) | 8 |
 
+Built so far under their own numbers: slices 5A to 5F (shipments, counter, insurance, supplies, invoices, cashier, credit accounts, customer screen, Stripe cards), 6A to 6C (bundles, dispatch, events), 7 (destination, pickup, delivery, partner agents), 8 ([payables and profit](SLICE-8-PAYABLES-AND-PROFIT-DESIGN.md), the rest of plan slice 9) and 9 (integrations, plan slice 10).
+
 Which of slices 10 to 12 must be ready before the migration weekend is decided from what V3 tenants use today; reports and counter sales are stubs in V3 (review, section 1).
 
 Two workstreams run beside the slices: **the migration tool** under `build/` (rehearsed on a copy of production; derives milestones per ADR-0018 and keeps V3 codes as legacy codes), and **the Edge routing** needed on the tenant host (Stage 5 scope, scheduled before go-live).
@@ -113,5 +115,7 @@ As in Platform, for both planes: builds with no warnings; architecture tests pas
 | (Slice 2) `POST /customer/verify`, `/customer/reset-password` | Customer.Web | Single-use links; GET only shows a button | 10 per hour per IP |
 
 ## 10. Decisions
+
+Operations help Version 1 has staff help wiring and all 27 H4a guides in English, French and Spanish as of 2026-10-25, following the owner's Public V2 → Operations V1 sequence. See [help plan](../help/HELP-4-OPERATIONS.md) and [H4a verification](../help/HELP-4A-VERIFICATION.md) for delivered scope and remaining gates. Help is company-branded, permission-filtered and text-only in this version. H4b through H4e remain pending.
 
 Taken: O-1 to O-16 (Operations plan), ADR-0017 (built together; marketplace in Platform; site content in Operations), ADR-0019 (double-click protection, bot check before sending), ADR-0018 (milestones, accepted 2026-10-17), ADR-0021 (tracking events) and ADR-0022 (receiving and inspection), accepted 2026-10-17. Slices 0 and 1: [sweep](SLICE-0-1-FOUNDATION-AND-SETUP-SWEEP.md), [Slice 0 design](SLICE-0-FOUNDATION-DESIGN.md) and [verification](SLICE-0-VERIFICATION.md), [Slice 1 design](SLICE-1-STAFF-AND-SETUP-DESIGN.md) [1A verification](SLICE-1A-VERIFICATION.md), [1B tenant site design](SLICE-1B-TENANT-SITE-DESIGN.md); [Slice 2 design](SLICE-2-CUSTOMERS-DESIGN.md) and [verification](SLICE-2-VERIFICATION.md); [Slice 3 design](SLICE-3-RECEIVING-DESIGN.md), [3A verification](SLICE-3A-VERIFICATION.md), [3B verification](SLICE-3B-VERIFICATION.md); [3C design](SLICE-3C-INSPECTION-DESIGN.md) and [verification](SLICE-3C-VERIFICATION.md). Open questions for each later slice are listed in its sweep.

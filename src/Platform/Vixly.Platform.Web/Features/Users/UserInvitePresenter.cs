@@ -74,7 +74,6 @@ public sealed class UserInvitePresenter : PlatformPresenter<UserInviteState>
                     Email = input.Email,
                     PreferredLanguage = input.PreferredLanguage,
                     AuthorityLevel = input.AuthorityLevel,
-                    EmployeeNumber = string.IsNullOrWhiteSpace(input.EmployeeNumber) ? null : input.EmployeeNumber,
                     PhoneNumber = input.PhoneNumber
                 },
                 cancellationToken);

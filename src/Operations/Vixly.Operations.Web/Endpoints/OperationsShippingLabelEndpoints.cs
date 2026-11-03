@@ -104,6 +104,37 @@ public static class OperationsShippingLabelEndpoints
                 + (failed is null ? "done=all_printed&count=" + sent : "error=" + Uri.EscapeDataString(failed.Code)));
         });
 
+        // Owner, 2026-10-27: all the labels of a shipment at once: the ID labels or the shipping labels, as one PDF (a new tab) or on a label printer.
+        RouteGroupBuilder shipments = endpoints.MapGroup("/staff/shipments").RequireAuthorization().RequireFormToken();
+
+        shipments.MapPost("/{shipmentId:guid}/labels", async (HttpContext http, Guid shipmentId, [FromForm] string? kind, [FromForm] Guid? printer, [FromForm] string? back,
+            Vixly.Operations.Application.UseCases.Printing.PrintOperationsShipmentLabels.PrintOperationsShipmentLabelsUseCase print) =>
+        {
+            Vixly.Operations.Application.UseCases.Printing.PrintOperationsShipmentLabels.PrintOperationsShipmentLabelsResponse response = await print.ExecuteAsync(
+                OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Printing.PrintOperationsShipmentLabels.PrintOperationsShipmentLabelsRequest
+                {
+                    ShipmentId = shipmentId, Shipping = kind == "shipping", PrinterId = printer
+                },
+                http.RequestAborted);
+            string page = (back == "counter" ? "/staff/counter/shipments/" : "/staff/shipments/") + shipmentId + "?";
+
+            if (!response.Succeeded)
+            {
+                return Results.Redirect(page + "error=" + Uri.EscapeDataString(response.Error!.Code));
+            }
+
+            if (response.Content is { } pdf)
+            {
+                // Shown in the tab, ready to print; never kept by a cache.
+                http.Response.Headers.CacheControl = "private, no-store";
+                http.Response.Headers.XContentTypeOptions = "nosniff";
+                return Results.File(pdf, "application/pdf");
+            }
+
+            return Results.Redirect(page + "done=labels_sent&count=" + response.Printed + "&waiting=" + response.Waiting);
+        });
+
         return endpoints;
     }
 
@@ -113,13 +144,23 @@ public static class OperationsShippingLabelEndpoints
     private static string Back(Guid parcelId, string? back, Guid? warehouse) =>
         back == "labels" ? "/staff/parcels/labels" + (warehouse is { } chosen ? "?warehouse=" + chosen + "&" : "?") : "/staff/parcels/" + parcelId + "?";
 
+    // "3 labels sent to the printer", and how many shipping labels still wait for their parcel to be cleared (owner, 2026-10-27).
+    internal static string LabelsSent(IStringLocalizer<OperationsText> text, int? count, int? waiting) =>
+        waiting is > 0
+            ? Vixly.Shared.Localization.VixlyText.Format(text, "ui.labels.sent_waiting",
+                new Dictionary<string, object> { ["count"] = Math.Clamp(count ?? 0, 0, 999), ["waiting"] = Math.Clamp(waiting.Value, 0, 999) })
+            : Vixly.Shared.Localization.VixlyText.Format(text, "ui.labels.sent", "count", Math.Clamp(count ?? 0, 0, 999));
+
     // Only codes of these pages come back in the address, so the page never shows an arbitrary text.
     internal static Error? Known(string? code) => code switch
     {
         "ops.printing.not_cleared" => Vixly.Operations.Domain.Printing.OperationsPrintingErrors.NotCleared,
+        "ops.printing.not_paid" => Vixly.Operations.Domain.Printing.OperationsPrintingErrors.NotPaid,
         "ops.printing.printer_not_found" => Vixly.Operations.Domain.Printing.OperationsPrintingErrors.PrinterNotFound,
         "ops.receiving.parcel_not_found" => Vixly.Operations.Domain.Receiving.OperationsReceivingErrors.ParcelNotFound,
         "ops.common.concurrency_conflict" => Vixly.Operations.Domain.Common.OperationsCommonErrors.ConcurrencyConflict,
+        "ops.access.permission_required" => Vixly.Operations.Application.Security.OperationsAccessErrors.PermissionRequired,
+        "ops.shipments.not_found" => Vixly.Operations.Domain.Shipments.OperationsShipmentErrors.NotFound,
         _ => null
     };
 }

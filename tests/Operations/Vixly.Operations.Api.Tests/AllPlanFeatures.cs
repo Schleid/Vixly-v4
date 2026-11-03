@@ -16,5 +16,5 @@ namespace Vixly.Operations.Api.Tests;
 // =========================================================
 internal sealed class AllPlanFeatures : IOperationsPlanFeatures
 {
-    public Task<OperationsPlanFeatures> GetAsync(Guid tenantId, CancellationToken cancellationToken) => Task.FromResult(new OperationsPlanFeatures(true, true));
+    public Task<OperationsPlanFeatures> GetAsync(Guid tenantId, CancellationToken cancellationToken) => Task.FromResult(OperationsPlanFeatures.All);
 }

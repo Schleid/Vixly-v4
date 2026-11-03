@@ -65,9 +65,12 @@ public sealed class OperationsCustomerSession : OperationsEntity
             OperationsIdentityText.Clip(ipAddress, OperationsIdentityLimits.IpAddressMaxLength), OperationsIdentityText.Clip(userAgent, OperationsIdentityLimits.UserAgentMaxLength), utcNow);
     }
 
-    public OperationsSessionEndReason? ExpiryReasonAt(DateTimeOffset utcNow) =>
+    public OperationsSessionEndReason? ExpiryReasonAt(DateTimeOffset utcNow) => ExpiryReasonAt(utcNow, OperationsCustomerLimits.SessionIdleTimeout);
+
+    // The idle time is the company's (owner, 2026-10-27); the one above is the default.
+    public OperationsSessionEndReason? ExpiryReasonAt(DateTimeOffset utcNow, TimeSpan idleTimeout) =>
         utcNow >= ExpiresUtc ? OperationsSessionEndReason.AbsoluteLifetime
-        : utcNow - LastSeenUtc >= OperationsCustomerLimits.SessionIdleTimeout ? OperationsSessionEndReason.IdleTimeout
+        : utcNow - LastSeenUtc >= idleTimeout ? OperationsSessionEndReason.IdleTimeout
         : null;
 
     public bool IsValidAt(DateTimeOffset utcNow) => !IsEnded && ExpiryReasonAt(utcNow) is null;

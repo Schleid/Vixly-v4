@@ -27,7 +27,7 @@ public sealed class GetOperationsTicketProofUseCase
 {
     private readonly OperationsOwnerCheck _owner;
 
-    private readonly OperationsReceivingScope _scope;
+    private readonly Vixly.Operations.Application.Tickets.OperationsTicketScope _scope;
 
     private readonly IOperationsTicketRepository _tickets;
 
@@ -35,7 +35,7 @@ public sealed class GetOperationsTicketProofUseCase
 
     public GetOperationsTicketProofUseCase(
         OperationsOwnerCheck owner,
-        OperationsReceivingScope scope,
+        Vixly.Operations.Application.Tickets.OperationsTicketScope scope,
         IOperationsTicketRepository tickets,
         IOperationsFileStore files)
     {
@@ -59,7 +59,7 @@ public sealed class GetOperationsTicketProofUseCase
         }
 
         if (await _tickets.GetAsync(request.TicketId, cancellationToken) is not { ProofKey: { } key, ProofContentType: { } type } ticket
-            || await _scope.CoveredAsync(access, OperationsPermissions.ParcelsView, ticket.WarehouseId, cancellationToken) is null
+            || await _scope.SeenAsync(access, ticket, cancellationToken) is null
             || await _files.ReadAsync(context.RequiredTenantId, key, cancellationToken) is not { } content)
         {
             return GetOperationsTicketProofResponse.Failure(OperationsTicketErrors.NotFound);

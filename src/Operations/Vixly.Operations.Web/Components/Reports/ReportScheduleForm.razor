@@ -1,0 +1,44 @@
+﻿@*
+=========================================================
+FILE: ReportScheduleForm.razor
+
+PURPOSE:
+Email this report on a schedule (Slice 11; owner, 2026-10-22: CSV or Excel to staff of the company).
+
+RESPONSIBILITIES:
+- Frequency, file and the staff it goes to; the report’s current filters go with it
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Each recipient gets the report as their own rights allow
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<details class="ops-editor__panel" data-schedule-form>
+    <summary>@T["ui.reports.schedule.title"]</summary>
+    <form method="post" action="/staff/reports/@Run.Report!.Key/schedule" class="ops-editor__form">
+        <AntiforgeryToken />
+        <input type="hidden" name="grain" value="@Run.Grain.ToString().ToLowerInvariant()" />
+        <input type="hidden" name="by" value="@Run.Dimension.ToString().ToLowerInvariant()" />
+        <input type="hidden" name="warehouse" value="@Run.WarehouseId" />
+        <input type="hidden" name="days" value="@Run.Days" />
+        <p class="ops-editor__hint">@T["ui.reports.schedule.hint"]</p>
+        <label>@T["ui.reports.schedule.frequency"] <select name="frequency">@foreach (OperationsReportFrequency frequency in Enum.GetValues<OperationsReportFrequency>()) { <option value="@frequency">@T["ui.reports.schedule.frequency." + frequency]</option> }</select></label>
+        <label>@T["ui.reports.schedule.format"] <select name="format">@foreach (OperationsReportFormat format in Enum.GetValues<OperationsReportFormat>()) { <option value="@format">@T["ui.reports.schedule.format." + format]</option> }</select></label>
+        <fieldset>
+            <legend>@T["ui.reports.schedule.recipients"]</legend>
+            @foreach (OperationsUser person in Staff)
+            {
+                <label><input type="checkbox" name="recipients" value="@person.Id" /> @person.FullName</label>
+            }
+        </fieldset>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.reports.schedule.save"]</button>
+    </form>
+</details>
+
+@code {
+    [Parameter, EditorRequired] public Vixly.Operations.Application.UseCases.Reports.RunOperationsReport.RunOperationsReportResponse Run { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsUser> Staff { get; set; } = Array.Empty<OperationsUser>();
+}

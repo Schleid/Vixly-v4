@@ -38,13 +38,17 @@ public sealed class PlatformSessionValidator
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly Vixly.Platform.Application.Ports.IPlatformIdleTimesReader? _idle;
+
     public PlatformSessionValidator(
         IPlatformSessionRepository sessions,
         IPlatformUserRepository users,
         IPlatformSecretGenerator secrets,
         IPlatformUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        Vixly.Platform.Application.Ports.IPlatformIdleTimesReader? idle = null)
     {
+        _idle = idle;
         _sessions = sessions ?? throw new ArgumentNullException(nameof(sessions));
         _users = users ?? throw new ArgumentNullException(nameof(users));
         _secrets = secrets ?? throw new ArgumentNullException(nameof(secrets));
@@ -78,7 +82,8 @@ public sealed class PlatformSessionValidator
 
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();
 
-        if (session.ExpiryReasonAt(utcNow) is PlatformSessionEndReason expired)
+        // Control's inactivity time, set by the security administrator (owner, 2026-10-27).
+        if (session.ExpiryReasonAt(utcNow, await IdleAsync(cancellationToken)) is PlatformSessionEndReason expired)
         {
             session.End(expired, utcNow);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -109,7 +114,7 @@ public sealed class PlatformSessionValidator
     {
         PlatformUserSession? session = await _sessions.GetAsync(sessionId, cancellationToken);
 
-        if (session is null || !session.IsValidAt(_timeProvider.GetUtcNow()))
+        if (session is null || !session.IsValidAt(_timeProvider.GetUtcNow(), await IdleAsync(cancellationToken)))
         {
             return false;
         }
@@ -118,4 +123,9 @@ public sealed class PlatformSessionValidator
 
         return user is not null && user.Account.IsActive;
     }
+
+    public async Task<PlatformIdleTimes> IdleTimesAsync(CancellationToken cancellationToken) =>
+        _idle is null ? PlatformIdleTimes.Default : await _idle.GetAsync(cancellationToken);
+
+    private async Task<TimeSpan> IdleAsync(CancellationToken cancellationToken) => (await IdleTimesAsync(cancellationToken)).Idle;
 }

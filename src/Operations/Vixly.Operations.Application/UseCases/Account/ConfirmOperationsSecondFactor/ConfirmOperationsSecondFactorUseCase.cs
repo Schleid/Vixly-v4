@@ -63,7 +63,7 @@ public sealed class ConfirmOperationsSecondFactorUseCase
             return ConfirmOperationsSecondFactorResponse.Failure(OperationsAccessErrors.SignInRequired);
         }
 
-        if (_stepUp.Check(access.User, request.Code) is { } refused)
+        if (await _stepUp.CheckAsync(access.User, request.Code, cancellationToken) is { } refused)
         {
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return ConfirmOperationsSecondFactorResponse.Failure(refused);

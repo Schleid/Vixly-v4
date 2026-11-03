@@ -88,6 +88,13 @@ public sealed class PlatformTenantChanges
         _audit.Record(staffUserId, actionCode, permissionCode, nameof(PlatformTenantChangeRequest), request.Id, arguments: arguments, before: before, after: after);
     }
 
+    // 2026-10-25: the company changed its own profile (no request); recorded against the tenant.
+    public void RecordProfile(PlatformTenant tenant, object arguments, object before, object after)
+    {
+        ArgumentNullException.ThrowIfNull(tenant);
+        _audit.Record(null, "platform.tenants.company_profile_updated", null, nameof(PlatformTenant), tenant.Id, arguments: arguments, before: before, after: after);
+    }
+
     public void Notify(string messageType, PlatformTenantChangeRequest request)
     {
         ArgumentNullException.ThrowIfNull(request);

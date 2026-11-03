@@ -18,5 +18,8 @@ public enum OperationsPrinterConnection
     Network = 1,
 
     // A printer installed on the computer that runs the print program (USB or Bluetooth), by its Windows name.
-    Installed = 2
+    Installed = 2,
+
+    // Slice 12E (owner H-6): a portable printer next to a phone running Vixly Print; the address is the phone's name for it.
+    Bluetooth = 3
 }

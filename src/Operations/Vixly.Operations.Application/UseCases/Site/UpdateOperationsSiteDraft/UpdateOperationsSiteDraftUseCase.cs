@@ -21,6 +21,7 @@ namespace Vixly.Operations.Application.UseCases.Site.UpdateOperationsSiteDraft;
 // IMPORTANT NOTES:
 // - Nothing changes on the public site until Publish
 // - Colours must pass WCAG 2.2 AA (domain)
+// - Changing the theme or font needs the plan's theme customisation; without it they stay as they are (W-4)
 // =========================================================
 public sealed class UpdateOperationsSiteDraftUseCase
 {
@@ -34,13 +35,17 @@ public sealed class UpdateOperationsSiteDraftUseCase
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly IOperationsPlanFeatures _features;
+
     public UpdateOperationsSiteDraftUseCase(
         IOperationsSiteRepository site,
         OperationsOwnerCheck owner,
         OperationsAuditTrail audit,
         IOperationsUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IOperationsPlanFeatures features)
     {
+        _features = features ?? throw new ArgumentNullException(nameof(features));
         _site = site ?? throw new ArgumentNullException(nameof(site));
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
         _audit = audit ?? throw new ArgumentNullException(nameof(audit));
@@ -68,13 +73,24 @@ public sealed class UpdateOperationsSiteDraftUseCase
             return UpdateOperationsSiteDraftResponse.Failure(OperationsCommonErrors.NotFound);
         }
 
+        OperationsSiteTheme theme = request.Theme ?? brand.Draft.Theme;
+        OperationsSiteFont font = request.Font ?? brand.Draft.Font;
+
+        if ((theme != brand.Draft.Theme || font != brand.Draft.Font)
+            && !(await _features.GetAsync(context.RequiredTenantId, cancellationToken)).ThemeCustomization)
+        {
+            return UpdateOperationsSiteDraftResponse.Failure(OperationsBrandingErrors.ThemeLocked);
+        }
+
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();
 
         try
         {
             brand.ChangeDraft(
                 brand.Draft.With(request.DisplayName, request.Preset, request.PrimaryColour, request.AccentColour, request.Services, request.ShowSteps, request.ShowFaq,
-                    (request.FacebookUrl, request.InstagramUrl, request.XUrl, request.LinkedInUrl, request.YouTubeUrl, request.TikTokUrl)),
+                    (request.FacebookUrl, request.InstagramUrl, request.XUrl, request.LinkedInUrl, request.YouTubeUrl, request.TikTokUrl))
+                    .WithLook(theme, font)
+                    .WithMarketing(request.ShowDelivered, request.ShowRates, request.ShowTestimonials),
                 utcNow);
 
             foreach ((string key, string? value) in request.Texts)
@@ -87,7 +103,7 @@ public sealed class UpdateOperationsSiteDraftUseCase
             return UpdateOperationsSiteDraftResponse.Failure(exception.Error);
         }
 
-        _audit.Record(context.UserId, "ops.site.draft_changed", nameof(OperationsTenantBrand), brand.Id, arguments: new { language = request.Language, texts = request.Texts.Count });
+        _audit.Record(context.UserId, "ops.site.draft_changed", nameof(OperationsTenantBrand), brand.Id, arguments: new { language = request.Language, texts = request.Texts.Count, theme = theme.ToString(), font = font.ToString() });
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken)
             ? UpdateOperationsSiteDraftResponse.Success()

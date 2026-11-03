@@ -1,0 +1,7 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Operations\Vixly.PrintHelper.Core\Vixly.PrintHelper.Core.csproj" />
+  </ItemGroup>
+
+</Project>

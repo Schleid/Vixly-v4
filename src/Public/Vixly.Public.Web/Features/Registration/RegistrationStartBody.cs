@@ -41,6 +41,7 @@ public static class RegistrationStartBody
             AcceptedTerms = form.AcceptedTerms,
             TermsVersion = terms?.Version ?? string.Empty,
             PrivacyVersion = terms?.Parts.FirstOrDefault(part => part.Kind == "privacy")?.Version ?? string.Empty,
+            TimeZone = string.IsNullOrWhiteSpace(form.TimeZone) ? null : form.TimeZone.Trim(),
             BotToken = botToken,
             OfferToken = string.IsNullOrWhiteSpace(form.OfferToken) ? null : form.OfferToken.Trim()
         };

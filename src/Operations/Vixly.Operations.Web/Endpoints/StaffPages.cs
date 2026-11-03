@@ -56,6 +56,7 @@ public sealed class StaffPages
     private readonly GetOperationsSignInBrandUseCase _brand;
     private readonly OperationsErrorText _errors;
     private readonly IStringLocalizer<OperationsText> _text;
+    private readonly Vixly.Operations.Application.UseCases.Staff.GetOperationsQuickSignInState.GetOperationsQuickSignInStateUseCase _quick;
 
     public StaffPages(
         ListOperationsStaffUseCase list,
@@ -65,8 +66,10 @@ public sealed class StaffPages
         GetMyOperationsAccountUseCase account,
         GetOperationsSignInBrandUseCase brand,
         OperationsErrorText errors,
-        IStringLocalizer<OperationsText> text)
+        IStringLocalizer<OperationsText> text,
+        Vixly.Operations.Application.UseCases.Staff.GetOperationsQuickSignInState.GetOperationsQuickSignInStateUseCase quick)
     {
+        _quick = quick ?? throw new ArgumentNullException(nameof(quick));
         _list = list ?? throw new ArgumentNullException(nameof(list));
         _member = member ?? throw new ArgumentNullException(nameof(member));
         _roles = roles ?? throw new ArgumentNullException(nameof(roles));
@@ -79,7 +82,7 @@ public sealed class StaffPages
 
     public string? Done(string done) => done switch
     {
-        "invited" or "granted" or "revoked" or "status" or "second_factor" or "sessions" or "transferred" or "saved" or "password" => _text["ui.staff.done." + done].Value,
+        "invited" or "granted" or "revoked" or "status" or "second_factor" or "sessions" or "transferred" or "saved" or "password" or "badge_revoked" or "pin" or "outside" => _text["ui.staff.done." + done].Value,
         _ => null
     };
 
@@ -126,6 +129,7 @@ public sealed class StaffPages
             Roles = roles.Roles,
             Branches = locations.Branches,
             Warehouses = locations.Warehouses,
+            Quick = await _quick.ExecuteAsync(context, new Vixly.Operations.Application.UseCases.Staff.GetOperationsQuickSignInState.GetOperationsQuickSignInStateRequest { UserId = userId }, http.RequestAborted),
             Error = _errors.Describe(error),
             Info = info
         });
@@ -175,8 +179,11 @@ public sealed class StaffPages
         }
 
         http.Response.Headers.CacheControl = "no-store";
+        Vixly.Operations.Application.UseCases.Staff.GetOperationsQuickSignInState.GetOperationsQuickSignInStateResponse quick = await _quick.ExecuteAsync(OperationsCurrentUser.Context(http), new Vixly.Operations.Application.UseCases.Staff.GetOperationsQuickSignInState.GetOperationsQuickSignInStateRequest(), http.RequestAborted);
         return Page<AccountPage>(http, new
         {
+            HasPin = quick.HasPin,
+            PinLocked = quick.PinLocked,
             Company = await CompanyAsync(http),
             Me = account.Me,
             RecoveryCodesLeft = account.RecoveryCodesLeft,
@@ -197,6 +204,7 @@ public sealed class StaffPages
             Company = await CompanyAsync(http),
             ReturnUrl = returnUrl,
             HasSecondFactor = account.Me?.HasSecondFactor ?? false,
+            PasswordConfirms = account.PasswordConfirms,
             Error = _errors.Describe(error)
         });
     }

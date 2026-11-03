@@ -59,6 +59,40 @@ public static class OperationsEditorEndpoints
                 : await SitePageAsync(http, lang, draft, await CompanyAsync(http, brand), text, response.Error, null);
         });
 
+        // Customer testimonials (owner, 2026-10-30): recorded with the customer's agreement, shown or hidden on the website.
+        staff.MapGet("/site/testimonials", async (HttpContext http, string? saved, Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsUseCase list,
+            GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
+            await TestimonialsPageAsync(http, list, await CompanyAsync(http, brand), text, null, saved is null ? null : Saved(http, "testimonial"), null));
+
+        staff.MapPost("/site/testimonials", async (HttpContext http, IFormCollection form, Vixly.Operations.Application.UseCases.Site.RecordOperationsSiteTestimonial.RecordOperationsSiteTestimonialUseCase record,
+            Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsUseCase list, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
+        {
+            Vixly.Operations.Application.UseCases.Site.RecordOperationsSiteTestimonial.RecordOperationsSiteTestimonialRequest request = new()
+            {
+                Name = form["name"], Place = form["place"], Quote = form["quote"], Source = form["source"],
+                Rating = int.TryParse(form["rating"], out int rating) ? rating : null,
+                CustomerAgreed = form["agreed"] == "true"
+            };
+            Vixly.Operations.Application.UseCases.Site.RecordOperationsSiteTestimonial.RecordOperationsSiteTestimonialResponse response =
+                await record.ExecuteAsync(OperationsCurrentUser.Context(http), request, http.RequestAborted);
+
+            return response.Succeeded
+                ? Results.Redirect("/staff/site/testimonials?saved=1")
+                : await TestimonialsPageAsync(http, list, await CompanyAsync(http, brand), text, response.Error, null, request);
+        });
+
+        staff.MapPost("/site/testimonials/{testimonialId:guid}/{action:regex(^(show|hide|remove)$)}", async (HttpContext http, Guid testimonialId, string action,
+            Vixly.Operations.Application.UseCases.Site.ChangeOperationsSiteTestimonial.ChangeOperationsSiteTestimonialUseCase change, Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsUseCase list,
+            GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
+        {
+            Vixly.Operations.Application.UseCases.Site.ChangeOperationsSiteTestimonial.ChangeOperationsSiteTestimonialResponse response = await change.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Site.ChangeOperationsSiteTestimonial.ChangeOperationsSiteTestimonialRequest { TestimonialId = testimonialId, Action = action }, http.RequestAborted);
+
+            return response.Succeeded
+                ? Results.Redirect("/staff/site/testimonials?saved=1")
+                : await TestimonialsPageAsync(http, list, await CompanyAsync(http, brand), text, response.Error, null, null);
+        });
+
         staff.MapPost("/site/publish", async (HttpContext http, IFormCollection form, PublishOperationsSiteUseCase publish, GetOperationsSiteDraftUseCase draft, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
         {
             PublishOperationsSiteResponse response = await publish.ExecuteAsync(OperationsCurrentUser.Context(http), new PublishOperationsSiteRequest(), http.RequestAborted);
@@ -245,6 +279,23 @@ public static class OperationsEditorEndpoints
         });
     }
 
+    private static async Task<IResult> TestimonialsPageAsync(HttpContext http, Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsUseCase list, string? company,
+        OperationsErrorText text, Error? error, string? info, Vixly.Operations.Application.UseCases.Site.RecordOperationsSiteTestimonial.RecordOperationsSiteTestimonialRequest? entered)
+    {
+        Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsResponse response =
+            await list.ExecuteAsync(OperationsCurrentUser.Context(http), new Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsRequest(), http.RequestAborted);
+        http.Response.Headers.CacheControl = "no-store";
+
+        return Page<SiteTestimonialsPage>(new
+        {
+            Company = company,
+            Testimonials = response.Testimonials,
+            Entered = entered,
+            Error = text.Describe(error ?? response.Error),
+            Info = info
+        });
+    }
+
     private static async Task<IResult> LocationsPageAsync(HttpContext http, ListOperationsLocationsUseCase list, string? company, OperationsErrorText text, Error? error, string? info)
     {
         ListOperationsLocationsResponse locations = await list.ExecuteAsync(OperationsCurrentUser.Context(http), new ListOperationsLocationsRequest(), http.RequestAborted);
@@ -273,6 +324,7 @@ public static class OperationsEditorEndpoints
             "published" => text["ui.editor.saved.published"],
             "image" => text["ui.editor.saved.image"],
             "location" => text["ui.editor.saved.location"],
+            "testimonial" => text["ui.editor.saved.testimonial"],
             _ => text["ui.editor.saved.draft"]
         };
     }

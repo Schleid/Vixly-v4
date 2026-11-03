@@ -90,3 +90,7 @@ body.ops-auth { background:radial-gradient(ellipse at top,var(--vx-color-primary
 .ops-auth .vx-auth__steps li::before { content:counter(access-step,decimal-leading-zero); font-family:var(--vx-font-mono); color:var(--vx-color-primary); font-weight:650; }
 @media(max-width:560px) { .ops-auth .vx-auth__header { padding:1.5rem; } .ops-auth .vx-auth__content { padding:1.5rem; } .ops-access-art { width:84px; height:90px; } .ops-auth .vx-auth__title { font-size:1.55rem; } .ops-access-heading { gap:.75rem; } .ops-auth .vx-auth__terminal { border-radius:.9rem; } .ops-access-kicker { font-size:.5625rem; } }
 .ops-auth a.vx-button--primary { color:var(--vx-color-on-primary); }
+.ops-auth .ops-idle__time strong, .ops-editor .ops-idle__time strong { font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+/* Owner, 2026-11-01: the Operations icon replaces the bar before the company name. */
+.ops-auth .vx-auth__brand-title:has(.ops-auth__mark)::before { content:none; }
+.ops-auth .ops-auth__mark { display:inline-grid; place-items:center; width:1.6rem; height:1.6rem; border-radius:.5rem; background:linear-gradient(135deg,#2563eb,#1e40af); color:#fff; flex:none; }

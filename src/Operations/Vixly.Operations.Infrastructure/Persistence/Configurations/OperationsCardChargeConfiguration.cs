@@ -29,6 +29,16 @@ internal sealed class OperationsCardChargeConfiguration : IEntityTypeConfigurati
         builder.Property(charge => charge.CheckoutSessionId).HasMaxLength(255).IsUnicode(false);
         builder.Property(charge => charge.PaymentIntentId).HasMaxLength(255).IsUnicode(false);
         builder.Property(charge => charge.PageUrl).HasMaxLength(2000).IsUnicode(false);
+        // The lines before the card (owner, 2026-10-26), as JSON; empty for a card that pays everything.
+        builder.Property(charge => charge.OtherTenders).HasColumnName("OtherTenders")
+            .HasConversion(
+                tenders => tenders.Count == 0 ? null : System.Text.Json.JsonSerializer.Serialize(tenders, (System.Text.Json.JsonSerializerOptions?)null),
+                json => json == null ? new List<OperationsTenderDraft>() : System.Text.Json.JsonSerializer.Deserialize<List<OperationsTenderDraft>>(json, (System.Text.Json.JsonSerializerOptions?)null)!,
+                new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<IReadOnlyList<OperationsTenderDraft>>(
+                    (left, right) => left!.SequenceEqual(right!),
+                    tenders => tenders.Aggregate(0, (hash, tender) => HashCode.Combine(hash, tender.GetHashCode())),
+                    tenders => tenders.ToList()))
+            .IsRequired(false);
         builder.HasOne<OperationsInvoice>().WithMany().HasForeignKey(charge => charge.InvoiceId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<OperationsWarehouse>().WithMany().HasForeignKey(charge => charge.WarehouseId).OnDelete(DeleteBehavior.Restrict);
         builder.HasIndex(charge => charge.InvoiceId).IsUnique().HasFilter("[Status] = 1").HasDatabaseName("IX_CardCharges_InvoiceId_Started");

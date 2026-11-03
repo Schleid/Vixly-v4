@@ -52,7 +52,7 @@ public sealed class OperationsSettingsHttpTests : IClassFixture<OperationsWebDat
         using CookieClient owner = await OwnerAsync("setco");
 
         (HttpResponseMessage _, string home) = await owner.GetAsync("/staff");
-        Assert.Contains("<a href=\"/staff/settings\">Choose the currency and units</a>", home, StringComparison.Ordinal);
+        Assert.Matches("<a href=\"/staff/settings\"[^>]*>(?:(?!</a>).)*Choose the currency and units", home);
 
         (HttpResponseMessage _, string page) = await owner.GetAsync("/staff/settings");
         (HttpResponseMessage _, string same) = await owner.PostAsync("/staff/settings", page, Fields("A", "A"));
@@ -65,13 +65,65 @@ public sealed class OperationsSettingsHttpTests : IClassFixture<OperationsWebDat
         Assert.Matches("<option value=\"Pound\" selected", after);
         Assert.Contains("value=\"ENV\"", after, StringComparison.Ordinal);
         (HttpResponseMessage _, string done) = await owner.GetAsync("/staff");
-        Assert.Contains("✓ Choose the currency and units", done, StringComparison.Ordinal);
+        Assert.Matches("✓</span> Choose the currency and units", done);
 
         (HttpResponseMessage _, string history) = await owner.GetAsync("/staff/audit?area=settings");
         Assert.Contains("ops.settings.changed", history, StringComparison.Ordinal);
         Assert.Contains("Grace Hopper", history, StringComparison.Ordinal);
         (HttpResponseMessage _, string roles) = await owner.GetAsync("/staff/audit?area=roles");
         Assert.DoesNotContain("ops.settings.changed", roles, StringComparison.Ordinal);
+    }
+
+    // Owner, 2026-10-22: "Require MFA: Yes/No". With No, someone without an authenticator confirms with the password.
+    [SqlServerFact]
+    public async Task RequireMfaNo_IsSavedByTheOwner_AndStaffWithoutAnAppConfirmWithThePassword()
+    {
+        NewTenant("mfaco", "Mfa Co");
+        using CookieClient owner = await OwnerAsync("mfaco");
+        using CookieClient ada = await StaffAsync(owner, "mfaco");
+
+        (HttpResponseMessage _, string before) = await ada.GetAsync("/staff/confirm?returnUrl=/staff/account");
+        Assert.DoesNotContain("type=\"password\"", before, StringComparison.Ordinal);
+
+        (HttpResponseMessage _, string page) = await owner.GetAsync("/staff/settings");
+        Assert.Matches("name=\"requireMfa\" value=\"true\" checked", page);
+        (HttpResponseMessage saved, string _) = await owner.PostAsync("/staff/settings", page, Fields("SH", "RC").Append(("requireMfa", "false")).ToArray());
+        Assert.Equal("/staff/settings?done=1", saved.Headers.Location?.OriginalString);
+        (HttpResponseMessage _, string after) = await owner.GetAsync("/staff/settings");
+        Assert.Matches("name=\"requireMfa\" value=\"false\" checked", after);
+
+        (HttpResponseMessage _, string confirm) = await ada.GetAsync("/staff/confirm?returnUrl=/staff/account");
+        Assert.Contains("type=\"password\"", confirm, StringComparison.Ordinal);
+        (HttpResponseMessage wrong, string refused) = await ada.PostAsync("/staff/confirm", confirm, ("code", "not the password at all"), ("returnUrl", "/staff/account"));
+        Assert.Null(wrong.Headers.Location);
+        (HttpResponseMessage right, string _) = await ada.PostAsync("/staff/confirm", refused, ("code", Password), ("returnUrl", "/staff/account"));
+        Assert.Equal("/staff/account", right.Headers.Location?.OriginalString);
+    }
+
+    // Owner, 2026-10-27: the inactivity sign-out is a setting the company's security administrator manages, no longer fixed in the code.
+    [SqlServerFact]
+    public async Task IdleTimes_AreSetInSettings_AndThePagesFollowThem()
+    {
+        NewTenant("idleco", "Idle Co");
+        using CookieClient owner = await OwnerAsync("idleco");
+
+        (HttpResponseMessage _, string page) = await owner.GetAsync("/staff/settings");
+        Assert.Contains("data-idle-warn=\"780\" data-idle-end=\"900\"", page, StringComparison.Ordinal);
+        Assert.Matches("name=\"staffIdle\"[^>]*value=\"15\"", page);
+        Assert.Matches("name=\"customerIdle\"[^>]*value=\"60\"", page);
+
+        (HttpResponseMessage refused, string tooShort) = await owner.PostAsync("/staff/settings", page,
+            Fields("SH", "RC").Concat(new[] { ("staffIdle", "3"), ("customerIdle", "60"), ("idleWarn", "2") }).ToArray());
+        Assert.Null(refused.Headers.Location);
+        Assert.Contains("Staff sign-out after inactivity must be between 5 and 60 minutes.", tooShort, StringComparison.Ordinal);
+
+        (HttpResponseMessage saved, string _) = await owner.PostAsync("/staff/settings", page,
+            Fields("SH", "RC").Concat(new[] { ("staffIdle", "20"), ("customerIdle", "90"), ("idleWarn", "3") }).ToArray());
+        Assert.Equal("/staff/settings?done=1", saved.Headers.Location?.OriginalString);
+
+        (HttpResponseMessage _, string after) = await owner.GetAsync("/staff/settings");
+        Assert.Contains("data-idle-warn=\"1020\" data-idle-end=\"1200\"", after, StringComparison.Ordinal);
+        Assert.Matches("name=\"customerIdle\"[^>]*value=\"90\"", after);
     }
 
     [SqlServerFact]
@@ -84,9 +136,21 @@ public sealed class OperationsSettingsHttpTests : IClassFixture<OperationsWebDat
         Assert.Contains("Ocean full container", page, StringComparison.Ordinal);
         Assert.Contains("Priced by container", page, StringComparison.Ordinal);
         Assert.Contains("value=\"6000\"", page, StringComparison.Ordinal);
+        // Owner, 2026-10-31: the label codes start from the catalogue's defaults; both ocean services share VXS.
+        Assert.Contains("name=\"code_air_express\" value=\"VXE\"", page, StringComparison.Ordinal);
+        Assert.Contains("name=\"code_ocean_full_container\" value=\"VXS\"", page, StringComparison.Ordinal);
+
+        (HttpResponseMessage refused, string refusedPage) = await owner.PostAsync("/staff/services", page,
+            ("offered", "air_standard"), ("code_air_standard", "VX1"), ("min_air_standard", "3"), ("max_air_standard", "5"), ("divisor_air_standard", "5000"),
+            ("min_air_express", "2"), ("max_air_express", "3"), ("divisor_air_express", "6000"),
+            ("min_ocean_consolidated", "14"), ("max_ocean_consolidated", "28"), ("divisor_ocean_consolidated", "1000"),
+            ("min_ocean_full_container", "14"), ("max_ocean_full_container", "35"),
+            ("min_ground", "1"), ("max_ground", "2"), ("divisor_ground", "5000"));
+        Assert.Null(refused.Headers.Location);
+        Assert.Contains("exactly 3 letters", refusedPage, StringComparison.Ordinal);
 
         (HttpResponseMessage saved, string _) = await owner.PostAsync("/staff/services", page,
-            ("offered", "air_standard"), ("offered", "ground"),
+            ("offered", "air_standard"), ("offered", "ground"), ("code_air_standard", "gla"),
             ("label_air_standard", "Air Miami"), ("min_air_standard", "3"), ("max_air_standard", "5"), ("divisor_air_standard", "5000"),
             ("min_air_express", "2"), ("max_air_express", "3"), ("divisor_air_express", "6000"),
             ("min_ocean_consolidated", "14"), ("max_ocean_consolidated", "28"), ("divisor_ocean_consolidated", "1000"),
@@ -96,10 +160,12 @@ public sealed class OperationsSettingsHttpTests : IClassFixture<OperationsWebDat
 
         (HttpResponseMessage _, string after) = await owner.GetAsync("/staff/services");
         Assert.Contains("value=\"Air Miami\"", after, StringComparison.Ordinal);
+        Assert.Contains("name=\"code_air_standard\" value=\"GLA\"", after, StringComparison.Ordinal);
+        Assert.Contains("name=\"code_ground\" value=\"VXG\"", after, StringComparison.Ordinal);
         Assert.Matches("value=\"ground\" checked", after);
         Assert.DoesNotMatch("value=\"air_express\" checked", after);
         (HttpResponseMessage _, string home) = await owner.GetAsync("/staff");
-        Assert.Contains("✓ Choose your shipping services", home, StringComparison.Ordinal);
+        Assert.Matches("✓</span> Choose your shipping services", home);
     }
 
     [SqlServerFact]
@@ -119,17 +185,122 @@ public sealed class OperationsSettingsHttpTests : IClassFixture<OperationsWebDat
         Assert.Equal("billing", Assert.Single(update.Contacts).Role);
         Assert.Equal("fr", update.Language);
 
+        // 2026-10-25: the profile is saved directly; only the legal name goes through a request with proof.
+        (HttpResponseMessage profile, string _) = await owner.PostAsync("/staff/company/profile", page,
+            ("tradingName", "Acme Express"), ("email", "billing@acme.example"), ("phone", "+50922223333"), ("line1", "12 Rue Capois"), ("city", "Port-au-Prince"), ("country", "ht"));
+        Assert.Equal("/staff/company?done=saved", profile.Headers.Location?.OriginalString);
+        var saved2 = Assert.Single(_host.Company.Profiles);
+        Assert.True(saved2.Actor.StepUp);
+        Assert.Equal("HT", saved2.Input.CountryCode);
+        Assert.Equal("Acme Express", saved2.Input.TradingName);
+
         (HttpResponseMessage sent, string _) = await owner.PostFormWithFileAsync("/staff/company/change", page, "proof", "proof.pdf", "application/pdf", Encoding.ASCII.GetBytes("%PDF-1.7 proof"),
-            ("legalName", "Acme Freight Haiti SA"), ("email", "billing@acme.example"), ("phone", "+50922223333"), ("line1", "12 Rue Capois"), ("city", "Port-au-Prince"),
-            ("country", "ht"), ("reason", "New legal name"));
+            ("legalName", "Acme Freight Haiti SA"), ("reason", "New legal name"));
         Assert.Equal("/staff/company?done=change", sent.Headers.Location?.OriginalString);
         var change = Assert.Single(_host.Company.Changes);
         Assert.Equal("proof.pdf", change.Input.ProofFileName);
-        Assert.Equal("HT", change.Input.CountryCode);
+        Assert.Equal("Acme Freight Haiti SA", change.Input.LegalName);
 
         (HttpResponseMessage _, string waiting) = await owner.GetAsync("/staff/company");
         Assert.Contains("Waiting for support", waiting, StringComparison.Ordinal);
         Assert.Contains("/staff/company/change/withdraw", waiting, StringComparison.Ordinal);
+    }
+
+    // Owner, 2026-10-28: a document logo, shown on the company page once saved, with its black and white copy for labels and sample PDFs.
+    [SqlServerFact]
+    public async Task Company_DocumentLogo_IsShownOnceSaved_PrintsOnSamples_AndCanBeRemoved()
+    {
+        NewTenant("logoco", "Logo Co");
+        using CookieClient owner = await OwnerAsync("logoco");
+
+        (HttpResponseMessage _, string page) = await owner.GetAsync("/staff/company");
+        Assert.Contains("No document logo yet", page, StringComparison.Ordinal);
+        Assert.Equal(HttpStatusCode.NotFound, (await owner.GetAsync("/staff/company/document-logo")).Response.StatusCode);
+
+        // A JPEG is refused: the label copy is made from a PNG.
+        byte[] jpeg = { 0xFF, 0xD8, 0xFF, 0xE0, 0, 16, (byte)'J', (byte)'F', (byte)'I', (byte)'F', 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0xFF, 0xD9 };
+        Assert.Contains("must be a PNG", (await owner.PostFormWithFileAsync("/staff/company/document-logo", page, "logo", "logo.jpg", "image/jpeg", jpeg)).Html, StringComparison.Ordinal);
+
+        byte[] png = Png(120, 40);
+        (HttpResponseMessage saved, string _) = await owner.PostFormWithFileAsync("/staff/company/document-logo", page, "logo", "logo.png", "image/png", png);
+        Assert.Equal("/staff/company?done=logo_saved#document-logo", saved.Headers.Location?.OriginalString);
+        (HttpResponseMessage _, string shown) = await owner.GetAsync("/staff/company?done=logo_saved");
+        Assert.Contains("Document logo saved", shown, StringComparison.Ordinal);
+        Assert.Contains("Logo saved and in use", shown, StringComparison.Ordinal);
+        Assert.Contains("120 × 40 px", shown, StringComparison.Ordinal);
+        Assert.Matches("src=\"/staff/company/document-logo\\?v=\\d+\"", shown);
+
+        HttpResponseMessage logo = (await owner.GetAsync("/staff/company/document-logo")).Response;
+        Assert.Equal("image/png", logo.Content.Headers.ContentType?.MediaType);
+        Assert.Equal(png, await logo.Content.ReadAsByteArrayAsync());
+        byte[] label = await (await owner.GetAsync("/staff/company/document-logo?label=true")).Response.Content.ReadAsByteArrayAsync();
+        Assert.Equal((byte)1, label[24]);
+
+        foreach (string sample in new[] { "/staff/company/document-logo/sample", "/staff/company/document-logo/sample-label" })
+        {
+            Assert.Equal("application/pdf", (await owner.GetAsync(sample)).Response.Content.Headers.ContentType?.MediaType);
+        }
+
+        (HttpResponseMessage removed, string _) = await owner.PostAsync("/staff/company/document-logo/remove", shown);
+        Assert.Equal("/staff/company?done=logo_removed#document-logo", removed.Headers.Location?.OriginalString);
+        Assert.Contains("No document logo yet", (await owner.GetAsync("/staff/company")).Html, StringComparison.Ordinal);
+        Assert.Equal(HttpStatusCode.NotFound, (await owner.GetAsync("/staff/company/document-logo")).Response.StatusCode);
+    }
+
+    // A blue and orange RGBA logo on a transparent background.
+    private static byte[] Png(int width, int height)
+    {
+        using MemoryStream raw = new();
+
+        for (int y = 0; y < height; y++)
+        {
+            raw.WriteByte(0);
+
+            for (int x = 0; x < width; x++)
+            {
+                raw.Write(x < width / 3 ? new byte[] { 20, 40, 200, 255 } : x < width * 2 / 3 ? new byte[] { 250, 160, 10, 255 } : new byte[] { 0, 0, 0, 0 });
+            }
+        }
+
+        using MemoryStream packed = new();
+
+        using (System.IO.Compression.ZLibStream deflate = new(packed, System.IO.Compression.CompressionLevel.Fastest, leaveOpen: true))
+        {
+            deflate.Write(raw.ToArray());
+        }
+
+        byte[] header = new byte[13];
+        System.Buffers.Binary.BinaryPrimitives.WriteInt32BigEndian(header, width);
+        System.Buffers.Binary.BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(4), height);
+        (header[8], header[9]) = (8, 6);
+        using MemoryStream png = new();
+        png.Write(new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A });
+
+        foreach ((string type, byte[] content) in new[] { ("IHDR", header), ("IDAT", packed.ToArray()), ("IEND", Array.Empty<byte>()) })
+        {
+            byte[] length = new byte[4];
+            System.Buffers.Binary.BinaryPrimitives.WriteInt32BigEndian(length, content.Length);
+            png.Write(length);
+            png.Write(Encoding.ASCII.GetBytes(type));
+            png.Write(content);
+            uint crc = 0xFFFFFFFFu;
+
+            foreach (byte value in Encoding.ASCII.GetBytes(type).Concat(content))
+            {
+                crc ^= value;
+
+                for (int bit = 0; bit < 8; bit++)
+                {
+                    crc = (crc & 1) != 0 ? 0xEDB88320u ^ (crc >> 1) : crc >> 1;
+                }
+            }
+
+            byte[] check = new byte[4];
+            System.Buffers.Binary.BinaryPrimitives.WriteUInt32BigEndian(check, crc ^ 0xFFFFFFFFu);
+            png.Write(check);
+        }
+
+        return png.ToArray();
     }
 
     [SqlServerFact]

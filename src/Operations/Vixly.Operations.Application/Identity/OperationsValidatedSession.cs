@@ -11,5 +11,9 @@
 //
 // IMPORTANT NOTES:
 // - Built only by OperationsSessionValidator
+// - IdleTimes: the company's inactivity times, for the page's warning and sign-out (owner, 2026-10-27)
 // =========================================================
-public sealed record OperationsValidatedSession(Guid UserId, Guid SessionId, string DisplayName, string PreferredLanguage, bool IsOwner, bool IsSetupSession, bool IsAdministrator = false);
+public sealed record OperationsValidatedSession(Guid UserId, Guid SessionId, string DisplayName, string PreferredLanguage, bool IsOwner, bool IsSetupSession, bool IsAdministrator = false)
+{
+    public OperationsIdleTimes IdleTimes { get; init; } = OperationsIdleTimes.Default;
+}

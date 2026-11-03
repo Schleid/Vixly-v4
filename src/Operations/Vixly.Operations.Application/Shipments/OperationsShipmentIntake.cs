@@ -34,8 +34,15 @@ public sealed class OperationsShipmentIntake
 
     private readonly TimeProvider _timeProvider;
 
-    public OperationsShipmentIntake(IOperationsLocationRepository locations, IOperationsSettingsRepository settings, IOperationsChargeRepository charges, TimeProvider timeProvider)
+    private readonly IOperationsTenantScope? _scope;
+
+    private readonly IOperationsPlanFeatures? _features;
+
+    public OperationsShipmentIntake(IOperationsLocationRepository locations, IOperationsSettingsRepository settings, IOperationsChargeRepository charges, TimeProvider timeProvider,
+        IOperationsTenantScope? scope = null, IOperationsPlanFeatures? features = null)
     {
+        _scope = scope;
+        _features = features;
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         _locations = locations ?? throw new ArgumentNullException(nameof(locations));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
@@ -48,7 +55,9 @@ public sealed class OperationsShipmentIntake
             .OrderBy(warehouse => warehouse.Address.CountryCode, StringComparer.Ordinal).ThenBy(warehouse => warehouse.Name, StringComparer.CurrentCulture).ToList();
 
     // Slice 4C: the insurance products in use with their terms in force, which the customer accepts when insuring; Slice 5D: in the company's order.
+    // Vixly Lite (owner, 2026-10-30): none when insurance is not in the company's plan.
     public async Task<IReadOnlyList<OperationsInsurancePlan>> InsuranceAsync(CancellationToken cancellationToken) =>
+        !await IncludesAsync(Vixly.Operations.Application.Plans.OperationsPlanModules.Insurance, cancellationToken) ? Array.Empty<OperationsInsurancePlan>() :
         (await _charges.ListInsurancePlansAsync(cancellationToken)).Where(plan => plan.IsActive && plan.VersionAt(_timeProvider.GetUtcNow()) is not null)
             .OrderBy(plan => plan.Mode).ThenBy(plan => plan.Position).ThenBy(plan => plan.Name, StringComparer.CurrentCulture).ToList();
 
@@ -64,8 +73,17 @@ public sealed class OperationsShipmentIntake
     // Freight collect offered to senders (owner, 2026-10-21).
     public async Task<bool> AllowCollectAsync(CancellationToken cancellationToken) => (await _settings.FindAsync(cancellationToken))?.AllowCollect == true;
 
-    public async Task<OperationsDeliveryModes> DeliveryModesAsync(CancellationToken cancellationToken) =>
-        (await _settings.FindAsync(cancellationToken))?.DeliveryModes ?? OperationsDeliveryModes.Pickup;
+    // Vixly Lite (owner, 2026-10-30): pickup only when home delivery is not in the company's plan.
+    public async Task<OperationsDeliveryModes> DeliveryModesAsync(CancellationToken cancellationToken)
+    {
+        OperationsDeliveryModes modes = (await _settings.FindAsync(cancellationToken))?.DeliveryModes ?? OperationsDeliveryModes.Pickup;
+
+        return await IncludesAsync(Vixly.Operations.Application.Plans.OperationsPlanModules.HomeDelivery, cancellationToken) ? modes : OperationsDeliveryModes.Pickup;
+    }
+
+    // A module of the company's plan; without a company scope or plan features (tests, the system), everything is included.
+    public async Task<bool> IncludesAsync(string module, CancellationToken cancellationToken) =>
+        _scope?.TenantId is not { } tenantId || _features is null || (await _features.GetAsync(tenantId, cancellationToken)).Includes(module);
 
     // The warehouses where the customer has a mailbox address.
     public async Task<IReadOnlyList<OperationsChoice>> OriginsAsync(OperationsCustomer customer, CancellationToken cancellationToken) =>
@@ -73,17 +91,23 @@ public sealed class OperationsShipmentIntake
             .Select(mailbox => new OperationsChoice(mailbox.WarehouseId, mailbox.WarehouseName, mailbox.City + ", " + mailbox.CountryCode))
             .ToList();
 
+    // Slice 3C, for a company without destination warehouses: the branches with an office to collect from (owner, 2026-10-29: branches are countries).
     public async Task<IReadOnlyList<OperationsChoice>> PickupBranchesAsync(CancellationToken cancellationToken) =>
         (await _locations.ListBranchesAsync(cancellationToken))
-            .Where(branch => branch.Status == OperationsLocationStatus.Active && branch.Side != OperationsBranchSide.Origin)
-            .OrderBy(branch => branch.Address.CountryCode, StringComparer.Ordinal).ThenBy(branch => branch.Name, StringComparer.CurrentCulture)
-            .Select(branch => new OperationsChoice(branch.Id, branch.Name, branch.Address.City + ", " + branch.Address.CountryCode))
+            .Where(branch => branch.Status == OperationsLocationStatus.Active && branch.Address is not null)
+            .OrderBy(branch => branch.CountryCode, StringComparer.Ordinal).ThenBy(branch => branch.Name, StringComparer.CurrentCulture)
+            .Select(branch => new OperationsChoice(branch.Id, branch.Name, branch.Address!.City + ", " + branch.CountryCode))
             .ToList();
 
-    public async Task<IReadOnlyList<string>> DestinationCountriesAsync(CancellationToken cancellationToken) =>
-        (await _locations.ListBranchesAsync(cancellationToken))
-            .Where(branch => branch.Status == OperationsLocationStatus.Active && branch.Side != OperationsBranchSide.Origin)
-            .Select(branch => branch.Address.CountryCode).Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToList();
+    // The countries the company delivers to: those of its destination warehouses; without any, those of its active branches (Slice 3C).
+    public async Task<IReadOnlyList<string>> DestinationCountriesAsync(CancellationToken cancellationToken)
+    {
+        IReadOnlyList<OperationsWarehouse> destinations = await DestinationsAsync(cancellationToken);
+        IEnumerable<string> countries = destinations.Count > 0
+            ? destinations.Select(warehouse => warehouse.Address.CountryCode)
+            : (await _locations.ListBranchesAsync(cancellationToken)).Where(branch => branch.Status == OperationsLocationStatus.Active).Select(branch => branch.CountryCode);
+        return countries.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToList();
+    }
 
     // Slice 4D: the services priced for the customer (its own lists and the standard ones), in the platform's order.
     public async Task<IReadOnlyList<string>> ServicesAsync(Guid customerId, CancellationToken cancellationToken)
@@ -97,6 +121,13 @@ public sealed class OperationsShipmentIntake
         Guid? customerId = null, Guid? recordedBy = null)
     {
         ArgumentNullException.ThrowIfNull(draft);
+
+        // Vixly Lite (owner, 2026-10-30): no insured shipment when insurance is not in the company's plan.
+        if (draft.Insured && !await IncludesAsync(Vixly.Operations.Application.Plans.OperationsPlanModules.Insurance, cancellationToken))
+        {
+            return (null, OperationsShipmentErrors.InsuranceUnavailable);
+        }
+
         (OperationsShipmentInstructions? instructions, Error? error) = await BuildAsync(draft, cancellationToken);
 
         // Slice 4D: a service the company prices for the customer; none lets the company choose (Q-D1).

@@ -1,0 +1,26 @@
+﻿@*
+=========================================================
+FILE: CountryFlag.razor
+
+PURPOSE:
+A country's flag as a small picture, next to its name.
+
+RESPONSIBILITIES:
+- Show the flag of a two-letter country code from the bundled set (wwwroot/flags, flag-icons, MIT)
+
+IMPORTANT NOTES:
+- Owner, 2026-10-25: Windows shows flag emoji as two letters ("HT"), so pages use pictures; a list option
+  (select) cannot hold a picture and keeps the emoji
+- Decorative: the country name is always written beside it (alt is empty)
+=========================================================
+*@
+
+@if (Code is { Length: 2 } code && char.IsAsciiLetter(code[0]) && char.IsAsciiLetter(code[1]))
+{
+    <img class="vx-flag" src="/flags/@(code.ToLowerInvariant()).svg" width="20" height="15" alt="" loading="lazy" />
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string? Code { get; set; }
+}

@@ -337,7 +337,7 @@ public sealed class OperationsArrivalDesk
         {
             foreach (OperationsShipment shipment in ready.Select(parcel => shipments[parcel.ShipmentId!.Value]).DistinctBy(item => item.Id))
             {
-                _outbox.Write(OperationsPickupNotice.MessageType, here.TenantId, shipment.Id, new OperationsPickupNotice(shipment.CustomerId, portalSlug, shipment.Number ?? string.Empty,
+                _outbox.Write(OperationsPickupNotice.MessageType, here.TenantId, shipment.Id, new OperationsPickupNotice(shipment.CustomerId, portalSlug, shipment.NumberForCustomer,
                     here.Name, Line(here.Address), here.OpeningHours));
             }
         }

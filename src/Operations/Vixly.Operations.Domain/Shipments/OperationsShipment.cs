@@ -119,6 +119,26 @@ public sealed class OperationsShipment : OperationsEntity
     // The last bill at the destination's request key: a double click bills once (review).
     public Guid? DestinationBillKey { get; private set; }
 
+    // Freight collect or paid at origin (owner, 2026-10-27): a payment term the cashier or the counter may change; never on a cancelled shipment.
+    public bool ChangeFreightCollect(bool collect, DateTimeOffset utcNow)
+    {
+        if (Status == OperationsShipmentStatus.Cancelled)
+        {
+            throw new DomainException(OperationsReceivingErrors.ShipmentNotOpen);
+        }
+
+        OperationsShipmentOptions options = collect ? Options | OperationsShipmentOptions.FreightCollect : Options & ~OperationsShipmentOptions.FreightCollect;
+
+        if (options == Options)
+        {
+            return false;
+        }
+
+        Options = options;
+        MarkAsModified(utcNow);
+        return true;
+    }
+
     public void ChangeCollector(string? name, string? phone, DateTimeOffset utcNow)
     {
         // A person may collect only what is picked up at a branch or warehouse, once booked, until it is collected (R-6, review).
@@ -270,6 +290,34 @@ public sealed class OperationsShipment : OperationsEntity
         ArgumentException.ThrowIfNullOrWhiteSpace(number);
         Number ??= number;
     }
+
+    // Owner, 2026-10-28: given once the shipment is paid, charged to an account or collect; never in sequence (OperationsTrackingNumbers).
+    public string? TrackingNumber { get; private set; }
+
+    public DateTimeOffset? TrackingNumberUtc { get; private set; }
+
+    // Paid, on account or collect: the tracking number is the proof that it may move on.
+    public void GiveTrackingNumber(string trackingNumber, DateTimeOffset utcNow)
+    {
+        if (OperationsTrackingNumbers.Read(trackingNumber) != trackingNumber)
+        {
+            throw new ArgumentException("Not a tracking number.", nameof(trackingNumber));
+        }
+
+        if (TrackingNumber is not null || Status != OperationsShipmentStatus.Booked)
+        {
+            return;
+        }
+
+        (TrackingNumber, TrackingNumberUtc) = (trackingNumber, utcNow);
+        MarkAsModified(utcNow);
+    }
+
+    // In the customer's emails: "SH26000002 · VX 482 917 36 054" once it has a tracking number.
+    public string NumberForCustomer => TrackingNumber is { } tracking ? (Number ?? string.Empty) + " · " + OperationsTrackingNumbers.Format(tracking) : Number ?? string.Empty;
+
+    // Collect counts once the shipment is final (booked); paid and on account come from its invoice.
+    public bool CollectReadyForTracking => FreightCollect && IsBooked && TrackingNumber is null;
 
     // Slice 4D: the reference of the customer's form that created it, so a double click creates one shipment (ADR-0019).
     public string? RequestKey { get; private set; }

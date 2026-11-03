@@ -13,4 +13,7 @@ Governed by the [Global Standard](../../../docs/global/VIXLY-GLOBAL-STANDARD.md)
 
 ## Dense component previews
 
+The localized help primitive fixture is at `/primitives/help?lang=en` (also fr/es).
+It previews `VxHelpLink` and `VxHelpArticle` with trusted static example HTML.
+
 Open /primitives/workbench?lang=en (or fr/es) for the deterministic workbench fixtures. All figures, scans, selections and dispatch reviews are sample-only. Run the Gallery project with dotnet run; it needs no backend. See [verification and boundaries](../../../docs/shared/ENTERPRISE-WORKBENCH-2026-10-16.md).

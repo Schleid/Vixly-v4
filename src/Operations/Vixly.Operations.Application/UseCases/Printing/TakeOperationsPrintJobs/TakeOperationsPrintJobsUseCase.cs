@@ -58,7 +58,7 @@ public sealed class TakeOperationsPrintJobsUseCase
         }
 
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();
-        IReadOnlyList<OperationsPrintJob> jobs = await _printing.ListWaitingJobsAsync(agent.WarehouseId, utcNow, MaxJobs, cancellationToken);
+        IReadOnlyList<OperationsPrintJob> jobs = await _printing.ListWaitingJobsForAsync(agent.WarehouseId, agent.IsPhone ? agent.Id : null, utcNow, MaxJobs, cancellationToken);
         Dictionary<Guid, OperationsLabelPrinter> printers = (await _printing.ListPrintersByIdAsync(jobs.Select(job => job.PrinterId).Distinct().ToList(), cancellationToken))
             .Where(printer => printer.IsActive)
             .ToDictionary(printer => printer.Id);

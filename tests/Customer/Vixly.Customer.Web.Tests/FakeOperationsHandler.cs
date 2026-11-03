@@ -64,6 +64,12 @@ internal sealed class FakeOperationsHandler : HttpMessageHandler
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.Unauthorized));
         }
 
+        // The maintenance check polls in the background (Control backlog 2026-10-22): no window, and not counted with the page calls.
+        if (request.RequestUri!.AbsolutePath.StartsWith("/internal/v1/maintenance", StringComparison.Ordinal))
+        {
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(Array.Empty<OperationsMaintenanceWindowDto>()) });
+        }
+
         Claims.Add(JsonDocument.Parse(Base64Url.DecodeFromChars(parts[1])).RootElement.Clone());
 
         if (request.RequestUri!.AbsolutePath.StartsWith("/internal/v1/customers/", StringComparison.Ordinal))

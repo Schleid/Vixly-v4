@@ -18,7 +18,7 @@ IMPORTANT NOTES:
 @inherits OperationsAllowedComponent
 
 <nav class="ops-workspace__links" aria-label="@L["workspace_tasks"]">
-    @foreach (var item in OperationsNavigation.Groups.SelectMany(group => group.Items).Where(item => item.Section != "workspace" && OperationsNavigation.Visible(item.Permissions, Allowance)))
+    @foreach (var item in OperationsNavigation.Groups.SelectMany(group => group.Items).Where(item => item.Section != "workspace" && OperationsNavigation.Visible(item.Permissions, Allowance) && !Allowance.Hides(item.Url)))
     {
         <a href="@item.Url">
             <VxWorkspaceArt Kind="@OperationsPageHeading.Scene(item.Section)" />

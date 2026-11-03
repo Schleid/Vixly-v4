@@ -4,7 +4,9 @@ using Microsoft.Extensions.Options;
 using Vixly.Public.Web.Components;
 using Vixly.Public.Web.Endpoints;
 using Vixly.Public.Web.Platform;
+using Vixly.Public.Web.Features.Help;
 using Vixly.Shared.Hosting;
+using Vixly.Shared.Hosting.Maintenance;
 using Vixly.Shared.Localization;
 
 namespace Vixly.Public.Web.Hosting;
@@ -34,13 +36,21 @@ public static class PublicSiteHost
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+        // A missing setting names itself on a setup page instead of failing the start (owner, 2026-10-23).
+        if (Vixly.Shared.Hosting.Settings.VixlySettingsCheck.Run(builder, PublicSiteSettings.Site, PublicSiteSettings.All, configure) is { } setup)
+        {
+            return setup;
+        }
+
         builder.Services.Configure<PublicSiteOptions>(builder.Configuration.GetSection(PublicSiteOptions.SectionName));
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddLocalization();
         builder.Services.AddRazorComponents();
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddMemoryCache();
-        builder.Services.AddOutputCache();
+        builder.Services.AddOutputCache(options => options.AddPolicy("public-help", PublicHelpCachePolicy.Instance));
+        builder.Services.AddSingleton<PublicHelpCatalogue>();
+        builder.Services.AddScoped<PublicHelpPresenter>();
         builder.Services.AddAntiforgery(options =>
         {
             // A __Host- cookie is dropped by browsers unless it is Secure.
@@ -58,6 +68,8 @@ public static class PublicSiteHost
             })
             .AddHttpMessageHandler<PublicCallerHandler>();
         builder.Services.AddScoped<PlatformCatalog>();
+        builder.Services.AddVixlyMaintenance(builder.Configuration);
+        builder.Services.AddScoped<Vixly.Shared.Hosting.Maintenance.IVixlyMaintenanceSource, PublicMaintenanceSource>();
         builder.Services.AddHealthChecks().AddCheck<PlatformApiHealthCheck>("platform-api", tags: new[] { VixlyHealth.ReadyTag });
 
         IDataProtectionBuilder protection = builder.Services.AddDataProtection().SetApplicationName("Vixly.V4.Public.Web");
@@ -79,7 +91,7 @@ public static class PublicSiteHost
             app.Logger.LogWarning("PublicSite:KeysPath is not set: Data Protection keys live in memory only.");
         }
 
-        app.UseForwardedHeaders();
+        app.UseVixlyForwardedHeaders();
         app.UseVixlySecurityHeaders(ContentSecurityPolicy(site));
 
         if (!app.Environment.IsDevelopment())
@@ -104,6 +116,8 @@ public static class PublicSiteHost
             };
         });
         app.UsePublicLanguage();
+        app.UseVixlyMaintenance(PublicMaintenancePages.SiteOf, PublicMaintenancePages.Text, "/css/public.css");
+        app.UsePublicHelpNotFound();
         app.UseRateLimiter();
         app.UseOutputCache();
         app.UseAntiforgery();
@@ -112,6 +126,9 @@ public static class PublicSiteHost
         app.MapVixlyHealth();
         app.MapPublicEndpoints();
         app.MapRazorComponents<App>();
+
+        // Fail startup on an invalid or incomplete embedded help publication.
+        _ = app.Services.GetRequiredService<PublicHelpCatalogue>();
 
         return app;
     }

@@ -6,12 +6,17 @@
 -- database: database, schemas, tables, indexes, migration
 -- history and (optionally) the SQL logins and grants.
 --
--- HOW TO RUN
--- - SSMS: open this file, connect to the server
---   (developer machine: GDELL\SQLEXPRESS), press Execute.
+-- HOW TO RUN (the same for development, staging and production)
+-- - SSMS: open this file, connect to the server, choose the
+--   database in the toolbar (VixlyV4 on a developer machine or
+--   staging; db_ac936e_vixlyv4 on production), press Execute.
 --   SQLCMD mode is not needed.
--- - Command line:
---     sqlcmd -S GDELL\SQLEXPRESS -E -C -i vixly-v4-database.sql
+-- - Command line: name the database with -d, for example
+--     sqlcmd -S GDELL\SQLEXPRESS -E -C -d VixlyV4 -i vixly-v4-database.sql
+-- - Started from master, it creates VixlyV4 if needed and stops:
+--   choose VixlyV4 and run it again.
+-- - Shared hosting (SmarterASP.net): the database exists already
+--   (made in the control panel); nothing is created outside it.
 --
 -- SAFE TO RUN AGAIN
 -- - Every step checks first. Migrations already applied are
@@ -24,7 +29,8 @@
 --   2. Platform plane, schema [platform] (EF migrations, generated)
 --   3. Operations plane, schema [ops] (EF migrations, generated)
 --   4. Customer plane, schema [customer] (EF migrations, generated)
---   5. Logins and grants (only for the planes whose passwords are given)
+--   5. Logins (only when their passwords are given) and grants
+--      (every run, for the app users that exist)
 --
 -- IMPORTANT NOTES
 -- - Sections 2, 3 and 4 are generated from the EF migrations
@@ -50,11 +56,14 @@ GO
 
 -- =========================================================
 -- 0. SETTINGS
--- Leave the passwords empty on a developer machine that
--- uses Windows authentication: section 5 is then skipped.
--- Staging and production: fill the passwords of the planes
--- being set up, run, then clear them. A plane whose
--- passwords are empty keeps its logins as they are.
+-- One script for every database: development, staging and
+-- production, new or being updated. Choose the database in
+-- the toolbar and run it; it skips what is already there.
+-- Passwords: only to CREATE the app logins, on a server you
+-- control, once. Leave them empty otherwise: on shared hosting
+-- (no logins allowed; the sites use the database's own user)
+-- and for every update (existing logins are kept, and their
+-- grants are refreshed without the passwords).
 -- =========================================================
 EXEC sys.sp_set_session_context @key = N'vixly.platform_app_pwd',    @value = N'';
 EXEC sys.sp_set_session_context @key = N'vixly.platform_migr_pwd',   @value = N'';
@@ -65,23 +74,34 @@ GO
 
 -- =========================================================
 -- 1. DATABASE
+-- The script works in the CURRENT database: choose it in the
+-- SSMS toolbar (or connect with -d on the command line) before
+-- Execute. Shared hosting: the database the control panel
+-- created, for example db_xxxx_vixlyv4.
+-- Started from master (developer machine, staging): it creates
+-- VixlyV4 if needed and stops; choose VixlyV4 and run it again.
+-- (USE cannot be made conditional: SQL Server checks the name
+-- before running the batch.)
 -- =========================================================
-IF DB_ID(N'VixlyV4') IS NULL
+IF DB_NAME() = N'master'
 BEGIN
-    CREATE DATABASE [VixlyV4];
-    PRINT N'Created database VixlyV4.';
+    IF DB_ID(N'VixlyV4') IS NULL
+    BEGIN
+        CREATE DATABASE [VixlyV4];
+        PRINT N'Created database VixlyV4.';
+    END
+
+    RAISERROR(N'The current database is master. Nothing was changed in it. Choose the V4 database in the toolbar (VixlyV4, or the one the control panel created), then run the script again.', 16, 1);
+    SET NOEXEC ON;
 END
 ELSE
-    PRINT N'Database VixlyV4 already exists.';
-GO
-
-USE [VixlyV4];
+    PRINT N'Working in database ' + DB_NAME() + N'.';
 GO
 
 -- =========================================================
 -- 2. PLATFORM PLANE (schema [platform])
 -- Generated from the EF migrations of
--- Vixly.Platform.Infrastructure: InitialIdentity, SecondFactorsSessionsAudit, DataProtectionKeys, SignInChallenges, SessionStepUpFailures, PasskeyCeremonies, Tenants, Subscriptions, CommercialFlexibility, Billing, Payments, Collections, Licensing, Zelle, Legal, Contracts, Leads, TenantChanges, OwnerSupport, DeviceOriginAndSignInCountry
+-- Vixly.Platform.Infrastructure: InitialIdentity, SecondFactorsSessionsAudit, DataProtectionKeys, SignInChallenges, SessionStepUpFailures, PasskeyCeremonies, Tenants, Subscriptions, CommercialFlexibility, Billing, Payments, Collections, Licensing, Zelle, Legal, Contracts, Leads, TenantChanges, OwnerSupport, DeviceOriginAndSignInCountry, SecuritySettings, JobRuns, MaintenanceWindows, EmployeeNumbers, IdleSettings, ShipmentCap, PlanModules, SalesFeedAndCheckout
 -- =========================================================
 IF OBJECT_ID(N'[platform].[__EFMigrationsHistory]') IS NULL
 BEGIN
@@ -4130,10 +4150,514 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022205239_SecuritySettings'
+)
+BEGIN
+    CREATE TABLE [platform].[SecuritySettings] (
+        [Id] uniqueidentifier NOT NULL,
+        [Key] varchar(20) NOT NULL,
+        [RequireMfa] bit NOT NULL,
+        [UpdatedByUserId] uniqueidentifier NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_SecuritySettings] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_SecuritySettings_Users_UpdatedByUserId] FOREIGN KEY ([UpdatedByUserId]) REFERENCES [platform].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022205239_SecuritySettings'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_SecuritySettings_Key] ON [platform].[SecuritySettings] ([Key]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022205239_SecuritySettings'
+)
+BEGIN
+    CREATE INDEX [IX_SecuritySettings_UpdatedByUserId] ON [platform].[SecuritySettings] ([UpdatedByUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022205239_SecuritySettings'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022205239_SecuritySettings', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023080255_JobRuns'
+)
+BEGIN
+    CREATE TABLE [platform].[JobRuns] (
+        [Id] uniqueidentifier NOT NULL,
+        [Job] varchar(100) NOT NULL,
+        [FinishedUtc] datetimeoffset NULL,
+        [Handled] int NOT NULL,
+        [Failed] int NOT NULL,
+        [ErrorCode] varchar(200) NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_JobRuns] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023080255_JobRuns'
+)
+BEGIN
+    CREATE INDEX [IX_JobRuns_CreatedUtc] ON [platform].[JobRuns] ([CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023080255_JobRuns'
+)
+BEGIN
+    CREATE INDEX [IX_JobRuns_Job_CreatedUtc] ON [platform].[JobRuns] ([Job], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023080255_JobRuns'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261023080255_JobRuns', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023081422_MaintenanceWindows'
+)
+BEGIN
+    CREATE TABLE [platform].[MaintenanceWindows] (
+        [Id] uniqueidentifier NOT NULL,
+        [StartsUtc] datetimeoffset NOT NULL,
+        [EndsUtc] datetimeoffset NOT NULL,
+        [Sites] int NOT NULL,
+        [NoticeHours] int NOT NULL,
+        [MessageEn] nvarchar(500) NULL,
+        [MessageFr] nvarchar(500) NULL,
+        [MessageEs] nvarchar(500) NULL,
+        [PassHash] varchar(128) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NULL,
+        [CancelledUtc] datetimeoffset NULL,
+        [EndedEarlyUtc] datetimeoffset NULL,
+        [StoppedByUserId] uniqueidentifier NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_MaintenanceWindows] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023081422_MaintenanceWindows'
+)
+BEGIN
+    CREATE INDEX [IX_MaintenanceWindows_EndsUtc] ON [platform].[MaintenanceWindows] ([EndsUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023081422_MaintenanceWindows'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_MaintenanceWindows_PassHash] ON [platform].[MaintenanceWindows] ([PassHash]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023081422_MaintenanceWindows'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261023081422_MaintenanceWindows', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261025065710_EmployeeNumbers'
+)
+BEGIN
+    CREATE SEQUENCE [platform].[EmployeeNumbers] START WITH 1 INCREMENT BY 1 NO CYCLE;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261025065710_EmployeeNumbers'
+)
+BEGIN
+
+    WITH numbered AS (
+        SELECT [Id], ROW_NUMBER() OVER (ORDER BY [CreatedUtc], [Id]) AS [N]
+        FROM [platform].[Users]
+    )
+    UPDATE u SET [EmployeeNumber] = 'TC-' + RIGHT('0000' + CAST(n.[N] AS varchar(20)), CASE WHEN n.[N] > 9999 THEN LEN(CAST(n.[N] AS varchar(20))) ELSE 4 END)
+    FROM [platform].[Users] u JOIN numbered n ON n.[Id] = u.[Id];
+
+    DECLARE @restart nvarchar(200) = N'ALTER SEQUENCE [platform].[EmployeeNumbers] RESTART WITH '
+        + CAST((SELECT COUNT(*) + 1 FROM [platform].[Users]) AS nvarchar(20));
+    EXEC (@restart);
+
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261025065710_EmployeeNumbers'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_Users_EmployeeNumber] ON [platform].[Users] ([EmployeeNumber]) WHERE [EmployeeNumber] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261025065710_EmployeeNumbers'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261025065710_EmployeeNumbers', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027063428_IdleSettings'
+)
+BEGIN
+    ALTER TABLE [platform].[SecuritySettings] ADD [IdleMinutes] int NOT NULL DEFAULT 5;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027063428_IdleSettings'
+)
+BEGIN
+    ALTER TABLE [platform].[SecuritySettings] ADD [IdleWarnMinutes] int NOT NULL DEFAULT 1;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027063428_IdleSettings'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261027063428_IdleSettings', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030040445_ShipmentCap'
+)
+BEGIN
+    ALTER TABLE [platform].[PlanVersions] ADD [ExtraShipmentPrice] decimal(19,4) NOT NULL DEFAULT 0.0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030040445_ShipmentCap'
+)
+BEGIN
+    CREATE TABLE [platform].[TenantShipmentUsage] (
+        [Id] uniqueidentifier NOT NULL,
+        [PlatformTenantId] uniqueidentifier NOT NULL,
+        [Month] char(7) NOT NULL,
+        [Shipments] int NOT NULL,
+        [IsFinal] bit NOT NULL,
+        [ReportedUtc] datetimeoffset NOT NULL,
+        [Cap] int NULL,
+        [ExtraShipments] int NULL,
+        [ChargedAmount] decimal(19,4) NULL,
+        [CurrencyCode] char(3) NULL,
+        [ChargedUtc] datetimeoffset NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_TenantShipmentUsage] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_TenantShipmentUsage_Tenants_PlatformTenantId] FOREIGN KEY ([PlatformTenantId]) REFERENCES [platform].[Tenants] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030040445_ShipmentCap'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_TenantShipmentUsage_OnePerMonth] ON [platform].[TenantShipmentUsage] ([PlatformTenantId], [Month]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030040445_ShipmentCap'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261030040445_ShipmentCap', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030050813_PlanModules'
+)
+BEGIN
+    INSERT INTO [platform].[PlanVersionFeatures] ([PlanVersionId], [Feature])
+    SELECT v.[Id], m.[Feature]
+    FROM [platform].[PlanVersions] AS v
+    CROSS JOIN (VALUES (12), (13), (14), (15), (16), (17), (18)) AS m([Feature])
+    WHERE NOT EXISTS (SELECT 1 FROM [platform].[PlanVersionFeatures] AS f WHERE f.[PlanVersionId] = v.[Id] AND f.[Feature] = m.[Feature]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030050813_PlanModules'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261030050813_PlanModules', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    ALTER TABLE [platform].[Subscriptions] ADD [RenewalRemindedForUtc] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    ALTER TABLE [platform].[MerchantAccounts] ADD [CheckoutBackgroundColor] varchar(7) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    ALTER TABLE [platform].[MerchantAccounts] ADD [CheckoutButtonColor] varchar(7) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    ALTER TABLE [platform].[MerchantAccounts] ADD [CheckoutDisplayName] nvarchar(100) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    ALTER TABLE [platform].[MerchantAccounts] ADD [CheckoutIconUrl] varchar(500) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    ALTER TABLE [platform].[MerchantAccounts] ADD [CheckoutLogoUrl] varchar(500) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    ALTER TABLE [platform].[MerchantAccounts] ADD [StatementPrefix] varchar(10) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    ALTER TABLE [platform].[MerchantAccounts] ADD [StatementSuffix] varchar(22) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    ALTER TABLE [platform].[CardTransactions] ADD [Delayed] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    ALTER TABLE [platform].[CardTransactions] ADD [Wallet] varchar(20) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    CREATE TABLE [platform].[SalesFeedEvents] (
+        [Id] uniqueidentifier NOT NULL,
+        [Sequence] bigint NOT NULL,
+        [EventType] varchar(40) NOT NULL,
+        [Source] int NOT NULL,
+        [SourceId] uniqueidentifier NULL,
+        [TotalsDate] date NULL,
+        [PlatformTenantId] uniqueidentifier NULL,
+        [OccurredUtc] datetimeoffset NOT NULL,
+        [Amount] decimal(18,2) NULL,
+        [CurrencyCode] char(3) NULL,
+        [Payload] nvarchar(max) NOT NULL,
+        [Status] int NOT NULL,
+        [LastError] nvarchar(200) NULL,
+        [SentUtc] datetimeoffset NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_SalesFeedEvents] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    CREATE TABLE [platform].[SalesFeedState] (
+        [Id] uniqueidentifier NOT NULL,
+        [Key] varchar(20) NOT NULL,
+        [LastSuccessUtc] datetimeoffset NULL,
+        [FailingSinceUtc] datetimeoffset NULL,
+        [FailedAttempts] int NOT NULL,
+        [NextAttemptUtc] datetimeoffset NULL,
+        [LastFailure] varchar(40) NULL,
+        [Problem] varchar(40) NULL,
+        [ProblemUtc] datetimeoffset NULL,
+        [AlertedUtc] datetimeoffset NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        CONSTRAINT [PK_SalesFeedState] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    CREATE INDEX [IX_SalesFeedEvents_OccurredUtc] ON [platform].[SalesFeedEvents] ([OccurredUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_SalesFeedEvents_Sequence] ON [platform].[SalesFeedEvents] ([Sequence]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_SalesFeedEvents_Source_SourceId] ON [platform].[SalesFeedEvents] ([Source], [SourceId]) WHERE [SourceId] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    CREATE INDEX [IX_SalesFeedEvents_Status_Sequence] ON [platform].[SalesFeedEvents] ([Status], [Sequence]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_SalesFeedEvents_TotalsDate] ON [platform].[SalesFeedEvents] ([TotalsDate]) WHERE [TotalsDate] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_SalesFeedState_Key] ON [platform].[SalesFeedState] ([Key]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    EXEC(N'UPDATE [platform].[MerchantAccounts] SET [StatementSuffix] = ''VIXLY'' WHERE [StatementSuffix] IS NULL;');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [platform].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102202423_SalesFeedAndCheckout'
+)
+BEGIN
+    INSERT INTO [platform].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261102202423_SalesFeedAndCheckout', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
 -- =========================================================
 -- 3. OPERATIONS PLANE (schema [ops])
 -- Generated from the EF migrations of
--- Vixly.Operations.Infrastructure: OperationsFoundation, StaffSignIn, TenantSite, ContactPhones, StaffAndRoles, TenantSettings, ShippingServices, Customers, CustomersSelfService, TrackingCore, Receiving, ReceivingStations, CustomerShipments, InspectionAndHolds, HoldAnswersAndUnclaimed, ChargesEngine, ZonesAndPriceVersions, RoutesAndModes, OriginIntake, ShippingLabels, UndeclaredParcels, Tickets, ShipmentsDesk, InsuranceModule, FrontDeskCounter, InsuranceProducts, CounterSignature, SuppliesCatalogue, SuppliesStock, SuppliesAtCounter, InvoicesAndCreditNotes, CashierAndPayments, BundlesAndRepackBoxes, CreditAccounts, Dispatches, DispatchPapers, OperationalEvents, DestinationReceiving, PickupCounter, HomeDelivery, FreightCollect, BundleListsAndPricing, SignInPlaces, PartnerAgents, CustomersMailbox, CardPayments, CustomerScreens
+-- Vixly.Operations.Infrastructure: OperationsFoundation, StaffSignIn, TenantSite, ContactPhones, StaffAndRoles, TenantSettings, ShippingServices, Customers, CustomersSelfService, TrackingCore, Receiving, ReceivingStations, CustomerShipments, InspectionAndHolds, HoldAnswersAndUnclaimed, ChargesEngine, ZonesAndPriceVersions, RoutesAndModes, OriginIntake, ShippingLabels, UndeclaredParcels, Tickets, ShipmentsDesk, InsuranceModule, FrontDeskCounter, InsuranceProducts, CounterSignature, SuppliesCatalogue, SuppliesStock, SuppliesAtCounter, InvoicesAndCreditNotes, CashierAndPayments, BundlesAndRepackBoxes, CreditAccounts, Dispatches, DispatchPapers, OperationalEvents, DestinationReceiving, PickupCounter, HomeDelivery, FreightCollect, BundleListsAndPricing, SignInPlaces, PartnerAgents, CustomersMailbox, CardPayments, CustomerScreens, Payables, TextMessages, CompanyApi, Reporting, DeviceBlocks, RequireMfa, QuickSignIn, DriverApps, HandheldsAndPrintHelper, CustomerHomeAddress, SplitCardPayments, IdleSettings, PortalPayments, CustomerWelcomeTour, TrackingAndDocumentLogo, BranchesAsCountries, CustomerLookup, SupportAgents, TicketDesk, WebsiteThemes, ShipmentCap, LandingMarketing, CustomerBans, ShippingLabelCodes, ParcelItems
 -- =========================================================
 IF OBJECT_ID(N'[ops].[__EFMigrationsHistory]') IS NULL
 BEGIN
@@ -12955,6 +13479,2208 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [BillsNeedApproval] bit NOT NULL DEFAULT CAST(1 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    ALTER TABLE [ops].[Dispatches] ADD [BilledComplete] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    ALTER TABLE [ops].[Dispatches] ADD [BilledTotal] decimal(18,2) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    CREATE TABLE [ops].[Bills] (
+        [Id] uniqueidentifier NOT NULL,
+        [Party] int NOT NULL,
+        [CarrierId] uniqueidentifier NULL,
+        [PartnerWarehouseId] uniqueidentifier NULL,
+        [VendorId] uniqueidentifier NULL,
+        [PartyName] nvarchar(120) NOT NULL,
+        [Reference] nvarchar(60) NOT NULL,
+        [Category] int NOT NULL,
+        [BilledOn] date NOT NULL,
+        [DueOn] date NOT NULL,
+        [Amount] decimal(18,2) NOT NULL,
+        [CurrencyCode] varchar(3) NOT NULL,
+        [Note] nvarchar(500) NULL,
+        [Status] int NOT NULL,
+        [EnteredByUserId] uniqueidentifier NOT NULL,
+        [DecidedByUserId] uniqueidentifier NULL,
+        [DecidedUtc] datetimeoffset NULL,
+        [RejectReason] nvarchar(500) NULL,
+        [VoidReason] nvarchar(500) NULL,
+        [PaidTotal] decimal(18,2) NOT NULL,
+        [RowVersion] rowversion NULL,
+        [Editors] nvarchar(max) NOT NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        [Payments] nvarchar(max) NULL,
+        CONSTRAINT [PK_Bills] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    CREATE TABLE [ops].[Vendors] (
+        [Id] uniqueidentifier NOT NULL,
+        [Name] nvarchar(120) NOT NULL,
+        [Category] int NOT NULL,
+        [Contact] nvarchar(200) NULL,
+        [Active] bit NOT NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_Vendors] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    CREATE TABLE [ops].[BillAllocations] (
+        [Id] uniqueidentifier NOT NULL,
+        [DispatchId] uniqueidentifier NULL,
+        [ShipmentId] uniqueidentifier NULL,
+        [Reference] nvarchar(40) NOT NULL,
+        [Amount] decimal(18,2) NOT NULL,
+        [BillId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_BillAllocations] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_BillAllocations_Bills_BillId] FOREIGN KEY ([BillId]) REFERENCES [ops].[Bills] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    CREATE INDEX [IX_BillAllocations_BillId] ON [ops].[BillAllocations] ([BillId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    CREATE INDEX [IX_BillAllocations_DispatchId] ON [ops].[BillAllocations] ([DispatchId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    CREATE INDEX [IX_BillAllocations_ShipmentId] ON [ops].[BillAllocations] ([ShipmentId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    CREATE INDEX [IX_Bills_TenantId] ON [ops].[Bills] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    CREATE INDEX [IX_Bills_TenantId_Party_Reference] ON [ops].[Bills] ([TenantId], [Party], [Reference]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    CREATE INDEX [IX_Bills_TenantId_Status_DueOn] ON [ops].[Bills] ([TenantId], [Status], [DueOn]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    CREATE INDEX [IX_Vendors_TenantId] ON [ops].[Vendors] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_Vendors_TenantId_Name] ON [ops].[Vendors] ([TenantId], [Name]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022074430_Payables'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022074430_Payables', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022085934_TextMessages'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [TextNotices] int NOT NULL DEFAULT 0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022085934_TextMessages'
+)
+BEGIN
+    ALTER TABLE [ops].[Customers] ADD [NoticeChannel] int NOT NULL DEFAULT 0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022085934_TextMessages'
+)
+BEGIN
+    ALTER TABLE [ops].[Customers] ADD [NoticeChannelUtc] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022085934_TextMessages'
+)
+BEGIN
+    CREATE TABLE [ops].[TextMessages] (
+        [Id] uniqueidentifier NOT NULL,
+        [CustomerId] uniqueidentifier NOT NULL,
+        [Channel] int NOT NULL,
+        [Notice] int NOT NULL,
+        [ToHint] nvarchar(8) NOT NULL,
+        [Status] int NOT NULL,
+        [ProviderId] varchar(64) NULL,
+        [ErrorCode] varchar(32) NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_TextMessages] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022085934_TextMessages'
+)
+BEGIN
+    CREATE TABLE [ops].[TextProviders] (
+        [Id] uniqueidentifier NOT NULL,
+        [AccountSid] varchar(34) NOT NULL,
+        [AuthTokenProtected] varchar(2000) NOT NULL,
+        [TokenHint] varchar(4) NOT NULL,
+        [AccountName] nvarchar(120) NULL,
+        [SmsFrom] varchar(34) NULL,
+        [WhatsAppFrom] varchar(16) NULL,
+        [ConnectedByUserId] uniqueidentifier NOT NULL,
+        [CallbackUrl] varchar(300) NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        [Templates] nvarchar(max) NULL,
+        CONSTRAINT [PK_TextProviders] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022085934_TextMessages'
+)
+BEGIN
+    CREATE INDEX [IX_TextMessages_TenantId] ON [ops].[TextMessages] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022085934_TextMessages'
+)
+BEGIN
+    CREATE INDEX [IX_TextMessages_TenantId_CreatedUtc] ON [ops].[TextMessages] ([TenantId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022085934_TextMessages'
+)
+BEGIN
+    CREATE INDEX [IX_TextMessages_TenantId_ProviderId] ON [ops].[TextMessages] ([TenantId], [ProviderId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022085934_TextMessages'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_TextProviders_TenantId] ON [ops].[TextProviders] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022085934_TextMessages'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022085934_TextMessages', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE TABLE [ops].[ApiEvents] (
+        [Id] uniqueidentifier NOT NULL,
+        [Kind] int NOT NULL,
+        [SourceId] uniqueidentifier NOT NULL,
+        [Version] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_ApiEvents] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE TABLE [ops].[ApiKeys] (
+        [Id] uniqueidentifier NOT NULL,
+        [Name] nvarchar(80) NOT NULL,
+        [KeyId] varchar(16) NOT NULL,
+        [SecretHash] varchar(64) NOT NULL,
+        [Hint] varchar(4) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NOT NULL,
+        [LastUsedUtc] datetimeoffset NULL,
+        [RevokedUtc] datetimeoffset NULL,
+        [RevokedByUserId] uniqueidentifier NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_ApiKeys] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE TABLE [ops].[WebhookEndpoints] (
+        [Id] uniqueidentifier NOT NULL,
+        [Url] nvarchar(500) NOT NULL,
+        [Events] int NOT NULL,
+        [SecretProtected] varchar(2000) NOT NULL,
+        [SecretHint] varchar(4) NOT NULL,
+        [Active] bit NOT NULL,
+        [DisabledForFailures] bit NOT NULL,
+        [LastSuccessUtc] datetimeoffset NULL,
+        [FailingSinceUtc] datetimeoffset NULL,
+        [CreatedByUserId] uniqueidentifier NOT NULL,
+        [TrackingAfter] bigint NOT NULL,
+        [CustomersAfter] bigint NOT NULL,
+        [InvoicesAfter] bigint NOT NULL,
+        [PaymentsAfter] bigint NOT NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_WebhookEndpoints] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE TABLE [ops].[WebhookDeliveries] (
+        [Id] uniqueidentifier NOT NULL,
+        [EndpointId] uniqueidentifier NOT NULL,
+        [EventId] varchar(64) NOT NULL,
+        [EventType] varchar(40) NOT NULL,
+        [Payload] nvarchar(max) NOT NULL,
+        [Status] int NOT NULL,
+        [Attempts] int NOT NULL,
+        [NextAttemptUtc] datetimeoffset NOT NULL,
+        [LastAttemptUtc] datetimeoffset NULL,
+        [LastStatusCode] int NULL,
+        [LastError] varchar(64) NULL,
+        [LeaseUntilUtc] datetimeoffset NULL,
+        [LeaseToken] uniqueidentifier NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_WebhookDeliveries] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_WebhookDeliveries_WebhookEndpoints_EndpointId] FOREIGN KEY ([EndpointId]) REFERENCES [ops].[WebhookEndpoints] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_TrackingEvents_TenantId_CreatedUtc] ON [ops].[TrackingEvents] ([TenantId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_Shipments_TenantId_CreatedUtc] ON [ops].[Shipments] ([TenantId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_Payments_TenantId_CreatedUtc] ON [ops].[Payments] ([TenantId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_Parcels_TenantId_CreatedUtc] ON [ops].[Parcels] ([TenantId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_Invoices_TenantId_CreatedUtc] ON [ops].[Invoices] ([TenantId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_Customers_TenantId_CreatedUtc] ON [ops].[Customers] ([TenantId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_ApiEvents_CreatedUtc] ON [ops].[ApiEvents] ([CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_ApiEvents_TenantId] ON [ops].[ApiEvents] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_ApiEvents_TenantId_Kind_Version] ON [ops].[ApiEvents] ([TenantId], [Kind], [Version]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_ApiKeys_KeyId] ON [ops].[ApiKeys] ([KeyId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_ApiKeys_TenantId] ON [ops].[ApiKeys] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_WebhookDeliveries_EndpointId_EventId] ON [ops].[WebhookDeliveries] ([EndpointId], [EventId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_WebhookDeliveries_TenantId] ON [ops].[WebhookDeliveries] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_WebhookDeliveries_TenantId_CreatedUtc] ON [ops].[WebhookDeliveries] ([TenantId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_WebhookDeliveries_TenantId_Status_NextAttemptUtc] ON [ops].[WebhookDeliveries] ([TenantId], [Status], [NextAttemptUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_WebhookEndpoints_TenantId] ON [ops].[WebhookEndpoints] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    CREATE INDEX [IX_WebhookEndpoints_TenantId_Active] ON [ops].[WebhookEndpoints] ([TenantId], [Active]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022101218_CompanyApi'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022101218_CompanyApi', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022115412_Reporting'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [DispatchGraceHours] int NOT NULL DEFAULT 0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022115412_Reporting'
+)
+BEGIN
+    ALTER TABLE [ops].[ShippingServiceSetups] ADD [ReadyTargetDays] int NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022115412_Reporting'
+)
+BEGIN
+    CREATE TABLE [ops].[ReportSchedules] (
+        [Id] uniqueidentifier NOT NULL,
+        [ReportKey] varchar(40) NOT NULL,
+        [Frequency] int NOT NULL,
+        [Format] int NOT NULL,
+        [WarehouseId] uniqueidentifier NULL,
+        [Grain] int NOT NULL,
+        [Dimension] int NULL,
+        [Days] int NOT NULL,
+        [Recipients] nvarchar(max) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NOT NULL,
+        [NextRunUtc] datetimeoffset NOT NULL,
+        [LastSentUtc] datetimeoffset NULL,
+        [Failures] int NOT NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_ReportSchedules] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022115412_Reporting'
+)
+BEGIN
+    CREATE INDEX [IX_TrackingEvents_TenantId_Code_OccurredUtc] ON [ops].[TrackingEvents] ([TenantId], [Code], [OccurredUtc]) INCLUDE ([SubjectKind], [SubjectId], [LocationCode]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022115412_Reporting'
+)
+BEGIN
+    EXEC(N'CREATE INDEX [IX_Shipments_TenantId_BookedUtc] ON [ops].[Shipments] ([TenantId], [BookedUtc]) WHERE [BookedUtc] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022115412_Reporting'
+)
+BEGIN
+    CREATE INDEX [IX_Payments_TenantId_TakenUtc] ON [ops].[Payments] ([TenantId], [TakenUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022115412_Reporting'
+)
+BEGIN
+    CREATE INDEX [IX_Invoices_TenantId_IssuedOn] ON [ops].[Invoices] ([TenantId], [IssuedOn]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022115412_Reporting'
+)
+BEGIN
+    EXEC(N'CREATE INDEX [IX_Dispatches_TenantId_DepartedUtc] ON [ops].[Dispatches] ([TenantId], [DepartedUtc]) WHERE [DepartedUtc] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022115412_Reporting'
+)
+BEGIN
+    CREATE INDEX [IX_ReportSchedules_NextRunUtc] ON [ops].[ReportSchedules] ([NextRunUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022115412_Reporting'
+)
+BEGIN
+    CREATE INDEX [IX_ReportSchedules_TenantId] ON [ops].[ReportSchedules] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022115412_Reporting'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022115412_Reporting', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022154037_DeviceBlocks'
+)
+BEGIN
+    CREATE TABLE [ops].[DeviceBlocks] (
+        [Id] uniqueidentifier NOT NULL,
+        [DeviceId] uniqueidentifier NOT NULL,
+        [DeviceName] nvarchar(80) NULL,
+        [DeviceNumber] varchar(12) NULL,
+        [RegisteredCountry] char(2) NOT NULL,
+        [Country] char(2) NOT NULL,
+        [UserId] uniqueidentifier NULL,
+        [UnblockedUtc] datetimeoffset NULL,
+        [UnblockedByUserId] uniqueidentifier NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_DeviceBlocks] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022154037_DeviceBlocks'
+)
+BEGIN
+    CREATE INDEX [IX_DeviceBlocks_TenantId] ON [ops].[DeviceBlocks] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022154037_DeviceBlocks'
+)
+BEGIN
+    CREATE INDEX [IX_DeviceBlocks_TenantId_CreatedUtc] ON [ops].[DeviceBlocks] ([TenantId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022154037_DeviceBlocks'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_DeviceBlocks_TenantId_DeviceId] ON [ops].[DeviceBlocks] ([TenantId], [DeviceId]) WHERE [UnblockedUtc] IS NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022154037_DeviceBlocks'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022154037_DeviceBlocks', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022205325_RequireMfa'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [RequireMfa] bit NOT NULL DEFAULT CAST(1 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261022205325_RequireMfa'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261022205325_RequireMfa', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    ALTER TABLE [ops].[UserSessions] ADD [IsQuick] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    CREATE TABLE [ops].[DevicePeople] (
+        [Id] uniqueidentifier NOT NULL,
+        [DeviceId] uniqueidentifier NOT NULL,
+        [UserId] uniqueidentifier NOT NULL,
+        [LastSignInUtc] datetimeoffset NOT NULL,
+        [LastFullSignInUtc] datetimeoffset NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_DevicePeople] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_DevicePeople_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [ops].[Users] ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    CREATE TABLE [ops].[StaffBadges] (
+        [Id] uniqueidentifier NOT NULL,
+        [UserId] uniqueidentifier NOT NULL,
+        [CodeHash] char(64) NOT NULL,
+        [IssuedByUserId] uniqueidentifier NOT NULL,
+        [RevokedUtc] datetimeoffset NULL,
+        [RevokedByUserId] uniqueidentifier NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_StaffBadges] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_StaffBadges_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [ops].[Users] ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    CREATE TABLE [ops].[StaffPins] (
+        [Id] uniqueidentifier NOT NULL,
+        [UserId] uniqueidentifier NOT NULL,
+        [PinHash] varchar(200) NOT NULL,
+        [Failures] int NOT NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_StaffPins] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_StaffPins_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [ops].[Users] ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    CREATE INDEX [IX_DevicePeople_TenantId] ON [ops].[DevicePeople] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    CREATE INDEX [IX_DevicePeople_TenantId_DeviceId_LastSignInUtc] ON [ops].[DevicePeople] ([TenantId], [DeviceId], [LastSignInUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_DevicePeople_TenantId_DeviceId_UserId] ON [ops].[DevicePeople] ([TenantId], [DeviceId], [UserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    CREATE INDEX [IX_DevicePeople_UserId] ON [ops].[DevicePeople] ([UserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_StaffBadges_CodeHash] ON [ops].[StaffBadges] ([CodeHash]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    CREATE INDEX [IX_StaffBadges_TenantId] ON [ops].[StaffBadges] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_StaffBadges_TenantId_UserId] ON [ops].[StaffBadges] ([TenantId], [UserId]) WHERE [RevokedUtc] IS NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    CREATE INDEX [IX_StaffBadges_UserId] ON [ops].[StaffBadges] ([UserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    CREATE INDEX [IX_StaffPins_TenantId] ON [ops].[StaffPins] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_StaffPins_TenantId_UserId] ON [ops].[StaffPins] ([TenantId], [UserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    CREATE INDEX [IX_StaffPins_UserId] ON [ops].[StaffPins] ([UserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023063259_QuickSignIn'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261023063259_QuickSignIn', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023065848_DriverApps'
+)
+BEGIN
+    ALTER TABLE [ops].[DeliveryStops] ADD [CodeUnconfirmed] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023065848_DriverApps'
+)
+BEGIN
+    ALTER TABLE [ops].[DeliveryStops] ADD [TrackTokenHash] char(64) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023065848_DriverApps'
+)
+BEGIN
+    CREATE TABLE [ops].[DriverPositions] (
+        [Id] uniqueidentifier NOT NULL,
+        [RouteId] uniqueidentifier NOT NULL,
+        [UserId] uniqueidentifier NOT NULL,
+        [Latitude] decimal(9,6) NOT NULL,
+        [Longitude] decimal(9,6) NOT NULL,
+        [AccuracyMeters] int NOT NULL,
+        [TakenUtc] datetimeoffset NOT NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_DriverPositions] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_DriverPositions_DeliveryRoutes_RouteId] FOREIGN KEY ([RouteId]) REFERENCES [ops].[DeliveryRoutes] ([Id]) ON DELETE CASCADE
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023065848_DriverApps'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_DeliveryStops_TrackTokenHash] ON [ops].[DeliveryStops] ([TrackTokenHash]) WHERE [TrackTokenHash] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023065848_DriverApps'
+)
+BEGIN
+    CREATE INDEX [IX_DriverPositions_RouteId] ON [ops].[DriverPositions] ([RouteId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023065848_DriverApps'
+)
+BEGIN
+    CREATE INDEX [IX_DriverPositions_TakenUtc] ON [ops].[DriverPositions] ([TakenUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023065848_DriverApps'
+)
+BEGIN
+    CREATE INDEX [IX_DriverPositions_TenantId] ON [ops].[DriverPositions] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023065848_DriverApps'
+)
+BEGIN
+    CREATE INDEX [IX_DriverPositions_TenantId_RouteId_TakenUtc] ON [ops].[DriverPositions] ([TenantId], [RouteId], [TakenUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023065848_DriverApps'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261023065848_DriverApps', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023072347_HandheldsAndPrintHelper'
+)
+BEGIN
+    ALTER TABLE [ops].[PrintAgents] ADD [IsPhone] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023072347_HandheldsAndPrintHelper'
+)
+BEGIN
+    ALTER TABLE [ops].[LabelPrinters] ADD [AgentId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023072347_HandheldsAndPrintHelper'
+)
+BEGIN
+    CREATE TABLE [ops].[PrintPairings] (
+        [Id] uniqueidentifier NOT NULL,
+        [WarehouseId] uniqueidentifier NOT NULL,
+        [CodeHash] char(64) NOT NULL,
+        [Name] nvarchar(60) NOT NULL,
+        [CreatedByUserId] uniqueidentifier NOT NULL,
+        [ExpiresUtc] datetimeoffset NOT NULL,
+        [UsedUtc] datetimeoffset NULL,
+        [AgentId] uniqueidentifier NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_PrintPairings] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_PrintPairings_Warehouses_WarehouseId] FOREIGN KEY ([WarehouseId]) REFERENCES [ops].[Warehouses] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023072347_HandheldsAndPrintHelper'
+)
+BEGIN
+    CREATE TABLE [ops].[ShelfCounts] (
+        [Id] uniqueidentifier NOT NULL,
+        [WarehouseId] uniqueidentifier NOT NULL,
+        [LocationId] uniqueidentifier NOT NULL,
+        [LocationCode] nvarchar(40) NOT NULL,
+        [StartedByUserId] uniqueidentifier NOT NULL,
+        [Scanned] varchar(max) NOT NULL,
+        [FinishedUtc] datetimeoffset NULL,
+        [FinishedByUserId] uniqueidentifier NULL,
+        [Found] varchar(max) NULL,
+        [Missing] varchar(max) NULL,
+        [Extra] varchar(max) NULL,
+        [Unknown] varchar(max) NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_ShelfCounts] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_ShelfCounts_StorageLocations_LocationId] FOREIGN KEY ([LocationId]) REFERENCES [ops].[StorageLocations] ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023072347_HandheldsAndPrintHelper'
+)
+BEGIN
+    CREATE UNIQUE INDEX [IX_PrintPairings_CodeHash] ON [ops].[PrintPairings] ([CodeHash]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023072347_HandheldsAndPrintHelper'
+)
+BEGIN
+    CREATE INDEX [IX_PrintPairings_TenantId] ON [ops].[PrintPairings] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023072347_HandheldsAndPrintHelper'
+)
+BEGIN
+    CREATE INDEX [IX_PrintPairings_WarehouseId] ON [ops].[PrintPairings] ([WarehouseId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023072347_HandheldsAndPrintHelper'
+)
+BEGIN
+    CREATE INDEX [IX_ShelfCounts_LocationId] ON [ops].[ShelfCounts] ([LocationId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023072347_HandheldsAndPrintHelper'
+)
+BEGIN
+    CREATE INDEX [IX_ShelfCounts_TenantId] ON [ops].[ShelfCounts] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023072347_HandheldsAndPrintHelper'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_ShelfCounts_TenantId_LocationId] ON [ops].[ShelfCounts] ([TenantId], [LocationId]) WHERE [FinishedUtc] IS NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023072347_HandheldsAndPrintHelper'
+)
+BEGIN
+    CREATE INDEX [IX_ShelfCounts_TenantId_WarehouseId_CreatedUtc] ON [ops].[ShelfCounts] ([TenantId], [WarehouseId], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261023072347_HandheldsAndPrintHelper'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261023072347_HandheldsAndPrintHelper', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261026162448_CustomerHomeAddress'
+)
+BEGIN
+    ALTER TABLE [ops].[Customers] ADD [HomeAddressUtc] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261026162448_CustomerHomeAddress'
+)
+BEGIN
+    ALTER TABLE [ops].[Customers] ADD [Home_City] nvarchar(100) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261026162448_CustomerHomeAddress'
+)
+BEGIN
+    ALTER TABLE [ops].[Customers] ADD [Home_CountryCode] char(2) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261026162448_CustomerHomeAddress'
+)
+BEGIN
+    ALTER TABLE [ops].[Customers] ADD [Home_Line1] nvarchar(200) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261026162448_CustomerHomeAddress'
+)
+BEGIN
+    ALTER TABLE [ops].[Customers] ADD [Home_Line2] nvarchar(200) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261026162448_CustomerHomeAddress'
+)
+BEGIN
+    ALTER TABLE [ops].[Customers] ADD [Home_PostalCode] nvarchar(20) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261026162448_CustomerHomeAddress'
+)
+BEGIN
+    ALTER TABLE [ops].[Customers] ADD [Home_Region] nvarchar(100) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261026162448_CustomerHomeAddress'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261026162448_CustomerHomeAddress', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027000740_SplitCardPayments'
+)
+BEGIN
+    ALTER TABLE [ops].[CardCharges] ADD [OtherTenders] nvarchar(max) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027000740_SplitCardPayments'
+)
+BEGIN
+    ALTER TABLE [ops].[CardCharges] ADD [ZelleTermsAccepted] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027000740_SplitCardPayments'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261027000740_SplitCardPayments', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027063419_IdleSettings'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [CustomerIdleMinutes] int NOT NULL DEFAULT 60;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027063419_IdleSettings'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [IdleWarnMinutes] int NOT NULL DEFAULT 2;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027063419_IdleSettings'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [StaffIdleMinutes] int NOT NULL DEFAULT 15;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027063419_IdleSettings'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261027063419_IdleSettings', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027074148_PortalPayments'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [BankTransferInstructionsEn] nvarchar(max) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027074148_PortalPayments'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [BankTransferInstructionsEs] nvarchar(max) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027074148_PortalPayments'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [BankTransferInstructionsFr] nvarchar(max) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027074148_PortalPayments'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [PortalBankTransfer] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027074148_PortalPayments'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [PortalCard] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027074148_PortalPayments'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [PortalZelle] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027074148_PortalPayments'
+)
+BEGIN
+    EXEC(N'UPDATE [ops].[TenantSettings] SET [PortalCard] = [AcceptCard];');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027074148_PortalPayments'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261027074148_PortalPayments', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027153627_CustomerWelcomeTour'
+)
+BEGIN
+    ALTER TABLE [ops].[Customers] ADD [WelcomeTourDismissedUtc] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027153627_CustomerWelcomeTour'
+)
+BEGIN
+    EXEC(N'UPDATE [ops].[Customers] SET [WelcomeTourDismissedUtc] = SYSUTCDATETIME();');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261027153627_CustomerWelcomeTour'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261027153627_CustomerWelcomeTour', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029010912_TrackingAndDocumentLogo'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [DocumentLogoByUserId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029010912_TrackingAndDocumentLogo'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [DocumentLogoImageId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029010912_TrackingAndDocumentLogo'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [DocumentLogoUtc] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029010912_TrackingAndDocumentLogo'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [LabelLogoImageId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029010912_TrackingAndDocumentLogo'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [TrackingPrefix] varchar(2) NOT NULL DEFAULT 'VX';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029010912_TrackingAndDocumentLogo'
+)
+BEGIN
+    ALTER TABLE [ops].[Shipments] ADD [TrackingNumber] varchar(13) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029010912_TrackingAndDocumentLogo'
+)
+BEGIN
+    ALTER TABLE [ops].[Shipments] ADD [TrackingNumberUtc] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029010912_TrackingAndDocumentLogo'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_Shipments_TrackingNumber] ON [ops].[Shipments] ([TrackingNumber]) WHERE [TrackingNumber] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029010912_TrackingAndDocumentLogo'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261029010912_TrackingAndDocumentLogo', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029133425_BranchesAsCountries'
+)
+BEGIN
+    DECLARE @var25 nvarchar(max);
+    SELECT @var25 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[ops].[Branches]') AND [c].[name] = N'Side');
+    IF @var25 IS NOT NULL EXEC(N'ALTER TABLE [ops].[Branches] DROP CONSTRAINT ' + @var25 + ';');
+    ALTER TABLE [ops].[Branches] DROP COLUMN [Side];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029133425_BranchesAsCountries'
+)
+BEGIN
+    ALTER TABLE [ops].[Roles] ADD [TemplateKey] varchar(40) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029133425_BranchesAsCountries'
+)
+BEGIN
+    DECLARE @var26 nvarchar(max);
+    SELECT @var26 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[ops].[Branches]') AND [c].[name] = N'Address_Line1');
+    IF @var26 IS NOT NULL EXEC(N'ALTER TABLE [ops].[Branches] DROP CONSTRAINT ' + @var26 + ';');
+    ALTER TABLE [ops].[Branches] ALTER COLUMN [Address_Line1] nvarchar(200) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029133425_BranchesAsCountries'
+)
+BEGIN
+    DECLARE @var27 nvarchar(max);
+    SELECT @var27 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[ops].[Branches]') AND [c].[name] = N'Address_CountryCode');
+    IF @var27 IS NOT NULL EXEC(N'ALTER TABLE [ops].[Branches] DROP CONSTRAINT ' + @var27 + ';');
+    ALTER TABLE [ops].[Branches] ALTER COLUMN [Address_CountryCode] char(2) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029133425_BranchesAsCountries'
+)
+BEGIN
+    DECLARE @var28 nvarchar(max);
+    SELECT @var28 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[ops].[Branches]') AND [c].[name] = N'Address_City');
+    IF @var28 IS NOT NULL EXEC(N'ALTER TABLE [ops].[Branches] DROP CONSTRAINT ' + @var28 + ';');
+    ALTER TABLE [ops].[Branches] ALTER COLUMN [Address_City] nvarchar(100) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029133425_BranchesAsCountries'
+)
+BEGIN
+    ALTER TABLE [ops].[Branches] ADD [CountryCode] char(2) NOT NULL DEFAULT '';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029133425_BranchesAsCountries'
+)
+BEGIN
+    EXEC(N'UPDATE [ops].[Branches] SET [CountryCode] = [Address_CountryCode] WHERE [CountryCode] = N'''' AND [Address_CountryCode] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029133425_BranchesAsCountries'
+)
+BEGIN
+    ALTER TABLE [ops].[Branches] ADD [LegalName] nvarchar(200) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029133425_BranchesAsCountries'
+)
+BEGIN
+    ALTER TABLE [ops].[Branches] ADD [LegalNotes] nvarchar(500) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029133425_BranchesAsCountries'
+)
+BEGIN
+    ALTER TABLE [ops].[Branches] ADD [TaxNumber] nvarchar(50) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029133425_BranchesAsCountries'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261029133425_BranchesAsCountries', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029143748_CustomerLookup'
+)
+BEGIN
+    UPDATE [ops].[Roles]
+    SET [Permissions] = REPLACE([Permissions], N'ops.customers.view', N'ops.customers.view;ops.customers.lookup')
+    WHERE [IsAdministrator] = 0
+      AND (N';' + [Permissions] + N';') LIKE N'%;ops.customers.view;%'
+      AND (N';' + [Permissions] + N';') NOT LIKE N'%;ops.customers.lookup;%';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029143748_CustomerLookup'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261029143748_CustomerLookup', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029185152_SupportAgents'
+)
+BEGIN
+    ALTER TABLE [ops].[Users] ADD [IsOutside] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029185152_SupportAgents'
+)
+BEGIN
+    ALTER TABLE [ops].[Users] ADD [OutsideDays] int NOT NULL DEFAULT 0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029185152_SupportAgents'
+)
+BEGIN
+    ALTER TABLE [ops].[Users] ADD [OutsideEndsOn] date NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029185152_SupportAgents'
+)
+BEGIN
+    ALTER TABLE [ops].[Users] ADD [OutsideFromMinute] int NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029185152_SupportAgents'
+)
+BEGIN
+    ALTER TABLE [ops].[Users] ADD [OutsideToMinute] int NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029185152_SupportAgents'
+)
+BEGIN
+    CREATE TABLE [ops].[SupportRequests] (
+        [Id] uniqueidentifier NOT NULL,
+        [CustomerId] uniqueidentifier NOT NULL,
+        [ShipmentId] uniqueidentifier NULL,
+        [ParcelId] uniqueidentifier NULL,
+        [Reference] varchar(60) NOT NULL,
+        [AgentUserId] uniqueidentifier NOT NULL,
+        [Text] nvarchar(1000) NOT NULL,
+        [Status] int NOT NULL,
+        [DoneByUserId] uniqueidentifier NULL,
+        [DoneUtc] datetimeoffset NULL,
+        [DoneNote] nvarchar(1000) NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_SupportRequests] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_SupportRequests_Customers_CustomerId] FOREIGN KEY ([CustomerId]) REFERENCES [ops].[Customers] ([Id]) ON DELETE NO ACTION,
+        CONSTRAINT [FK_SupportRequests_Users_AgentUserId] FOREIGN KEY ([AgentUserId]) REFERENCES [ops].[Users] ([Id]) ON DELETE NO ACTION
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029185152_SupportAgents'
+)
+BEGIN
+    CREATE INDEX [IX_SupportRequests_AgentUserId] ON [ops].[SupportRequests] ([AgentUserId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029185152_SupportAgents'
+)
+BEGIN
+    CREATE INDEX [IX_SupportRequests_CustomerId] ON [ops].[SupportRequests] ([CustomerId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029185152_SupportAgents'
+)
+BEGIN
+    CREATE INDEX [IX_SupportRequests_TenantId] ON [ops].[SupportRequests] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029185152_SupportAgents'
+)
+BEGIN
+    CREATE INDEX [IX_SupportRequests_TenantId_Status_CreatedUtc] ON [ops].[SupportRequests] ([TenantId], [Status], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029185152_SupportAgents'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261029185152_SupportAgents', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    DROP INDEX [IX_Tickets_TenantId_CustomerId_TrackingNumber] ON [ops].[Tickets];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    ALTER TABLE [ops].[Tickets] ADD [AgentUserId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    ALTER TABLE [ops].[Tickets] ADD [EscalationsSent] int NOT NULL DEFAULT 0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    ALTER TABLE [ops].[Tickets] ADD [OpenedBy] int NOT NULL DEFAULT 0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    ALTER TABLE [ops].[Tickets] ADD [ShipmentId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    ALTER TABLE [ops].[Tickets] ADD [TakenByUserId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    ALTER TABLE [ops].[Tickets] ADD [TakenUtc] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    ALTER TABLE [ops].[Tickets] ADD [Topic] int NOT NULL DEFAULT 0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [TicketResolveDays] int NOT NULL DEFAULT 3;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [TicketTakeHours] int NOT NULL DEFAULT 4;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_Tickets_TenantId_CustomerId_TrackingNumber] ON [ops].[Tickets] ([TenantId], [CustomerId], [TrackingNumber]) WHERE [Status] <> 3 AND [OpenedBy] = 0');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    CREATE INDEX [IX_Tickets_TenantId_Topic_Status_CreatedUtc] ON [ops].[Tickets] ([TenantId], [Topic], [Status], [CreatedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    EXEC(N'
+    INSERT INTO [ops].[Tickets] ([Id], [TenantId], [CustomerId], [WarehouseId], [Status], [Carrier], [TrackingNumber], [Contents], [ParcelId], [ResolvedUtc],
+        [Messages], [CreatedUtc], [LastModifiedUtc], [Topic], [OpenedBy], [AgentUserId], [ShipmentId], [TakenByUserId], [TakenUtc], [EscalationsSent])
+    SELECT r.[Id], r.[TenantId], r.[CustomerId], COALESCE(p.[WarehouseId], s.[DestinationWarehouseId], s.[OriginWarehouseId]),
+        CASE WHEN r.[Status] = 2 THEN 3 ELSE 1 END, N'''', LEFT(r.[Reference], 40), N'''', r.[ParcelId], r.[DoneUtc],
+        (SELECT m.[FromStaff], m.[UserId], m.[Text], m.[SentUtc]
+         FROM (SELECT CAST(1 AS bit) AS [FromStaff], r.[AgentUserId] AS [UserId], r.[Text] AS [Text], r.[CreatedUtc] AS [SentUtc]
+               UNION ALL
+               SELECT CAST(1 AS bit), r.[DoneByUserId], r.[DoneNote], r.[DoneUtc] WHERE r.[DoneNote] IS NOT NULL AND r.[DoneUtc] IS NOT NULL) AS m
+         ORDER BY m.[SentUtc] FOR JSON PATH),
+        r.[CreatedUtc], r.[LastModifiedUtc], 4, 1, r.[AgentUserId], r.[ShipmentId], r.[DoneByUserId], r.[DoneUtc], 0
+    FROM [ops].[SupportRequests] r
+    LEFT JOIN [ops].[Parcels] p ON p.[Id] = r.[ParcelId]
+    LEFT JOIN [ops].[Shipments] s ON s.[Id] = r.[ShipmentId]
+    WHERE COALESCE(p.[WarehouseId], s.[DestinationWarehouseId], s.[OriginWarehouseId]) IS NOT NULL
+        AND NOT EXISTS (SELECT 1 FROM [ops].[Tickets] t WHERE t.[Id] = r.[Id])')
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    DROP TABLE [ops].[SupportRequests];
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261029221707_TicketDesk'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261029221707_TicketDesk', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030002317_WebsiteThemes'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantBrands] ADD [Draft_AirImageId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030002317_WebsiteThemes'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantBrands] ADD [Draft_Font] int NOT NULL DEFAULT 0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030002317_WebsiteThemes'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantBrands] ADD [Draft_SeaImageId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030002317_WebsiteThemes'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantBrands] ADD [Draft_Theme] int NOT NULL DEFAULT 0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030002317_WebsiteThemes'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantBrands] ADD [Published_AirImageId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030002317_WebsiteThemes'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantBrands] ADD [Published_Font] int NOT NULL DEFAULT 0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030002317_WebsiteThemes'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantBrands] ADD [Published_SeaImageId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030002317_WebsiteThemes'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantBrands] ADD [Published_Theme] int NOT NULL DEFAULT 0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030002317_WebsiteThemes'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261030002317_WebsiteThemes', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030041401_ShipmentCap'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [ShipmentCapNoticeLevel] int NOT NULL DEFAULT 0;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030041401_ShipmentCap'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [ShipmentCapNoticeMonth] varchar(7) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030041401_ShipmentCap'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [ShipmentGraceMonth] varchar(7) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030041401_ShipmentCap'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261030041401_ShipmentCap', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030145548_LandingMarketing'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantBrands] ADD [Draft_ShowDelivered] bit NOT NULL DEFAULT CAST(1 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030145548_LandingMarketing'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantBrands] ADD [Draft_ShowRates] bit NOT NULL DEFAULT CAST(1 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030145548_LandingMarketing'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantBrands] ADD [Draft_ShowTestimonials] bit NOT NULL DEFAULT CAST(1 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030145548_LandingMarketing'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantBrands] ADD [Published_ShowDelivered] bit NOT NULL DEFAULT CAST(1 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030145548_LandingMarketing'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantBrands] ADD [Published_ShowRates] bit NOT NULL DEFAULT CAST(1 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030145548_LandingMarketing'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantBrands] ADD [Published_ShowTestimonials] bit NOT NULL DEFAULT CAST(1 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030145548_LandingMarketing'
+)
+BEGIN
+    CREATE TABLE [ops].[SiteTestimonials] (
+        [Id] uniqueidentifier NOT NULL,
+        [Name] nvarchar(80) NOT NULL,
+        [Place] nvarchar(80) NULL,
+        [Quote] nvarchar(400) NOT NULL,
+        [Rating] int NULL,
+        [Source] nvarchar(40) NULL,
+        [ConsentRecordedByUserId] uniqueidentifier NOT NULL,
+        [ConsentRecordedUtc] datetimeoffset NOT NULL,
+        [Shown] bit NOT NULL,
+        [SortOrder] int NOT NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_SiteTestimonials] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030145548_LandingMarketing'
+)
+BEGIN
+    CREATE INDEX [IX_SiteTestimonials_TenantId] ON [ops].[SiteTestimonials] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030145548_LandingMarketing'
+)
+BEGIN
+    CREATE INDEX [IX_SiteTestimonials_TenantId_SortOrder] ON [ops].[SiteTestimonials] ([TenantId], [SortOrder]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030145548_LandingMarketing'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261030145548_LandingMarketing', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261031235123_CustomerBans'
+)
+BEGIN
+    ALTER TABLE [ops].[Customers] ADD [SuspendedUntil] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261031235123_CustomerBans'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261031235123_CustomerBans', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261101021051_ShippingLabelCodes'
+)
+BEGIN
+    ALTER TABLE [ops].[ShippingServiceSetups] ADD [LabelCode] char(3) NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261101021051_ShippingLabelCodes'
+)
+BEGIN
+    EXEC(N'ALTER TABLE [ops].[ShippingServiceSetups] ADD CONSTRAINT [CK_ShippingServiceSetups_LabelCode] CHECK ([LabelCode] IS NULL OR (LEN([LabelCode]) = 3 AND [LabelCode] COLLATE Latin1_General_BIN NOT LIKE ''%[^A-Z]%''))');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261101021051_ShippingLabelCodes'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261101021051_ShippingLabelCodes', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261101053129_ParcelItems'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [ItemCatalogueLoaded] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261101053129_ParcelItems'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [ItemsRequiredSinceUtc] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261101053129_ParcelItems'
+)
+BEGIN
+    CREATE TABLE [ops].[ItemCatalogue] (
+        [Id] uniqueidentifier NOT NULL,
+        [Description] nvarchar(200) NOT NULL,
+        [Matches] nvarchar(400) NULL,
+        [HsCode] varchar(10) NOT NULL,
+        [Unit] int NOT NULL,
+        [UseCount] int NOT NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_ItemCatalogue] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261101053129_ParcelItems'
+)
+BEGIN
+    CREATE TABLE [ops].[ParcelItems] (
+        [Id] uniqueidentifier NOT NULL,
+        [ParcelId] uniqueidentifier NULL,
+        [PreAlertId] uniqueidentifier NULL,
+        [Line] int NOT NULL,
+        [Words] nvarchar(200) NOT NULL,
+        [Quantity] decimal(12,3) NOT NULL,
+        [ValueEach] decimal(18,2) NOT NULL,
+        [CurrencyCode] char(3) NOT NULL,
+        [Used] bit NOT NULL,
+        [Description] nvarchar(200) NULL,
+        [HsCode] varchar(10) NULL,
+        [OriginCountryCode] char(2) NULL,
+        [Unit] int NOT NULL,
+        [CatalogueEntryId] uniqueidentifier NULL,
+        [ClassifiedByUserId] uniqueidentifier NULL,
+        [ClassifiedUtc] datetimeoffset NULL,
+        [RowVersion] rowversion NULL,
+        [CreatedUtc] datetimeoffset NOT NULL,
+        [LastModifiedUtc] datetimeoffset NULL,
+        [TenantId] uniqueidentifier NOT NULL,
+        CONSTRAINT [PK_ParcelItems] PRIMARY KEY ([Id])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261101053129_ParcelItems'
+)
+BEGIN
+    CREATE INDEX [IX_ItemCatalogue_TenantId] ON [ops].[ItemCatalogue] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261101053129_ParcelItems'
+)
+BEGIN
+    CREATE INDEX [IX_ItemCatalogue_TenantId_Description] ON [ops].[ItemCatalogue] ([TenantId], [Description]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261101053129_ParcelItems'
+)
+BEGIN
+    CREATE INDEX [IX_ParcelItems_TenantId] ON [ops].[ParcelItems] ([TenantId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261101053129_ParcelItems'
+)
+BEGIN
+    CREATE INDEX [IX_ParcelItems_TenantId_ParcelId] ON [ops].[ParcelItems] ([TenantId], [ParcelId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261101053129_ParcelItems'
+)
+BEGIN
+    CREATE INDEX [IX_ParcelItems_TenantId_PreAlertId] ON [ops].[ParcelItems] ([TenantId], [PreAlertId]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261101053129_ParcelItems'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261101053129_ParcelItems', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
 -- =========================================================
 -- 4. CUSTOMER PLANE (schema [customer])
 -- Generated from the EF migrations of
@@ -13011,37 +15737,60 @@ GO
 
 -- =========================================================
 -- 5. LOGINS AND GRANTS (D-1)
--- 5a. Platform: skipped when its passwords in section 0 are empty.
+-- The same script sets up a new database and updates one,
+-- on any server; choose the database and run it:
+-- - a login is created only when its password is given in
+--   section 0 (a server you control; never on shared hosting);
+-- - the database user is created when its login exists;
+-- - the grants and append-only rules are applied on every run
+--   to each user that exists, so tables added by a release
+--   get them too, without giving the passwords again.
+-- Where none of these users exist (shared hosting: the sites
+-- use the database's own user), this section changes nothing.
 -- =========================================================
 SET NOCOUNT ON;
-DECLARE @appPwd  nvarchar(256) = CONVERT(nvarchar(256), SESSION_CONTEXT(N'vixly.platform_app_pwd'));
-DECLARE @migrPwd nvarchar(256) = CONVERT(nvarchar(256), SESSION_CONTEXT(N'vixly.platform_migr_pwd'));
-DECLARE @sql nvarchar(max);
+DECLARE @logins TABLE (Name sysname, PasswordKey sysname, DefaultSchema sysname);
+INSERT INTO @logins VALUES
+    (N'vixly_platform_app',        N'vixly.platform_app_pwd',    N'platform'),
+    (N'vixly_platform_migrator',   N'vixly.platform_migr_pwd',   N'platform'),
+    (N'vixly_operations_app',      N'vixly.operations_app_pwd',  N'ops'),
+    (N'vixly_operations_migrator', N'vixly.operations_migr_pwd', N'ops'),
+    (N'vixly_customer_app',        N'vixly.customer_app_pwd',    N'customer');
 
-IF ISNULL(@appPwd, N'') = N'' OR ISNULL(@migrPwd, N'') = N''
+DECLARE @name sysname, @key sysname, @schema sysname, @pwd nvarchar(256), @sql nvarchar(max);
+DECLARE logins CURSOR LOCAL FAST_FORWARD FOR SELECT Name, PasswordKey, DefaultSchema FROM @logins;
+OPEN logins;
+FETCH NEXT FROM logins INTO @name, @key, @schema;
+
+WHILE @@FETCH_STATUS = 0
 BEGIN
-    PRINT N'Section 5a skipped: no Platform passwords given (Windows authentication).';
+    SET @pwd = CONVERT(nvarchar(256), SESSION_CONTEXT(@key));
+
+    IF ISNULL(@pwd, N'') <> N'' AND NOT EXISTS (SELECT 1 FROM sys.server_principals WHERE name = @name)
+    BEGIN
+        SET @sql = N'CREATE LOGIN ' + QUOTENAME(@name) + N' WITH PASSWORD = ' + QUOTENAME(@pwd, '''') + N', CHECK_POLICY = ON;';
+        EXEC (@sql);
+        PRINT N'Section 5: login ' + @name + N' created.';
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = @name)
+       AND EXISTS (SELECT 1 FROM sys.server_principals WHERE name = @name)
+    BEGIN
+        SET @sql = N'CREATE USER ' + QUOTENAME(@name) + N' FOR LOGIN ' + QUOTENAME(@name) + N' WITH DEFAULT_SCHEMA = ' + QUOTENAME(@schema) + N';';
+        EXEC (@sql);
+        PRINT N'Section 5: user ' + @name + N' created in this database.';
+    END
+
+    FETCH NEXT FROM logins INTO @name, @key, @schema;
 END
-ELSE
+
+CLOSE logins;
+DEALLOCATE logins;
+GO
+
+-- 5a. Platform grants, for the users that exist.
+IF EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N'vixly_platform_app')
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM sys.server_principals WHERE name = N'vixly_platform_app')
-    BEGIN
-        SET @sql = N'CREATE LOGIN [vixly_platform_app] WITH PASSWORD = ' + QUOTENAME(@appPwd, '''') + N', CHECK_POLICY = ON;';
-        EXEC (@sql);
-    END
-
-    IF NOT EXISTS (SELECT 1 FROM sys.server_principals WHERE name = N'vixly_platform_migrator')
-    BEGIN
-        SET @sql = N'CREATE LOGIN [vixly_platform_migrator] WITH PASSWORD = ' + QUOTENAME(@migrPwd, '''') + N', CHECK_POLICY = ON;';
-        EXEC (@sql);
-    END
-
-    IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N'vixly_platform_app')
-        CREATE USER [vixly_platform_app] FOR LOGIN [vixly_platform_app] WITH DEFAULT_SCHEMA = [platform];
-
-    IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N'vixly_platform_migrator')
-        CREATE USER [vixly_platform_migrator] FOR LOGIN [vixly_platform_migrator] WITH DEFAULT_SCHEMA = [platform];
-
     -- The app reads and writes the platform schema only.
     GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA::[platform] TO [vixly_platform_app];
 
@@ -13062,38 +15811,27 @@ BEGIN
     DENY UPDATE, DELETE ON OBJECT::[platform].[TenantTermsAcceptances] TO [vixly_platform_app];
     -- Slice 9: published events never change; old ones are removed by the event feed clock.
     DENY UPDATE ON OBJECT::[platform].[PublishedEvents] TO [vixly_platform_app];
+    PRINT N'Section 5a: Platform app grants are in place.';
+END
+ELSE
+    PRINT N'Section 5a: no Platform app user here (the sites use the database''s own user).';
 
+IF EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N'vixly_platform_migrator')
+BEGIN
     -- The migrator changes the platform schema only.
     GRANT ALTER, CONTROL ON SCHEMA::[platform] TO [vixly_platform_migrator];
     GRANT CREATE TABLE TO [vixly_platform_migrator];
-
-    PRINT N'Section 5a done: platform logins and grants are in place.';
+    PRINT N'Section 5a: Platform migrator grants are in place.';
 END
 GO
 
 -- =========================================================
--- 5b. OPERATIONS AND CUSTOMER LOGINS (Stage 3, Slice 0)
--- Each login is created only when its password is given.
+-- 5b. OPERATIONS AND CUSTOMER GRANTS (Stage 3, Slice 0)
 -- The Operations migrator also changes the customer schema
 -- (the customer portal belongs to Operations).
 -- =========================================================
-SET NOCOUNT ON;
-DECLARE @opsAppPwd  nvarchar(256) = CONVERT(nvarchar(256), SESSION_CONTEXT(N'vixly.operations_app_pwd'));
-DECLARE @opsMigrPwd nvarchar(256) = CONVERT(nvarchar(256), SESSION_CONTEXT(N'vixly.operations_migr_pwd'));
-DECLARE @custAppPwd nvarchar(256) = CONVERT(nvarchar(256), SESSION_CONTEXT(N'vixly.customer_app_pwd'));
-DECLARE @sql nvarchar(max);
-
-IF ISNULL(@opsAppPwd, N'') <> N''
+IF EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N'vixly_operations_app')
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM sys.server_principals WHERE name = N'vixly_operations_app')
-    BEGIN
-        SET @sql = N'CREATE LOGIN [vixly_operations_app] WITH PASSWORD = ' + QUOTENAME(@opsAppPwd, '''') + N', CHECK_POLICY = ON;';
-        EXEC (@sql);
-    END
-
-    IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N'vixly_operations_app')
-        CREATE USER [vixly_operations_app] FOR LOGIN [vixly_operations_app] WITH DEFAULT_SCHEMA = [ops];
-
     -- The Operations app reads and writes the ops schema only; it never sees platform or customer.
     GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA::[ops] TO [vixly_operations_app];
     -- The audit log is append-only for the app (Slice 1).
@@ -13103,47 +15841,27 @@ BEGIN
     -- Slice 3B: a warehouse receipt is a record; a photo is evidence. Neither is changed once written.
     DENY UPDATE, DELETE ON OBJECT::[ops].[WarehouseReceipts] TO [vixly_operations_app];
     DENY UPDATE ON OBJECT::[ops].[ParcelPhotos] TO [vixly_operations_app];
-    PRINT N'Section 5b: Operations app login and grants are in place.';
+    PRINT N'Section 5b: Operations app grants are in place.';
 END
 ELSE
-    PRINT N'Section 5b: Operations app login skipped (no password).';
+    PRINT N'Section 5b: no Operations app user here.';
 
-IF ISNULL(@opsMigrPwd, N'') <> N''
+IF EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N'vixly_operations_migrator')
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM sys.server_principals WHERE name = N'vixly_operations_migrator')
-    BEGIN
-        SET @sql = N'CREATE LOGIN [vixly_operations_migrator] WITH PASSWORD = ' + QUOTENAME(@opsMigrPwd, '''') + N', CHECK_POLICY = ON;';
-        EXEC (@sql);
-    END
-
-    IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N'vixly_operations_migrator')
-        CREATE USER [vixly_operations_migrator] FOR LOGIN [vixly_operations_migrator] WITH DEFAULT_SCHEMA = [ops];
-
     GRANT ALTER, CONTROL ON SCHEMA::[ops] TO [vixly_operations_migrator];
     GRANT ALTER, CONTROL ON SCHEMA::[customer] TO [vixly_operations_migrator];
     GRANT CREATE TABLE TO [vixly_operations_migrator];
-    PRINT N'Section 5b: Operations migrator login and grants are in place.';
+    PRINT N'Section 5b: Operations migrator grants are in place.';
 END
-ELSE
-    PRINT N'Section 5b: Operations migrator login skipped (no password).';
 
-IF ISNULL(@custAppPwd, N'') <> N''
+IF EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N'vixly_customer_app')
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM sys.server_principals WHERE name = N'vixly_customer_app')
-    BEGIN
-        SET @sql = N'CREATE LOGIN [vixly_customer_app] WITH PASSWORD = ' + QUOTENAME(@custAppPwd, '''') + N', CHECK_POLICY = ON;';
-        EXEC (@sql);
-    END
-
-    IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = N'vixly_customer_app')
-        CREATE USER [vixly_customer_app] FOR LOGIN [vixly_customer_app] WITH DEFAULT_SCHEMA = [customer];
-
     -- Customer.Web keeps only its key ring here; business data comes through Operations.Api.
     GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA::[customer] TO [vixly_customer_app];
-    PRINT N'Section 5b: Customer app login and grants are in place.';
+    PRINT N'Section 5b: Customer app grants are in place.';
 END
 ELSE
-    PRINT N'Section 5b: Customer app login skipped (no password).';
+    PRINT N'Section 5b: no Customer app user here.';
 GO
 
 -- Clear the passwords from the session.
@@ -13152,6 +15870,23 @@ EXEC sys.sp_set_session_context @key = N'vixly.platform_migr_pwd',   @value = NU
 EXEC sys.sp_set_session_context @key = N'vixly.operations_app_pwd',  @value = NULL;
 EXEC sys.sp_set_session_context @key = N'vixly.operations_migr_pwd', @value = NULL;
 EXEC sys.sp_set_session_context @key = N'vixly.customer_app_pwd',    @value = NULL;
+GO
+
+-- =========================================================
+-- CHECK: which server and database were updated, and are they current?
+-- The newest migrations this file holds are written in below
+-- when it is generated. If the "file" column shows an older
+-- name than the release notes, SSMS is running an old copy of
+-- this file: close the tab and open the file again.
+-- =========================================================
+SELECT @@SERVERNAME AS [server], DB_NAME() AS [database], v.[schema], v.[file_newest],
+       h.[db_newest],
+       CASE WHEN h.[db_newest] = v.[file_newest] THEN N'UP TO DATE' ELSE N'NOT UPDATED: wrong database, or an error in the Messages tab' END AS [status]
+FROM (VALUES (N'platform', N'20261102202423_SalesFeedAndCheckout'), (N'ops', N'20261101053129_ParcelItems'), (N'customer', N'20261018024801_CustomerFoundation')) AS v([schema], [file_newest])
+CROSS APPLY (SELECT MAX(MigrationId) AS [db_newest] FROM (
+    SELECT N'platform' AS [schema], MigrationId FROM [platform].[__EFMigrationsHistory]
+    UNION ALL SELECT N'ops', MigrationId FROM [ops].[__EFMigrationsHistory]
+    UNION ALL SELECT N'customer', MigrationId FROM [customer].[__EFMigrationsHistory]) AS m WHERE m.[schema] = v.[schema]) AS h;
 GO
 
 -- =========================================================
@@ -13167,4 +15902,8 @@ SELECT N'platform' AS [schema], MigrationId FROM [platform].[__EFMigrationsHisto
 UNION ALL SELECT N'ops', MigrationId FROM [ops].[__EFMigrationsHistory]
 UNION ALL SELECT N'customer', MigrationId FROM [customer].[__EFMigrationsHistory]
 ORDER BY [schema], MigrationId;
+GO
+
+-- Back to normal after a stop in section 1.
+SET NOEXEC OFF;
 GO

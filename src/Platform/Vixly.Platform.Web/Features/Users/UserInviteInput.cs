@@ -27,7 +27,5 @@ public sealed class UserInviteInput
 
     public PlatformUserAuthorityLevel AuthorityLevel { get; set; } = PlatformUserAuthorityLevel.Standard;
 
-    public string? EmployeeNumber { get; set; }
-
     public string? PhoneNumber { get; set; }
 }

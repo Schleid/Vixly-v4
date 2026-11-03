@@ -27,7 +27,7 @@ namespace Vixly.Operations.Infrastructure.Documents;
 // =========================================================
 internal static class OperationsWaybillLayout
 {
-    public static byte[] RenderHouseWaybills(IReadOnlyList<OperationsHouseWaybill> waybills, IStringLocalizer<OperationsText> text)
+    public static byte[] RenderHouseWaybills(IReadOnlyList<OperationsHouseWaybill> waybills, IStringLocalizer<OperationsText> text, byte[]? logo = null)
     {
         ArgumentNullException.ThrowIfNull(waybills);
         ArgumentNullException.ThrowIfNull(text);
@@ -46,6 +46,12 @@ internal static class OperationsWaybillLayout
                         {
                             row.RelativeItem().Column(head =>
                             {
+                                // Owner, 2026-10-28: the company's document logo above the form's title.
+                                if (OperationsDocumentBrand.Readable(logo) is { } image)
+                                {
+                                    head.Item().Height(OperationsDocumentBrand.LogoHeight).AlignLeft().Image(image).FitHeight();
+                                }
+
                                 head.Item().Text(Word("house_title")).FontSize(14).SemiBold();
                                 head.Item().Text(Word("master") + ": " + (waybill.MasterWaybill ?? "—"));
                             });
@@ -96,7 +102,7 @@ internal static class OperationsWaybillLayout
         }).GeneratePdf();
     }
 
-    public static byte[] RenderShipperLetter(OperationsShipperLetter letter, IStringLocalizer<OperationsText> text)
+    public static byte[] RenderShipperLetter(OperationsShipperLetter letter, IStringLocalizer<OperationsText> text, byte[]? logo = null)
     {
         ArgumentNullException.ThrowIfNull(letter);
         ArgumentNullException.ThrowIfNull(text);
@@ -107,6 +113,12 @@ internal static class OperationsWaybillLayout
             Setup(page);
             page.Content().Column(column =>
             {
+                // Owner, 2026-10-28: the company's document logo above the form's title.
+                if (OperationsDocumentBrand.Readable(logo) is { } image)
+                {
+                    column.Item().Height(OperationsDocumentBrand.LogoHeight).AlignLeft().Image(image).FitHeight();
+                }
+
                 column.Item().Row(row =>
                 {
                     row.RelativeItem().Text(Word("title")).FontSize(14).SemiBold();

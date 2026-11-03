@@ -30,6 +30,9 @@ public sealed class PlatformApi
 {
     public const string Unavailable = "public.platform_unavailable";
 
+    // Platform answered 429 (its per-visitor limit): the visitor waits, the service is not down.
+    public const string Busy = "public.platform_busy";
+
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
 
     private readonly HttpClient _http;
@@ -45,6 +48,12 @@ public sealed class PlatformApi
     // =====================================================
     // CATALOGUE, LEGAL, CONTACT
     // =====================================================
+    public Task<PlatformApiResult<IReadOnlyList<Vixly.Contracts.Platform.Maintenance.PlatformMaintenanceWindowInfo>>> MaintenanceAsync(CancellationToken cancellationToken)
+        => SendAsync<IReadOnlyList<Vixly.Contracts.Platform.Maintenance.PlatformMaintenanceWindowInfo>>(new HttpRequestMessage(HttpMethod.Get, "maintenance?site=public"), null, cancellationToken);
+
+    public Task<PlatformApiResult<Vixly.Contracts.Platform.Maintenance.PlatformMaintenancePassInfo>> MaintenancePassAsync(string token, CancellationToken cancellationToken)
+        => SendAsync<Vixly.Contracts.Platform.Maintenance.PlatformMaintenancePassInfo>(Post("maintenance/pass", new Vixly.Contracts.Platform.Maintenance.PlatformMaintenancePassBody { Token = token, Site = "public" }), null, cancellationToken);
+
     public Task<PlatformApiResult<IReadOnlyList<PlatformPublicPlan>>> PlansAsync(CancellationToken cancellationToken)
         => SendAsync<IReadOnlyList<PlatformPublicPlan>>(new HttpRequestMessage(HttpMethod.Get, "registration/plans"), null, cancellationToken);
 
@@ -158,7 +167,8 @@ public sealed class PlatformApi
                     error = await response.Content.ReadFromJsonAsync<PlatformApiError>(Json, cancellationToken);
                 }
 
-                return new PlatformApiResult<T>(default, error ?? new PlatformApiError(Unavailable, string.Empty), (int)response.StatusCode);
+                error ??= new PlatformApiError(response.StatusCode == HttpStatusCode.TooManyRequests ? Busy : Unavailable, string.Empty);
+                return new PlatformApiResult<T>(default, error, (int)response.StatusCode);
             }
             catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException or JsonException)
             {

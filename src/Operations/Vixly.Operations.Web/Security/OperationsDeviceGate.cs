@@ -71,7 +71,12 @@ public sealed class OperationsDeviceGate
             try
             {
                 check = await verify.ExecuteAsync(OperationsCurrentUser.Context(http),
-                    new VerifyOperationsDeviceRequest { DeviceId = device.DeviceId, Secret = device.Secret }, http.RequestAborted);
+                    new VerifyOperationsDeviceRequest
+                    {
+                        DeviceId = device.DeviceId,
+                        Secret = device.Secret,
+                        PortalSlug = OperationsTenantMiddleware.Host(http)?.CanonicalSlug
+                    }, http.RequestAborted);
             }
             catch (OperationsPlatformUnavailableException)
             {
@@ -81,7 +86,14 @@ public sealed class OperationsDeviceGate
 
             if (!check.Allowed)
             {
-                // The session ended: signed in again from here, the second factor confirms the other country.
+                // Owner, R-6: the device is blocked (used from another country than its own); its session ended and only an administrator unblocks it.
+                if (check.Code == VerifyOperationsDeviceUseCase.DeviceBlocked)
+                {
+                    OperationsCookies.Delete(http.Response, OperationsCookies.Session);
+                    http.Response.Redirect("/staff?blocked=1");
+                    return;
+                }
+
                 if (check.Code == VerifyOperationsDeviceUseCase.CountryChanged)
                 {
                     OperationsCookies.Delete(http.Response, OperationsCookies.Session);

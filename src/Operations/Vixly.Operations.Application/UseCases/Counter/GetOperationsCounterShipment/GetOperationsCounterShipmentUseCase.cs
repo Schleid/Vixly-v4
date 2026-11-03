@@ -117,6 +117,6 @@ public sealed class GetOperationsCounterShipmentUseCase
                     parcel.LengthCm ?? 0m, parcel.WidthCm ?? 0m, parcel.HeightCm ?? 0m, parcel.DeclaredValue ?? 0m, null, parcel.DeclaredContents))).ToList(), null,
                 Vixly.Operations.Application.Charges.OperationsEstimateSupply.Of(sale, sale is null ? Array.Empty<Vixly.Operations.Domain.Supplies.OperationsSupply>()
                     : await _supplies.ListAsync(cancellationToken), System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName)), products, cancellationToken))
-            .Invoiced(shipment.IsBooked ? await _billing.FindShipmentInvoiceAsync(shipment.Id, cancellationToken) : null);
+            .Invoiced(shipment.IsBooked ? await _billing.FindShipmentInvoiceAsync(shipment.Id, cancellationToken) : null).WithAllowCollect(settings?.AllowCollect == true);
     }
 }

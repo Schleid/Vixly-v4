@@ -44,8 +44,10 @@ public sealed class AddOperationsCounterSupplyUseCase
         OperationsSupplySales sales,
         OperationsAuditTrail audit,
         IOperationsUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        Vixly.Operations.Application.Plans.OperationsPlanGate plan)
     {
+        _plan = plan ?? throw new ArgumentNullException(nameof(plan));
         _counter = counter ?? throw new ArgumentNullException(nameof(counter));
         _supplies = supplies ?? throw new ArgumentNullException(nameof(supplies));
         _sales = sales ?? throw new ArgumentNullException(nameof(sales));
@@ -54,6 +56,9 @@ public sealed class AddOperationsCounterSupplyUseCase
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
+    // Vixly Lite (owner, 2026-10-30): the modules in the company's plan.
+    private readonly Vixly.Operations.Application.Plans.OperationsPlanGate _plan;
+
     public async Task<AddOperationsCounterSupplyResponse> ExecuteAsync(
         OperationsAuthorizationContext context,
         AddOperationsCounterSupplyRequest request,
@@ -61,6 +66,11 @@ public sealed class AddOperationsCounterSupplyUseCase
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(request);
+
+        if (!await _plan.IncludesAsync(Vixly.Operations.Application.Plans.OperationsPlanModules.Supplies, cancellationToken))
+        {
+            return AddOperationsCounterSupplyResponse.Failure(Vixly.Operations.Domain.Common.OperationsCommonErrors.NotInPlan);
+        }
 
         (OperationsSupplyCounter.Opened? opened, Error? refused) = request.SaleId is { } saleId
             ? await _counter.SaleAsync(context, saleId, cancellationToken)

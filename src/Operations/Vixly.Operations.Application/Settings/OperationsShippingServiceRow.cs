@@ -11,5 +11,6 @@
 //
 // IMPORTANT NOTES:
 // - Divisor in the tenant's units; null when the service is priced by container
+// - LabelCode: the code printed on the shipping label (the catalogue's default until the company changes it)
 // =========================================================
-public sealed record OperationsShippingServiceRow(string Code, string Mode, bool Offered, string? Label, int MinDays, int MaxDays, decimal? VolumetricDivisor, bool DivisorAllowed);
+public sealed record OperationsShippingServiceRow(string Code, string Mode, bool Offered, string? Label, int MinDays, int MaxDays, decimal? VolumetricDivisor, bool DivisorAllowed, string? LabelCode = null);

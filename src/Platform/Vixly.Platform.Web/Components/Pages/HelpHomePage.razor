@@ -1,0 +1,20 @@
+﻿@page "/help"
+@attribute [Authorize]
+@using Vixly.Platform.Web.Features.Help
+@* =========================================================
+   FILE: HelpHomePage.razor
+
+   PURPOSE:
+   Routes signed-in staff to Control's help and search.
+
+   RESPONSIBILITIES:
+   - Compose the help feature with its query parameter.
+
+   IMPORTANT NOTES:
+   - Reader permissions are loaded by the feature presenter.
+   ========================================================= *@
+<PlatformHelpBrowser Query="@Query" />
+
+@code {
+    [SupplyParameterFromQuery(Name = "q")] public string? Query { get; set; }
+}

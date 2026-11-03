@@ -28,6 +28,7 @@ internal sealed class OperationsRoleConfiguration : IEntityTypeConfiguration<Ope
         builder.Ignore(role => role.Permissions);
         builder.Property<string>("PermissionsText").HasColumnName("Permissions").HasMaxLength(2000).IsUnicode(false).IsRequired();
         builder.HasIndex(role => new { role.TenantId, role.Name }).IsUnique();
+        builder.Property(role => role.TemplateKey).HasMaxLength(Vixly.Operations.Domain.Access.OperationsStandardRoles.KeyMaxLength).IsUnicode(false);
         builder.HasIndex(role => role.TenantId).IsUnique().HasFilter("[IsAdministrator] = 1").HasDatabaseName("IX_Roles_TenantId_Administrator");
     }
 }

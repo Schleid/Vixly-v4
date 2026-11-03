@@ -64,7 +64,7 @@ public sealed class SaveOperationsWarehouseUseCase
 
         OperationsWarehouse? warehouse = request.WarehouseId is { } id ? await _locations.GetWarehouseAsync(id, cancellationToken) : null;
 
-        if ((request.WarehouseId is not null && warehouse is null) || await _locations.GetBranchAsync(request.BranchId, cancellationToken) is null)
+        if ((request.WarehouseId is not null && warehouse is null) || await _locations.GetBranchAsync(request.BranchId, cancellationToken) is not { } branch)
         {
             return SaveOperationsWarehouseResponse.Failure(warehouse is null && request.WarehouseId is not null ? OperationsCommonErrors.NotFound : OperationsLocationErrors.BranchRequired);
         }
@@ -103,6 +103,12 @@ public sealed class SaveOperationsWarehouseUseCase
         if (request.HubWarehouseId is { } chainStart && request.WarehouseId is { } self && await HubChainReachesAsync(chainStart, self, cancellationToken))
         {
             return SaveOperationsWarehouseResponse.Failure(OperationsDestinationErrors.HubInvalid);
+        }
+
+        // Owner, 2026-10-29: a branch is one country, and its warehouses are in it.
+        if (!string.Equals(branch.CountryCode, (request.CountryCode ?? string.Empty).Trim().ToUpperInvariant(), StringComparison.Ordinal))
+        {
+            return SaveOperationsWarehouseResponse.Failure(OperationsLocationErrors.WarehouseOutsideCountry);
         }
 
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();

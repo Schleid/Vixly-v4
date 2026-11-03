@@ -38,13 +38,17 @@ public sealed class StartOperationsCardPaymentUseCase
 
     private readonly IOperationsSettingsRepository _settings;
 
+    private readonly IOperationsPaymentRepository _payments;
+
     public StartOperationsCardPaymentUseCase(
         OperationsBillingDesk desk,
         OperationsCardDesk cards,
         IOperationsCardRepository store,
         IOperationsBillingRepository billing,
-        IOperationsSettingsRepository settings)
+        IOperationsSettingsRepository settings,
+        IOperationsPaymentRepository payments)
     {
+        _payments = payments ?? throw new ArgumentNullException(nameof(payments));
         _desk = desk ?? throw new ArgumentNullException(nameof(desk));
         _cards = cards ?? throw new ArgumentNullException(nameof(cards));
         _store = store ?? throw new ArgumentNullException(nameof(store));
@@ -78,9 +82,23 @@ public sealed class StartOperationsCardPaymentUseCase
             return StartOperationsCardPaymentResponse.Failure(Vixly.Operations.Domain.Pickup.OperationsPickupErrors.MoneyNotHandled);
         }
 
-        if (await _cards.SecretKeyAsync(cancellationToken) is not { } secret || !OperationsCardDesk.Offered(await _settings.FindAsync(cancellationToken), true))
+        OperationsTenantSettings? settings = await _settings.FindAsync(cancellationToken);
+
+        if (await _cards.SecretKeyAsync(cancellationToken) is not { } secret || !OperationsCardDesk.Offered(settings, true))
         {
             return StartOperationsCardPaymentResponse.Failure(OperationsCardErrors.NotConnected);
+        }
+
+        // The lines before the card (owner, 2026-10-26): methods the company takes, and the cashier's drawer open for cash, checked now rather than after the card.
+        if (request.Others.Any(tender => tender.Amount != 0m && settings?.Accepts(tender.Method) != true))
+        {
+            return StartOperationsCardPaymentResponse.Failure(OperationsPaymentErrors.MethodNotAccepted);
+        }
+
+        if (request.Others.Any(tender => tender.Amount != 0m && tender.Method == OperationsPaymentMethod.Cash)
+            && await _payments.FindOpenDrawerAsync(access!.User.Id, invoice.WarehouseId, cancellationToken) is not { Status: OperationsCashDrawerStatus.Open })
+        {
+            return StartOperationsCardPaymentResponse.Failure(OperationsPaymentErrors.DrawerRequired);
         }
 
         OperationsCardReader? reader = null;
@@ -98,7 +116,7 @@ public sealed class StartOperationsCardPaymentUseCase
         }
 
         (OperationsCardCharge? charge, string? _, Error? failed) = await _cards.StartAsync(secret, invoice, request.Channel, reader, access.User.Id, invoice.Party.CustomerEmail,
-            id => request.ReturnUrlPrefix + id.ToString("D"), cancellationToken);
+            id => request.ReturnUrlPrefix + id.ToString("D"), cancellationToken, request.Others, request.ZelleTermsAccepted);
         return charge is null ? StartOperationsCardPaymentResponse.Failure(failed!) : StartOperationsCardPaymentResponse.Success(charge.Id);
     }
 }

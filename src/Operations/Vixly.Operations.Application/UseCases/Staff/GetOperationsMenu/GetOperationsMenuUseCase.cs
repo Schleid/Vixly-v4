@@ -19,9 +19,12 @@ public sealed class GetOperationsMenuUseCase
 {
     private readonly OperationsOwnerCheck _owner;
 
-    public GetOperationsMenuUseCase(OperationsOwnerCheck owner)
+    private readonly Vixly.Operations.Application.Ports.IOperationsPlanFeatures _features;
+
+    public GetOperationsMenuUseCase(OperationsOwnerCheck owner, Vixly.Operations.Application.Ports.IOperationsPlanFeatures features)
     {
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        _features = features ?? throw new ArgumentNullException(nameof(features));
     }
 
     public async Task<GetOperationsMenuResponse> ExecuteAsync(
@@ -37,6 +40,9 @@ public sealed class GetOperationsMenuUseCase
             return GetOperationsMenuResponse.Failure(OperationsAccessErrors.SignInRequired);
         }
 
-        return GetOperationsMenuResponse.Success(OperationsPermissions.All.Where(access.Has).ToHashSet(StringComparer.Ordinal), access.IsOwner, access.IsAdministrator);
+        Vixly.Operations.Application.Ports.OperationsPlanFeatures features = await _features.GetAsync(context.RequiredTenantId, cancellationToken);
+        return GetOperationsMenuResponse.Success(OperationsPermissions.All.Where(access.Has).ToHashSet(StringComparer.Ordinal), access.IsOwner, access.IsAdministrator,
+            Vixly.Operations.Application.Plans.OperationsPlanModules.HiddenPages(features), !features.Includes(Vixly.Operations.Application.Plans.OperationsPlanModules.CustomerPortal),
+            features.ModulesOff);
     }
 }

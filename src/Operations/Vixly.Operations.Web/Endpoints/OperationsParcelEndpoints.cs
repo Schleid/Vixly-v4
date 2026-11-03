@@ -21,6 +21,7 @@ using Vixly.Operations.Web.Hosting;
 using Vixly.Operations.Web.Security;
 using Vixly.Operations.Web.Tenancy;
 using Vixly.Shared.Kernel.Errors;
+using Vixly.Shared.Localization;
 
 namespace Vixly.Operations.Web.Endpoints;
 
@@ -51,6 +52,63 @@ public static class OperationsParcelEndpoints
             GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
             await ListAsync(http, search, warehouse, false, held == true, Math.Max(page ?? 1, 1), list, brand, errors));
 
+        // Parcel inventory (owner, 2026-10-22): what is physically on hand, oldest first, with its totals.
+        staff.MapGet("/parcels/on-hand", async (HttpContext http, Guid? warehouse, Guid? location, string? zone, bool? unshelved, bool? held, int? days, string? search, int? page,
+            Vixly.Operations.Application.UseCases.Receiving.ListOperationsOnHandParcels.ListOperationsOnHandParcelsUseCase list, GetOperationsSignInBrandUseCase brand,
+            OperationsErrorText errors) =>
+        {
+            OnHandFilter filter = new(warehouse, location, Enum.TryParse(zone, true, out OperationsStorageZone parsed) && Enum.IsDefined(parsed) ? parsed : null,
+                unshelved == true, held == true, days is > 0 ? Math.Min(days.Value, 3650) : null, search, Math.Max(page ?? 1, 1));
+            var response = await list.ExecuteAsync(OperationsCurrentUser.Context(http), new Vixly.Operations.Application.UseCases.Receiving.ListOperationsOnHandParcels.ListOperationsOnHandParcelsRequest
+            {
+                WarehouseId = filter.WarehouseId,
+                LocationId = filter.LocationId,
+                Zone = filter.Zone,
+                UnshelvedOnly = filter.Unshelved,
+                HeldOnly = filter.Held,
+                MinDays = filter.MinDays,
+                Search = filter.Search,
+                Page = filter.Page
+            }, http.RequestAborted);
+            return Page<OnHandPage>(http, new { Company = await CompanyAsync(http, brand), Filter = filter, Result = response, Error = errors.Describe(response.Error) });
+        });
+
+        // The move station (owner, 2026-10-22: every move is scanned, the package then the shelf).
+        staff.MapGet("/parcels/move", async (HttpContext http, GetOperationsSignInBrandUseCase brand) =>
+            Page<MoveStationPage>(http, new { Company = await CompanyAsync(http, brand), Key = NewKey() }));
+
+        staff.MapPost("/parcels/move", async (HttpContext http, [FromForm] string? package, [FromForm] string? shelf, [FromForm] string? key,
+            PutAwayOperationsParcelUseCase putAway, GetOperationsSignInBrandUseCase brand, OperationsErrorText errors, IStringLocalizer<OperationsText> text) =>
+        {
+            string? company = await CompanyAsync(http, brand);
+
+            // Step one: the package is kept and the shelf asked for.
+            if (string.IsNullOrWhiteSpace(shelf))
+            {
+                return Page<MoveStationPage>(http, new { Company = company, Package = package?.Trim(), Key = string.IsNullOrWhiteSpace(key) ? NewKey() : key });
+            }
+
+            PutAwayOperationsParcelResponse response = await putAway.ExecuteAsync(OperationsCurrentUser.Context(http), new PutAwayOperationsParcelRequest
+            {
+                ParcelCode = package,
+                ShelfCode = shelf,
+                CommandKey = key ?? string.Empty
+            }, http.RequestAborted);
+
+            return response.Succeeded
+                ? Page<MoveStationPage>(http, new
+                {
+                    Company = company,
+                    Key = NewKey(),
+                    Done = VixlyText.Format(text, "ui.move.done", new Dictionary<string, object>(StringComparer.Ordinal)
+                    {
+                        ["package"] = response.ParcelNumber ?? package ?? string.Empty,
+                        ["shelf"] = response.ShelfCode ?? shelf
+                    })
+                })
+                : Page<MoveStationPage>(http, new { Company = company, Package = package?.Trim(), Key = NewKey(), Error = errors.Describe(response.Error) });
+        });
+
         staff.MapGet("/parcels/unidentified", async (HttpContext http, string? search, Guid? warehouse, int? page, ListOperationsParcelsUseCase list,
             GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
             await ListAsync(http, search, warehouse, true, false, Math.Max(page ?? 1, 1), list, brand, errors));
@@ -59,8 +117,37 @@ public static class OperationsParcelEndpoints
             OperationsErrorText errors, IStringLocalizer<OperationsText> text) =>
             await ParcelAsync(http, parcelId, OperationsShippingLabelEndpoints.Known(error),
                 done is "assigned" or "put_away" or "printed" or "checked" or "selected" ? text["ui.parcels.done." + done].Value
+                : done is "items" ? text["ui.items.done"].Value
                 : done is "label_printed" or "label_recorded" ? text[done == "label_printed" ? "ui.shipping_label.done.label_printed" : "ui.undeclared.done.label_recorded"].Value : null,
                 get, brand, errors));
+
+        // Owner, 2026-11-01: staff classify the items for customs.
+        staff.MapPost("/parcels/{parcelId:guid}/items", async (HttpContext http, Guid parcelId,
+            Vixly.Operations.Application.UseCases.Items.SaveOperationsParcelItems.SaveOperationsParcelItemsUseCase save, GetOperationsParcelUseCase get,
+            GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
+        {
+            IFormCollection form = await http.Request.ReadFormAsync(http.RequestAborted);
+            HashSet<string> added = form["add"].Where(value => value is not null).Select(value => value!).ToHashSet(StringComparer.Ordinal);
+            List<Vixly.Operations.Application.Items.OperationsItemClassification> items = new();
+
+            for (int index = 0; index < form["item_id"].Count && index < Vixly.Operations.Domain.Items.OperationsParcelItem.MaxPerParcel; index++)
+            {
+                items.Add(new Vixly.Operations.Application.Items.OperationsItemClassification(
+                    Guid.TryParse(form["item_id"][index], out Guid itemId) ? itemId : null,
+                    At(form, "description", index),
+                    At(form, "code", index),
+                    At(form, "origin", index),
+                    Enum.TryParse(At(form, "unit", index), out Vixly.Operations.Domain.Items.OperationsItemUnit unit) && Enum.IsDefined(unit) ? unit : Vixly.Operations.Domain.Items.OperationsItemUnit.Pieces,
+                    added.Contains(index.ToString(System.Globalization.CultureInfo.InvariantCulture))));
+            }
+
+            var response = await save.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Items.SaveOperationsParcelItems.SaveOperationsParcelItemsRequest { ParcelId = parcelId, Items = items }, http.RequestAborted);
+
+            return response.Succeeded
+                ? Results.Redirect("/staff/parcels/" + parcelId + "?done=items#items")
+                : await ParcelAsync(http, parcelId, response.Error, null, get, brand, errors);
+        });
 
         staff.MapGet("/parcels/{parcelId:guid}/photos/{photoId:guid}", async (HttpContext http, Guid parcelId, Guid photoId, GetOperationsParcelPhotoUseCase photo) =>
         {
@@ -182,6 +269,9 @@ public static class OperationsParcelEndpoints
         return Results.Bytes(content, contentType);
     }
 
+    // The value of a repeated form field at a row; null when missing.
+    private static string? At(IFormCollection form, string name, int index) => index < form[name].Count ? form[name][index] : null;
+
     private static async Task<IResult> ListAsync(HttpContext http, string? search, Guid? warehouse, bool unidentified, bool held, int page, ListOperationsParcelsUseCase list,
         GetOperationsSignInBrandUseCase brand, OperationsErrorText errors)
     {
@@ -247,7 +337,11 @@ public static class OperationsParcelEndpoints
             DimensionUnit = response.DimensionUnit,
             CommandKey = Guid.NewGuid().ToString("N"),
             Error = errors.Describe(error),
-            Info = info
+            Info = info,
+            // Owner, 2026-11-01: the items panel.
+            ItemsPanel = await http.RequestServices.GetRequiredService<Vixly.Operations.Application.UseCases.Items.GetOperationsParcelItems.GetOperationsParcelItemsUseCase>()
+                .ExecuteAsync(OperationsCurrentUser.Context(http), new Vixly.Operations.Application.UseCases.Items.GetOperationsParcelItems.GetOperationsParcelItemsRequest { ParcelId = parcelId },
+                    http.RequestAborted)
         });
     }
 
@@ -271,6 +365,8 @@ public static class OperationsParcelEndpoints
             Info = info
         });
     }
+
+    private static string NewKey() => Guid.NewGuid().ToString("N");
 
     private static IResult Page<TComponent>(HttpContext http, object parameters)
         where TComponent : Microsoft.AspNetCore.Components.IComponent

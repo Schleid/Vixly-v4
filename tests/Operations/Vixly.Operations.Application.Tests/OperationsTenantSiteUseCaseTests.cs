@@ -8,7 +8,6 @@ using Vixly.Operations.Application.UseCases.Locations.SaveOperationsWarehouse;
 using Vixly.Operations.Application.UseCases.Site.GetOperationsPublicSite;
 using Vixly.Operations.Application.UseCases.Site.GetOperationsSiteImage;
 using Vixly.Operations.Application.UseCases.Site.PublishOperationsSite;
-using Vixly.Operations.Application.UseCases.Site.TrackOperationsShipmentPublicly;
 using Vixly.Operations.Application.UseCases.Site.UpdateOperationsSiteDraft;
 using Vixly.Operations.Application.UseCases.Site.UploadOperationsSiteImage;
 using Vixly.Operations.Domain.Branding;
@@ -39,6 +38,8 @@ public sealed class OperationsTenantSiteUseCaseTests
 
     private readonly FakeSiteStore _site = new();
 
+    private readonly FakeStores _outbox = new();
+
     private readonly OperationsAuthorizationContext _owner;
 
     public OperationsTenantSiteUseCaseTests()
@@ -64,6 +65,8 @@ public sealed class OperationsTenantSiteUseCaseTests
         Assert.Equal("Northwind Cargo", ownerPreview.Settings.DisplayName);
 
         Assert.True((await Publish(_owner)).Succeeded);
+        // Owner, 2026-10-28: the brand goes to the Cloudflare Worker for its maintenance page.
+        Assert.Contains(_outbox.Outbox, message => message.Type == Vixly.Operations.Application.Branding.OperationsEdgeBrandChanged.MessageType && message.TenantId == _kit.TenantId);
 
         OperationsPublicSite published = (await PublicSite(_kit.Context, preview: false)).Site!;
         Assert.Equal("Ship with us", published.Text("headline"));
@@ -121,32 +124,44 @@ public sealed class OperationsTenantSiteUseCaseTests
     {
         SaveOperationsBranchResponse haiti = await new SaveOperationsBranchUseCase(_site, Owner(), _kit.Audit, _kit.Store, _kit.Clock).ExecuteAsync(_owner, new SaveOperationsBranchRequest
         {
-            Code = "PAP", Name = "Port-au-Prince", Line1 = "12 Rue Capois", City = "Port-au-Prince", CountryCode = "HT", ShowOnSite = true, Side = OperationsBranchSide.Destination
+            Code = "PAP", Name = "Port-au-Prince", Line1 = "12 Rue Capois", City = "Port-au-Prince", CountryCode = "HT", ShowOnSite = true
         }, CancellationToken.None);
         Assert.True(haiti.Succeeded);
+
+        // Owner, 2026-10-29: a branch is one country; its warehouses are in it.
+        SaveOperationsBranchResponse unitedStates = await new SaveOperationsBranchUseCase(_site, Owner(), _kit.Audit, _kit.Store, _kit.Clock).ExecuteAsync(_owner, new SaveOperationsBranchRequest
+        {
+            Code = "US", Name = "United States", CountryCode = "US", LegalName = "Northwind Freight LLC"
+        }, CancellationToken.None);
+        Assert.True(unitedStates.Succeeded);
 
         SaveOperationsWarehouseUseCase warehouses = new(_kit.Store, _site, Owner(), _kit.Audit, _kit.Store, _kit.Clock);
         Assert.True((await warehouses.ExecuteAsync(_owner, new SaveOperationsWarehouseRequest
         {
-            BranchId = haiti.BranchId, Code = "FLL", Name = "Fort Lauderdale", Line1 = "1 Harbor Road", City = "Fort Lauderdale", Region = "FL", CountryCode = "US",
+            BranchId = unitedStates.BranchId, Code = "FLL", Name = "Fort Lauderdale", Line1 = "1 Harbor Road", City = "Fort Lauderdale", Region = "FL", CountryCode = "US",
             Roles = OperationsWarehouseRoles.Receiving, AcceptingDeliveries = true, ShowOnSite = true
         }, CancellationToken.None)).Succeeded);
         Assert.True((await warehouses.ExecuteAsync(_owner, new SaveOperationsWarehouseRequest
         {
-            BranchId = haiti.BranchId, Code = "SEC", Name = "Back office", Line1 = "2 Harbor Road", City = "Miami", CountryCode = "US",
+            BranchId = unitedStates.BranchId, Code = "SEC", Name = "Back office", Line1 = "2 Harbor Road", City = "Miami", CountryCode = "US",
             Roles = OperationsWarehouseRoles.DispatchHub | OperationsWarehouseRoles.Storage, ShowOnSite = false, TimeZone = "America/New_York"
         }, CancellationToken.None)).Succeeded);
         Assert.Equal("ops.destinations.time_zone_invalid", (await warehouses.ExecuteAsync(_owner, new SaveOperationsWarehouseRequest
         {
-            BranchId = haiti.BranchId, Code = "TZ1", Name = "Elsewhere", Line1 = "4 Road", City = "Miami", CountryCode = "US", Roles = OperationsWarehouseRoles.Storage, TimeZone = "Miami"
+            BranchId = unitedStates.BranchId, Code = "TZ1", Name = "Elsewhere", Line1 = "4 Road", City = "Miami", CountryCode = "US", Roles = OperationsWarehouseRoles.Storage, TimeZone = "Miami"
         }, CancellationToken.None)).Error?.Code);
         Assert.Equal("ops.destinations.manager_invalid", (await warehouses.ExecuteAsync(_owner, new SaveOperationsWarehouseRequest
         {
-            BranchId = haiti.BranchId, Code = "MG1", Name = "Elsewhere", Line1 = "4 Road", City = "Miami", CountryCode = "US", Roles = OperationsWarehouseRoles.Storage, ManagerUserId = Guid.NewGuid()
+            BranchId = unitedStates.BranchId, Code = "MG1", Name = "Elsewhere", Line1 = "4 Road", City = "Miami", CountryCode = "US", Roles = OperationsWarehouseRoles.Storage, ManagerUserId = Guid.NewGuid()
         }, CancellationToken.None)).Error?.Code);
         Assert.Equal("ops.locations.code_taken", (await warehouses.ExecuteAsync(_owner, new SaveOperationsWarehouseRequest
         {
-            BranchId = haiti.BranchId, Code = "FLL", Name = "Again", Line1 = "3 Road", City = "Miami", CountryCode = "US", Roles = OperationsWarehouseRoles.Receiving
+            BranchId = unitedStates.BranchId, Code = "FLL", Name = "Again", Line1 = "3 Road", City = "Miami", CountryCode = "US", Roles = OperationsWarehouseRoles.Receiving
+        }, CancellationToken.None)).Error?.Code);
+
+                Assert.Equal("ops.locations.warehouse_outside_country", (await warehouses.ExecuteAsync(_owner, new SaveOperationsWarehouseRequest
+        {
+            BranchId = haiti.BranchId, Code = "MIA", Name = "Miami", Line1 = "3 Road", City = "Miami", CountryCode = "US", Roles = OperationsWarehouseRoles.Receiving
         }, CancellationToken.None)).Error?.Code);
 
         // Slice 4C: warehouses as destinations: Les Cayes, a hub and pickup point delivering home in two communes; Jérémie, run by a partner, served through Les Cayes.
@@ -228,14 +243,37 @@ public sealed class OperationsTenantSiteUseCaseTests
         Assert.Equal("Ship with us", (await PublicSite(_kit.Context, preview: false)).Site!.Text("headline"));
     }
 
+    // Website themes, step 1: the look needs the plan's theme customisation; a downgrade keeps what is published (W-4).
     [Fact]
-    public async Task PublicTracking_AnswersNotFound_UntilTrackingArrives()
+    public async Task ThemeAndFont_NeedThePlan_AndADowngradeKeepsThePublishedLook()
     {
-        TrackOperationsShipmentPubliclyResponse response = await new TrackOperationsShipmentPubliclyUseCase().ExecuteAsync(
-            _kit.Context, new TrackOperationsShipmentPubliclyRequest { Number = "VX123" }, CancellationToken.None);
+        Assert.True((await Update(theme: OperationsSiteTheme.Horizon, font: OperationsSiteFont.Manrope)).Succeeded);
+        Assert.True((await Publish(_owner)).Succeeded);
+        Features.Tenants[_kit.TenantId] = new OperationsPlanFeatures(false, false);
 
-        Assert.False(response.Succeeded);
-        Assert.Empty(response.Milestones);
+        OperationsPublicSite kept = (await PublicSite(_kit.Context, preview: false)).Site!;
+        Assert.Equal(OperationsSiteTheme.Horizon, kept.Settings.Theme);
+        Assert.Equal(OperationsSiteFont.Manrope, kept.Settings.Font);
+
+        Assert.Equal("ops.brand.theme_locked", (await Update(theme: OperationsSiteTheme.Classic)).Error?.Code);
+        Assert.Equal("ops.brand.theme_locked", (await Upload(_owner, OperationsSiteImageKind.Air)).Error?.Code);
+        Assert.True((await Update(headline: "Still mine")).Succeeded);
+        Assert.Equal(OperationsSiteTheme.Horizon, _site.Brand!.Draft.Theme);
+        Assert.Equal(OperationsSiteFont.Manrope, _site.Brand.Draft.Font);
+    }
+
+    [Fact]
+    public async Task ThemePreview_ShowsTheDraftInAnotherTheme_OnlyToTheOwner_WithoutSaving()
+    {
+        Assert.True((await Update()).Succeeded);
+
+        GetOperationsPublicSiteRequest request = new() { Language = "en", Preview = true, Theme = OperationsSiteTheme.AirSea };
+        OperationsPublicSite owner = (await new GetOperationsPublicSiteUseCase(_site, _site, Owner(), Features).ExecuteAsync(_owner, request, CancellationToken.None)).Site!;
+        OperationsPublicSite visitor = (await new GetOperationsPublicSiteUseCase(_site, _site, Owner(), Features).ExecuteAsync(_kit.Context, request, CancellationToken.None)).Site!;
+
+        Assert.Equal(OperationsSiteTheme.AirSea, owner.Settings.Theme);
+        Assert.Equal(OperationsSiteTheme.Classic, visitor.Settings.Theme);
+        Assert.Equal(OperationsSiteTheme.Classic, _site.Brand!.Draft.Theme);
     }
 
     private FakePlanFeatures Features { get; } = new();
@@ -245,25 +283,28 @@ public sealed class OperationsTenantSiteUseCaseTests
     private Task<GetOperationsPublicSiteResponse> PublicSite(OperationsAuthorizationContext context, bool preview) =>
         new GetOperationsPublicSiteUseCase(_site, _site, Owner(), Features).ExecuteAsync(context, new GetOperationsPublicSiteRequest { Language = "en", Preview = preview }, CancellationToken.None);
 
-    private Task<UpdateOperationsSiteDraftResponse> Update(string? headline = null, string primary = "#1D4ED8", OperationsAuthorizationContext? context = null) =>
-        new UpdateOperationsSiteDraftUseCase(_site, Owner(), _kit.Audit, _kit.Store, _kit.Clock).ExecuteAsync(context ?? _owner, new UpdateOperationsSiteDraftRequest
+    private Task<UpdateOperationsSiteDraftResponse> Update(string? headline = null, string primary = "#1D4ED8", OperationsAuthorizationContext? context = null,
+        OperationsSiteTheme? theme = null, OperationsSiteFont? font = null) =>
+        new UpdateOperationsSiteDraftUseCase(_site, Owner(), _kit.Audit, _kit.Store, _kit.Clock, Features).ExecuteAsync(context ?? _owner, new UpdateOperationsSiteDraftRequest
         {
             DisplayName = "Northwind Cargo",
             PrimaryColour = primary,
             AccentColour = "#0E7490",
             Services = OperationsSiteServices.All,
             ShowSteps = true,
+            Theme = theme,
+            Font = font,
             Language = "en",
             Texts = new Dictionary<string, string?> { ["headline"] = headline }
         }, CancellationToken.None);
 
     private Task<PublishOperationsSiteResponse> Publish(OperationsAuthorizationContext context) =>
-        new PublishOperationsSiteUseCase(_site, Owner(), _kit.Audit, _kit.Store, _kit.Clock).ExecuteAsync(context, new PublishOperationsSiteRequest(), CancellationToken.None);
+        new PublishOperationsSiteUseCase(_site, Owner(), _kit.Audit, _kit.Store, _kit.Clock, new Vixly.Operations.Application.Messaging.OperationsOutboxWriter(_outbox, _kit.Clock)).ExecuteAsync(context, new PublishOperationsSiteRequest(), CancellationToken.None);
 
-    private Task<UploadOperationsSiteImageResponse> Upload(OperationsAuthorizationContext context) =>
-        new UploadOperationsSiteImageUseCase(_site, _site, Owner(), _kit.Audit, _kit.Store, _kit.Clock).ExecuteAsync(context, new UploadOperationsSiteImageRequest
+    private Task<UploadOperationsSiteImageResponse> Upload(OperationsAuthorizationContext context, OperationsSiteImageKind kind = OperationsSiteImageKind.Logo) =>
+        new UploadOperationsSiteImageUseCase(_site, _site, Owner(), _kit.Audit, _kit.Store, _kit.Clock, Features).ExecuteAsync(context, new UploadOperationsSiteImageRequest
         {
-            Kind = OperationsSiteImageKind.Logo,
+            Kind = kind,
             Content = new byte[] { 0x89, 0x50, 0x4E, 0x47 }
         }, CancellationToken.None);
 }

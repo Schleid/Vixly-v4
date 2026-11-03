@@ -49,4 +49,17 @@ public sealed class SaveOperationsPaymentSettingsRequest
 
     // True removes the current picture.
     public bool RemoveZelleQr { get; init; }
+
+    // The customer portal (owner, 2026-10-27): the electronic methods offered there.
+    public bool PortalZelle { get; init; }
+
+    public bool PortalBankTransfer { get; init; }
+
+    public bool PortalCard { get; init; }
+
+    public string? BankTransferInstructionsEn { get; init; }
+
+    public string? BankTransferInstructionsFr { get; init; }
+
+    public string? BankTransferInstructionsEs { get; init; }
 }

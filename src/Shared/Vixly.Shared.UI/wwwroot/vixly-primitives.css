@@ -446,3 +446,28 @@ div.vx-message {
 }
 
 .vx-metric__detail { display: flex; align-items: center; flex-wrap: wrap; gap: var(--vx-space-2); }
+
+/* Shared help primitives (ADR-0023). */
+.vx-help-article { max-width: 72ch; color: var(--vx-color-text); overflow-wrap: anywhere; line-height: 1.65; }
+.vx-help-article__body h2 { margin-block-start: 2rem; scroll-margin-top: 5rem; }
+.vx-help-article__body a, .vx-help-article a { color: var(--vx-color-primary); }
+.vx-help-article__body { overflow-x: auto; }
+.vx-help-article__body table { border-collapse: collapse; width: 100%; }
+.vx-help-article__body th, .vx-help-article__body td { border: 1px solid var(--vx-color-border); padding: .5rem; text-align: start; }
+.vx-help-article__body img { max-width: 100%; height: auto; }
+.vx-help-article__body pre { overflow-x: auto; }
+
+.vx-help-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-md);
+    color: var(--vx-color-text);
+    background: var(--vx-color-surface);
+    text-decoration: none;
+    font-weight: 600;
+}
+.vx-help-link:focus-visible { outline: 2px solid var(--vx-color-primary); outline-offset: 2px; }

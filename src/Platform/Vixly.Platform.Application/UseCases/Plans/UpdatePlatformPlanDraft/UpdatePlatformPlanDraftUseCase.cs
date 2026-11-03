@@ -60,7 +60,8 @@ public sealed class UpdatePlatformPlanDraftUseCase
                     request.TrialDays,
                     request.MaxLicensedDevices,
                     request.MaxWarehouses,
-                    request.Features),
+                    request.Features)
+                    .WithShipmentCap(request.MaxShipmentsPerMonth, request.ExtraShipmentPrice),
                 _administration.UtcNow);
         }
         catch (DomainException exception)
@@ -68,7 +69,7 @@ public sealed class UpdatePlatformPlanDraftUseCase
             return UpdatePlatformPlanDraftResponse.Failure(exception.Error);
         }
 
-        _administration.RecordChange(context, plan, PlatformPermissions.PlansManage, "platform.plans.draft_updated", after: new { monthly = request.MonthlyPricePerLicence, annual = request.AnnualPricePerLicence, setup = request.SetupFee, trial = request.TrialDays });
+        _administration.RecordChange(context, plan, PlatformPermissions.PlansManage, "platform.plans.draft_updated", after: new { monthly = request.MonthlyPricePerLicence, annual = request.AnnualPricePerLicence, setup = request.SetupFee, trial = request.TrialDays, shipments = request.MaxShipmentsPerMonth, extraShipment = request.ExtraShipmentPrice });
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken)
             ? UpdatePlatformPlanDraftResponse.Success()

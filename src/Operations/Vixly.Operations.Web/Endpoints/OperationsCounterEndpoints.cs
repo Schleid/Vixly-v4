@@ -87,10 +87,13 @@ public static class OperationsCounterEndpoints
                 : await CustomerAsync(http, customerId, response.Error, draft, parcelCount, get, brand, errors);
         });
 
-        staff.MapGet("/shipments/{shipmentId:guid}", async (HttpContext http, Guid shipmentId, string? done, string? screen, GetOperationsCounterShipmentUseCase get,
-            GetOperationsSignInBrandUseCase brand, OperationsErrorText errors, IStringLocalizer<OperationsText> text) =>
-            await ShipmentAsync(http, shipmentId, OperationsScreenEndpoints.Refusal(screen), screen == "sent" ? text["ui.screens.sent"].Value
+        staff.MapGet("/shipments/{shipmentId:guid}", async (HttpContext http, Guid shipmentId, string? done, string? screen, string? error, int? count, int? waiting,
+            GetOperationsCounterShipmentUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText errors, IStringLocalizer<OperationsText> text) =>
+            await ShipmentAsync(http, shipmentId, OperationsScreenEndpoints.Refusal(screen) ?? OperationsShippingLabelEndpoints.Known(error),
+                done == "labels_sent" ? OperationsShippingLabelEndpoints.LabelsSent(text, count, waiting)
+                : screen == "sent" ? text["ui.screens.sent"].Value
                 : done is "created" or "added" or "booked" or "count" or "insurance" or "signed" ? text["ui.counter.done." + done].Value
+                : done is "collect_on" or "collect_off" ? text["ui.collect.done." + done].Value
                 : done is "supply" or "supply_short" or "line" ? text["ui.counter.supplies.done." + done].Value : null, null, get, brand, errors));
 
         staff.MapPost("/shipments/{shipmentId:guid}/parcels", async (HttpContext http, Guid shipmentId, [FromForm] string? weight, [FromForm] string? length, [FromForm] string? width,
@@ -106,13 +109,27 @@ public static class OperationsCounterEndpoints
                 Height = Number(height),
                 Contents = contents,
                 Value = Number(value),
-                CommandKey = key
+                CommandKey = key,
+                MoreItems = MoreItems(await http.Request.ReadFormAsync(http.RequestAborted))
             };
             AddOperationsCounterParcelResponse response = await add.ExecuteAsync(OperationsCurrentUser.Context(http), request, http.RequestAborted);
 
             return response.Succeeded
                 ? Results.Redirect("/staff/counter/shipments/" + shipmentId + "?done=" + (response.Booked ? "booked" : "added"))
                 : await ShipmentAsync(http, shipmentId, response.Error, null, request, get, brand, errors);
+        });
+
+        // Freight collect or paid here, by a person who takes payments (owner, 2026-10-27).
+        staff.MapPost("/shipments/{shipmentId:guid}/collect", async (HttpContext http, Guid shipmentId, [FromForm] string? collect, [FromForm] string? reason,
+            Vixly.Operations.Application.UseCases.Cashier.ChangeOperationsFreightCollect.ChangeOperationsFreightCollectUseCase change, GetOperationsCounterShipmentUseCase get, GetOperationsSignInBrandUseCase brand,
+            OperationsErrorText errors) =>
+        {
+            Vixly.Operations.Application.UseCases.Cashier.ChangeOperationsFreightCollect.ChangeOperationsFreightCollectResponse response = await change.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Cashier.ChangeOperationsFreightCollect.ChangeOperationsFreightCollectRequest { ShipmentId = shipmentId, Collect = collect == "true", Reason = reason }, http.RequestAborted);
+
+            return response.Succeeded
+                ? Results.Redirect("/staff/counter/shipments/" + shipmentId + "?done=" + (collect == "true" ? "collect_on" : "collect_off"))
+                : await ShipmentAsync(http, shipmentId, response.Error, null, null, get, brand, errors);
         });
 
         staff.MapPost("/shipments/{shipmentId:guid}/count", async (HttpContext http, Guid shipmentId, [FromForm] int? parcelCount, ChangeOperationsCounterParcelCountUseCase change,
@@ -288,8 +305,34 @@ public static class OperationsCounterEndpoints
             Entered = entered,
             EnteredCount = enteredCount,
             Orders = response.Orders,
+            SuppliesOn = (await http.RequestServices.GetRequiredService<Vixly.Operations.Web.Security.OperationsAllowed>().GetAsync())
+                .Includes(Vixly.Operations.Application.Plans.OperationsPlanModules.Supplies),
             Error = errors.Describe(error)
         });
+    }
+
+    // Owner, 2026-11-01: more items typed for the box; a row without words is left out, without a quantity it counts one.
+    private static IReadOnlyList<Vixly.Operations.Application.Items.OperationsItemDraft> MoreItems(IFormCollection form)
+    {
+        List<Vixly.Operations.Application.Items.OperationsItemDraft> items = new();
+
+        for (int row = 0; row < form["more_words"].Count && row < 10; row++)
+        {
+            string? words = form["more_words"][row];
+
+            if (string.IsNullOrWhiteSpace(words))
+            {
+                continue;
+            }
+
+            string? quantity = row < form["more_qty"].Count ? form["more_qty"][row] : null;
+            items.Add(new Vixly.Operations.Application.Items.OperationsItemDraft(words.Trim(),
+                string.IsNullOrWhiteSpace(quantity) ? 1m : Number(quantity) ?? 0m,
+                Number(row < form["more_value"].Count ? form["more_value"][row] : null) ?? -1m,
+                row < form["more_used"].Count && form["more_used"][row] == "used"));
+        }
+
+        return items;
     }
 
     internal static async Task<IResult> ShipmentAsync(HttpContext http, Guid shipmentId, Error? error, string? info, AddOperationsCounterParcelRequest? entered,
@@ -305,9 +348,23 @@ public static class OperationsCounterEndpoints
                 : Results.NotFound();
         }
 
+        // Freight collect at the counter only for people who take payments (owner, 2026-10-27).
+        bool collectOffered = response.AllowCollect
+            && (await http.RequestServices.GetRequiredService<Vixly.Operations.Web.Security.OperationsAllowed>().GetAsync()).Has(Vixly.Operations.Domain.Access.OperationsPermissions.PaymentsTake);
+
+        // Owner, 2026-10-27: the warehouse's label printers, for "Print all".
+        Vixly.Operations.Application.UseCases.Printing.ListOperationsLabelPrinters.ListOperationsLabelPrintersResponse printers = await http.RequestServices
+            .GetRequiredService<Vixly.Operations.Application.UseCases.Printing.ListOperationsLabelPrinters.ListOperationsLabelPrintersUseCase>()
+            .ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Printing.ListOperationsLabelPrinters.ListOperationsLabelPrintersRequest { WarehouseId = shipment.OriginWarehouseId ?? Guid.Empty }, http.RequestAborted);
+
         return OperationsStaffResults.Page<CounterShipmentPage>(http, new
         {
+            Printers = printers.Printers,
+            CollectOffered = collectOffered,
             Supplies = response.Supplies,
+            SuppliesOn = (await http.RequestServices.GetRequiredService<Vixly.Operations.Web.Security.OperationsAllowed>().GetAsync())
+                .Includes(Vixly.Operations.Application.Plans.OperationsPlanModules.Supplies),
             Company = await OperationsStaffResults.CompanyAsync(http, brand),
             Customer = customer,
             Standing = response.Standing,

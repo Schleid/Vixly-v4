@@ -74,7 +74,8 @@ public sealed class OperationsDispatchCosting
         ArgumentNullException.ThrowIfNull(dispatch);
         List<OperationsDispatchShipment> rows = (await _dispatches.ListDispatchShipmentsAsync(dispatch.Id, cancellationToken)).OrderBy(row => row.HouseNumber, StringComparer.Ordinal).ToList();
 
-        if (dispatch.CostTotal is not { } total)
+        // Slice 8: the carriers' bills once approved, the estimate until then.
+        if (dispatch.CostUsed is not { } total)
         {
             rows.ForEach(row => row.Share(null, utcNow));
             return;

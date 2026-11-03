@@ -31,6 +31,9 @@ public sealed class OperationsAllowed
 
     public Task<GetOperationsMenuResponse> GetAsync() => _loaded ??= LoadAsync();
 
+    // A help request may retain unrestricted guidance when its permission source is unavailable.
+    internal void UseNoPermissionsForHelp() => _loaded = Task.FromResult(GetOperationsMenuResponse.Nothing);
+
     private async Task<GetOperationsMenuResponse> LoadAsync()
     {
         if (_http.HttpContext is not { } http || !OperationsCurrentUser.IsSignedIn(http) || Tenancy.OperationsTenantMiddleware.Host(http) is not { TenantId: not null })

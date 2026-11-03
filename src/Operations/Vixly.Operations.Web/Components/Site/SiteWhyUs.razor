@@ -1,0 +1,36 @@
+@*
+=========================================================
+FILE: SiteWhyUs.razor
+
+PURPOSE:
+Why customers choose the company, in its own words (landing page marketing, owner 2026-10-30).
+
+RESPONSIBILITIES:
+- Show the company's "why us" cards: a title and a short text each
+
+IMPORTANT NOTES:
+- Markup only. Only cards the company wrote; none by default
+- Tenant surface: never says "Vixly"
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+@if (Cards.Count > 0)
+{
+    <section class="site-section as-why" aria-labelledby="why-title">
+        <h2 id="why-title">@(Page.Site.Text("why.heading") ?? VixlyText.Format(T, "site.why.title", "company", Page.Company))</h2>
+        <ul class="site-cards as-why__cards">
+            @foreach ((string title, string text) in Cards)
+            {
+                <li class="site-card"><h3>@title</h3><p>@text</p></li>
+            }
+        </ul>
+    </section>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public OperationsSitePage Page { get; set; } = null!;
+
+    private IReadOnlyList<(string Title, string Text)> Cards => OperationsSiteHome.WhyCards(Page);
+}

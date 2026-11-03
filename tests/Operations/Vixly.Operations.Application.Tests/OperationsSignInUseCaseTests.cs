@@ -91,31 +91,32 @@ public sealed class OperationsSignInUseCaseTests
         Assert.True((await Begin(Password)).Succeeded);
     }
 
-    // Owner, 2026-10-21: a device signing in from another country than its own is flagged and must confirm with a second factor.
+    // Owner, R-6 (2026-10-21): a device signing in from another country than its own is blocked; no code lets the person through.
     [Fact]
-    public async Task Device_InAnotherCountry_IsFlagged_AndConfirmedWithTheCode()
+    public async Task Device_InAnotherCountry_IsBlocked_AndNoCodeLetsThePersonThrough()
     {
         _kit.Owner(withApp: true);
         Guid device = _kit.Devices.Register("secret", "US");
         _kit.Services.Country = "FR";
 
         BeginOperationsSignInResponse begun = await _kit.Begin().ExecuteAsync(_kit.Context,
-            new BeginOperationsSignInRequest { Email = "grace@northwind.example", Password = Password, DeviceId = device, DeviceSecret = "secret" }, CancellationToken.None);
-        _kit.Clock.Advance(TimeSpan.FromSeconds(31));
-        CompleteOperationsSignInWithAuthenticatorCodeResponse verified = await Verify(begun.ChallengeToken, FakeCode);
+            new BeginOperationsSignInRequest { Email = "grace@northwind.example", Password = Password, DeviceId = device, DeviceSecret = "secret", PortalSlug = "northwind" },
+            CancellationToken.None);
 
-        Assert.True(verified.Succeeded);
+        Assert.Equal("ops.auth.device_blocked", begun.Error!.Code);
+        Assert.Empty(begun.ChallengeToken);
+        Assert.Empty(_kit.Store.Sessions);
+        OperationsDeviceBlock block = Assert.Single(_kit.Blocks.Blocks);
+        Assert.Equal(device, block.DeviceId);
+        Assert.Equal("US", block.RegisteredCountry);
+        Assert.Equal("FR", block.Country);
         Assert.Contains(_kit.Store.Audit, entry => entry.ActionCode == "ops.auth.country_changed");
-        OperationsUserSession session = Assert.Single(_kit.Store.Sessions);
-        Assert.Equal(device, session.DeviceId);
-        Assert.Equal("D-000001", session.DeviceNumber);
-        Assert.Equal("FR", session.Country);
-        Assert.True(session.CountryChanged);
+        Assert.Contains(_kit.Store.Audit, entry => entry.ActionCode == "ops.auth.device_blocked");
     }
 
-    // Staff who sign in with the password alone: at home, as usual; abroad, refused while they have no second factor to confirm with.
+    // A blocked device refuses everyone, even back home, until an administrator unblocks it; then the usual sign-in works.
     [Fact]
-    public async Task Device_InAnotherCountry_WithoutASecondFactor_IsRefused()
+    public async Task BlockedDevice_RefusesEveryone_UntilUnblocked()
     {
         OperationsUser staff = OperationsUser.InviteStaff(_kit.TenantId, "Ada Lovelace", EmailAddress.Create("ada@northwind.example"), LanguageCode.En, _kit.Clock.GetUtcNow());
         staff.AcceptInvitation(_kit.Services.Hash(Password), _kit.Clock.GetUtcNow());
@@ -127,9 +128,12 @@ public sealed class OperationsSignInUseCaseTests
         BeginOperationsSignInResponse abroad = await _kit.Begin().ExecuteAsync(_kit.Context, request, CancellationToken.None);
         _kit.Services.Country = "US";
         BeginOperationsSignInResponse home = await _kit.Begin().ExecuteAsync(_kit.Context, request, CancellationToken.None);
+        Assert.Single(_kit.Blocks.Blocks).Unblock(Guid.NewGuid(), _kit.Clock.GetUtcNow());
+        BeginOperationsSignInResponse unblocked = await _kit.Begin().ExecuteAsync(_kit.Context, request, CancellationToken.None);
 
-        Assert.Equal("ops.auth.country_needs_second_factor", abroad.Error!.Code);
-        Assert.NotEmpty(home.SessionToken);
+        Assert.Equal("ops.auth.device_blocked", abroad.Error!.Code);
+        Assert.Equal("ops.auth.device_blocked", home.Error!.Code);
+        Assert.NotEmpty(unblocked.SessionToken);
         OperationsUserSession session = Assert.Single(_kit.Store.Sessions);
         Assert.Equal("Front desk", session.DeviceName);
         Assert.False(session.CountryChanged);

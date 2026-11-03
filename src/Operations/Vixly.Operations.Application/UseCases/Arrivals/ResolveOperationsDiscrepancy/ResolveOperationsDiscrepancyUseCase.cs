@@ -148,7 +148,7 @@ public sealed class ResolveOperationsDiscrepancyUseCase
                     if (await _receiving.GetShipmentAsync(shipmentId, cancellationToken) is { } shipment)
                     {
                         _outbox.Write(OperationsEventNotice.MessageType, context.RequiredTenantId, shipment.Id, new OperationsEventNotice(shipment.CustomerId, request.PortalSlug,
-                            shipment.Number ?? string.Empty, true, "missing_in_transit", null, null, null, null));
+                            shipment.NumberForCustomer, true, "missing_in_transit", null, null, null, null));
                     }
                 }
             }

@@ -83,8 +83,11 @@ internal sealed class OperationsArrivalRepository : IOperationsArrivalRepository
         return rows.Select(row => (row.item, (string?)row.Number, row.Origin)).ToList();
     }
 
-    public Task<OperationsParcel?> FindParcelForUpdateAsync(string number, CancellationToken cancellationToken) =>
-        _context.Parcels.FirstOrDefaultAsync(item => item.Number == number, cancellationToken);
+    // The exact number first; then without separators, for numbers moved from V3 that keep their dashes (owner, 2026-10-27).
+    public async Task<OperationsParcel?> FindParcelForUpdateAsync(string number, CancellationToken cancellationToken) =>
+        await _context.Parcels.FirstOrDefaultAsync(item => item.Number == number, cancellationToken)
+        ?? await _context.Parcels.Where(item => item.Number!.Replace("-", "").Replace(" ", "").Replace("/", "").Replace(".", "").Replace("_", "") == number)
+            .OrderByDescending(item => item.CreatedUtc).FirstOrDefaultAsync(cancellationToken);
 
     public async Task<IReadOnlyList<OperationsParcel>> ListBoxParcelsForUpdateAsync(Guid boxId, CancellationToken cancellationToken) =>
         await _context.Parcels.Where(item => item.BoxId == boxId).Take(Vixly.Operations.Domain.Bundles.OperationsBundleLimits.MaxParcels).ToListAsync(cancellationToken);

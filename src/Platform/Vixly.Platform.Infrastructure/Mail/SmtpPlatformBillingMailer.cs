@@ -33,6 +33,7 @@ internal sealed class SmtpPlatformBillingMailer : IPlatformBillingMailer
         PlatformInvoice invoice,
         PlatformBillingDocument document,
         string? payLink,
+        string? statementWording,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(tenant);
@@ -68,7 +69,8 @@ internal sealed class SmtpPlatformBillingMailer : IPlatformBillingMailer
                         ["due"] = invoice.DueUtc.UtcDateTime.ToString("D", culture),
                         ["support"] = _sender.SupportAddress
                     })
-                    + (payLink is null ? string.Empty : "\n\n" + VixlyText.Format(text, "email.invoice.pay_online", "link", payLink))),
+                    + (payLink is null ? string.Empty : "\n\n" + VixlyText.Format(text, "email.invoice.pay_online", "link", payLink))
+                    + (statementWording is null || document.Kind != PlatformBillingDocumentKind.Receipt ? string.Empty : "\n\n" + VixlyText.Format(text, "email.receipt.statement", "wording", statementWording))),
             (document.FileName, document.Content),
             cancellationToken);
     }

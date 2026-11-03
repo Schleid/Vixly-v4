@@ -37,6 +37,10 @@ internal sealed class OperationsShipmentConfiguration : IEntityTypeConfiguration
         builder.Property(item => item.RequestKey).HasMaxLength(60).IsUnicode(false);
         builder.Property(item => item.Number).HasMaxLength(Vixly.Operations.Domain.Receiving.OperationsReceivingLimits.NumberMaxLength).IsUnicode(false);
         builder.HasIndex(item => new { item.TenantId, item.Number }).IsUnique().HasFilter("[Number] IS NOT NULL");
+
+        // Owner, 2026-10-28: unique everywhere, so a number never points to two shipments, in any company.
+        builder.Property(item => item.TrackingNumber).HasMaxLength(Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.Length).IsUnicode(false).IsFixedLength(false);
+        builder.HasIndex(item => item.TrackingNumber).IsUnique().HasFilter("[TrackingNumber] IS NOT NULL").HasDatabaseName("IX_Shipments_TrackingNumber");
         builder.HasIndex(item => new { item.TenantId, item.CustomerId, item.RequestKey }).IsUnique().HasFilter("[RequestKey] IS NOT NULL");
         builder.Property(item => item.ServiceCode).HasMaxLength(Vixly.Operations.Domain.Charges.OperationsChargeLimits.ServiceCodeMaxLength).IsUnicode(false);
         builder.Property(item => item.RecipientPhone).HasMaxLength(OperationsShipmentInstructions.PhoneMaxLength).IsUnicode(false);
@@ -53,6 +57,10 @@ internal sealed class OperationsShipmentConfiguration : IEntityTypeConfiguration
         builder.Property(item => item.CollectorPhone).HasMaxLength(OperationsShipmentInstructions.PhoneMaxLength).IsUnicode(false);
         builder.Property(item => item.PickupCodeProtected).HasMaxLength(1000).IsUnicode(false);
         builder.HasIndex(item => new { item.TenantId, item.PickupRemindersSent, item.PickupReadyUtc }).HasFilter("[PickupReadyUtc] IS NOT NULL AND [PickedUpUtc] IS NULL");
+        // Slice 10: the company API and webhooks read in order of creation.
+        builder.HasIndex(item => new { item.TenantId, item.CreatedUtc });
+        // Slice 11: reports by booking day.
+        builder.HasIndex(item => new { item.TenantId, item.BookedUtc }).HasFilter("[BookedUtc] IS NOT NULL");
 
         // Slice 5D: the insurance product chosen; a product in use is never deleted.
         builder.HasOne<Vixly.Operations.Domain.Charges.OperationsInsurancePlan>().WithMany().HasForeignKey(item => item.InsurancePlanId).OnDelete(DeleteBehavior.Restrict);

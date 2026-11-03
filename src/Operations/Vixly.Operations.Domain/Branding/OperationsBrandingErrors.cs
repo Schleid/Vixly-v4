@@ -18,6 +18,11 @@ public static class OperationsBrandingErrors
 {
     public static Error DisplayNameRequired { get; } = Error.Create("ops.brand.display_name_required");
 
+    // Owner, 2026-10-28.
+    public static Error DocumentLogoPngOnly { get; } = Error.Create("ops.brand.document_logo_png_only");
+
+    public static Error DocumentLogoUnreadable { get; } = Error.Create("ops.brand.document_logo_unreadable");
+
     public static Error DisplayNameTooLong { get; } = Error.Create("ops.brand.display_name_too_long", ("maxLength", OperationsBrandSettings.DisplayNameMaxLength));
 
     public static Error ColourInvalid { get; } = Error.Create("ops.brand.colour_invalid");
@@ -25,6 +30,9 @@ public static class OperationsBrandingErrors
     public static Error PrimaryContrastTooLow { get; } = Error.Create("ops.brand.primary_contrast_too_low", ("minimum", "4.5"));
 
     public static Error AccentContrastTooLow { get; } = Error.Create("ops.brand.accent_contrast_too_low", ("minimum", "3"));
+
+    // Website themes, step 1: themes, fonts and the air and sea photos come with the plan's theme customisation.
+    public static Error ThemeLocked { get; } = Error.Create("ops.brand.theme_locked");
 
     public static Error LinkInvalid { get; } = Error.Create("ops.brand.link_invalid");
 
@@ -43,4 +51,19 @@ public static class OperationsBrandingErrors
     public static Error ImageSizeInvalid { get; } = Error.Create("ops.brand.image_size_invalid");
 
     public static Error ImageNotFound { get; } = Error.Create("ops.brand.image_not_found");
+
+    // Customer testimonials (owner, 2026-10-30): real words of real customers who agreed to be quoted.
+    public static Error TestimonialNameRequired { get; } = Error.Create("ops.brand.testimonial_name_required");
+
+    public static Error TestimonialQuoteRequired { get; } = Error.Create("ops.brand.testimonial_quote_required");
+
+    public static Error TestimonialTooLong { get; } = Error.Create("ops.brand.testimonial_too_long");
+
+    public static Error TestimonialRatingInvalid { get; } = Error.Create("ops.brand.testimonial_rating_invalid");
+
+    public static Error TestimonialConsentRequired { get; } = Error.Create("ops.brand.testimonial_consent_required");
+
+    public static Error TestimonialNotFound { get; } = Error.Create("ops.brand.testimonial_not_found");
+
+    public static Error TestimonialLimitReached { get; } = Error.Create("ops.brand.testimonial_limit_reached");
 }

@@ -127,6 +127,22 @@ public static class OperationsStaffEndpoints
             return await pages.AfterMemberActionAsync(http, userId, response.Succeeded, response.Error, "status");
         });
 
+        // Owner, 2026-10-29 (S-5): an outside account (a call centre), with its end date, days and hours; or an ordinary one again.
+        staff.MapPost("/people/{userId:guid}/outside", async (HttpContext http, Guid userId, [FromForm] bool outside, [FromForm] DateOnly? endsOn, [FromForm] int[]? days,
+            [FromForm] TimeOnly? from, [FromForm] TimeOnly? to, Vixly.Operations.Application.UseCases.Staff.SetOperationsStaffOutside.SetOperationsStaffOutsideUseCase useCase, StaffPages pages) =>
+        {
+            // 24:00 is typed as 00:00 at the end of a shift: the whole day to midnight.
+            int? fromMinute = from is { } start ? (start.Hour * 60) + start.Minute : null;
+            int? toMinute = to is { } end ? (end == TimeOnly.MinValue && fromMinute is not null ? 24 * 60 : (end.Hour * 60) + end.Minute) : null;
+            Vixly.Operations.Application.UseCases.Staff.SetOperationsStaffOutside.SetOperationsStaffOutsideResponse response = await useCase.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Staff.SetOperationsStaffOutside.SetOperationsStaffOutsideRequest
+                {
+                    UserId = userId, Outside = outside, EndsOn = endsOn, Days = (days ?? Array.Empty<int>()).Where(day => day is >= 1 and <= 64 && (day & (day - 1)) == 0).Distinct().Sum(),
+                    FromMinute = fromMinute, ToMinute = toMinute
+                }, http.RequestAborted);
+            return await pages.AfterMemberActionAsync(http, userId, response.Succeeded, response.Error, "outside");
+        });
+
         staff.MapPost("/people/{userId:guid}/reset-second-factor", async (HttpContext http, Guid userId, ResetOperationsStaffSecondFactorUseCase useCase, StaffPages pages) =>
         {
             ResetOperationsStaffSecondFactorResponse response = await useCase.ExecuteAsync(OperationsCurrentUser.Context(http), new ResetOperationsStaffSecondFactorRequest { UserId = userId }, http.RequestAborted);
@@ -137,6 +153,35 @@ public static class OperationsStaffEndpoints
         {
             EndOperationsStaffSessionsResponse response = await useCase.ExecuteAsync(OperationsCurrentUser.Context(http), new EndOperationsStaffSessionsRequest { UserId = userId }, http.RequestAborted);
             return await pages.AfterMemberActionAsync(http, userId, response.Succeeded, response.Error, "sessions");
+        });
+
+        // Slice 12A (owner H-8): print a new badge (the old one stops working), or revoke it.
+        staff.MapPost("/people/{userId:guid}/badge", async (HttpContext http, Guid userId,
+            Vixly.Operations.Application.UseCases.Staff.IssueOperationsStaffBadge.IssueOperationsStaffBadgeUseCase useCase,
+            Vixly.Operations.Application.UseCases.SignIn.GetOperationsSignInBrand.GetOperationsSignInBrandUseCase brand,
+            Vixly.Operations.Application.Ports.IOperationsLabelRenderer renderer, StaffPages pages) =>
+        {
+            Vixly.Operations.Application.UseCases.Staff.IssueOperationsStaffBadge.IssueOperationsStaffBadgeResponse response = await useCase.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Staff.IssueOperationsStaffBadge.IssueOperationsStaffBadgeRequest { UserId = userId }, http.RequestAborted);
+
+            if (!response.Succeeded)
+            {
+                return await pages.AfterMemberActionAsync(http, userId, false, response.Error, "badge");
+            }
+
+            string company = (await brand.ExecuteAsync(OperationsCurrentUser.Context(http), new Vixly.Operations.Application.UseCases.SignIn.GetOperationsSignInBrand.GetOperationsSignInBrandRequest(),
+                http.RequestAborted)).DisplayName ?? string.Empty;
+            http.Response.Headers.CacheControl = "no-store";
+            return Results.File(renderer.RenderStaffBadge(new Vixly.Operations.Application.Identity.OperationsStaffBadgeCard(company, response.PersonName, response.Code)),
+                "application/pdf", "badge.pdf");
+        });
+
+        staff.MapPost("/people/{userId:guid}/badge/revoke", async (HttpContext http, Guid userId,
+            Vixly.Operations.Application.UseCases.Staff.RevokeOperationsStaffBadge.RevokeOperationsStaffBadgeUseCase useCase, StaffPages pages) =>
+        {
+            Vixly.Operations.Application.UseCases.Staff.RevokeOperationsStaffBadge.RevokeOperationsStaffBadgeResponse response = await useCase.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Staff.RevokeOperationsStaffBadge.RevokeOperationsStaffBadgeRequest { UserId = userId }, http.RequestAborted);
+            return await pages.AfterMemberActionAsync(http, userId, response.Succeeded, response.Error, "badge_revoked");
         });
 
         staff.MapPost("/people/{userId:guid}/transfer", async (HttpContext http, Guid userId, [FromForm] bool confirm, TransferOperationsOwnershipUseCase useCase, StaffPages pages) =>
@@ -191,6 +236,15 @@ public static class OperationsStaffEndpoints
             ChangeMyOperationsPasswordResponse response = await useCase.ExecuteAsync(OperationsCurrentUser.Context(http),
                 new ChangeMyOperationsPasswordRequest { CurrentPassword = currentPassword ?? string.Empty, NewPassword = newPassword ?? string.Empty }, http.RequestAborted);
             return response.Succeeded ? Results.Redirect("/staff/account?done=password") : await pages.AccountAsync(http, response.Error, null, null);
+        });
+
+        // Slice 12A: my PIN for licensed devices.
+        staff.MapPost("/account/pin", async (HttpContext http, [FromForm] string? currentPassword, [FromForm] string? pin,
+            Vixly.Operations.Application.UseCases.Account.SetMyOperationsPin.SetMyOperationsPinUseCase useCase, StaffPages pages) =>
+        {
+            Vixly.Operations.Application.UseCases.Account.SetMyOperationsPin.SetMyOperationsPinResponse response = await useCase.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Account.SetMyOperationsPin.SetMyOperationsPinRequest { CurrentPassword = currentPassword, Pin = pin }, http.RequestAborted);
+            return response.Succeeded ? Results.Redirect("/staff/account?done=pin") : await pages.AccountAsync(http, response.Error, null, null);
         });
 
         staff.MapPost("/account/language", async (HttpContext http, [FromForm] string? language, ChangeMyOperationsLanguageUseCase useCase, StaffPages pages) =>

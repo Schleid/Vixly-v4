@@ -31,6 +31,9 @@ public static class PlatformApiRateLimits
 
     public const string Status = "registration-status";
 
+    // The sign-up payment page: polled while the first invoice is prepared (two calls per refresh with the status).
+    public const string RegistrationInvoice = "registration-invoice";
+
     public const string Catalogue = "registration-catalogue";
 
     public const string Webhook = "payments-webhook";
@@ -40,6 +43,10 @@ public static class PlatformApiRateLimits
     public const string PaymentCheckout = "payments-checkout";
 
     public const string Leads = "public-leads";
+
+    public const string Maintenance = "public-maintenance";
+
+    public const string MaintenancePass = "public-maintenance-pass";
 
     public static IServiceCollection AddPlatformApiRateLimits(this IServiceCollection services)
     {
@@ -52,12 +59,17 @@ public static class PlatformApiRateLimits
             AddPerIp(options, Start, 5, TimeSpan.FromHours(1));
             AddPerIp(options, Verify, 10, TimeSpan.FromHours(1));
             AddPerIp(options, Change, 10, TimeSpan.FromHours(1));
-            AddPerIp(options, Status, 60, TimeSpan.FromHours(1));
+            // 2026-10-25: 60 an hour ran out in minutes while the pay page waited for its invoice (status + invoice every refresh).
+            AddPerIp(options, Status, 300, TimeSpan.FromHours(1));
+            AddPerIp(options, RegistrationInvoice, 300, TimeSpan.FromHours(1));
             AddPerIp(options, Catalogue, 60, TimeSpan.FromMinutes(1));
             AddPerIp(options, Webhook, 600, TimeSpan.FromMinutes(1));
             AddPerIp(options, PaymentLinkView, 60, TimeSpan.FromHours(1));
             AddPerIp(options, PaymentCheckout, 20, TimeSpan.FromHours(1));
             AddPerIp(options, Leads, 5, TimeSpan.FromHours(1));
+            // Every site instance asks once a minute; many share an address behind the edge.
+            AddPerIp(options, Maintenance, 600, TimeSpan.FromMinutes(1));
+            AddPerIp(options, MaintenancePass, 20, TimeSpan.FromMinutes(10));
         });
 
         return services;

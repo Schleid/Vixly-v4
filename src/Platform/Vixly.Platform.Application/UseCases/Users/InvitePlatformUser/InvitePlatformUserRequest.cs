@@ -26,7 +26,5 @@ public sealed class InvitePlatformUserRequest
 
     public PlatformUserAuthorityLevel AuthorityLevel { get; init; }
 
-    public string? EmployeeNumber { get; init; }
-
     public string? PhoneNumber { get; init; }
 }

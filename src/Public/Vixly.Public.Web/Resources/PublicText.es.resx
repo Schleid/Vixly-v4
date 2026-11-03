@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
@@ -513,7 +513,7 @@
     <comment>needs-review</comment>
   </data>
   <data name="public.plans.choose" xml:space="preserve">
-    <value>Elegir este plan</value>
+    <value>Empezar</value>
     <comment>needs-review</comment>
   </data>
   <data name="public.plans.tax_note" xml:space="preserve">
@@ -1090,5 +1090,93 @@
   </data>
   <data name="public.plans.feature.partner_agents" xml:space="preserve">
     <value>Agentes asociados</value>
+  </data>
+  <data name="public.plans.feature.text_messages" xml:space="preserve">
+    <value>Avisos por SMS y WhatsApp</value>
+  </data>
+  <data name="public.plans.feature.quick_books_sync" xml:space="preserve">
+    <value>Sincronización con QuickBooks Online</value>
+  </data>
+  <data name="public.plans.feature.tenant_api" xml:space="preserve">
+    <value>API y webhooks</value>
+  </data>
+  <data name="public.plans.feature.carrier_data" xml:space="preserve">
+    <value>Datos de transportistas (fechas automáticas)</value>
+  </data>
+  <data name="public.register.new_email" xml:space="preserve">
+    <value>Nueva dirección de correo electrónico</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.preparing" xml:space="preserve">
+    <value>Estamos preparando su factura. Esta página se actualiza sola en unos segundos.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="nav.help" xml:space="preserve"><value>Ayuda</value><comment>needs-review</comment></data>
+  <data name="footer.help" xml:space="preserve"><value>Ayuda</value><comment>needs-review</comment></data>
+  <data name="ui.help.title" xml:space="preserve"><value>Ayuda de Vixly</value><comment>needs-review</comment></data>
+  <data name="ui.help.summary" xml:space="preserve"><value>Conozca Vixly y encuentre ayuda sobre planes, registro y pagos.</value><comment>needs-review</comment></data>
+  <data name="ui.help.context" xml:space="preserve"><value>Ayuda para esta página</value><comment>needs-review</comment></data>
+  <data name="ui.help.back" xml:space="preserve"><value>Volver a la ayuda</value><comment>needs-review</comment></data>
+  <data name="ui.help.related" xml:space="preserve"><value>Artículos relacionados</value><comment>needs-review</comment></data>
+  <data name="ui.help.search" xml:space="preserve"><value>Buscar en la ayuda</value><comment>needs-review</comment></data>
+  <data name="ui.help.search_go" xml:space="preserve"><value>Buscar</value><comment>needs-review</comment></data>
+  <data name="ui.help.results" xml:space="preserve"><value>Resultados de búsqueda</value><comment>needs-review</comment></data>
+  <data name="ui.help.empty" xml:space="preserve"><value>No se encontraron artículos. Pruebe con otra palabra.</value><comment>needs-review</comment></data>
+  <data name="ui.help.clear" xml:space="preserve"><value>Explorar todos los artículos</value><comment>needs-review</comment></data>
+  <data name="ui.help.section.getting-started" xml:space="preserve"><value>Primeros pasos</value><comment>needs-review</comment></data>
+  <data name="ui.help.section.sign-up" xml:space="preserve"><value>Registro</value><comment>needs-review</comment></data>
+  <data name="ui.help.section.paying" xml:space="preserve"><value>Pagos</value><comment>needs-review</comment></data>
+  <data name="ui.help.section.terms-and-contact" xml:space="preserve"><value>Condiciones y contacto</value><comment>needs-review</comment></data>
+  <data name="ui.maintenance.page_title" xml:space="preserve">
+    <value>En mantenimiento</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.page_body" xml:space="preserve">
+    <value>Estamos realizando un mantenimiento planificado. Esperamos volver hacia las {time} (UTC).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.banner" xml:space="preserve">
+    <value>Mantenimiento planificado del {start} al {end} (UTC): el sitio no estará disponible durante ese tiempo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.preparing_slow" xml:space="preserve">
+    <value>Su factura está tardando más de lo habitual. No se pierde nada: vuelva a esta página en unos minutos o pulse el botón de abajo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.pay.refresh" xml:space="preserve">
+    <value>Volver a comprobar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.shipments" xml:space="preserve">
+    <value>Hasta {count} envíos al mes, luego {price} cada uno</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.feature.customer_portal" xml:space="preserve">
+    <value>Portal de clientes y dirección de casillero</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.feature.insurance" xml:space="preserve">
+    <value>Seguro de envíos</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.feature.credit_accounts" xml:space="preserve">
+    <value>Cuentas de crédito de clientes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.feature.supplies" xml:space="preserve">
+    <value>Venta de suministros e inventario</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.feature.home_delivery" xml:space="preserve">
+    <value>Entrega a domicilio con choferes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.feature.support_desk" xml:space="preserve">
+    <value>Agentes de soporte y mesa de tickets</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="public.plans.feature.payables" xml:space="preserve">
+    <value>Facturas de proveedores y margen por envío</value>
+    <comment>needs-review</comment>
   </data>
 </root>

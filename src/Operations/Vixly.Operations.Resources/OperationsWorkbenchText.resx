@@ -72,4 +72,19 @@
   <data name="company" xml:space="preserve">
     <value>Company</value>
   </data>
+  <data name="front_office" xml:space="preserve">
+    <value>Front Office</value>
+  </data>
+  <data name="warehouse_operations" xml:space="preserve">
+    <value>Warehouse Operations</value>
+  </data>
+  <data name="back_office" xml:space="preserve">
+    <value>Back Office</value>
+  </data>
+  <data name="technical" xml:space="preserve">
+    <value>Technical</value>
+  </data>
+  <data name="support" xml:space="preserve">
+    <value>Support</value>
+  </data>
 </root>

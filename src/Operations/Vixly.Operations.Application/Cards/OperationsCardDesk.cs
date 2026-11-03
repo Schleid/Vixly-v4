@@ -76,7 +76,8 @@ public sealed class OperationsCardDesk
 
     // A new charge for what the invoice owes; the one already started for it is cancelled first (on its reader too).
     public async Task<(OperationsCardCharge? Charge, string? PageUrl, Shared.Kernel.Errors.Error? Refused)> StartAsync(string secretKey, OperationsInvoice invoice,
-        OperationsCardChannel channel, OperationsCardReader? reader, Guid? startedBy, string? email, Func<Guid, string> returnUrl, CancellationToken cancellationToken)
+        OperationsCardChannel channel, OperationsCardReader? reader, Guid? startedBy, string? email, Func<Guid, string> returnUrl, CancellationToken cancellationToken,
+        IReadOnlyList<OperationsTenderDraft>? others = null, bool zelleTermsAccepted = false)
     {
         ArgumentNullException.ThrowIfNull(invoice);
         ArgumentNullException.ThrowIfNull(returnUrl);
@@ -102,7 +103,7 @@ public sealed class OperationsCardDesk
 
         try
         {
-            charge = OperationsCardCharge.Start(invoice.TenantId, invoice, channel, startedBy, reader?.Id, OperationsCardProvider.IsLive(secretKey), utcNow);
+            charge = OperationsCardCharge.Start(invoice.TenantId, invoice, channel, startedBy, reader?.Id, OperationsCardProvider.IsLive(secretKey), utcNow, others, zelleTermsAccepted);
         }
         catch (DomainException exception)
         {
@@ -141,7 +142,7 @@ public sealed class OperationsCardDesk
         }
 
         _audit.Record(startedBy, "ops.payments.card_started", nameof(OperationsCardCharge), charge.Id,
-            after: new { invoice = invoice.Number, charge.Amount, channel = channel.ToString(), reader = reader?.Label });
+            after: new { invoice = invoice.Number, charge.Amount, channel = channel.ToString(), reader = reader?.Label, others = charge.OtherTotal });
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return (charge, pageUrl, null);
     }
@@ -287,12 +288,26 @@ public sealed class OperationsCardDesk
         OperationsInvoice? invoice = await _billing.GetInvoiceAsync(charge.InvoiceId, cancellationToken);
         OperationsPayment? payment = null;
 
-        if (invoice is not null && state.Amount == charge.Amount && string.Equals(state.CurrencyCode, charge.CurrencyCode, StringComparison.OrdinalIgnoreCase) && invoice.Owed == state.Amount)
+        if (invoice is not null && state.Amount == charge.Amount && string.Equals(state.CurrencyCode, charge.CurrencyCode, StringComparison.OrdinalIgnoreCase)
+            && invoice.Owed == state.Amount + charge.OtherTotal)
         {
             try
             {
-                payment = OperationsPayment.TakeByCard(charge.TenantId, invoice, await _numbering.NextAsync(OperationsNumberKind.Payment, cancellationToken), state.Amount, intent,
-                    charge.StartedByUserId, charge.Id, utcNow);
+                // With lines before the card (owner, 2026-10-26): one payment of all of them, the cash into the cashier's open drawer.
+                if (charge.OtherTenders.Count > 0 && charge.StartedByUserId is { } cashier)
+                {
+                    OperationsCashDrawer? drawer = charge.OtherTenders.Any(tender => tender.Method == OperationsPaymentMethod.Cash)
+                        ? await _payments.FindOpenDrawerAsync(cashier, invoice.WarehouseId, cancellationToken)
+                        : null;
+                    payment = OperationsPayment.Take(charge.TenantId, invoice, await _numbering.NextAsync(OperationsNumberKind.Payment, cancellationToken), charge.OtherTenders, drawer,
+                        charge.ZelleTermsAccepted, cashier, charge.Id, utcNow, new OperationsCardPart(state.Amount, intent));
+                }
+                else
+                {
+                    payment = OperationsPayment.TakeByCard(charge.TenantId, invoice, await _numbering.NextAsync(OperationsNumberKind.Payment, cancellationToken), state.Amount, intent,
+                        charge.StartedByUserId, charge.Id, utcNow);
+                }
+
                 _payments.Add(payment);
             }
             catch (DomainException)

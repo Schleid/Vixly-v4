@@ -17,13 +17,14 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<OperationsText> T
 
 <fieldset>
-    <legend>@T["ui.editor.address"]</legend>
-    <label>@T["ui.editor.address.line1"] <input name="line1" value="@Line1" maxlength="@OperationsLocationLimits.AddressLineMaxLength" required /></label>
+    <legend>@T[Legend]</legend>
+    @if (Hint is not null) { <p class="vx-hint">@T[Hint]</p> }
+    <label>@T["ui.editor.address.line1"] <input name="line1" value="@Line1" maxlength="@OperationsLocationLimits.AddressLineMaxLength" required="@(!Optional)" /></label>
     <label>@T["ui.editor.address.line2"] <input name="line2" value="@Line2" maxlength="@OperationsLocationLimits.AddressLineMaxLength" /></label>
-    <label>@T["ui.editor.address.city"] <input name="city" value="@City" maxlength="@OperationsLocationLimits.CityMaxLength" required /></label>
+    <label>@T["ui.editor.address.city"] <input name="city" value="@City" maxlength="@OperationsLocationLimits.CityMaxLength" required="@(!Optional)" /></label>
     <label>@T["ui.editor.address.region"] <input name="region" value="@Region" maxlength="@OperationsLocationLimits.RegionMaxLength" /></label>
     <label>@T["ui.editor.address.postal_code"] <input name="postalCode" value="@PostalCode" maxlength="@OperationsLocationLimits.PostalCodeMaxLength" /></label>
-    <CountrySelect Name="countryCode" Value="@CountryCode" />
+    @if (ShowCountry) { <CountrySelect Name="countryCode" Value="@CountryCode" /> }
 </fieldset>
 
 @code {
@@ -38,4 +39,13 @@ IMPORTANT NOTES:
     [Parameter] public string? PostalCode { get; set; }
 
     [Parameter] public string? CountryCode { get; set; }
+
+    // Owner, 2026-10-29: a branch's office address is optional, and its country is chosen on the branch itself.
+    [Parameter] public bool Optional { get; set; }
+
+    [Parameter] public bool ShowCountry { get; set; } = true;
+
+    [Parameter] public string Legend { get; set; } = "ui.editor.address";
+
+    [Parameter] public string? Hint { get; set; }
 }

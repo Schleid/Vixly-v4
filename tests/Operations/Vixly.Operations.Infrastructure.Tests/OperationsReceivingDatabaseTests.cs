@@ -225,7 +225,7 @@ public sealed class OperationsReceivingDatabaseTests : IClassFixture<OperationsD
         await using OperationsDbContext context = _database.NewContext(tenant);
         OperationsCustomer customer = OperationsCustomer.SignUp(tenant, "Ana", "Pierre", null, EmailAddress.Create("ana@example.com"), "+50937123456", LanguageCode.En, "$2a$12$hash", now);
         customer.ConfirmEmail(code, now);
-        OperationsBranch branch = OperationsBranch.Create(tenant, Details("MIA"), OperationsBranchSide.Origin, now);
+        OperationsBranch branch = OperationsBranch.Create(tenant, Details("MIA"), "US", OperationsBranchLegal.None, now);
         OperationsWarehouse warehouse = OperationsWarehouse.Create(tenant, branch.Id, Details("WH1"), OperationsWarehouseRoles.Receiving, true, now);
         OperationsWarehouse elsewhere = OperationsWarehouse.Create(tenant, branch.Id, Details("WH2"), OperationsWarehouseRoles.Receiving, true, now);
         context.AddRange(customer, branch, warehouse, elsewhere);

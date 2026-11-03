@@ -1,6 +1,10 @@
-﻿using Vixly.Operations.Application.Security;
+﻿using Vixly.Operations.Application.Ports;
+using Vixly.Operations.Application.Security;
 using Vixly.Operations.Application.Site;
+using Vixly.Operations.Application.Tracking;
 using Vixly.Operations.Domain.Common;
+using Vixly.Operations.Domain.Shipments;
+using Vixly.Operations.Domain.Tracking;
 
 namespace Vixly.Operations.Application.UseCases.Site.TrackOperationsShipmentPublicly;
 
@@ -12,6 +16,8 @@ namespace Vixly.Operations.Application.UseCases.Site.TrackOperationsShipmentPubl
 //
 // RESPONSIBILITIES:
 // - Run the rule and return a response; never throw for an expected refusal
+// - Owner, 2026-10-28: by the shipment's tracking number (VX 482 917 36 054), given once it is paid, on account or collect;
+//   the milestones its parcels reached, each with the first time one of them reached it
 //
 // IMPORTANT NOTES:
 // - Never amounts, names, addresses, photos or notes
@@ -19,7 +25,17 @@ namespace Vixly.Operations.Application.UseCases.Site.TrackOperationsShipmentPubl
 // =========================================================
 public sealed class TrackOperationsShipmentPubliclyUseCase
 {
-    public Task<TrackOperationsShipmentPubliclyResponse> ExecuteAsync(
+    private readonly IOperationsReceivingRepository _receiving;
+
+    private readonly IOperationsTrackingRepository _tracking;
+
+    public TrackOperationsShipmentPubliclyUseCase(IOperationsReceivingRepository receiving, IOperationsTrackingRepository tracking)
+    {
+        _receiving = receiving ?? throw new ArgumentNullException(nameof(receiving));
+        _tracking = tracking ?? throw new ArgumentNullException(nameof(tracking));
+    }
+
+    public async Task<TrackOperationsShipmentPubliclyResponse> ExecuteAsync(
         OperationsAuthorizationContext context,
         TrackOperationsShipmentPubliclyRequest request,
         CancellationToken cancellationToken)
@@ -27,8 +43,25 @@ public sealed class TrackOperationsShipmentPubliclyUseCase
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(request);
 
-        // The tracking core arrives with Slice 3; until then every number is "not found",
-        // the same answer as for a number of another tenant.
-        return Task.FromResult(TrackOperationsShipmentPubliclyResponse.Failure(OperationsCommonErrors.NotFound));
+        // A mistyped number fails its check digit and is never looked up.
+        if (OperationsTrackingNumbers.Read(request.Number) is not { } number
+            || await _receiving.FindShipmentByTrackingNumberAsync(number, cancellationToken) is not { } shipment)
+        {
+            return TrackOperationsShipmentPubliclyResponse.Failure(OperationsCommonErrors.NotFound);
+        }
+
+        List<Guid> parcels = (await _receiving.ListShipmentParcelsAsync(shipment.Id, cancellationToken)).Select(item => item.Id).ToList();
+        List<OperationsTrackingEvent> events = new(await _tracking.ListForSubjectAsync(OperationsTrackingSubject.Shipment, shipment.Id, cancellationToken));
+
+        if (parcels.Count > 0)
+        {
+            events.AddRange(await _tracking.ListForSubjectsAsync(OperationsTrackingSubject.Parcel, parcels, cancellationToken));
+        }
+
+        List<OperationsPublicMilestone> milestones = OperationsTrackingViews.ForPublic(events)
+            .Select(item => new OperationsPublicMilestone(item.Milestone.ToString(), item.OccurredUtc, null))
+            .ToList();
+
+        return TrackOperationsShipmentPubliclyResponse.Success(milestones);
     }
 }

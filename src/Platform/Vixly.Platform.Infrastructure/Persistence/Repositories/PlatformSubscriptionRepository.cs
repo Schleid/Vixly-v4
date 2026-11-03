@@ -80,6 +80,20 @@ internal sealed class PlatformSubscriptionRepository : IPlatformSubscriptionRepo
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<PlatformSubscription>> ListRenewalRemindersDueAsync(DateTimeOffset fromUtc, DateTimeOffset toUtc, int max, CancellationToken cancellationToken)
+    {
+        return await _context.Subscriptions
+            .Where(subscription => subscription.Status == PlatformSubscriptionStatus.Active
+                && subscription.Term == PlatformSubscriptionTerm.Annual
+                && !subscription.CancelAtPeriodEnd
+                && subscription.PeriodEndUtc > fromUtc
+                && subscription.PeriodEndUtc <= toUtc
+                && (subscription.RenewalRemindedForUtc == null || subscription.RenewalRemindedForUtc != subscription.PeriodEndUtc))
+            .OrderBy(subscription => subscription.PeriodEndUtc)
+            .Take(max)
+            .ToListAsync(cancellationToken);
+    }
+
     public void Add(PlatformSubscription subscription)
     {
         ArgumentNullException.ThrowIfNull(subscription);

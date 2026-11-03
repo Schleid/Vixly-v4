@@ -21,7 +21,7 @@ IMPORTANT NOTES:
 @if (_offer is { } offer)
 {
     <OfferSummary Offer="offer" />
-    <form method="post" class="pub-form" @formname="register-offer" @onsubmit="AcceptOfferAsync">
+    <form method="post" class="pub-form pub-offer-accept" @formname="register-offer" @onsubmit="AcceptOfferAsync">
         <AntiforgeryToken />
         <div class="pub-form__actions">
             <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["public.register.offer_accept"]</VxButton>
@@ -34,13 +34,14 @@ else if (_plans is { Count: > 0 } plans)
         <fieldset class="pub-field--full">
             <legend>@T["public.register.plan"]</legend>
             <InputRadioGroup @bind-Value="Choice!.PlanCode">
-                <div class="pub-plan-radio-group">
+                <div class="pub-plan-radio-group pub-field--full">
                     @foreach (Vixly.Contracts.Platform.Registration.PlatformPublicPlan plan in plans)
                     {
                         <label class="pub-plan-radio-option">
                             <InputRadio Value="plan.Code" required />
                             <span class="pub-plan-radio-label">
-                                <strong>@plan.Name</strong> · @VixlyText.Format(T, "public.plans.monthly", "price", Vixly.Public.Web.Features.Plans.PlanDisplay.Money(plan.MonthlyPricePerLicence, plan.CurrencyCode))
+                                <strong>@plan.Name</strong>
+                                <span>@VixlyText.Format(T, "public.plans.monthly", "price", Vixly.Public.Web.Features.Plans.PlanDisplay.Money(plan.MonthlyPricePerLicence, plan.CurrencyCode))</span>
                                 @if (plan.TrialDays is int days && days > 0)
                                 {
                                     <span class="pub-hint">@VixlyText.Format(T, "public.plans.trial", "days", days)</span>
@@ -92,7 +93,8 @@ else if (_plans is { Count: > 0 } plans)
 
     protected override async Task OnInitializedAsync()
     {
-        Choice ??= new PlanChoiceModel { PlanCode = Plan };
+        // The plan chosen on the plans page is remembered through the earlier steps (owner, 2026-10-22: a smooth sign-up).
+        Choice ??= new PlanChoiceModel { PlanCode = Plan ?? RegistrationCookies.Read(HttpContext, RegistrationCookies.Plan), StartTrial = true };
 
         if (RegistrationCookies.Read(HttpContext, RegistrationCookies.Access) is not { } access)
         {
@@ -149,6 +151,7 @@ else if (_plans is { Count: > 0 } plans)
         if (result.Value is { } choice && HttpContext is not null)
         {
             RegistrationCookies.Clear(HttpContext, RegistrationCookies.Offer);
+            RegistrationCookies.Clear(HttpContext, RegistrationCookies.Plan);
             Navigation.NavigateTo(RegistrationSteps.PageFor(choice.Step));
             return;
         }

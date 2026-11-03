@@ -47,9 +47,12 @@ public sealed class GetOperationsCardPaymentResponse
 
     public Guid? PaymentId { get; private init; }
 
-    public static GetOperationsCardPaymentResponse Success(Guid chargeId, Guid invoiceId, string invoiceNumber, OperationsCardChannel channel, OperationsCardChargeStatus status, decimal amount, string currencyCode, string? pageUrl, string? readerLabel, string? paymentNumber, Guid? paymentId)
+    // The lines added before the card, recorded with it once it is approved (owner, 2026-10-26).
+    public decimal OtherTotal { get; private init; }
+
+    public static GetOperationsCardPaymentResponse Success(Guid chargeId, Guid invoiceId, string invoiceNumber, OperationsCardChannel channel, OperationsCardChargeStatus status, decimal amount, string currencyCode, string? pageUrl, string? readerLabel, string? paymentNumber, Guid? paymentId, decimal otherTotal = 0m)
     {
-        return new GetOperationsCardPaymentResponse { Succeeded = true, ChargeId = chargeId, InvoiceId = invoiceId, InvoiceNumber = invoiceNumber, Channel = channel, Status = status, Amount = amount, CurrencyCode = currencyCode, PageUrl = pageUrl, ReaderLabel = readerLabel, PaymentNumber = paymentNumber, PaymentId = paymentId };
+        return new GetOperationsCardPaymentResponse { OtherTotal = otherTotal, Succeeded = true, ChargeId = chargeId, InvoiceId = invoiceId, InvoiceNumber = invoiceNumber, Channel = channel, Status = status, Amount = amount, CurrencyCode = currencyCode, PageUrl = pageUrl, ReaderLabel = readerLabel, PaymentNumber = paymentNumber, PaymentId = paymentId };
     }
 
     public static GetOperationsCardPaymentResponse Failure(Error error)

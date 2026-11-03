@@ -32,6 +32,7 @@ public sealed class ProjectDependencyRulesTests
     private const string SharedUi = "Vixly.Shared.UI";
     private const string Localization = "Vixly.Shared.Localization";
     private const string Hosting = "Vixly.Shared.Hosting";
+    private const string Help = "Vixly.Shared.Help";
     private const string ContractsPrefix = "Vixly.Contracts.";
 
     private static readonly string[] Planes = { "Platform", "Operations", "Customer" };
@@ -93,7 +94,7 @@ public sealed class ProjectDependencyRulesTests
 
     private static Func<string, bool>? AllowedReferences(string project)
     {
-        if (project == Kernel || project == SharedUi || project.StartsWith(ContractsPrefix, StringComparison.Ordinal))
+        if (project == Kernel || project == SharedUi || project == Help || project.StartsWith(ContractsPrefix, StringComparison.Ordinal))
         {
             return _ => false;
         }
@@ -119,10 +120,21 @@ public sealed class ProjectDependencyRulesTests
             return reference => reference == "Vixly.Contracts.Operations";
         }
 
+        // Slice 12E (owner H-6): the phone print helper speaks only the Operations contracts; its app adds nothing else of Vixly.
+        if (project == "Vixly.PrintHelper.Core")
+        {
+            return reference => reference == "Vixly.Contracts.Operations";
+        }
+
+        if (project == "Vixly.PrintHelper")
+        {
+            return reference => reference == "Vixly.PrintHelper.Core";
+        }
+
         if (project == "Vixly.Public.Web")
         {
             return reference => reference == "Vixly.Contracts.Platform" || reference == SharedUi
-                || reference == Localization || reference == Hosting;
+                || reference == Localization || reference == Hosting || reference == Help;
         }
 
         string[] parts = project.Split('.');
@@ -151,7 +163,7 @@ public sealed class ProjectDependencyRulesTests
                 || reference == $"{plane}.Resources" || reference == Localization || reference == Hosting,
             "Web" => reference =>
                 reference == $"{plane}.Application" || reference == $"{plane}.Infrastructure"
-                || IsContracts(reference) || reference == SharedUi
+                || IsContracts(reference) || reference == SharedUi || reference == Help
                 || reference == $"{plane}.Resources" || reference == Localization || reference == Hosting,
             "Worker" => reference =>
                 reference == $"{plane}.Application" || reference == $"{plane}.Infrastructure"

@@ -8,6 +8,7 @@ using Vixly.Operations.Application.UseCases.Devices.EnrolOperationsDevice;
 using Vixly.Operations.Application.UseCases.Devices.ListOperationsDevices;
 using Vixly.Operations.Application.UseCases.Devices.ReleaseOperationsDevice;
 using Vixly.Operations.Application.UseCases.Devices.RequestOperationsFirstDeviceLink;
+using Vixly.Operations.Application.UseCases.Devices.UnblockOperationsDevice;
 using Vixly.Operations.Application.UseCases.SignIn.GetOperationsSignInBrand;
 using Vixly.Operations.Web.Components.Editor;
 using Vixly.Operations.Web.Components.SignIn;
@@ -118,6 +119,18 @@ public static class OperationsDeviceEndpoints
                 : await DevicePageAsync(http, deviceId, list, await CompanyAsync(http, brand), text, response.Error);
         }).RequireAuthorization().RequireRateLimiting(OperationsRateLimits.SecondFactor);
 
+        // Owner, R-6: a company administrator lifts the block of a device used from another country, with a fresh code.
+        endpoints.MapPost("/staff/devices/{deviceId:guid}/unblock", async (HttpContext http, Guid deviceId, [FromForm] string? code,
+            UnblockOperationsDeviceUseCase unblock, ListOperationsDevicesUseCase list, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
+        {
+            UnblockOperationsDeviceResponse response = await unblock.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new UnblockOperationsDeviceRequest { DeviceId = deviceId, Code = code ?? string.Empty }, http.RequestAborted);
+
+            return response.Succeeded
+                ? Results.Redirect("/staff/devices?done=1")
+                : await DevicePageAsync(http, deviceId, list, await CompanyAsync(http, brand), text, response.Error);
+        }).RequireAuthorization().RequireRateLimiting(OperationsRateLimits.SecondFactor);
+
         endpoints.MapPost("/staff/devices/{deviceId:guid}/release", async (HttpContext http, Guid deviceId, [FromForm] string? reason, [FromForm] string? code,
             ReleaseOperationsDeviceUseCase release, ListOperationsDevicesUseCase list, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
         {
@@ -156,7 +169,8 @@ public static class OperationsDeviceEndpoints
             Devices = devices.Devices,
             Seats = devices.Seats,
             Error = text.Describe(error ?? devices.Error),
-            Info = info
+            Info = info,
+            Blocks = devices.Blocks
         });
     }
 
@@ -171,12 +185,12 @@ public static class OperationsDeviceEndpoints
         }
 
         return devices.Devices.FirstOrDefault(device => device.DeviceId == deviceId) is { } found
-            ? Page<DeviceDetailPage>(new { Company = company, Device = found, Error = text.Describe(error) })
+            ? Page<DeviceDetailPage>(new { Company = company, Device = found, Error = text.Describe(error), Block = devices.Blocks.FirstOrDefault(block => block.DeviceId == deviceId), PasswordConfirms = devices.PasswordConfirms })
             : Results.Redirect("/staff/devices");
     }
 
     private static Task<IResult> DevicesListAsync(HttpContext http, ListOperationsDevicesResponse devices, string? company, OperationsErrorText text) =>
-        Task.FromResult<IResult>(Page<DevicesPage>(new { Company = company, Devices = devices.Devices, Seats = devices.Seats, Error = text.Describe(devices.Error), Info = (string?)null }));
+        Task.FromResult<IResult>(Page<DevicesPage>(new { Company = company, Devices = devices.Devices, Seats = devices.Seats, Error = text.Describe(devices.Error), Info = (string?)null, Blocks = devices.Blocks }));
 
     private static IResult LinkPage(string? company, bool recovery, string? error) =>
         Page<DeviceLinkPage>(new { Company = company, Recovery = recovery, Error = error });

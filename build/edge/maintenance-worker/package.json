@@ -1,0 +1,8 @@
+{
+  "name": "vixly-maintenance-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}

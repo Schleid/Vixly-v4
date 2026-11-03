@@ -47,7 +47,8 @@ public static class PlatformInternalMapping
             PlatformWireCodes.Of(access.Access),
             access.CanonicalSlug,
             access.DefaultLanguage,
-            PlatformWireCodes.Of(access.Legal));
+            PlatformWireCodes.Of(access.Legal),
+            access.TimeZone);
     }
 
     public static PlatformEntitlementsInfo Entitlements(PlatformTenantEntitlements entitlements)
@@ -63,7 +64,11 @@ public static class PlatformInternalMapping
             entitlements.NonPayment is { } due
                 ? new PlatformNonPaymentPartInfo(due.BlockedUtc, due.AmountDue.Select(item => new PlatformMoneyInfo(item.CurrencyCode, item.Amount)).ToArray(), due.CardPaymentsAvailable)
                 : null,
-            entitlements.Legal is { } legal ? new PlatformEntitlementsLegalInfo(PlatformWireCodes.Of(legal.Status), legal.DeadlineUtc, legal.RequiredVersion) : null);
+            entitlements.Legal is { } legal ? new PlatformEntitlementsLegalInfo(PlatformWireCodes.Of(legal.Status), legal.DeadlineUtc, legal.RequiredVersion) : null)
+        {
+            ExtraShipmentPrice = entitlements.ExtraShipmentPrice,
+            CurrencyCode = entitlements.CurrencyCode
+        };
     }
 
     public static PlatformTenantAccountInfo Account(PlatformTenantAccountSummary account)

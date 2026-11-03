@@ -74,6 +74,46 @@ public sealed class OperationsUser : OperationsEntity
 
     public bool IsPartnerAgent => PartnerWarehouseId is not null;
 
+    // Owner, 2026-10-29 (S-5): an outside account, such as an outsourced call centre's agent: only the support lookup, only during its hours.
+    public bool IsOutside { get; private set; }
+
+    public DateOnly? OutsideEndsOn { get; private set; }
+
+    public int OutsideDays { get; private set; }
+
+    public int? OutsideFromMinute { get; private set; }
+
+    public int? OutsideToMinute { get; private set; }
+
+    public OperationsOutsideHours? OutsideHours => IsOutside ? OperationsOutsideHours.Create(OutsideEndsOn, OutsideDays, OutsideFromMinute, OutsideToMinute) : null;
+
+    public void MakeOutside(OperationsOutsideHours hours, DateOnly today, DateTimeOffset utcNow)
+    {
+        ArgumentNullException.ThrowIfNull(hours);
+
+        if (IsOwner || IsAdministrator || IsPartnerAgent)
+        {
+            throw new DomainException(OperationsOutsideErrors.NotForThisAccount);
+        }
+
+        if (hours.EndsOn is { } end && end < today)
+        {
+            throw new DomainException(OperationsOutsideErrors.EndsInThePast);
+        }
+
+        (IsOutside, OutsideEndsOn, OutsideDays, OutsideFromMinute, OutsideToMinute) = (true, hours.EndsOn, hours.Days, hours.FromMinute, hours.ToMinute);
+        MarkAsModified(utcNow);
+    }
+
+    public void MakeInside(DateTimeOffset utcNow)
+    {
+        (IsOutside, OutsideEndsOn, OutsideDays, OutsideFromMinute, OutsideToMinute) = (false, null, 0, null, null);
+        MarkAsModified(utcNow);
+    }
+
+    // Any account works at any time, except an outside one outside its hours or after its end date (local: the company's time zone).
+    public bool MayWorkAt(DateTime local) => OutsideHours is not { } hours || hours.Covers(local);
+
     // =====================================================
     // METHOD: INVITE OWNER
     // =====================================================
@@ -104,6 +144,11 @@ public sealed class OperationsUser : OperationsEntity
         if (isAdministrator && IsPartnerAgent)
         {
             throw new DomainException(Vixly.Operations.Domain.Access.OperationsRoleErrors.PartnerAgentNoRoles);
+        }
+
+        if (isAdministrator && IsOutside)
+        {
+            throw new DomainException(OperationsOutsideErrors.NotForThisAccount);
         }
 
         IsAdministrator = isAdministrator;

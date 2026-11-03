@@ -71,7 +71,19 @@ public static class OperationsCashierEndpoints
         staff.MapGet("/cashier/invoices/{invoiceId:guid}", async (HttpContext http, Guid invoiceId, string? done, string? card, string? screen, GetOperationsCashierInvoiceUseCase get,
             GetOperationsSignInBrandUseCase brand, OperationsErrorText errors, IStringLocalizer<OperationsText> texts) =>
             await InvoiceAsync(http, invoiceId, OperationsCardEndpoints.Refusal(card) ?? OperationsScreenEndpoints.Refusal(screen), get, brand, errors,
-                screen == "sent" ? texts["ui.screens.sent"].Value : done is "billed" or "awaiting_credit" ? texts["ui.credit.done." + done].Value : null));
+                screen == "sent" ? texts["ui.screens.sent"].Value : done is "billed" or "awaiting_credit" ? texts["ui.credit.done." + done].Value
+                    : done is "collect_on" or "collect_off" ? texts["ui.collect.done." + done].Value : null));
+
+        // Freight collect or paid here, chosen at the cashier (owner, 2026-10-27).
+        staff.MapPost("/cashier/invoices/{invoiceId:guid}/collect", async (HttpContext http, Guid invoiceId, [FromForm] string? collect, [FromForm] string? reason,
+            Vixly.Operations.Application.UseCases.Cashier.ChangeOperationsFreightCollect.ChangeOperationsFreightCollectUseCase change, GetOperationsCashierInvoiceUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
+        {
+            Vixly.Operations.Application.UseCases.Cashier.ChangeOperationsFreightCollect.ChangeOperationsFreightCollectResponse response = await change.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Cashier.ChangeOperationsFreightCollect.ChangeOperationsFreightCollectRequest { InvoiceId = invoiceId, Collect = collect == "true", Reason = reason }, http.RequestAborted);
+            return response.Succeeded
+                ? Results.Redirect("/staff/cashier/invoices/" + invoiceId + "?done=" + (collect == "true" ? "collect_on" : "collect_off"))
+                : await InvoiceAsync(http, invoiceId, response.Error, get, brand, errors);
+        });
 
         // Slice 5F step 2b (K-3): billed to the customer's credit account.
         staff.MapPost("/cashier/invoices/{invoiceId:guid}/bill-account", async (HttpContext http, Guid invoiceId, BillOperationsAccountUseCase bill, GetOperationsCashierInvoiceUseCase get,
@@ -83,31 +95,15 @@ public static class OperationsCashierEndpoints
                 : await InvoiceAsync(http, invoiceId, response.Error, get, brand, errors);
         });
 
-        // Paid in full with up to three tenders: the method, the amount, the cash handed over, the reference.
+        // Paid in full: the payments the cashier added one by one, then the row still being typed (owner, 2026-10-26).
         staff.MapPost("/cashier/invoices/{invoiceId:guid}/pay", async (HttpContext http, Guid invoiceId, TakeOperationsPaymentUseCase take, GetOperationsCashierInvoiceUseCase get,
             GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
         {
             IFormCollection form = await http.Request.ReadFormAsync(http.RequestAborted);
-            List<OperationsTenderDraft> tenders = new();
 
-            for (int row = 1; row <= 3; row++)
+            if (Tenders(form, withNewRow: true) is not { } tenders)
             {
-                string amountText = form["amount_" + row].ToString();
-
-                if (string.IsNullOrWhiteSpace(amountText))
-                {
-                    continue;
-                }
-
-                string givenText = form["given_" + row].ToString();
-
-                if (!Enum.TryParse(form["method_" + row], false, out OperationsPaymentMethod method) || OperationsCounterEndpoints.Amount(amountText) is not { } amount
-                    || (!string.IsNullOrWhiteSpace(givenText) && OperationsCounterEndpoints.Amount(givenText) is null))
-                {
-                    return await InvoiceAsync(http, invoiceId, OperationsPaymentErrors.AmountInvalid, get, brand, errors);
-                }
-
-                tenders.Add(new OperationsTenderDraft(method, amount, string.IsNullOrWhiteSpace(givenText) ? null : OperationsCounterEndpoints.Amount(givenText), form["reference_" + row]));
+                return await InvoiceAsync(http, invoiceId, OperationsPaymentErrors.AmountInvalid, get, brand, errors, entered: Tenders(form, false, lenient: true));
             }
 
             TakeOperationsPaymentResponse response = await take.ExecuteAsync(OperationsCurrentUser.Context(http), new TakeOperationsPaymentRequest
@@ -119,7 +115,7 @@ public static class OperationsCashierEndpoints
             }, http.RequestAborted);
             return response.Succeeded
                 ? Results.Redirect("/staff/cashier/payments/" + response.PaymentId)
-                : await InvoiceAsync(http, invoiceId, response.Error, get, brand, errors);
+                : await InvoiceAsync(http, invoiceId, response.Error, get, brand, errors, entered: Tenders(form, false, lenient: true));
         });
 
         staff.MapGet("/cashier/payments/{paymentId:guid}", async (HttpContext http, Guid paymentId, GetOperationsPaymentUseCase get, GetOperationsSignInBrandUseCase brand,
@@ -257,7 +253,13 @@ public static class OperationsCashierEndpoints
                 ZelleTermsFr = form["termsFr"],
                 ZelleTermsEs = form["termsEs"],
                 ZelleQr = picture,
-                RemoveZelleQr = form["removeQr"] == "true"
+                RemoveZelleQr = form["removeQr"] == "true",
+                PortalZelle = form["portalZelle"] == "true",
+                PortalBankTransfer = form["portalTransfer"] == "true",
+                PortalCard = form["portalCard"] == "true",
+                BankTransferInstructionsEn = form["bankEn"],
+                BankTransferInstructionsFr = form["bankFr"],
+                BankTransferInstructionsEs = form["bankEs"]
             }, http.RequestAborted);
             return response.Succeeded
                 ? Results.Redirect("/staff/settings/payments?done=1")
@@ -281,8 +283,8 @@ public static class OperationsCashierEndpoints
         return endpoints;
     }
 
-    private static async Task<IResult> InvoiceAsync(HttpContext http, Guid invoiceId, Error? error, GetOperationsCashierInvoiceUseCase get, GetOperationsSignInBrandUseCase brand,
-        OperationsErrorText errors, string? info = null)
+    internal static async Task<IResult> InvoiceAsync(HttpContext http, Guid invoiceId, Error? error, GetOperationsCashierInvoiceUseCase get, GetOperationsSignInBrandUseCase brand,
+        OperationsErrorText errors, string? info = null, IReadOnlyList<OperationsTenderDraft>? entered = null)
     {
         GetOperationsCashierInvoiceResponse response = await get.ExecuteAsync(OperationsCurrentUser.Context(http), new GetOperationsCashierInvoiceRequest { InvoiceId = invoiceId },
             http.RequestAborted);
@@ -303,8 +305,44 @@ public static class OperationsCashierEndpoints
                 http.RequestServices.GetRequiredService<Vixly.Operations.Application.UseCases.Screens.ListOperationsCustomerScreens.ListOperationsCustomerScreensUseCase>(),
                 response.Succeeded ? response.Invoice?.WarehouseId : null),
             Error = errors.Describe(error ?? response.Error),
-            Info = info
+            Info = info,
+            Entered = entered ?? Array.Empty<OperationsTenderDraft>()
         });
+    }
+
+    // The payments the cashier added (method_1, amount_1...), then, when asked, the row still being typed (method_new...): owner, 2026-10-26.
+    // Null when a line cannot be read; lenient skips such lines, to show the list again after a refusal.
+    internal static List<OperationsTenderDraft>? Tenders(IFormCollection form, bool withNewRow, bool lenient = false)
+    {
+        List<OperationsTenderDraft> tenders = new();
+        IEnumerable<string> rows = Enumerable.Range(1, OperationsPayment.MaxTenders).Select(row => row.ToString(System.Globalization.CultureInfo.InvariantCulture));
+
+        foreach (string row in withNewRow ? rows.Append("new") : rows)
+        {
+            string amountText = form["amount_" + row].ToString();
+
+            if (string.IsNullOrWhiteSpace(amountText))
+            {
+                continue;
+            }
+
+            string givenText = form["given_" + row].ToString();
+
+            if (!Enum.TryParse(form["method_" + row], false, out OperationsPaymentMethod method) || OperationsCounterEndpoints.Amount(amountText) is not { } amount
+                || (!string.IsNullOrWhiteSpace(givenText) && OperationsCounterEndpoints.Amount(givenText) is null))
+            {
+                if (lenient)
+                {
+                    continue;
+                }
+
+                return null;
+            }
+
+            tenders.Add(new OperationsTenderDraft(method, amount, string.IsNullOrWhiteSpace(givenText) ? null : OperationsCounterEndpoints.Amount(givenText), form["reference_" + row]));
+        }
+
+        return tenders;
     }
 
     private static async Task<IResult> DrawersAsync(HttpContext http, Error? error, string? info, ListOperationsCashDrawersUseCase list, GetOperationsSignInBrandUseCase brand,

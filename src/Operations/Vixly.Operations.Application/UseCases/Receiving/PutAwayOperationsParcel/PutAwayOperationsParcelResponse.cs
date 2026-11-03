@@ -26,9 +26,14 @@ public sealed class PutAwayOperationsParcelResponse
 
     public Guid ParcelId { get; private init; }
 
-    public static PutAwayOperationsParcelResponse Success(Guid parcelId)
+    // What was moved where, for the move station to confirm.
+    public string? ParcelNumber { get; private init; }
+
+    public string? ShelfCode { get; private init; }
+
+    public static PutAwayOperationsParcelResponse Success(Guid parcelId, string? parcelNumber = null, string? shelfCode = null)
     {
-        return new PutAwayOperationsParcelResponse { Succeeded = true, ParcelId = parcelId };
+        return new PutAwayOperationsParcelResponse { Succeeded = true, ParcelId = parcelId, ParcelNumber = parcelNumber, ShelfCode = shelfCode };
     }
 
     public static PutAwayOperationsParcelResponse Failure(Error error)

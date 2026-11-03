@@ -74,6 +74,8 @@ public sealed class PlanDraftPresenter : PlatformPresenter<PlanDraftState>
                 TrialDays = model.TrialDays,
                 MaxLicensedDevices = model.MaxLicensedDevices,
                 MaxWarehouses = model.MaxWarehouses,
+                MaxShipmentsPerMonth = model.MaxShipmentsPerMonth,
+                ExtraShipmentPrice = model.ExtraShipmentPrice,
                 Features = model.Features.ToArray()
             },
             cancellationToken)).Error);

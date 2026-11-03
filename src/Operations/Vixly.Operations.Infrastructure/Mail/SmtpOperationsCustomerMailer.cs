@@ -47,6 +47,12 @@ public sealed class SmtpOperationsCustomerMailer : IOperationsCustomerMailer
             OperationsCustomerMailKind.PickupFinalNotice => "pickup_final_notice",
             OperationsCustomerMailKind.OutForDelivery => "out_for_delivery",
             OperationsCustomerMailKind.OutForDeliveryCode => "out_for_delivery_code",
+            OperationsCustomerMailKind.Quote => "quote",
+            OperationsCustomerMailKind.AccountSuspended => "account_suspended",
+            OperationsCustomerMailKind.AccountReactivated => "account_reactivated",
+            OperationsCustomerMailKind.AccountClosed => "account_closed",
+            OperationsCustomerMailKind.AccountBanned => "account_banned",
+            OperationsCustomerMailKind.AccountSuspendedUntil => "account_suspended_until",
             _ => "password_reset"
         };
         Dictionary<string, object> values = new(StringComparer.Ordinal)
@@ -78,6 +84,7 @@ public sealed class SmtpOperationsCustomerMailer : IOperationsCustomerMailer
 
                 return (VixlyText.Format(text, "email.customer." + kind + ".subject", all), VixlyText.Format(text, "email.customer." + kind + ".body", all));
             },
-            cancellationToken);
+            cancellationToken,
+            mail.Attachment);
     }
 }

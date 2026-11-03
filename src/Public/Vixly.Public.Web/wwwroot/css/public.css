@@ -1,4 +1,4 @@
-﻿/* =========================================================
+/* =========================================================
    FILE: public.css
    PURPOSE: Public marketing layout on Shared.UI foundations.
    NOTES: Theme -> primitives -> plane. Comfortable density for public & sign-in forms.
@@ -271,25 +271,25 @@ button.vx-button {
     border-color: var(--vx-color-border-control);
 }
 
-.vx-button--primary {
+.vx-button.vx-button--primary {
     background-color: var(--vx-color-link);
     border: 1px solid var(--vx-color-link);
     color: #ffffff;
 }
 
-.vx-button--primary:hover:not(:disabled) {
+.vx-button.vx-button--primary:hover:not(:disabled) {
     background-color: var(--vx-color-primary-hover);
     border-color: var(--vx-color-primary-hover);
     color: #ffffff;
 }
 
-.vx-button--subtle {
+.vx-button.vx-button--subtle {
     background: transparent;
     border: 1px solid transparent;
     color: var(--vx-color-text-muted);
 }
 
-.vx-button--subtle:hover:not(:disabled) {
+.vx-button.vx-button--subtle:hover:not(:disabled) {
     background: var(--vx-color-primary-soft);
     color: var(--vx-color-link);
 }
@@ -724,4 +724,69 @@ button.vx-button {
 @media (prefers-reduced-motion: reduce) {
     .pub-feature-intro *, .pub-feature-journey *, .pub-feature-index *, .pub-module-sketch { animation: none !important; transition: none !important; }
     .pub-feature-route::before, .pub-feature-chapter { animation: none !important; }
+}
+
+/* Public in-app help (ADR-0023). */
+.pub-help { max-width: var(--vx-content-reading); margin-inline: auto; }
+.pub-help-search { display: flex; flex-wrap: wrap; align-items: end; gap: var(--vx-space-3); margin-block: var(--vx-space-6); }
+.pub-help-search label { flex-basis: 100%; font-weight: 600; }
+.pub-help-search input { flex: 1 1 12rem; min-width: 0; }
+.pub-help-list { list-style: none; padding: 0; display: grid; gap: var(--vx-space-4); }
+.pub-help-list li { border-bottom: var(--vx-border-width) solid var(--vx-color-border); padding-block: var(--vx-space-3); }
+.pub-help-list a { font-weight: 600; color: var(--vx-color-link); }
+.pub-help-list p { margin-block: var(--vx-space-2) 0; color: var(--vx-color-text-muted); }
+.pub-help-section { margin-block-start: var(--vx-space-8); }
+.pub-help .vx-help-article__body img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin-block: var(--vx-space-5);
+    border: var(--vx-border-width) solid var(--vx-color-border);
+    border-radius: var(--vx-radius-md);
+}
+.pub-help .vx-help-article__body a:has(img) {
+    display: block;
+    cursor: zoom-in;
+}
+
+/* Sales Offer (registration with an offer link; production review 2026-10-25) */
+.pub-offer,
+.pub-offer-accept {
+    width: 100%;
+    max-width: var(--vx-content-form);
+    box-sizing: border-box;
+}
+
+.pub-offer .vx-card {
+    padding: var(--vx-form-card-padding);
+    box-sizing: border-box;
+}
+
+.pub-offer .vx-facts {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.pub-offer .vx-facts dd {
+    overflow-wrap: anywhere;
+}
+
+.pub-offer__expires {
+    grid-column: 1 / -1;
+}
+
+.pub-offer__email {
+    margin: var(--vx-space-4) 0 0;
+    padding-top: var(--vx-space-3);
+    border-top: var(--vx-border-width) solid var(--vx-color-border);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.pub-offer-accept {
+    margin-top: var(--vx-space-4);
+    padding: 0;
+    background: none;
+    border: 0;
+    box-shadow: none;
 }

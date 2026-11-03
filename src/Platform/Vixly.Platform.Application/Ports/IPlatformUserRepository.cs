@@ -34,5 +34,8 @@ public interface IPlatformUserRepository
 
     Task<bool> AnyAsync(CancellationToken cancellationToken);
 
+    // The next employee number (TC-0001 ...), from a database sequence: never repeated, even across failed saves.
+    Task<string> NextEmployeeNumberAsync(CancellationToken cancellationToken);
+
     void Add(PlatformUser user);
 }

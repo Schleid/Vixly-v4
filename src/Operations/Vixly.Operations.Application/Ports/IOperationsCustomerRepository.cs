@@ -33,6 +33,9 @@ public interface IOperationsCustomerRepository
 
     Task<OperationsCustomer?> FindByEmailAsync(EmailAddress email, CancellationToken cancellationToken);
 
+    // Owner, 2026-10-31: the phone numbers of the company's banned customers, which cannot open another account.
+    Task<IReadOnlyList<string>> ListBannedPhonesAsync(CancellationToken cancellationToken);
+
     // A confirmed customer email at any company (not only this one): such an email never becomes a work email (review item 3).
     Task<bool> IsCustomerEmailAnywhereAsync(EmailAddress email, CancellationToken cancellationToken);
 

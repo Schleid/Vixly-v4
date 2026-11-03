@@ -80,18 +80,21 @@ public sealed class SaveOperationsBranchUseCase
 
         try
         {
-            OperationsLocationDetails details = new(
-                request.Code, request.Name, OperationsPostalAddress.Create(request.Line1, request.Line2, request.City, request.Region, request.PostalCode, request.CountryCode),
-                request.Phone, request.Email, request.OpeningHours, request.ShowOnSite);
+            // Owner, 2026-10-29: the office address is optional; the country is not.
+            OperationsPostalAddress? office = string.IsNullOrWhiteSpace(request.Line1) && string.IsNullOrWhiteSpace(request.City)
+                ? null
+                : OperationsPostalAddress.Create(request.Line1, request.Line2, request.City, request.Region, request.PostalCode, request.CountryCode);
+            OperationsLocationDetails details = new(request.Code, request.Name, office, request.Phone, request.Email, request.OpeningHours, request.ShowOnSite);
+            OperationsBranchLegal legal = new(request.LegalName, request.TaxNumber, request.LegalNotes);
 
             if (branch is null)
             {
-                branch = OperationsBranch.Create(context.RequiredTenantId, details, request.Side, utcNow);
+                branch = OperationsBranch.Create(context.RequiredTenantId, details, request.CountryCode, legal, utcNow);
                 _locations.Add(branch);
             }
             else
             {
-                branch.Update(details, request.Side, request.Status, utcNow);
+                branch.Update(details, request.CountryCode, legal, request.Status, utcNow);
             }
         }
         catch (DomainException exception)
@@ -100,7 +103,7 @@ public sealed class SaveOperationsBranchUseCase
         }
 
         _audit.Record(context.UserId, request.BranchId is null ? "ops.locations.branch_created" : "ops.locations.branch_changed", nameof(OperationsBranch), branch.Id,
-            after: new { code = branch.Code, country = branch.Address.CountryCode, status = branch.Status.ToString(), site = branch.ShowOnSite });
+            after: new { code = branch.Code, country = branch.CountryCode, office = branch.Address is not null, legal = branch.LegalName is not null, status = branch.Status.ToString(), site = branch.ShowOnSite });
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken)
             ? SaveOperationsBranchResponse.Success(branch.Id)

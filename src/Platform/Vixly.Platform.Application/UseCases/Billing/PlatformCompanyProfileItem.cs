@@ -29,4 +29,6 @@ public sealed record PlatformCompanyProfileItem(
     string? Website,
     bool HasLogo,
     string? SupportEmail = null,
-    string? SupportPhone = null);
+    string? SupportPhone = null,
+    byte[]? Logo = null,
+    string? LogoContentType = null);

@@ -2,6 +2,7 @@
 using Vixly.Operations.Application.Ports;
 using Vixly.Operations.Application.Security;
 using Vixly.Operations.Application.Tenancy;
+using Vixly.Operations.Application.UseCases.Settings.AdoptOperationsCompanyTimeZone;
 using Vixly.Operations.Application.UseCases.Tenancy.ResolveOperationsTenant;
 using Vixly.Operations.Web.Hosting;
 
@@ -45,7 +46,7 @@ public sealed class OperationsTenantMiddleware
         _next = next ?? throw new ArgumentNullException(nameof(next));
     }
 
-    public async Task InvokeAsync(HttpContext http, ResolveOperationsTenantUseCase resolve, IOperationsTenantScope scope, IOptions<OperationsHostingOptions> options)
+    public async Task InvokeAsync(HttpContext http, ResolveOperationsTenantUseCase resolve, IOperationsTenantScope scope, IOptions<OperationsHostingOptions> options, ILogger<OperationsTenantMiddleware> logger)
     {
         ArgumentNullException.ThrowIfNull(http);
         ArgumentNullException.ThrowIfNull(resolve);
@@ -78,6 +79,7 @@ public sealed class OperationsTenantMiddleware
         if (host.TenantId is { } tenantId)
         {
             scope.Enter(tenantId);
+            await AdoptTimeZoneAsync(http, host, tenantId, logger);
         }
 
         switch (host.State)
@@ -97,6 +99,25 @@ public sealed class OperationsTenantMiddleware
         }
 
         await _next(http);
+    }
+
+    // The first use of a tenant copies the company's time zone into Operations settings (owner, 2026-11-02); it never fails the request.
+    private static async Task AdoptTimeZoneAsync(HttpContext http, OperationsTenantHost host, Guid tenantId, ILogger logger)
+    {
+        if (host.State is not (OperationsTenantState.Live or OperationsTenantState.SettingUp) || AdoptOperationsCompanyTimeZoneUseCase.AlreadyChecked(tenantId))
+        {
+            return;
+        }
+
+        try
+        {
+            AdoptOperationsCompanyTimeZoneUseCase adopt = http.RequestServices.GetRequiredService<AdoptOperationsCompanyTimeZoneUseCase>();
+            await adopt.ExecuteAsync(OperationsAuthorizationContext.Host, new AdoptOperationsCompanyTimeZoneRequest { TenantId = tenantId, CompanyTimeZone = host.TimeZone }, http.RequestAborted);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            logger.LogWarning(exception, "The company time zone could not be copied into the Operations settings.");
+        }
     }
 
     // robots.txt and sitemap.xml belong to the tenant site (Slice 1B), unlike other files.

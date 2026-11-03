@@ -77,17 +77,17 @@ public sealed class OperationsShipmentInstructions
         return this;
     }
 
-    // Collected at one of the company's destination branches.
+    // Collected at a branch's office (Slice 3C), for a company without destination warehouses; owner 2026-10-29: only a branch with an office address.
     public static OperationsShipmentInstructions Pickup(OperationsBranch branch, string? recipientName, string? recipientPhone, OperationsShipmentOptions options)
     {
         ArgumentNullException.ThrowIfNull(branch);
 
-        if (branch.Status != OperationsLocationStatus.Active || branch.Side == OperationsBranchSide.Origin)
+        if (branch.Status != OperationsLocationStatus.Active || branch.Address is null)
         {
             throw new DomainException(OperationsShipmentErrors.DestinationInvalid);
         }
 
-        return new(branch.Id, null, branch.Address.CountryCode, Name(recipientName), Phone(recipientPhone), Checked(options));
+        return new(branch.Id, null, branch.CountryCode, Name(recipientName), Phone(recipientPhone), Checked(options));
     }
 
     // Slice 4C: collected at the destination warehouse the customer chose, where it is a pickup point.

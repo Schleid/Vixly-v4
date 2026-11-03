@@ -62,7 +62,7 @@ public sealed class GetOperationsPublicSiteUseCase
         IReadOnlyList<OperationsBranch> branches = await _locations.ListBranchesAsync(cancellationToken);
         IReadOnlyList<OperationsPublicLocation> locations = branches
             .Where(branch => branch.IsPublic)
-            .Select(branch => Location(branch.Id, "branch", branch.Name, branch.Address, branch.OpeningHours, OperationsWarehouseRoles.None, false))
+            .Select(branch => Location(branch.Id, "branch", branch.Name, branch.Address!, branch.OpeningHours, OperationsWarehouseRoles.None, false))
             .Concat((await _locations.ListWarehousesAsync(cancellationToken))
                 .Where(warehouse => warehouse.IsPublic)
                 .Select(warehouse => Location(warehouse.Id, "warehouse", warehouse.Name, warehouse.Address, warehouse.OpeningHours, warehouse.Roles, warehouse.AcceptingDeliveries)))
@@ -76,11 +76,23 @@ public sealed class GetOperationsPublicSiteUseCase
             .Select(contact => new OperationsPublicContact(contact.CountryCode, contact.Label, contact.Phones, contact.WhatsApp, contact.Email, contact.Hours))
             .ToList();
 
-        // What the plan does not include falls back to the defaults, for visitors and in the preview alike (W-4).
+        // What the plan does not include falls back to the defaults, for visitors and in the preview alike (W-4, Slice 1B).
+        // The theme, font and air and sea photos are kept as published after a downgrade (website themes W-4: nothing breaks).
         OperationsPlanFeatures features = await _features.GetAsync(context.RequiredTenantId, cancellationToken);
         OperationsBrandSettings settings = preview ? brand.Draft : brand.Published;
         settings = features.ThemeCustomization ? settings : settings.WithDefaultTheme();
         settings = features.ContentCustomization ? settings : settings.WithDefaultContent();
+
+        if (preview && request.Theme is { } theme && Enum.IsDefined(theme))
+        {
+            settings = settings.WithLook(theme, settings.Font);
+        }
+
+        // Landing page marketing: real figures and real customers only, each switched on by the company.
+        int? delivered = request.Home && settings.ShowDelivered ? OperationsPublicFigures.Delivered(await _site.CountDeliveredPackagesAsync(cancellationToken)) : null;
+        IReadOnlyList<OperationsSiteTestimonial> testimonials = request.Home && settings.ShowTestimonials
+            ? (await _site.ListTestimonialsAsync(cancellationToken)).Where(item => item.Shown).Take(OperationsSiteTestimonial.ShownOnSite).ToList()
+            : Array.Empty<OperationsSiteTestimonial>();
 
         return GetOperationsPublicSiteResponse.Success(new OperationsPublicSite(
             settings,
@@ -88,7 +100,12 @@ public sealed class GetOperationsPublicSiteUseCase
             brand.PublishedVersion,
             preview,
             locations,
-            contacts));
+            contacts)
+        {
+            PortalShown = features.Includes(Vixly.Operations.Application.Plans.OperationsPlanModules.CustomerPortal),
+            DeliveredPackages = delivered,
+            Testimonials = testimonials
+        });
     }
 
     private static OperationsPublicLocation Location(Guid id, string kind, string name, OperationsPostalAddress address, string? hours, OperationsWarehouseRoles roles, bool accepting)

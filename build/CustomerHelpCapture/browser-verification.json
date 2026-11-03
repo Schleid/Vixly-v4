@@ -1,0 +1,257 @@
+{
+  "checked": "2026-10-27",
+  "checks": [
+    {
+      "language": "en",
+      "width": 1280,
+      "slug": "your-mailbox-address",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Find and use your mailbox address",
+          "src": "/customer/help/media/v2/en-mailbox.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "slug": "announce-a-package",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Announce a package",
+          "src": "/customer/help/media/v2/en-announce.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "slug": "create-a-shipment",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Create a shipment",
+          "src": "/customer/help/media/v2/en-shipment.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "slug": "your-mailbox-address",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Find and use your mailbox address",
+          "src": "/customer/help/media/v2/en-mailbox.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "slug": "announce-a-package",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Announce a package",
+          "src": "/customer/help/media/v2/en-announce.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "slug": "create-a-shipment",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Create a shipment",
+          "src": "/customer/help/media/v2/en-shipment.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "slug": "your-mailbox-address",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Trouver et utiliser votre adresse de réception",
+          "src": "/customer/help/media/v2/fr-mailbox.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "slug": "announce-a-package",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Annoncer un colis",
+          "src": "/customer/help/media/v2/fr-announce.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "slug": "create-a-shipment",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Créer une expédition",
+          "src": "/customer/help/media/v2/fr-shipment.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "slug": "your-mailbox-address",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Trouver et utiliser votre adresse de réception",
+          "src": "/customer/help/media/v2/fr-mailbox.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "slug": "announce-a-package",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Annoncer un colis",
+          "src": "/customer/help/media/v2/fr-announce.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "slug": "create-a-shipment",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Créer une expédition",
+          "src": "/customer/help/media/v2/fr-shipment.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "slug": "your-mailbox-address",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Encuentre y utilice su dirección de recepción",
+          "src": "/customer/help/media/v2/es-mailbox.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "slug": "announce-a-package",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Anuncie un paquete",
+          "src": "/customer/help/media/v2/es-announce.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "slug": "create-a-shipment",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Cree un envío",
+          "src": "/customer/help/media/v2/es-shipment.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "slug": "your-mailbox-address",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Encuentre y utilice su dirección de recepción",
+          "src": "/customer/help/media/v2/es-mailbox.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "slug": "announce-a-package",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Anuncie un paquete",
+          "src": "/customer/help/media/v2/es-announce.png"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "slug": "create-a-shipment",
+      "overflow": false,
+      "images": [
+        {
+          "loaded": true,
+          "alt": "Cree un envío",
+          "src": "/customer/help/media/v2/es-shipment.png"
+        }
+      ],
+      "passed": true
+    }
+  ]
+}

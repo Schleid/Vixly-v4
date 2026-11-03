@@ -40,5 +40,9 @@ internal sealed class OperationsDeliveryStopConfiguration : IEntityTypeConfigura
         builder.HasOne<OperationsShipment>().WithMany().HasForeignKey(row => row.ShipmentId).OnDelete(DeleteBehavior.Restrict);
         builder.HasIndex(row => new { row.TenantId, row.RouteId, row.ShipmentId }).IsUnique();
         builder.HasIndex(row => new { row.TenantId, row.ShipmentId });
+
+        // Slice 12C: the private link of the "out for delivery" notice.
+        builder.Property(row => row.TrackTokenHash).HasMaxLength(64).IsFixedLength().IsUnicode(false);
+        builder.HasIndex(row => row.TrackTokenHash).IsUnique().HasFilter("[TrackTokenHash] IS NOT NULL");
     }
 }

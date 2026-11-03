@@ -119,6 +119,40 @@ public sealed class OperationsTenantSiteHttpTests : IClassFixture<OperationsWebD
         Assert.Contains("Brand new headline", await (await visitor.GetAsync("/en")).Content.ReadAsStringAsync(), StringComparison.Ordinal);
     }
 
+    // Website themes, step 1: the Owner previews each theme without saving; publishing the chosen theme and font changes the public page.
+    [SqlServerFact]
+    public async Task Themes_PreviewSideBySide_ThenPublishTheChosenThemeAndFont()
+    {
+        using CookieClient owner = await OwnerAsync("themeco", "Theme Co", "en");
+        HttpClient visitor = _host.Client("themeco.techcrafters.ltd");
+
+        (HttpResponseMessage _, string editor) = await owner.GetAsync("/staff/site");
+        Assert.Contains("/en?preview=true&amp;theme=horizon", editor, StringComparison.Ordinal);
+        Assert.Contains("name=\"theme\"", editor, StringComparison.Ordinal);
+        Assert.DoesNotContain("/staff/site/image/documentlogo", editor, StringComparison.Ordinal);
+
+        (HttpResponseMessage _, string horizon) = await owner.GetAsync("/en?preview=true&theme=horizon");
+        Assert.Contains("data-site-theme=\"horizon\"", horizon, StringComparison.Ordinal);
+        Assert.Contains("class=\"hz-hero\"", horizon, StringComparison.Ordinal);
+        Assert.Contains("href=\"/customer/sign-in\"", horizon, StringComparison.Ordinal);
+        Assert.Contains("id=\"track\"", horizon, StringComparison.Ordinal);
+        (HttpResponseMessage _, string airSea) = await owner.GetAsync("/en?preview=true&theme=airsea");
+        Assert.Contains("class=\"as-hero\"", airSea, StringComparison.Ordinal);
+        Assert.Contains("class=\"site-art\"", airSea, StringComparison.Ordinal);
+
+        string notPreviewed = await (await visitor.GetAsync("/en?preview=true&theme=horizon")).Content.ReadAsStringAsync();
+        Assert.Contains("data-site-theme=\"classic\"", notPreviewed, StringComparison.Ordinal);
+
+        await SaveSiteAsync(owner, "en", ("theme", "Horizon"), ("font", "Manrope"));
+        await PublishAsync(owner);
+
+        string published = await (await visitor.GetAsync("/en")).Content.ReadAsStringAsync();
+        Assert.Contains("data-site-theme=\"horizon\"", published, StringComparison.Ordinal);
+        Assert.Contains("data-site-font=\"manrope\"", published, StringComparison.Ordinal);
+        Assert.Contains("/fonts/site/manrope.woff2", published, StringComparison.Ordinal);
+        Assert.Equal(HttpStatusCode.OK, (await visitor.GetAsync("/fonts/site/manrope.woff2")).StatusCode);
+    }
+
     // Prices on the public website (owner, 2026-10-21): only while the company publishes prices, only the regular lists marked to publish, never a customer's.
     [SqlServerFact]
     public async Task Pricing_OnThePublicWebsite_OnlyWhatTheCompanyPublishes()
@@ -150,7 +184,7 @@ public sealed class OperationsTenantSiteHttpTests : IClassFixture<OperationsWebD
         string form = settings[settings.IndexOf("action=\"/staff/settings\"", StringComparison.Ordinal)..];
         form = form[..form.IndexOf("</form>", StringComparison.Ordinal)];
         List<(string, string)> fields = Regex.Matches(form, "<input(?=[^>]*name=\"(?<n>[^\"]+)\")(?=[^>]*value=\"(?<v>[^\"]*)\")(?<rest>[^>]*)>")
-            .Where(match => !match.Value.Contains("type=\"checkbox\"", StringComparison.Ordinal) || match.Value.Contains("checked", StringComparison.Ordinal))
+            .Where(match => !(match.Value.Contains("type=\"checkbox\"", StringComparison.Ordinal) || match.Value.Contains("type=\"radio\"", StringComparison.Ordinal)) || match.Value.Contains("checked", StringComparison.Ordinal))
             .Select(match => (match.Groups["n"].Value, WebUtility.HtmlDecode(match.Groups["v"].Value))).Where(field => field.Item1 != "__RequestVerificationToken").ToList();
         fields.AddRange(Regex.Matches(form, "<select name=\"(?<n>[^\"]+)\"[\\s\\S]*?<option value=\"(?<v>[^\"]*)\" selected").Select(match => (match.Groups["n"].Value, match.Groups["v"].Value)));
         fields.Add(("publicPricing", "true"));
@@ -175,6 +209,79 @@ public sealed class OperationsTenantSiteHttpTests : IClassFixture<OperationsWebD
         Assert.Contains("/en/pricing", (await owner.GetRawAsync("/sitemap.xml")).Raw, StringComparison.Ordinal);
     }
 
+    // Landing page marketing (owner, 2026-10-30): the Air & Sea page shows the company's own words, real figures, published rates with an estimate,
+    // and testimonials recorded with the customer's agreement; nothing shows without real content behind it.
+    [SqlServerFact]
+    public async Task Landing_AirSea_OwnWordsRatesEstimateAndTestimonials()
+    {
+        using CookieClient owner = await OwnerAsync("landco", "Land Co", "en");
+        (HttpResponseMessage _, string services) = await owner.GetAsync("/staff/services");
+        await owner.PostAsync("/staff/services", services, ("offered", "air_standard"), ("min_air_standard", "3"), ("max_air_standard", "5"), ("divisor_air_standard", "5000"),
+            ("min_air_express", "2"), ("max_air_express", "3"), ("divisor_air_express", "6000"), ("min_ocean_consolidated", "14"), ("max_ocean_consolidated", "28"),
+            ("divisor_ocean_consolidated", "1000"), ("min_ocean_full_container", "14"), ("max_ocean_full_container", "35"), ("min_ground", "1"), ("max_ground", "2"), ("divisor_ground", "5000"));
+        (HttpResponseMessage _, string branchForm) = await owner.GetAsync("/staff/locations/branch");
+        await owner.PostAsync("/staff/locations/branch", branchForm, ("code", "HT"), ("name", "Haiti"), ("countryCode", "HT"), ("legalName", "Land Co SA"), ("status", "Active"), ("showOnSite", "true"));
+        (HttpResponseMessage _, string warehouseForm) = await owner.GetAsync("/staff/locations/warehouse");
+        string haiti = Regex.Match(warehouseForm, "<option value=\"(?<id>[0-9a-f-]{36})\"[^>]*>HT ").Groups["id"].Value;
+        Assert.Equal(HttpStatusCode.Redirect, (await owner.PostAsync("/staff/locations/warehouse", warehouseForm, ("branchId", haiti), ("code", "CAY"), ("name", "Les Cayes office"),
+            ("line1", "5 Rue Gabions"), ("city", "Les Cayes"), ("countryCode", "HT"), ("roles", "PickupPoint"), ("status", "Active"), ("showOnSite", "true"))).Response.StatusCode);
+        (HttpResponseMessage _, string charges) = await owner.GetAsync("/staff/charges");
+        Assert.Equal(HttpStatusCode.Redirect, (await owner.PostAsync("/staff/charges/cards", charges, ("mode", "Air"), ("active", "true"), ("published", "true"),
+            ("service", "air_standard"), ("band_from_0", "0"), ("band_kind_0", "PerUnit"), ("band_amount_0", "3.25"))).Response.StatusCode);
+        (HttpResponseMessage _, string settings) = await owner.GetAsync("/staff/settings");
+        string form = settings[settings.IndexOf("action=\"/staff/settings\"", StringComparison.Ordinal)..];
+        form = form[..form.IndexOf("</form>", StringComparison.Ordinal)];
+        List<(string, string)> fields = Regex.Matches(form, "<input(?=[^>]*name=\"(?<n>[^\"]+)\")(?=[^>]*value=\"(?<v>[^\"]*)\")(?<rest>[^>]*)>")
+            .Where(match => !(match.Value.Contains("type=\"checkbox\"", StringComparison.Ordinal) || match.Value.Contains("type=\"radio\"", StringComparison.Ordinal)) || match.Value.Contains("checked", StringComparison.Ordinal))
+            .Select(match => (match.Groups["n"].Value, WebUtility.HtmlDecode(match.Groups["v"].Value))).Where(field => field.Item1 != "__RequestVerificationToken").ToList();
+        fields.AddRange(Regex.Matches(form, "<select name=\"(?<n>[^\"]+)\"[\\s\\S]*?<option value=\"(?<v>[^\"]*)\" selected").Select(match => (match.Groups["n"].Value, match.Groups["v"].Value)));
+        fields.Add(("publicPricing", "true"));
+        Assert.Equal(HttpStatusCode.Redirect, (await owner.PostAsync("/staff/settings", settings, fields.ToArray())).Response.StatusCode);
+
+        // Nothing invented: before the company writes anything, no chips, no "why us", no testimonials.
+        (HttpResponseMessage _, string empty) = await owner.GetAsync("/en?preview=true&theme=airsea");
+        Assert.DoesNotContain("as-chips", empty, StringComparison.Ordinal);
+        Assert.DoesNotContain("as-why", empty, StringComparison.Ordinal);
+        Assert.DoesNotContain("as-voices", empty, StringComparison.Ordinal);
+
+        await SaveSiteAsync(owner, "en", ("theme", "AirSea"), ("services", "ocean"), ("showRates", "true"), ("showTestimonials", "true"), ("showDelivered", "true"),
+            ("text.eyebrow", "Florida to Haiti"), ("text.chip.1", "Weighed and photographed"), ("text.time.air", "5 to 7 days"), ("text.story.air.point.1", "Consolidated on the next flight"),
+            ("text.why.1.title", "Family run"), ("text.why.1.text", "We answer the phone."), ("text.closing.title", "Your packages, our care"), ("text.figure.value", "$0"),
+            ("text.figure.label", "US address included"));
+
+        // A testimonial needs the customer's agreement.
+        (HttpResponseMessage _, string voices) = await owner.GetAsync("/staff/site/testimonials");
+        Assert.Contains("Confirm that the customer agreed", WebUtility.HtmlDecode((await owner.PostAsync("/staff/site/testimonials", voices, ("name", "Marie J."), ("quote", "Fast and careful."))).Html),
+            StringComparison.Ordinal);
+        Assert.Equal("/staff/site/testimonials?saved=1", (await owner.PostAsync("/staff/site/testimonials", voices, ("name", "Marie J."), ("place", "Les Cayes"), ("quote", "Fast & careful."),
+            ("rating", "5"), ("agreed", "true"))).Response.Headers.Location?.OriginalString);
+        Assert.Equal("/staff/site/testimonials?saved=1", (await owner.PostAsync("/staff/site/testimonials", voices, ("name", "Jean P."), ("quote", "Always on time."), ("agreed", "true")))
+            .Response.Headers.Location?.OriginalString);
+        string listed = (await owner.GetAsync("/staff/site/testimonials")).Html;
+        Assert.Contains("Fast & careful.", listed, StringComparison.Ordinal);
+        string hide = Regex.Match(listed, "action=\"(?<a>/staff/site/testimonials/[0-9a-f-]{36}/hide)\"").Groups["a"].Value;
+        Assert.Equal("/staff/site/testimonials?saved=1", (await owner.PostAsync(hide, listed)).Response.Headers.Location?.OriginalString);
+
+        string page = WebUtility.HtmlDecode((await owner.GetAsync("/en?preview=true&theme=airsea")).Html);
+        foreach (string expected in new[] { "Florida to Haiti", "Weighed and photographed", "5 to 7 days", "Consolidated on the next flight", "Family run", "Your packages, our care",
+            "US address included", "as-rates", "3.25", "name=\"weight\"", "Les Cayes office" })
+        {
+            Assert.Contains(expected, page, StringComparison.Ordinal);
+        }
+
+        // The first testimonial was shown then hidden in turn: only one of the two is on the page; packages delivered stay hidden below the minimum.
+        Assert.Single(Regex.Matches(page, "class=\"as-voice\""));
+        Assert.DoesNotContain("packages delivered", page, StringComparison.Ordinal);
+
+        // The estimate: the company's published price for the weight, to its pickup point.
+        string cayes = Regex.Match(page, "<option value=\"(?<id>[0-9a-f-]{36})\"[^>]*>Les Cayes office").Groups["id"].Value;
+        string estimate = WebUtility.HtmlDecode((await owner.GetAsync("/en?preview=true&theme=airsea&service=air_standard&destination=" + cayes + "&weight=10")).Html);
+        Assert.Contains("Estimated cost: 32.50", estimate, StringComparison.Ordinal);
+        Assert.Contains("not included", estimate, StringComparison.Ordinal);
+        string unpriced = WebUtility.HtmlDecode((await owner.GetAsync("/en?preview=true&theme=airsea&service=ground&destination=" + cayes + "&weight=10")).Html);
+        Assert.Contains("no published price", unpriced, StringComparison.Ordinal);
+    }
+
     [SqlServerFact]
     public async Task Locations_AppearUnderTheirOwnCountry_AndEveryValueIsEncoded()
     {
@@ -183,11 +290,24 @@ public sealed class OperationsTenantSiteHttpTests : IClassFixture<OperationsWebD
         (HttpResponseMessage _, string branchForm) = await owner.GetAsync("/staff/locations/branch");
         (HttpResponseMessage branchSaved, string _) = await owner.PostAsync("/staff/locations/branch", branchForm,
             ("code", "PAP"), ("name", "Port-au-Prince office"), ("line1", "12 Rue Capois"), ("city", "Port-au-Prince"), ("countryCode", "HT"),
-            ("phone", "+50922223333"), ("side", "Destination"), ("status", "Active"), ("showOnSite", "true"));
+            ("phone", "+50922223333"), ("status", "Active"), ("showOnSite", "true"));
         Assert.Equal(HttpStatusCode.Redirect, branchSaved.StatusCode);
 
+        // Owner, 2026-10-29: a branch is a country; one without an office stays off the website, and a warehouse goes in the branch of its country.
+        (HttpResponseMessage _, string usForm) = await owner.GetAsync("/staff/locations/branch");
+        Assert.Contains("name=\"legalName\"", usForm, StringComparison.Ordinal);
+        Assert.DoesNotContain("name=\"side\"", usForm, StringComparison.Ordinal);
+        (HttpResponseMessage usSaved, string _) = await owner.PostAsync("/staff/locations/branch", usForm,
+            ("code", "US"), ("name", "United States"), ("countryCode", "US"), ("legalName", "Haiti Express LLC"), ("status", "Active"), ("showOnSite", "true"));
+        Assert.Equal(HttpStatusCode.Redirect, usSaved.StatusCode);
+        Assert.Contains("No office", WebUtility.HtmlDecode((await owner.GetAsync("/staff/locations")).Html), StringComparison.Ordinal);
+
         (HttpResponseMessage _, string warehouseForm) = await owner.GetAsync("/staff/locations/warehouse");
-        string branchId = Regex.Match(warehouseForm, "<option value=\"(?<id>[0-9a-f-]{36})\"").Groups["id"].Value;
+        string haitiBranchId = Regex.Match(warehouseForm, "<option value=\"(?<id>[0-9a-f-]{36})\"[^>]*>PAP ").Groups["id"].Value;
+        string branchId = Regex.Match(warehouseForm, "<option value=\"(?<id>[0-9a-f-]{36})\"[^>]*>US ").Groups["id"].Value;
+        Assert.Contains("must be in its branch", WebUtility.HtmlDecode((await owner.PostAsync("/staff/locations/warehouse", warehouseForm,
+            ("branchId", haitiBranchId), ("code", "MIA"), ("name", "Miami"), ("line1", "1 Harbor Road"), ("city", "Miami"),
+            ("countryCode", "US"), ("roles", "Receiving"), ("status", "Active"))).Html), StringComparison.Ordinal);
         (HttpResponseMessage warehouseSaved, string _) = await owner.PostAsync("/staff/locations/warehouse", warehouseForm,
             ("branchId", branchId), ("code", "FLL"), ("name", "<script>alert(1)</script> Fort Lauderdale"), ("line1", "1 Harbor Road"), ("city", "Fort Lauderdale"),
             ("region", "FL"), ("countryCode", "US"), ("roles", "Receiving"), ("acceptingDeliveries", "true"), ("status", "Active"), ("showOnSite", "true"));
@@ -205,6 +325,7 @@ public sealed class OperationsTenantSiteHttpTests : IClassFixture<OperationsWebD
         string unitedStates = WebUtility.HtmlDecode(Section(raw, "us"));
 
         Assert.Contains("Port-au-Prince office", haiti, StringComparison.Ordinal);
+        Assert.Contains("src=\"/flags/ht.svg\"", haiti, StringComparison.Ordinal);
         Assert.Contains("href=\"tel:+50948605107\">+509 4860-5107</a>", haiti, StringComparison.Ordinal);
         Assert.Contains("tel:+50939946752", haiti, StringComparison.Ordinal);
         Assert.Contains("tel:+50932149800", haiti, StringComparison.Ordinal);

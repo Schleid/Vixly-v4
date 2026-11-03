@@ -24,4 +24,9 @@ public sealed class StartOperationsCardPaymentRequest
 
     // Where Stripe's page sends the customer back: this address followed by the charge's id.
     public string ReturnUrlPrefix { get; init; } = string.Empty;
+
+    // The lines added before the card (owner, 2026-10-26): the card charges only what is left, and they are recorded with it once it is approved.
+    public IReadOnlyList<Vixly.Operations.Domain.Billing.OperationsTenderDraft> Others { get; init; } = Array.Empty<Vixly.Operations.Domain.Billing.OperationsTenderDraft>();
+
+    public bool ZelleTermsAccepted { get; init; }
 }

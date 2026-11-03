@@ -51,14 +51,14 @@ public sealed class OperationsPasswordResetUseCaseTests
     }
 
     [Fact]
-    public void StepUpCode_WorksOnce()
+    public async Task StepUpCode_WorksOnce()
     {
         OperationsUser owner = _kit.Owner(withApp: true);
-        OperationsStepUp stepUp = new(_kit.Services, _kit.Clock);
+        OperationsStepUp stepUp = new(_kit.Services, _kit.Clock, _kit.Store, _kit.Services);
 
-        Assert.Equal("ops.devices.code_required", stepUp.Check(owner, " ")?.Code);
-        Assert.Null(stepUp.Check(owner, FakeIdentityServices.GoodCode));
-        Assert.Equal("ops.auth.code_invalid", stepUp.Check(owner, FakeIdentityServices.GoodCode)?.Code);
+        Assert.Equal("ops.devices.code_required", (await stepUp.CheckAsync(owner, " ", CancellationToken.None))?.Code);
+        Assert.Null(await stepUp.CheckAsync(owner, FakeIdentityServices.GoodCode, CancellationToken.None));
+        Assert.Equal("ops.auth.code_invalid", (await stepUp.CheckAsync(owner, FakeIdentityServices.GoodCode, CancellationToken.None))?.Code);
     }
 
     private Task<RequestOperationsPasswordResetResponse> Request(string email) =>

@@ -26,7 +26,7 @@ namespace Vixly.Operations.Infrastructure.Documents;
 // =========================================================
 internal static class OperationsRunSheetLayout
 {
-    public static byte[] Render(OperationsRunSheet sheet, IStringLocalizer<OperationsText> text)
+    public static byte[] Render(OperationsRunSheet sheet, IStringLocalizer<OperationsText> text, byte[]? logo = null)
     {
         ArgumentNullException.ThrowIfNull(sheet);
         ArgumentNullException.ThrowIfNull(text);
@@ -41,7 +41,7 @@ internal static class OperationsRunSheetLayout
             {
                 row.RelativeItem().Column(column =>
                 {
-                    column.Item().Text(sheet.CompanyName).FontSize(14).SemiBold();
+                    OperationsDocumentBrand.Head(column, logo, sheet.CompanyName, 14);
                     column.Item().Text(sheet.WarehouseName + " · " + sheet.ServiceDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture));
                     column.Item().Text(Word("driver") + ": " + sheet.DriverName);
                 });

@@ -31,6 +31,8 @@ internal sealed class FakeBillingStore : IOperationsBillingRepository
     public Task<OperationsInvoice?> FindShipmentInvoiceAsync(Guid shipmentId, CancellationToken cancellationToken) =>
         Task.FromResult(Invoices.FirstOrDefault(invoice => invoice.ShipmentId == shipmentId && invoice.Kind == OperationsInvoiceKind.Shipment));
 
+    public Task<string?> FindTrackingNumberAsync(Guid shipmentId, CancellationToken cancellationToken) => Task.FromResult<string?>(null);
+
     public Task<OperationsInvoice?> FindOrderInvoiceAsync(Guid supplySaleId, CancellationToken cancellationToken) =>
         Task.FromResult(Invoices.FirstOrDefault(invoice => invoice.SupplySaleId == supplySaleId && invoice.Kind == OperationsInvoiceKind.SupplyOrder));
 

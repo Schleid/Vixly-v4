@@ -26,7 +26,7 @@ namespace Vixly.Operations.Infrastructure.Documents;
 // =========================================================
 internal static class OperationsPaymentReceiptLayout
 {
-    public static byte[] Render(OperationsPaymentReceipt receipt, IStringLocalizer<OperationsText> text, Func<string, string> barcode)
+    public static byte[] Render(OperationsPaymentReceipt receipt, IStringLocalizer<OperationsText> text, Func<string, string> barcode, byte[]? logo = null)
     {
         ArgumentNullException.ThrowIfNull(receipt);
         ArgumentNullException.ThrowIfNull(text);
@@ -46,7 +46,7 @@ internal static class OperationsPaymentReceiptLayout
             {
                 row.RelativeItem().Column(column =>
                 {
-                    column.Item().Text(invoice.Party.CompanyName).FontSize(14).SemiBold();
+                    OperationsDocumentBrand.Head(column, logo, invoice.Party.CompanyName, 14);
                     column.Item().Text(invoice.Party.WarehouseName);
                 });
                 row.ConstantItem(190).Column(column =>
@@ -62,6 +62,12 @@ internal static class OperationsPaymentReceiptLayout
                 column.Spacing(6);
                 column.Item().Text(invoice.Party.CustomerName + (invoice.Party.CustomerCode is { } code ? " · " + code : string.Empty));
                 column.Item().Text(VixlyText.Format(text, "ui.payments.receipt.for", new Dictionary<string, object> { ["invoice"] = invoice.Number, ["reference"] = invoice.Reference }));
+
+                // Owner, 2026-10-28: the shipment's tracking number, once it is paid.
+                if (receipt.TrackingNumber is { } tracking)
+                {
+                    column.Item().Text(VixlyText.Format(text, "ui.documents.tracking_number", "number", Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.Format(tracking))).SemiBold();
+                }
                 column.Item().Table(table =>
                 {
                     table.ColumnsDefinition(columns =>

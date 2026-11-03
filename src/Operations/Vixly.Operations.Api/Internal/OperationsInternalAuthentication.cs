@@ -78,6 +78,16 @@ public static class OperationsInternalAuthentication
                 http.RequestServices.GetRequiredService<Vixly.Operations.Application.Ports.IOperationsTenantScope>().Enter(tenantId);
             }
 
+            // Vixly Lite (owner, 2026-10-30): without the customer portal in the company's plan, the portal's calls are refused.
+            if (token.TenantId is { } portalTenant
+                && http.Request.Path.StartsWithSegments("/internal/v1/customers")
+                && !(await http.RequestServices.GetRequiredService<Vixly.Operations.Application.Ports.IOperationsPlanFeatures>().GetAsync(portalTenant, http.RequestAborted))
+                    .Includes(Vixly.Operations.Application.Plans.OperationsPlanModules.CustomerPortal))
+            {
+                await OperationsApiErrors.Problem(http, Vixly.Operations.Domain.Customers.OperationsCustomerErrors.PortalUnavailable).ExecuteAsync(http);
+                return;
+            }
+
             http.Items[TokenItem] = token;
             await next(http);
         });

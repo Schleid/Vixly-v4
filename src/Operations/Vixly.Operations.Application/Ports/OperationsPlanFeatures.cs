@@ -22,11 +22,46 @@ public sealed record OperationsPlanFeatures(bool ThemeCustomization, bool Conten
 
     public const string Partners = "partner_agents";
 
-    public static OperationsPlanFeatures All { get; } = new(true, true) { PartnerAgents = true };
+    // Slice 9: the integrations, each a plan feature (owner, 2026-10-22).
+    public const string Texts = "text_messages";
 
-    public static OperationsPlanFeatures Unknown { get; } = new(true, true) { PartnerAgents = false };
+    public const string QuickBooks = "quick_books_sync";
+
+    public const string Api = "tenant_api";
+
+    public const string Carriers = "carrier_data";
+
+    public static OperationsPlanFeatures All { get; } = new(true, true) { PartnerAgents = true, TextMessages = true, QuickBooksSync = true, TenantApi = true, CarrierData = true };
+
+    // Fails closed: nothing paid for is used while Platform cannot answer.
+    public static OperationsPlanFeatures Unknown { get; } = new(true, true) { PartnerAgents = false, IsKnown = false };
+
+    // Help must distinguish the cosmetic fallback from a verified feature grant.
+    public bool IsKnown { get; init; } = true;
 
     public bool PartnerAgents { get; init; }
+
+    public bool TextMessages { get; init; }
+
+    public bool QuickBooksSync { get; init; }
+
+    public bool TenantApi { get; init; }
+
+    public bool CarrierData { get; init; }
+
+    // Shipment cap (owner, 2026-10-29): shipments a month (0 = no cap), the price of each one above it and the plan's currency.
+    public const string ShipmentsLimit = "max_shipments_per_month";
+
+    public int ShipmentCap { get; init; }
+
+    public decimal ExtraShipmentPrice { get; init; }
+
+    public string? CurrencyCode { get; init; }
+
+    // Vixly Lite (owner, 2026-10-30): the Operations modules the plan leaves out (OperationsPlanModules). Empty means every module.
+    public IReadOnlySet<string> ModulesOff { get; init; } = new HashSet<string>(StringComparer.Ordinal);
+
+    public bool Includes(string module) => !ModulesOff.Contains(module);
 
     public bool Limited => !ThemeCustomization || !ContentCustomization;
 }

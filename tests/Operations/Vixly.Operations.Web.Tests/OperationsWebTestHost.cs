@@ -62,6 +62,14 @@ internal sealed class OperationsWebTestHost : IAsyncDisposable
 
     public FakeCardGateway Cards { get; private init; } = new();
 
+    public FakeTextGateway Texts { get; private init; } = new();
+
+    public FakeWebhookSender Webhooks { get; private init; } = new();
+
+    public FakeReportMailer Reports { get; private init; } = new();
+
+    public FakeEdgeClient Edge { get; private init; } = new();
+
     public static async Task<OperationsWebTestHost> StartAsync(string? connectionString = null)
     {
         FakePlatformClient platform = new();
@@ -73,12 +81,19 @@ internal sealed class OperationsWebTestHost : IAsyncDisposable
         FakeCustomerMailer customerMailer = new();
         FakeInspectionDraw draw = new();
         FakeCardGateway cards = new();
+        FakeTextGateway texts = new();
+        FakeWebhookSender webhooks = new();
+        FakeReportMailer reports = new();
+        FakeEdgeClient edge = new();
         WebApplication app = OperationsWebHost.Build(
             new[]
             {
                 "--environment=Production",
+                "--VixlySettingsCheck:Enabled=false",
                 "--applicationName=Vixly.Operations.Web",
                 "--AllowedHosts=*",
+                "--TenantHosting:BaseDomains:0=techcrafters.ltd",
+                "--OperationsLinks:PortalUrlTemplate=https://{slug}.techcrafters.ltd",
                 "--OperationsFiles:Root=" + Path.Combine(Path.GetTempPath(), "vixly-files-" + Guid.NewGuid().ToString("N")),
                 "--ConnectionStrings:Operations=" + (connectionString ?? "Server=127.0.0.1,1;Database=None;User Id=none;Password=none;Connect Timeout=1;TrustServerCertificate=True")
             },
@@ -105,13 +120,21 @@ internal sealed class OperationsWebTestHost : IAsyncDisposable
                 builder.Services.AddSingleton<Vixly.Operations.Application.Receiving.OperationsInspectionDraw>(draw);
                 builder.Services.RemoveAll<IOperationsCardGateway>();
                 builder.Services.AddSingleton<IOperationsCardGateway>(cards);
+                builder.Services.RemoveAll<IOperationsTextGateway>();
+                builder.Services.AddSingleton<IOperationsTextGateway>(texts);
+                builder.Services.RemoveAll<IOperationsWebhookSender>();
+                builder.Services.AddSingleton<IOperationsWebhookSender>(webhooks);
+                builder.Services.RemoveAll<IOperationsReportMailer>();
+                builder.Services.AddSingleton<IOperationsReportMailer>(reports);
+                builder.Services.RemoveAll<IOperationsEdgeClient>();
+                builder.Services.AddSingleton<IOperationsEdgeClient>(edge);
                 builder.Services.RemoveAll<IHostedService>();
                 builder.Services.AddScoped<OperationsDemoStaffSeeder>();
             });
 
         await app.StartAsync();
 
-        return new OperationsWebTestHost(app, platform, mailer, devices, legal, company, features) { CustomerMailer = customerMailer, Draw = draw, Cards = cards };
+        return new OperationsWebTestHost(app, platform, mailer, devices, legal, company, features) { CustomerMailer = customerMailer, Draw = draw, Cards = cards, Texts = texts, Webhooks = webhooks, Reports = reports, Edge = edge };
     }
 
     public HttpClient Client(string host)

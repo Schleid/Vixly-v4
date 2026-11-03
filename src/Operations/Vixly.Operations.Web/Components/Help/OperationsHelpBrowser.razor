@@ -1,0 +1,64 @@
+﻿@using Vixly.Operations.Web.Features.Help
+@inject IStringLocalizer<OperationsText> T
+@* =========================================================
+   FILE: OperationsHelpBrowser.razor
+
+   PURPOSE:
+   Renders text-only help and the reader's visible search results.
+
+   RESPONSIBILITIES:
+   - Show localized sections, errors and related articles.
+
+   IMPORTANT NOTES:
+   - Only validated, request-branded HTML reaches VxHelpArticle.
+   ========================================================= *@
+<section class="ops-help">
+    @if (State.Unavailable)
+    {
+        <h2>@T["ui.help.unavailable"]</h2>
+    }
+    else if (State.NotFound)
+    {
+        <h2>@T["ui.help.not_found"]</h2>
+        <p><a href="/staff/help">@T["ui.help.back"]</a></p>
+    }
+    else if (State.Article is { } article)
+    {
+        <p><a href="/staff/help">@T["ui.help.back"]</a></p>
+        <VxHelpArticle Title="@article.Metadata.Title" Html="@State.Html" RelatedLabel="@T["ui.help.related"]"
+            Related="@State.Related.Select(item => new VxHelpRelatedLink(item.Metadata.Title, OperationsHelpCatalogue.Address(item.Language, item.Metadata.Slug))).ToArray()" />
+    }
+    else
+    {
+        <p>@T["ui.help.summary"]</p>
+        <form method="get" action="/staff/help" role="search" class="ops-help__search">
+            <label for="help-query">@T["ui.help.search"]</label>
+            <input id="help-query" class="vx-input" type="search" name="q" value="@State.Query" maxlength="160" />
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.help.search_go"]</button>
+        </form>
+        @if (State.Query.Length > 0)
+        {
+            <h2>@T["ui.help.results"]</h2>
+            <OperationsHelpList Articles="State.Articles" />
+            <p><a href="/staff/help">@T["ui.help.clear"]</a></p>
+        }
+        else
+        {
+            @foreach (string section in OperationsHelpCatalogue.Sections)
+            {
+                var articles = State.Articles.Where(item => item.Metadata.Section == section).ToArray();
+                @if (articles.Length > 0)
+                {
+                    <section>
+                        <h2>@T["ui.help.section." + section]</h2>
+                        <OperationsHelpList Articles="articles" />
+                    </section>
+                }
+            }
+        }
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public OperationsHelpState State { get; set; } = OperationsHelpState.Empty;
+}

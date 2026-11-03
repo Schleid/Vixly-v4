@@ -76,4 +76,13 @@ public static class OperationsShipmentErrors
 
     // Freight collect only when the company allows it (owner, 2026-10-21).
     public static Error CollectUnavailable { get; } = Error.Create("ops.shipments.collect_unavailable");
+
+    // Shipment cap (owner, 2026-10-29): above 150 percent of the plan's shipments this month, after the one-time grace month.
+    public static Error PlanLimitReached { get; } = Error.Create("ops.shipments.plan_limit_reached");
+
+    // Vixly Lite (owner, 2026-10-30): insurance is not in the company's plan.
+    public static Error InsuranceUnavailable { get; } = Error.Create("ops.shipments.insurance_unavailable");
+
+    // What a customer sees in the portal at that point.
+    public static Error RequestsPaused { get; } = Error.Create("ops.shipments.requests_paused");
 }

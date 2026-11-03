@@ -44,27 +44,41 @@ public static class OperationsAuthEndpoints
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        endpoints.MapGet("/staff", async (HttpContext http, string? reset, string? device, string? idle, string? ended, string? country, GetOperationsSignInBrandUseCase brand, IStringLocalizer<OperationsText> text,
+        endpoints.MapGet("/staff", async (HttpContext http, string? reset, string? device, string? idle, string? ended, string? country, string? blocked, string? email, GetOperationsSignInBrandUseCase brand, IStringLocalizer<OperationsText> text,
             Vixly.Operations.Application.UseCases.Settings.GetOperationsSetupChecklist.GetOperationsSetupChecklistUseCase checklist,
-            Vixly.Operations.Application.UseCases.Supplies.ListOperationsLowSupplies.ListOperationsLowSuppliesUseCase lowSupplies) =>
+            Vixly.Operations.Application.UseCases.Supplies.ListOperationsLowSupplies.ListOperationsLowSuppliesUseCase lowSupplies,
+            Vixly.Operations.Application.UseCases.Dashboard.GetOperationsDashboard.GetOperationsDashboardUseCase dashboard,
+            Vixly.Operations.Application.UseCases.Plans.GetOperationsShipmentCap.GetOperationsShipmentCapUseCase shipmentCap) =>
             OperationsCurrentUser.IsSignedIn(http)
                 ? Page<WorkspacePage>(new
                 {
                     Company = await CompanyAsync(http, brand),
                     Name = OperationsCurrentUser.DisplayName(http),
+                    ShipmentCap = (await shipmentCap.ExecuteAsync(OperationsCurrentUser.Context(http), new Vixly.Operations.Application.UseCases.Plans.GetOperationsShipmentCap.GetOperationsShipmentCapRequest(), http.RequestAborted)).Status,
+                    Counters = (await dashboard.ExecuteAsync(OperationsCurrentUser.Context(http), new Vixly.Operations.Application.UseCases.Dashboard.GetOperationsDashboard.GetOperationsDashboardRequest(), http.RequestAborted)).Counters,
                     Checklist = (await checklist.ExecuteAsync(OperationsCurrentUser.Context(http), new Vixly.Operations.Application.UseCases.Settings.GetOperationsSetupChecklist.GetOperationsSetupChecklistRequest(), http.RequestAborted)).Items,
                     LowSupplies = (await lowSupplies.ExecuteAsync(OperationsCurrentUser.Context(http), new Vixly.Operations.Application.UseCases.Supplies.ListOperationsLowSupplies.ListOperationsLowSuppliesRequest
                     {
                         Language = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
                     }, http.RequestAborted)).Items
                 })
+                // Slice 12A: a licensed device that used a badge or PIN opens at the badge screen; ?email=1 shows the email sign-in.
+                : email is null && blocked is null && OperationsQuickSignInEndpoints.StartsWithBadge(http)
+                    ? Page<QuickSignInPage>(new
+                    {
+                        Company = await CompanyAsync(http, brand),
+                        ReturnUrl = "/staff",
+                        Info = idle is not null ? text["ui.session.signed_out_idle"].Value : ended is not null ? text["ui.session.ended"].Value : null
+                    })
                 : Page<SignInPage>(new
                 {
                     Company = await CompanyAsync(http, brand),
                     ReturnUrl = "/staff",
+                    Quick = OperationsDeviceCookie.Read(http.Request) is not null,
                     Info = reset is not null ? text["ui.reset.done"].Value : device is not null ? text["ui.devices.ready"].Value
                         : idle is not null ? text["ui.session.signed_out_idle"].Value : ended is not null ? text["ui.session.ended"].Value
-                        : country is not null ? text["ui.session.country_changed"].Value : null
+                        : country is not null ? text["ui.session.country_changed"].Value
+                        : blocked is not null ? text["ops.auth.device_blocked"].Value : null
                 }));
 
         endpoints.MapGet("/setup", async (HttpContext http, string? link, GetOperationsSignInBrandUseCase brand, IStringLocalizer<OperationsText> text) =>
@@ -84,7 +98,14 @@ public static class OperationsAuthEndpoints
             // The device cookie tells where the sign-in happens (owner, 2026-10-21); checked there without rotating its secret.
             (Guid DeviceId, string Secret)? device = OperationsDeviceCookie.Read(http.Request);
             BeginOperationsSignInResponse response = await useCase.ExecuteAsync(OperationsCurrentUser.Context(http),
-                new BeginOperationsSignInRequest { Email = email, Password = password, DeviceId = device?.DeviceId, DeviceSecret = device?.Secret }, http.RequestAborted);
+                new BeginOperationsSignInRequest
+                {
+                    Email = email,
+                    Password = password,
+                    DeviceId = device?.DeviceId,
+                    DeviceSecret = device?.Secret,
+                    PortalSlug = Vixly.Operations.Web.Tenancy.OperationsTenantMiddleware.Host(http)?.CanonicalSlug
+                }, http.RequestAborted);
 
             if (!response.Succeeded)
             {

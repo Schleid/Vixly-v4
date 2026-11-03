@@ -43,8 +43,8 @@ public sealed class OperationsWarehouseScopeTests
     public OperationsWarehouseScopeTests()
     {
         DateTimeOffset now = _kit.Clock.GetUtcNow();
-        _miami = OperationsBranch.Create(_kit.TenantId, Details("MIA", "US"), OperationsBranchSide.Origin, now);
-        _haiti = OperationsBranch.Create(_kit.TenantId, Details("PAP", "HT"), OperationsBranchSide.Destination, now);
+        _miami = OperationsBranch.Create(_kit.TenantId, Details("MIA", "US"), "US", OperationsBranchLegal.None, now);
+        _haiti = OperationsBranch.Create(_kit.TenantId, Details("PAP", "HT"), "HT", OperationsBranchLegal.None, now);
         _a = OperationsWarehouse.Create(_kit.TenantId, _miami.Id, Details("WHA", "US"), OperationsWarehouseRoles.Receiving, true, now);
         _b = OperationsWarehouse.Create(_kit.TenantId, _haiti.Id, Details("WHB", "HT"), OperationsWarehouseRoles.PickupPoint, true, now);
         _site.Add(_miami);
@@ -77,15 +77,17 @@ public sealed class OperationsWarehouseScopeTests
         Assert.Equal(new[] { _b.Id }, list.Warehouses.Select(warehouse => warehouse.Id));
     }
 
+    // Owner, 2026-10-29 (design 4.2): changing warehouses is a company task; given for one warehouse, it does nothing.
     [Fact]
-    public async Task WarehouseScopedUser_CannotChangeOrMoveIntoWarehouseB()
+    public async Task WarehouseScopedUser_CannotChangeAnyWarehouse_ManagingThemIsCompanyOnly()
     {
         OperationsAuthorizationContext clerk = Staff(OperationsRoleScope.Warehouse, _a.Id, OperationsPermissions.WarehousesView, OperationsPermissions.WarehousesManage);
+        OperationsAuthorizationContext company = Staff(OperationsRoleScope.Tenant, null, OperationsPermissions.WarehousesView, OperationsPermissions.WarehousesManage);
 
-        Assert.True((await Save(clerk, _a.Id, _miami.Id, "WHA")).Succeeded);
+        Assert.Equal("ops.access.permission_required", (await Save(clerk, _a.Id, _miami.Id, "WHA")).Error?.Code);
         Assert.Equal("ops.access.permission_required", (await Save(clerk, _b.Id, _haiti.Id, "WHB")).Error?.Code);
-        Assert.Equal("ops.access.permission_required", (await Save(clerk, _a.Id, _haiti.Id, "WHA")).Error?.Code);
         Assert.Equal("ops.access.permission_required", (await Save(clerk, null, _miami.Id, "WHC")).Error?.Code);
+        Assert.True((await Save(company, _a.Id, _miami.Id, "WHA")).Succeeded);
         Assert.Equal(_haiti.Id, _b.BranchId);
     }
 
@@ -93,7 +95,7 @@ public sealed class OperationsWarehouseScopeTests
     public async Task ScopedGrant_GivesNoCompanyPowers()
     {
         OperationsAuthorizationContext lead = Staff(OperationsRoleScope.Warehouse, _a.Id, OperationsPermissions.StaffView, OperationsPermissions.StaffSuspend, OperationsPermissions.RolesGrant, OperationsPermissions.WarehousesView);
-        OperationsAccess access = new(_kit.Store, _roles, _kit.Store, _kit.Clock, _site, new FakePlanFeatures());
+        OperationsAccess access = new(_kit.Store, _roles, _kit.Store, _kit.Clock, _site, new FakePlanFeatures(), _kit.Store);
 
         foreach (string permission in new[] { OperationsPermissions.StaffView, OperationsPermissions.StaffSuspend, OperationsPermissions.RolesGrant })
         {
@@ -123,7 +125,7 @@ public sealed class OperationsWarehouseScopeTests
         return _kit.Context.WithUser(user.Id, Guid.NewGuid());
     }
 
-    private OperationsOwnerCheck Check() => new(_kit.Store, new OperationsAccess(_kit.Store, _roles, _kit.Store, _kit.Clock, _site, new FakePlanFeatures()));
+    private OperationsOwnerCheck Check() => new(_kit.Store, new OperationsAccess(_kit.Store, _roles, _kit.Store, _kit.Clock, _site, new FakePlanFeatures(), _kit.Store));
 
     private Task<ListOperationsLocationsResponse> List(OperationsAuthorizationContext context) =>
         new ListOperationsLocationsUseCase(_site, Check(), _kit.Store).ExecuteAsync(context, new ListOperationsLocationsRequest(), CancellationToken.None);

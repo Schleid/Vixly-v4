@@ -40,6 +40,8 @@ public sealed class OperationsSignInSteps
 
     private readonly IOperationsSettingsRepository _settings;
 
+    private readonly IOperationsQuickSignInRepository _quick;
+
     public OperationsSignInSteps(
         IOperationsSignInChallengeRepository challenges,
         IOperationsUserRepository users,
@@ -49,8 +51,10 @@ public sealed class OperationsSignInSteps
         OperationsAuditTrail audit,
         IOperationsUnitOfWork unitOfWork,
         TimeProvider timeProvider,
-        IOperationsSettingsRepository settings)
+        IOperationsSettingsRepository settings,
+        IOperationsQuickSignInRepository quick)
     {
+        _quick = quick ?? throw new ArgumentNullException(nameof(quick));
         _challenges = challenges ?? throw new ArgumentNullException(nameof(challenges));
         _users = users ?? throw new ArgumentNullException(nameof(users));
         _sessions = sessions ?? throw new ArgumentNullException(nameof(sessions));
@@ -67,21 +71,25 @@ public sealed class OperationsSignInSteps
     // The country the request comes from (Cloudflare's), when known.
     public string? Country => _metadata.Country;
 
-    // The Owner and Administrators always need a second factor; other staff when the tenant requires it for all (D-O2).
+    // Require MFA = Yes: the Owner and Administrators always need a second factor; other staff when the tenant requires it for all (D-O2).
+    // Require MFA = No (owner, 2026-10-22): nobody is made to set one up.
     public async Task<bool> NeedsSecondFactorAsync(OperationsUser user, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(user);
 
-        return user.RequiresSecondFactor || (await _settings.FindAsync(cancellationToken))?.RequireSecondFactorForAllStaff == true;
+        Vixly.Operations.Domain.Settings.OperationsTenantSettings? settings = await _settings.FindAsync(cancellationToken);
+
+        return settings?.RequireMfa != false && (user.RequiresSecondFactor || settings?.RequireSecondFactorForAllStaff == true);
     }
 
-    public string IssueChallenge(OperationsAuthorizationContext context, OperationsUser user, DateTimeOffset utcNow, OperationsSignInPlace? place = null)
+    public string IssueChallenge(OperationsAuthorizationContext context, OperationsUser user, DateTimeOffset utcNow, OperationsSignInPlace? place = null,
+        OperationsSignInStage? asked = null)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(user);
 
         OperationsSecret secret = _secrets.NewToken();
-        OperationsSignInStage stage = user.HasSecondFactor ? OperationsSignInStage.SecondFactor : OperationsSignInStage.Enrolment;
+        OperationsSignInStage stage = asked ?? (user.HasSecondFactor ? OperationsSignInStage.SecondFactor : OperationsSignInStage.Enrolment);
         OperationsSignInChallenge challenge = OperationsSignInChallenge.Issue(context.RequiredTenantId, user.Id, secret.Hash, stage, utcNow);
         challenge.At(place ?? OperationsSignInPlace.Nowhere(Country));
         _challenges.Add(challenge);
@@ -108,6 +116,32 @@ public sealed class OperationsSignInSteps
         return user is null || !user.Account.IsSignInAllowed(UtcNow) ? null : (challenge, user);
     }
 
+    // Slice 12A: who signed in on the licensed device, and whether it was a full sign-in (the daily check). A full sign-in also unlocks the PIN.
+    private async Task RememberOnDeviceAsync(OperationsAuthorizationContext context, OperationsUser user, OperationsSignInPlace where, bool full, DateTimeOffset utcNow,
+        CancellationToken cancellationToken)
+    {
+        if (full && await _quick.FindPinAsync(user.Id, cancellationToken) is { } pin)
+        {
+            pin.Unlock(utcNow);
+        }
+
+        if (where.DeviceId is not { } deviceId || context.TenantId is not { } tenantId)
+        {
+            return;
+        }
+
+        if (await _quick.FindDevicePersonAsync(deviceId, user.Id, cancellationToken) is { } person)
+        {
+            person.SignedIn(full, utcNow);
+        }
+        else
+        {
+            OperationsDevicePerson first = OperationsDevicePerson.First(tenantId, deviceId, user.Id, utcNow);
+            first.SignedIn(full, utcNow);
+            _quick.Add(first);
+        }
+    }
+
     public async Task RecordFailedAttemptAsync(OperationsSignInChallenge challenge, OperationsUser user, string actionCode, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(challenge);
@@ -126,6 +160,11 @@ public sealed class OperationsSignInSteps
         return StartSessionAsync(context, user, method, cancellationToken, challenge.Place);
     }
 
+    // Slice 12A: a badge or PIN sign-in starts a quick session; every other method is a full sign-in.
+    public const string BadgeMethod = "badge";
+
+    public const string PinMethod = "pin";
+
     public async Task<OperationsIssuedSession?> StartSessionAsync(OperationsAuthorizationContext context, OperationsUser user, string method, CancellationToken cancellationToken,
         OperationsSignInPlace? place = null)
     {
@@ -137,6 +176,14 @@ public sealed class OperationsSignInSteps
         OperationsUserSession session = OperationsUserSession.Start(context.RequiredTenantId, user.Id, token.Hash, _metadata.ClientIp, _metadata.UserAgent, context.IsSettingUp, utcNow);
         OperationsSignInPlace where = place ?? OperationsSignInPlace.Nowhere(Country);
         session.At(where);
+        bool quick = method is BadgeMethod or PinMethod;
+
+        if (quick)
+        {
+            session.Quick();
+        }
+
+        await RememberOnDeviceAsync(context, user, where, !quick, utcNow, cancellationToken);
         user.RecordSuccessfulSignIn(utcNow);
         _sessions.Add(session);
         _audit.Record(user.Id, "ops.auth.signed_in", nameof(OperationsUser), user.Id,

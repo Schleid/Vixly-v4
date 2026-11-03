@@ -56,12 +56,18 @@ public sealed class OperationsStaffHttpTests : IClassFixture<OperationsWebDataba
 
         // A role that edits the website only
         (HttpResponseMessage _, string form) = await owner.GetAsync("/staff/roles/new");
-        Assert.DoesNotContain("value=\"ops.devices.approve\"", form, StringComparison.Ordinal);
+        // Owner, 2026-10-29: approving devices can be in a company role; the company decides who does it. The company details stay reserved.
+        Assert.Contains("value=\"ops.devices.approve\"", form, StringComparison.Ordinal);
+        Assert.DoesNotContain("value=\"ops.company.request_change\"", form, StringComparison.Ordinal);
+        Assert.Contains("company level only", form, StringComparison.Ordinal);
         (HttpResponseMessage saved, string _) = await owner.PostAsync("/staff/roles/save", form, ("name", "Website editor"), ("permissions", "ops.brand.view"), ("permissions", "ops.brand.edit"));
         Assert.Equal("/staff/roles?done=saved", saved.Headers.Location?.OriginalString);
         (HttpResponseMessage _, string roles) = await owner.GetAsync("/staff/roles");
         Assert.Contains("Website editor", roles, StringComparison.Ordinal);
         Assert.Contains("Administrator", roles, StringComparison.Ordinal);
+        // Owner, 2026-10-29 (R-5): the standard roles are there from the first look.
+        Assert.Contains("Security administrator", roles, StringComparison.Ordinal);
+        Assert.Contains("Warehouse worker", roles, StringComparison.Ordinal);
 
         // Invite a person with it
         (HttpResponseMessage _, string people) = await owner.GetAsync("/staff/people");
@@ -138,9 +144,10 @@ public sealed class OperationsStaffHttpTests : IClassFixture<OperationsWebDataba
         Assert.Contains("shown only once", codes, StringComparison.Ordinal);
     }
 
-    // Owner, 2026-10-21: the type and browser of a device; each sign-in with its device and country; another country than the device's is flagged.
+    // Owner, R-6 (2026-10-21): the type and browser of a device; used from another country than its own, the device is blocked, the administrators
+    // are told, and nobody signs in from it (even back home) until an administrator unblocks it with a fresh code.
     [SqlServerFact]
-    public async Task Device_TypeAndBrowser_ThenASignInFromAnotherCountry_IsFlaggedInTheActivity()
+    public async Task Device_UsedFromAnotherCountry_IsBlocked_UntilAnAdministratorUnblocksIt()
     {
         Guid tenant = NewTenant("travelco", "Travel Co");
         (CookieClient browser, string key) = await OwnerAsync(tenant, "travelco");
@@ -155,43 +162,72 @@ public sealed class OperationsStaffHttpTests : IClassFixture<OperationsWebDataba
         (HttpResponseMessage _, string devices) = await owner.GetAsync("/staff/devices");
         Assert.Contains("Front desk laptop", devices, StringComparison.Ordinal);
         Assert.Contains("of 5 licences in use", devices, StringComparison.Ordinal);
-        Assert.Contains("<td>D-0000", devices, StringComparison.Ordinal);
+        Assert.Matches("<td[^>]*>D-0000", devices);
         Assert.Contains(">Laptop<", devices, StringComparison.Ordinal);
         Assert.Contains("<td>Chrome</td>", devices, StringComparison.Ordinal);
         Assert.Contains("<td>Grace Hopper, ", devices, StringComparison.Ordinal);
         Assert.Contains(">Free<", devices, StringComparison.Ordinal);
+        string laptop = Regex.Match(devices, "href=\"/staff/devices/(?<id>[0-9a-f-]{36})\"[^>]*>Front desk laptop<").Groups["id"].Value;
+        Assert.NotEmpty(laptop);
 
-        // Signed out, then in again from another country: the code is asked (as always for the Owner), and the sign-in is flagged.
+        // Signed out, then in again from another country: refused at once (no code asked), and the device is blocked.
         (HttpResponseMessage _, string home) = await owner.GetAsync("/staff");
         await owner.PostAsync("/staff/sign-out", home);
         owner.Header("CF-IPCountry", "FR");
         (HttpResponseMessage _, string signIn) = await owner.GetAsync("/staff");
-        (HttpResponseMessage password, string _) = await owner.PostAsync("/staff/sign-in", signIn, ("email", "grace@travelco.example"), ("password", Password));
-        Assert.StartsWith("/staff/sign-in/verify", password.Headers.Location?.OriginalString, StringComparison.Ordinal);
-        (HttpResponseMessage _, string verify) = await owner.GetAsync(password.Headers.Location!.OriginalString);
-        await owner.PostAsync("/staff/sign-in/verify", verify, ("code", Code(key, DateTime.UtcNow.AddSeconds(30))));
+        (HttpResponseMessage refused, string refusedPage) = await owner.PostAsync("/staff/sign-in", signIn, ("email", "grace@travelco.example"), ("password", Password));
+        Assert.Null(refused.Headers.Location);
+        Assert.Contains("This device is blocked because it was used from another country.", refusedPage, StringComparison.Ordinal);
+        Assert.Null(owner.Cookie(OperationsCookies.Session));
 
-        (HttpResponseMessage _, string activity) = await owner.GetAsync("/staff/activity");
-        Assert.Contains("Front desk laptop", activity, StringComparison.Ordinal);
-        Assert.Contains("data-flag=\"country\"", activity, StringComparison.Ordinal);
-        Assert.Contains("FR", activity, StringComparison.Ordinal);
-        Assert.Contains("signed out", activity, StringComparison.Ordinal);
-        Assert.Contains("Still signed in", activity, StringComparison.Ordinal);
-        (HttpResponseMessage _, string history) = await owner.GetAsync("/staff/audit?area=auth");
-        Assert.Contains("ops.auth.country_changed", history, StringComparison.Ordinal);
+        // Every administrator is told, with the device's page.
+        await DrainAsync(tenant, "ops.devices.blocked.v1");
+        Vixly.Operations.Application.Ports.OperationsDeviceBlockedMail told = Assert.Single(_host.Mailer.Blocked);
+        Assert.Equal("grace@travelco.example", told.ToAddress);
+        Assert.Equal("FR", told.Country);
+        Assert.Equal("US", told.RegisteredCountry);
+        Assert.EndsWith("/staff/devices/" + laptop, told.Link, StringComparison.Ordinal);
 
-        // Confirmed in France, not elsewhere: used from a third country, the session ends and the sign-in page says why.
-        owner.Header("CF-IPCountry", "DE");
-        (HttpResponseMessage moved, string _) = await owner.GetAsync("/staff/devices");
-        Assert.Equal("/staff?country=1", moved.Headers.Location?.OriginalString);
-        (HttpResponseMessage _, string why) = await owner.GetAsync("/staff?country=1");
-        Assert.Contains("used from another country", why, StringComparison.Ordinal);
-        Assert.NotNull(owner.Cookie(OperationsCookies.Device));
+        // Back home, still refused: only an administrator lifts the block.
+        owner.Header("CF-IPCountry", "US");
+        (HttpResponseMessage _, string again) = await owner.PostAsync("/staff/sign-in", signIn, ("email", "grace@travelco.example"), ("password", Password));
+        Assert.Contains("This device is blocked because it was used from another country.", again, StringComparison.Ordinal);
+
+        // The Owner unblocks it from another approved computer, with a fresh code.
+        using CookieClient office = _host.Browser("travelco.techcrafters.ltd");
+        office.Header("CF-IPCountry", "US");
+        (HttpResponseMessage _, string officeSignIn) = await office.GetAsync("/staff");
+        (HttpResponseMessage password, string _) = await office.PostAsync("/staff/sign-in", officeSignIn, ("email", "grace@travelco.example"), ("password", Password));
+        (HttpResponseMessage _, string verify) = await office.GetAsync(password.Headers.Location!.OriginalString);
+        await office.PostAsync("/staff/sign-in/verify", verify, ("code", Code(key, DateTime.UtcNow.AddSeconds(30))));
+        await EnrolAsync(office);
+        (HttpResponseMessage _, string blockedPage) = await office.GetAsync("/staff/devices/" + laptop);
+        Assert.Contains("Blocked: used from another country", blockedPage, StringComparison.Ordinal);
+        (HttpResponseMessage _, string list) = await office.GetAsync("/staff/devices");
+        Assert.Contains("data-status=\"blocked\"", list, StringComparison.Ordinal);
+        // The code of the sign-in a moment ago may not be used twice: the test steps the app's clock back one step, as half a minute passing would.
+        await using (SqlConnection connection = new(_database.ConnectionString))
+        {
+            await connection.OpenAsync();
+            await using SqlCommand command = new("UPDATE ops.UserAuthenticatorApps SET LastAcceptedTimeStep = LastAcceptedTimeStep - 1 WHERE TenantId = @tenant", connection);
+            command.Parameters.AddWithValue("@tenant", tenant);
+            await command.ExecuteNonQueryAsync();
+        }
+
+        (HttpResponseMessage unblocked, string unblockPage) = await office.PostAsync("/staff/devices/" + laptop + "/unblock", blockedPage, ("code", Code(key, DateTime.UtcNow.AddSeconds(30))));
+        Assert.True(unblocked.Headers.Location is not null, unblockPage.Contains("ops-editor__error", StringComparison.Ordinal) ? Regex.Match(unblockPage, "class=\"[^\"]*error[^\"]*\"[^>]*>(?<t>[^<]+)").Groups["t"].Value : "no redirect");
+        Assert.Equal("/staff/devices?done=1", unblocked.Headers.Location?.OriginalString);
+
+        // The laptop signs in again from home, with the code as always for the Owner.
+        (HttpResponseMessage back, string _) = await owner.PostAsync("/staff/sign-in", signIn, ("email", "grace@travelco.example"), ("password", Password));
+        Assert.StartsWith("/staff/sign-in/verify", back.Headers.Location?.OriginalString, StringComparison.Ordinal);
+        (HttpResponseMessage _, string history) = await office.GetAsync("/staff/audit?area=auth");
+        Assert.Contains("ops.auth.device_blocked", history, StringComparison.Ordinal);
     }
 
-    // Owner, 2026-10-21: signed in without the device (no flag), then the device's cookie from another country: the session ends.
+    // Owner, R-6: signed in without the device, then the device's cookie from another country: the session ends and the device is blocked.
     [SqlServerFact]
-    public async Task SignIn_WithoutTheDevice_ThenItsCookieFromAnotherCountry_EndsTheSession()
+    public async Task SignIn_WithoutTheDevice_ThenItsCookieFromAnotherCountry_BlocksTheDevice()
     {
         Guid tenant = NewTenant("sneakco", "Sneak Co");
         (CookieClient browser, string key) = await OwnerAsync(tenant, "sneakco");
@@ -216,9 +252,33 @@ public sealed class OperationsStaffHttpTests : IClassFixture<OperationsWebDataba
         abroad.Cookies.Add(new Uri("https://sneakco.techcrafters.ltd/"), new System.Net.Cookie(OperationsCookies.Device, deviceCookie) { Secure = true, Path = "/" });
         (HttpResponseMessage ended, string _) = await abroad.GetAsync("/staff/devices");
 
-        Assert.Equal("/staff?country=1", ended.Headers.Location?.OriginalString);
-        (HttpResponseMessage _, string activity) = await owner.GetAsync("/staff/activity");
-        Assert.Contains("used from another country", activity, StringComparison.Ordinal);
+        Assert.Equal("/staff?blocked=1", ended.Headers.Location?.OriginalString);
+        (HttpResponseMessage _, string why) = await abroad.GetAsync("/staff?blocked=1");
+        Assert.Contains("This device is blocked because it was used from another country.", why, StringComparison.Ordinal);
+
+        // The device's own session (back home) ends too at its next check: the device is blocked for everyone.
+        owner.Header("CF-IPCountry", "US");
+        (HttpResponseMessage _, string activity) = await abroad.GetAsync("/staff/activity");
+        Assert.DoesNotContain("Still signed in", activity, StringComparison.Ordinal);
+        await DrainAsync(tenant, "ops.devices.blocked.v1");
+        Assert.Single(_host.Mailer.Blocked, mail => mail.ToAddress == "grace@sneakco.example");
+    }
+
+    // What the outbox worker does: runs the messages of one type for one company.
+    private async Task DrainAsync(Guid tenant, string type)
+    {
+        await using Microsoft.Extensions.DependencyInjection.AsyncServiceScope scope = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.CreateAsyncScope(_host.Services);
+        IServiceProvider services = scope.ServiceProvider;
+        Vixly.Operations.Infrastructure.Persistence.OperationsDbContext context = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<Vixly.Operations.Infrastructure.Persistence.OperationsDbContext>(services);
+        List<Vixly.Operations.Domain.Messaging.OperationsOutboxMessage> messages = await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.ToListAsync(
+            context.OutboxMessages.Where(message => message.Type == type && message.TenantId == tenant));
+        Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<Vixly.Operations.Application.Ports.IOperationsTenantScope>(services).Enter(tenant);
+
+        foreach (Vixly.Operations.Domain.Messaging.OperationsOutboxMessage message in messages)
+        {
+            await Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetServices<Vixly.Operations.Application.Messaging.IOperationsOutboxHandler>(services)
+                .Single(handler => handler.MessageType == type).HandleAsync(message, CancellationToken.None);
+        }
     }
 
     [SqlServerFact]

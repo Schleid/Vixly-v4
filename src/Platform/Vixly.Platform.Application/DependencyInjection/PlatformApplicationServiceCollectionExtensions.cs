@@ -106,7 +106,25 @@ public static class PlatformApplicationServiceCollectionExtensions
         // Contact requests from the public site (Stage 2, D-U3).
         services.AddScoped<PlatformLeadAdministration>();
         services.AddScoped<PlatformSalesLeadClock>();
+        services.AddScoped<Vixly.Platform.Application.Identity.PlatformSignInCleanupClock>();
+
+        // Job records (owner, 2026-10-23): each clock step's run, kept 90 days.
+        services.AddScoped<Vixly.Platform.Application.Jobs.PlatformJobRecorder>();
+        services.AddScoped<Vixly.Platform.Application.Jobs.PlatformJobRunClock>();
+
+        // Maintenance windows (Control backlog 2026-10-22, section 1).
+        services.AddScoped<Vixly.Platform.Application.Maintenance.PlatformMaintenanceAdministration>();
+        services.AddScoped<Vixly.Platform.Application.Maintenance.PlatformEdgeMaintenance>();
+        services.AddScoped<Vixly.Platform.Application.Maintenance.PlatformEdgeMaintenanceClock>();
+        services.AddScoped<IPlatformOutboxHandler, PlatformEdgeMaintenanceHandler>();
         services.AddScoped<IPlatformOutboxHandler, PlatformSalesLeadMailHandler>();
+
+        // Sales feed to TechOS (contract version 1, 2026-11-02): history rows become signed sale events.
+        services.AddScoped<Vixly.Platform.Application.SalesFeed.PlatformSalesFeedRecorder>();
+        services.AddScoped<PlatformRenewalReminderClock>();
+        services.AddScoped<Vixly.Platform.Application.SalesFeed.PlatformSalesFeedSender>();
+        services.AddScoped<Vixly.Platform.Application.SalesFeed.PlatformSalesFeedClock>();
+        services.AddScoped<IPlatformOutboxHandler, Vixly.Platform.Application.SalesFeed.PlatformSalesFeedAlertHandler>();
 
         // Company change requests (B12, D-T8).
         services.AddScoped<PlatformTenantChanges>();

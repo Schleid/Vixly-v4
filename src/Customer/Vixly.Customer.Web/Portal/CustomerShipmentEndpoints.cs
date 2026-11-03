@@ -38,8 +38,8 @@ public static class CustomerShipmentEndpoints
             return context.HttpContext.Features.Get<IAntiforgeryValidationFeature>() is { IsValid: false } ? Results.BadRequest() : await next(context);
         });
 
-        portal.MapGet("/new", async (HttpContext http, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
-            await FormAsync(http, api, text, null, null, Array.Empty<Guid>(), null));
+        portal.MapGet("/new", async (HttpContext http, int? tour, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
+            await FormAsync(http, api, text, null, null, Array.Empty<Guid>(), null, tour: tour == 3));
 
         portal.MapPost("/new", async (HttpContext http, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
         {
@@ -81,6 +81,19 @@ public static class CustomerShipmentEndpoints
 
         portal.MapGet("/{shipmentId:guid}", async (HttpContext http, Guid shipmentId, string? done, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
             await ShipmentAsync(http, api, text, shipmentId, null, null, done is "created" or "matched" or "added" or "changed" or "moved" or "collector" ? text["ui.shipments.done." + done].Value : null));
+
+        // Slice 12C (owner H-5): the driver's whereabouts for the page's refresh, every 30 seconds.
+        portal.MapGet("/{shipmentId:guid}/driver", async (HttpContext http, Guid shipmentId, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
+        {
+            if (Signed(http) is not { } signedIn)
+            {
+                return Results.Unauthorized();
+            }
+
+            http.Response.Headers.CacheControl = "no-store";
+            CustomerDriverDto? driver = (await api.GetDriverAsync(signedIn.Tenant, signedIn.Session, shipmentId, http, http.RequestAborted)).Value;
+            return driver is null ? Results.NoContent() : Results.Json(CustomerDriverWords.Json(driver, text));
+        });
 
         // Slice 7 step 2 (R-6): the person the customer names to collect it, or none.
         portal.MapPost("/{shipmentId:guid}/collector", async (HttpContext http, Guid shipmentId, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
@@ -197,19 +210,44 @@ public static class CustomerShipmentEndpoints
     // The value field sends a dot; a group separator such as 1,200 is refused, never read as 1.2 (review M3).
     internal static CustomerPreAlertBody Package(IFormCollection form, Guid? shipmentId)
     {
-        string typed = form["value"].ToString().Trim();
+        // Owner, 2026-11-01: item by item; a row without words is left out, a row without a quantity counts one.
+        List<CustomerItemBody> items = new();
+        string[] words = form["item_words"].Select(value => value ?? string.Empty).ToArray();
 
-        return new CustomerPreAlertBody(form["carrier"], form["tracking"], form["store"], form["contents"],
-            typed.Length is > 0 and <= 20 && typed.All(character => char.IsAsciiDigit(character) || character == '.')
-            && decimal.TryParse(typed, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out decimal declared) ? declared : -1m,
+        for (int row = 0; row < words.Length && row < 10; row++)
+        {
+            if (string.IsNullOrWhiteSpace(words[row]))
+            {
+                continue;
+            }
+
+            string quantity = row < form["item_qty"].Count ? form["item_qty"][row]?.Trim() ?? string.Empty : string.Empty;
+            items.Add(new CustomerItemBody(words[row].Trim(),
+                quantity.Length == 0 ? 1m : Plain(quantity) ?? 0m,
+                Plain(row < form["item_value"].Count ? form["item_value"][row] : null) ?? -1m,
+                row < form["item_used"].Count && form["item_used"][row] == "used"));
+        }
+
+        return new CustomerPreAlertBody(form["carrier"], form["tracking"], form["store"], items.Count == 0 ? form["contents"].ToString() : null,
+            items.Count == 0 ? Plain(form["value"]) ?? -1m : items.Sum(item => item.Quantity * Math.Max(0m, item.ValueEach)),
             DateOnly.TryParseExact(form["expected"], "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly date) ? date : null,
             shipmentId,
-            Guid.TryParse(form["warehouse"], out Guid warehouse) ? warehouse : null);
+            Guid.TryParse(form["warehouse"], out Guid warehouse) ? warehouse : null,
+            items.Count == 0 ? null : items);
     }
+
+    // A plain number as a number box sends it (digits and one dot); anything else, such as "1,200", gives null and is refused, never read as 1.2 (review M3).
+    private static decimal? Plain(string? typed)
+    {
+        string text = typed?.Trim() ?? string.Empty;
+        return text.Length is > 0 and <= 20 && text.All(character => char.IsAsciiDigit(character) || character == '.')
+            && decimal.TryParse(text, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out decimal amount) ? amount : null;
+    }
+
 
     // A new shipment (no id) or the instructions of an open one, with what was typed after a refusal.
     private static async Task<IResult> FormAsync(HttpContext http, CustomerOperationsApi api, IStringLocalizer<CustomerText> text, Guid? shipmentId,
-        CustomerShipmentInstructionsBody? entered, IReadOnlyCollection<Guid> chosen, string? error, CustomerPreAlertBody? package = null)
+        CustomerShipmentInstructionsBody? entered, IReadOnlyCollection<Guid> chosen, string? error, CustomerPreAlertBody? package = null, bool tour = false)
     {
         if (Signed(http) is not { } signedIn)
         {
@@ -243,6 +281,7 @@ public static class CustomerShipmentEndpoints
 
         return Page<ShipmentFormPage>(new
         {
+            TourStep = tour && choices.Value is not null ? 3 : 0,
             Brand = await api.GetBrandAsync(signedIn.Tenant, http.RequestAborted),
             Choices = choices.Value,
             ShipmentId = shipmentId,
@@ -281,8 +320,12 @@ public static class CustomerShipmentEndpoints
         // Slice 4D: the customer's packages from this shipment's warehouse that are in no shipment yet.
         CustomerPackagesDto? packages = detail.Shipment.IsOpen ? (await api.ListPackagesAsync(signedIn.Tenant, signedIn.Session, http, http.RequestAborted)).Value : null;
 
+        // Slice 12C: the driver, when it is out for delivery today.
+        CustomerDriverDto? driver = (await api.GetDriverAsync(signedIn.Tenant, signedIn.Session, shipmentId, http, http.RequestAborted)).Value;
+
         return Page<ShipmentPage>(new
         {
+            Driver = driver,
             Brand = await api.GetBrandAsync(signedIn.Tenant, http.RequestAborted), Detail = detail, Package = package, Error = error, Info = info,
             UnplacedPreAlerts = CustomerPackagePlaces.UnplacedPreAlerts(packages, detail.Shipment.OriginId),
             UnplacedParcels = CustomerPackagePlaces.UnplacedParcels(packages, detail.Shipment.OriginId),

@@ -51,7 +51,7 @@ public sealed class ReplyMyOperationsTicketUseCase
             return ReplyMyOperationsTicketResponse.Failure(OperationsCustomerAuthErrors.SessionRequired);
         }
 
-        if (await _tickets.GetAsync(request.TicketId, cancellationToken) is not { } ticket || ticket.CustomerId != signedIn.Customer.Id)
+        if (await _tickets.GetAsync(request.TicketId, cancellationToken) is not { } ticket || ticket.CustomerId != signedIn.Customer.Id || !ticket.FromCustomer)
         {
             return ReplyMyOperationsTicketResponse.Failure(OperationsTicketErrors.NotFound);
         }

@@ -43,13 +43,21 @@ public sealed class OperationsAccessDomainTests
     }
 
     [Theory]
-    [InlineData("ops.devices.approve", "ops.roles.permission_reserved")]
-    [InlineData("ops.devices.release", "ops.roles.permission_reserved")]
     [InlineData("ops.company.request_change", "ops.roles.permission_reserved")]
     [InlineData("ops.staff.everything", "ops.roles.permission_unknown")]
     public void Role_RefusesReservedAndUnknownPermissions(string permission, string code)
     {
         Assert.Equal(code, Assert.Throws<DomainException>(() => OperationsRole.Create(Tenant, "Clerk", new[] { permission }, Now)).Error.Code);
+    }
+
+    // Owner, 2026-10-29 (R-3): the company decides who approves and releases devices, so a company role may hold it.
+    [Fact]
+    public void Role_MayHoldDeviceApproval()
+    {
+        OperationsRole role = OperationsRole.Create(Guid.NewGuid(), "Security", new[] { OperationsPermissions.DevicesApprove, OperationsPermissions.DevicesRelease }, DateTimeOffset.UtcNow);
+
+        Assert.True(role.Holds(OperationsPermissions.DevicesApprove));
+        Assert.True(role.Holds(OperationsPermissions.DevicesRelease));
     }
 
     [Fact]

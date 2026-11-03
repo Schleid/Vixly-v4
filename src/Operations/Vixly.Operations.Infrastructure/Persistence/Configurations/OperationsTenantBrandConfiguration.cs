@@ -57,6 +57,10 @@ internal sealed class OperationsTenantBrandConfiguration : IEntityTypeConfigurat
         settings.Property(item => item.LogoDarkImageId).HasColumnName(prefix + "LogoDarkImageId");
         settings.Property(item => item.FaviconImageId).HasColumnName(prefix + "FaviconImageId");
         settings.Property(item => item.HeroImageId).HasColumnName(prefix + "HeroImageId");
+        settings.Property(item => item.AirImageId).HasColumnName(prefix + "AirImageId");
+        settings.Property(item => item.SeaImageId).HasColumnName(prefix + "SeaImageId");
+        settings.Property(item => item.Theme).HasColumnName(prefix + "Theme");
+        settings.Property(item => item.Font).HasColumnName(prefix + "Font");
         settings.Property(item => item.FacebookUrl).HasColumnName(prefix + "FacebookUrl").HasMaxLength(OperationsBrandSettings.LinkMaxLength);
         settings.Property(item => item.InstagramUrl).HasColumnName(prefix + "InstagramUrl").HasMaxLength(OperationsBrandSettings.LinkMaxLength);
         settings.Property(item => item.XUrl).HasColumnName(prefix + "XUrl").HasMaxLength(OperationsBrandSettings.LinkMaxLength);
@@ -67,5 +71,8 @@ internal sealed class OperationsTenantBrandConfiguration : IEntityTypeConfigurat
         settings.Property(item => item.Services).HasColumnName(prefix + "Services").HasDefaultValue(OperationsSiteServices.All).HasSentinel((OperationsSiteServices)(-1));
         settings.Property(item => item.ShowSteps).HasColumnName(prefix + "ShowSteps").HasDefaultValue(true);
         settings.Property(item => item.ShowFaq).HasColumnName(prefix + "ShowFaq");
+        settings.Property(item => item.ShowDelivered).HasColumnName(prefix + "ShowDelivered").HasDefaultValue(true);
+        settings.Property(item => item.ShowRates).HasColumnName(prefix + "ShowRates").HasDefaultValue(true);
+        settings.Property(item => item.ShowTestimonials).HasColumnName(prefix + "ShowTestimonials").HasDefaultValue(true);
     }
 }

@@ -92,9 +92,11 @@ public static class OperationsShipmentEndpoints
             return Results.File(new UTF8Encoding(true).GetPreamble().Concat(Encoding.UTF8.GetBytes(csv.ToString())).ToArray(), "text/csv; charset=utf-8", "shipments.csv");
         });
 
-        staff.MapGet("/{shipmentId:guid}", async (HttpContext http, Guid shipmentId, string? done, GetOperationsShipmentUseCase get, GetOperationsSignInBrandUseCase brand,
+        staff.MapGet("/{shipmentId:guid}", async (HttpContext http, Guid shipmentId, string? done, string? error, int? count, int? waiting, GetOperationsShipmentUseCase get,
+            GetOperationsSignInBrandUseCase brand,
             OperationsErrorText errors, IStringLocalizer<OperationsText> text) =>
-            await ShipmentAsync(http, shipmentId, null, done == "service" ? text["ui.shipments_desk.done.service"].Value : null, get, brand, errors));
+            await ShipmentAsync(http, shipmentId, OperationsShippingLabelEndpoints.Known(error), done == "service" ? text["ui.shipments_desk.done.service"].Value
+                : done == "labels_sent" ? OperationsShippingLabelEndpoints.LabelsSent(text, count, waiting) : null, get, brand, errors));
 
         staff.MapPost("/{shipmentId:guid}/service", async (HttpContext http, Guid shipmentId, [FromForm] string? service, ChangeOperationsShipmentServiceUseCase change,
             GetOperationsShipmentUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
@@ -137,8 +139,15 @@ public static class OperationsShipmentEndpoints
             return Results.NotFound();
         }
 
+        // Owner, 2026-10-27: the warehouse's label printers, for "Print all".
+        Vixly.Operations.Application.UseCases.Printing.ListOperationsLabelPrinters.ListOperationsLabelPrintersResponse printers = await http.RequestServices
+            .GetRequiredService<Vixly.Operations.Application.UseCases.Printing.ListOperationsLabelPrinters.ListOperationsLabelPrintersUseCase>()
+            .ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Printing.ListOperationsLabelPrinters.ListOperationsLabelPrintersRequest { WarehouseId = shipment.OriginWarehouseId }, http.RequestAborted);
+
         return OperationsStaffResults.Page<ShipmentPage>(http, new
         {
+            Printers = printers.Printers,
             Company = await OperationsStaffResults.CompanyAsync(http, brand),
             Shipment = shipment,
             Origin = response.Origin,
@@ -150,6 +159,10 @@ public static class OperationsShipmentEndpoints
             Services = response.Services,
             CanChangeService = response.CanChangeService,
             Settings = response.Settings,
+            // Slice 8: its costs and profit, for whoever may see costs.
+            Profit = (await http.RequestServices.GetRequiredService<Vixly.Operations.Application.UseCases.Payables.GetOperationsShipmentProfit.GetOperationsShipmentProfitUseCase>()
+                .ExecuteAsync(OperationsCurrentUser.Context(http), new Vixly.Operations.Application.UseCases.Payables.GetOperationsShipmentProfit.GetOperationsShipmentProfitRequest
+                    { ShipmentId = shipment.Id }, http.RequestAborted)).Profit,
             Error = errors.Describe(error),
             Info = info
         });

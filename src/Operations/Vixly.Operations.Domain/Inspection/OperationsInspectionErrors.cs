@@ -40,6 +40,9 @@ public static class OperationsInspectionErrors
 
     public static Error NotWaiting { get; } = Error.Create("ops.inspection.not_waiting");
 
+    // A scanned parcel that exists but has no inspection waiting (owner, 2026-10-27: "not found" read like a failed scan).
+    public static Error ParcelNotQueued { get; } = Error.Create("ops.inspection.parcel_not_queued");
+
     public static Error NotInProgress { get; } = Error.Create("ops.inspection.not_in_progress");
 
     public static Error ResultInvalid { get; } = Error.Create("ops.inspection.result_invalid");

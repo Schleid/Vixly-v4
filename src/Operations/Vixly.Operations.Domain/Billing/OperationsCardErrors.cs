@@ -36,4 +36,7 @@ public static class OperationsCardErrors
     public static Error PaymentsOpen { get; } = Error.Create("ops.cards.payments_open");
 
     public static Error RefundNotPossible { get; } = Error.Create("ops.cards.refund_not_possible");
+
+    // The other lines already pay everything: there is nothing left for the card (owner, 2026-10-26).
+    public static Error NothingLeftForCard { get; } = Error.Create("ops.cards.nothing_left");
 }

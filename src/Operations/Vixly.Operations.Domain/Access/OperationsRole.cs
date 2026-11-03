@@ -41,6 +41,9 @@ public sealed class OperationsRole : OperationsEntity
 
     public bool IsActive { get; private set; } = true;
 
+    // Owner, 2026-10-29: the standard role this one was created from (OperationsStandardRoles); null for the company's own roles.
+    public string? TemplateKey { get; private set; }
+
     public IReadOnlyList<string> Permissions => IsAdministrator
         ? OperationsPermissions.Administrator
         : PermissionsText.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
@@ -52,9 +55,9 @@ public sealed class OperationsRole : OperationsEntity
         return new OperationsRole(tenantId, utcNow) { Name = "administrator", IsAdministrator = true };
     }
 
-    public static OperationsRole Create(Guid tenantId, string? name, IEnumerable<string> permissions, DateTimeOffset utcNow)
+    public static OperationsRole Create(Guid tenantId, string? name, IEnumerable<string> permissions, DateTimeOffset utcNow, string? templateKey = null)
     {
-        OperationsRole role = new(tenantId, utcNow) { Name = CheckName(name) };
+        OperationsRole role = new(tenantId, utcNow) { Name = CheckName(name), TemplateKey = string.IsNullOrWhiteSpace(templateKey) ? null : templateKey.Trim() };
         role.PermissionsText = Check(permissions);
         return role;
     }

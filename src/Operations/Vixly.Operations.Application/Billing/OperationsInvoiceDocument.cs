@@ -15,4 +15,4 @@ namespace Vixly.Operations.Application.Billing;
 // IMPORTANT NOTES:
 // - Printed in the invoice's language (the customer's at issue); the company's name only, never "Vixly"
 // =========================================================
-public sealed record OperationsInvoiceDocument(OperationsInvoice Invoice, OperationsCreditNote? CreditNote);
+public sealed record OperationsInvoiceDocument(OperationsInvoice Invoice, OperationsCreditNote? CreditNote, string? TrackingNumber = null);

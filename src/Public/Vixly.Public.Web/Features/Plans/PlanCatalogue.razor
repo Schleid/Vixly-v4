@@ -38,6 +38,10 @@ IMPORTANT NOTES:
                     <li>@VixlyText.Format(T, "public.plans.minimum", "count", plan.MinimumLicences)</li>
                     <li>@VixlyText.Format(T, "public.plans.devices", "count", plan.MaxLicensedDevices)</li>
                     <li>@VixlyText.Format(T, "public.plans.warehouses", "count", plan.MaxWarehouses)</li>
+                    @if (plan.MaxShipmentsPerMonth > 0)
+                    {
+                        <li>@VixlyText.Format(T, "public.plans.shipments", new Dictionary<string, object> { ["count"] = plan.MaxShipmentsPerMonth, ["price"] = PlanDisplay.Money(plan.ExtraShipmentPrice, plan.CurrencyCode) })</li>
+                    }
                     @if (plan.SetupFee > 0m)
                     {
                         <li>@VixlyText.Format(T, "public.plans.setup_fee", "price", PlanDisplay.Money(plan.SetupFee, plan.CurrencyCode))</li>

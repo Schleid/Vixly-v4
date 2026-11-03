@@ -18,6 +18,7 @@ IMPORTANT NOTES:
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/img/operations-icon.svg" type="image/svg+xml" />
     <meta name="referrer" content="no-referrer" />
     <meta name="robots" content="noindex" />
     <title>@L["heading"] · @(string.IsNullOrWhiteSpace(Company) ? L["portal"] : Company)</title>
@@ -41,7 +42,7 @@ IMPORTANT NOTES:
         <div class="ops-login__topbar-inner">
             <div class="ops-login__topbar-brand">
                 <span class="ops-login__topbar-mark" aria-hidden="true">
-                    @(string.IsNullOrWhiteSpace(Company) ? "OP" : string.Concat(Company.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(w => System.Globalization.StringInfo.GetNextTextElement(w))).ToUpperInvariant())
+                    <OperationsMark Size="16" />
                 </span>
                 <span class="ops-login__topbar-title">@(string.IsNullOrWhiteSpace(Company) ? L["portal"] : Company)</span>
                 <span class="ops-login__topbar-tag">OPERATIONS</span>
@@ -125,10 +126,10 @@ IMPORTANT NOTES:
 
             <!-- Right Wing: Staff Authentication Console -->
             <section class="ops-login__form-panel">
-                <Vixly.Operations.Web.Features.SignIn.LoginBrand.OperationsLoginBrand Company="@Company" />
+                <Vixly.Operations.Web.Features.SignIn.LoginBrand.OperationsLoginBrand />
                 <header class="ops-login__header">
                     <h1 id="login-heading">@L["heading"]</h1>
-                    <p>@(Setup ? T["ui.signin.setup_subtitle"] : L["subtitle"])</p>
+                    <p>@(Setup ? T["ui.signin.setup_subtitle"] : string.IsNullOrWhiteSpace(Company) ? L["subtitle"] : VixlyText.Format(L, "subtitle_company", "company", Company))</p>
                 </header>
                 <FormMessage Error="@Error" Info="@Info" />
                 <form method="post" action="/staff/sign-in" class="ops-login__form">
@@ -160,6 +161,11 @@ IMPORTANT NOTES:
                     </button>
                 </form>
 
+                @if (Quick)
+                {
+                    <p class="ops-login__quick"><a href="/staff/sign-in/badge">@T["ui.quick.link"]</a></p>
+                }
+
                 <div class="ops-login__footer-trust">
                     <p class="ops-login__protected">
                         <span class="ops-login__status-pulse" aria-hidden="true"></span>
@@ -190,4 +196,8 @@ IMPORTANT NOTES:
 
     [Parameter]
     public string? Info { get; set; }
+
+    // Slice 12A: this browser is a licensed device, so a badge or PIN works here.
+    [Parameter]
+    public bool Quick { get; set; }
 }

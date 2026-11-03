@@ -13,6 +13,7 @@ IMPORTANT NOTES:
 *@
 @inject IStringLocalizer<PublicText> T
 
+<div class="pub-offer">
 <VxCard Title="@VixlyText.Format(T, "public.register.offer_title", "company", Offer.CompanyName)">
     <dl class="vx-facts">
         <div>
@@ -45,16 +46,17 @@ IMPORTANT NOTES:
                 <dd>@VixlyText.Format(T, "public.plans.trial", "days", days)</dd>
             </div>
         }
-        <div>
+        <div class="pub-offer__expires">
             <dt>@T["public.register.offer_expires"]</dt>
             <dd>@Offer.ExpiresUtc.UtcDateTime.ToString("D", CultureInfo.CurrentCulture)</dd>
         </div>
     </dl>
     @if (Offer.MaskedEmail is { } email)
     {
-        <p class="pub-hint">@VixlyText.Format(T, "public.register.offer_email", "email", email)</p>
+        <p class="pub-hint pub-offer__email">@VixlyText.Format(T, "public.register.offer_email", "email", email)</p>
     }
 </VxCard>
+</div>
 
 @code {
     [Parameter, EditorRequired]

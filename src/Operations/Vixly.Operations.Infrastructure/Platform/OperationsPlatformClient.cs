@@ -46,7 +46,7 @@ public sealed class OperationsPlatformClient : IOperationsPlatformClient
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(slug);
         PlatformPortalAccessInfo info = await GetAsync<PlatformPortalAccessInfo>("internal/v1/portal/" + Uri.EscapeDataString(slug), null, cancellationToken);
-        return new OperationsPortalAnswer(info.Found, info.TenantId, info.Status, info.Access, info.CanonicalSlug, info.DefaultLanguage, info.Legal);
+        return new OperationsPortalAnswer(info.Found, info.TenantId, info.Status, info.Access, info.CanonicalSlug, info.DefaultLanguage, info.Legal, info.TimeZone);
     }
 
     public async Task<OperationsPlatformEventPage> ReadEventsAsync(long after, int limit, CancellationToken cancellationToken)

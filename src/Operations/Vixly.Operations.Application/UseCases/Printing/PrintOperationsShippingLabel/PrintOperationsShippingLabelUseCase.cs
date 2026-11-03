@@ -86,7 +86,7 @@ public sealed class PrintOperationsShippingLabelUseCase
 
         if (await _shippingLabels.BuildAsync(parcel, cancellationToken) is not { } label)
         {
-            return PrintOperationsShippingLabelResponse.Failure(OperationsPrintingErrors.NotCleared);
+            return PrintOperationsShippingLabelResponse.Failure(await _shippingLabels.RefusalAsync(parcel, cancellationToken));
         }
 
         _labels.QueueShippingLabel(context.RequiredTenantId, printer, label);

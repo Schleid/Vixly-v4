@@ -72,6 +72,24 @@ public static class OperationsPrinterEndpoints
             return await PageAsync(http, warehouseId, response.Error, null, response.Succeeded ? response.Key : null, list, brand, errors);
         });
 
+        // Slice 12E (owner H-6): a one-time code for a phone running Vixly Print, shown as a QR code.
+        staff.MapPost("/agents/phone", async (HttpContext http, Guid warehouseId, [FromForm] string? name,
+            Vixly.Operations.Application.UseCases.Printing.CreateOperationsPrintPairing.CreateOperationsPrintPairingUseCase create, ListOperationsPrintersUseCase list,
+            GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
+        {
+            Vixly.Operations.Application.UseCases.Printing.CreateOperationsPrintPairing.CreateOperationsPrintPairingResponse response = await create.ExecuteAsync(
+                OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Printing.CreateOperationsPrintPairing.CreateOperationsPrintPairingRequest { WarehouseId = warehouseId, Name = name }, http.RequestAborted);
+
+            if (!response.Succeeded)
+            {
+                return await PageAsync(http, warehouseId, response.Error, null, null, list, brand, errors);
+            }
+
+            string link = "https://" + http.Request.Host.Value + "/agent/v1/pair?code=" + response.Code;
+            return await PageAsync(http, warehouseId, null, null, null, list, brand, errors, new PhonePairingView(response.Code, Qr(link), response.ExpiresUtc));
+        });
+
         staff.MapPost("/agents/{agentId:guid}/stop", async (HttpContext http, Guid warehouseId, Guid agentId, StopOperationsPrintAgentUseCase stop, ListOperationsPrintersUseCase list,
             GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
         {
@@ -85,8 +103,15 @@ public static class OperationsPrinterEndpoints
 
     private static string Path(Guid warehouseId) => "/staff/locations/warehouse/" + warehouseId + "/printers";
 
+    private static string Qr(string text)
+    {
+        using QRCoder.QRCodeGenerator generator = new();
+        using QRCoder.QRCodeData data = generator.CreateQrCode(text, QRCoder.QRCodeGenerator.ECCLevel.M);
+        return "data:image/svg+xml;base64," + Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(new QRCoder.SvgQRCode(data).GetGraphic(5)));
+    }
+
     private static async Task<IResult> PageAsync(HttpContext http, Guid warehouseId, Error? error, string? info, string? newKey, ListOperationsPrintersUseCase list,
-        GetOperationsSignInBrandUseCase brand, OperationsErrorText errors)
+        GetOperationsSignInBrandUseCase brand, OperationsErrorText errors, PhonePairingView? pairing = null)
     {
         ListOperationsPrintersResponse response = await list.ExecuteAsync(OperationsCurrentUser.Context(http), new ListOperationsPrintersRequest { WarehouseId = warehouseId }, http.RequestAborted);
 
@@ -102,6 +127,8 @@ public static class OperationsPrinterEndpoints
             Printers = response.Printers,
             Agents = response.Agents,
             NewKey = newKey,
+            Pairing = pairing,
+            PrintAppName = http.RequestServices.GetRequiredService<IConfiguration>()["OperationsPrintHelper:AppName"] ?? string.Empty,
             Error = errors.Describe(error),
             Info = info
         });

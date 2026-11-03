@@ -91,6 +91,35 @@ public sealed class OperationsSettingsDomainTests
         Assert.Equal("ops.services.label_too_long", Assert.Throws<DomainException>(() => setup.Change(true, "<b>x</b>", 2, 3, 6000, true, Now)).Error.Code);
     }
 
+    // Owner, 2026-10-31: the label code is always three letters A to Z, stored in capitals.
+    [Theory]
+    [InlineData("vxa", "VXA")]
+    [InlineData(" VXS ", "VXS")]
+    public void ShippingService_LabelCode_IsThreeCapitalLetters(string typed, string stored)
+    {
+        OperationsShippingServiceSetup setup = OperationsShippingServiceSetup.Create(Tenant, "ocean_consolidated", Now);
+
+        setup.ChangeLabelCode(typed, Now);
+
+        Assert.Equal(stored, setup.LabelCode);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("VX")]
+    [InlineData("VXAB")]
+    [InlineData("VX1")]
+    [InlineData("VÉA")]
+    [InlineData("V-A")]
+    public void ShippingService_LabelCode_RefusesAnythingButThreeLetters(string? typed)
+    {
+        OperationsShippingServiceSetup setup = OperationsShippingServiceSetup.Create(Tenant, "air_standard", Now);
+
+        Assert.Equal("ops.services.label_code_invalid", Assert.Throws<DomainException>(() => setup.ChangeLabelCode(typed, Now)).Error.Code);
+        Assert.Null(setup.LabelCode);
+    }
+
     [Fact]
     public void Prefixes_AreUpperCased_AndMustDiffer()
     {

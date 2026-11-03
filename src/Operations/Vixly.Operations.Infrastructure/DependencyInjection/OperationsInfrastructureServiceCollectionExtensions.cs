@@ -124,9 +124,32 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<IOperationsUnitOfWork, OperationsUnitOfWork>();
         services.AddScoped<IOperationsOutboxRepository, OperationsOutboxRepository>();
         services.AddScoped<IOperationsJobRunRepository, OperationsJobRunRepository>();
+        services.AddScoped<IOperationsSignInCleanupRepository, OperationsSignInCleanupRepository>();
+        services.AddScoped<Vixly.Operations.Application.Identity.OperationsSignInCleanup>();
+        services.AddScoped<Vixly.Operations.Application.Ports.IOperationsTrackingNumberBackfill, Vixly.Operations.Infrastructure.Persistence.OperationsTrackingNumberBackfill>();
         services.AddScoped<IOperationsFeedPositionRepository, OperationsFeedPositionRepository>();
         services.AddScoped<IOperationsUserRepository, OperationsUserRepository>();
         services.AddScoped<IOperationsSessionRepository, OperationsSessionRepository>();
+        services.AddScoped<IOperationsDeviceBlockRepository, OperationsDeviceBlockRepository>();
+        services.AddScoped<IOperationsQuickSignInRepository, OperationsQuickSignInRepository>();
+        services.AddScoped<IOperationsDriverTrackingRepository, OperationsDriverTrackingRepository>();
+        services.AddScoped<IOperationsShelfCountRepository, OperationsShelfCountRepository>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Printing.CreateOperationsPrintPairing.CreateOperationsPrintPairingUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Printing.PairOperationsPrintAgent.PairOperationsPrintAgentUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Printing.SaveOperationsPhonePrinter.SaveOperationsPhonePrinterUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Receiving.StartOperationsShelfCount.StartOperationsShelfCountUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Receiving.ScanOperationsShelfCount.ScanOperationsShelfCountUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Receiving.FinishOperationsShelfCount.FinishOperationsShelfCountUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Receiving.GetOperationsShelfCounts.GetOperationsShelfCountsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.Delivery.OperationsDriverTracking>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Delivery.RecordOperationsDriverPosition.RecordOperationsDriverPositionUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Delivery.GetOperationsRouteMap.GetOperationsRouteMapUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Customers.GetMyOperationsShipmentDriver.GetMyOperationsShipmentDriverUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Customers.GetOperationsTrackedDelivery.GetOperationsTrackedDeliveryUseCase>();
+        services.AddOptions<Vixly.Operations.Infrastructure.Maps.OperationsMapOptions>().Bind(configuration.GetSection(Vixly.Operations.Infrastructure.Maps.OperationsMapOptions.SectionName));
+        services.AddSingleton<Vixly.Operations.Infrastructure.Maps.OperationsMapTiles>();
+        services.AddHttpClient(Vixly.Operations.Infrastructure.Maps.OperationsMapTiles.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(10));
+        services.AddScoped<Vixly.Operations.Application.Identity.OperationsDeviceBlocking>();
         services.AddScoped<IOperationsSignInChallengeRepository, OperationsSignInChallengeRepository>();
         services.AddScoped<IOperationsAccountTokenRepository, OperationsAccountTokenRepository>();
         services.AddScoped<OperationsAuditRepository>();
@@ -135,6 +158,7 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<IOperationsBrandRepository, OperationsBrandRepository>();
         services.AddScoped<IOperationsRoleRepository, OperationsRoleRepository>();
         services.AddScoped<IOperationsSettingsRepository, OperationsSettingsRepository>();
+        services.AddScoped<IOperationsIdleTimesReader, Vixly.Operations.Infrastructure.Persistence.OperationsIdleTimesReader>();
         services.AddScoped<IOperationsShippingServiceRepository, OperationsShippingServiceRepository>();
         services.AddScoped<IOperationsCustomerRepository, OperationsCustomerRepository>();
         services.AddScoped<IOperationsTrackingRepository, OperationsTrackingRepository>();
@@ -149,9 +173,11 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddSingleton<IOperationsAuthenticatorCodes, TotpOperationsAuthenticatorCodes>();
         services.TryAddScoped<IOperationsRequestMetadata, OperationsNoRequestMetadata>();
         services.AddOptions<OperationsMailOptions>().Bind(configuration.GetSection(OperationsMailOptions.SectionName));
-        services.AddSingleton<OperationsMailSender>();
-        services.AddSingleton<IOperationsIdentityMailer, SmtpOperationsIdentityMailer>();
-        services.AddSingleton<IOperationsCustomerMailer, SmtpOperationsCustomerMailer>();
+        // Scoped: the company's email look comes from the tenant scope (owner, 2026-10-25).
+        services.AddScoped<OperationsMailBrandReader>();
+        services.AddScoped<OperationsMailSender>();
+        services.AddScoped<IOperationsIdentityMailer, SmtpOperationsIdentityMailer>();
+        services.AddScoped<IOperationsCustomerMailer, SmtpOperationsCustomerMailer>();
         services.AddOptions<OperationsLinkOptions>().Bind(configuration.GetSection(OperationsLinkOptions.SectionName));
         services.AddSingleton<IOperationsPortalLinks, OperationsPortalLinks>();
         services.AddScoped<OperationsAuditTrail>();
@@ -159,6 +185,13 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<OperationsSessionValidator>();
         services.AddScoped<BeginOperationsSignInUseCase>();
         services.AddScoped<CompleteOperationsSignInWithAuthenticatorCodeUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.SignIn.BeginOperationsQuickSignIn.BeginOperationsQuickSignInUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.SignIn.CompleteOperationsSignInWithPassword.CompleteOperationsSignInWithPasswordUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.SignIn.ListOperationsDevicePeople.ListOperationsDevicePeopleUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Account.SetMyOperationsPin.SetMyOperationsPinUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Staff.IssueOperationsStaffBadge.IssueOperationsStaffBadgeUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Staff.RevokeOperationsStaffBadge.RevokeOperationsStaffBadgeUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Staff.GetOperationsQuickSignInState.GetOperationsQuickSignInStateUseCase>();
         services.AddScoped<CompleteOperationsSignInWithRecoveryCodeUseCase>();
         services.AddScoped<BeginOperationsSignInEnrolmentUseCase>();
         services.AddScoped<CompleteOperationsSignInEnrolmentUseCase>();
@@ -173,6 +206,7 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddSingleton<IOperationsLegalClient, OperationsLegalClient>();
         services.AddSingleton<IOperationsCompanyClient, OperationsCompanyClient>();
         services.AddSingleton<IOperationsPlanFeatures, OperationsPlanFeaturesClient>();
+        services.AddSingleton<IOperationsUsageReporter, OperationsUsageReporter>();
         services.AddScoped<CompleteOperationsSecondFactorResetUseCase>();
         services.AddScoped<GetOperationsLegalStatusUseCase>();
         services.AddScoped<AcceptOperationsLegalTermsUseCase>();
@@ -185,11 +219,14 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<ListOperationsDevicesUseCase>();
         services.AddScoped<DecideOperationsDeviceUseCase>();
         services.AddScoped<ReleaseOperationsDeviceUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Devices.UnblockOperationsDevice.UnblockOperationsDeviceUseCase>();
         services.AddScoped<RequestOperationsPasswordResetUseCase>();
         services.AddScoped<ResetOperationsPasswordUseCase>();
 
         // Tenant public site (Slice 1B).
         services.AddScoped<IOperationsSiteRepository, OperationsSiteRepository>();
+        services.AddScoped<IOperationsItemRepository, OperationsItemRepository>();
+        services.AddSingleton<IOperationsItemStarterList, Vixly.Operations.Infrastructure.Items.OperationsItemStarterList>();
         services.AddScoped<IOperationsLocationRepository, OperationsLocationRepository>();
         services.AddSingleton<IOperationsImageInspector, OperationsImageInspector>();
         services.AddScoped<OperationsAccess>();
@@ -206,6 +243,9 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<TransferOperationsOwnershipUseCase>();
         services.AddScoped<GrantOperationsRoleUseCase>();
         services.AddScoped<ListOperationsRolesUseCase>();
+        // Owner, 2026-10-29: the standard roles every company starts with.
+        services.AddScoped<IOperationsRoleNames, Vixly.Operations.Infrastructure.Identity.OperationsRoleNames>();
+        services.AddScoped<Vixly.Operations.Application.Security.OperationsStandardRoleSetup>();
         services.AddScoped<RevokeOperationsRoleGrantUseCase>();
         services.AddScoped<SaveOperationsRoleUseCase>();
         services.AddScoped<SetOperationsRoleActiveUseCase>();
@@ -222,8 +262,22 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.ResetOperationsCustomerPassword.ResetOperationsCustomerPasswordUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.GetMyOperationsCustomer.GetMyOperationsCustomerUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.UpdateMyOperationsCustomer.UpdateMyOperationsCustomerUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Customers.ChangeMyOperationsCustomerAddress.ChangeMyOperationsCustomerAddressUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Customers.DismissMyOperationsCustomerTour.DismissMyOperationsCustomerTourUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.ChangeOperationsFreightCollect.ChangeOperationsFreightCollectUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.ChangeMyOperationsCustomerPassword.ChangeMyOperationsCustomerPasswordUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.ListOperationsCustomers.ListOperationsCustomersUseCase>();
+        // Owner, 2026-10-29 (design 4.4): find one customer, recorded and limited; the list stays with the company.
+        services.AddScoped<Vixly.Operations.Application.Customers.OperationsCustomerLookups>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Customers.LookUpOperationsCustomers.LookUpOperationsCustomersUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Customers.CreateOperationsCustomer.CreateOperationsCustomerUseCase>();
+
+        // Owner, 2026-10-29 (design section 9): the support agent's call, the call tickets, outside accounts.
+        services.AddScoped<Vixly.Operations.Application.Support.OperationsSupportDesk>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Support.FindOperationsSupportCaller.FindOperationsSupportCallerUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Support.GetOperationsSupportCase.GetOperationsSupportCaseUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Support.OpenOperationsSupportRequest.OpenOperationsSupportRequestUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Staff.SetOperationsStaffOutside.SetOperationsStaffOutsideUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.GetOperationsCustomer.GetOperationsCustomerUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.ChangeOperationsCustomerStatus.ChangeOperationsCustomerStatusUseCase>();
 
@@ -233,6 +287,7 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<IOperationsHoldRepository, OperationsHoldRepository>();
         services.AddScoped<IOperationsStockCountRepository, OperationsStockCountRepository>();
         services.AddScoped<IOperationsTicketRepository, OperationsTicketRepository>();
+        services.AddScoped<IOperationsShipmentCounter, OperationsShipmentCounter>();
         services.AddScoped<IOperationsInsuranceRepository, OperationsInsuranceRepository>();
         services.AddScoped<IOperationsChargeRepository, OperationsChargeRepository>();
         services.AddScoped<IOperationsSupplyRepository, OperationsSupplyRepository>();
@@ -246,6 +301,11 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<IOperationsDeliveryRepository, OperationsDeliveryRepository>();
         services.AddScoped<IOperationsCreditRepository, OperationsCreditRepository>();
         services.AddScoped<Vixly.Operations.Application.Holds.OperationsUnclaimedReminders>();
+        // Owner, 2026-10-28: company brands for the Cloudflare Worker's maintenance page.
+        services.AddOptions<Vixly.Operations.Infrastructure.Edge.OperationsEdgeOptions>().Bind(configuration.GetSection(Vixly.Operations.Infrastructure.Edge.OperationsEdgeOptions.SectionName));
+        services.AddHttpClient<IOperationsEdgeClient, Vixly.Operations.Infrastructure.Edge.OperationsEdgeClient>(client => client.Timeout = TimeSpan.FromSeconds(15));
+        services.AddScoped<Vixly.Operations.Application.Branding.OperationsEdgeBrands>();
+        services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Branding.OperationsEdgeBrandHandler>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Holds.AnswerMyOperationsHold.AnswerMyOperationsHoldUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Holds.ReviewOperationsHoldAnswer.ReviewOperationsHoldAnswerUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Holds.GetOperationsHoldAnswerDocument.GetOperationsHoldAnswerDocumentUseCase>();
@@ -321,6 +381,10 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<Vixly.Operations.Application.Charges.OperationsPricing>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Charges.GetMyOperationsPricing.GetMyOperationsPricingUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Site.GetOperationsPublicPricing.GetOperationsPublicPricingUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Site.EstimateOperationsPublicShipment.EstimateOperationsPublicShipmentUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Site.RecordOperationsSiteTestimonial.RecordOperationsSiteTestimonialUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Site.ChangeOperationsSiteTestimonial.ChangeOperationsSiteTestimonialUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.AddToOperationsBundleList.AddToOperationsBundleListUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.RemoveFromOperationsBundleList.RemoveFromOperationsBundleListUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.GetOperationsRepackBoxLabel.GetOperationsRepackBoxLabelUseCase>();
@@ -419,6 +483,68 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         // Slice 5F step 4: cards through the company's own Stripe account.
         services.AddScoped<IOperationsCardRepository, OperationsCardRepository>();
         services.AddScoped<IOperationsScreenRepository, OperationsScreenRepository>();
+        services.AddScoped<IOperationsPayablesRepository, OperationsPayablesRepository>();
+        services.AddScoped<IOperationsTextRepository, OperationsTextRepository>();
+        services.AddScoped<IOperationsTextGateway, Vixly.Operations.Infrastructure.Texts.OperationsTwilioGateway>();
+        services.AddScoped<IOperationsTextWriter, Vixly.Operations.Infrastructure.Texts.OperationsTextWriter>();
+        services.AddScoped<Vixly.Operations.Application.Texts.OperationsTextDesk>();
+        services.AddSingleton<IOperationsTextLog, Vixly.Operations.Infrastructure.Texts.OperationsTextLog>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Texts.HandleOperationsTextStatus.HandleOperationsTextStatusUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Texts.GetOperationsTextSettings.GetOperationsTextSettingsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Texts.ConnectOperationsTextProvider.ConnectOperationsTextProviderUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Texts.DisconnectOperationsTextProvider.DisconnectOperationsTextProviderUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Texts.SaveOperationsTextNotices.SaveOperationsTextNoticesUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Customers.GetMyOperationsNotices.GetMyOperationsNoticesUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Customers.ChangeMyOperationsNotices.ChangeMyOperationsNoticesUseCase>();
+        services.AddHttpClient(Vixly.Operations.Infrastructure.Texts.OperationsTwilioGateway.HttpClientName, client =>
+        {
+            client.BaseAddress = new Uri("https://api.twilio.com/");
+            client.Timeout = TimeSpan.FromSeconds(20);
+        });
+        services.AddScoped<IOperationsReportReader, Vixly.Operations.Infrastructure.Reports.OperationsReportReader>();
+        services.AddSingleton<IOperationsReportFiles, Vixly.Operations.Infrastructure.Reports.OperationsReportFiles>();
+        services.AddScoped<IOperationsDashboardReader, Vixly.Operations.Infrastructure.Reports.OperationsDashboardReader>();
+        services.AddScoped<IOperationsReportScheduleRepository, OperationsReportScheduleRepository>();
+        services.AddScoped<IOperationsReportMailer, Vixly.Operations.Infrastructure.Mail.SmtpOperationsReportMailer>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Reports.ListOperationsReportSchedules.ListOperationsReportSchedulesUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Reports.SaveOperationsReportSchedule.SaveOperationsReportScheduleUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Reports.RemoveOperationsReportSchedule.RemoveOperationsReportScheduleUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Dashboard.GetOperationsDashboard.GetOperationsDashboardUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Reports.ListOperationsReports.ListOperationsReportsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Reports.RunOperationsReport.RunOperationsReportUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Reports.GetOperationsReportRules.GetOperationsReportRulesUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Reports.SaveOperationsReportRules.SaveOperationsReportRulesUseCase>();
+        services.AddScoped<IOperationsApiRepository, OperationsApiRepository>();
+        services.AddScoped<IOperationsApiReader, Vixly.Operations.Infrastructure.Api.OperationsApiReader>();
+        services.AddScoped<IOperationsWebhookSender, Vixly.Operations.Infrastructure.Api.OperationsWebhookSender>();
+        services.AddScoped<Vixly.Operations.Application.Api.OperationsWebhookDesk>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Api.GetOperationsApiSettings.GetOperationsApiSettingsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Api.CreateOperationsApiKey.CreateOperationsApiKeyUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Api.RevokeOperationsApiKey.RevokeOperationsApiKeyUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Api.SaveOperationsWebhookEndpoint.SaveOperationsWebhookEndpointUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Api.SwitchOperationsWebhookEndpoint.SwitchOperationsWebhookEndpointUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Api.SendOperationsWebhookTest.SendOperationsWebhookTestUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Api.ResendOperationsWebhookDelivery.ResendOperationsWebhookDeliveryUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Api.AuthenticateOperationsApiKey.AuthenticateOperationsApiKeyUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Api.QueryOperationsApi.QueryOperationsApiUseCase>();
+        services.AddHttpClient(Vixly.Operations.Infrastructure.Api.OperationsWebhookSender.HttpClientName, client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(10);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Webhooks/1.0");
+        }).ConfigurePrimaryHttpMessageHandler(Vixly.Operations.Infrastructure.Api.OperationsWebhookSender.Handler);
+        services.AddScoped<Vixly.Operations.Application.Payables.OperationsPayablesDesk>();
+        services.AddScoped<Vixly.Operations.Application.Payables.OperationsProfitCalculator>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Payables.ListOperationsBills.ListOperationsBillsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Payables.GetOperationsBill.GetOperationsBillUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Payables.SaveOperationsBill.SaveOperationsBillUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Payables.DecideOperationsBill.DecideOperationsBillUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Payables.PayOperationsBill.PayOperationsBillUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Payables.VoidOperationsBill.VoidOperationsBillUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Payables.ListOperationsVendors.ListOperationsVendorsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Payables.SaveOperationsVendor.SaveOperationsVendorUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Payables.GetOperationsProfit.GetOperationsProfitUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Payables.GetOperationsShipmentProfit.GetOperationsShipmentProfitUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Payables.ChangeOperationsBillSettings.ChangeOperationsBillSettingsUseCase>();
         services.AddHttpClient(Vixly.Operations.Infrastructure.Payments.OperationsStripeGateway.HttpClientName, client =>
         {
             client.BaseAddress = new Uri("https://api.stripe.com/");
@@ -446,6 +572,8 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.CancelOperationsCardPayment.CancelOperationsCardPaymentUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.HandleOperationsCardWebhook.HandleOperationsCardWebhookUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Billing.PayMyOperationsInvoiceByCard.PayMyOperationsInvoiceByCardUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Billing.PayMyOperationsInvoice.PayMyOperationsInvoiceUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Billing.GetMyOperationsZelleQr.GetMyOperationsZelleQrUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Billing.GetMyOperationsCardPayment.GetMyOperationsCardPaymentUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.GetOperationsPaymentSettings.GetOperationsPaymentSettingsUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Cashier.SaveOperationsPaymentSettings.SaveOperationsPaymentSettingsUseCase>();
@@ -521,6 +649,9 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<Vixly.Operations.Application.UseCases.Printing.FinishOperationsPrintJob.FinishOperationsPrintJobUseCase>();
         services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Receiving.OperationsParcelNoticeHandler>();
         services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Tickets.OperationsTicketNoticeHandler>();
+        services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Identity.OperationsDeviceBlockedHandler>();
+        services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Tickets.OperationsTicketEscalatedHandler>();
+        services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Plans.OperationsShipmentCapHandler>();
         services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Billing.OperationsPaymentNoticeHandler>();
         services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Billing.OperationsStatementNoticeHandler>();
         services.AddScoped<IOperationsOutboxHandler, Vixly.Operations.Application.Events.OperationsEventNoticeHandler>();
@@ -535,8 +666,18 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddSingleton<Vixly.Operations.Infrastructure.Files.IOperationsFileProvider, Vixly.Operations.Infrastructure.Files.OperationsFolderFileProvider>();
         services.AddSingleton<IOperationsFileStore, Vixly.Operations.Infrastructure.Files.OperationsFileStore>();
         services.AddOptions<Vixly.Operations.Infrastructure.Documents.OperationsDocumentOptions>().Bind(configuration.GetSection(Vixly.Operations.Infrastructure.Documents.OperationsDocumentOptions.SectionName));
-        services.AddSingleton<IOperationsLabelRenderer, Vixly.Operations.Infrastructure.Documents.QuestPdfOperationsLabelRenderer>();
+        // Scoped: each document carries the company's own logo (owner, 2026-10-28).
+        services.AddScoped<Vixly.Operations.Infrastructure.Documents.OperationsDocumentLogos>();
+        services.AddScoped<IOperationsLabelRenderer, Vixly.Operations.Infrastructure.Documents.QuestPdfOperationsLabelRenderer>();
+        services.AddSingleton<IOperationsLabelLogoMaker, Vixly.Operations.Infrastructure.Documents.OperationsLabelLogoMaker>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Company.SaveOperationsDocumentLogo.SaveOperationsDocumentLogoUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Company.RemoveOperationsDocumentLogo.RemoveOperationsDocumentLogoUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Company.GetOperationsDocumentLogo.GetOperationsDocumentLogoUseCase>();
+        services.AddScoped<Vixly.Operations.Application.Charges.OperationsQuoteDocuments>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Charges.GetOperationsQuoteDocument.GetOperationsQuoteDocumentUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Charges.EmailOperationsQuote.EmailOperationsQuoteUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Receiving.ListOperationsParcels.ListOperationsParcelsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Receiving.ListOperationsOnHandParcels.ListOperationsOnHandParcelsUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Receiving.GetOperationsParcel.GetOperationsParcelUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Receiving.GetOperationsParcelPhoto.GetOperationsParcelPhotoUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Receiving.GetOperationsParcelLabel.GetOperationsParcelLabelUseCase>();
@@ -548,7 +689,21 @@ public static class OperationsInfrastructureServiceCollectionExtensions
 
         // Customer-created shipments (owner, 2026-10-18).
         services.AddScoped<Vixly.Operations.Application.Shipments.OperationsShipmentIntake>();
+        services.AddScoped<Vixly.Operations.Application.Plans.OperationsPlanGate>();
+        services.AddScoped<IOperationsSuspensionLift, Vixly.Operations.Infrastructure.Persistence.OperationsSuspensionLift>();
         services.AddScoped<Vixly.Operations.Application.Shipments.OperationsPreAlertIntake>();
+
+        // Items in parcels and the item catalogue (owner, 2026-11-01).
+        services.AddScoped<Vixly.Operations.Application.Items.OperationsItemDeclaration>();
+        services.AddScoped<Vixly.Operations.Application.Items.OperationsItemCatalogue>();
+        services.AddScoped<Vixly.Operations.Application.Items.OperationsItemCheck>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Items.GetOperationsParcelItems.GetOperationsParcelItemsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Items.SaveOperationsParcelItems.SaveOperationsParcelItemsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Items.ListOperationsItemsToReview.ListOperationsItemsToReviewUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Items.GetOperationsItemCatalogue.GetOperationsItemCatalogueUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Items.SaveOperationsItemCatalogueEntry.SaveOperationsItemCatalogueEntryUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Items.RemoveOperationsItemCatalogueEntry.RemoveOperationsItemCatalogueEntryUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Items.ChangeOperationsItemRule.ChangeOperationsItemRuleUseCase>();
         services.AddScoped<Vixly.Operations.Application.Shipments.OperationsShipmentPlacement>();
         services.AddScoped<Vixly.Operations.Application.Shipments.OperationsPackageMover>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Shipments.PlaceMyOperationsPackage.PlaceMyOperationsPackageUseCase>();
@@ -606,7 +761,22 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<Vixly.Operations.Application.UseCases.Tickets.GetOperationsTicket.GetOperationsTicketUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Tickets.AnswerOperationsTicket.AnswerOperationsTicketUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Tickets.GetOperationsTicketProof.GetOperationsTicketProofUseCase>();
+
+        // Owner, 2026-10-29: the ticket desk (departments, taking, moving, escalations).
+        services.AddScoped<Vixly.Operations.Application.Tickets.OperationsTicketScope>();
+        services.AddScoped<Vixly.Operations.Application.Tickets.OperationsTicketPeople>();
+        services.AddScoped<Vixly.Operations.Application.Tickets.OperationsTicketEscalations>();
+
+        // Owner, 2026-10-29: the plan's monthly shipment cap.
+        services.AddScoped<Vixly.Operations.Application.Plans.OperationsShipmentCap>();
+        services.AddScoped<Vixly.Operations.Application.Plans.OperationsShipmentCapReport>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Plans.GetOperationsShipmentCap.GetOperationsShipmentCapUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Tickets.TakeOperationsTicket.TakeOperationsTicketUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Tickets.MoveOperationsTicket.MoveOperationsTicketUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Tickets.ChangeOperationsTicketSettings.ChangeOperationsTicketSettingsUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Printing.PrintOperationsShippingLabel.PrintOperationsShippingLabelUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Printing.PrintOperationsShipmentLabels.PrintOperationsShipmentLabelsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Printing.ListOperationsLabelPrinters.ListOperationsLabelPrintersUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Printing.GetOperationsShippingLabel.GetOperationsShippingLabelUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Printing.ListOperationsLabelsToPrint.ListOperationsLabelsToPrintUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Shipments.GetMyOperationsShipmentChoices.GetMyOperationsShipmentChoicesUseCase>();
@@ -627,6 +797,7 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<Vixly.Operations.Application.UseCases.Company.GetOperationsCompany.GetOperationsCompanyUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Company.UpdateOperationsCompanyContacts.UpdateOperationsCompanyContactsUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Company.SubmitOperationsCompanyChange.SubmitOperationsCompanyChangeUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Company.UpdateOperationsCompanyProfile.UpdateOperationsCompanyProfileUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Company.WithdrawOperationsCompanyChange.WithdrawOperationsCompanyChangeUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Company.GetOperationsBilling.GetOperationsBillingUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Company.CreateOperationsPayLink.CreateOperationsPayLinkUseCase>();
@@ -669,9 +840,11 @@ public static class OperationsInfrastructureServiceCollectionExtensions
             client.Timeout = TimeSpan.FromSeconds(Math.Clamp(options.TimeoutSeconds, 1, 60));
         });
         services.AddSingleton<IOperationsPlatformClient, OperationsPlatformClient>();
+        services.AddSingleton<OperationsMaintenanceReader>();
         services.AddSingleton<IOperationsTenantDirectory, OperationsTenantDirectory>();
 
         services.AddScoped<ResolveOperationsTenantUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Settings.AdoptOperationsCompanyTimeZone.AdoptOperationsCompanyTimeZoneUseCase>();
         services.AddScoped<OperationsOutboxWriter>();
         services.AddScoped<OperationsOutboxDispatcher>();
         services.AddScoped<OperationsPlatformFeedClock>();

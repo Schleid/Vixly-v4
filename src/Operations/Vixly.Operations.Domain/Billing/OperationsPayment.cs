@@ -19,7 +19,8 @@ namespace Vixly.Operations.Domain.Billing;
 // =========================================================
 public sealed class OperationsPayment : OperationsEntity
 {
-    public const int MaxTenders = 3;
+    // Payments are added one by one at the cashier (owner, 2026-10-26); a card, when there is one, is the last of them.
+    public const int MaxTenders = 6;
 
     private readonly List<OperationsPaymentTender> _tenders = new();
 
@@ -105,8 +106,54 @@ public sealed class OperationsPayment : OperationsEntity
         return payment;
     }
 
+    // The customer reports a Zelle or bank transfer on the portal (owner, 2026-10-27): the whole amount left, with the reference, waiting for finance.
+    // Nobody took it at a desk, so no person and no drawer; "Not received" undoes it as at the cashier.
+    public static OperationsPayment Report(Guid tenantId, OperationsInvoice invoice, string number, OperationsPaymentMethod method, string? reference, bool zelleTermsAccepted,
+        Guid requestKey, DateTimeOffset utcNow)
+    {
+        ArgumentNullException.ThrowIfNull(invoice);
+        invoice.EnsureIssued();
+
+        if (method is not (OperationsPaymentMethod.Zelle or OperationsPaymentMethod.BankTransfer))
+        {
+            throw new DomainException(OperationsPaymentErrors.MethodNotAccepted);
+        }
+
+        if (invoice.Owed <= 0m || invoice.PendingTotal != 0m || invoice.OnAccount != OperationsAccountCharge.None)
+        {
+            throw new DomainException(OperationsPaymentErrors.NothingOwed);
+        }
+
+        if (method == OperationsPaymentMethod.Zelle && !zelleTermsAccepted)
+        {
+            throw new DomainException(OperationsPaymentErrors.ZelleTermsRequired);
+        }
+
+        // Finance matches the money in the bank by this reference.
+        string written = OperationsBillingLimits.Text(reference, 60, OperationsPaymentErrors.TextInvalid) ?? throw new DomainException(OperationsPaymentErrors.ReferenceRequired);
+        decimal owed = invoice.Owed;
+        OperationsPayment payment = new(tenantId, utcNow)
+        {
+            Number = number,
+            InvoiceId = invoice.Id,
+            CustomerId = invoice.CustomerId,
+            WarehouseId = invoice.WarehouseId,
+            TakenByUserId = null,
+            TakenUtc = utcNow,
+            CurrencyCode = invoice.CurrencyCode,
+            ZelleTermsAccepted = method == OperationsPaymentMethod.Zelle,
+            RequestKey = requestKey,
+            Total = owed
+        };
+        payment._tenders.Add(new OperationsPaymentTender(method, owed, null, written));
+        payment.Pending = true;
+        invoice.Paid(0m, owed, utcNow);
+        return payment;
+    }
+
+    // The card part, when given, is what Stripe confirmed for the rest (owner, 2026-10-26): the other parts were held on the card charge until then.
     public static OperationsPayment Take(Guid tenantId, OperationsInvoice invoice, string number, IReadOnlyList<OperationsTenderDraft> drafts, OperationsCashDrawer? drawer,
-        bool zelleTermsAccepted, Guid takenBy, Guid requestKey, DateTimeOffset utcNow)
+        bool zelleTermsAccepted, Guid takenBy, Guid requestKey, DateTimeOffset utcNow, OperationsCardPart? card = null)
     {
         ArgumentNullException.ThrowIfNull(invoice);
         ArgumentNullException.ThrowIfNull(drafts);
@@ -120,14 +167,19 @@ public sealed class OperationsPayment : OperationsEntity
 
         List<OperationsTenderDraft> parts = drafts.Where(draft => draft.Amount != 0m).ToList();
 
-        // A card is never typed in: it is recorded only on Stripe's word (TakeByCard).
-        if (parts.Count is 0 or > MaxTenders || parts.Any(draft => !Enum.IsDefined(draft.Method) || draft.Method == OperationsPaymentMethod.Card || draft.Amount < 0m
+        // A card is never typed in: it is recorded only on Stripe's word (TakeByCard, or the card part).
+        if ((parts.Count == 0 && card is null) || parts.Count + (card is null ? 0 : 1) > MaxTenders || parts.Any(draft => !Enum.IsDefined(draft.Method) || draft.Method == OperationsPaymentMethod.Card || draft.Amount < 0m
             || decimal.Round(draft.Amount, 2) != draft.Amount))
         {
             throw new DomainException(OperationsPaymentErrors.AmountInvalid);
         }
 
-        if (parts.Sum(draft => draft.Amount) != owed)
+        if (card is not null && (card.Amount <= 0m || decimal.Round(card.Amount, 2) != card.Amount || string.IsNullOrWhiteSpace(card.PaymentIntentId) || card.PaymentIntentId.Length > 60))
+        {
+            throw new DomainException(OperationsPaymentErrors.AmountInvalid);
+        }
+
+        if (parts.Sum(draft => draft.Amount) + (card?.Amount ?? 0m) != owed)
         {
             throw new DomainException(OperationsPaymentErrors.NotInFull);
         }
@@ -176,6 +228,11 @@ public sealed class OperationsPayment : OperationsEntity
             payment._tenders.Add(new OperationsPaymentTender(draft.Method, draft.Amount,
                 draft.Method == OperationsPaymentMethod.Cash ? draft.CashGiven : null,
                 OperationsBillingLimits.Text(draft.Reference, 60, OperationsPaymentErrors.TextInvalid)));
+        }
+
+        if (card is not null)
+        {
+            payment._tenders.Add(new OperationsPaymentTender(OperationsPaymentMethod.Card, card.Amount, null, card.PaymentIntentId));
         }
 
         payment.Total = owed;

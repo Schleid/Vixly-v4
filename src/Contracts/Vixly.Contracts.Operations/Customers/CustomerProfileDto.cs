@@ -12,4 +12,6 @@
 // IMPORTANT NOTES:
 // - Wire type: add fields at the end, never rename (ADR-0014)
 // =========================================================
-public sealed record CustomerProfileDto(Guid CustomerId, string? Code, string FirstName, string LastName, string? CompanyName, string Email, string Phone, string Language, IReadOnlyList<CustomerMailboxDto> Mailboxes);
+public sealed record CustomerProfileDto(Guid CustomerId, string? Code, string FirstName, string LastName, string? CompanyName, string Email, string Phone, string Language, IReadOnlyList<CustomerMailboxDto> Mailboxes,
+    Vixly.Contracts.Operations.Packages.CustomerAddressDto? HomeAddress = null,
+    bool WelcomeTourPending = false);

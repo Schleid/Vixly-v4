@@ -16,6 +16,13 @@ namespace Vixly.Operations.Domain.Receiving;
 // =========================================================
 public static class OperationsReceivingErrors
 {
+    // Slice 12D: a shelf count already finished, or full (500 scans).
+    public static Error CountClosed { get; } = Error.Create("ops.receiving.count_closed");
+
+    public static Error CountFull { get; } = Error.Create("ops.receiving.count_full", ("max", OperationsShelfCount.MaxScans));
+
+    public static Error ShelfUnknown { get; } = Error.Create("ops.receiving.shelf_unknown");
+
     public static Error TrackingNumberInvalid { get; } = Error.Create("ops.receiving.tracking_number_invalid");
 
     public static Error CarrierInvalid { get; } = Error.Create("ops.receiving.carrier_invalid");

@@ -31,14 +31,18 @@ public sealed class ListOperationsRolesUseCase
 
     private readonly IOperationsUnitOfWork _unitOfWork;
 
+    private readonly OperationsStandardRoleSetup _standard;
+
     public ListOperationsRolesUseCase(
         OperationsAccess access,
         IOperationsRoleRepository roles,
-        IOperationsUnitOfWork unitOfWork)
+        IOperationsUnitOfWork unitOfWork,
+        OperationsStandardRoleSetup standard)
     {
         _access = access ?? throw new ArgumentNullException(nameof(access));
         _roles = roles ?? throw new ArgumentNullException(nameof(roles));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        _standard = standard ?? throw new ArgumentNullException(nameof(standard));
     }
 
     public async Task<ListOperationsRolesResponse> ExecuteAsync(
@@ -57,9 +61,19 @@ public sealed class ListOperationsRolesUseCase
         }
 
         // The Administrator role exists from the first look, so it can be given.
+        bool created = false;
+
         if (await _roles.FindAdministratorAsync(cancellationToken) is null)
         {
             await _access.AdministratorRoleAsync(context.RequiredTenantId, cancellationToken);
+            created = true;
+        }
+
+        // Owner, 2026-10-29 (R-5): so are the standard roles, for new and existing companies.
+        created |= await _standard.EnsureAsync(context.RequiredTenantId, cancellationToken) > 0;
+
+        if (created)
+        {
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
 

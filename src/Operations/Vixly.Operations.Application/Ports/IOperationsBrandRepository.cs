@@ -10,6 +10,7 @@ namespace Vixly.Operations.Application.Ports;
 //
 // RESPONSIBILITIES:
 // - Find and add
+// - List the companies that have a brand (system scope, for the nightly send to the Cloudflare Worker)
 //
 // IMPORTANT NOTES:
 // - One per tenant
@@ -19,4 +20,6 @@ public interface IOperationsBrandRepository
     Task<OperationsTenantBrand?> FindAsync(CancellationToken cancellationToken);
 
     void Add(OperationsTenantBrand brand);
+
+    Task<IReadOnlyList<Guid>> ListTenantIdsAsync(CancellationToken cancellationToken);
 }

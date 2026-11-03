@@ -38,7 +38,7 @@ internal sealed class IdentityTestKit
         Scope.Enter(TenantId);
         Context = OperationsAuthorizationContext.ForTenant(TenantId, settingUp);
         Audit = new OperationsAuditTrail(Store, Scope, Services, Clock);
-        Steps = new OperationsSignInSteps(Store, Store, Store, Services, Services, Audit, Store, Clock, Store);
+        Steps = new OperationsSignInSteps(Store, Store, Store, Services, Services, Audit, Store, Clock, Store, Store);
     }
 
     public Guid TenantId { get; } = Guid.NewGuid();
@@ -63,9 +63,21 @@ internal sealed class IdentityTestKit
 
     public FakePlanFeatures Features { get; } = new();
 
-    public BeginOperationsSignInUseCase Begin() => new(Store, Services, Steps, Audit, Store, Devices, new OperationsAccess(Store, new FakeRoleStore(), Store, Clock, new FakeSiteStore(), Features));
+    public FakeDeviceBlocks Blocks { get; } = new();
+
+    public BeginOperationsSignInUseCase Begin() => new(Store, Services, Steps, Audit, Store, Devices, new OperationsAccess(Store, new FakeRoleStore(), Store, Clock, new FakeSiteStore(), Features, Store),
+        new Vixly.Operations.Application.Identity.OperationsDeviceBlocking(Blocks, new Vixly.Operations.Application.Messaging.OperationsOutboxWriter(new FakeStores(), Clock), Audit, Clock));
 
     public CompleteOperationsSignInWithAuthenticatorCodeUseCase Verify() => new(Steps, Services);
+
+    // Slice 12A: badge and PIN sign-in.
+    public Vixly.Operations.Application.UseCases.SignIn.BeginOperationsQuickSignIn.BeginOperationsQuickSignInUseCase Quick() =>
+        new(Store, Store, Services, Services, Steps, Audit, Store, Devices, new OperationsAccess(Store, new FakeRoleStore(), Store, Clock, new FakeSiteStore(), Features, Store),
+            new Vixly.Operations.Application.Identity.OperationsDeviceBlocking(Blocks, new Vixly.Operations.Application.Messaging.OperationsOutboxWriter(new FakeStores(), Clock), Audit, Clock), Store);
+
+    public Vixly.Operations.Application.UseCases.SignIn.CompleteOperationsSignInWithPassword.CompleteOperationsSignInWithPasswordUseCase PasswordCheck() => new(Steps, Services);
+
+    public Vixly.Operations.Application.UseCases.SignIn.ListOperationsDevicePeople.ListOperationsDevicePeopleUseCase DevicePeople() => new(Store, Store, Devices, Clock);
 
     public CompleteOperationsSignInWithRecoveryCodeUseCase Recovery() => new(Steps, Services);
 
@@ -75,7 +87,7 @@ internal sealed class IdentityTestKit
 
     public FakeCustomerStore Customers { get; } = new();
 
-    public AcceptOperationsInvitationUseCase Accept() => new(Store, Store, Customers, Services, Services, Steps, Audit, Store, new OperationsAccess(Store, new FakeRoleStore(), Store, Clock, new FakeSiteStore(), Features));
+    public AcceptOperationsInvitationUseCase Accept() => new(Store, Store, Customers, Services, Services, Steps, Audit, Store, new OperationsAccess(Store, new FakeRoleStore(), Store, Clock, new FakeSiteStore(), Features, Store));
 
     public SignOutOperationsUseCase SignOut() => new(Store, Audit, Store, Clock);
 

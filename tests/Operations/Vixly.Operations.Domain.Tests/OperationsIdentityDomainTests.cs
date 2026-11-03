@@ -238,4 +238,21 @@ public sealed class OperationsIdentityDomainTests
         owner.AcceptInvitation("hash", Now);
         return owner;
     }
+
+    // Owner, R-6: a device blocked after a sign-in from another country is lifted once, by an administrator; the block stays as history.
+    [Fact]
+    public void DeviceBlock_IsLiftedOnce_AndKeepsWhereItWasUsed()
+    {
+        DateTimeOffset now = new(2026, 10, 22, 12, 0, 0, TimeSpan.Zero);
+        OperationsDeviceBlock block = OperationsDeviceBlock.Block(Guid.NewGuid(), Guid.NewGuid(), "Front desk", "D-000001", "us", "fr", Guid.NewGuid(), now);
+
+        Assert.True(block.IsOpen);
+        Assert.Equal("US", block.RegisteredCountry);
+        Assert.Equal("FR", block.Country);
+        Assert.True(block.Unblock(Guid.NewGuid(), now.AddMinutes(5)));
+        Assert.False(block.IsOpen);
+        Assert.False(block.Unblock(Guid.NewGuid(), now.AddMinutes(6)));
+        Assert.Equal(now.AddMinutes(5), block.UnblockedUtc);
+        Assert.Throws<ArgumentException>(() => OperationsDeviceBlock.Block(Guid.NewGuid(), Guid.Empty, null, null, "US", "FR", null, now));
+    }
 }

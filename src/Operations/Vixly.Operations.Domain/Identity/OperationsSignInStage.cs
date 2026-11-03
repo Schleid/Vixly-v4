@@ -15,5 +15,8 @@
 public enum OperationsSignInStage
 {
     SecondFactor = 0,
-    Enrolment = 1
+    Enrolment = 1,
+
+    // Slice 12A: the daily check of a badge or PIN sign-in, for a person without an authenticator.
+    Password = 2
 }

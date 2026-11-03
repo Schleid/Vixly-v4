@@ -35,28 +35,77 @@ internal sealed class OperationsTicketRepository : IOperationsTicketRepository
     public Task<OperationsTicket?> GetAsync(Guid ticketId, CancellationToken cancellationToken) =>
         _context.Tickets.FirstOrDefaultAsync(item => item.Id == ticketId, cancellationToken);
 
+    // The customer's own (an agent's tickets are never the customer's).
     public Task<OperationsTicket?> FindOpenAsync(Guid customerId, string trackingNumber, CancellationToken cancellationToken) =>
-        _context.Tickets.FirstOrDefaultAsync(item => item.CustomerId == customerId && item.TrackingNumber == trackingNumber && item.Status != OperationsTicketStatus.Resolved,
-            cancellationToken);
+        _context.Tickets.FirstOrDefaultAsync(item => item.CustomerId == customerId && item.TrackingNumber == trackingNumber && item.Status != OperationsTicketStatus.Resolved
+            && item.OpenedBy == OperationsTicketSource.Customer, cancellationToken);
 
     public async Task<IReadOnlyList<OperationsTicket>> ListForCustomerAsync(Guid customerId, int take, CancellationToken cancellationToken) =>
-        await _context.Tickets.AsNoTracking().Where(item => item.CustomerId == customerId).OrderByDescending(item => item.CreatedUtc).Take(take).ToListAsync(cancellationToken);
+        await _context.Tickets.AsNoTracking().Where(item => item.CustomerId == customerId && item.OpenedBy == OperationsTicketSource.Customer)
+            .OrderByDescending(item => item.CreatedUtc).Take(take).ToListAsync(cancellationToken);
 
-    public async Task<(IReadOnlyList<OperationsTicket> Items, int TotalCount)> ListAsync(IReadOnlyCollection<Guid> warehouses, OperationsTicketStatus? status, int page, int pageSize,
-        CancellationToken cancellationToken)
+    public async Task<(IReadOnlyList<OperationsTicket> Items, int TotalCount)> ListAsync(IReadOnlyDictionary<OperationsTicketTopic, IReadOnlyCollection<Guid>> scope,
+        Vixly.Operations.Application.Tickets.OperationsTicketDeskFilter filter, int page, int pageSize, CancellationToken cancellationToken)
     {
-        List<Guid> shown = warehouses.ToList();
-        IQueryable<OperationsTicket> query = _context.Tickets.AsNoTracking().Where(item => shown.Contains(item.WarehouseId));
+        ArgumentNullException.ThrowIfNull(scope);
+        ArgumentNullException.ThrowIfNull(filter);
 
-        if (status is { } wanted)
+        // One list per topic: a ticket shows only where its department is the person's.
+        List<Guid> package = Of(OperationsTicketTopic.Package), billing = Of(OperationsTicketTopic.Billing), pickup = Of(OperationsTicketTopic.PickupDelivery),
+            claim = Of(OperationsTicketTopic.Claim), other = Of(OperationsTicketTopic.Other);
+        IQueryable<OperationsTicket> query = _context.Tickets.AsNoTracking().Where(item =>
+            (item.Topic == OperationsTicketTopic.Package && package.Contains(item.WarehouseId))
+            || (item.Topic == OperationsTicketTopic.Billing && billing.Contains(item.WarehouseId))
+            || (item.Topic == OperationsTicketTopic.PickupDelivery && pickup.Contains(item.WarehouseId))
+            || (item.Topic == OperationsTicketTopic.Claim && claim.Contains(item.WarehouseId))
+            || (item.Topic == OperationsTicketTopic.Other && other.Contains(item.WarehouseId)));
+
+        if (filter.Topic is { } topic)
         {
-            query = query.Where(item => item.Status == wanted);
+            query = query.Where(item => item.Topic == topic);
         }
 
+        if (filter.WarehouseId is { } warehouse)
+        {
+            query = query.Where(item => item.WarehouseId == warehouse);
+        }
+
+        if (filter.TakenBy is { } person)
+        {
+            query = query.Where(item => item.TakenByUserId == person);
+        }
+
+        query = filter.State switch
+        {
+            "new" => query.Where(item => item.Status == OperationsTicketStatus.Open && item.TakenByUserId == null),
+            "taken" => query.Where(item => item.Status == OperationsTicketStatus.Open && item.TakenByUserId != null),
+            "open" => query.Where(item => item.Status == OperationsTicketStatus.Open),
+            "answered" => query.Where(item => item.Status == OperationsTicketStatus.Answered),
+            "resolved" => query.Where(item => item.Status == OperationsTicketStatus.Resolved),
+            "escalated" => query.Where(item => item.Status != OperationsTicketStatus.Resolved && item.EscalationsSent > 0),
+            _ => query
+        };
+
         int total = await query.CountAsync(cancellationToken);
-        List<OperationsTicket> items = await query.OrderBy(item => item.Status).ThenBy(item => item.CreatedUtc).Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+        List<OperationsTicket> items = await query
+            .OrderBy(item => item.Status == OperationsTicketStatus.Resolved)
+            .ThenByDescending(item => item.EscalationsSent)
+            .ThenBy(item => item.Status)
+            .ThenBy(item => item.CreatedUtc)
+            .Skip((Math.Max(page, 1) - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
         return (items, total);
+
+        List<Guid> Of(OperationsTicketTopic topic) => scope.TryGetValue(topic, out IReadOnlyCollection<Guid>? ids) ? ids.ToList() : new List<Guid>();
     }
+
+    public async Task<IReadOnlyList<OperationsTicket>> ListEscalatableAsync(DateTimeOffset openedBefore, int take, CancellationToken cancellationToken) =>
+        await Escalatable(openedBefore).OrderBy(item => item.CreatedUtc).Take(take).ToListAsync(cancellationToken);
+
+    public async Task<IReadOnlyList<Guid>> ListTenantsWithEscalatableAsync(DateTimeOffset openedBefore, CancellationToken cancellationToken) =>
+        await Escalatable(openedBefore).AsNoTracking().Select(item => item.TenantId).Distinct().Take(10_000).ToListAsync(cancellationToken);
+
+    private IQueryable<OperationsTicket> Escalatable(DateTimeOffset openedBefore) =>
+        _context.Tickets.Where(item => item.Status != OperationsTicketStatus.Resolved && item.EscalationsSent < 2 && item.CreatedUtc <= openedBefore);
 
     public async Task<IReadOnlyList<OperationsParcel>> ListLookalikesAsync(OperationsTicket ticket, int take, CancellationToken cancellationToken)
     {

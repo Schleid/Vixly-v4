@@ -31,14 +31,14 @@ public sealed class OperationsShipmentDomainTests
     private static readonly DateTimeOffset Now = new(2026, 10, 18, 12, 0, 0, TimeSpan.Zero);
 
     [Fact]
-    public void Pickup_IsAtAnActiveDestinationBranch_AndGivesItsCountry()
+    public void Pickup_IsAtAnActiveBranchOffice_AndGivesItsCountry()
     {
-        OperationsShipmentInstructions pickup = OperationsShipmentInstructions.Pickup(Branch(OperationsBranchSide.Destination), " Ana Pierre ", "+509 3712 3456",
+        OperationsShipmentInstructions pickup = OperationsShipmentInstructions.Pickup(Branch(), " Ana Pierre ", "+509 3712 3456",
             OperationsShipmentOptions.Consolidate | OperationsShipmentOptions.Insured);
 
         Assert.Equal(("HT", "Ana Pierre", "+50937123456"), (pickup.CountryCode, pickup.RecipientName, pickup.RecipientPhone));
         Assert.Equal("ops.shipments.destination_invalid",
-            Assert.Throws<DomainException>(() => OperationsShipmentInstructions.Pickup(Branch(OperationsBranchSide.Origin), "Ana", "+50937123456", OperationsShipmentOptions.None)).Error.Code);
+            Assert.Throws<DomainException>(() => OperationsShipmentInstructions.Pickup(Branch(office: false), "Ana", "+50937123456", OperationsShipmentOptions.None)).Error.Code);
     }
 
     [Theory]
@@ -57,7 +57,7 @@ public sealed class OperationsShipmentDomainTests
         OperationsShipment shipment = OperationsShipment.Request(Tenant, Customer, Warehouse, Home("Ana Pierre", "+50937123456"), Now);
         Assert.True(shipment.HasInstructions);
 
-        shipment.ChangeInstructions(OperationsShipmentInstructions.Pickup(Branch(OperationsBranchSide.Both), "Marie Pierre", "+50937123457", OperationsShipmentOptions.Refrigerated), Now);
+        shipment.ChangeInstructions(OperationsShipmentInstructions.Pickup(Branch(), "Marie Pierre", "+50937123457", OperationsShipmentOptions.Refrigerated), Now);
         Assert.Equal(("Marie Pierre", OperationsShipmentOptions.Refrigerated), (shipment.RecipientName, shipment.Options));
         Assert.Null(shipment.DeliveryAddress);
 
@@ -202,9 +202,9 @@ public sealed class OperationsShipmentDomainTests
     private static OperationsShipmentInstructions Home(string name, string phone) =>
         OperationsShipmentInstructions.HomeDelivery(OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"), name, phone, OperationsShipmentOptions.None);
 
-    private static OperationsBranch Branch(OperationsBranchSide side) =>
-        OperationsBranch.Create(Tenant, new OperationsLocationDetails("PAP", "Port-au-Prince office", OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT"),
-            null, null, null, true), side, Now);
+    private static OperationsBranch Branch(bool office = true) =>
+        OperationsBranch.Create(Tenant, new OperationsLocationDetails("PAP", "Haiti", office ? OperationsPostalAddress.Create("12 Rue Capois", null, "Port-au-Prince", null, null, "HT") : null,
+            null, null, null, true), "HT", OperationsBranchLegal.None, Now);
 
     // Slice 5A: staff change the service of an open shipment that says where it goes; never the waiting one or a cancelled one.
     [Fact]

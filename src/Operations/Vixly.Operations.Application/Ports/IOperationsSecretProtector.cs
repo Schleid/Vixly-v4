@@ -17,4 +17,9 @@ public interface IOperationsSecretProtector
     string Protect(string value);
 
     string? Unprotect(string protectedValue);
+
+    // A secret kept under its own purpose, so it can never be read as another kind (Slice 9 review: the company's Twilio token).
+    string Protect(string value, string purpose);
+
+    string? Unprotect(string protectedValue, string purpose);
 }

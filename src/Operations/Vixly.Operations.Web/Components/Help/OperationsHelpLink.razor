@@ -1,0 +1,32 @@
+﻿@using System.Globalization
+@using Microsoft.AspNetCore.Routing
+@using Vixly.Operations.Web.Features.Help
+@inject IOperationsHelpReaderSource Reader
+@inject OperationsHelpCatalogue Help
+@inject IHttpContextAccessor Http
+@inject IStringLocalizer<OperationsText> T
+@* =========================================================
+   FILE: OperationsHelpLink.razor
+
+   PURPOSE:
+   Opens visible help for the current staff page.
+
+   RESPONSIBILITIES:
+   - Share the request's reader rules with its help page.
+
+   IMPORTANT NOTES:
+   - Uses route templates, never user or company record IDs.
+   ========================================================= *@
+<VxHelpLink Href="@_address" Label="@T["ui.help.context"]" />
+
+@code {
+    private string _address = "/staff/help";
+    [Parameter] public string? Company { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        OperationsHelpReaderContext context = await Reader.GetAsync(Company);
+        string? route = (Http.HttpContext?.GetEndpoint() as RouteEndpoint)?.RoutePattern.RawText;
+        _address = Help.ContextAddress(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, route, context.Reader);
+    }
+}

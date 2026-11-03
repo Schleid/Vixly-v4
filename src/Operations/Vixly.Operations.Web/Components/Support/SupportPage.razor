@@ -184,6 +184,14 @@ IMPORTANT NOTES:
                         <AntiforgeryToken />
                         <input type="hidden" name="caller" value="@CallerToken" />
                         <input type="hidden" name="number" value="@Number" />
+                        <label>@T["ui.tickets.topic"]
+                            <select name="topic" required>
+                                @foreach (Vixly.Operations.Domain.Tickets.OperationsTicketTopic topic in Enum.GetValues<Vixly.Operations.Domain.Tickets.OperationsTicketTopic>())
+                                {
+                                    <option value="@topic" selected="@(topic == (found.IsPackage ? Vixly.Operations.Domain.Tickets.OperationsTicketTopic.Package : Vixly.Operations.Domain.Tickets.OperationsTicketTopic.Other))">@T["ui.tickets.topic." + topic]</option>
+                                }
+                            </select>
+                        </label>
                         <label class="ops-editor__form-span-full">
                             <span class="vx-visually-hidden">@T["ui.support.request_title"]</span>
                             <textarea name="text" maxlength="1000" rows="3" required placeholder="@T["ui.support.request_placeholder"]" aria-label="@T["ui.support.request_title"]" style="width: 100%; min-height: 80px;"></textarea>

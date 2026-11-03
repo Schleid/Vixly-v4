@@ -53,6 +53,10 @@ IMPORTANT NOTES:
             <p class="ops-editor__hint">@T["ui.delivery.start_hint"]</p>
         }
     </section>
+    @if (MapAttribution is not null && Status == OperationsRouteStatus.Out)
+    {
+        <RouteMapPanel RouteId="@RouteId" Attribution="@MapAttribution" />
+    }
     <section class="ops-editor__panel" aria-labelledby="stops-title">
         <h2 id="stops-title" class="ops-section-title">@T["ui.delivery.stops"] (@Stops.Count)</h2>
         @if (Stops.Count == 0)
@@ -70,7 +74,7 @@ IMPORTANT NOTES:
                         <span class="ops-editor__status" data-status="@OperationsDeliveryWords.Status(stop.Status)">@T["ui.delivery.stop_status." + stop.Status]</span>
                     </h3>
                     <p>@stop.AddressLine</p>
-                    @if (stop.RecipientPhone is { } phone) { <p><a href="tel:@phone">@phone</a></p> }
+                    @if (stop.RecipientPhone is { } phone) { <p><a href="tel:@phone">@Vixly.Shared.Localization.VixlyPhone.International(phone)</a></p> }
                     <p>
                         @VixlyText.Format(T, "ui.delivery.parcels_line", "count", stop.Parcels)
                         @if (stop.Status == OperationsStopStatus.Pending && stop.Due > 0m) { <strong> · @VixlyText.Format(T, "ui.delivery.collect", new Dictionary<string, object> { ["amount"] = OperationsDeliveryWords.Amount(stop.Due), ["currency"] = stop.CurrencyCode ?? CurrencyCode })</strong> }
@@ -84,6 +88,7 @@ IMPORTANT NOTES:
                             @if (stop.FromSheet) { <span> · @T["ui.delivery.from_sheet"]</span> }
                             @if (stop.Photographed) { <span> · @T["ui.pickup.photographed"]</span> }
                             @if (stop.CodeChecked) { <span> · @T["ui.pickup.code_checked"]</span> }
+                            @if (stop.CodeUnconfirmed) { <span class="ops-editor__status" data-status="unpaid">@T["ui.delivery.code_unconfirmed"]</span> }
                             @if (stop.CashCollected > 0m) { <span> · @VixlyText.Format(T, "ui.delivery.collected", new Dictionary<string, object> { ["amount"] = OperationsDeliveryWords.Amount(stop.CashCollected), ["currency"] = stop.CurrencyCode ?? CurrencyCode })</span> }
                         </p>
                     }
@@ -174,10 +179,21 @@ IMPORTANT NOTES:
     {
         <script src="/js/ops-signature.js?v=20261020-1" defer></script>
     }
+    @if (CanRecord && Status == OperationsRouteStatus.Out && !(Planner && Recording == OperationsDeliveryRecording.Sheet))
+    {
+        @* Slice 12B: the stops are kept on the phone and sent when there is a signal. *@
+        <DriveQueueText RouteId="@RouteId" />
+        <script src="/js/ops-drive.js?v=20261023-1" defer></script>
+        @* Slice 12C: the driver's phone says where it is while the route is out (the server keeps it only from the driver). *@
+        <script src="/js/ops-drive-location.js?v=20261023-1" defer data-route="@RouteId"></script>
+    }
 </EditorShell>
 
 @code {
     [Parameter] public string? Company { get; set; }
+
+    // Slice 12C: the map's credit line; none when no map is configured.
+    [Parameter] public string? MapAttribution { get; set; }
 
     [Parameter] public Guid RouteId { get; set; }
 

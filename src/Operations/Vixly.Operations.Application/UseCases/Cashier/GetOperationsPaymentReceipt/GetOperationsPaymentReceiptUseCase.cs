@@ -77,13 +77,14 @@ public sealed class GetOperationsPaymentReceiptUseCase
         }
 
         OperationsTenantSettings settings = await _settings.FindAsync(cancellationToken) ?? OperationsTenantSettings.CreateDefault(context.RequiredTenantId, _timeProvider.GetUtcNow());
+        string? tracking = invoice.ShipmentId is { } shipmentId ? await _billing.FindTrackingNumberAsync(shipmentId, cancellationToken) : null;
         CultureInfo before = CultureInfo.CurrentUICulture;
 
         try
         {
             CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(invoice.Language);
             return GetOperationsPaymentReceiptResponse.Success(_renderer.RenderPaymentReceipt(new OperationsPaymentReceipt(payment, invoice, OperationsPaymentNames.Others(settings),
-                OperationsTimeZones.Today(payment.TakenUtc, settings.TimeZone))),
+                OperationsTimeZones.Today(payment.TakenUtc, settings.TimeZone), tracking)),
                 payment.Number + ".pdf");
         }
         finally

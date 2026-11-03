@@ -53,5 +53,20 @@ public enum OperationsCustomerMailKind
     OutForDeliveryCode = 23,
 
     // Review item 3: a work email tried to open a customer account.
-    EmailNotAllowed = 24
+    EmailNotAllowed = 24,
+
+    // Owner, 2026-10-31: the company suspended, reactivated, closed or banned the customer's account; never the internal reason.
+    AccountSuspended = 30,
+
+    AccountReactivated = 31,
+
+    AccountClosed = 32,
+
+    AccountBanned = 33,
+
+    // A suspension that ends by itself on a given day.
+    AccountSuspendedUntil = 34,
+
+    // Owner, 2026-10-28: a quote, with its PDF attached.
+    Quote = 25
 }

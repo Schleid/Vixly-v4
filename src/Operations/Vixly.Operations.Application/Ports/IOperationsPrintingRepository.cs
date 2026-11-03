@@ -37,4 +37,13 @@ public interface IOperationsPrintingRepository
     Task<IReadOnlyList<OperationsPrintJob>> ListWaitingJobsAsync(Guid warehouseId, DateTimeOffset utcNow, int max, CancellationToken cancellationToken);
 
     Task<OperationsPrintJob?> GetJobAsync(Guid jobId, CancellationToken cancellationToken);
+
+    // Slice 12E: the waiting labels one print program may take: a phone only its portable printers', a computer only the others'.
+    Task<IReadOnlyList<OperationsPrintJob>> ListWaitingJobsForAsync(Guid warehouseId, Guid? phoneAgentId, DateTimeOffset utcNow, int max, CancellationToken cancellationToken);
+
+    void Add(OperationsPrintPairing pairing);
+
+    Task<OperationsPrintPairing?> FindPairingAsync(string codeHash, CancellationToken cancellationToken);
+
+    Task<OperationsLabelPrinter?> FindPhonePrinterAsync(Guid agentId, string address, CancellationToken cancellationToken);
 }

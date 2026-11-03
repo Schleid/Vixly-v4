@@ -156,7 +156,7 @@ public sealed class PlatformTenantRegistration : AuditableEntity
             OwnerEmail = ownerEmail,
             OwnerPhone = ownerPhone,
             Language = language,
-            TimeZone = PlatformTimeZones.Normalize(timeZone),
+            TimeZone = PlatformCompanyTimeZones.Choose(timeZone, company.Address),
             Slug = PlatformPortalSlugFormat.Normalize(slug),
             AccessTokenHash = PlatformTokenHash.Require(accessTokenHash),
             AccessExpiresUtc = utcNow.Add(PlatformTenantLimits.RegistrationAccessLifetime),

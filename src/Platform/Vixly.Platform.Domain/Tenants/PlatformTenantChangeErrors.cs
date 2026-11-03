@@ -37,4 +37,7 @@ public static class PlatformTenantChangeErrors
     public static Error AlreadyPending { get; } = Error.Create("platform.tenant_changes.already_pending");
 
     public static Error NotFound { get; } = Error.Create("platform.tenant_changes.not_found");
+
+    // 2026-10-25: the company edits its profile itself; only the legal name needs a request with proof.
+    public static Error LegalNameNeedsRequest { get; } = Error.Create("platform.tenant_changes.legal_name_needs_request");
 }

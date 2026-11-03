@@ -19,7 +19,8 @@ namespace Vixly.Operations.Application.Tests.Fakes;
 // IMPORTANT NOTES:
 // - Tests only. Nothing is written until SaveChangesAsync, as with EF
 // =========================================================
-internal sealed class FakeIdentityStore : IOperationsUserRepository, IOperationsSessionRepository, IOperationsSignInChallengeRepository, IOperationsAccountTokenRepository, IOperationsAuditRepository, IOperationsBrandRepository, IOperationsSettingsRepository, IOperationsUnitOfWork
+internal sealed class FakeIdentityStore : IOperationsUserRepository, IOperationsSessionRepository, IOperationsSignInChallengeRepository, IOperationsAccountTokenRepository, IOperationsAuditRepository, IOperationsBrandRepository, IOperationsSettingsRepository, IOperationsUnitOfWork,
+    IOperationsQuickSignInRepository
 {
     private readonly List<object> _pending = new();
 
@@ -36,6 +37,32 @@ internal sealed class FakeIdentityStore : IOperationsUserRepository, IOperations
     public List<OperationsTenantBrand> Brands { get; } = new();
 
     public int Saves { get; private set; }
+
+    // Slice 12A: badges, PINs and the people of each device, kept at once (they are only read back after a save in these tests).
+    public List<OperationsStaffBadge> Badges { get; } = new();
+
+    public List<OperationsStaffPin> Pins { get; } = new();
+
+    public List<OperationsDevicePerson> DevicePeople { get; } = new();
+
+    public void Add(OperationsStaffBadge badge) => Badges.Add(badge);
+
+    public void Add(OperationsStaffPin pin) => Pins.Add(pin);
+
+    public void Add(OperationsDevicePerson person) => DevicePeople.Add(person);
+
+    public Task<OperationsStaffBadge?> FindBadgeAsync(string codeHash, CancellationToken cancellationToken) => Task.FromResult(Badges.FirstOrDefault(item => item.CodeHash == codeHash));
+
+    public Task<OperationsStaffBadge?> FindActiveBadgeAsync(Guid userId, CancellationToken cancellationToken) =>
+        Task.FromResult(Badges.FirstOrDefault(item => item.UserId == userId && item.IsActive));
+
+    public Task<OperationsStaffPin?> FindPinAsync(Guid userId, CancellationToken cancellationToken) => Task.FromResult(Pins.FirstOrDefault(item => item.UserId == userId));
+
+    public Task<OperationsDevicePerson?> FindDevicePersonAsync(Guid deviceId, Guid userId, CancellationToken cancellationToken) =>
+        Task.FromResult(DevicePeople.FirstOrDefault(item => item.DeviceId == deviceId && item.UserId == userId));
+
+    public Task<IReadOnlyList<OperationsDevicePerson>> ListDevicePeopleAsync(Guid deviceId, DateTimeOffset sinceUtc, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<OperationsDevicePerson>>(DevicePeople.Where(item => item.DeviceId == deviceId && item.LastSignInUtc >= sinceUtc).OrderByDescending(item => item.LastSignInUtc).ToList());
 
     public void Add(OperationsUser user) => _pending.Add(user);
 
@@ -60,6 +87,9 @@ internal sealed class FakeIdentityStore : IOperationsUserRepository, IOperations
     public Task<OperationsUser?> FindByEmailAsync(EmailAddress email, CancellationToken cancellationToken) => Task.FromResult(Users.FirstOrDefault(user => user.Email == email));
 
     public Task<bool> AnyAsync(CancellationToken cancellationToken) => Task.FromResult(Users.Count > 0);
+
+    public Task<IReadOnlyList<OperationsUser>> ListAdministratorsAsync(CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<OperationsUser>>(Users.Where(user => user.IsOwner || user.IsAdministrator).ToList());
 
     public Task<IReadOnlyList<OperationsUser>> ListPartnerAgentsAsync(Guid warehouseId, CancellationToken cancellationToken) =>
         Task.FromResult<IReadOnlyList<OperationsUser>>(Users.Where(user => user.PartnerWarehouseId == warehouseId).ToList());
@@ -98,6 +128,8 @@ internal sealed class FakeIdentityStore : IOperationsUserRepository, IOperations
         Task.FromResult(Tokens.FirstOrDefault(token => token.TokenHash == tokenHash));
 
     public Task<OperationsTenantBrand?> FindAsync(CancellationToken cancellationToken) => Task.FromResult(Brands.FirstOrDefault());
+
+    public Task<IReadOnlyList<Guid>> ListTenantIdsAsync(CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<Guid>>(Brands.Select(brand => brand.TenantId).Distinct().ToList());
 
     public Task<bool> SaveChangesAsync(CancellationToken cancellationToken)
     {

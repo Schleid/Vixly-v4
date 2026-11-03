@@ -56,8 +56,14 @@ public sealed class ListMyOperationsInvoicesUseCase
         }
 
         IReadOnlyList<OperationsInvoice> invoices = await _billing.ListCustomerInvoicesAsync(signedIn.Customer.Id, 100, cancellationToken);
+
+        // The methods the company offers on the portal (owner, 2026-10-27): each switched on in Settings and set up.
+        Vixly.Operations.Domain.Settings.OperationsTenantSettings? settings = await _settings.FindAsync(cancellationToken);
+        bool connected = await _cards.GetProviderAsync(cancellationToken) is not null;
         return ListMyOperationsInvoicesResponse.Success(invoices,
             await _billing.ListApprovedCreditNotesAsync(invoices.Select(invoice => invoice.Id).ToList(), cancellationToken),
-            Vixly.Operations.Application.Cards.OperationsCardDesk.Offered(await _settings.FindAsync(cancellationToken), await _cards.GetProviderAsync(cancellationToken) is not null));
+            settings?.OffersOnPortal(Vixly.Operations.Domain.Billing.OperationsPaymentMethod.Card, connected) == true,
+            settings?.OffersOnPortal(Vixly.Operations.Domain.Billing.OperationsPaymentMethod.Zelle, false) == true,
+            settings?.OffersOnPortal(Vixly.Operations.Domain.Billing.OperationsPaymentMethod.BankTransfer, false) == true);
     }
 }

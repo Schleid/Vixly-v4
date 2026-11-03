@@ -95,6 +95,27 @@ public sealed class OperationsCompanyClient : IOperationsCompanyClient
         return refused is null ? OperationsPlatformCall<bool>.Ok(true) : OperationsPlatformCall<bool>.Refused(Translate(refused));
     }
 
+    public async Task<OperationsPlatformCall<bool>> UpdateProfileAsync(OperationsPlatformActor actor, OperationsCompanyChangeInput input, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(actor);
+        ArgumentNullException.ThrowIfNull(input);
+        PlatformCompanyChangeBody body = new()
+        {
+            TradingName = input.TradingName,
+            Email = input.Email,
+            Phone = input.Phone,
+            AddressLine1 = input.AddressLine1,
+            AddressLine2 = input.AddressLine2,
+            City = input.City,
+            StateProvince = input.StateProvince,
+            PostalCode = input.PostalCode,
+            CountryCode = input.CountryCode
+        };
+        (_, string? refused) = await _sender.SendAsync<object>(HttpMethod.Put, "internal/v1/tenant/company", actor.TenantId, actor, body, cancellationToken);
+
+        return refused is null ? OperationsPlatformCall<bool>.Ok(true) : OperationsPlatformCall<bool>.Refused(Translate(refused));
+    }
+
     public async Task<OperationsPlatformCall<bool>> WithdrawChangeAsync(OperationsPlatformActor actor, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(actor);
@@ -166,6 +187,8 @@ public sealed class OperationsCompanyClient : IOperationsCompanyClient
         "platform.tenant_changes.reason_required" or "platform.tenant_changes.reason_too_long" => OperationsCompanyErrors.ReasonRequired,
         "platform.tenant_changes.not_found" or "platform.tenant_changes.not_pending" => OperationsCompanyErrors.NoChange,
         "platform.tenants.time_zone_invalid" => OperationsCompanyErrors.TimeZoneInvalid,
+        "platform.tenant_changes.legal_name_needs_request" => OperationsCompanyErrors.LegalNameNeedsRequest,
+        "shared.email.invalid" or "shared.phone.invalid" => OperationsCompanyErrors.DetailsInvalid,
         "platform.tenants.contact_name_required" or "platform.tenants.contact_name_too_long" or "platform.tenants.contact_role_duplicate"
             or "platform.tenants.contact_role_invalid" or "platform.tenant_account.owner_contact_locked" => OperationsCompanyErrors.ContactInvalid,
         "platform.billing.invoice_paid" or "platform.billing.invoice_void" or "platform.billing.invoice_not_found" or "platform.billing.method_not_allowed"

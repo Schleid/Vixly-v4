@@ -1,0 +1,35 @@
+﻿@*
+=========================================================
+FILE: SiteFaq.razor
+
+PURPOSE:
+The questions and answers of a home page.
+
+RESPONSIBILITIES:
+- Render the accordion when the company shows questions
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText and the tenant texts; values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); every value is HTML-encoded by Razor
+- Native details and summary: keyboard and screen readers work without script
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+@if (Items.Count > 0)
+{
+    <section class="site-section site-section--faq" aria-labelledby="faq-title">
+        <h2 id="faq-title">@T["site.faq.title"]</h2>
+        @foreach ((string question, string answer) in Items)
+        {
+            <details class="site-faq"><summary>@question</summary><p>@answer</p></details>
+        }
+    </section>
+}
+
+@code {
+    private IReadOnlyList<(string Question, string Answer)> Items => OperationsSiteHome.Faq(Page);
+
+    [Parameter, EditorRequired]
+    public OperationsSitePage Page { get; set; } = null!;
+}

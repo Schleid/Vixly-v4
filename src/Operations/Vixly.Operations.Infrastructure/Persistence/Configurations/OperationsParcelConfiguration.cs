@@ -82,6 +82,8 @@ internal sealed class OperationsParcelConfiguration : IEntityTypeConfiguration<O
         builder.HasOne<Vixly.Operations.Domain.Bundles.OperationsRepackBox>().WithMany().HasForeignKey(item => item.BoxId).OnDelete(DeleteBehavior.Restrict);
         builder.HasIndex(item => new { item.TenantId, item.BundleId });
         builder.HasIndex(item => new { item.TenantId, item.BoxId });
+        // Slice 10: the company API and webhooks read in order of creation.
+        builder.HasIndex(item => new { item.TenantId, item.CreatedUtc });
         builder.HasOne<OperationsPreAlert>().WithMany().HasForeignKey(item => item.PreAlertId).OnDelete(DeleteBehavior.Restrict);
 
         // The customer must be of the parcel's own tenant: the key includes the tenant (review M2).

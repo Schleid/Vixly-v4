@@ -60,6 +60,16 @@ public sealed class OperationsDbContext : DbContext, IDataProtectionKeyContext
 
     public DbSet<OperationsUserSession> UserSessions => Set<OperationsUserSession>();
 
+    public DbSet<OperationsDeviceBlock> DeviceBlocks => Set<OperationsDeviceBlock>();
+
+    public DbSet<OperationsStaffBadge> StaffBadges => Set<OperationsStaffBadge>();
+
+    public DbSet<Vixly.Operations.Domain.Receiving.OperationsShelfCount> ShelfCounts => Set<Vixly.Operations.Domain.Receiving.OperationsShelfCount>();
+
+    public DbSet<OperationsStaffPin> StaffPins => Set<OperationsStaffPin>();
+
+    public DbSet<OperationsDevicePerson> DevicePeople => Set<OperationsDevicePerson>();
+
     public DbSet<OperationsSignInChallenge> SignInChallenges => Set<OperationsSignInChallenge>();
 
     public DbSet<OperationsAccountToken> AccountTokens => Set<OperationsAccountToken>();
@@ -75,6 +85,12 @@ public sealed class OperationsDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<OperationsWarehouse> Warehouses => Set<OperationsWarehouse>();
 
     public DbSet<OperationsCountryContact> CountryContacts => Set<OperationsCountryContact>();
+
+    public DbSet<Vixly.Operations.Domain.Branding.OperationsSiteTestimonial> SiteTestimonials => Set<Vixly.Operations.Domain.Branding.OperationsSiteTestimonial>();
+
+    public DbSet<Vixly.Operations.Domain.Items.OperationsParcelItem> ParcelItems => Set<Vixly.Operations.Domain.Items.OperationsParcelItem>();
+
+    public DbSet<Vixly.Operations.Domain.Items.OperationsItemCatalogueEntry> ItemCatalogue => Set<Vixly.Operations.Domain.Items.OperationsItemCatalogueEntry>();
 
     public DbSet<OperationsRole> Roles => Set<OperationsRole>();
 
@@ -107,6 +123,8 @@ public sealed class OperationsDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<Vixly.Operations.Domain.Printing.OperationsPrintAgent> PrintAgents => Set<Vixly.Operations.Domain.Printing.OperationsPrintAgent>();
 
     public DbSet<Vixly.Operations.Domain.Printing.OperationsPrintJob> PrintJobs => Set<Vixly.Operations.Domain.Printing.OperationsPrintJob>();
+
+    public DbSet<Vixly.Operations.Domain.Printing.OperationsPrintPairing> PrintPairings => Set<Vixly.Operations.Domain.Printing.OperationsPrintPairing>();
 
     public DbSet<Vixly.Operations.Domain.Settings.OperationsNumberSequence> NumberSequences => Set<Vixly.Operations.Domain.Settings.OperationsNumberSequence>();
 
@@ -172,6 +190,24 @@ public sealed class OperationsDbContext : DbContext, IDataProtectionKeyContext
 
     public DbSet<Vixly.Operations.Domain.Screens.OperationsScreenRecord> ScreenRecords => Set<Vixly.Operations.Domain.Screens.OperationsScreenRecord>();
 
+    public DbSet<Vixly.Operations.Domain.Payables.OperationsVendor> Vendors => Set<Vixly.Operations.Domain.Payables.OperationsVendor>();
+
+    public DbSet<Vixly.Operations.Domain.Payables.OperationsBill> Bills => Set<Vixly.Operations.Domain.Payables.OperationsBill>();
+
+    public DbSet<Vixly.Operations.Domain.Texts.OperationsTextProvider> TextProviders => Set<Vixly.Operations.Domain.Texts.OperationsTextProvider>();
+
+    public DbSet<Vixly.Operations.Domain.Texts.OperationsTextMessage> TextMessages => Set<Vixly.Operations.Domain.Texts.OperationsTextMessage>();
+
+    public DbSet<Vixly.Operations.Domain.Reports.OperationsReportSchedule> ReportSchedules => Set<Vixly.Operations.Domain.Reports.OperationsReportSchedule>();
+
+    public DbSet<Vixly.Operations.Domain.Api.OperationsApiEvent> ApiEvents => Set<Vixly.Operations.Domain.Api.OperationsApiEvent>();
+
+    public DbSet<Vixly.Operations.Domain.Api.OperationsApiKey> ApiKeys => Set<Vixly.Operations.Domain.Api.OperationsApiKey>();
+
+    public DbSet<Vixly.Operations.Domain.Api.OperationsWebhookEndpoint> WebhookEndpoints => Set<Vixly.Operations.Domain.Api.OperationsWebhookEndpoint>();
+
+    public DbSet<Vixly.Operations.Domain.Api.OperationsWebhookDelivery> WebhookDeliveries => Set<Vixly.Operations.Domain.Api.OperationsWebhookDelivery>();
+
     // Slice 5F step 2b: customers' credit accounts.
     public DbSet<Vixly.Operations.Domain.Billing.OperationsCreditAccount> CreditAccounts => Set<Vixly.Operations.Domain.Billing.OperationsCreditAccount>();
 
@@ -199,6 +235,8 @@ public sealed class OperationsDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<Vixly.Operations.Domain.Delivery.OperationsDeliveryRoute> DeliveryRoutes => Set<Vixly.Operations.Domain.Delivery.OperationsDeliveryRoute>();
 
     public DbSet<Vixly.Operations.Domain.Delivery.OperationsDeliveryStop> DeliveryStops => Set<Vixly.Operations.Domain.Delivery.OperationsDeliveryStop>();
+
+    public DbSet<Vixly.Operations.Domain.Delivery.OperationsDriverPosition> DriverPositions => Set<Vixly.Operations.Domain.Delivery.OperationsDriverPosition>();
 
     // Slice 7: what did not match at a destination.
     public DbSet<Vixly.Operations.Domain.Arrivals.OperationsArrivalDiscrepancy> ArrivalDiscrepancies => Set<Vixly.Operations.Domain.Arrivals.OperationsArrivalDiscrepancy>();
@@ -231,14 +269,93 @@ public sealed class OperationsDbContext : DbContext, IDataProtectionKeyContext
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
+        GiveTrackingNumbersAsync(false, CancellationToken.None).GetAwaiter().GetResult();
+        RecordApiEvents();
         CheckTenantOfChanges();
         return base.SaveChanges(acceptAllChangesOnSuccess);
     }
 
-    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
+        await GiveTrackingNumbersAsync(true, cancellationToken);
+        RecordApiEvents();
         CheckTenantOfChanges();
-        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+    // =====================================================
+    // METHOD: GIVE TRACKING NUMBERS
+    // Owner, 2026-10-28: a shipment gets its tracking number in the same save that makes it paid, charged to an account
+    // or collect, whichever screen or webhook did it. The housekeeping round gives any that were missed.
+    // =====================================================
+    private async Task GiveTrackingNumbersAsync(bool isAsync, CancellationToken cancellationToken)
+    {
+        Dictionary<Guid, DateTimeOffset> due = new();
+
+        foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<Vixly.Operations.Domain.Billing.OperationsInvoice> entry in ChangeTracker.Entries<Vixly.Operations.Domain.Billing.OperationsInvoice>())
+        {
+            if (entry.State is EntityState.Added or EntityState.Modified && entry.Entity.ShipmentId is { } shipmentId && entry.Entity.Released)
+            {
+                due[shipmentId] = entry.Entity.LastModifiedUtc ?? entry.Entity.CreatedUtc;
+            }
+        }
+
+        foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<Vixly.Operations.Domain.Shipments.OperationsShipment> entry in ChangeTracker.Entries<Vixly.Operations.Domain.Shipments.OperationsShipment>())
+        {
+            if (entry.State is EntityState.Added or EntityState.Modified && entry.Entity.CollectReadyForTracking)
+            {
+                due[entry.Entity.Id] = entry.Entity.LastModifiedUtc ?? entry.Entity.CreatedUtc;
+            }
+        }
+
+        foreach ((Guid shipmentId, DateTimeOffset utcNow) in due)
+        {
+            Vixly.Operations.Domain.Shipments.OperationsShipment? shipment = Shipments.Local.FirstOrDefault(item => item.Id == shipmentId)
+                ?? (isAsync
+                    ? await Shipments.FirstOrDefaultAsync(item => item.Id == shipmentId, cancellationToken)
+                    : Shipments.FirstOrDefault(item => item.Id == shipmentId));
+
+            if (shipment is not null)
+            {
+                await GiveTrackingNumberAsync(shipment, utcNow, isAsync, cancellationToken);
+            }
+        }
+    }
+
+    // One shipment, booked and still without a number; also used by the housekeeping round (OperationsTrackingNumberBackfill).
+    internal async Task GiveTrackingNumberAsync(Vixly.Operations.Domain.Shipments.OperationsShipment shipment, DateTimeOffset utcNow, bool isAsync, CancellationToken cancellationToken)
+    {
+        if (shipment.TrackingNumber is not null || !shipment.IsBooked)
+        {
+            return;
+        }
+
+        Vixly.Operations.Domain.Settings.OperationsTenantSettings? settings = TenantSettings.Local.FirstOrDefault(item => item.TenantId == shipment.TenantId)
+            ?? (isAsync
+                ? await TenantSettings.FirstOrDefaultAsync(item => item.TenantId == shipment.TenantId, cancellationToken)
+                : TenantSettings.FirstOrDefault(item => item.TenantId == shipment.TenantId));
+        string prefix = settings?.TrackingPrefix ?? Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.DefaultPrefix;
+
+        for (int attempt = 0; ; attempt++)
+        {
+            string number = OperationsTrackingNumberSource.Next(prefix);
+            // Within the company; the unique index guards across companies (ten random digits make a clash practically impossible).
+            bool taken = Shipments.Local.Any(item => item.TrackingNumber == number)
+                || (isAsync
+                    ? await Shipments.AnyAsync(item => item.TrackingNumber == number, cancellationToken)
+                    : Shipments.Any(item => item.TrackingNumber == number));
+
+            if (!taken)
+            {
+                shipment.GiveTrackingNumber(number, utcNow);
+                return;
+            }
+
+            if (attempt >= 5)
+            {
+                throw new InvalidOperationException("No free tracking number after several tries.");
+            }
+        }
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -249,6 +366,44 @@ public sealed class OperationsDbContext : DbContext, IDataProtectionKeyContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(OperationsDbContext).Assembly);
         _testModel?.Invoke(modelBuilder);
         OperationsModelConventions.Apply(modelBuilder, this);
+    }
+
+    // =====================================================
+    // METHOD: RECORD API EVENTS
+    // Slice 10 (review): what the company's webhooks send is written in the same save as the change itself.
+    // =====================================================
+    private void RecordApiEvents()
+    {
+        List<Vixly.Operations.Domain.Api.OperationsApiEvent> events = new();
+
+        foreach (Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<OperationsEntity> entry in ChangeTracker.Entries<OperationsEntity>())
+        {
+            if (entry.State != EntityState.Added)
+            {
+                continue;
+            }
+
+            Vixly.Operations.Domain.Api.OperationsWebhookEvents kind = entry.Entity switch
+            {
+                Vixly.Operations.Domain.Tracking.OperationsTrackingEvent tracking
+                    when tracking.SubjectKind is Vixly.Operations.Domain.Tracking.OperationsTrackingSubject.Parcel or Vixly.Operations.Domain.Tracking.OperationsTrackingSubject.Shipment
+                    => Vixly.Operations.Domain.Api.OperationsWebhookEvents.Tracking,
+                Vixly.Operations.Domain.Customers.OperationsCustomer => Vixly.Operations.Domain.Api.OperationsWebhookEvents.CustomerCreated,
+                Vixly.Operations.Domain.Billing.OperationsInvoice => Vixly.Operations.Domain.Api.OperationsWebhookEvents.InvoiceIssued,
+                Vixly.Operations.Domain.Billing.OperationsPayment => Vixly.Operations.Domain.Api.OperationsWebhookEvents.PaymentRecorded,
+                _ => Vixly.Operations.Domain.Api.OperationsWebhookEvents.None
+            };
+
+            if (kind != Vixly.Operations.Domain.Api.OperationsWebhookEvents.None)
+            {
+                events.Add(Vixly.Operations.Domain.Api.OperationsApiEvent.Record(entry.Entity.TenantId, kind, entry.Entity.Id, entry.Entity.CreatedUtc));
+            }
+        }
+
+        if (events.Count > 0)
+        {
+            ApiEvents.AddRange(events);
+        }
     }
 
     // =====================================================

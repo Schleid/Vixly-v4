@@ -93,7 +93,7 @@ public sealed class OperationsSupplyDiscounts
             return (null, OperationsSupplySaleErrors.ApproverInvalid);
         }
 
-        return _stepUp.Check(view.User, approverCode) is null ? (approver.Id, null) : (null, OperationsSupplySaleErrors.ApproverInvalid);
+        return await _stepUp.CheckAsync(view.User, approverCode, cancellationToken) is null ? (approver.Id, null) : (null, OperationsSupplySaleErrors.ApproverInvalid);
     }
 
     // A wrong code for a known approver counts as a failed sign-in of theirs (the account locks as at sign-in). Saved by the caller.

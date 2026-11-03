@@ -46,7 +46,7 @@ public static class CustomerPackageEndpoints
                 : done == "cancelled" ? text["ui.shipments.done.cancelled"].Value : null));
 
         // Slice 4D: pre-alerts come first; a shipment may be chosen now or later (owner, 2026-10-19).
-        portal.MapGet("/new", async (HttpContext http, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) => await PreAlertFormAsync(http, api, text, null, null));
+        portal.MapGet("/new", async (HttpContext http, int? tour, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) => await PreAlertFormAsync(http, api, text, null, null, tour == 2));
 
         portal.MapPost("/new", async (HttpContext http, CustomerOperationsApi api, IStringLocalizer<CustomerText> text) =>
         {
@@ -198,7 +198,7 @@ public static class CustomerPackageEndpoints
     private static (Guid Tenant, string Session)? Signed(HttpContext http) =>
         CustomerTenantMiddleware.Host(http)?.TenantId is { } tenant && CustomerSessionCookie.Read(http.Request) is { } session ? (tenant, session) : null;
 
-    private static async Task<IResult> PreAlertFormAsync(HttpContext http, CustomerOperationsApi api, IStringLocalizer<CustomerText> text, CustomerPreAlertBody? entered, string? error)
+    private static async Task<IResult> PreAlertFormAsync(HttpContext http, CustomerOperationsApi api, IStringLocalizer<CustomerText> text, CustomerPreAlertBody? entered, string? error, bool tour = false)
     {
         if (Signed(http) is not { } signedIn)
         {
@@ -217,6 +217,7 @@ public static class CustomerPackageEndpoints
 
         return Page<PreAlertFormPage>(new
         {
+            TourStep = tour && choices.Value is not null ? 2 : 0,
             Brand = await api.GetBrandAsync(signedIn.Tenant, http.RequestAborted),
             Choices = choices.Value,
             Shipments = CustomerPackagePlaces.Open(packages, null),

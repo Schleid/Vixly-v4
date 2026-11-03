@@ -15,6 +15,7 @@ namespace Vixly.Operations.Infrastructure.Platform;
 // RESPONSIBILITIES:
 // - Keep each answer 5 minutes per tenant
 // - Answer the branding features when Platform cannot be reached, so the site never breaks; partner agents stay off (R-8)
+// - Read the shipment cap (0 when Platform cannot be reached: a counter never stops because of Platform)
 //
 // IMPORTANT NOTES:
 // - A plan change shows on the site, and for partner agents, within 5 minutes
@@ -58,7 +59,19 @@ public sealed class OperationsPlanFeaturesClient : IOperationsPlanFeatures
                 info.Features.Contains(OperationsPlanFeatures.Theme, StringComparer.Ordinal),
                 info.Features.Contains(OperationsPlanFeatures.Content, StringComparer.Ordinal))
             {
-                PartnerAgents = info.Features.Contains(OperationsPlanFeatures.Partners, StringComparer.Ordinal)
+                PartnerAgents = info.Features.Contains(OperationsPlanFeatures.Partners, StringComparer.Ordinal),
+                TextMessages = info.Features.Contains(OperationsPlanFeatures.Texts, StringComparer.Ordinal),
+                QuickBooksSync = info.Features.Contains(OperationsPlanFeatures.QuickBooks, StringComparer.Ordinal),
+                TenantApi = info.Features.Contains(OperationsPlanFeatures.Api, StringComparer.Ordinal),
+                CarrierData = info.Features.Contains(OperationsPlanFeatures.Carriers, StringComparer.Ordinal),
+                ShipmentCap = info.Limits is not null && info.Limits.TryGetValue(OperationsPlanFeatures.ShipmentsLimit, out int cap) && cap > 0 ? cap : 0,
+                ExtraShipmentPrice = info.ExtraShipmentPrice,
+                CurrencyCode = info.CurrencyCode,
+
+                // A company without a subscription keeps every module; a plan without a module's feature leaves it out.
+                ModulesOff = info.Status is null
+                    ? new HashSet<string>(StringComparer.Ordinal)
+                    : Vixly.Operations.Application.Plans.OperationsPlanModules.All.Where(module => !info.Features.Contains(module, StringComparer.Ordinal)).ToHashSet(StringComparer.Ordinal)
             };
             _cache.Set(key, features, Lifetime);
             return features;

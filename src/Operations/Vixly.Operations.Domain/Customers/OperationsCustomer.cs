@@ -53,6 +53,18 @@ public sealed class OperationsCustomer : OperationsEntity
 
     public string Phone { get; private set; }
 
+    // Slice 9 (owner, 2026-10-22: the customer picks the channel): how the company's notices reach them, and when they chose it (their consent to texts).
+    public Vixly.Operations.Domain.Texts.OperationsNoticeChannel NoticeChannel { get; private set; }
+
+    public DateTimeOffset? NoticeChannelUtc { get; private set; }
+
+    public void ChangeNoticeChannel(Vixly.Operations.Domain.Texts.OperationsNoticeChannel channel, DateTimeOffset utcNow)
+    {
+        NoticeChannel = Enum.IsDefined(channel) ? channel : Vixly.Operations.Domain.Texts.OperationsNoticeChannel.Email;
+        NoticeChannelUtc = utcNow;
+        MarkAsModified(utcNow);
+    }
+
     public LanguageCode PreferredLanguage { get; private set; }
 
     public OperationsCustomerStatus Status { get; private set; }
@@ -60,6 +72,9 @@ public sealed class OperationsCustomer : OperationsEntity
     public string? StatusReason { get; private set; }
 
     public DateTimeOffset? StatusChangedUtc { get; private set; }
+
+    // Owner, 2026-10-31: when a suspension ends by itself; null for one lifted by hand.
+    public DateTimeOffset? SuspendedUntil { get; private set; }
 
     public bool CreditAllowed { get; private set; }
 
@@ -77,6 +92,20 @@ public sealed class OperationsCustomer : OperationsEntity
 
     public DateTimeOffset? LastSignInUtc { get; private set; }
 
+    // The customer's home address, asked at the first sign-in or copied from V3 (owner, 2026-10-26). None until then.
+    public Vixly.Operations.Domain.Locations.OperationsPostalAddress? HomeAddress { get; private set; }
+
+    public DateTimeOffset? HomeAddressUtc { get; private set; }
+
+    public DateTimeOffset? WelcomeTourDismissedUtc { get; private set; }
+
+    public void DismissWelcomeTour(DateTimeOffset utcNow)
+    {
+        if (WelcomeTourDismissedUtc is not null) return;
+        WelcomeTourDismissedUtc = utcNow;
+        MarkAsModified(utcNow);
+    }
+
     public string FullName => FirstName + " " + LastName;
 
     // =====================================================
@@ -87,6 +116,20 @@ public sealed class OperationsCustomer : OperationsEntity
         OperationsCustomer customer = New(tenantId, firstName, lastName, companyName, email, phone, language, utcNow);
         customer.Status = OperationsCustomerStatus.PendingVerification;
         customer.PasswordHash = RequireHash(passwordHash);
+        return customer;
+    }
+
+    // =====================================================
+    // METHOD: ENTERED BY STAFF (Vixly Lite, owner 2026-10-30): a company without the customer portal enters its customers;
+    // active at once with its code, no password (no sign-in) until the company has a portal and invites them
+    // =====================================================
+    public static OperationsCustomer EnteredByStaff(Guid tenantId, string? firstName, string? lastName, string? companyName, EmailAddress email, string? phone, LanguageCode language,
+        string code, DateTimeOffset utcNow)
+    {
+        OperationsCustomer customer = New(tenantId, firstName, lastName, companyName, email, phone, language, utcNow);
+        customer.Code = RequireCode(code);
+        customer.Status = OperationsCustomerStatus.Active;
+        customer.StatusChangedUtc = utcNow;
         return customer;
     }
 
@@ -158,19 +201,39 @@ public sealed class OperationsCustomer : OperationsEntity
         FirstName = first;
         LastName = last;
         CompanyName = company;
+
+        // Slice 9 (review): consent to texts was given for the old number; a new one gets email until the customer chooses again.
+        if (checkedPhone != Phone && NoticeChannel != Vixly.Operations.Domain.Texts.OperationsNoticeChannel.Email)
+        {
+            NoticeChannel = Vixly.Operations.Domain.Texts.OperationsNoticeChannel.Email;
+            NoticeChannelUtc = utcNow;
+        }
+
         Phone = checkedPhone;
         PreferredLanguage = language;
         MarkAsModified(utcNow);
     }
 
+    // The home address; the value object checks each part before anything changes.
+    public void ChangeHomeAddress(Vixly.Operations.Domain.Locations.OperationsPostalAddress address, DateTimeOffset utcNow)
+    {
+        ArgumentNullException.ThrowIfNull(address);
+
+        HomeAddress = address;
+        HomeAddressUtc = utcNow;
+        MarkAsModified(utcNow);
+    }
+
     // Suspend and reactivate an active account; close any account that is not closed. Closed is final.
-    public void ChangeStatus(OperationsCustomerStatus status, string? reason, DateTimeOffset utcNow)
+    // Owner, 2026-10-31: suspend (until a day, or until lifted), reactivate (also reopens a closed account), close, or ban (permanent).
+    public void ChangeStatus(OperationsCustomerStatus status, string? reason, DateTimeOffset utcNow, DateTimeOffset? suspendedUntil = null)
     {
         bool allowed = status switch
         {
-            OperationsCustomerStatus.Suspended => Status == OperationsCustomerStatus.Active,
-            OperationsCustomerStatus.Active => Status == OperationsCustomerStatus.Suspended,
-            OperationsCustomerStatus.Closed => Status != OperationsCustomerStatus.Closed,
+            OperationsCustomerStatus.Suspended => Status is OperationsCustomerStatus.Active or OperationsCustomerStatus.Suspended,
+            OperationsCustomerStatus.Active => Status is OperationsCustomerStatus.Suspended or OperationsCustomerStatus.Closed,
+            OperationsCustomerStatus.Closed => Status is OperationsCustomerStatus.Active or OperationsCustomerStatus.Suspended or OperationsCustomerStatus.PendingVerification,
+            OperationsCustomerStatus.Banned => Status != OperationsCustomerStatus.Banned,
             _ => false
         };
 
@@ -179,12 +242,34 @@ public sealed class OperationsCustomer : OperationsEntity
             throw new DomainException(OperationsCustomerErrors.StatusChangeInvalid);
         }
 
+        if (suspendedUntil is { } until && (status != OperationsCustomerStatus.Suspended || until <= utcNow))
+        {
+            throw new DomainException(OperationsCustomerErrors.SuspendedUntilInvalid);
+        }
+
         // Checked before anything changes, so a refused change leaves the customer as it was.
         string checkedReason = Reason(reason);
         Status = status;
         StatusReason = checkedReason;
         StatusChangedUtc = utcNow;
+        SuspendedUntil = suspendedUntil;
         MarkAsModified(utcNow);
+    }
+
+    // Owner, 2026-10-31: a suspension with an end day is lifted once that day has come; true when it was.
+    public bool LiftSuspension(string reason, DateTimeOffset utcNow)
+    {
+        if (Status != OperationsCustomerStatus.Suspended || SuspendedUntil is not { } until || until > utcNow)
+        {
+            return false;
+        }
+
+        Status = OperationsCustomerStatus.Active;
+        StatusReason = Reason(reason);
+        StatusChangedUtc = utcNow;
+        SuspendedUntil = null;
+        MarkAsModified(utcNow);
+        return true;
     }
 
     public void SetCredit(bool allowed, string? reason, DateTimeOffset utcNow)

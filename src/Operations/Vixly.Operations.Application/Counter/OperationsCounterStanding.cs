@@ -31,6 +31,7 @@ public sealed record OperationsCounterStanding(
         OperationsCustomerStatus.Active => null,
         OperationsCustomerStatus.Suspended => "suspended",
         OperationsCustomerStatus.PendingVerification => "pending",
+        OperationsCustomerStatus.Banned => "banned",
         _ => "closed"
     };
 }

@@ -33,9 +33,12 @@ public sealed class GetMyOperationsAccountResponse
 
     public bool StepUpFresh { get; private init; }
 
-    public static GetMyOperationsAccountResponse Success(OperationsStaffMember? me, int recoveryCodesLeft, IReadOnlyList<OperationsSessionSummary> sessions, bool stepUpFresh)
+    // Require MFA = No and no authenticator: sensitive actions are confirmed with the password (owner, 2026-10-22).
+    public bool PasswordConfirms { get; private init; }
+
+    public static GetMyOperationsAccountResponse Success(OperationsStaffMember? me, int recoveryCodesLeft, IReadOnlyList<OperationsSessionSummary> sessions, bool stepUpFresh, bool passwordConfirms = false)
     {
-        return new GetMyOperationsAccountResponse { Succeeded = true, Me = me, RecoveryCodesLeft = recoveryCodesLeft, Sessions = sessions, StepUpFresh = stepUpFresh };
+        return new GetMyOperationsAccountResponse { Succeeded = true, Me = me, RecoveryCodesLeft = recoveryCodesLeft, Sessions = sessions, StepUpFresh = stepUpFresh, PasswordConfirms = passwordConfirms };
     }
 
     public static GetMyOperationsAccountResponse Failure(Error error)

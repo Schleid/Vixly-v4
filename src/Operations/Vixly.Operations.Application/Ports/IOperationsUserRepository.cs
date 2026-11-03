@@ -31,6 +31,9 @@ public interface IOperationsUserRepository
     // Slice 7 step 4 (R-8): the partner agents of a warehouse, by name.
     Task<IReadOnlyList<OperationsUser>> ListPartnerAgentsAsync(Guid warehouseId, CancellationToken cancellationToken);
 
+    // The company's active Owner and Administrators (owner, R-6: they are told when a device is blocked).
+    Task<IReadOnlyList<OperationsUser>> ListAdministratorsAsync(CancellationToken cancellationToken);
+
     // A page of staff, by name; the search matches the name or the exact email (Slice 1D).
     Task<(IReadOnlyList<OperationsUser> Items, int TotalCount)> ListAsync(string? search, int page, int pageSize, CancellationToken cancellationToken);
 }

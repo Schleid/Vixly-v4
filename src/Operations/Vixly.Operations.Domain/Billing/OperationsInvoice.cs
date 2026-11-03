@@ -135,6 +135,35 @@ public sealed class OperationsInvoice : OperationsEntity
     // At most what was credited beyond what was owed, and never more than was paid (C-8).
     public decimal Refundable => Owed < 0m ? Math.Min(-Owed, PaidTotal - RefundedTotal) : 0m;
 
+    // Freight collect or paid here (owner, 2026-10-27): a payment term, not an amount, so the issued invoice keeps its lines and totals.
+    // Only a shipment's invoice, still issued, with nothing paid, pending or charged to an account; collect never with supplies.
+    public bool ChangePaymentPlace(bool payAtDestination, DateTimeOffset utcNow)
+    {
+        if (Kind != OperationsInvoiceKind.Shipment || ShipmentId is null || Status != OperationsInvoiceStatus.Issued)
+        {
+            throw new DomainException(OperationsBillingErrors.CollectNotPossible);
+        }
+
+        if (PaidTotal != 0m || PendingTotal != 0m || OnAccount != OperationsAccountCharge.None)
+        {
+            throw new DomainException(OperationsBillingErrors.CollectAfterPayment);
+        }
+
+        if (payAtDestination && _lines.Any(line => line.SupplyId is not null))
+        {
+            throw new DomainException(OperationsBillingErrors.CollectWithSupplies);
+        }
+
+        if (PayAtDestination == payAtDestination)
+        {
+            return false;
+        }
+
+        PayAtDestination = payAtDestination;
+        MarkAsModified(utcNow);
+        return true;
+    }
+
     public bool CanVoid => Status == OperationsInvoiceStatus.Issued && CreditedTotal == 0m && PaidTotal == 0m && PendingTotal == 0m;
 
     public OperationsPaymentState PaymentState => Status == OperationsInvoiceStatus.Voided ? OperationsPaymentState.Voided

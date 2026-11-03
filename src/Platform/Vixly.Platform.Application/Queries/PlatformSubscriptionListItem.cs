@@ -31,4 +31,6 @@ public sealed record PlatformSubscriptionListItem(
     DateTimeOffset? TrialEndsUtc,
     bool CancelAtPeriodEnd,
     bool HasScheduledChange,
-    bool HasDiscount);
+    bool HasDiscount,
+    int? Shipments = null,
+    string? ShipmentsMonth = null);

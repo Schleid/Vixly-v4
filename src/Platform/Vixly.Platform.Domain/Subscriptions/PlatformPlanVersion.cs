@@ -54,6 +54,9 @@ public sealed class PlatformPlanVersion : AuditableEntity
 
     public int? TrialDays { get; private set; }
 
+    // Shipment cap (owner, 2026-10-29): the price of each shipment above the cap.
+    public decimal ExtraShipmentPrice { get; private set; }
+
     public DateTimeOffset? PublishedUtc { get; private set; }
 
     public Guid? PublishedByUserId { get; private set; }
@@ -85,7 +88,8 @@ public sealed class PlatformPlanVersion : AuditableEntity
         TrialDays,
         Limit(PlatformPlanLimitKind.MaxLicensedDevices),
         Limit(PlatformPlanLimitKind.MaxWarehouses),
-        _features.Select(item => item.Feature));
+        _features.Select(item => item.Feature))
+        .WithShipmentCap(Limit(PlatformPlanLimitKind.MaxShipmentsPerMonth), ExtraShipmentPrice);
 
     public int Limit(PlatformPlanLimitKind kind)
     {
@@ -208,10 +212,16 @@ public sealed class PlatformPlanVersion : AuditableEntity
         SetupFee = terms.SetupFee;
         MinimumLicences = terms.MinimumLicences;
         TrialDays = terms.TrialDays;
+        ExtraShipmentPrice = terms.ExtraShipmentPrice;
 
         _limits.Clear();
         _limits.Add(new PlatformPlanVersionLimit(PlatformPlanLimitKind.MaxLicensedDevices, terms.MaxLicensedDevices));
         _limits.Add(new PlatformPlanVersionLimit(PlatformPlanLimitKind.MaxWarehouses, terms.MaxWarehouses));
+
+        if (terms.MaxShipmentsPerMonth > 0)
+        {
+            _limits.Add(new PlatformPlanVersionLimit(PlatformPlanLimitKind.MaxShipmentsPerMonth, terms.MaxShipmentsPerMonth));
+        }
 
         _features.Clear();
         _features.AddRange(terms.Features.Select(feature => new PlatformPlanVersionFeature(feature)));

@@ -39,14 +39,18 @@ public sealed class CloseOperationsDispatchUseCase
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly Vixly.Operations.Application.Items.OperationsItemCheck _itemCheck;
+
     public CloseOperationsDispatchUseCase(
         OperationsBundleDesk desk,
         IOperationsDispatchRepository dispatches,
         OperationsDispatching dispatching,
         OperationsDispatchPapers papers,
         IOperationsUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        Vixly.Operations.Application.Items.OperationsItemCheck itemCheck)
     {
+        _itemCheck = itemCheck ?? throw new ArgumentNullException(nameof(itemCheck));
         _desk = desk ?? throw new ArgumentNullException(nameof(desk));
         _dispatches = dispatches ?? throw new ArgumentNullException(nameof(dispatches));
         _dispatching = dispatching ?? throw new ArgumentNullException(nameof(dispatching));
@@ -86,6 +90,12 @@ public sealed class CloseOperationsDispatchUseCase
         if (parcels.Any(OperationsDispatching.Held))
         {
             return CloseOperationsDispatchResponse.Failure(OperationsDispatchErrors.ParcelHeld);
+        }
+
+        // Owner, 2026-11-01: the same items check as at bundling, again (an item changed after its bundle closed).
+        if (await _itemCheck.RefuseAsync(parcels, cancellationToken) is { } incomplete)
+        {
+            return CloseOperationsDispatchResponse.Failure(incomplete);
         }
 
         try

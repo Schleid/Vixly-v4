@@ -41,6 +41,12 @@ public static class PlatformApiHost
     public static WebApplication Build(string[] args, Action<WebApplicationBuilder>? configure)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+        // A missing setting names itself on a setup page instead of failing the start (owner, 2026-10-23).
+        if (Vixly.Shared.Hosting.Settings.VixlySettingsCheck.Run(builder, PlatformApiSettings.Site, PlatformApiSettings.All, configure) is { } setup)
+        {
+            return setup;
+        }
         PlatformApiOptions api = builder.Configuration.GetSection(PlatformApiOptions.SectionName).Get<PlatformApiOptions>() ?? new PlatformApiOptions();
 
         builder.Services.AddPlatformInfrastructure(builder.Configuration, "Vixly.V4.Platform.Api");
@@ -64,7 +70,7 @@ public static class PlatformApiHost
 
         WebApplication app = builder.Build();
 
-        app.UseForwardedHeaders();
+        app.UseVixlyForwardedHeaders();
         app.UseVixlySecurityHeaders();
         app.UseExceptionHandler(errors => errors.Run(context =>
         {
@@ -112,6 +118,7 @@ public static class PlatformApiHost
         app.MapPlatformPaymentEndpoints();
         app.MapPlatformLegalEndpoints();
         app.MapPlatformLeadEndpoints();
+        app.MapPlatformMaintenanceEndpoints();
         app.MapPlatformSimulatedCheckout(app.Environment);
         app.MapPlatformInternalEndpoints();
 

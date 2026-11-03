@@ -136,7 +136,9 @@ public sealed class RecordOperationsDeliveryStopUseCase
         }
 
         IReadOnlyList<OperationsParcel> parcels = view.ParcelsOf(shipment.Id);
-        DateTimeOffset utcNow = _timeProvider.GetUtcNow();
+
+        // Slice 12B: the time of the stop as the phone kept it, between the route's start and now (a wrong phone clock never moves it outside).
+        DateTimeOffset utcNow = Happened(request.HappenedUtc, view.Route.StartedUtc, _timeProvider.GetUtcNow());
         Guid userId = access!.User.Id;
 
         if (!request.Delivered)
@@ -192,30 +194,51 @@ public sealed class RecordOperationsDeliveryStopUseCase
         }
 
         bool codeChecked = false;
+        bool codeUnconfirmed = false;
 
         if (proofs.HasFlag(OperationsDeliveryProofs.Code))
         {
+            // Slice 12B: without a signal the phone could not check the code; the parcel is handed over already, so the stop is kept and marked.
             if (_codes.Current(shipment) is null)
             {
-                return RecordOperationsDeliveryStopResponse.Failure(shipment.PickupCodeLocked ? OperationsPickupErrors.CodeLocked : OperationsPickupErrors.CodeNotSent);
-            }
+                if (!request.Queued)
+                {
+                    return RecordOperationsDeliveryStopResponse.Failure(shipment.PickupCodeLocked ? OperationsPickupErrors.CodeLocked : OperationsPickupErrors.CodeNotSent);
+                }
 
+                codeUnconfirmed = true;
+            }
             // Every try is counted before the code is compared, in one statement; five stop the code (as at the counter).
-            if (!await _pickups.CountCodeTryAsync(shipment, cancellationToken))
+            else if (!await _pickups.CountCodeTryAsync(shipment, cancellationToken))
             {
-                return RecordOperationsDeliveryStopResponse.Failure(OperationsPickupErrors.CodeLocked);
+                if (!request.Queued)
+                {
+                    return RecordOperationsDeliveryStopResponse.Failure(OperationsPickupErrors.CodeLocked);
+                }
+
+                codeUnconfirmed = true;
             }
-
-            codeChecked = _codes.Matches(shipment, request.Code);
-
-            if (!codeChecked)
+            else
             {
-                _audit.Record(userId, "ops.delivery.code_failed", nameof(OperationsShipment), shipment.Id, after: new { tries = shipment.PickupCodeFailures });
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
-                return RecordOperationsDeliveryStopResponse.Failure(shipment.PickupCodeLocked ? OperationsPickupErrors.CodeLocked : OperationsPickupErrors.CodeWrong);
-            }
+                codeChecked = _codes.Matches(shipment, request.Code);
 
-            shipment.PickupCodeAccepted(utcNow);
+                if (!codeChecked)
+                {
+                    _audit.Record(userId, "ops.delivery.code_failed", nameof(OperationsShipment), shipment.Id, after: new { tries = shipment.PickupCodeFailures });
+
+                    if (!request.Queued)
+                    {
+                        await _unitOfWork.SaveChangesAsync(cancellationToken);
+                        return RecordOperationsDeliveryStopResponse.Failure(shipment.PickupCodeLocked ? OperationsPickupErrors.CodeLocked : OperationsPickupErrors.CodeWrong);
+                    }
+
+                    codeUnconfirmed = true;
+                }
+                else
+                {
+                    shipment.PickupCodeAccepted(utcNow);
+                }
+            }
         }
 
         // The proof files are written first; whatever does not end in a saved stop removes them.
@@ -240,7 +263,7 @@ public sealed class RecordOperationsDeliveryStopUseCase
 
             try
             {
-                stop.Deliver(request.ReceiverName, request.IdKind, request.IdLast, signatureKey, photoKey, codeChecked, fromSheet, cash, userId, utcNow, owedInvoices);
+                stop.Deliver(request.ReceiverName, request.IdKind, request.IdLast, signatureKey, photoKey, codeChecked, fromSheet, cash, userId, utcNow, owedInvoices, codeUnconfirmed);
                 view.Route.StopDone(cash, view.Stops.All(item => item.IsDone), utcNow);
             }
             catch (DomainException exception)
@@ -272,6 +295,11 @@ public sealed class RecordOperationsDeliveryStopUseCase
             else if (all.All(parcel => OperationsEventDesk.Finished(parcel) || parcel.Milestone == OperationsMilestone.ReadyForPickup) && shipment.PickupReadyUtc is null)
             {
                 Announce(shipment, view.Warehouse, settings, request.PortalSlug, utcNow);
+            }
+
+            if (codeUnconfirmed)
+            {
+                _audit.Record(userId, "ops.delivery.code_unconfirmed", nameof(OperationsShipment), shipment.Id, after: new { stop = stop.Id });
             }
 
             _audit.Record(userId, "ops.delivery.delivered", nameof(OperationsDeliveryRoute), view.Route.Id, after: new
@@ -404,6 +432,18 @@ public sealed class RecordOperationsDeliveryStopUseCase
         await _routes.FindStopAsync(stopId, cancellationToken) is { } saved && saved.Status == wanted
             ? RecordOperationsDeliveryStopResponse.Success()
             : RecordOperationsDeliveryStopResponse.Failure(OperationsCommonErrors.ConcurrencyConflict);
+
+    // The phone's time for the stop, kept within the route's start and now; none given, now.
+    internal static DateTimeOffset Happened(DateTimeOffset? happenedUtc, DateTimeOffset? startedUtc, DateTimeOffset utcNow)
+    {
+        if (happenedUtc is not { } happened || happened > utcNow)
+        {
+            return utcNow;
+        }
+
+        DateTimeOffset earliest = startedUtc ?? utcNow.AddDays(-1);
+        return happened < earliest ? earliest : happened;
+    }
 
     private const int SignatureMaxBytes = 200 * 1024;
 

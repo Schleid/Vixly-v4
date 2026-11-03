@@ -1,4 +1,4 @@
-﻿<Solution>
+<Solution>
   <Folder Name="/src/" />
   <Folder Name="/src/Contracts/">
     <Project Path="src/Contracts/Vixly.Contracts.Operations/Vixly.Contracts.Operations.csproj" />
@@ -19,6 +19,7 @@
     <Project Path="src/Operations/Vixly.PrintAgent/Vixly.PrintAgent.csproj" />
   </Folder>
   <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/Vixly.Shared.Help/Vixly.Shared.Help.csproj" />
     <Project Path="src/Shared/Vixly.Shared.Hosting/Vixly.Shared.Hosting.csproj" />
     <Project Path="src/Shared/Vixly.Shared.Kernel/Vixly.Shared.Kernel.csproj" />
     <Project Path="src/Shared/Vixly.Shared.Localization/Vixly.Shared.Localization.csproj" />
@@ -39,4 +40,5 @@
     <Project Path="tests/Operations/Vixly.Operations.Infrastructure.Tests/Vixly.Operations.Infrastructure.Tests.csproj" />
     <Project Path="tests/Operations/Vixly.Operations.Web.Tests/Vixly.Operations.Web.Tests.csproj" />
   </Folder>
+  <Folder Name="/tests/Shared/"><Project Path="tests/Shared/Vixly.Shared.Help.Tests/Vixly.Shared.Help.Tests.csproj" /></Folder>
 </Solution>

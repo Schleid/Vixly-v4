@@ -15,13 +15,9 @@ IMPORTANT NOTES:
 *@
 @inject IStringLocalizer<OperationsText> T
 
-<EditorShell Title="@T["ui.counts.title"]" Company="@Company" Section="parcels" Error="@Error">
+<EditorShell Title="@T["ui.counts.title"]" Company="@Company" Section="inventory" Error="@Error">
+    <InventoryTabs Current="undeclared_counts" />
     <div class="ops-stock-workflow">
-    <nav class="ops-editor__inline" aria-label="@T["ui.parcels.views"]">
-        <a href="/staff/parcels">@T["ui.parcels.view.all"]</a>
-        <a href="/staff/parcels/unidentified">@T["ui.parcels.view.unidentified"]</a>
-        <a href="/staff/parcels/counts" aria-current="page">@T["ui.counts.title"]</a>
-    </nav>
     <section class="ops-editor__panel">
         <p class="ops-editor__hint">@T["ui.counts.hint"]</p>
         @if (Warehouses.Count > 0)

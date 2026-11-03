@@ -192,7 +192,7 @@ No customer screens in this slice. The published brand (name, logos, colours, su
 - **D-O15, Shipping services:** Vixly offers five shipping services: air express, air standard, ocean consolidated (LCL), ocean full container (FCL) and ground. Platform publishes the list in `Contracts.Platform`. Each tenant chooses the ones it offers, for example air and ocean only, or ground only, and sets the label, business days and volumetric divisor.
 - **D-O16, Passkeys later:** passkeys come after the shipment slices, as a slice of their own. Until then, the authenticator app and recovery codes are the second factor.
 - **D-O17, Branding by plan (W-4):** without `portal_theme_customization` the site shows the default colours; without `homepage_content_customization` it shows the default texts and no main image. Saved choices are kept.
-- **D-O18, Staging:** `vixly.freedns.org` with wildcard DNS: `control.`, `api.`, `ops-internal.` and `{slug}.`.
+- **D-O18, Staging:** `vixly.freeddns.org` with wildcard DNS: `control.`, `api.`, `ops-internal.` and `{slug}.`.
 
 ## 11. Done when (in addition to the slice gate)
 

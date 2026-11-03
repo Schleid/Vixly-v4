@@ -117,22 +117,42 @@ IMPORTANT NOTES:
             </div>
         }
     </form>
-    @if (Profile is not null)
-    {
-        <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--vx-color-border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-            <div>
-                <strong style="font-size: 0.84rem; display: block;">@T["ui.billing_settings.logo"]</strong>
-                <span class="vx-hint">@T[Profile.HasLogo ? "ui.billing_settings.logo_set" : "ui.billing_settings.logo_none"]</span>
-            </div>
-            @if (CanEdit)
+    @* Owner, 2026-10-28: the logo section always shows, and a saved logo is shown as it prints. *@
+    <div id="company-logo" style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--vx-color-border); display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <strong style="font-size: 0.84rem; display: block;">@T["ui.billing_settings.logo"]</strong>
+            @if (Profile is null)
             {
-                <div style="display: flex; flex-direction: column; gap: 0.25rem; min-width: 14rem;">
-                    <InputFile id="profile-logo" accept="image/png,image/jpeg" OnChange="UploadAsync" aria-describedby="profile-logo-help" style="font-size: 0.8125rem;" />
-                    <span id="profile-logo-help" class="vx-hint">@VixlyText.Format(T, "ui.billing_settings.logo_help", "maxKilobytes", PlatformBillingLimits.MaxLogoKilobytes)</span>
+                <span class="vx-hint">@T["ui.billing_settings.logo_profile_first"]</span>
+            }
+            else if (Profile.Logo is { Length: > 0 } logo)
+            {
+                <div style="margin-top: 0.5rem; background: #ffffff; border: 1px solid var(--vx-color-border); border-radius: 0.375rem; padding: 0.75rem; display: inline-block;">
+                    <img src="@("data:" + (Profile.LogoContentType ?? "image/png") + ";base64," + Convert.ToBase64String(logo))" alt="@T["ui.billing_settings.logo"]" style="height: 56px; width: auto; max-width: 100%; display: block;" />
                 </div>
+                <span class="vx-hint" style="display: block; margin-top: 0.35rem;">
+                    <strong>@T["ui.billing_settings.logo_set"]</strong>
+                    · @(Profile.LogoContentType == "image/jpeg" ? "JPEG" : "PNG") · @Size(logo.Length)
+                </span>
+            }
+            else
+            {
+                <span class="vx-hint">@T["ui.billing_settings.logo_none"]</span>
             }
         </div>
-    }
+        @if (CanEdit && Profile is not null)
+        {
+            <div style="display: flex; flex-direction: column; gap: 0.35rem; min-width: 14rem;">
+                <label for="profile-logo" style="font-size: 0.8125rem;">@T[Profile.HasLogo ? "ui.billing_settings.logo_replace" : "ui.billing_settings.logo_upload"]</label>
+                <InputFile id="profile-logo" accept="image/png,image/jpeg" OnChange="UploadAsync" aria-describedby="profile-logo-help" style="font-size: 0.8125rem;" />
+                <span id="profile-logo-help" class="vx-hint">@VixlyText.Format(T, "ui.billing_settings.logo_help", "maxKilobytes", PlatformBillingLimits.MaxLogoKilobytes)</span>
+                @if (Profile.HasLogo)
+                {
+                    <button type="button" class="vx-button vx-button--secondary" disabled="@IsBusy" @onclick="RemoveAsync" style="align-self: flex-start;">@T["ui.billing_settings.logo_remove"]</button>
+                }
+            </div>
+        }
+    </div>
 </VxCard></div>
 
 @code {
@@ -169,6 +189,11 @@ IMPORTANT NOTES:
             _model = CompanyProfileModel.From(Profile);
         }
     }
+
+    // Removing goes through the same step as uploading: an empty file, with the fresh confirmation it asks for.
+    private Task RemoveAsync() => OnLogo.InvokeAsync((Array.Empty<byte>(), "image/png"));
+
+    private static string Size(int bytes) => Math.Max(1, (int)Math.Round(bytes / 1024.0)).ToString(System.Globalization.CultureInfo.CurrentCulture) + " KB";
 
     private async Task UploadAsync(InputFileChangeEventArgs args)
     {

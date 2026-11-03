@@ -33,6 +33,16 @@ public sealed class UpdateOperationsTenantSettingsRequest
 
     public bool RequireSecondFactorForAllStaff { get; init; }
 
+    // Require MFA Yes/No (owner, 2026-10-22); null leaves it as it is.
+    public bool? RequireMfa { get; init; }
+
+    // Inactivity sign-out in minutes (owner, 2026-10-27); null leaves each as it is.
+    public int? StaffIdleMinutes { get; init; }
+
+    public int? CustomerIdleMinutes { get; init; }
+
+    public int? IdleWarnMinutes { get; init; }
+
     public string ShipmentPrefix { get; init; } = string.Empty;
 
     public string ReceivingPrefix { get; init; } = string.Empty;
@@ -60,6 +70,9 @@ public sealed class UpdateOperationsTenantSettingsRequest
 
     // Slice 6B.
     public string? DispatchPrefix { get; init; }
+
+    // Owner, 2026-10-28: the two letters of the tracking numbers; null keeps the current ones.
+    public string? TrackingPrefix { get; init; }
 
     // Slice 4B: the company's IANA time zone (null keeps the current one).
     public string? TimeZone { get; init; }

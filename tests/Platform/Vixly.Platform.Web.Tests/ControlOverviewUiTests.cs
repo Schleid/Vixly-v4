@@ -76,6 +76,7 @@ public sealed class ControlOverviewUiTests : BunitContext
     {
         Services.AddLocalization();
         ComponentFactories.AddStub<Microsoft.AspNetCore.Components.Authorization.AuthorizeView>();
+        ComponentFactories.AddStub<Vixly.Platform.Web.Features.Help.PlatformHelpContextLink>();
         Services.GetRequiredService<Microsoft.AspNetCore.Components.NavigationManager>().NavigateTo("/invoices?overdue=true");
         var view = Render<Vixly.Platform.Web.Components.Layout.MainLayout>();
         var search = view.Find("form[role=search]");
@@ -85,6 +86,7 @@ public sealed class ControlOverviewUiTests : BunitContext
         Assert.False(search.QuerySelector("input")!.HasAttribute("readonly"));
         Assert.Equal("/invoices?overdue=true#vx-main-content", view.Find(".vx-skip-link").GetAttribute("href"));
         Assert.Empty(view.FindAll(".vx-sidebar__telemetry, .vx-topbar__status"));
+        Assert.Equal("Help", view.Find("a[href='/help']").TextContent.Trim());
     }
 
 }

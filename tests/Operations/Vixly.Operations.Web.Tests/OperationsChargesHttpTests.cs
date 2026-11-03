@@ -186,6 +186,18 @@ public sealed partial class OperationsChargesHttpTests : IClassFixture<Operation
             Assert.Contains(quote.Number, (await owner.GetAsync("/staff/quotes/list?search=" + quote.Number.ToLowerInvariant())).Html, StringComparison.Ordinal);
             Assert.DoesNotContain(quote.Number, (await owner.GetAsync("/staff/quotes/list?search=QT00000000")).Html, StringComparison.Ordinal);
             Assert.DoesNotContain(quote.Number, (await owner.GetAsync("/staff/quotes/list?state=expired")).Html, StringComparison.Ordinal);
+
+            // Owner, 2026-10-28: the quote prints as a PDF and is emailed to the customer with it.
+            Assert.Contains("href=\"/staff/quotes/" + quote.Id + "/pdf\"", all, StringComparison.Ordinal);
+            HttpResponseMessage pdf = (await owner.GetAsync("/staff/quotes/" + quote.Id + "/pdf")).Response;
+            Assert.Equal("application/pdf", pdf.Content.Headers.ContentType?.MediaType);
+            Assert.Equal("%PDF", System.Text.Encoding.ASCII.GetString((await pdf.Content.ReadAsByteArrayAsync())[..4]));
+            Assert.Equal("/staff/quotes/list?done=emailed&number=" + quote.Number, (await owner.PostAsync("/staff/quotes/" + quote.Id + "/email", all, ("from", "list"))).Response
+                .Headers.Location?.OriginalString);
+            Assert.Contains("Quote " + quote.Number + " emailed to the customer", (await owner.GetAsync("/staff/quotes/list?done=emailed&number=" + quote.Number)).Html, StringComparison.Ordinal);
+            Vixly.Operations.Application.Ports.OperationsCustomerMail mail = _host.CustomerMailer.Sent.Last();
+            Assert.Equal((Vixly.Operations.Application.Ports.OperationsCustomerMailKind.Quote, "valued@example.com", quote.Number + ".pdf"), (mail.Kind, mail.ToAddress, mail.Attachment?.Name));
+            Assert.Equal("%PDF", System.Text.Encoding.ASCII.GetString(mail.Attachment!.Value.Content[..4]));
             string withdraw = "/staff/quotes/" + quote.Id + "/withdraw";
             Assert.Equal("/staff/quotes/list?state=withdrawn&done=withdrawn", (await owner.PostAsync(withdraw, all, ("from", "list"))).Response.Headers.Location?.OriginalString);
             (HttpResponseMessage _, string withdrawn) = await owner.GetAsync("/staff/quotes/list?state=withdrawn&done=withdrawn");
@@ -193,6 +205,10 @@ public sealed partial class OperationsChargesHttpTests : IClassFixture<Operation
             Assert.Contains(quote.Number, withdrawn, StringComparison.Ordinal);
             Assert.Matches("ops-status-chip__label\">Withdrawn</span>\\s*<span class=\"ops-status-chip__count\">1<", withdrawn);
             Assert.Equal("/staff/quotes", (await owner.PostAsync(withdraw, listed)).Response.Headers.Location?.OriginalString);
+
+            // Withdrawn, it is not emailed again; it still prints.
+            Assert.Contains("This quote is withdrawn or past its date.", (await owner.PostAsync("/staff/quotes/" + quote.Id + "/email", withdrawn, ("from", "list"))).Html, StringComparison.Ordinal);
+            Assert.Equal("application/pdf", (await owner.GetAsync("/staff/quotes/" + quote.Id + "/pdf")).Response.Content.Headers.ContentType?.MediaType);
         }
 
         // Prices exist: the company's units are locked.
@@ -358,7 +374,7 @@ public sealed partial class OperationsChargesHttpTests : IClassFixture<Operation
         Assert.NotEmpty(receive);
         (HttpResponseMessage _, string atMiami) = await owner.GetAsync(here);
         Assert.Contains("1 supplies are at or below their reorder level.", WebUtility.HtmlDecode(atMiami), StringComparison.Ordinal);
-        Assert.Contains("TAPE · Packing tape: 28 left (reorder at 30)", WebUtility.HtmlDecode((await owner.GetAsync("/staff")).Html), StringComparison.Ordinal);
+        Assert.Matches("<strong>TAPE</strong> · Packing tape\\s*<span[^>]*>28 left \\(reorder at 30\\)</span>", WebUtility.HtmlDecode((await owner.GetAsync("/staff")).Html));
         Assert.Equal("/staff/supplies/stock?done=arrived", (await owner.PostAsync(receive, atCayes)).Response.Headers.Location?.OriginalString);
         Assert.Contains("This transfer was already received.", WebUtility.HtmlDecode((await owner.PostAsync(receive, atCayes)).Html), StringComparison.Ordinal);
 
@@ -402,8 +418,8 @@ public sealed partial class OperationsChargesHttpTests : IClassFixture<Operation
         scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
         OperationsDbContext context = scope.ServiceProvider.GetRequiredService<OperationsDbContext>();
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        OperationsBranch florida = OperationsBranch.Create(tenant, Place("MIA", "Miami", "Miami", "US"), OperationsBranchSide.Origin, now);
-        OperationsBranch haiti = OperationsBranch.Create(tenant, Place("HT", "Haiti", "Les Cayes", "HT"), OperationsBranchSide.Destination, now);
+        OperationsBranch florida = OperationsBranch.Create(tenant, Place("MIA", "Miami", "Miami", "US"), "US", OperationsBranchLegal.None, now);
+        OperationsBranch haiti = OperationsBranch.Create(tenant, Place("HT", "Haiti", "Les Cayes", "HT"), "HT", OperationsBranchLegal.None, now);
         OperationsWarehouse doral = OperationsWarehouse.Create(tenant, florida.Id, Place("DOR", "Doral", "Doral", "US"), OperationsWarehouseRoles.Receiving, true, now);
         OperationsWarehouse cayes = OperationsWarehouse.Create(tenant, haiti.Id, Place("CAY", "Les Cayes", "Les Cayes", "HT"),
             OperationsWarehouseRoles.DispatchHub | OperationsWarehouseRoles.PickupPoint, false, now);

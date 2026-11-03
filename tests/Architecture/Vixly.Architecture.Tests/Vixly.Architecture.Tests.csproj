@@ -3,6 +3,7 @@
   <!-- References every Domain and Application project so the rules below can inspect them.
        Add a reference here when a slice adds a project (checklist item in the slice gate). -->
   <ItemGroup>
+    <ProjectReference Include="../../../src/Shared/Vixly.Shared.Help/Vixly.Shared.Help.csproj" />
     <ProjectReference Include="..\..\..\src\Platform\Vixly.Platform.Domain\Vixly.Platform.Domain.csproj" />
     <ProjectReference Include="..\..\..\src\Platform\Vixly.Platform.Application\Vixly.Platform.Application.csproj" />
     <ProjectReference Include="..\..\..\src\Operations\Vixly.Operations.Domain\Vixly.Operations.Domain.csproj" />

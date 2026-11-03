@@ -71,6 +71,14 @@ public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
 
     public DbSet<PlatformPublishedEvent> PublishedEvents => Set<PlatformPublishedEvent>();
 
+    public DbSet<Vixly.Platform.Domain.Jobs.PlatformJobRun> JobRuns => Set<Vixly.Platform.Domain.Jobs.PlatformJobRun>();
+
+    public DbSet<Vixly.Platform.Domain.SalesFeed.PlatformSalesFeedEvent> SalesFeedEvents => Set<Vixly.Platform.Domain.SalesFeed.PlatformSalesFeedEvent>();
+
+    public DbSet<Vixly.Platform.Domain.SalesFeed.PlatformSalesFeedState> SalesFeedStates => Set<Vixly.Platform.Domain.SalesFeed.PlatformSalesFeedState>();
+
+    public DbSet<Vixly.Platform.Domain.Maintenance.PlatformMaintenanceWindow> MaintenanceWindows => Set<Vixly.Platform.Domain.Maintenance.PlatformMaintenanceWindow>();
+
     public DbSet<Vixly.Platform.Domain.Sales.PlatformSalesLead> SalesLeads => Set<Vixly.Platform.Domain.Sales.PlatformSalesLead>();
 
     public DbSet<Vixly.Platform.Domain.Tenants.PlatformTenantChangeRequest> TenantChangeRequests => Set<Vixly.Platform.Domain.Tenants.PlatformTenantChangeRequest>();
@@ -85,7 +93,11 @@ public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
 
     public DbSet<PlatformTenantLimitOverride> TenantLimitOverrides => Set<PlatformTenantLimitOverride>();
 
+    public DbSet<PlatformTenantShipmentUsage> TenantShipmentUsage => Set<PlatformTenantShipmentUsage>();
+
     public DbSet<PlatformSalesSettings> SalesSettings => Set<PlatformSalesSettings>();
+
+    public DbSet<PlatformSecuritySettings> SecuritySettings => Set<PlatformSecuritySettings>();
 
     public DbSet<PlatformPromotion> Promotions => Set<PlatformPromotion>();
 
@@ -154,6 +166,7 @@ public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
         ArgumentNullException.ThrowIfNull(modelBuilder);
 
         modelBuilder.HasDefaultSchema(PlatformDatabase.Schema);
+        modelBuilder.HasSequence<long>(PlatformDatabase.EmployeeNumberSequence);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PlatformDbContext).Assembly);
 
         ApplicationAssignedKeyConvention.Apply(modelBuilder);

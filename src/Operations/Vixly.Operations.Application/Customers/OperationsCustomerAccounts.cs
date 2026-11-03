@@ -40,7 +40,11 @@ public sealed class OperationsCustomerAccounts
 
     private readonly IOperationsUnitOfWork _unitOfWork;
 
+    private readonly Vixly.Operations.Application.Texts.OperationsTextDesk _texts;
+
     private readonly TimeProvider _timeProvider;
+
+    private readonly IOperationsIdleTimesReader? _idle;
 
     public OperationsCustomerAccounts(
         IOperationsCustomerRepository customers,
@@ -51,8 +55,12 @@ public sealed class OperationsCustomerAccounts
         IOperationsPortalLinks links,
         IOperationsRequestMetadata request,
         IOperationsUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        Vixly.Operations.Application.Texts.OperationsTextDesk texts,
+        TimeProvider timeProvider,
+        IOperationsIdleTimesReader? idle = null)
     {
+        _idle = idle;
+        _texts = texts ?? throw new ArgumentNullException(nameof(texts));
         _customers = customers ?? throw new ArgumentNullException(nameof(customers));
         _locations = locations ?? throw new ArgumentNullException(nameof(locations));
         _brands = brands ?? throw new ArgumentNullException(nameof(brands));
@@ -94,9 +102,12 @@ public sealed class OperationsCustomerAccounts
 
         OperationsCustomer? customer = await _customers.GetAsync(session.CustomerId, cancellationToken);
 
-        if (session.ExpiryReasonAt(utcNow) is { } reason || customer is null || customer.Status != OperationsCustomerStatus.Active)
+        // The company's inactivity time for customers (owner, 2026-10-27).
+        TimeSpan idle = (await IdleTimesAsync(cancellationToken)).Customer;
+
+        if (session.ExpiryReasonAt(utcNow, idle) is { } reason || customer is null || customer.Status != OperationsCustomerStatus.Active)
         {
-            session.End(session.ExpiryReasonAt(utcNow) ?? OperationsSessionEndReason.AccountRestricted, utcNow);
+            session.End(session.ExpiryReasonAt(utcNow, idle) ?? OperationsSessionEndReason.AccountRestricted, utcNow);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return null;
         }
@@ -177,6 +188,14 @@ public sealed class OperationsCustomerAccounts
         ArgumentNullException.ThrowIfNull(extra);
         ArgumentNullException.ThrowIfNull(worded);
         string company = (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty;
+
+        // Slice 9: by SMS or WhatsApp when the customer chose it and the company sends this notice by text; otherwise, or when the text fails, by email.
+        // A code goes by email as well (review): a text Twilio accepts can still fail to arrive.
+        if (await _texts.TrySendAsync(customer, kind, company, link, extra, cancellationToken) && !Vixly.Operations.Application.Texts.OperationsTextDesk.AlsoByEmail(kind))
+        {
+            return;
+        }
+
         await _mailer.SendAsync(new OperationsCustomerMail(kind, customer.Email.Value, customer.FullName, customer.PreferredLanguage, company, link) { Extra = extra, Worded = worded },
             cancellationToken);
     }
@@ -204,4 +223,7 @@ public sealed class OperationsCustomerAccounts
     }
 
     public string HashToken(string token) => _secrets.HashToken(token);
+
+    private async Task<Vixly.Operations.Application.Identity.OperationsIdleTimes> IdleTimesAsync(CancellationToken cancellationToken) =>
+        _idle is null ? Vixly.Operations.Application.Identity.OperationsIdleTimes.Default : await _idle.GetAsync(cancellationToken);
 }

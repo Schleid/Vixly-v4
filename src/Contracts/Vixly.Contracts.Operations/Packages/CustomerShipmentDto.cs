@@ -25,4 +25,5 @@ public sealed record CustomerShipmentDto(Guid ShipmentId, bool HasInstructions, 
     string? CollectorPhone = null,
     DateTimeOffset? PickedUpUtc = null,
     DateTimeOffset? DeliveredUtc = null,
-    bool Collect = false);
+    bool Collect = false,
+    string? TrackingNumber = null);

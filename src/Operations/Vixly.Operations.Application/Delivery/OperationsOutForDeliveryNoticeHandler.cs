@@ -33,9 +33,15 @@ public sealed class OperationsOutForDeliveryNoticeHandler : IOperationsOutboxHan
 
     private readonly IOperationsUnitOfWork _unitOfWork;
 
+    private readonly IOperationsDriverTrackingRepository _tracking;
+
+    private readonly IOperationsSecretGenerator _secrets;
+
     public OperationsOutForDeliveryNoticeHandler(IOperationsCustomerRepository customers, OperationsCustomerAccounts accounts, IOperationsReceivingRepository receiving,
-        OperationsPickupCodes codes, IOperationsUnitOfWork unitOfWork)
+        OperationsPickupCodes codes, IOperationsUnitOfWork unitOfWork, IOperationsDriverTrackingRepository tracking, IOperationsSecretGenerator secrets)
     {
+        _tracking = tracking ?? throw new ArgumentNullException(nameof(tracking));
+        _secrets = secrets ?? throw new ArgumentNullException(nameof(secrets));
         _customers = customers ?? throw new ArgumentNullException(nameof(customers));
         _accounts = accounts ?? throw new ArgumentNullException(nameof(accounts));
         _receiving = receiving ?? throw new ArgumentNullException(nameof(receiving));
@@ -77,7 +83,21 @@ public sealed class OperationsOutForDeliveryNoticeHandler : IOperationsOutboxHan
             kind = OperationsCustomerMailKind.OutForDeliveryCode;
         }
 
-        await _accounts.SendAsync(customer, kind, _accounts.PortalPage(notice.PortalSlug, "/customer/shipments"), extra, new Dictionary<string, string>(StringComparer.Ordinal),
+        // Slice 12C (owner H-5): the link follows the driver for that day; a retry of this notice makes a new one, the old one stops.
+        string page = "/customer/shipments";
+
+        if (await _tracking.FindOutStopAsync(shipment.Id, cancellationToken) is { } stop)
+        {
+            string token = OperationsDriverTracking.NewToken();
+            stop.Stop.Track(_secrets.HashToken(token), DateTimeOffset.UtcNow);
+
+            if (await _unitOfWork.SaveChangesAsync(cancellationToken))
+            {
+                page = "/customer/track/" + token;
+            }
+        }
+
+        await _accounts.SendAsync(customer, kind, _accounts.PortalPage(notice.PortalSlug, page), extra, new Dictionary<string, string>(StringComparer.Ordinal),
             cancellationToken);
     }
 }

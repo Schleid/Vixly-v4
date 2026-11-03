@@ -19,6 +19,9 @@ public interface IOperationsCompanyClient
 
     Task<OperationsPlatformCall<bool>> UpdateAsync(OperationsPlatformActor actor, IReadOnlyList<OperationsCompanyContact> contacts, string language, string timeZone, CancellationToken cancellationToken);
 
+    // 2026-10-25: the owner saves the company profile directly (everything but the legal name).
+    Task<OperationsPlatformCall<bool>> UpdateProfileAsync(OperationsPlatformActor actor, OperationsCompanyChangeInput input, CancellationToken cancellationToken);
+
     Task<OperationsCompanyChange?> GetChangeAsync(OperationsPlatformActor actor, CancellationToken cancellationToken);
 
     Task<OperationsPlatformCall<bool>> SubmitChangeAsync(OperationsPlatformActor actor, OperationsCompanyChangeInput input, CancellationToken cancellationToken);

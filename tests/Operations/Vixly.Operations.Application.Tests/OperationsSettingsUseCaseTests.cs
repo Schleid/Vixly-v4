@@ -149,13 +149,13 @@ public sealed class OperationsSettingsUseCaseTests
         return _kit.Context.WithUser(user.Id, session.Id);
     }
 
-    private OperationsAccess Access() => new(_kit.Store, _roles, _kit.Store, _kit.Clock, new FakeSiteStore(), new FakePlanFeatures());
+    private OperationsAccess Access() => new(_kit.Store, _roles, _kit.Store, _kit.Clock, new FakeSiteStore(), new FakePlanFeatures(), _kit.Store);
 
     private Task<BeginOperationsSignInResponse> Begin(string email) =>
         _kit.Begin().ExecuteAsync(_kit.Context, new BeginOperationsSignInRequest { Email = email, Password = "a long enough password" }, CancellationToken.None);
 
     private Task<UpdateOperationsTenantSettingsResponse> Update(OperationsAuthorizationContext context, bool secondFactor, string currency = "USD") =>
-        new UpdateOperationsTenantSettingsUseCase(new Fakes.FakeChargeStore(), new Fakes.FakeBillingStore(), Access(), _kit.Store, _kit.Audit, _kit.Store, _kit.Clock).ExecuteAsync(context, new UpdateOperationsTenantSettingsRequest
+        new UpdateOperationsTenantSettingsUseCase(new Fakes.FakeChargeStore(), new Fakes.FakeBillingStore(), Access(), _kit.Store, _kit.Audit, _kit.Store, _kit.Clock, new Fakes.FakeIdleTimes()).ExecuteAsync(context, new UpdateOperationsTenantSettingsRequest
         {
             CurrencyCode = currency,
             WeightUnit = OperationsWeightUnit.Kilogram,

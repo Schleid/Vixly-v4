@@ -40,7 +40,7 @@ else if (Presenter.State.User is { } user)
             <dt>@T["ui.users.authority"]</dt><dd>@T[PlatformDisplay.AuthorityKey(user.AuthorityLevel)]</dd>
             <dt>@T["ui.language"]</dt><dd>@T["ui.language." + user.PreferredLanguage]</dd>
             <dt>@T["ui.users.employee_number"]</dt><dd>@(user.EmployeeNumber ?? T["ui.common.none"].Value)</dd>
-            <dt>@T["ui.users.phone"]</dt><dd>@(user.PhoneNumber ?? T["ui.common.none"].Value)</dd>
+            <dt>@T["ui.users.phone"]</dt><dd>@(user.PhoneNumber is { } userPhone ? Vixly.Shared.Localization.VixlyPhone.International(userPhone) : T["ui.common.none"].Value)</dd>
             <dt>@T["ui.users.created"]</dt><dd>@PlatformDisplay.Utc(T, user.CreatedUtc)</dd>
             <dt>@T["ui.users.last_sign_in"]</dt><dd>@PlatformDisplay.Utc(T, user.LastSignInUtc)</dd>
         </dl>

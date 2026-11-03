@@ -34,18 +34,34 @@ public sealed class PlatformStepUpSteps
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly IPlatformSecuritySettingsRepository _security;
+
+    private readonly IPlatformIdleTimesReader? _idle;
+
     public PlatformStepUpSteps(
         IPlatformSessionRepository sessions,
         IPlatformUserRepository users,
         PlatformAuditTrail audit,
         IPlatformUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IPlatformSecuritySettingsRepository security,
+        IPlatformIdleTimesReader? idle = null)
     {
+        _idle = idle;
         _sessions = sessions ?? throw new ArgumentNullException(nameof(sessions));
         _users = users ?? throw new ArgumentNullException(nameof(users));
         _audit = audit ?? throw new ArgumentNullException(nameof(audit));
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
+        _security = security ?? throw new ArgumentNullException(nameof(security));
+    }
+
+    // Require MFA = No (owner, 2026-10-22): a person with no second factor confirms with the password.
+    public async Task<bool> PasswordConfirmsAsync(PlatformUser user, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(user);
+
+        return !user.HasSecondFactor && !PlatformSecuritySettings.Requires(await _security.GetAsync(cancellationToken));
     }
 
     public DateTimeOffset UtcNow => _timeProvider.GetUtcNow();
@@ -60,7 +76,9 @@ public sealed class PlatformStepUpSteps
             ? await _sessions.GetAsync(sessionId, cancellationToken)
             : null;
 
-        if (session is null || session.PlatformUserId != context.PlatformUserId || !session.IsValidAt(UtcNow))
+        TimeSpan idle = _idle is null ? PlatformIdentityLimits.SessionIdleTimeout : (await _idle.GetAsync(cancellationToken)).Idle;
+
+        if (session is null || session.PlatformUserId != context.PlatformUserId || !session.IsValidAt(UtcNow, idle))
         {
             return null;
         }

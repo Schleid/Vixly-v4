@@ -17,5 +17,10 @@ public enum OperationsCustomerStatus
     PendingVerification = 0,
     Active = 1,
     Suspended = 2,
-    Closed = 3
+
+    // Closed at the customer's request or by the company; it can be reopened (owner, 2026-10-31).
+    Closed = 3,
+
+    // Owner, 2026-10-31: removed for breaking the company's terms; permanent, and the email and phone cannot open a new account.
+    Banned = 4
 }

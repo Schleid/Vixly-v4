@@ -105,6 +105,11 @@ public sealed class OperationsSignInHttpTests : IClassFixture<OperationsWebDatab
         Assert.Contains("Northwind Freight", html, StringComparison.Ordinal);
         Assert.Contains("action=\"/staff/sign-in\"", html, StringComparison.Ordinal);
         Assert.Contains("vixly-forms.js", html, StringComparison.Ordinal);
+        // Owner, 2026-11-01: the fixed Operations icon, never the company's logo; the company is named in the subtitle.
+        Assert.Contains("class=\"ops-mark\"", html, StringComparison.Ordinal);
+        Assert.Contains("/img/operations-icon.svg", html, StringComparison.Ordinal);
+        Assert.Contains("Sign in to the Northwind Freight workspace.", html, StringComparison.Ordinal);
+        Assert.DoesNotContain("data-tenant-logo", html, StringComparison.Ordinal);
         Assert.DoesNotContain("Vixly", html.Replace("/_content/Vixly.Shared.UI/", string.Empty, StringComparison.Ordinal), StringComparison.Ordinal);
     }
 

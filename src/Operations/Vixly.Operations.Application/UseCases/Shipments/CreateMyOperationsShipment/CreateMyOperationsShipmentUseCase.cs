@@ -43,6 +43,8 @@ public sealed class CreateMyOperationsShipmentUseCase
 
     private readonly OperationsShipmentBooking _booking;
 
+    private readonly Vixly.Operations.Application.Plans.OperationsShipmentCap _cap;
+
     public CreateMyOperationsShipmentUseCase(
         OperationsCustomerAccounts accounts,
         OperationsShipmentIntake intake,
@@ -52,8 +54,10 @@ public sealed class CreateMyOperationsShipmentUseCase
         OperationsPackageMover mover,
         Vixly.Operations.Application.Settings.OperationsNumbering numbering,
         Vixly.Operations.Application.Insurance.OperationsCertificates certificates,
-        OperationsShipmentBooking booking)
+        OperationsShipmentBooking booking,
+        Vixly.Operations.Application.Plans.OperationsShipmentCap cap)
     {
+        _cap = cap ?? throw new ArgumentNullException(nameof(cap));
         _booking = booking ?? throw new ArgumentNullException(nameof(booking));
         _certificates = certificates ?? throw new ArgumentNullException(nameof(certificates));
         _numbering = numbering ?? throw new ArgumentNullException(nameof(numbering));
@@ -107,6 +111,13 @@ public sealed class CreateMyOperationsShipmentUseCase
         }
 
         DateTimeOffset utcNow = _accounts.UtcNow;
+
+        // Shipment cap (owner, 2026-10-29): the customer is only told the company cannot take new shipments now; the plan is the company's business.
+        if (await _cap.RefuseNewAsync(context.RequiredTenantId, utcNow, cancellationToken) is not null)
+        {
+            return CreateMyOperationsShipmentResponse.Failure(OperationsShipmentErrors.RequestsPaused);
+        }
+
         OperationsShipment shipment = OperationsShipment.Request(context.RequiredTenantId, signedIn.Customer.Id, request.OriginWarehouseId, instructions, utcNow);
         shipment.Keyed(requestKey);
 

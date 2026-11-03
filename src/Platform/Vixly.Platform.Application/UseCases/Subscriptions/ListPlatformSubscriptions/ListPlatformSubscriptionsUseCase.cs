@@ -1,4 +1,5 @@
 ﻿using Vixly.Platform.Application.Queries;
+using Vixly.Platform.Application.Ports;
 using Vixly.Platform.Application.Security;
 using Vixly.Platform.Application.UseCases.Subscriptions;
 using Vixly.Platform.Domain.Subscriptions;
@@ -26,10 +27,14 @@ public sealed class ListPlatformSubscriptionsUseCase
 
     private readonly IPlatformSubscriptionQueries _queries;
 
+    private readonly IPlatformShipmentUsageRepository _usage;
+
     public ListPlatformSubscriptionsUseCase(
         PlatformSubscriptionAdministration administration,
-        IPlatformSubscriptionQueries queries)
+        IPlatformSubscriptionQueries queries,
+        IPlatformShipmentUsageRepository usage)
     {
+        _usage = usage ?? throw new ArgumentNullException(nameof(usage));
         _administration = administration ?? throw new ArgumentNullException(nameof(administration));
         _queries = queries ?? throw new ArgumentNullException(nameof(queries));
     }
@@ -63,7 +68,7 @@ public sealed class ListPlatformSubscriptionsUseCase
 
         DateTimeOffset? renewsBefore = request.RenewsWithinDays is int days ? _administration.UtcNow.AddDays(days) : null;
 
-        return ListPlatformSubscriptionsResponse.Success(await _queries.ListSubscriptionsAsync(
+        PagedResult<PlatformSubscriptionListItem> page = await _queries.ListSubscriptionsAsync(
             new PlatformSubscriptionListFilter(
                 request.Status,
                 request.PlatformPlanId,
@@ -73,6 +78,15 @@ public sealed class ListPlatformSubscriptionsUseCase
                 request.DiscountedOnly,
                 PlatformLanguageInput.Read(request.Language).Value),
             PagedRequest.Create(request.Page, request.PageSize),
-            cancellationToken));
+            cancellationToken);
+
+        // Shipment cap (owner, 2026-10-29): each company's latest monthly shipments, next to its plan.
+        Dictionary<Guid, PlatformTenantShipmentUsage> usage = (await _usage.ListLatestAsync(page.Items.Select(item => item.PlatformTenantId).Distinct().ToArray(), cancellationToken))
+            .ToDictionary(item => item.PlatformTenantId);
+
+        return ListPlatformSubscriptionsResponse.Success(new PagedResult<PlatformSubscriptionListItem>(
+            page.Items.Select(item => usage.TryGetValue(item.PlatformTenantId, out PlatformTenantShipmentUsage? month) ? item with { Shipments = month.Shipments, ShipmentsMonth = month.Month } : item).ToArray(),
+            PagedRequest.Create(page.Page, page.PageSize),
+            page.TotalCount));
     }
 }

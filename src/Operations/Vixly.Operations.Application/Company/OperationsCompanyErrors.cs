@@ -34,6 +34,9 @@ public static class OperationsCompanyErrors
 
     public static Error DetailsInvalid { get; } = Error.Create("ops.company.details_invalid");
 
+    // 2026-10-25: only the legal name needs a request with proof.
+    public static Error LegalNameNeedsRequest { get; } = Error.Create("ops.company.legal_name_needs_request");
+
     public static Error ContactInvalid { get; } = Error.Create("ops.company.contact_invalid");
 
     public static Error TimeZoneInvalid { get; } = Error.Create("ops.company.time_zone_invalid");

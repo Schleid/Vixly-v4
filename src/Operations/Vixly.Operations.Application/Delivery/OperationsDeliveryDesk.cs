@@ -206,7 +206,7 @@ public sealed class OperationsDeliveryDesk
             return new OperationsDeliveryStopRow(stop.Id, stop.Sequence, stop.ShipmentId, shipment?.Number ?? string.Empty, shipment?.RecipientName, shipment?.RecipientPhone,
                 shipment is null ? string.Empty : AddressLine(shipment), stop.ParcelCount, due, currency, stop.Status)
             {
-                ReceiverName = stop.ReceiverName, IdKind = stop.IdKind, Signed = stop.SignatureKey is not null, Photographed = stop.PhotoKey is not null, CodeChecked = stop.CodeChecked, FromSheet = stop.FromSheet,
+                ReceiverName = stop.ReceiverName, IdKind = stop.IdKind, Signed = stop.SignatureKey is not null, Photographed = stop.PhotoKey is not null, CodeChecked = stop.CodeChecked, CodeUnconfirmed = stop.CodeUnconfirmed, FromSheet = stop.FromSheet,
                 CashCollected = stop.CashCollected, FailureReason = stop.FailureReason, Note = stop.Note, DoneUtc = stop.DoneUtc,
                 Blocked = !stop.IsDone && Blocked(due, waiting, settings, view.Warehouse)
             };

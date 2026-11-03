@@ -11,5 +11,7 @@
 //
 // IMPORTANT NOTES:
 // - Wire type: add fields at the end, never rename (ADR-0014)
+// - IdleMinutes and IdleWarnMinutes: the company's inactivity sign-out for customers and the warning before it (owner, 2026-10-27)
 // =========================================================
-public sealed record CustomerPortalBrandDto(string DisplayName, Guid? LogoImageId, Guid? FaviconImageId, string PrimaryColour, string AccentColour);
+public sealed record CustomerPortalBrandDto(string DisplayName, Guid? LogoImageId, Guid? FaviconImageId, string PrimaryColour, string AccentColour,
+    int IdleMinutes = 60, int IdleWarnMinutes = 2);

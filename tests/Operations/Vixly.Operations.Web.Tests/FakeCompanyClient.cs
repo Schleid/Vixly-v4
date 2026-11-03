@@ -27,6 +27,8 @@ internal sealed class FakeCompanyClient : IOperationsCompanyClient
 
     public List<(OperationsPlatformActor Actor, OperationsCompanyChangeInput Input)> Changes { get; } = new();
 
+    public List<(OperationsPlatformActor Actor, OperationsCompanyChangeInput Input)> Profiles { get; } = new();
+
     public OperationsCompanyChange? Change { get; set; }
 
     public Task<OperationsPlatformCall<OperationsCompany>> GetAsync(OperationsPlatformActor actor, CancellationToken cancellationToken) =>
@@ -49,6 +51,17 @@ internal sealed class FakeCompanyClient : IOperationsCompanyClient
     }
 
     public Task<OperationsCompanyChange?> GetChangeAsync(OperationsPlatformActor actor, CancellationToken cancellationToken) => Task.FromResult(Change);
+
+    public Task<OperationsPlatformCall<bool>> UpdateProfileAsync(OperationsPlatformActor actor, OperationsCompanyChangeInput input, CancellationToken cancellationToken)
+    {
+        if (actor.Role != "owner" || !actor.StepUp)
+        {
+            return Task.FromResult(OperationsPlatformCall<bool>.Refused(actor.Role != "owner" ? OperationsAccessErrors.PermissionRequired : OperationsAccessErrors.StepUpRequired));
+        }
+
+        Profiles.Add((actor, input));
+        return Task.FromResult(OperationsPlatformCall<bool>.Ok(true));
+    }
 
     public Task<OperationsPlatformCall<bool>> SubmitChangeAsync(OperationsPlatformActor actor, OperationsCompanyChangeInput input, CancellationToken cancellationToken)
     {

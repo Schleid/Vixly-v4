@@ -24,7 +24,7 @@ namespace Vixly.Operations.Infrastructure.Documents;
 // =========================================================
 internal static class OperationsCreditStatementLayout
 {
-    public static byte[] Render(OperationsCreditStatement statement, IStringLocalizer<OperationsText> text)
+    public static byte[] Render(OperationsCreditStatement statement, IStringLocalizer<OperationsText> text, byte[]? logo = null)
     {
         ArgumentNullException.ThrowIfNull(statement);
         ArgumentNullException.ThrowIfNull(text);
@@ -41,7 +41,7 @@ internal static class OperationsCreditStatementLayout
             {
                 row.RelativeItem().Column(column =>
                 {
-                    column.Item().Text(statement.CompanyName).FontSize(15).SemiBold();
+                    OperationsDocumentBrand.Head(column, logo, statement.CompanyName, 15);
                     column.Item().PaddingTop(6).Text(statement.Customer.FullName + (statement.Customer.Code is { } code ? " · " + code : string.Empty)).SemiBold();
                     column.Item().Text(statement.Customer.CompanyName ?? string.Empty);
                 });

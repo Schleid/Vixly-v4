@@ -2,6 +2,7 @@
 using Vixly.Platform.Application.Security;
 using Vixly.Platform.Application.UseCases.Payments.CheckPlatformMerchantAccount;
 using Vixly.Platform.Application.UseCases.Payments.GetPlatformMerchantAccount;
+using Vixly.Platform.Application.UseCases.Payments.UpdatePlatformCheckoutSettings;
 using Vixly.Platform.Application.UseCases.Payments.UpdatePlatformMerchantAccount;
 using Vixly.Shared.Kernel.Errors;
 
@@ -16,6 +17,7 @@ namespace Vixly.Platform.Web.Features.Payments;
 // RESPONSIBILITIES:
 // - Load the merchant account and the provider configuration
 // - Save the publishable key, currencies and on/off; check the connection
+// - Save the checkout page look and the bank statement wording
 //
 // IMPORTANT NOTES:
 // - Keys are never entered here: they come from configuration (S-11)
@@ -29,9 +31,18 @@ public sealed class PaymentsSettingsPresenter : PlatformPresenter<PaymentsSettin
 
     private readonly CheckPlatformMerchantAccountUseCase _check;
 
-    public PaymentsSettingsPresenter(GetPlatformMerchantAccountUseCase get, UpdatePlatformMerchantAccountUseCase update, CheckPlatformMerchantAccountUseCase check, PlatformUseCaseScope scope, ILogger<PaymentsSettingsPresenter> logger)
+    private readonly UpdatePlatformCheckoutSettingsUseCase _checkout;
+
+    public PaymentsSettingsPresenter(
+        GetPlatformMerchantAccountUseCase get,
+        UpdatePlatformMerchantAccountUseCase update,
+        CheckPlatformMerchantAccountUseCase check,
+        UpdatePlatformCheckoutSettingsUseCase checkout,
+        PlatformUseCaseScope scope,
+        ILogger<PaymentsSettingsPresenter> logger)
         : base(scope, PaymentsSettingsState.Initial, logger)
     {
+        _checkout = checkout ?? throw new ArgumentNullException(nameof(checkout));
         _get = get ?? throw new ArgumentNullException(nameof(get));
         _update = update ?? throw new ArgumentNullException(nameof(update));
         _check = check ?? throw new ArgumentNullException(nameof(check));
@@ -61,6 +72,26 @@ public sealed class PaymentsSettingsPresenter : PlatformPresenter<PaymentsSettin
         string[] codes = (currencies ?? string.Empty).Split(new[] { ',', ' ', ';' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         Error? error = await RunUseCaseAsync(async (context, cancellationToken) => (await _update.ExecuteAsync(
             context, new UpdatePlatformMerchantAccountRequest { PublishableKey = publishableKey, Currencies = codes, Enabled = enabled }, cancellationToken)).Error);
+
+        if (PlatformCommonErrors.StepUpRequired.Equals(error))
+        {
+            SetState(State with { StepUpPending = true, Error = null });
+            return;
+        }
+
+        SetState(State with { StepUpPending = false, DoneKey = error is null ? "ui.payments_settings.saved" : null, Error = error });
+
+        if (error is null)
+        {
+            await LoadAsync();
+        }
+    }
+
+    public async Task SaveCheckoutAsync(UpdatePlatformCheckoutSettingsRequest request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        Error? error = await RunUseCaseAsync(async (context, cancellationToken) => (await _checkout.ExecuteAsync(context, request, cancellationToken)).Error);
 
         if (PlatformCommonErrors.StepUpRequired.Equals(error))
         {

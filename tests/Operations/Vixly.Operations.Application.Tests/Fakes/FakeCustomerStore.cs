@@ -35,6 +35,9 @@ internal sealed class FakeCustomerStore : IOperationsCustomerRepository
 
     public Task<OperationsCustomer?> FindByEmailAsync(EmailAddress email, CancellationToken cancellationToken) => Task.FromResult(Customers.FirstOrDefault(customer => customer.Email == email));
 
+    public Task<IReadOnlyList<string>> ListBannedPhonesAsync(CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<string>>(Customers.Where(customer => customer.Status == OperationsCustomerStatus.Banned).Select(customer => customer.Phone).ToList());
+
     public Task<bool> IsCustomerEmailAnywhereAsync(EmailAddress email, CancellationToken cancellationToken) =>
         Task.FromResult(Customers.Any(customer => customer.Email == email && customer.EmailVerifiedUtc is not null && customer.Status != OperationsCustomerStatus.Closed));
 
@@ -52,5 +55,6 @@ internal sealed class FakeCustomerStore : IOperationsCustomerRepository
     public Task<(IReadOnlyList<OperationsCustomer> Items, int TotalCount)> ListAsync(string? search, int page, int pageSize, CancellationToken cancellationToken) =>
         throw new NotSupportedException();
 
-    public Task<IReadOnlyList<OperationsCustomer>> FindForCounterAsync(string text, int take, CancellationToken cancellationToken) => throw new NotSupportedException();
+    public Task<IReadOnlyList<OperationsCustomer>> FindForCounterAsync(string text, int take, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<OperationsCustomer>>(Customers.Where(customer => customer.Code == text).Take(take).ToList());
 }

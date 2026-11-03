@@ -18,6 +18,16 @@ IMPORTANT NOTES:
 @inject NavigationManager Navigation
 
 <ErrorBox Error="_error" />
+@if (_preparing && _wait < MaxWaits)
+{
+    <HeadContent><meta http-equiv="refresh" content="@($"{WaitSeconds};url={WaitUrl(_wait + 1)}")" /></HeadContent>
+    <VxMessage Type="VxMessageType.Info">@T["public.pay.preparing"]</VxMessage>
+}
+else if (_preparing)
+{
+    <VxMessage Type="VxMessageType.Info">@T["public.pay.preparing_slow"]</VxMessage>
+    <p><a class="vx-button vx-button--primary" href="@WaitUrl(0)">@T["public.pay.refresh"]</a></p>
+}
 @if (Status == "done")
 {
     <VxMessage Type="VxMessageType.Success">@T[_info?.Kind == "save_card" ? "public.pay.card_saved" : "public.pay.done"]</VxMessage>
@@ -96,6 +106,16 @@ else if (Status == "zelle")
 
     private PlatformApiError? _error;
 
+    // Sign-up: the first invoice is issued a moment after the plan is chosen; the page waits and refreshes itself.
+    // Every 10 seconds for 5 minutes at most (?wait=n), well inside Platform's per-visitor limit; then a button.
+    private const int WaitSeconds = 10;
+
+    private const int MaxWaits = 30;
+
+    private bool _preparing;
+
+    private int _wait;
+
     [Parameter, EditorRequired]
     public PaymentTarget Target { get; set; } = default!;
 
@@ -108,10 +128,15 @@ else if (Status == "zelle")
     protected override async Task OnInitializedAsync()
     {
         Card ??= new CardFormModel();
+        string? wait = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(new Uri(Navigation.Uri).Query).TryGetValue("wait", out var values) ? values.ToString() : null;
+        _wait = int.TryParse(wait, NumberStyles.None, CultureInfo.InvariantCulture, out int count) ? Math.Min(count, MaxWaits) : 0;
         PlatformApiResult<PlatformPaymentLinkInfo> result = await Target.LoadAsync(Api, CancellationToken.None);
         _info = result.Value;
-        _error ??= result.Error;
+        _preparing = result.Error?.Code == "platform.payments.invoice_preparing";
+        _error ??= _preparing ? null : result.Error;
     }
+
+    private string WaitUrl(int wait) => new Uri(Navigation.Uri).AbsolutePath + (wait > 0 ? "?wait=" + wait.ToString(CultureInfo.InvariantCulture) : string.Empty);
 
     private string? Consent(string version)
     {

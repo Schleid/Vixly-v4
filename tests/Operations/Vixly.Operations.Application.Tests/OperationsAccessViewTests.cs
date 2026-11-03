@@ -36,7 +36,7 @@ public sealed class OperationsAccessViewTests
 
     private static readonly Guid PortWarehouse = Guid.NewGuid();
 
-    private static readonly OperationsRole Manager = OperationsRole.Create(Tenant, "Manager", new[] { OperationsPermissions.WarehousesView, OperationsPermissions.WarehousesManage, OperationsPermissions.RolesGrant }, Now);
+    private static readonly OperationsRole Manager = OperationsRole.Create(Tenant, "Manager", new[] { OperationsPermissions.WarehousesView, OperationsPermissions.ShipmentsManage, OperationsPermissions.WarehousesManage, OperationsPermissions.RolesGrant }, Now);
 
     private static readonly OperationsRole Viewer = OperationsRole.Create(Tenant, "Viewer", new[] { OperationsPermissions.WarehousesView }, Now);
 
@@ -45,12 +45,12 @@ public sealed class OperationsAccessViewTests
     {
         OperationsAccessView view = View(Grant(Manager, OperationsRoleScope.Branch, Miami));
 
-        Assert.True(view.Has(OperationsPermissions.WarehousesManage));
-        Assert.False(view.HasTenantWide(OperationsPermissions.WarehousesManage));
-        Assert.True(view.CoversBranch(OperationsPermissions.WarehousesManage, Miami));
-        Assert.True(view.CoversWarehouse(OperationsPermissions.WarehousesManage, MiamiWarehouse, Miami));
-        Assert.False(view.CoversBranch(OperationsPermissions.WarehousesManage, PortAuPrince));
-        Assert.False(view.CoversWarehouse(OperationsPermissions.WarehousesManage, PortWarehouse, PortAuPrince));
+        Assert.True(view.Has(OperationsPermissions.ShipmentsManage));
+        Assert.False(view.HasTenantWide(OperationsPermissions.ShipmentsManage));
+        Assert.True(view.CoversBranch(OperationsPermissions.ShipmentsManage, Miami));
+        Assert.True(view.CoversWarehouse(OperationsPermissions.ShipmentsManage, MiamiWarehouse, Miami));
+        Assert.False(view.CoversBranch(OperationsPermissions.ShipmentsManage, PortAuPrince));
+        Assert.False(view.CoversWarehouse(OperationsPermissions.ShipmentsManage, PortWarehouse, PortAuPrince));
     }
 
     [Fact]
@@ -58,9 +58,35 @@ public sealed class OperationsAccessViewTests
     {
         OperationsAccessView view = View(Grant(Manager, OperationsRoleScope.Warehouse, PortWarehouse));
 
-        Assert.True(view.CoversWarehouse(OperationsPermissions.WarehousesManage, PortWarehouse, PortAuPrince));
-        Assert.False(view.CoversBranch(OperationsPermissions.WarehousesManage, PortAuPrince));
-        Assert.False(view.CoversWarehouse(OperationsPermissions.WarehousesManage, MiamiWarehouse, Miami));
+        Assert.True(view.CoversWarehouse(OperationsPermissions.ShipmentsManage, PortWarehouse, PortAuPrince));
+        Assert.False(view.CoversBranch(OperationsPermissions.ShipmentsManage, PortAuPrince));
+        Assert.False(view.CoversWarehouse(OperationsPermissions.ShipmentsManage, MiamiWarehouse, Miami));
+    }
+
+    // Owner, 2026-10-29 (branches and roles design, 4.2): staff, roles, devices and company setup count only in a grant for the whole company.
+    [Fact]
+    public void CompanyOnlyPermissions_CountOnlyInACompanyGrant()
+    {
+        OperationsRole security = OperationsRole.Create(Tenant, "Security", new[]
+        {
+            OperationsPermissions.StaffInvite, OperationsPermissions.RolesGrant, OperationsPermissions.DevicesApprove, OperationsPermissions.WarehousesManage, OperationsPermissions.ShipmentsView
+        }, Now);
+
+        OperationsAccessView branch = View(Grant(security, OperationsRoleScope.Branch, Miami));
+        OperationsAccessView warehouse = View(Grant(security, OperationsRoleScope.Warehouse, MiamiWarehouse));
+        OperationsAccessView company = View(Grant(security, OperationsRoleScope.Tenant, null));
+
+        foreach (string permission in new[] { OperationsPermissions.StaffInvite, OperationsPermissions.RolesGrant, OperationsPermissions.DevicesApprove, OperationsPermissions.WarehousesManage })
+        {
+            Assert.False(branch.Has(permission), permission);
+            Assert.False(branch.CoversBranch(permission, Miami), permission);
+            Assert.False(warehouse.CoversWarehouse(permission, MiamiWarehouse, Miami), permission);
+            Assert.True(company.HasTenantWide(permission), permission);
+            Assert.True(company.Has(permission), permission);
+        }
+
+        Assert.True(branch.CoversWarehouse(OperationsPermissions.ShipmentsView, MiamiWarehouse, Miami));
+        Assert.True(warehouse.CoversWarehouse(OperationsPermissions.ShipmentsView, MiamiWarehouse, Miami));
     }
 
     [Fact]

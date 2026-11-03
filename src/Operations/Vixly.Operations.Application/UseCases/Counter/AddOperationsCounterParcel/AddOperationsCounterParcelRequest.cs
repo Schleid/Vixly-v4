@@ -29,4 +29,7 @@ public sealed class AddOperationsCounterParcelRequest
     public decimal? Value { get; init; }
 
     public string? CommandKey { get; init; }
+
+    // Owner, 2026-11-01: more items the customer names for this box; with them, Contents and Value are the first item.
+    public IReadOnlyList<Vixly.Operations.Application.Items.OperationsItemDraft> MoreItems { get; init; } = Array.Empty<Vixly.Operations.Application.Items.OperationsItemDraft>();
 }

@@ -41,12 +41,14 @@ public sealed class OperationsServiceTokenSigner : IDisposable
 
         if (!string.IsNullOrWhiteSpace(options.Value.CallerPrivateKey) && !string.IsNullOrWhiteSpace(_keyId))
         {
-            _key = ECDsa.Create();
-            _key.ImportPkcs8PrivateKey(Convert.FromBase64String(options.Value.CallerPrivateKey), out _);
-
-            if (_key.KeySize != 256)
+            // Hex or base64 PKCS#8; anything but a P-256 key is refused.
+            try
             {
-                throw new InvalidOperationException("OperationsPlatform:CallerPrivateKey must be a P-256 key.");
+                _key = Vixly.Shared.Kernel.Security.VixlyCallerKey.Import(options.Value.CallerPrivateKey);
+            }
+            catch (CryptographicException exception)
+            {
+                throw new InvalidOperationException("OperationsPlatform:CallerPrivateKey must be a P-256 key.", exception);
             }
         }
     }

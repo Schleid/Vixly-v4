@@ -16,6 +16,12 @@ namespace Vixly.Operations.Domain.Delivery;
 // =========================================================
 public static class OperationsDeliveryErrors
 {
+    // Slice 12C: a position the phone could not have taken.
+    public static Error PositionInvalid { get; } = Error.Create("ops.delivery.position_invalid");
+
+    // Slice 12C: only the route's driver sends its position, and only while it is out.
+    public static Error NotTheDriver { get; } = Error.Create("ops.delivery.not_the_driver");
+
     public static Error NotFound { get; } = Error.Create("ops.delivery.not_found");
 
     public static Error SettingsInvalid { get; } = Error.Create("ops.delivery.settings_invalid");

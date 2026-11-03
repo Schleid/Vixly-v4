@@ -57,7 +57,8 @@ public sealed class GetPlatformPortalAccessUseCase
                 PlatformSubscriptionAccess.None,
                 tenant.CurrentSlug,
                 tenant.DefaultLanguage.Value,
-                (await _licensing.LegalAsync(tenant.Id, cancellationToken)).Status));
+                (await _licensing.LegalAsync(tenant.Id, cancellationToken)).Status,
+                tenant.TimeZone));
         }
 
         // Unknown, never-active and closed tenants all look the same from outside.
@@ -74,6 +75,7 @@ public sealed class GetPlatformPortalAccessUseCase
             await _licensing.AccessAsync(tenant.Id, cancellationToken),
             tenant.CurrentSlug,
             tenant.DefaultLanguage.Value,
-            (await _licensing.LegalAsync(tenant.Id, cancellationToken)).Status));
+            (await _licensing.LegalAsync(tenant.Id, cancellationToken)).Status,
+            tenant.TimeZone));
     }
 }

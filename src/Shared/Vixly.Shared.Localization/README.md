@@ -2,6 +2,8 @@
 
 Culture and request-localization setup, the error-to-text localizer, the plural helper (CLDR categories for en, fr, es) and the `en-XA` pseudo-locale. Holds the `shared.*` error texts.
 
+`VixlyEmail` (2026-10-25) turns a plain-text email into the designed HTML version every plane sends with it: a header with the sender's name and logo, the main link as a button with the link to copy below, and a footer. Each plane's mail sender chooses the brand (Platform: Vixly; Operations: the company, never Vixly) and its own texts (`email.layout.*`, and `email.<x>.button` for each email's button).
+
 | | |
 |---|---|
 | Owner | Architecture / Frontend/UI |

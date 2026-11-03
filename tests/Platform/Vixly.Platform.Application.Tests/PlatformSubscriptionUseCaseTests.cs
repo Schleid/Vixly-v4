@@ -301,7 +301,7 @@ public sealed class PlatformSubscriptionUseCaseTests
         PlatformAuthorizationContext context = _kit.Staff(PlatformPermissions.SubscriptionsView, PlatformPermissions.SubscriptionsManage);
         _kit.Plan();
 
-        GetPlatformTenantSubscriptionResponse view = await new GetPlatformTenantSubscriptionUseCase(_kit.Subscriptions(), _kit.Store, _kit.Tenants.Tenants).ExecuteAsync(
+        GetPlatformTenantSubscriptionResponse view = await new GetPlatformTenantSubscriptionUseCase(_kit.Subscriptions(), _kit.Store, _kit.Tenants.Tenants, _kit.Store).ExecuteAsync(
             context,
             new GetPlatformTenantSubscriptionRequest { PlatformTenantId = tenant.Id, Language = "en" },
             CancellationToken.None);

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
 <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
 <resheader name="version"><value>2.0</value></resheader>
@@ -62,4 +62,9 @@
 <data name="spanish" xml:space="preserve"><value>Español</value></data>
 <data name="shortcut" xml:space="preserve"><value>Ctrl / ⌘ K</value></data>
 <data name="language" xml:space="preserve"><value>Idioma</value></data>
+  <data name="help.link" xml:space="preserve"><value>Explorar los artículos de ayuda</value><comment>needs-review</comment></data>
+  <data name="help.html" xml:space="preserve"><value>&lt;p&gt;Encuentre orientación para la página que está usando.&lt;/p&gt;&lt;h2 id=&quot;steps&quot;&gt;Pasos&lt;/h2&gt;&lt;ol&gt;&lt;li&gt;Abra Ayuda en el encabezado de la página.&lt;/li&gt;&lt;li&gt;Elija un artículo.&lt;/li&gt;&lt;/ol&gt;</value><comment>needs-review</comment></data>
+  <data name="help.label" xml:space="preserve"><value>Ayuda</value><comment>needs-review</comment></data>
+  <data name="help.related" xml:space="preserve"><value>Artículos relacionados</value><comment>needs-review</comment></data>
+  <data name="help.title" xml:space="preserve"><value>Usar el centro de ayuda</value><comment>needs-review</comment></data>
 </root>

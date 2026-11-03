@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <UserSecretsId>vixly-v4-operations-web</UserSecretsId>
+    <!-- Production (2026-10-23): the customer portal is the /customer application inside the Operations Web site and shares its
+         application pool (the host gives sub-applications no pool of their own). Two in-process apps cannot share a pool (500.35),
+         so both run out of process. The published web.config then says hostingModel="outofprocess". -->
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +16,7 @@
     <ProjectReference Include="..\..\Shared\Vixly.Shared.Localization\Vixly.Shared.Localization.csproj" />
     <ProjectReference Include="..\..\Shared\Vixly.Shared.Hosting\Vixly.Shared.Hosting.csproj" />
     <ProjectReference Include="..\..\Shared\Vixly.Shared.UI\Vixly.Shared.UI.csproj" />
+    <ProjectReference Include="..\..\Shared\Vixly.Shared.Help\Vixly.Shared.Help.csproj" />
   </ItemGroup>
 
   <ItemGroup>

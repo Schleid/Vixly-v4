@@ -22,5 +22,7 @@ public static class OperationsShippingServiceErrors
 
     public static Error DaysInvalid { get; } = Error.Create("ops.services.days_invalid");
 
+    public static Error LabelCodeInvalid { get; } = Error.Create("ops.services.label_code_invalid", ("length", OperationsShippingServiceSetup.LabelCodeLength));
+
     public static Error DivisorInvalid { get; } = Error.Create("ops.services.divisor_invalid");
 }

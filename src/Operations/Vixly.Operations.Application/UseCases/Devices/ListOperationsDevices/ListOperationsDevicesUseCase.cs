@@ -30,12 +30,20 @@ public sealed class ListOperationsDevicesUseCase
 
     private readonly IOperationsDeviceClient _devices;
 
+    private readonly IOperationsDeviceBlockRepository _blocks;
+
+    private readonly Vixly.Operations.Application.Devices.OperationsStepUp _stepUp;
+
     public ListOperationsDevicesUseCase(
         IOperationsUserRepository users,
         OperationsAccess access,
         OperationsActors actors,
-        IOperationsDeviceClient devices)
+        IOperationsDeviceClient devices,
+        IOperationsDeviceBlockRepository blocks,
+        Vixly.Operations.Application.Devices.OperationsStepUp stepUp)
     {
+        _stepUp = stepUp ?? throw new ArgumentNullException(nameof(stepUp));
+        _blocks = blocks ?? throw new ArgumentNullException(nameof(blocks));
         _users = users ?? throw new ArgumentNullException(nameof(users));
         _access = access ?? throw new ArgumentNullException(nameof(access));
         _actors = actors ?? throw new ArgumentNullException(nameof(actors));
@@ -71,6 +79,7 @@ public sealed class ListOperationsDevicesUseCase
         }
 
         OperationsPlatformCall<OperationsDeviceSeats> seats = await _devices.SeatsAsync(actor, cancellationToken);
-        return ListOperationsDevicesResponse.Success(call.Value!, seats.Succeeded ? seats.Value : null);
+        return ListOperationsDevicesResponse.Success(call.Value!, seats.Succeeded ? seats.Value : null, await _blocks.ListOpenAsync(cancellationToken),
+            await _stepUp.PasswordConfirmsAsync(user, cancellationToken));
     }
 }

@@ -153,13 +153,22 @@ public sealed class OperationsInvoicing
 
         OperationsTenantSettings settings = await _settings.FindAsync(cancellationToken) ?? OperationsTenantSettings.CreateDefault(customer.TenantId, utcNow);
         string language = customer.PreferredLanguage.Value;
-        OperationsInvoiceParty party = new((await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty, settings.TaxNumber, warehouse.Name, customer.Code,
-            customer.FirstName + " " + customer.LastName, customer.CompanyName, customer.Phone, customer.Email.Value);
+        // Owner, 2026-10-29 (B-4): the legal identity of the warehouse's branch, when the branch has one; else the company's.
+        OperationsBranch? branch = await _locations.GetBranchAsync(warehouse.BranchId, cancellationToken);
+        OperationsInvoiceParty party = new(branch?.LegalName ?? (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty, branch?.TaxNumber ?? settings.TaxNumber,
+            warehouse.Name, customer.Code, customer.FirstName + " " + customer.LastName, customer.CompanyName, customer.Phone, customer.Email.Value);
         OperationsInvoiceDraft draft = new(kind, customer.Id, warehouse.Id, shipmentId, saleId, reference, route, serviceCode, currencyCode, language, party, lines, settings.TaxName,
-            settings.TaxPerKind, settings.TaxRates, settings.InvoiceNote(language)) { PayAtDestination = payAtDestination };
+            settings.TaxPerKind, settings.TaxRates, Note(settings.InvoiceNote(language), branch?.LegalNotes)) { PayAtDestination = payAtDestination };
         OperationsInvoice invoice = OperationsInvoice.Issue(customer.TenantId, await _numbering.NextAsync(OperationsNumberKind.Invoice, cancellationToken), draft,
             OperationsTimeZones.Today(utcNow, settings.TimeZone), utcNow);
         _billing.Add(invoice);
         return invoice;
+    }
+
+    // The company's invoice note, then the lines the branch's country requires.
+    private static string? Note(string? companyNote, string? branchNotes)
+    {
+        string text = string.Join("\n", new[] { companyNote, branchNotes }.Where(part => !string.IsNullOrWhiteSpace(part)).Select(part => part!.Trim()));
+        return text.Length == 0 ? null : text[..Math.Min(text.Length, OperationsBillingLimits.NoteMaxLength)];
     }
 }

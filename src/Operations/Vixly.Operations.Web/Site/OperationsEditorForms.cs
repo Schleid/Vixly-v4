@@ -44,12 +44,17 @@ public static class OperationsEditorForms
             Services = services,
             ShowSteps = Flag(form, "showSteps"),
             ShowFaq = Flag(form, "showFaq"),
+            ShowDelivered = Flag(form, "showDelivered"),
+            ShowRates = Flag(form, "showRates"),
+            ShowTestimonials = Flag(form, "showTestimonials"),
             FacebookUrl = Text(form, "facebook"),
             InstagramUrl = Text(form, "instagram"),
             XUrl = Text(form, "x"),
             LinkedInUrl = Text(form, "linkedin"),
             YouTubeUrl = Text(form, "youtube"),
             TikTokUrl = Text(form, "tiktok"),
+            Theme = OptionalEnum<OperationsSiteTheme>(form, "theme"),
+            Font = OptionalEnum<OperationsSiteFont>(form, "font"),
             Language = language,
             Texts = OperationsSiteTextKeys.All.Keys
                 .Where(key => form.ContainsKey("text." + key))
@@ -77,7 +82,9 @@ public static class OperationsEditorForms
             OpeningHours = Text(form, "openingHours"),
             ShowOnSite = Flag(form, "showOnSite"),
             Status = Enum<OperationsLocationStatus>(form, "status"),
-            Side = form.ContainsKey("side") ? Enum<OperationsBranchSide>(form, "side") : OperationsBranchSide.Both
+            LegalName = Text(form, "legalName"),
+            TaxNumber = Text(form, "taxNumber"),
+            LegalNotes = Text(form, "legalNotes")
         };
     }
 
@@ -88,10 +95,11 @@ public static class OperationsEditorForms
         return new SaveOperationsBranchRequest
         {
             BranchId = branch.Id, Code = branch.Code, Name = branch.Name,
-            Line1 = branch.Address.Line1, Line2 = branch.Address.Line2, City = branch.Address.City, Region = branch.Address.Region,
-            PostalCode = branch.Address.PostalCode, CountryCode = branch.Address.CountryCode,
+            Line1 = branch.Address?.Line1 ?? string.Empty, Line2 = branch.Address?.Line2, City = branch.Address?.City ?? string.Empty, Region = branch.Address?.Region,
+            PostalCode = branch.Address?.PostalCode, CountryCode = branch.CountryCode,
             Phone = branch.Phone, Email = branch.Email, OpeningHours = branch.OpeningHours,
-            ShowOnSite = branch.ShowOnSite, Status = branch.Status, Side = branch.Side
+            ShowOnSite = branch.ShowOnSite, Status = branch.Status,
+            LegalName = branch.LegalName, TaxNumber = branch.TaxNumber, LegalNotes = branch.LegalNotes
         };
     }
 
@@ -202,23 +210,35 @@ public static class OperationsEditorForms
         "logodark" => OperationsSiteImageKind.LogoDark,
         "favicon" => OperationsSiteImageKind.Favicon,
         "hero" => OperationsSiteImageKind.Hero,
+        "air" => OperationsSiteImageKind.Air,
+        "sea" => OperationsSiteImageKind.Sea,
         _ => null
+    };
+
+    // The images the website editor shows; the document and label logos live on the Company page.
+    public static IReadOnlyList<OperationsSiteImageKind> SiteImageKinds { get; } = new[]
+    {
+        OperationsSiteImageKind.Logo, OperationsSiteImageKind.LogoDark, OperationsSiteImageKind.Favicon, OperationsSiteImageKind.Hero,
+        OperationsSiteImageKind.Air, OperationsSiteImageKind.Sea
     };
 
     public static Guid? ImageId(OperationsBrandSettings settings, OperationsSiteImageKind kind)
     {
         ArgumentNullException.ThrowIfNull(settings);
-
-        return kind switch
-        {
-            OperationsSiteImageKind.Logo => settings.LogoImageId,
-            OperationsSiteImageKind.LogoDark => settings.LogoDarkImageId,
-            OperationsSiteImageKind.Favicon => settings.FaviconImageId,
-            _ => settings.HeroImageId
-        };
+        return settings.ImageId(kind);
     }
 
     // "step.2.title" is labelled by "ui.editor.text.step.title" followed by its number.
+    // The heading of a group of website texts in the editor (landing page marketing, owner 2026-10-30).
+    public static string GroupLabel(string group) => group switch
+    {
+        "service" => "site.services.title",
+        "step" => "site.steps.title",
+        "faq" => "site.faq.title",
+        "chip" or "time" or "figure" or "story" or "why" or "closing" => "ui.editor.site.group." + group,
+        _ => "ui.editor.site.texts"
+    };
+
     public static string LabelKey(string key)
     {
         ArgumentNullException.ThrowIfNull(key);
@@ -241,6 +261,13 @@ public static class OperationsEditorForms
     private static bool Flag(IFormCollection form, string name) => string.Equals(Text(form, name), "true", StringComparison.OrdinalIgnoreCase);
 
     private static Guid? Id(IFormCollection form, string name) => Guid.TryParse(Text(form, name), out Guid id) && id != Guid.Empty ? id : null;
+
+    // A field the form does not carry (a locked select is disabled, so not sent) stays null.
+    private static TEnum? OptionalEnum<TEnum>(IFormCollection form, string name)
+        where TEnum : struct, System.Enum
+    {
+        return form.ContainsKey(name) ? Enum<TEnum>(form, name) : null;
+    }
 
     private static TEnum Enum<TEnum>(IFormCollection form, string name)
         where TEnum : struct, System.Enum

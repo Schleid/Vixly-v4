@@ -25,4 +25,8 @@ public sealed record OperationsStaffMember(
     bool HasSecondFactor,
     DateTimeOffset? LastSignInUtc,
     IReadOnlyList<OperationsStaffGrant> Grants,
-    string? PartnerWarehouse = null);
+    string? PartnerWarehouse = null)
+{
+    // Owner, 2026-10-29 (S-5): an outside account's end date and hours; null for everyone else.
+    public OperationsOutsideHours? Outside { get; init; }
+}

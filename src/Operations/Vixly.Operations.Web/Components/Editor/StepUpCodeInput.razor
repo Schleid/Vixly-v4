@@ -1,0 +1,29 @@
+﻿@*
+=========================================================
+FILE: StepUpCodeInput.razor
+
+PURPOSE:
+The field that confirms a sensitive action inline: the
+authenticator code, or the password when the company does not
+require MFA and the person has no authenticator (owner,
+2026-10-22).
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The form field is always named "code"
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+@if (PasswordConfirms)
+{
+    <input name="code" type="password" autocomplete="current-password" required placeholder="@T["ui.confirm.password"]" aria-label="@T["ui.confirm.password"]" />
+}
+else
+{
+    <input name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required placeholder="@T["ui.devices.code"]" aria-label="@T["ui.devices.code"]" />
+}
+
+@code {
+    [Parameter] public bool PasswordConfirms { get; set; }
+}

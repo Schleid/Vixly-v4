@@ -41,4 +41,10 @@ public sealed class RecordOperationsDeliveryStopRequest
     public string? Note { get; init; }
 
     public string? PortalSlug { get; init; }
+
+    // Slice 12B (owner H-4): when the stop happened, as the driver's phone recorded it (sent later without a signal).
+    public DateTimeOffset? HappenedUtc { get; init; }
+
+    // Recorded on the phone without a signal: a code that is not accepted on arrival marks the stop for follow-up instead of refusing it.
+    public bool Queued { get; init; }
 }

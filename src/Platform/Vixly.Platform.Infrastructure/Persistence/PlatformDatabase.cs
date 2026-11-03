@@ -27,4 +27,7 @@ public static class PlatformDatabase
     public const string MigrationsHistoryTable = "__EFMigrationsHistory";
 
     public const string ConnectionStringName = "Platform";
+
+    // Control staff employee numbers (TC-0001 ...), owner 2026-10-25.
+    public const string EmployeeNumberSequence = "EmployeeNumbers";
 }

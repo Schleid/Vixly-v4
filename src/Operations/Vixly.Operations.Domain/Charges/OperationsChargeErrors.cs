@@ -56,6 +56,11 @@ public static class OperationsChargeErrors
 
     public static Error QuoteNotFound { get; } = Error.Create("ops.charges.quote_not_found");
 
+    // Owner, 2026-10-28: a withdrawn or past quote is not emailed; the email server did not take it.
+    public static Error QuoteNotValid { get; } = Error.Create("ops.charges.quote_not_valid");
+
+    public static Error QuoteEmailFailed { get; } = Error.Create("ops.charges.quote_email_failed");
+
     public static Error ReasonRequired { get; } = Error.Create("ops.charges.reason_required");
 
     public static Error PreferredInvalid { get; } = Error.Create("ops.charges.preferred_invalid");

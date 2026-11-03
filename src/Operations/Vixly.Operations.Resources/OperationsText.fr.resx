@@ -262,6 +262,20 @@ Si vous n'avez pas créé ce compte, ignorez cet e-mail.</value>
   <data name="email.customer.verification.subject" xml:space="preserve">
     <value>{company} : confirmez votre e-mail</value>
   </data>
+  <data name="email.device_blocked.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+L’appareil « {device} » de {company} a été utilisé depuis un autre pays ({country}) par {person} le {time}. Il est enregistré en {registered}.
+
+L’appareil est bloqué : personne ne peut s’y connecter tant qu’un administrateur ne l’a pas débloqué. Ouvrez sa page pour l’examiner :
+
+{link}
+
+Si vous ne savez pas qui l’a utilisé, laissez-le bloqué et libérez sa licence.</value>
+  </data>
+  <data name="email.device_blocked.subject" xml:space="preserve">
+    <value>{company} : un appareil est bloqué</value>
+  </data>
   <data name="email.owner_invitation.body" xml:space="preserve">
     <value>Bonjour {name},
 
@@ -286,6 +300,16 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="email.password_reset.subject" xml:space="preserve">
     <value>{company} : réinitialisez votre mot de passe</value>
   </data>
+  <data name="email.report.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Le rapport programmé « {report} » ({period}) est en pièce jointe.
+
+{company}</value>
+  </data>
+  <data name="email.report.subject" xml:space="preserve">
+    <value>{company} : {report}, {period}</value>
+  </data>
   <data name="ops.access.owner_only" xml:space="preserve">
     <value>Seul le propriétaire de l’entreprise peut faire cela.</value>
   </data>
@@ -297,6 +321,33 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ops.access.step_up_required" xml:space="preserve">
     <value>Confirmez d’abord avec votre application d’authentification.</value>
+  </data>
+  <data name="ops.api.delivery_not_found" xml:space="preserve">
+    <value>Cette remise est introuvable.</value>
+  </data>
+  <data name="ops.api.endpoint_not_found" xml:space="preserve">
+    <value>Cette adresse est introuvable ou désactivée.</value>
+  </data>
+  <data name="ops.api.events_required" xml:space="preserve">
+    <value>Choisissez au moins un événement.</value>
+  </data>
+  <data name="ops.api.feature_off" xml:space="preserve">
+    <value>L’API et les webhooks ne font pas partie de votre forfait.</value>
+  </data>
+  <data name="ops.api.key_not_found" xml:space="preserve">
+    <value>Cette clé est introuvable.</value>
+  </data>
+  <data name="ops.api.name_required" xml:space="preserve">
+    <value>Donnez un nom à la clé (80 caractères au plus).</value>
+  </data>
+  <data name="ops.api.too_many_endpoints" xml:space="preserve">
+    <value>Il y a déjà 10 adresses. Supprimez-en une d’abord.</value>
+  </data>
+  <data name="ops.api.too_many_keys" xml:space="preserve">
+    <value>Il y a déjà 20 clés actives. Révoquez-en une d’abord.</value>
+  </data>
+  <data name="ops.api.url_invalid" xml:space="preserve">
+    <value>Saisissez une adresse HTTPS sur l’internet public (pas une adresse privée ou locale).</value>
   </data>
   <data name="ops.arrivals.bundles_unopened" xml:space="preserve">
     <value>Ouvrez d’abord chaque groupage qui s’arrête ici et scannez ses colis.</value>
@@ -337,6 +388,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ops.auth.country_needs_second_factor" xml:space="preserve">
     <value>Cet appareil se connecte depuis un autre pays que celui où il a été enregistré. Il faut alors votre deuxième étape (une application d'authentification ou un code de secours), et votre compte n'en a pas encore. Connectez-vous depuis votre lieu habituel pour en configurer une, ou demandez à un administrateur.</value>
   </data>
+  <data name="ops.auth.device_blocked" xml:space="preserve">
+    <value>Cet appareil est bloqué car il a été utilisé depuis un autre pays. Un administrateur de l’entreprise doit le débloquer avant que quiconque puisse s’y connecter.</value>
+  </data>
   <data name="ops.auth.link_invalid" xml:space="preserve">
     <value>Ce lien n’est plus valide. Demandez-en un nouveau.</value>
   </data>
@@ -369,6 +423,72 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ops.billing.refused" xml:space="preserve">
     <value>La facturation n’est pas disponible pour le moment. Réessayez plus tard.</value>
+  </data>
+  <data name="ops.bills.allocation_invalid" xml:space="preserve">
+    <value>Chaque part demande un numéro d’expédition ou d’envoi et un montant supérieur à zéro, une seule fois chacun.</value>
+  </data>
+  <data name="ops.bills.allocation_not_found" xml:space="preserve">
+    <value>Le numéro d’une part n’est ni une expédition ni un envoi.</value>
+  </data>
+  <data name="ops.bills.allocation_too_high" xml:space="preserve">
+    <value>Les parts dépassent le montant de la facture.</value>
+  </data>
+  <data name="ops.bills.amount_invalid" xml:space="preserve">
+    <value>Saisissez un montant supérieur à zéro, au centime près.</value>
+  </data>
+  <data name="ops.bills.carrier_not_on_dispatch" xml:space="preserve">
+    <value>Ce transporteur n’est pas sur cette expédition.</value>
+  </data>
+  <data name="ops.bills.changed" xml:space="preserve">
+    <value>La facture a changé depuis que vous l’avez ouverte. Relisez-la avant de décider.</value>
+  </data>
+  <data name="ops.bills.dates_invalid" xml:space="preserve">
+    <value>L’échéance ne peut pas précéder la date de la facture, et une période dure au plus un an.</value>
+  </data>
+  <data name="ops.bills.not_approvable" xml:space="preserve">
+    <value>Cette facture n’attend pas d’approbation.</value>
+  </data>
+  <data name="ops.bills.not_editable" xml:space="preserve">
+    <value>Seule une facture pas encore approuvée peut être corrigée.</value>
+  </data>
+  <data name="ops.bills.not_found" xml:space="preserve">
+    <value>Cette facture est introuvable.</value>
+  </data>
+  <data name="ops.bills.not_payable" xml:space="preserve">
+    <value>Seule une facture approuvée peut être payée.</value>
+  </data>
+  <data name="ops.bills.not_voidable" xml:space="preserve">
+    <value>Une facture avec un paiement ne peut pas être annulée.</value>
+  </data>
+  <data name="ops.bills.own_bill" xml:space="preserve">
+    <value>Une autre personne que celle qui a saisi la facture doit l’approuver ou la refuser.</value>
+  </data>
+  <data name="ops.bills.party_required" xml:space="preserve">
+    <value>Choisissez qui a envoyé la facture.</value>
+  </data>
+  <data name="ops.bills.payment_too_high" xml:space="preserve">
+    <value>C’est plus que le solde dû sur la facture.</value>
+  </data>
+  <data name="ops.bills.reason_required" xml:space="preserve">
+    <value>Indiquez une raison.</value>
+  </data>
+  <data name="ops.bills.reference_required" xml:space="preserve">
+    <value>Saisissez leur numéro de facture.</value>
+  </data>
+  <data name="ops.bills.reference_taken" xml:space="preserve">
+    <value>Une facture de ce fournisseur avec ce numéro est déjà saisie.</value>
+  </data>
+  <data name="ops.bills.share_not_allowed" xml:space="preserve">
+    <value>Une expédition ne prend que les factures de ses transporteurs, et la facture d’un transporteur va sur des expéditions, pas sur un envoi.</value>
+  </data>
+  <data name="ops.bills.text_invalid" xml:space="preserve">
+    <value>Un texte est trop long ou contient des caractères non permis.</value>
+  </data>
+  <data name="ops.bills.vendor_invalid" xml:space="preserve">
+    <value>Donnez au fournisseur un nom (120 caractères au plus) et une catégorie.</value>
+  </data>
+  <data name="ops.bills.vendor_name_taken" xml:space="preserve">
+    <value>Un autre fournisseur porte déjà ce nom.</value>
   </data>
   <data name="ops.brand.accent_contrast_too_low" xml:space="preserve">
     <value>La couleur d’accent est trop claire sur fond blanc : les boutons exigent un contraste d’au moins {minimum}:1.</value>
@@ -1639,6 +1759,27 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ops.receiving.warehouse_not_receiving" xml:space="preserve">
     <value>Cet entrepôt ne réceptionne pas de colis.</value>
   </data>
+  <data name="ops.reports.not_found" xml:space="preserve">
+    <value>Ce rapport est introuvable.</value>
+  </data>
+  <data name="ops.reports.period_invalid" xml:space="preserve">
+    <value>Choisissez une date de fin égale ou postérieure au début, 13 mois au plus après.</value>
+  </data>
+  <data name="ops.reports.recipients_invalid" xml:space="preserve">
+    <value>Cochez de 1 à 10 membres de votre personnel.</value>
+  </data>
+  <data name="ops.reports.rules_invalid" xml:space="preserve">
+    <value>Saisissez de 0 à 72 heures, et de 1 à 60 jours pour un service (ou laissez vide).</value>
+  </data>
+  <data name="ops.reports.schedule_not_found" xml:space="preserve">
+    <value>Ce rapport programmé est introuvable.</value>
+  </data>
+  <data name="ops.reports.too_many_schedules" xml:space="preserve">
+    <value>Il y a déjà 50 rapports programmés. Arrêtez-en un d’abord.</value>
+  </data>
+  <data name="ops.reports.warehouse_not_allowed" xml:space="preserve">
+    <value>Vous ne pouvez pas voir les rapports de cet entrepôt.</value>
+  </data>
   <data name="ops.roles.grant_exists" xml:space="preserve">
     <value>Cette personne a déjà ce rôle à cet endroit.</value>
   </data>
@@ -1951,6 +2092,33 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ops.supplies.warehouse_prices_invalid" xml:space="preserve">
     <value>Le prix d’un entrepôt doit concerner un entrepôt de l’entreprise, avec au plus deux décimales.</value>
   </data>
+  <data name="ops.texts.channel_unavailable" xml:space="preserve">
+    <value>Ce moyen de recevoir les avis n’est pas proposé.</value>
+  </data>
+  <data name="ops.texts.consent_required" xml:space="preserve">
+    <value>Cochez la case pour accepter de recevoir les avis par message.</value>
+  </data>
+  <data name="ops.texts.feature_off" xml:space="preserve">
+    <value>Les avis par SMS et WhatsApp ne font pas partie de votre forfait.</value>
+  </data>
+  <data name="ops.texts.keys_invalid" xml:space="preserve">
+    <value>Twilio n’a pas accepté cet identifiant de compte et ce jeton. Collez-les à nouveau depuis la console Twilio.</value>
+  </data>
+  <data name="ops.texts.not_connected" xml:space="preserve">
+    <value>Aucun compte Twilio n’est connecté.</value>
+  </data>
+  <data name="ops.texts.provider_refused" xml:space="preserve">
+    <value>Twilio a refusé le message.</value>
+  </data>
+  <data name="ops.texts.provider_unavailable" xml:space="preserve">
+    <value>Twilio est injoignable pour le moment. Réessayez dans un instant.</value>
+  </data>
+  <data name="ops.texts.sender_invalid" xml:space="preserve">
+    <value>Un expéditeur est un numéro au format international (+13055550123) ou, pour les SMS, un identifiant de service de messagerie (MG…).</value>
+  </data>
+  <data name="ops.texts.template_invalid" xml:space="preserve">
+    <value>Un identifiant de modèle WhatsApp commence par HX suivi de 32 caractères.</value>
+  </data>
   <data name="ops.tickets.already_linked" xml:space="preserve">
     <value>Ce ticket est déjà résolu avec un autre colis.</value>
   </data>
@@ -2209,6 +2377,33 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="site.track.title" xml:space="preserve">
     <value>Suivre un envoi</value>
   </data>
+  <data name="text.notice.ActionNeeded" xml:space="preserve">
+    <value>Un de vos colis demande votre attention.</value>
+  </data>
+  <data name="text.notice.DeliveryCode" xml:space="preserve">
+    <value>L’envoi {shipment} est en livraison. Donnez ce code au livreur : {code}</value>
+  </data>
+  <data name="text.notice.OutForDelivery" xml:space="preserve">
+    <value>L’envoi {shipment} est en cours de livraison aujourd’hui.</value>
+  </data>
+  <data name="text.notice.ParcelReceived" xml:space="preserve">
+    <value>Nous avons reçu un colis pour vous.</value>
+  </data>
+  <data name="text.notice.PaymentNotReceived" xml:space="preserve">
+    <value>Nous n’avons pas encore reçu votre paiement.</value>
+  </data>
+  <data name="text.notice.PickupCode" xml:space="preserve">
+    <value>Code de retrait de l’envoi {shipment} : {code}</value>
+  </data>
+  <data name="text.notice.PickupReminder" xml:space="preserve">
+    <value>L’envoi {shipment} vous attend toujours à {place}.</value>
+  </data>
+  <data name="text.notice.ReadyForPickup" xml:space="preserve">
+    <value>L’envoi {shipment} est prêt à retirer à {place}.</value>
+  </data>
+  <data name="text.notice.ShipmentUpdate" xml:space="preserve">
+    <value>Nouvelles de l’envoi {shipment}.</value>
+  </data>
   <data name="ui.access.back" xml:space="preserve">
     <value>Retour à l’accueil</value>
   </data>
@@ -2355,6 +2550,156 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.activity.title" xml:space="preserve">
     <value>Activité de connexion</value>
+  </data>
+  <data name="ui.api.active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="ui.api.add" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="ui.api.add_webhook" xml:space="preserve">
+    <value>Ajouter une adresse</value>
+  </data>
+  <data name="ui.api.deliveries" xml:space="preserve">
+    <value>Dernières remises</value>
+  </data>
+  <data name="ui.api.deliveries_none" xml:space="preserve">
+    <value>Rien n’a encore été envoyé.</value>
+  </data>
+  <data name="ui.api.event" xml:space="preserve">
+    <value>Événement</value>
+  </data>
+  <data name="ui.api.event.CustomerCreated" xml:space="preserve">
+    <value>Nouveaux clients</value>
+  </data>
+  <data name="ui.api.event.InvoiceIssued" xml:space="preserve">
+    <value>Factures émises</value>
+  </data>
+  <data name="ui.api.event.PaymentRecorded" xml:space="preserve">
+    <value>Paiements enregistrés</value>
+  </data>
+  <data name="ui.api.event.Tracking" xml:space="preserve">
+    <value>Événements de suivi (reçu, parti, arrivé, prêt, livré…)</value>
+  </data>
+  <data name="ui.api.events" xml:space="preserve">
+    <value>Événements</value>
+  </data>
+  <data name="ui.api.intro" xml:space="preserve">
+    <value>Permettez à vos propres programmes de lire vos clients, envois, colis, suivis, factures et paiements, et de recevoir vos événements au fil de l’eau. En lecture seule : rien ne peut être modifié par l’API.</value>
+  </data>
+  <data name="ui.api.key" xml:space="preserve">
+    <value>Clé</value>
+  </data>
+  <data name="ui.api.key_made" xml:space="preserve">
+    <value>Clé créée.</value>
+  </data>
+  <data name="ui.api.key_name" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="ui.api.keys" xml:space="preserve">
+    <value>Clés d’API</value>
+  </data>
+  <data name="ui.api.keys_hint" xml:space="preserve">
+    <value>Envoyez une clé dans l’en-tête Authorization : Bearer suivi de la clé. Chaque clé lit tout ; révoquez-la aussitôt si elle fuit.</value>
+  </data>
+  <data name="ui.api.keys_none" xml:space="preserve">
+    <value>Aucune clé pour l’instant.</value>
+  </data>
+  <data name="ui.api.last_success" xml:space="preserve">
+    <value>Dernière remise</value>
+  </data>
+  <data name="ui.api.last_used" xml:space="preserve">
+    <value>Dernière utilisation</value>
+  </data>
+  <data name="ui.api.made" xml:space="preserve">
+    <value>Créée</value>
+  </data>
+  <data name="ui.api.make_key" xml:space="preserve">
+    <value>Créer une clé</value>
+  </data>
+  <data name="ui.api.never" xml:space="preserve">
+    <value>Jamais</value>
+  </data>
+  <data name="ui.api.not_in_plan" xml:space="preserve">
+    <value>L’API et les webhooks ne font pas partie de votre forfait. Vous pouvez changer de forfait dans Facturation.</value>
+  </data>
+  <data name="ui.api.off" xml:space="preserve">
+    <value>Désactivée</value>
+  </data>
+  <data name="ui.api.off_failures" xml:space="preserve">
+    <value>Désactivée : en échec pendant trois jours</value>
+  </data>
+  <data name="ui.api.on" xml:space="preserve">
+    <value>Activée</value>
+  </data>
+  <data name="ui.api.remove" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="ui.api.resend" xml:space="preserve">
+    <value>Renvoyer</value>
+  </data>
+  <data name="ui.api.result" xml:space="preserve">
+    <value>Résultat</value>
+  </data>
+  <data name="ui.api.revoke" xml:space="preserve">
+    <value>Révoquer</value>
+  </data>
+  <data name="ui.api.revoked" xml:space="preserve">
+    <value>Révoquée</value>
+  </data>
+  <data name="ui.api.secret" xml:space="preserve">
+    <value>Secret de signature</value>
+  </data>
+  <data name="ui.api.shown_once" xml:space="preserve">
+    <value>Copiez-le maintenant : il ne sera plus affiché.</value>
+  </data>
+  <data name="ui.api.state" xml:space="preserve">
+    <value>État</value>
+  </data>
+  <data name="ui.api.status.Delivered" xml:space="preserve">
+    <value>Remis</value>
+  </data>
+  <data name="ui.api.status.Failed" xml:space="preserve">
+    <value>Échec</value>
+  </data>
+  <data name="ui.api.status.Pending" xml:space="preserve">
+    <value>En attente</value>
+  </data>
+  <data name="ui.api.test" xml:space="preserve">
+    <value>Envoyer un événement de test</value>
+  </data>
+  <data name="ui.api.test_delivered" xml:space="preserve">
+    <value>L’événement de test a été remis (statut {status}).</value>
+  </data>
+  <data name="ui.api.test_failed" xml:space="preserve">
+    <value>L’événement de test n’a pas été remis ({reason}). Il sera réessayé.</value>
+  </data>
+  <data name="ui.api.title" xml:space="preserve">
+    <value>API et webhooks</value>
+  </data>
+  <data name="ui.api.tries" xml:space="preserve">
+    <value>Essais</value>
+  </data>
+  <data name="ui.api.turn_off" xml:space="preserve">
+    <value>Désactiver</value>
+  </data>
+  <data name="ui.api.turn_on" xml:space="preserve">
+    <value>Activer</value>
+  </data>
+  <data name="ui.api.url" xml:space="preserve">
+    <value>Adresse</value>
+  </data>
+  <data name="ui.api.webhook_added" xml:space="preserve">
+    <value>Adresse ajoutée. Voici son secret de signature.</value>
+  </data>
+  <data name="ui.api.webhooks" xml:space="preserve">
+    <value>Webhooks</value>
+  </data>
+  <data name="ui.api.webhooks_hint" xml:space="preserve">
+    <value>Nous envoyons chaque événement en JSON à votre adresse, signé avec votre secret de signature (en-têtes webhook-id, webhook-timestamp et webhook-signature). Répondez avec un statut 2xx ; les échecs sont réessayés pendant environ un jour et demi. Une adresse en échec pendant trois jours est désactivée.</value>
+  </data>
+  <data name="ui.api.when" xml:space="preserve">
+    <value>Quand</value>
   </data>
   <data name="ui.app.name" xml:space="preserve">
     <value>Opérations</value>
@@ -2600,7 +2945,7 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Imprimantes d'étiquettes</value>
   </data>
   <data name="ui.audit.area.receiving" xml:space="preserve">
-    <value>Réception</value>
+    <value>Réception entrepôt</value>
   </data>
   <data name="ui.audit.area.roles" xml:space="preserve">
     <value>Rôles</value>
@@ -2730,6 +3075,222 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.billing.trial_ends" xml:space="preserve">
     <value>L’essai se termine le {date}</value>
+  </data>
+  <data name="ui.bills.all" xml:space="preserve">
+    <value>Toutes</value>
+  </data>
+  <data name="ui.bills.amount" xml:space="preserve">
+    <value>Montant</value>
+  </data>
+  <data name="ui.bills.amount_in" xml:space="preserve">
+    <value>Montant ({currency})</value>
+  </data>
+  <data name="ui.bills.approve" xml:space="preserve">
+    <value>Approuver</value>
+  </data>
+  <data name="ui.bills.back" xml:space="preserve">
+    <value>Retour aux factures</value>
+  </data>
+  <data name="ui.bills.bill_title" xml:space="preserve">
+    <value>{party} · {reference}</value>
+  </data>
+  <data name="ui.bills.billed_on" xml:space="preserve">
+    <value>Date de facture</value>
+  </data>
+  <data name="ui.bills.category" xml:space="preserve">
+    <value>Pour</value>
+  </data>
+  <data name="ui.bills.category.Customs" xml:space="preserve">
+    <value>Douane</value>
+  </data>
+  <data name="ui.bills.category.Freight" xml:space="preserve">
+    <value>Fret</value>
+  </data>
+  <data name="ui.bills.category.Handling" xml:space="preserve">
+    <value>Manutention et livraison</value>
+  </data>
+  <data name="ui.bills.category.Other" xml:space="preserve">
+    <value>Autre</value>
+  </data>
+  <data name="ui.bills.category.PartnerFee" xml:space="preserve">
+    <value>Frais de partenaire</value>
+  </data>
+  <data name="ui.bills.category.Rent" xml:space="preserve">
+    <value>Loyer</value>
+  </data>
+  <data name="ui.bills.category.Supplies" xml:space="preserve">
+    <value>Fournitures achetées</value>
+  </data>
+  <data name="ui.bills.category.Utilities" xml:space="preserve">
+    <value>Services publics</value>
+  </data>
+  <data name="ui.bills.correct" xml:space="preserve">
+    <value>Corriger la facture</value>
+  </data>
+  <data name="ui.bills.decide" xml:space="preserve">
+    <value>Approuver ou renvoyer</value>
+  </data>
+  <data name="ui.bills.decided_by" xml:space="preserve">
+    <value>Décidée par</value>
+  </data>
+  <data name="ui.bills.done.approved" xml:space="preserve">
+    <value>La facture est approuvée.</value>
+  </data>
+  <data name="ui.bills.done.paid" xml:space="preserve">
+    <value>Le paiement est enregistré.</value>
+  </data>
+  <data name="ui.bills.done.rejected" xml:space="preserve">
+    <value>La facture est renvoyée.</value>
+  </data>
+  <data name="ui.bills.done.saved" xml:space="preserve">
+    <value>La facture est enregistrée.</value>
+  </data>
+  <data name="ui.bills.done.voided" xml:space="preserve">
+    <value>La facture est annulée.</value>
+  </data>
+  <data name="ui.bills.due_on" xml:space="preserve">
+    <value>Échéance</value>
+  </data>
+  <data name="ui.bills.entered_by" xml:space="preserve">
+    <value>Saisie par</value>
+  </data>
+  <data name="ui.bills.filter" xml:space="preserve">
+    <value>Afficher</value>
+  </data>
+  <data name="ui.bills.method" xml:space="preserve">
+    <value>Comment</value>
+  </data>
+  <data name="ui.bills.method.BankTransfer" xml:space="preserve">
+    <value>Virement</value>
+  </data>
+  <data name="ui.bills.method.Card" xml:space="preserve">
+    <value>Carte</value>
+  </data>
+  <data name="ui.bills.method.Cash" xml:space="preserve">
+    <value>Espèces</value>
+  </data>
+  <data name="ui.bills.method.Cheque" xml:space="preserve">
+    <value>Chèque</value>
+  </data>
+  <data name="ui.bills.method.Other" xml:space="preserve">
+    <value>Autre</value>
+  </data>
+  <data name="ui.bills.method.Zelle" xml:space="preserve">
+    <value>Zelle</value>
+  </data>
+  <data name="ui.bills.need_approval" xml:space="preserve">
+    <value>Les factures demandent l’approbation d’une autre personne</value>
+  </data>
+  <data name="ui.bills.need_approval_hint" xml:space="preserve">
+    <value>Désactivé : une facture compte dans les coûts dès sa saisie.</value>
+  </data>
+  <data name="ui.bills.new" xml:space="preserve">
+    <value>Nouvelle facture</value>
+  </data>
+  <data name="ui.bills.none" xml:space="preserve">
+    <value>Aucune facture ici.</value>
+  </data>
+  <data name="ui.bills.note" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="ui.bills.overdue" xml:space="preserve">
+    <value>En retard</value>
+  </data>
+  <data name="ui.bills.overhead" xml:space="preserve">
+    <value>Non réparti (coût général) : {amount}</value>
+  </data>
+  <data name="ui.bills.owed" xml:space="preserve">
+    <value>Dû</value>
+  </data>
+  <data name="ui.bills.paid" xml:space="preserve">
+    <value>Payé</value>
+  </data>
+  <data name="ui.bills.paid_on" xml:space="preserve">
+    <value>Payé le</value>
+  </data>
+  <data name="ui.bills.party" xml:space="preserve">
+    <value>De</value>
+  </data>
+  <data name="ui.bills.party_kind.Carrier" xml:space="preserve">
+    <value>Transporteurs</value>
+  </data>
+  <data name="ui.bills.party_kind.Partner" xml:space="preserve">
+    <value>Agents partenaires</value>
+  </data>
+  <data name="ui.bills.party_kind.Vendor" xml:space="preserve">
+    <value>Autres fournisseurs</value>
+  </data>
+  <data name="ui.bills.payment_reference" xml:space="preserve">
+    <value>Référence (chèque, virement)</value>
+  </data>
+  <data name="ui.bills.payments" xml:space="preserve">
+    <value>Paiements effectués</value>
+  </data>
+  <data name="ui.bills.reason" xml:space="preserve">
+    <value>Raison</value>
+  </data>
+  <data name="ui.bills.record_payment" xml:space="preserve">
+    <value>Enregistrer un paiement effectué</value>
+  </data>
+  <data name="ui.bills.reference" xml:space="preserve">
+    <value>Leur numéro</value>
+  </data>
+  <data name="ui.bills.reject" xml:space="preserve">
+    <value>Renvoyer (raison requise)</value>
+  </data>
+  <data name="ui.bills.save" xml:space="preserve">
+    <value>Enregistrer la facture</value>
+  </data>
+  <data name="ui.bills.save_settings" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="ui.bills.settings" xml:space="preserve">
+    <value>Approbation</value>
+  </data>
+  <data name="ui.bills.share_number" xml:space="preserve">
+    <value>Numéro d’expédition ou d’envoi</value>
+  </data>
+  <data name="ui.bills.shares" xml:space="preserve">
+    <value>Répartie sur des expéditions ou des envois</value>
+  </data>
+  <data name="ui.bills.shares_hint" xml:space="preserve">
+    <value>Tapez un numéro d’expédition (son coût transporteur, réparti sur ses envois au poids taxable) ou un numéro d’envoi (un coût de cet envoi) et le montant. Le reste est un coût général.</value>
+  </data>
+  <data name="ui.bills.state" xml:space="preserve">
+    <value>État</value>
+  </data>
+  <data name="ui.bills.status.Approved" xml:space="preserve">
+    <value>Approuvée, à payer</value>
+  </data>
+  <data name="ui.bills.status.Entered" xml:space="preserve">
+    <value>En attente d’approbation</value>
+  </data>
+  <data name="ui.bills.status.Paid" xml:space="preserve">
+    <value>Payée</value>
+  </data>
+  <data name="ui.bills.status.Rejected" xml:space="preserve">
+    <value>Renvoyée</value>
+  </data>
+  <data name="ui.bills.status.Voided" xml:space="preserve">
+    <value>Annulée</value>
+  </data>
+  <data name="ui.bills.still_owed" xml:space="preserve">
+    <value>Reste dû</value>
+  </data>
+  <data name="ui.bills.title" xml:space="preserve">
+    <value>Factures fournisseurs</value>
+  </data>
+  <data name="ui.bills.to_approve" xml:space="preserve">
+    <value>En attente d’approbation</value>
+  </data>
+  <data name="ui.bills.void" xml:space="preserve">
+    <value>Annuler cette facture</value>
+  </data>
+  <data name="ui.bills.void_reason" xml:space="preserve">
+    <value>Annulée car</value>
+  </data>
+  <data name="ui.bills.waits_for_approval" xml:space="preserve">
+    <value>Une fois enregistrée, la facture attend l’approbation d’une autre personne.</value>
   </data>
   <data name="ui.boxes.back" xml:space="preserve">
     <value>Retour aux envois consolidés</value>
@@ -3350,7 +3911,7 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Rechercher</value>
   </data>
   <data name="ui.cashier.in_full" xml:space="preserve">
-    <value>Payé en totalité : les montants doivent faire exactement ce qui est dû. Plusieurs modes peuvent être combinés.</value>
+    <value>Ajoutez chaque paiement du client : il est déduit du reste. Encaissez quand il ne reste rien.</value>
   </data>
   <data name="ui.cashier.method" xml:space="preserve">
     <value>Mode</value>
@@ -3938,10 +4499,10 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Enregistrez vos codes de récupération</value>
   </data>
   <data name="ui.company.change" xml:space="preserve">
-    <value>Changer les informations légales</value>
+    <value>Changer la raison sociale</value>
   </data>
   <data name="ui.company.change_hint" xml:space="preserve">
-    <value>Saisissez les nouvelles informations, le motif et un justificatif (PDF, PNG ou JPEG, 10 Mo au plus). Le support le vérifie avant que le changement ne s’applique.</value>
+    <value>Saisissez la nouvelle raison sociale, le motif et un justificatif (PDF, PNG ou JPEG, 10 Mo au plus), par exemple l’extrait d’immatriculation. Le support le vérifie avant d’appliquer le changement.</value>
   </data>
   <data name="ui.company.change_status.approved" xml:space="preserve">
     <value>Approuvée</value>
@@ -3971,10 +4532,10 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Langue de l’entreprise</value>
   </data>
   <data name="ui.company.legal" xml:space="preserve">
-    <value>Informations légales</value>
+    <value>Raison sociale</value>
   </data>
   <data name="ui.company.legal_hint" xml:space="preserve">
-    <value>Ces informations figurent sur les factures de votre fournisseur. Pour les changer, envoyez une demande avec justificatif ci-dessous.</value>
+    <value>Seule la raison sociale demande une requête avec justificatif, vérifiée par votre fournisseur avant d’être appliquée. Tout le reste se modifie directement ci-dessous.</value>
   </data>
   <data name="ui.company.legal_name" xml:space="preserve">
     <value>Raison sociale</value>
@@ -4319,7 +4880,7 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Au-delà de votre limite, une personne autorisée à approuver les remises saisit son e-mail et le code de son application d’authentification.</value>
   </data>
   <data name="ui.counter.supplies.approver_code" xml:space="preserve">
-    <value>Son code</value>
+    <value>Son code ou mot de passe</value>
   </data>
   <data name="ui.counter.supplies.approver_email" xml:space="preserve">
     <value>E-mail de l’approbateur</value>
@@ -4412,7 +4973,7 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Pour annuler cette commande, une personne autorisée demande l’annulation de sa facture ; dès qu’une autre personne l’approuve, la commande est annulée et son stock revient.</value>
   </data>
   <data name="ui.counter.title" xml:space="preserve">
-    <value>Comptoir</value>
+    <value>Dépôt client</value>
   </data>
   <data name="ui.counter.value" xml:space="preserve">
     <value>Valeur ({currency})</value>
@@ -5516,13 +6077,55 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Suspendu</value>
   </data>
   <data name="ui.customers.status_hint" xml:space="preserve">
-    <value>Suspendre ou fermer déconnecte le client immédiatement.</value>
+    <value>Le client est prévenu par e-mail, sans la raison. La raison reste dans l’historique du client.</value>
   </data>
   <data name="ui.customers.status_submit" xml:space="preserve">
     <value>Changer le statut</value>
   </data>
   <data name="ui.customers.title" xml:space="preserve">
     <value>Clients</value>
+  </data>
+  <data name="ui.dashboard.arriving" xml:space="preserve">
+    <value>Expéditions en route vers ici</value>
+  </data>
+  <data name="ui.dashboard.bills_overdue" xml:space="preserve">
+    <value>Factures fournisseurs en retard</value>
+  </data>
+  <data name="ui.dashboard.bills_to_approve" xml:space="preserve">
+    <value>Factures fournisseurs à approuver</value>
+  </data>
+  <data name="ui.dashboard.credit_charges" xml:space="preserve">
+    <value>Débits de compte à approuver</value>
+  </data>
+  <data name="ui.dashboard.holds" xml:space="preserve">
+    <value>Colis retenus</value>
+  </data>
+  <data name="ui.dashboard.invoices_overdue" xml:space="preserve">
+    <value>Factures en retard</value>
+  </data>
+  <data name="ui.dashboard.open_shipments" xml:space="preserve">
+    <value>Envois ouverts</value>
+  </data>
+  <data name="ui.dashboard.payments_to_verify" xml:space="preserve">
+    <value>Paiements à vérifier</value>
+  </data>
+  <data name="ui.dashboard.ready_for_pickup" xml:space="preserve">
+    <value>Colis prêts à retirer</value>
+  </data>
+  <data name="ui.dashboard.tickets" xml:space="preserve">
+    <value>Tickets de colis ouverts</value>
+  </data>
+  <data name="ui.dashboard.title" xml:space="preserve">
+    <value>À traiter</value>
+  </data>
+  <data name="ui.dashboard.to_dispatch" xml:space="preserve">
+    <value>Expéditions à faire partir</value>
+  </data>
+  <data name="ui.dashboard.to_inspect" xml:space="preserve">
+    <value>Colis à inspecter</value>
+  </data>
+  <data name="ui.dashboard.webhooks_off" xml:space="preserve">
+    <value>Adresses de webhook désactivées</value>
   </data>
   <data name="ui.declaration.accept" xml:space="preserve">
     <value>J’accepte les conditions de cette assurance.</value>
@@ -6166,6 +6769,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.dispatch.cost.at_departure" xml:space="preserve">
     <value>Calculé au départ de l’expédition</value>
   </data>
+  <data name="ui.dispatch.cost.billed" xml:space="preserve">
+    <value>Facturé par les transporteurs</value>
+  </data>
   <data name="ui.dispatch.cost.computed" xml:space="preserve">
     <value>Calculé d’après les tarifs</value>
   </data>
@@ -6532,9 +7138,6 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.editor.branch.edit" xml:space="preserve">
     <value>Modifier l’agence</value>
   </data>
-  <data name="ui.editor.branch.side" xml:space="preserve">
-    <value>Rôle dans l’expédition</value>
-  </data>
   <data name="ui.editor.branches" xml:space="preserve">
     <value>Agences</value>
   </data>
@@ -6664,6 +7267,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.editor.nav.activity" xml:space="preserve">
     <value>Activité de connexion</value>
   </data>
+  <data name="ui.editor.nav.api_settings" xml:space="preserve">
+    <value>API et webhooks</value>
+  </data>
   <data name="ui.editor.nav.arrivals" xml:space="preserve">
     <value>Arrivées</value>
   </data>
@@ -6672,6 +7278,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.editor.nav.billing" xml:space="preserve">
     <value>Facturation</value>
+  </data>
+  <data name="ui.editor.nav.bills" xml:space="preserve">
+    <value>Factures fournisseurs</value>
   </data>
   <data name="ui.editor.nav.bundle_settings" xml:space="preserve">
     <value>Paramètres des groupages</value>
@@ -6692,7 +7301,7 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Entreprise</value>
   </data>
   <data name="ui.editor.nav.counter" xml:space="preserve">
-    <value>Comptoir</value>
+    <value>Dépôt client</value>
   </data>
   <data name="ui.editor.nav.credit" xml:space="preserve">
     <value>Comptes de crédit</value>
@@ -6763,11 +7372,20 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.editor.nav.pickup_settings" xml:space="preserve">
     <value>Paramètres du retrait</value>
   </data>
+  <data name="ui.editor.nav.profit" xml:space="preserve">
+    <value>Marge</value>
+  </data>
   <data name="ui.editor.nav.quotes" xml:space="preserve">
     <value>Devis</value>
   </data>
   <data name="ui.editor.nav.receiving" xml:space="preserve">
-    <value>Réception</value>
+    <value>Réception entrepôt</value>
+  </data>
+  <data name="ui.editor.nav.report_settings" xml:space="preserve">
+    <value>Règles des rapports</value>
+  </data>
+  <data name="ui.editor.nav.reports" xml:space="preserve">
+    <value>Rapports</value>
   </data>
   <data name="ui.editor.nav.roles" xml:space="preserve">
     <value>Rôles</value>
@@ -6792,6 +7410,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.editor.nav.supplies_stock" xml:space="preserve">
     <value>Stock de fournitures</value>
+  </data>
+  <data name="ui.editor.nav.texts_settings" xml:space="preserve">
+    <value>Messages</value>
   </data>
   <data name="ui.editor.nav.verify" xml:space="preserve">
     <value>Paiements à vérifier</value>
@@ -6862,15 +7483,6 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.editor.show_on_site" xml:space="preserve">
     <value>Afficher sur le site</value>
   </data>
-  <data name="ui.editor.side.both" xml:space="preserve">
-    <value>Les deux</value>
-  </data>
-  <data name="ui.editor.side.destination" xml:space="preserve">
-    <value>Destination (retrait par les clients)</value>
-  </data>
-  <data name="ui.editor.side.origin" xml:space="preserve">
-    <value>Origine (réception des colis)</value>
-  </data>
   <data name="ui.editor.site.accent" xml:space="preserve">
     <value>Couleur d’accent</value>
   </data>
@@ -6887,7 +7499,7 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Images</value>
   </data>
   <data name="ui.editor.site.images_hint" xml:space="preserve">
-    <value>PNG, JPEG ou WebP, 1 Mo au plus. L’icône du site est carrée, 256 Ko au plus.</value>
+    <value>PNG, JPEG ou WebP, 1 Mo au plus. Le favicon est carré, 256 Ko au plus. Les marges vides autour d’un logo sont retirées à l’envoi, pour qu’il s’affiche le plus grand possible.</value>
   </data>
   <data name="ui.editor.site.plan_content" xml:space="preserve">
     <value>Votre formule affiche les textes par défaut et aucune image principale sur votre site. Vos textes et images sont conservés et s’affichent si vous changez de formule.</value>
@@ -8812,6 +9424,15 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.licences.back" xml:space="preserve">
     <value>Toutes les licences</value>
   </data>
+  <data name="ui.licences.blocked" xml:space="preserve">
+    <value>Bloqué</value>
+  </data>
+  <data name="ui.licences.blocked_text" xml:space="preserve">
+    <value>Cet appareil a été utilisé depuis {country} le {time} ; il est enregistré en {registered}. Personne ne peut s’y connecter tant qu’un administrateur ne l’a pas débloqué. Ne le débloquez que lorsque vous savez qui l’a utilisé et pourquoi.</value>
+  </data>
+  <data name="ui.licences.blocked_title" xml:space="preserve">
+    <value>Bloqué : utilisé depuis un autre pays</value>
+  </data>
   <data name="ui.licences.decide" xml:space="preserve">
     <value>Approuver cet appareil ?</value>
   </data>
@@ -8862,6 +9483,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.licences.title" xml:space="preserve">
     <value>Licences</value>
+  </data>
+  <data name="ui.licences.unblock" xml:space="preserve">
+    <value>Débloquer cet appareil</value>
   </data>
   <data name="ui.manifest.arrives" xml:space="preserve">
     <value>Arrivée</value>
@@ -8991,6 +9615,75 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.milestone.ReturnedToSender" xml:space="preserve">
     <value>Retourné à l'expéditeur</value>
+  </data>
+  <data name="ui.move.cancel" xml:space="preserve">
+    <value>Un autre colis</value>
+  </data>
+  <data name="ui.move.done" xml:space="preserve">
+    <value>{package} est sur l’étagère {shelf}. Scannez le colis suivant.</value>
+  </data>
+  <data name="ui.move.intro" xml:space="preserve">
+    <value>Scannez un colis, puis l’étagère où il va.</value>
+  </data>
+  <data name="ui.move.next" xml:space="preserve">
+    <value>Suivant</value>
+  </data>
+  <data name="ui.move.package" xml:space="preserve">
+    <value>Colis</value>
+  </data>
+  <data name="ui.move.shelf" xml:space="preserve">
+    <value>Étagère</value>
+  </data>
+  <data name="ui.move.submit" xml:space="preserve">
+    <value>Déplacer</value>
+  </data>
+  <data name="ui.move.title" xml:space="preserve">
+    <value>Déplacer des colis</value>
+  </data>
+  <data name="ui.onhand.any_shelf" xml:space="preserve">
+    <value>Toutes les étagères</value>
+  </data>
+  <data name="ui.onhand.any_zone" xml:space="preserve">
+    <value>Toutes les zones</value>
+  </data>
+  <data name="ui.onhand.days" xml:space="preserve">
+    <value>En stock depuis au moins (jours)</value>
+  </data>
+  <data name="ui.onhand.days_on_hand" xml:space="preserve">
+    <value>Jours</value>
+  </data>
+  <data name="ui.onhand.filter" xml:space="preserve">
+    <value>Afficher</value>
+  </data>
+  <data name="ui.onhand.held" xml:space="preserve">
+    <value>En attente</value>
+  </data>
+  <data name="ui.onhand.intro" xml:space="preserve">
+    <value>Tous les colis physiquement présents dans vos entrepôts, du plus ancien au plus récent.</value>
+  </data>
+  <data name="ui.onhand.move" xml:space="preserve">
+    <value>Déplacer des colis</value>
+  </data>
+  <data name="ui.onhand.no_shelf" xml:space="preserve">
+    <value>sans étagère</value>
+  </data>
+  <data name="ui.onhand.none" xml:space="preserve">
+    <value>Aucun colis en stock avec ces filtres.</value>
+  </data>
+  <data name="ui.onhand.shelf" xml:space="preserve">
+    <value>Étagère</value>
+  </data>
+  <data name="ui.onhand.shipment" xml:space="preserve">
+    <value>Envoi</value>
+  </data>
+  <data name="ui.onhand.title" xml:space="preserve">
+    <value>Colis en stock</value>
+  </data>
+  <data name="ui.onhand.totals" xml:space="preserve">
+    <value>Colis : {count} · Poids : {weight}</value>
+  </data>
+  <data name="ui.onhand.unshelved" xml:space="preserve">
+    <value>Sans étagère</value>
   </data>
   <data name="ui.parcels.all_warehouses" xml:space="preserve">
     <value>Tous les entrepôts</value>
@@ -9274,6 +9967,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.permissions.area.audit" xml:space="preserve">
     <value>Historique</value>
   </data>
+  <data name="ui.permissions.area.bills" xml:space="preserve">
+    <value>Factures fournisseurs</value>
+  </data>
   <data name="ui.permissions.area.branches" xml:space="preserve">
     <value>Agences</value>
   </data>
@@ -9282,6 +9978,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.permissions.area.company" xml:space="preserve">
     <value>Entreprise</value>
+  </data>
+  <data name="ui.permissions.area.costs" xml:space="preserve">
+    <value>Coûts</value>
   </data>
   <data name="ui.permissions.area.credits" xml:space="preserve">
     <value>Avoirs</value>
@@ -9314,7 +10013,7 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Imprimantes d'étiquettes</value>
   </data>
   <data name="ui.permissions.area.receiving" xml:space="preserve">
-    <value>Réception</value>
+    <value>Réception entrepôt</value>
   </data>
   <data name="ui.permissions.area.roles" xml:space="preserve">
     <value>Rôles</value>
@@ -9339,6 +10038,12 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.permissions.ops.audit.view" xml:space="preserve">
     <value>Voir l’historique</value>
+  </data>
+  <data name="ui.permissions.ops.bills.approve" xml:space="preserve">
+    <value>Approuver les factures fournisseurs et enregistrer les paiements</value>
+  </data>
+  <data name="ui.permissions.ops.bills.enter" xml:space="preserve">
+    <value>Saisir les factures fournisseurs et les fournisseurs</value>
   </data>
   <data name="ui.permissions.ops.branches.manage" xml:space="preserve">
     <value>Gérer les agences et les contacts</value>
@@ -9369,6 +10074,9 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.permissions.ops.company.view" xml:space="preserve">
     <value>Voir les informations de l’entreprise</value>
+  </data>
+  <data name="ui.permissions.ops.costs.view" xml:space="preserve">
+    <value>Voir les coûts et la marge</value>
   </data>
   <data name="ui.permissions.ops.counter.serve" xml:space="preserve">
     <value>Servir les clients au comptoir</value>
@@ -9459,6 +10167,12 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.permissions.ops.receiving.receive" xml:space="preserve">
     <value>Réceptionner les colis et les ranger</value>
+  </data>
+  <data name="ui.permissions.ops.reports.finance" xml:space="preserve">
+    <value>Voir les rapports financiers et les montants</value>
+  </data>
+  <data name="ui.permissions.ops.reports.operations" xml:space="preserve">
+    <value>Voir les rapports d’exploitation, clients et transporteurs</value>
   </data>
   <data name="ui.permissions.ops.roles.create" xml:space="preserve">
     <value>Créer des rôles</value>
@@ -9868,6 +10582,57 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.printers.title" xml:space="preserve">
     <value>Imprimantes d'étiquettes de {warehouse}</value>
   </data>
+  <data name="ui.profit.carrier" xml:space="preserve">
+    <value>Coût transporteur</value>
+  </data>
+  <data name="ui.profit.csv" xml:space="preserve">
+    <value>Télécharger le CSV</value>
+  </data>
+  <data name="ui.profit.estimated" xml:space="preserve">
+    <value>estimation</value>
+  </data>
+  <data name="ui.profit.from" xml:space="preserve">
+    <value>Du</value>
+  </data>
+  <data name="ui.profit.how" xml:space="preserve">
+    <value>Envois facturés dans la période. Revenu : les factures sans taxes de vente, sans droits ni taxes locales perçus pour l’État, moins les avoirs. Coût transporteur : la part de chaque expédition, selon la facture du transporteur une fois approuvée, l’estimation jusque-là.</value>
+  </data>
+  <data name="ui.profit.margin" xml:space="preserve">
+    <value>Taux de marge</value>
+  </data>
+  <data name="ui.profit.none" xml:space="preserve">
+    <value>Aucun envoi facturé dans cette période.</value>
+  </data>
+  <data name="ui.profit.not_dispatched" xml:space="preserve">
+    <value>pas encore expédié</value>
+  </data>
+  <data name="ui.profit.other" xml:space="preserve">
+    <value>Autres coûts</value>
+  </data>
+  <data name="ui.profit.panel" xml:space="preserve">
+    <value>Coûts et marge</value>
+  </data>
+  <data name="ui.profit.profit" xml:space="preserve">
+    <value>Marge</value>
+  </data>
+  <data name="ui.profit.revenue" xml:space="preserve">
+    <value>Revenu</value>
+  </data>
+  <data name="ui.profit.shipment" xml:space="preserve">
+    <value>Envoi</value>
+  </data>
+  <data name="ui.profit.show" xml:space="preserve">
+    <value>Afficher</value>
+  </data>
+  <data name="ui.profit.title" xml:space="preserve">
+    <value>Marge par envoi</value>
+  </data>
+  <data name="ui.profit.to" xml:space="preserve">
+    <value>Au</value>
+  </data>
+  <data name="ui.profit.total" xml:space="preserve">
+    <value>Total ({count} envois)</value>
+  </data>
   <data name="ui.quotes.consolidated" xml:space="preserve">
     <value>Consolidé</value>
   </data>
@@ -10139,7 +10904,7 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Reçus d'entrepôt</value>
   </data>
   <data name="ui.receiving.title" xml:space="preserve">
-    <value>Réception</value>
+    <value>Réception entrepôt</value>
   </data>
   <data name="ui.receiving.warehouse" xml:space="preserve">
     <value>Entrepôt</value>
@@ -10158,6 +10923,552 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.recovery.title" xml:space="preserve">
     <value>Utiliser un code de récupération</value>
+  </data>
+  <data name="ui.reports.about.activity" xml:space="preserve">
+    <value>Colis reçus, inspectés, retenus, partis, arrivés, prêts, retirés et livrés, chaque jour.</value>
+  </data>
+  <data name="ui.reports.about.carrier_cost" xml:space="preserve">
+    <value>Par transporteur : expéditions parties, coût estimé, montant facturé et écart.</value>
+  </data>
+  <data name="ui.reports.about.dwell" xml:space="preserve">
+    <value>Pour les colis partis dans la période : jours entre réception et départ (moyenne, médiane, 90 % des colis en dessous).</value>
+  </data>
+  <data name="ui.reports.about.holds" xml:space="preserve">
+    <value>Retenues ouvertes dans la période par motif, combien ont été levées et leur durée.</value>
+  </data>
+  <data name="ui.reports.about.inactive_customers" xml:space="preserve">
+    <value>Clients ayant déjà expédié, mais pas depuis le nombre de jours choisi.</value>
+  </data>
+  <data name="ui.reports.about.on_time" xml:space="preserve">
+    <value>Étapes parties à l’heure prévue, et colis prêts dans le délai de leur service, selon les règles de Paramètres → Règles des rapports.</value>
+  </data>
+  <data name="ui.reports.about.payables" xml:space="preserve">
+    <value>Ce que l’entreprise doit sur les factures fournisseurs saisies ou approuvées, selon les jours de retard.</value>
+  </data>
+  <data name="ui.reports.about.payments" xml:space="preserve">
+    <value>Paiements encaissés, réglés et encore attendus, par mode, entrepôt ou période.</value>
+  </data>
+  <data name="ui.reports.about.profit" xml:space="preserve">
+    <value>Revenu, coût transporteur, autres coûts et marge de chaque envoi facturé.</value>
+  </data>
+  <data name="ui.reports.about.receivables" xml:space="preserve">
+    <value>Ce que chaque client doit aujourd’hui, selon les jours de retard au jour choisi.</value>
+  </data>
+  <data name="ui.reports.about.sales" xml:space="preserve">
+    <value>Factures émises (sans les annulées), par période, service, trajet, client ou entrepôt.</value>
+  </data>
+  <data name="ui.reports.about.shipments" xml:space="preserve">
+    <value>Envois créés et réservés, avec leurs colis et leur poids.</value>
+  </data>
+  <data name="ui.reports.about.signups" xml:space="preserve">
+    <value>Clients inscrits, et clients ayant réservé au moins un envoi.</value>
+  </data>
+  <data name="ui.reports.about.stock_age" xml:space="preserve">
+    <value>Colis présents dans chaque entrepôt (reçus, pas encore partis), selon les jours depuis leur arrivée ; les non réclamés à part.</value>
+  </data>
+  <data name="ui.reports.about.supplies_value" xml:space="preserve">
+    <value>Fournitures en stock dans chaque entrepôt et leur valeur au prix du jour.</value>
+  </data>
+  <data name="ui.reports.about.taxes" xml:space="preserve">
+    <value>Taxes sur les factures émises, par type et taux, moins ce que les avoirs ont rendu.</value>
+  </data>
+  <data name="ui.reports.about.top_customers" xml:space="preserve">
+    <value>Les 50 clients au plus gros revenu (ou poids) dans la période.</value>
+  </data>
+  <data name="ui.reports.about.transit" xml:space="preserve">
+    <value>Heures entre départ et arrivée des étapes arrivées, par transporteur et trajet.</value>
+  </data>
+  <data name="ui.reports.all_warehouses" xml:space="preserve">
+    <value>Tous mes entrepôts</value>
+  </data>
+  <data name="ui.reports.as_of" xml:space="preserve">
+    <value>Au {day}</value>
+  </data>
+  <data name="ui.reports.as_of_label" xml:space="preserve">
+    <value>Au</value>
+  </data>
+  <data name="ui.reports.back" xml:space="preserve">
+    <value>Tous les rapports</value>
+  </data>
+  <data name="ui.reports.by" xml:space="preserve">
+    <value>Lignes</value>
+  </data>
+  <data name="ui.reports.by.Customer" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="ui.reports.by.Method" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="ui.reports.by.Period" xml:space="preserve">
+    <value>Période</value>
+  </data>
+  <data name="ui.reports.by.Route" xml:space="preserve">
+    <value>Trajet</value>
+  </data>
+  <data name="ui.reports.by.Service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="ui.reports.by.Warehouse" xml:space="preserve">
+    <value>Entrepôt</value>
+  </data>
+  <data name="ui.reports.column.active_customers" xml:space="preserve">
+    <value>Clients actifs</value>
+  </data>
+  <data name="ui.reports.column.amount" xml:space="preserve">
+    <value>Réglé</value>
+  </data>
+  <data name="ui.reports.column.arrived" xml:space="preserve">
+    <value>Arrivés</value>
+  </data>
+  <data name="ui.reports.column.average_days" xml:space="preserve">
+    <value>Jours en moyenne</value>
+  </data>
+  <data name="ui.reports.column.average_hours" xml:space="preserve">
+    <value>Heures en moyenne</value>
+  </data>
+  <data name="ui.reports.column.basis" xml:space="preserve">
+    <value>Base taxable</value>
+  </data>
+  <data name="ui.reports.column.billed" xml:space="preserve">
+    <value>Facturé</value>
+  </data>
+  <data name="ui.reports.column.booked" xml:space="preserve">
+    <value>Réservés</value>
+  </data>
+  <data name="ui.reports.column.created" xml:space="preserve">
+    <value>Créés</value>
+  </data>
+  <data name="ui.reports.column.credited" xml:space="preserve">
+    <value>Rendu</value>
+  </data>
+  <data name="ui.reports.column.current" xml:space="preserve">
+    <value>Non échu</value>
+  </data>
+  <data name="ui.reports.column.days_0_7" xml:space="preserve">
+    <value>0–7 jours</value>
+  </data>
+  <data name="ui.reports.column.days_15_30" xml:space="preserve">
+    <value>15–30 jours</value>
+  </data>
+  <data name="ui.reports.column.days_1_30" xml:space="preserve">
+    <value>1–30 jours</value>
+  </data>
+  <data name="ui.reports.column.days_31_60" xml:space="preserve">
+    <value>31–60 jours</value>
+  </data>
+  <data name="ui.reports.column.days_61_90" xml:space="preserve">
+    <value>61–90 jours</value>
+  </data>
+  <data name="ui.reports.column.days_8_14" xml:space="preserve">
+    <value>8–14 jours</value>
+  </data>
+  <data name="ui.reports.column.days_over_60" xml:space="preserve">
+    <value>Plus de 60 jours</value>
+  </data>
+  <data name="ui.reports.column.days_over_90" xml:space="preserve">
+    <value>Plus de 90 jours</value>
+  </data>
+  <data name="ui.reports.column.days_since" xml:space="preserve">
+    <value>Jours depuis le dernier envoi</value>
+  </data>
+  <data name="ui.reports.column.delivered" xml:space="preserve">
+    <value>Livrés</value>
+  </data>
+  <data name="ui.reports.column.delivery_failed" xml:space="preserve">
+    <value>Livraison échouée</value>
+  </data>
+  <data name="ui.reports.column.departed" xml:space="preserve">
+    <value>Partis</value>
+  </data>
+  <data name="ui.reports.column.difference" xml:space="preserve">
+    <value>Facturé moins estimé</value>
+  </data>
+  <data name="ui.reports.column.dispatches" xml:space="preserve">
+    <value>Expéditions</value>
+  </data>
+  <data name="ui.reports.column.estimated" xml:space="preserve">
+    <value>Estimé</value>
+  </data>
+  <data name="ui.reports.column.holds_opened" xml:space="preserve">
+    <value>Retenus</value>
+  </data>
+  <data name="ui.reports.column.inspected" xml:space="preserve">
+    <value>Inspectés</value>
+  </data>
+  <data name="ui.reports.column.invoices" xml:space="preserve">
+    <value>Factures</value>
+  </data>
+  <data name="ui.reports.column.items" xml:space="preserve">
+    <value>Articles</value>
+  </data>
+  <data name="ui.reports.column.late" xml:space="preserve">
+    <value>En retard</value>
+  </data>
+  <data name="ui.reports.column.legs" xml:space="preserve">
+    <value>Étapes</value>
+  </data>
+  <data name="ui.reports.column.measured" xml:space="preserve">
+    <value>Mesurés</value>
+  </data>
+  <data name="ui.reports.column.median_days" xml:space="preserve">
+    <value>Jours médians</value>
+  </data>
+  <data name="ui.reports.column.median_hours" xml:space="preserve">
+    <value>Heures médianes</value>
+  </data>
+  <data name="ui.reports.column.net_tax" xml:space="preserve">
+    <value>Taxe nette</value>
+  </data>
+  <data name="ui.reports.column.new_customers" xml:space="preserve">
+    <value>Nouveaux clients</value>
+  </data>
+  <data name="ui.reports.column.on_hand" xml:space="preserve">
+    <value>Présents</value>
+  </data>
+  <data name="ui.reports.column.on_time" xml:space="preserve">
+    <value>À l’heure</value>
+  </data>
+  <data name="ui.reports.column.on_time_percent" xml:space="preserve">
+    <value>% à l’heure</value>
+  </data>
+  <data name="ui.reports.column.opened" xml:space="preserve">
+    <value>Ouvertes</value>
+  </data>
+  <data name="ui.reports.column.owed" xml:space="preserve">
+    <value>Dû</value>
+  </data>
+  <data name="ui.reports.column.p90_days" xml:space="preserve">
+    <value>90 % en dessous (jours)</value>
+  </data>
+  <data name="ui.reports.column.parcels" xml:space="preserve">
+    <value>Colis</value>
+  </data>
+  <data name="ui.reports.column.payments" xml:space="preserve">
+    <value>Paiements</value>
+  </data>
+  <data name="ui.reports.column.pending" xml:space="preserve">
+    <value>En attente</value>
+  </data>
+  <data name="ui.reports.column.picked_up" xml:space="preserve">
+    <value>Retirés</value>
+  </data>
+  <data name="ui.reports.column.ready" xml:space="preserve">
+    <value>Prêts</value>
+  </data>
+  <data name="ui.reports.column.received" xml:space="preserve">
+    <value>Reçus</value>
+  </data>
+  <data name="ui.reports.column.released" xml:space="preserve">
+    <value>Levées</value>
+  </data>
+  <data name="ui.reports.column.revenue" xml:space="preserve">
+    <value>Revenu</value>
+  </data>
+  <data name="ui.reports.column.shipments" xml:space="preserve">
+    <value>Envois</value>
+  </data>
+  <data name="ui.reports.column.subtotal" xml:space="preserve">
+    <value>Hors taxes</value>
+  </data>
+  <data name="ui.reports.column.tax" xml:space="preserve">
+    <value>Taxes</value>
+  </data>
+  <data name="ui.reports.column.total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="ui.reports.column.unclaimed" xml:space="preserve">
+    <value>Non réclamés</value>
+  </data>
+  <data name="ui.reports.column.units" xml:space="preserve">
+    <value>Unités</value>
+  </data>
+  <data name="ui.reports.column.value" xml:space="preserve">
+    <value>Valeur</value>
+  </data>
+  <data name="ui.reports.column.weight" xml:space="preserve">
+    <value>Poids</value>
+  </data>
+  <data name="ui.reports.days" xml:space="preserve">
+    <value>Jours sans envoi</value>
+  </data>
+  <data name="ui.reports.file.csv" xml:space="preserve">
+    <value>CSV</value>
+  </data>
+  <data name="ui.reports.file.pdf" xml:space="preserve">
+    <value>PDF</value>
+  </data>
+  <data name="ui.reports.file.xlsx" xml:space="preserve">
+    <value>Excel</value>
+  </data>
+  <data name="ui.reports.from" xml:space="preserve">
+    <value>Du</value>
+  </data>
+  <data name="ui.reports.grace_hours" xml:space="preserve">
+    <value>Une étape est en retard si elle part plus de ce nombre d’heures après l’heure prévue</value>
+  </data>
+  <data name="ui.reports.grain" xml:space="preserve">
+    <value>Par</value>
+  </data>
+  <data name="ui.reports.grain.Day" xml:space="preserve">
+    <value>Jour</value>
+  </data>
+  <data name="ui.reports.grain.Month" xml:space="preserve">
+    <value>Mois</value>
+  </data>
+  <data name="ui.reports.grain.Week" xml:space="preserve">
+    <value>Semaine</value>
+  </data>
+  <data name="ui.reports.group.Carriers" xml:space="preserve">
+    <value>Transporteurs et entrepôt</value>
+  </data>
+  <data name="ui.reports.group.Customers" xml:space="preserve">
+    <value>Clients</value>
+  </data>
+  <data name="ui.reports.group.Finance" xml:space="preserve">
+    <value>Finances</value>
+  </data>
+  <data name="ui.reports.group.Operations" xml:space="preserve">
+    <value>Exploitation</value>
+  </data>
+  <data name="ui.reports.hold.AwaitingCustomerInformation" xml:space="preserve">
+    <value>En attente du client</value>
+  </data>
+  <data name="ui.reports.hold.AwaitingShipment" xml:space="preserve">
+    <value>En attente d’un envoi</value>
+  </data>
+  <data name="ui.reports.hold.Damaged" xml:space="preserve">
+    <value>Endommagé</value>
+  </data>
+  <data name="ui.reports.hold.InspectionDocuments" xml:space="preserve">
+    <value>Documents requis</value>
+  </data>
+  <data name="ui.reports.hold.InspectionFee" xml:space="preserve">
+    <value>Frais à payer</value>
+  </data>
+  <data name="ui.reports.hold.InspectionPermit" xml:space="preserve">
+    <value>Permis requis</value>
+  </data>
+  <data name="ui.reports.hold.InspectionValue" xml:space="preserve">
+    <value>Valeur à confirmer</value>
+  </data>
+  <data name="ui.reports.hold.None" xml:space="preserve">
+    <value>Sans motif</value>
+  </data>
+  <data name="ui.reports.hold.Other" xml:space="preserve">
+    <value>Autre</value>
+  </data>
+  <data name="ui.reports.hold.Refused" xml:space="preserve">
+    <value>Refusé</value>
+  </data>
+  <data name="ui.reports.hold.Unidentified" xml:space="preserve">
+    <value>Non identifié</value>
+  </data>
+  <data name="ui.reports.method.BankTransfer" xml:space="preserve">
+    <value>Virement</value>
+  </data>
+  <data name="ui.reports.method.Card" xml:space="preserve">
+    <value>Carte</value>
+  </data>
+  <data name="ui.reports.method.Cash" xml:space="preserve">
+    <value>Espèces</value>
+  </data>
+  <data name="ui.reports.method.Cheque" xml:space="preserve">
+    <value>Chèque</value>
+  </data>
+  <data name="ui.reports.method.Other1" xml:space="preserve">
+    <value>Autre mode 1</value>
+  </data>
+  <data name="ui.reports.method.Other2" xml:space="preserve">
+    <value>Autre mode 2</value>
+  </data>
+  <data name="ui.reports.method.Other3" xml:space="preserve">
+    <value>Autre mode 3</value>
+  </data>
+  <data name="ui.reports.method.Zelle" xml:space="preserve">
+    <value>Zelle</value>
+  </data>
+  <data name="ui.reports.none" xml:space="preserve">
+    <value>Non renseigné</value>
+  </data>
+  <data name="ui.reports.on_time.legs_air" xml:space="preserve">
+    <value>Étapes aériennes</value>
+  </data>
+  <data name="ui.reports.on_time.legs_ground" xml:space="preserve">
+    <value>Étapes routières</value>
+  </data>
+  <data name="ui.reports.on_time.legs_ocean" xml:space="preserve">
+    <value>Étapes maritimes</value>
+  </data>
+  <data name="ui.reports.on_time.ready" xml:space="preserve">
+    <value>Prêts après l’arrivée</value>
+  </data>
+  <data name="ui.reports.period" xml:space="preserve">
+    <value>Du {from} au {to}</value>
+  </data>
+  <data name="ui.reports.previous" xml:space="preserve">
+    <value>Période précédente</value>
+  </data>
+  <data name="ui.reports.previous_period" xml:space="preserve">
+    <value>Avant : {from} au {to}</value>
+  </data>
+  <data name="ui.reports.ready_days" xml:space="preserve">
+    <value>Jours après l’arrivée</value>
+  </data>
+  <data name="ui.reports.ready_targets" xml:space="preserve">
+    <value>Jours pour être prêt après l’arrivée</value>
+  </data>
+  <data name="ui.reports.report.activity" xml:space="preserve">
+    <value>Activité des entrepôts</value>
+  </data>
+  <data name="ui.reports.report.carrier_cost" xml:space="preserve">
+    <value>Coût des transporteurs</value>
+  </data>
+  <data name="ui.reports.report.dwell" xml:space="preserve">
+    <value>Jours en entrepôt</value>
+  </data>
+  <data name="ui.reports.report.holds" xml:space="preserve">
+    <value>Retenues</value>
+  </data>
+  <data name="ui.reports.report.inactive_customers" xml:space="preserve">
+    <value>Clients inactifs</value>
+  </data>
+  <data name="ui.reports.report.on_time" xml:space="preserve">
+    <value>À l’heure</value>
+  </data>
+  <data name="ui.reports.report.payables" xml:space="preserve">
+    <value>Dettes fournisseurs par ancienneté</value>
+  </data>
+  <data name="ui.reports.report.payments" xml:space="preserve">
+    <value>Paiements</value>
+  </data>
+  <data name="ui.reports.report.receivables" xml:space="preserve">
+    <value>Créances par ancienneté</value>
+  </data>
+  <data name="ui.reports.report.sales" xml:space="preserve">
+    <value>Ventes</value>
+  </data>
+  <data name="ui.reports.report.shipments" xml:space="preserve">
+    <value>Envois</value>
+  </data>
+  <data name="ui.reports.report.signups" xml:space="preserve">
+    <value>Clients nouveaux et actifs</value>
+  </data>
+  <data name="ui.reports.report.stock_age" xml:space="preserve">
+    <value>Colis en rayon</value>
+  </data>
+  <data name="ui.reports.report.supplies_value" xml:space="preserve">
+    <value>Valeur du stock de fournitures</value>
+  </data>
+  <data name="ui.reports.report.taxes" xml:space="preserve">
+    <value>Taxes perçues</value>
+  </data>
+  <data name="ui.reports.report.top_customers" xml:space="preserve">
+    <value>Meilleurs clients</value>
+  </data>
+  <data name="ui.reports.report.transit" xml:space="preserve">
+    <value>Délais de transit</value>
+  </data>
+  <data name="ui.reports.rules_intro" xml:space="preserve">
+    <value>Ces règles décident ce que le rapport À l’heure compte comme en retard. Laissez un service vide pour ne pas le mesurer.</value>
+  </data>
+  <data name="ui.reports.rules_link" xml:space="preserve">
+    <value>Quand est-on à l’heure ? Paramètres → Règles des rapports.</value>
+  </data>
+  <data name="ui.reports.rules_title" xml:space="preserve">
+    <value>Règles des rapports</value>
+  </data>
+  <data name="ui.reports.schedule.format" xml:space="preserve">
+    <value>Fichier</value>
+  </data>
+  <data name="ui.reports.schedule.format.Csv" xml:space="preserve">
+    <value>CSV</value>
+  </data>
+  <data name="ui.reports.schedule.format.Xlsx" xml:space="preserve">
+    <value>Excel</value>
+  </data>
+  <data name="ui.reports.schedule.frequency" xml:space="preserve">
+    <value>Fréquence</value>
+  </data>
+  <data name="ui.reports.schedule.frequency.Daily" xml:space="preserve">
+    <value>Chaque matin (la veille)</value>
+  </data>
+  <data name="ui.reports.schedule.frequency.Monthly" xml:space="preserve">
+    <value>Le 1er (le mois dernier)</value>
+  </data>
+  <data name="ui.reports.schedule.frequency.Weekly" xml:space="preserve">
+    <value>Chaque lundi (la semaine passée)</value>
+  </data>
+  <data name="ui.reports.schedule.hint" xml:space="preserve">
+    <value>Le rapport part avec ces filtres, pour le jour, la semaine ou le mois écoulé, au personnel coché. Chacun le reçoit selon ses propres droits.</value>
+  </data>
+  <data name="ui.reports.schedule.last" xml:space="preserve">
+    <value>Dernier envoi</value>
+  </data>
+  <data name="ui.reports.schedule.list" xml:space="preserve">
+    <value>Rapports programmés</value>
+  </data>
+  <data name="ui.reports.schedule.next" xml:space="preserve">
+    <value>Prochain</value>
+  </data>
+  <data name="ui.reports.schedule.recipients" xml:space="preserve">
+    <value>Envoyer à</value>
+  </data>
+  <data name="ui.reports.schedule.report" xml:space="preserve">
+    <value>Rapport</value>
+  </data>
+  <data name="ui.reports.schedule.save" xml:space="preserve">
+    <value>Programmer</value>
+  </data>
+  <data name="ui.reports.schedule.saved" xml:space="preserve">
+    <value>Programmé.</value>
+  </data>
+  <data name="ui.reports.schedule.stop" xml:space="preserve">
+    <value>Arrêter</value>
+  </data>
+  <data name="ui.reports.schedule.title" xml:space="preserve">
+    <value>Envoyer ce rapport régulièrement</value>
+  </data>
+  <data name="ui.reports.service" xml:space="preserve">
+    <value>Service</value>
+  </data>
+  <data name="ui.reports.show" xml:space="preserve">
+    <value>Afficher</value>
+  </data>
+  <data name="ui.reports.tax.Charges" xml:space="preserve">
+    <value>Frais</value>
+  </data>
+  <data name="ui.reports.tax.Freight" xml:space="preserve">
+    <value>Fret</value>
+  </data>
+  <data name="ui.reports.tax.Insurance" xml:space="preserve">
+    <value>Assurance</value>
+  </data>
+  <data name="ui.reports.tax.Supplies" xml:space="preserve">
+    <value>Fournitures</value>
+  </data>
+  <data name="ui.reports.title" xml:space="preserve">
+    <value>Rapports</value>
+  </data>
+  <data name="ui.reports.to" xml:space="preserve">
+    <value>Au</value>
+  </data>
+  <data name="ui.reports.total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="ui.reports.truncated" xml:space="preserve">
+    <value>Seules les 500 premières lignes sont affichées ; les totaux les couvrent toutes.</value>
+  </data>
+  <data name="ui.reports.warehouse" xml:space="preserve">
+    <value>Entrepôt</value>
+  </data>
+  <data name="ui.reports.week_of" xml:space="preserve">
+    <value>Semaine du {day}</value>
+  </data>
+  <data name="ui.reports.what" xml:space="preserve">
+    <value>Élément</value>
+  </data>
+  <data name="ui.reports.when" xml:space="preserve">
+    <value>Période</value>
   </data>
   <data name="ui.reset.done" xml:space="preserve">
     <value>Votre mot de passe a été changé. Connectez-vous avec le nouveau.</value>
@@ -10205,7 +11516,7 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Réactiver</value>
   </data>
   <data name="ui.roles.reserved_hint" xml:space="preserve">
-    <value>L’approbation des appareils et les informations de l’entreprise restent au Propriétaire et aux Administrateurs.</value>
+    <value>Les informations de l’entreprise restent au Propriétaire et aux Administrateurs.</value>
   </data>
   <data name="ui.roles.title" xml:space="preserve">
     <value>Rôles</value>
@@ -10778,7 +12089,7 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Publier les tarifs sur le site public (les grilles marquées à publier)</value>
   </data>
   <data name="ui.settings.require_second_factor" xml:space="preserve">
-    <value>Chaque membre du personnel doit utiliser une application d’authentification</value>
+    <value>Lorsque l’authentification à deux facteurs est exigée : chaque membre du personnel doit utiliser une application d’authentification</value>
   </data>
   <data name="ui.settings.second_factor_hint" xml:space="preserve">
     <value>Le Propriétaire et les Administrateurs en ont toujours besoin. Activé, tous les autres en configurent une à la prochaine connexion.</value>
@@ -11147,7 +12458,7 @@ Votre application d’authentification ne change pas et sera toujours demandée 
     <value>Chaque colis dégagé a son étiquette d’expédition.</value>
   </data>
   <data name="ui.shipping_label.not_cleared" xml:space="preserve">
-    <value>Imprimée dès que le colis est dégagé : contrôlé, sans blocage, sans inspection en attente, et dans un envoi du client.</value>
+    <value>Imprimée dès que le colis est dégagé (contrôlé, sans blocage, sans inspection en attente, et dans un envoi du client) et que son envoi est payé, débité sur un compte ou en port dû.</value>
   </data>
   <data name="ui.shipping_label.print" xml:space="preserve">
     <value>Imprimer l’étiquette d’expédition</value>
@@ -11938,6 +13249,138 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.tenant.unavailable.title" xml:space="preserve">
     <value>Veuillez réessayer</value>
   </data>
+  <data name="ui.texts.account" xml:space="preserve">
+    <value>Compte Twilio</value>
+  </data>
+  <data name="ui.texts.account_name" xml:space="preserve">
+    <value>Compte</value>
+  </data>
+  <data name="ui.texts.account_sid" xml:space="preserve">
+    <value>Account SID (AC…)</value>
+  </data>
+  <data name="ui.texts.auth_token" xml:space="preserve">
+    <value>Jeton d’authentification</value>
+  </data>
+  <data name="ui.texts.by_text" xml:space="preserve">
+    <value>Par message</value>
+  </data>
+  <data name="ui.texts.channel" xml:space="preserve">
+    <value>Par</value>
+  </data>
+  <data name="ui.texts.channel.Email" xml:space="preserve">
+    <value>Courriel</value>
+  </data>
+  <data name="ui.texts.channel.Sms" xml:space="preserve">
+    <value>SMS</value>
+  </data>
+  <data name="ui.texts.channel.WhatsApp" xml:space="preserve">
+    <value>WhatsApp</value>
+  </data>
+  <data name="ui.texts.connect" xml:space="preserve">
+    <value>Connecter</value>
+  </data>
+  <data name="ui.texts.disconnect" xml:space="preserve">
+    <value>Déconnecter Twilio</value>
+  </data>
+  <data name="ui.texts.intro" xml:space="preserve">
+    <value>Vos clients peuvent choisir de recevoir vos avis par SMS ou WhatsApp au lieu du courriel. Les messages passent par votre propre compte Twilio, depuis votre propre numéro ; Twilio vous facture directement. Un avis qui ne peut pas partir par message part par courriel.</value>
+  </data>
+  <data name="ui.texts.log" xml:space="preserve">
+    <value>Messages récents</value>
+  </data>
+  <data name="ui.texts.log_none" xml:space="preserve">
+    <value>Aucun message envoyé.</value>
+  </data>
+  <data name="ui.texts.none" xml:space="preserve">
+    <value>Aucun</value>
+  </data>
+  <data name="ui.texts.not_in_plan" xml:space="preserve">
+    <value>Les avis par SMS et WhatsApp ne font pas partie de votre forfait. Le forfait se change sous Société → Facturation.</value>
+  </data>
+  <data name="ui.texts.notice" xml:space="preserve">
+    <value>Avis</value>
+  </data>
+  <data name="ui.texts.notice.ActionNeeded" xml:space="preserve">
+    <value>Colis : action du client requise</value>
+  </data>
+  <data name="ui.texts.notice.DeliveryCode" xml:space="preserve">
+    <value>Code de livraison</value>
+  </data>
+  <data name="ui.texts.notice.OutForDelivery" xml:space="preserve">
+    <value>En cours de livraison</value>
+  </data>
+  <data name="ui.texts.notice.ParcelReceived" xml:space="preserve">
+    <value>Colis reçu</value>
+  </data>
+  <data name="ui.texts.notice.PaymentNotReceived" xml:space="preserve">
+    <value>Paiement non reçu</value>
+  </data>
+  <data name="ui.texts.notice.PickupCode" xml:space="preserve">
+    <value>Code de retrait</value>
+  </data>
+  <data name="ui.texts.notice.PickupReminder" xml:space="preserve">
+    <value>Rappel de retrait</value>
+  </data>
+  <data name="ui.texts.notice.ReadyForPickup" xml:space="preserve">
+    <value>Prêt à retirer</value>
+  </data>
+  <data name="ui.texts.notice.ShipmentUpdate" xml:space="preserve">
+    <value>Retard ou problème</value>
+  </data>
+  <data name="ui.texts.notices" xml:space="preserve">
+    <value>Avis envoyés par message</value>
+  </data>
+  <data name="ui.texts.notices_hint" xml:space="preserve">
+    <value>Les avis cochés partent par SMS ou WhatsApp aux clients qui l’ont choisi ; les autres par courriel. WhatsApp demande, pour chaque avis, un modèle approuvé par Meta dans votre compte Twilio, avec variable 1 la société, variable 2 le texte et variable 3 le lien.</value>
+  </data>
+  <data name="ui.texts.result" xml:space="preserve">
+    <value>Résultat</value>
+  </data>
+  <data name="ui.texts.save_account" xml:space="preserve">
+    <value>Enregistrer le compte</value>
+  </data>
+  <data name="ui.texts.save_notices" xml:space="preserve">
+    <value>Enregistrer les avis</value>
+  </data>
+  <data name="ui.texts.sms_from" xml:space="preserve">
+    <value>SMS depuis (numéro ou MG…)</value>
+  </data>
+  <data name="ui.texts.status.Delivered" xml:space="preserve">
+    <value>Remis</value>
+  </data>
+  <data name="ui.texts.status.Failed" xml:space="preserve">
+    <value>Non envoyé (courriel à la place)</value>
+  </data>
+  <data name="ui.texts.status.OptedOut" xml:space="preserve">
+    <value>Le client a répondu STOP (courriel désormais)</value>
+  </data>
+  <data name="ui.texts.status.Sent" xml:space="preserve">
+    <value>Envoyé</value>
+  </data>
+  <data name="ui.texts.status.Undelivered" xml:space="preserve">
+    <value>Non remis</value>
+  </data>
+  <data name="ui.texts.template" xml:space="preserve">
+    <value>Modèle WhatsApp (HX…)</value>
+  </data>
+  <data name="ui.texts.title" xml:space="preserve">
+    <value>Messages par SMS et WhatsApp</value>
+  </data>
+  <data name="ui.texts.to" xml:space="preserve">
+    <value>À</value>
+  </data>
+  <data name="ui.texts.token" xml:space="preserve">
+    <value>Jeton</value>
+  </data>
+  <data name="ui.texts.token_keep" xml:space="preserve">
+    <value>Laissez le jeton vide pour garder celui enregistré et ne changer que les expéditeurs.</value>
+  </data>
+  <data name="ui.texts.whatsapp_from" xml:space="preserve">
+    <value>WhatsApp depuis (numéro)</value>
+  </data>
+  <data name="ui.texts.when" xml:space="preserve">
+    <value>Quand</value>
+  </data>
   <data name="ui.tickets.all_warehouses" xml:space="preserve">
     <value>Tous les entrepôts</value>
   </data>
@@ -12238,6 +13681,30 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   <data name="ui.undeclared.storage_fee_value" xml:space="preserve">
     <value>{amount} {currency} à ce jour ({days} jours)</value>
   </data>
+  <data name="ui.vendors.active" xml:space="preserve">
+    <value>Actif</value>
+  </data>
+  <data name="ui.vendors.add" xml:space="preserve">
+    <value>Ajouter un fournisseur</value>
+  </data>
+  <data name="ui.vendors.add_button" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="ui.vendors.contact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="ui.vendors.name" xml:space="preserve">
+    <value>Nom</value>
+  </data>
+  <data name="ui.vendors.none" xml:space="preserve">
+    <value>Aucun fournisseur. Les transporteurs sont sous Transporteurs ; les agents partenaires sur leur entrepôt.</value>
+  </data>
+  <data name="ui.vendors.save" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="ui.vendors.title" xml:space="preserve">
+    <value>Fournisseurs</value>
+  </data>
   <data name="ui.verify.code_label" xml:space="preserve">
     <value>Code à 6 chiffres de votre application d’authentification</value>
   </data>
@@ -12327,5 +13794,2662 @@ Votre application d’authentification ne change pas et sera toujours demandée 
   </data>
   <data name="ui.workspace.title" xml:space="preserve">
     <value>Bienvenue</value>
+  </data>
+  <data name="ui.editor.nav.dock" xml:space="preserve">
+    <value>Livraisons des transporteurs au quai</value>
+  </data>
+  <data name="ui.parcels.state" xml:space="preserve">
+    <value>Statut</value>
+  </data>
+  <data name="ui.settings.require_mfa" xml:space="preserve">
+    <value>Exiger l’authentification à deux facteurs (une deuxième étape à la connexion)</value>
+  </data>
+  <data name="ui.settings.require_mfa_yes" xml:space="preserve">
+    <value>Oui</value>
+  </data>
+  <data name="ui.settings.require_mfa_no" xml:space="preserve">
+    <value>Non</value>
+  </data>
+  <data name="ui.settings.require_mfa_hint" xml:space="preserve">
+    <value>Oui : le propriétaire et les administrateurs utilisent toujours une application d’authentification, ainsi que le reste du personnel si la case ci-dessous est cochée. Non : personne n’est obligé d’en configurer une ; les personnes qui n’en ont pas se connectent avec leur mot de passe et confirment les actions sensibles avec celui-ci, et celles qui en ont configuré une continuent de l’utiliser. Seuls le propriétaire ou un administrateur peuvent modifier ce réglage, après avoir confirmé leur identité.</value>
+  </data>
+  <data name="ui.confirm.body_password" xml:space="preserve">
+    <value>Cette action nécessite de saisir à nouveau votre mot de passe.</value>
+  </data>
+  <data name="ui.confirm.password" xml:space="preserve">
+    <value>Votre mot de passe</value>
+  </data>
+  <data name="ui.quick.title" xml:space="preserve">
+    <value>Scannez votre badge</value>
+  </data>
+  <data name="ui.quick.subtitle" xml:space="preserve">
+    <value>Connectez-vous sur cet appareil avec votre badge ou votre code PIN.</value>
+  </data>
+  <data name="ui.quick.badge" xml:space="preserve">
+    <value>Badge</value>
+  </data>
+  <data name="ui.quick.submit" xml:space="preserve">
+    <value>Se connecter</value>
+  </data>
+  <data name="ui.quick.use_pin" xml:space="preserve">
+    <value>Utiliser mon code PIN</value>
+  </data>
+  <data name="ui.quick.use_badge" xml:space="preserve">
+    <value>Scanner un badge</value>
+  </data>
+  <data name="ui.quick.use_email" xml:space="preserve">
+    <value>Se connecter avec l’adresse e-mail et le mot de passe</value>
+  </data>
+  <data name="ui.quick.link" xml:space="preserve">
+    <value>Se connecter avec un badge ou un code PIN</value>
+  </data>
+  <data name="ui.quick.pin_title" xml:space="preserve">
+    <value>Connexion avec votre code PIN</value>
+  </data>
+  <data name="ui.quick.pin_who" xml:space="preserve">
+    <value>Qui êtes-vous ?</value>
+  </data>
+  <data name="ui.quick.pin" xml:space="preserve">
+    <value>Votre code PIN à 4 chiffres</value>
+  </data>
+  <data name="ui.quick.pin_someone_else" xml:space="preserve">
+    <value>Ce n’est pas vous ? Choisissez une autre personne</value>
+  </data>
+  <data name="ui.quick.pin_nobody" xml:space="preserve">
+    <value>Personne ne peut encore utiliser de code PIN sur cet appareil. Connectez-vous une fois avec votre e-mail et votre mot de passe, puis choisissez un code PIN dans Mon compte.</value>
+  </data>
+  <data name="ui.quick.daily_title" xml:space="preserve">
+    <value>Première connexion de la journée</value>
+  </data>
+  <data name="ui.quick.daily_password" xml:space="preserve">
+    <value>Une fois par jour, confirmez votre identité avec votre mot de passe.</value>
+  </data>
+  <data name="ui.staff.badge_title" xml:space="preserve">
+    <value>Badge et code PIN</value>
+  </data>
+  <data name="ui.staff.badge_in_use" xml:space="preserve">
+    <value>Un badge imprimé le {date} est en service.</value>
+  </data>
+  <data name="ui.staff.badge_none" xml:space="preserve">
+    <value>Aucun badge en service.</value>
+  </data>
+  <data name="ui.staff.pin_set" xml:space="preserve">
+    <value>Un code PIN est défini.</value>
+  </data>
+  <data name="ui.staff.pin_none" xml:space="preserve">
+    <value>Aucun code PIN défini.</value>
+  </data>
+  <data name="ui.staff.pin_locked" xml:space="preserve">
+    <value>Le code PIN est bloqué après cinq essais erronés. Il fonctionne de nouveau après une connexion avec l’e-mail et le mot de passe.</value>
+  </data>
+  <data name="ui.staff.badge_print" xml:space="preserve">
+    <value>Imprimer un badge</value>
+  </data>
+  <data name="ui.staff.badge_reprint" xml:space="preserve">
+    <value>Imprimer un nouveau badge</value>
+  </data>
+  <data name="ui.staff.badge_revoke" xml:space="preserve">
+    <value>Révoquer le badge</value>
+  </data>
+  <data name="ui.staff.badge_hint" xml:space="preserve">
+    <value>Un badge connecte son porteur sur les appareils enregistrés de l’entreprise. Imprimer un nouveau badge désactive aussitôt l’ancien. En cas de perte, révoquez-le.</value>
+  </data>
+  <data name="ui.staff.done.badge_revoked" xml:space="preserve">
+    <value>Le badge a été révoqué.</value>
+  </data>
+  <data name="ui.staff.done.pin" xml:space="preserve">
+    <value>Votre code PIN a été enregistré.</value>
+  </data>
+  <data name="ui.account.pin" xml:space="preserve">
+    <value>Code PIN pour les appareils de l’entreprise</value>
+  </data>
+  <data name="ui.account.pin_hint" xml:space="preserve">
+    <value>Quatre chiffres, pas tous identiques et pas une suite comme 1234. Sur un appareil enregistré, votre nom et ce code PIN vous connectent ; une fois par jour, vous confirmez aussi avec votre application d’authentification ou votre mot de passe.</value>
+  </data>
+  <data name="ui.account.new_pin" xml:space="preserve">
+    <value>Nouveau code PIN</value>
+  </data>
+  <data name="ui.account.save_pin" xml:space="preserve">
+    <value>Enregistrer le code PIN</value>
+  </data>
+  <data name="ops.auth.quick_device_required" xml:space="preserve">
+    <value>Un badge ou un code PIN ne fonctionne que sur un appareil enregistré par l’entreprise.</value>
+  </data>
+  <data name="ops.auth.quick_failed" xml:space="preserve">
+    <value>Ce badge ou ce code PIN n’a pas fonctionné. Réessayez, ou connectez-vous avec votre e-mail.</value>
+  </data>
+  <data name="ops.auth.pin_locked" xml:space="preserve">
+    <value>Ce code PIN est bloqué après cinq essais erronés. Connectez-vous avec votre e-mail et votre mot de passe pour le débloquer.</value>
+  </data>
+  <data name="ops.auth.quick_full_sign_in_first" xml:space="preserve">
+    <value>Connectez-vous une fois avec votre e-mail et votre mot de passe pour configurer votre application d’authentification, puis utilisez votre badge ou votre code PIN.</value>
+  </data>
+  <data name="ops.auth.password_wrong" xml:space="preserve">
+    <value>Ce mot de passe n’est pas correct.</value>
+  </data>
+  <data name="ops.staff.pin_invalid" xml:space="preserve">
+    <value>Choisissez quatre chiffres, pas tous identiques et pas une suite comme 1234.</value>
+  </data>
+  <data name="ops.staff.pin_needs_full_sign_in" xml:space="preserve">
+    <value>Pour définir un code PIN, connectez-vous d’abord avec votre e-mail et votre mot de passe.</value>
+  </data>
+  <data name="ui.drive.queue_waiting" xml:space="preserve">
+    <value>{count} arrêt(s) enregistré(s) sur ce téléphone, en attente de réseau.</value>
+  </data>
+  <data name="ui.drive.queue_sending" xml:space="preserve">
+    <value>Envoi de {count} arrêt(s) enregistré(s) sur ce téléphone…</value>
+  </data>
+  <data name="ui.drive.queue_one" xml:space="preserve">
+    <value>Enregistré sur ce téléphone. Il sera envoyé dès qu’il y aura du réseau.</value>
+  </data>
+  <data name="ui.drive.queue_sent" xml:space="preserve">
+    <value>Envoyé.</value>
+  </data>
+  <data name="ui.drive.queue_sign_in" xml:space="preserve">
+    <value>Reconnectez-vous pour envoyer les arrêts enregistrés sur ce téléphone. Ils y restent d’ici là.</value>
+  </data>
+  <data name="ui.delivery.code_unconfirmed" xml:space="preserve">
+    <value>Code non confirmé : enregistré sans réseau et non accepté</value>
+  </data>
+  <data name="ui.delivery.map_title" xml:space="preserve">
+    <value>Où se trouve le chauffeur</value>
+  </data>
+  <data name="ui.delivery.map_none" xml:space="preserve">
+    <value>Le téléphone du chauffeur n’a pas encore envoyé sa position. Il le fait tant que la page de la tournée est ouverte sur le téléphone.</value>
+  </data>
+  <data name="ui.delivery.map_next" xml:space="preserve">
+    <value>Prochain arrêt : {stop}, {address}.</value>
+  </data>
+  <data name="ui.delivery.map_seen" xml:space="preserve">
+    <value>Vu à {time}.</value>
+  </data>
+  <data name="ops.delivery.position_invalid" xml:space="preserve">
+    <value>Le téléphone a envoyé une position impossible.</value>
+  </data>
+  <data name="ops.delivery.not_the_driver" xml:space="preserve">
+    <value>Seul le chauffeur de la tournée envoie sa position, pendant la tournée.</value>
+  </data>
+  <data name="ui.shelfcount.title" xml:space="preserve">
+    <value>Comptage d’étagère</value>
+  </data>
+  <data name="ui.shelfcount.start" xml:space="preserve">
+    <value>Compter une étagère</value>
+  </data>
+  <data name="ui.shelfcount.intro" xml:space="preserve">
+    <value>Scannez l’étiquette de l’étagère, puis chaque colis qui s’y trouve. À la fin, vous voyez ce qui manque et ce qui est enregistré ailleurs.</value>
+  </data>
+  <data name="ui.shelfcount.shelf" xml:space="preserve">
+    <value>Étagère</value>
+  </data>
+  <data name="ui.shelfcount.start_button" xml:space="preserve">
+    <value>Commencer</value>
+  </data>
+  <data name="ui.shelfcount.latest" xml:space="preserve">
+    <value>Derniers comptages</value>
+  </data>
+  <data name="ui.shelfcount.none" xml:space="preserve">
+    <value>Aucune étagère comptée pour l’instant.</value>
+  </data>
+  <data name="ui.shelfcount.open" xml:space="preserve">
+    <value>En cours</value>
+  </data>
+  <data name="ui.shelfcount.summary" xml:space="preserve">
+    <value>{found} trouvé(s), {missing} manquant(s), {extra} enregistré(s) ailleurs, {unknown} inconnu(s)</value>
+  </data>
+  <data name="ui.shelfcount.of" xml:space="preserve">
+    <value>Comptage de l’étagère {shelf}</value>
+  </data>
+  <data name="ui.shelfcount.back" xml:space="preserve">
+    <value>← Tous les comptages</value>
+  </data>
+  <data name="ui.shelfcount.progress" xml:space="preserve">
+    <value>{scanned} scanné(s) ; les registres placent {expected} colis sur cette étagère.</value>
+  </data>
+  <data name="ui.shelfcount.scan" xml:space="preserve">
+    <value>Scanner un colis</value>
+  </data>
+  <data name="ui.shelfcount.add" xml:space="preserve">
+    <value>Ajouter</value>
+  </data>
+  <data name="ui.shelfcount.finish" xml:space="preserve">
+    <value>Terminer le comptage</value>
+  </data>
+  <data name="ui.shelfcount.missing" xml:space="preserve">
+    <value>Manquants</value>
+  </data>
+  <data name="ui.shelfcount.extra" xml:space="preserve">
+    <value>Enregistrés ailleurs</value>
+  </data>
+  <data name="ui.shelfcount.unknown" xml:space="preserve">
+    <value>Codes inconnus</value>
+  </data>
+  <data name="ui.shelfcount.found" xml:space="preserve">
+    <value>Trouvés</value>
+  </data>
+  <data name="ui.shelfcount.move_here" xml:space="preserve">
+    <value>Déplacer ici</value>
+  </data>
+  <data name="ui.shelfcount.done.scanned" xml:space="preserve">
+    <value>Ajouté.</value>
+  </data>
+  <data name="ui.shelfcount.done.again" xml:space="preserve">
+    <value>Déjà scanné.</value>
+  </data>
+  <data name="ui.shelfcount.done.finished" xml:space="preserve">
+    <value>Le comptage est terminé.</value>
+  </data>
+  <data name="ui.shelfcount.done.moved" xml:space="preserve">
+    <value>Le colis est maintenant sur cette étagère.</value>
+  </data>
+  <data name="ops.receiving.count_closed" xml:space="preserve">
+    <value>Ce comptage est déjà terminé.</value>
+  </data>
+  <data name="ops.receiving.count_full" xml:space="preserve">
+    <value>Un comptage contient au plus {max} scans. Terminez-le et commencez-en un autre.</value>
+  </data>
+  <data name="ops.receiving.shelf_unknown" xml:space="preserve">
+    <value>Aucune étagère active ne porte ce code dans vos entrepôts.</value>
+  </data>
+  <data name="ui.printers.active" xml:space="preserve">
+    <value>En service</value>
+  </data>
+  <data name="ui.printers.phone_title" xml:space="preserve">
+    <value>Imprimantes portables (téléphones)</value>
+  </data>
+  <data name="ui.printers.phone_hint" xml:space="preserve">
+    <value>Un téléphone ou un terminal portable peut imprimer des étiquettes sur une imprimante Bluetooth à côté de lui avec l’application gratuite {app}. Donnez un nom au téléphone, puis scannez le code avec l’application dans les 10 minutes. L’imprimante apparaît alors ici et se choisit comme les autres.</value>
+  </data>
+  <data name="ui.printers.phone_name" xml:space="preserve">
+    <value>Nom du téléphone</value>
+  </data>
+  <data name="ui.printers.phone_add" xml:space="preserve">
+    <value>Ajouter un téléphone</value>
+  </data>
+  <data name="ui.printers.phone_qr" xml:space="preserve">
+    <value>Code à scanner avec l’application</value>
+  </data>
+  <data name="ui.printers.phone_code" xml:space="preserve">
+    <value>Ou saisissez ce code dans l’application :</value>
+  </data>
+  <data name="ui.printers.phone_expires" xml:space="preserve">
+    <value>Ce code fonctionne une seule fois, jusqu’à {time}.</value>
+  </data>
+  <data name="ui.printers.phone_printer" xml:space="preserve">
+    <value>imprimante portable d’un téléphone, modifiée depuis le téléphone</value>
+  </data>
+  <data name="ops.printing.pairing_invalid" xml:space="preserve">
+    <value>Ce code n’est plus valable. Créez-en un nouveau sur la page Imprimantes.</value>
+  </data>
+  <data name="ops.printing.phone_printer" xml:space="preserve">
+    <value>Une imprimante portable s’ajoute et se modifie depuis son téléphone.</value>
+  </data>
+  <data name="ui.maintenance.page_title" xml:space="preserve">
+    <value>En maintenance</value>
+  </data>
+  <data name="ui.maintenance.page_body" xml:space="preserve">
+    <value>Nous effectuons une maintenance planifiée. Retour prévu vers {time} (UTC).</value>
+  </data>
+  <data name="ui.maintenance.banner" xml:space="preserve">
+    <value>Maintenance planifiée du {start} au {end} (UTC) : le site sera indisponible pendant ce temps.</value>
+  </data>
+  <data name="ui.editor.nav.inventory" xml:space="preserve">
+    <value>Inventaire</value>
+  </data>
+  <data name="ui.inventory.tabs" xml:space="preserve">
+    <value>Vues de l’inventaire</value>
+  </data>
+  <data name="ui.inventory.tab.on_hand" xml:space="preserve">
+    <value>En stock</value>
+  </data>
+  <data name="ui.inventory.tab.move" xml:space="preserve">
+    <value>Déplacer</value>
+  </data>
+  <data name="ui.inventory.tab.shelf_counts" xml:space="preserve">
+    <value>Comptages d’étagère</value>
+  </data>
+  <data name="ui.inventory.tab.undeclared_counts" xml:space="preserve">
+    <value>Comptages des non déclarés</value>
+  </data>
+  <data name="ui.inventory.tab.parcels" xml:space="preserve">
+    <value>Tous les colis</value>
+  </data>
+  <data name="ui.permissions.area.arrivals" xml:space="preserve">
+    <value>Arrivées</value>
+  </data>
+  <data name="ui.permissions.area.bundles" xml:space="preserve">
+    <value>Groupages</value>
+  </data>
+  <data name="ui.permissions.area.carriers" xml:space="preserve">
+    <value>Transporteurs</value>
+  </data>
+  <data name="ui.permissions.area.charges" xml:space="preserve">
+    <value>Tarifs</value>
+  </data>
+  <data name="ui.permissions.area.counter" xml:space="preserve">
+    <value>Comptoir</value>
+  </data>
+  <data name="ui.permissions.area.customs" xml:space="preserve">
+    <value>Douane</value>
+  </data>
+  <data name="ui.permissions.area.delivery" xml:space="preserve">
+    <value>Livraison à domicile</value>
+  </data>
+  <data name="ui.permissions.area.dispatches" xml:space="preserve">
+    <value>Expéditions</value>
+  </data>
+  <data name="ui.permissions.area.events" xml:space="preserve">
+    <value>Événements</value>
+  </data>
+  <data name="ui.permissions.area.insurance" xml:space="preserve">
+    <value>Assurance</value>
+  </data>
+  <data name="ui.permissions.area.pickup" xml:space="preserve">
+    <value>Comptoir de retrait</value>
+  </data>
+  <data name="ui.permissions.area.quotes" xml:space="preserve">
+    <value>Devis</value>
+  </data>
+  <data name="ui.permissions.area.reports" xml:space="preserve">
+    <value>Rapports</value>
+  </data>
+  <data name="ui.permissions.area.shipments" xml:space="preserve">
+    <value>Envois</value>
+  </data>
+  <data name="email.layout.button" xml:space="preserve">
+    <value>Ouvrir</value>
+  </data>
+  <data name="email.layout.copy_link" xml:space="preserve">
+    <value>Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :</value>
+  </data>
+  <data name="email.layout.footer" xml:space="preserve">
+    <value>Cet e-mail vous a été envoyé par {company}.</value>
+  </data>
+  <data name="email.customer.account_exists.button" xml:space="preserve">
+    <value>Se connecter</value>
+  </data>
+  <data name="email.customer.credit_statement.button" xml:space="preserve">
+    <value>Voir mon relevé</value>
+  </data>
+  <data name="email.customer.email_not_allowed.button" xml:space="preserve">
+    <value>S’inscrire</value>
+  </data>
+  <data name="email.customer.out_for_delivery.button" xml:space="preserve">
+    <value>Suivre mon envoi</value>
+  </data>
+  <data name="email.customer.out_for_delivery_code.button" xml:space="preserve">
+    <value>Suivre mon envoi</value>
+  </data>
+  <data name="email.customer.parcel_action_needed.button" xml:space="preserve">
+    <value>Répondre maintenant</value>
+  </data>
+  <data name="email.customer.parcel_final_notice.button" xml:space="preserve">
+    <value>Répondre maintenant</value>
+  </data>
+  <data name="email.customer.parcel_received.button" xml:space="preserve">
+    <value>Voir mon colis</value>
+  </data>
+  <data name="email.customer.parcel_reminder.button" xml:space="preserve">
+    <value>Répondre maintenant</value>
+  </data>
+  <data name="email.customer.password_reset.button" xml:space="preserve">
+    <value>Choisir un nouveau mot de passe</value>
+  </data>
+  <data name="email.customer.payment_not_received.button" xml:space="preserve">
+    <value>Voir mes factures</value>
+  </data>
+  <data name="email.customer.pickup_code.button" xml:space="preserve">
+    <value>Voir mon envoi</value>
+  </data>
+  <data name="email.customer.pickup_final_notice.button" xml:space="preserve">
+    <value>Voir mon envoi</value>
+  </data>
+  <data name="email.customer.pickup_reminder.button" xml:space="preserve">
+    <value>Voir mon envoi</value>
+  </data>
+  <data name="email.customer.ready_for_pickup.button" xml:space="preserve">
+    <value>Voir mon envoi</value>
+  </data>
+  <data name="email.customer.shipment_update.button" xml:space="preserve">
+    <value>Suivre mon envoi</value>
+  </data>
+  <data name="email.customer.ticket_answered.button" xml:space="preserve">
+    <value>Lire la réponse</value>
+  </data>
+  <data name="email.customer.verification.button" xml:space="preserve">
+    <value>Confirmer mon e-mail</value>
+  </data>
+  <data name="email.device_blocked.button" xml:space="preserve">
+    <value>Examiner l’appareil</value>
+  </data>
+  <data name="email.owner_invitation.button" xml:space="preserve">
+    <value>Choisir mon mot de passe</value>
+  </data>
+  <data name="email.password_reset.button" xml:space="preserve">
+    <value>Choisir un nouveau mot de passe</value>
+  </data>
+  <data name="ui.company.profile" xml:space="preserve">
+    <value>Profil de l’entreprise</value>
+  </data>
+  <data name="ui.company.profile_hint" xml:space="preserve">
+    <value>Enregistré aussitôt, sans approbation. Ces informations figurent sur les factures de votre fournisseur et sur votre site.</value>
+  </data>
+  <data name="ui.company.new_legal_name" xml:space="preserve">
+    <value>Nouvelle raison sociale</value>
+  </data>
+  <data name="ops.company.legal_name_needs_request" xml:space="preserve">
+    <value>La raison sociale ne change que par une demande avec justificatif.</value>
+  </data>
+  <data name="ui.session.time_left" xml:space="preserve">
+    <value>Temps restant :</value>
+  </data>
+  <data name="ui.help.title" xml:space="preserve">
+    <value>Aide</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.summary" xml:space="preserve">
+    <value>Trouvez des conseils pour votre travail dans l’espace de cette entreprise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.search" xml:space="preserve">
+    <value>Rechercher dans l’aide</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.search_go" xml:space="preserve">
+    <value>Rechercher</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.results" xml:space="preserve">
+    <value>Résultats de recherche</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.clear" xml:space="preserve">
+    <value>Afficher toute l’aide</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.back" xml:space="preserve">
+    <value>Retour à l’aide</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.related" xml:space="preserve">
+    <value>Articles associés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.empty" xml:space="preserve">
+    <value>Aucun article ne correspond à votre recherche.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.context" xml:space="preserve">
+    <value>Aide pour cette page</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.not_found" xml:space="preserve">
+    <value>Page introuvable</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.unavailable" xml:space="preserve">
+    <value>L’aide est temporairement indisponible.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.setup" xml:space="preserve">
+    <value>Aide à la configuration</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.getting-started" xml:space="preserve">
+    <value>Premiers pas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.setting-up" xml:space="preserve">
+    <value>Configuration</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.receiving-and-checking" xml:space="preserve">
+    <value>Réception et vérification</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.at-the-counter" xml:space="preserve">
+    <value>Au comptoir</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.money" xml:space="preserve">
+    <value>Finances</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.consolidation-and-dispatch" xml:space="preserve">
+    <value>Regroupement et expédition</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.at-destination" xml:space="preserve">
+    <value>À destination</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.team-and-company" xml:space="preserve">
+    <value>Équipe et entreprise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.website-and-integrations" xml:space="preserve">
+    <value>Site web et intégrations</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.reports" xml:space="preserve">
+    <value>Rapports</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.home_address" xml:space="preserve">
+    <value>Adresse du domicile</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.no_address" xml:space="preserve">
+    <value>Pas encore indiquée : demandée à la prochaine connexion.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cashier.total_due" xml:space="preserve">
+    <value>À payer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cashier.added" xml:space="preserve">
+    <value>Ajouté</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cashier.left" xml:space="preserve">
+    <value>Reste à payer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cashier.add_title" xml:space="preserve">
+    <value>Ajouter un paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cashier.add" xml:space="preserve">
+    <value>Ajouter</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cashier.remove" xml:space="preserve">
+    <value>Retirer ce paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cashier.given_short" xml:space="preserve">
+    <value>remis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cashier.change_short" xml:space="preserve">
+    <value>monnaie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cashier.err_amount" xml:space="preserve">
+    <value>Saisissez un montant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cashier.err_more" xml:space="preserve">
+    <value>C’est plus que ce qui reste à payer ({amount}).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cashier.err_given" xml:space="preserve">
+    <value>L’argent remis est inférieur au montant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cashier.err_left" xml:space="preserve">
+    <value>Il reste {amount} à payer : ajoutez un autre paiement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cards.rest_title" xml:space="preserve">
+    <value>Débiter le reste par carte :</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cards.one_card" xml:space="preserve">
+    <value>Une seule carte par facture : la carte est débitée en dernier, pour ce qui reste après les autres paiements. Deux cartes différentes ne peuvent pas être utilisées sur la même facture.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cards.keep_cash" xml:space="preserve">
+    <value>Gardez l’argent du client en main jusqu’à l’approbation de la carte : les autres paiements ne sont enregistrés qu’avec la carte.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cards.others_waiting" xml:space="preserve">
+    <value>Plus {amount} d’autres paiements, enregistrés à l’approbation de la carte.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cards.others_recorded" xml:space="preserve">
+    <value>Enregistré avec les autres paiements ({amount}).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.cards.nothing_left" xml:space="preserve">
+    <value>Les autres paiements règlent déjà tout : il ne reste rien pour la carte.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collect.title" xml:space="preserve">
+    <value>Où le client paie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collect.now_on" xml:space="preserve">
+    <value>Paiement à destination (port dû).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collect.now_off" xml:space="preserve">
+    <value>Payé ici, avant le départ de l’envoi.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collect.make_on" xml:space="preserve">
+    <value>Payer à destination</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collect.make_off" xml:space="preserve">
+    <value>Payer ici plutôt</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collect.reason" xml:space="preserve">
+    <value>Motif (facultatif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collect.hint" xml:space="preserve">
+    <value>Possible tant que rien n’est payé et sans fournitures. Retour au paiement ici seulement avant le départ d’un colis. L’expéditeur peut toujours payer à tout moment sur le portail.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collect.done.collect_on" xml:space="preserve">
+    <value>Désormais payé à destination. Réimprimez la lettre de transport : le mode de paiement a changé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.collect.done.collect_off" xml:space="preserve">
+    <value>Désormais payé ici. Réimprimez la lettre de transport : le mode de paiement a changé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.invoices.collect_not_possible" xml:space="preserve">
+    <value>Seule la facture ouverte d’un envoi peut être payée à destination.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.invoices.collect_after_payment" xml:space="preserve">
+    <value>Un montant est déjà payé, en attente de confirmation ou sur le compte : le lieu de paiement ne peut plus changer.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.invoices.collect_with_supplies" xml:space="preserve">
+    <value>Les fournitures se paient ici : un envoi avec des fournitures ne peut pas être payé à destination.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.invoices.collect_departed" xml:space="preserve">
+    <value>Un colis est déjà parti : l’envoi reste payable à destination.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.inspection.parcel_not_queued" xml:space="preserve">
+    <value>Ce colis a été trouvé, mais il n’attend pas d’inspection : elle est peut-être déjà terminée, ou le colis est dans un entrepôt que vous ne couvrez pas.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.settings.staff_idle_invalid" xml:space="preserve">
+    <value>La déconnexion du personnel après inactivité doit être comprise entre {min} et {max} minutes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.settings.customer_idle_invalid" xml:space="preserve">
+    <value>La déconnexion des clients après inactivité doit être comprise entre {min} et {max} minutes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.settings.idle_warn_invalid" xml:space="preserve">
+    <value>L’avertissement doit venir {min} à {max} minutes avant la déconnexion, et avant la fin du délai du personnel.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.settings.idle" xml:space="preserve">
+    <value>Déconnexion après inactivité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.settings.idle_staff" xml:space="preserve">
+    <value>Personnel (minutes, 5 à 60)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.settings.idle_customer" xml:space="preserve">
+    <value>Clients sur le portail (minutes, 15 à 240)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.settings.idle_warn" xml:space="preserve">
+    <value>Avertir avant (minutes, 1 à 5)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.settings.idle_hint" xml:space="preserve">
+    <value>Une personne inactive pendant ce temps est déconnectée ; un avertissement avec un compte à rebours vient d’abord. Un changement s’applique dès la page suivante de chacun.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payment_settings.portal" xml:space="preserve">
+    <value>Proposer sur le portail client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payment_settings.portal_hint" xml:space="preserve">
+    <value>Les clients voient un bouton Payer sur leurs factures impayées pour chaque moyen coché ici, une fois configuré : Zelle avec son identifiant ou courriel/téléphone, son nom et ses conditions ; le virement avec ses instructions ; la carte avec le compte connecté. Zelle et les virements attendent dans Paiements à vérifier jusqu’à ce que la finance les confirme. Les espèces et les chèques n’y sont jamais proposés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payment_settings.bank_en" xml:space="preserve">
+    <value>Instructions en anglais</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payment_settings.bank_fr" xml:space="preserve">
+    <value>Instructions en français</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payment_settings.bank_es" xml:space="preserve">
+    <value>Instructions en espagnol</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payment_settings.bank_hint" xml:space="preserve">
+    <value>Ce qui est indiqué aux clients pour un virement : la banque, le titulaire, les numéros de compte et de routage. Le texte anglais est requis pour le proposer sur le portail ; le modifier demande une nouvelle confirmation.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.payments.zelle_name_required" xml:space="preserve">
+    <value>Indiquez le nom affiché dans Zelle avant de le proposer sur le portail client.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.payments.bank_instructions_required" xml:space="preserve">
+    <value>Rédigez les instructions de virement en anglais avant de le proposer sur le portail client.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.payments.reference_required" xml:space="preserve">
+    <value>La référence du paiement est requise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_verify.from_portal" xml:space="preserve">
+    <value>Envoyé par le client sur le portail</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.labels.group" xml:space="preserve">
+    <value>Étiquettes de cet envoi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.labels.print_all_ids" xml:space="preserve">
+    <value>Imprimer toutes les étiquettes ID ({count})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.labels.print_all_shipping" xml:space="preserve">
+    <value>Imprimer toutes les étiquettes d’expédition ({count})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.labels.printer" xml:space="preserve">
+    <value>Imprimante d’étiquettes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.labels.send_to_printer" xml:space="preserve">
+    <value>Tout envoyer à l’imprimante</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.labels.sent" xml:space="preserve">
+    <value>{count} étiquettes envoyées à l’imprimante.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.labels.sent_waiting" xml:space="preserve">
+    <value>{count} étiquettes envoyées à l’imprimante ; {waiting} attendent encore l’inspection ou la levée d’une retenue.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.labels.id_label" xml:space="preserve">
+    <value>Étiquette ID</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.labels.shipping_label" xml:space="preserve">
+    <value>Étiquette d’expédition</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tracking_number" xml:space="preserve">
+    <value>Numéro de suivi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tracking_number.after_payment" xml:space="preserve">
+    <value>Attribué une fois l'expédition payée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.documents.tracking_number" xml:space="preserve">
+    <value>Numéro de suivi : {number}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.settings.prefix.tracking" xml:space="preserve">
+    <value>Numéros de suivi (2 lettres)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.settings.tracking_prefix_invalid" xml:space="preserve">
+    <value>Les lettres des numéros de suivi sont deux lettres de A à Z.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo" xml:space="preserve">
+    <value>Logo des documents</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo.on_documents" xml:space="preserve">
+    <value>Sur les documents</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo.on_labels" xml:space="preserve">
+    <value>Sur les étiquettes d'expédition (noir et blanc)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo.saved" xml:space="preserve">
+    <value>Logo enregistré et utilisé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo.by" xml:space="preserve">
+    <value>enregistré le {date} par {name}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo.sample" xml:space="preserve">
+    <value>Page d'exemple (PDF)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo.sample_label" xml:space="preserve">
+    <value>Exemple d'étiquette d'expédition (PDF)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo.none" xml:space="preserve">
+    <value>Pas encore de logo pour les documents : les documents et les étiquettes affichent le nom de l'entreprise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo.file" xml:space="preserve">
+    <value>Fichier PNG</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo.upload" xml:space="preserve">
+    <value>Envoyer le logo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo.replace" xml:space="preserve">
+    <value>Remplacer le logo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo.remove" xml:space="preserve">
+    <value>Retirer le logo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo.hint" xml:space="preserve">
+    <value>Un PNG large convient le mieux, sur fond blanc ou transparent ; au plus 1 Mo et 2000 × 2000 pixels. Les étiquettes l'impriment en noir et blanc. L'enregistrer ou le retirer demande une nouvelle confirmation.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo.sample_warehouse" xml:space="preserve">
+    <value>Entrepôt principal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.document_logo.sample_person" xml:space="preserve">
+    <value>Exemple</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.done.logo_saved" xml:space="preserve">
+    <value>Logo des documents enregistré. Il s'imprime désormais sur vos documents et étiquettes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.company.done.logo_removed" xml:space="preserve">
+    <value>Logo des documents retiré. Les documents affichent le nom de l'entreprise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.document_logo_png_only" xml:space="preserve">
+    <value>Le logo des documents doit être un fichier PNG.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.document_logo_unreadable" xml:space="preserve">
+    <value>Ce PNG n'a pas pu être lu. Enregistrez-le de nouveau sans entrelacement et réessayez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quotes.print" xml:space="preserve">
+    <value>Imprimer (PDF)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quotes.email" xml:space="preserve">
+    <value>Envoyer au client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quotes.done.emailed" xml:space="preserve">
+    <value>Devis {number} envoyé au client, avec son PDF.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.charges.quote_not_valid" xml:space="preserve">
+    <value>Ce devis est retiré ou a dépassé sa date. Faites-en un nouveau.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.charges.quote_email_failed" xml:space="preserve">
+    <value>Le courriel n'a pas pu être envoyé. Réessayez dans un instant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.title" xml:space="preserve">
+    <value>DEVIS</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.for" xml:space="preserve">
+    <value>Devis pour</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.route" xml:space="preserve">
+    <value>Trajet et service</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.consolidated" xml:space="preserve">
+    <value>Groupé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.insured" xml:space="preserve">
+    <value>Assuré</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.valid_until" xml:space="preserve">
+    <value>Valable jusqu'au {date}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.pieces" xml:space="preserve">
+    <value>Colis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.piece" xml:space="preserve">
+    <value>N°</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.contents" xml:space="preserve">
+    <value>Contenu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.weight" xml:space="preserve">
+    <value>Poids</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.size" xml:space="preserve">
+    <value>Dimensions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.value" xml:space="preserve">
+    <value>Valeur déclarée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.description" xml:space="preserve">
+    <value>Description</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.amount" xml:space="preserve">
+    <value>Montant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.total" xml:space="preserve">
+    <value>Total</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.quote.pdf.terms" xml:space="preserve">
+    <value>Ce devis est valable jusqu'au {date}. Le prix final est fixé lorsque les colis sont reçus, pesés et mesurés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.customer.quote.subject" xml:space="preserve">
+    <value>{company} : votre devis {number}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.customer.quote.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Veuillez trouver ci-joint votre devis {number}. Il est valable jusqu'au {date}.
+
+Le prix final est fixé lorsque vos colis sont reçus, pesés et mesurés.
+
+{company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.printing.not_paid" xml:space="preserve">
+    <value>Pas encore payé : l'étiquette d'expédition s'imprime une fois l'expédition payée, débitée sur un compte ou en port dû.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.labels.after_payment" xml:space="preserve">
+    <value>Après paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.labels.after_payment_hint" xml:space="preserve">
+    <value>Les étiquettes d'expédition s'impriment une fois l'expédition payée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permissions.ops.devices.approve" xml:space="preserve">
+    <value>Approuver les nouveaux appareils</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permissions.ops.devices.release" xml:space="preserve">
+    <value>Libérer des appareils</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.company_only" xml:space="preserve">
+    <value>niveau entreprise seulement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.company_only_hint" xml:space="preserve">
+    <value>Les permissions marquées « niveau entreprise seulement » ne fonctionnent que si le rôle est attribué pour toute l’entreprise. Attribuées pour une agence ou un entrepôt, elles n’ont aucun effet.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.branch.no_office" xml:space="preserve">
+    <value>Sans bureau</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.branch.hint" xml:space="preserve">
+    <value>Une agence est un pays ou un marché que vous desservez, par exemple États-Unis ou Haïti. Vos bureaux et entrepôts sur place sont ses entrepôts.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.branch.legal" xml:space="preserve">
+    <value>Identité légale dans ce pays</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.branch.legal_hint" xml:space="preserve">
+    <value>Imprimée sur les factures émises dans cette agence. Laissez vide pour imprimer celle de l’entreprise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.branch.legal_name" xml:space="preserve">
+    <value>Raison sociale</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.branch.tax_number" xml:space="preserve">
+    <value>Numéro fiscal</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.branch.legal_notes" xml:space="preserve">
+    <value>Mentions exigées par le pays sur les factures</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.branch.office" xml:space="preserve">
+    <value>Bureau principal (facultatif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.branch.office_hint" xml:space="preserve">
+    <value>Laissez vide si l’agence n’a pas de bureau propre. Seule une agence avec bureau peut apparaître sur votre site.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.locations.address_outside_country" xml:space="preserve">
+    <value>L’adresse du bureau doit se trouver dans le pays de l’agence.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.locations.warehouse_outside_country" xml:space="preserve">
+    <value>Un entrepôt doit se trouver dans le pays de son agence. Choisissez l’agence de ce pays.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.locations.legal_name_too_long" xml:space="preserve">
+    <value>La raison sociale est trop longue ({maxLength} caractères au plus).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.locations.tax_number_too_long" xml:space="preserve">
+    <value>Le numéro fiscal est trop long ({maxLength} caractères au plus).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.locations.legal_notes_too_long" xml:space="preserve">
+    <value>Les mentions sont trop longues ({maxLength} caractères au plus).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.standard.security_admin" xml:space="preserve">
+    <value>Administrateur de la sécurité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.standard.finance" xml:space="preserve">
+    <value>Finances</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.standard.customer_service" xml:space="preserve">
+    <value>Service client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.standard.branch_manager" xml:space="preserve">
+    <value>Directeur d’agence</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.standard.warehouse_manager" xml:space="preserve">
+    <value>Responsable d’entrepôt</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.standard.counter_clerk" xml:space="preserve">
+    <value>Agent de comptoir</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.standard.cashier" xml:space="preserve">
+    <value>Caissier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.standard.warehouse_worker" xml:space="preserve">
+    <value>Magasinier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.standard.driver" xml:space="preserve">
+    <value>Chauffeur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permissions.ops.customers.lookup" xml:space="preserve">
+    <value>Rechercher un client (téléphone, e-mail ou code exact)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.lookup.title" xml:space="preserve">
+    <value>Trouver un client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.lookup.placeholder" xml:space="preserve">
+    <value>Numéro de téléphone complet, e-mail ou code client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.lookup.hint" xml:space="preserve">
+    <value>Saisissez le numéro de téléphone complet, l’e-mail ou le code du client. La liste de tous les clients reste au niveau de l’entreprise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.lookup.none" xml:space="preserve">
+    <value>Aucun client n’a exactement ce numéro, cet e-mail ou ce code.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.customers.lookup_limit" xml:space="preserve">
+    <value>Vous avez recherché {limit} clients au cours de la dernière heure. Réessayez plus tard ou demandez à un collègue qui a accès à la liste des clients.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.staff.outside.not_for_this_account" xml:space="preserve">
+    <value>Le propriétaire, un administrateur ou l'agent d'un partenaire ne peut pas être un compte externe.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.staff.outside.days_required" xml:space="preserve">
+    <value>Choisissez au moins un jour de travail.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.staff.outside.hours_invalid" xml:space="preserve">
+    <value>Indiquez les deux heures, le début avant la fin, ou aucune.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.staff.outside.ends_in_the_past" xml:space="preserve">
+    <value>La date de fin est déjà passée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.auth.outside_hours" xml:space="preserve">
+    <value>Votre compte ne fonctionne que pendant ses heures de travail et jusqu'à sa date de fin. Demandez à votre entreprise si vous avez besoin d'un accès maintenant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.support.phone_invalid" xml:space="preserve">
+    <value>Saisissez le numéro de téléphone complet de l'appelant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.support.not_found" xml:space="preserve">
+    <value>Rien n'a été trouvé pour ce numéro et cet appelant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.support.caller_required" xml:space="preserve">
+    <value>Le numéro de suivi d'un transporteur nécessite d'abord le numéro de téléphone de l'appelant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.support.lookup_limit" xml:space="preserve">
+    <value>Vous avez fait {limit} recherches au cours de la dernière heure. Réessayez plus tard.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permissions.area.support" xml:space="preserve">
+    <value>Service client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permissions.ops.support.lookup" xml:space="preserve">
+    <value>Répondre aux appelants sur un envoi (téléphone, puis numéro de suivi)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.roles.standard.support_agent" xml:space="preserve">
+    <value>Agent de support</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.nav.support" xml:space="preserve">
+    <value>Appels clients</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.area.lookups" xml:space="preserve">
+    <value>Recherches de clients</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.area.calls" xml:space="preserve">
+    <value>Appels clients</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.done.outside" xml:space="preserve">
+    <value>Compte externe enregistré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.title" xml:space="preserve">
+    <value>Compte externe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.is_outside" xml:space="preserve">
+    <value>Compte externe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.until" xml:space="preserve">
+    <value>jusqu'au {date}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.no_end" xml:space="preserve">
+    <value>sans date de fin</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.hint" xml:space="preserve">
+    <value>Pour les personnes extérieures à l'entreprise, comme les agents d'un centre d'appels : ils ne peuvent utiliser que les Appels clients, seulement leurs jours et heures, et jusqu'à la date de fin.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.make" xml:space="preserve">
+    <value>C'est un compte externe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.ends_on" xml:space="preserve">
+    <value>Date de fin</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.days" xml:space="preserve">
+    <value>Jours de travail</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.from" xml:space="preserve">
+    <value>De</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.to" xml:space="preserve">
+    <value>À</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.hours_hint" xml:space="preserve">
+    <value>Dans le fuseau horaire de l'entreprise. Laissez les deux heures vides pour toute la journée ; 00:00 comme fin signifie minuit.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.day.mon" xml:space="preserve">
+    <value>Lun</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.day.tue" xml:space="preserve">
+    <value>Mar</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.day.wed" xml:space="preserve">
+    <value>Mer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.day.thu" xml:space="preserve">
+    <value>Jeu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.day.fri" xml:space="preserve">
+    <value>Ven</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.day.sat" xml:space="preserve">
+    <value>Sam</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.outside.day.sun" xml:space="preserve">
+    <value>Dim</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.title" xml:space="preserve">
+    <value>Appels clients</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.no_print" xml:space="preserve">
+    <value>Cette page ne peut pas être imprimée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.step_caller" xml:space="preserve">
+    <value>1. Le téléphone de l'appelant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.phone" xml:space="preserve">
+    <value>Numéro de téléphone complet</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.find_caller" xml:space="preserve">
+    <value>Trouver l'appelant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.new_call" xml:space="preserve">
+    <value>Nouvel appel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.good_standing" xml:space="preserve">
+    <value>En règle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.refer_to_billing" xml:space="preserve">
+    <value>Merci de voir avec la facturation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.no_account" xml:space="preserve">
+    <value>Aucun compte avec ce numéro. Continuez avec le numéro de suivi : vous ne verrez que le statut.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.caller_hint" xml:space="preserve">
+    <value>Demandez à l'appelant son numéro de téléphone. Seuls son prénom, l'initiale de son nom, son code et sa situation sont affichés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.step_number" xml:space="preserve">
+    <value>2. Le numéro de suivi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.number" xml:space="preserve">
+    <value>Numéro de suivi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.open" xml:space="preserve">
+    <value>Ouvrir</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.number_hint" xml:space="preserve">
+    <value>Le numéro de suivi de l'entreprise, ou celui du transporteur (Amazon, UPS, USPS...) pour un colis. Ce doit être l'envoi ou le colis de l'appelant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.number_hint_status" xml:space="preserve">
+    <value>Sans téléphone correspondant, seul le statut d'un envoi est affiché, avec le numéro de suivi de l'entreprise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.status_only" xml:space="preserve">
+    <value>Statut uniquement : le téléphone de l'appelant ne correspond pas à cet envoi.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.package_received" xml:space="preserve">
+    <value>Colis reçu le {date}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.package_announced" xml:space="preserve">
+    <value>Colis annoncé, pas encore reçu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.other_packages" xml:space="preserve">
+    <value>{count} autres colis dans le même envoi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.on_hold" xml:space="preserve">
+    <value>En attente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.no_milestones" xml:space="preserve">
+    <value>Aucun mouvement pour l'instant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.destination" xml:space="preserve">
+    <value>Destination</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.amount_due" xml:space="preserve">
+    <value>Montant dû</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.paid" xml:space="preserve">
+    <value>Payé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.collect" xml:space="preserve">
+    <value>à payer à destination</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.not_invoiced" xml:space="preserve">
+    <value>Pas encore facturé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.customer" xml:space="preserve">
+    <value>Client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.contact" xml:space="preserve">
+    <value>Contact</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.city" xml:space="preserve">
+    <value>Ville</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.request_title" xml:space="preserve">
+    <value>Ticket d'appel pour l'équipe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.request_placeholder" xml:space="preserve">
+    <value>Ce que demande l'appelant, par exemple : changer la personne qui récupère</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.request_open" xml:space="preserve">
+    <value>Ouvrir un ticket d'appel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.request_hint" xml:space="preserve">
+    <value>L'équipe s'en occupe et répond au client. Vous ne modifiez rien vous-même.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.support.done.request" xml:space="preserve">
+    <value>Ticket d'appel ouvert pour l'équipe.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.nav.tickets" xml:space="preserve">
+    <value>Tickets</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.topic" xml:space="preserve">
+    <value>Sujet</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.topic.Package" xml:space="preserve">
+    <value>Colis manquant ou erroné</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.topic.Billing" xml:space="preserve">
+    <value>Facturation et paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.topic.PickupDelivery" xml:space="preserve">
+    <value>Retrait, livraison, destinataire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.topic.Claim" xml:space="preserve">
+    <value>Dommage ou réclamation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.topic.Other" xml:space="preserve">
+    <value>Autre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.all_topics" xml:space="preserve">
+    <value>Tous les sujets</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.mine" xml:space="preserve">
+    <value>Pris par moi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.opened_by" xml:space="preserve">
+    <value>Ouvert par</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.taken_by" xml:space="preserve">
+    <value>Pris par</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.by_customer" xml:space="preserve">
+    <value>Client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.by_agent" xml:space="preserve">
+    <value>Appel au support</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.nobody" xml:space="preserve">
+    <value>Personne encore</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.escalated" xml:space="preserve">
+    <value>Signalé aux responsables</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.filter.new" xml:space="preserve">
+    <value>Nouveaux</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.filter.taken" xml:space="preserve">
+    <value>Pris en charge</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.filter.escalated" xml:space="preserve">
+    <value>Signalés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.shipment" xml:space="preserve">
+    <value>Envoi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.open_shipment" xml:space="preserve">
+    <value>Ouvrir l'envoi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.who" xml:space="preserve">
+    <value>Qui s'en occupe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.take" xml:space="preserve">
+    <value>Je m'en occupe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.release" xml:space="preserve">
+    <value>Le libérer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.give_to" xml:space="preserve">
+    <value>Le confier à</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.give" xml:space="preserve">
+    <value>Confier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.move_to" xml:space="preserve">
+    <value>Déplacer vers</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.move" xml:space="preserve">
+    <value>Déplacer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.note" xml:space="preserve">
+    <value>Ajouter une note</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.note_hint" xml:space="preserve">
+    <value>Les notes restent internes : le client ne reçoit pas d'e-mail pour le ticket d'un appel. Répondez au client comme d'habitude.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.done.taken" xml:space="preserve">
+    <value>Le ticket est pris en charge.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.done.released" xml:space="preserve">
+    <value>Le ticket est libéré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.done.settings" xml:space="preserve">
+    <value>Délais de signalement enregistrés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.done.moved" xml:space="preserve">
+    <value>Le ticket a été déplacé vers l'autre service.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.limits.title" xml:space="preserve">
+    <value>Quand les responsables sont avertis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.limits.take_hours" xml:space="preserve">
+    <value>Personne ne l'a pris après (heures)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.limits.resolve_days" xml:space="preserve">
+    <value>Non résolu après (jours)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.limits.hint" xml:space="preserve">
+    <value>Les responsables du service du ticket reçoivent un e-mail à chaque étape ; le second va aussi au propriétaire.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.tickets.topic_invalid" xml:space="preserve">
+    <value>Choisissez un sujet.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.tickets.not_in_department" xml:space="preserve">
+    <value>Cette personne ne fait pas partie du service du ticket.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.tickets.limits_invalid" xml:space="preserve">
+    <value>Utilisez 1 à {maxHours} heures et 1 à {maxDays} jours.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.dashboard.billing_tickets" xml:space="preserve">
+    <value>Tickets de facturation ouverts</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.dashboard.service_tickets" xml:space="preserve">
+    <value>Tickets du service client ouverts</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.ticket_not_taken.subject" xml:space="preserve">
+    <value>{company} : un ticket attend quelqu'un</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.ticket_not_taken.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Un ticket sur « {topic} » ({reference}), ouvert le {time}, n'a encore été pris par personne de votre service.
+
+Ouvrez-le pour le prendre ou le confier à un collègue :
+
+{link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.ticket_not_taken.button" xml:space="preserve">
+    <value>Ouvrir le ticket</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.ticket_unresolved.subject" xml:space="preserve">
+    <value>{company} : un ticket n'est toujours pas résolu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.ticket_unresolved.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Un ticket sur « {topic} » ({reference}), ouvert le {time}, n'est toujours pas résolu.
+
+Ouvrez-le pour voir où il en est :
+
+{link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.ticket_unresolved.button" xml:space="preserve">
+    <value>Ouvrir le ticket</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.area.support" xml:space="preserve">
+    <value>Agents de support</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.area.tickets" xml:space="preserve">
+    <value>Tickets</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.theme_locked" xml:space="preserve">
+    <value>Votre forfait n'inclut pas les thèmes de site, les polices ni les photos aérien et maritime.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.hero.track" xml:space="preserve">
+    <value>Suivre un colis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.figures.label" xml:space="preserve">
+    <value>En bref</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.figures.services" xml:space="preserve">
+    <value>Services</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.figures.countries" xml:space="preserve">
+    <value>Pays</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.figures.locations" xml:space="preserve">
+    <value>Adresses</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.route.title" xml:space="preserve">
+    <value>Suivez chaque étape</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.route.example" xml:space="preserve">
+    <value>Exemple</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.cta.title" xml:space="preserve">
+    <value>Prêt à expédier avec {company} ?</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.cta.text" xml:space="preserve">
+    <value>Créez votre compte en quelques minutes, ou suivez un colis dès maintenant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.services.more" xml:space="preserve">
+    <value>Autres services</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.look" xml:space="preserve">
+    <value>Thème et police</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.look_hint" xml:space="preserve">
+    <value>Prévisualisez chaque thème avec votre propre contenu avant de choisir. Rien ne change sur votre site avant la publication.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.look_locked" xml:space="preserve">
+    <value>Les thèmes, les polices et les photos aérien et maritime sont inclus dans un forfait supérieur. Vous pouvez quand même prévisualiser chaque thème. Ce que votre site affiche aujourd'hui reste inchangé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.theme" xml:space="preserve">
+    <value>Thème</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.font" xml:space="preserve">
+    <value>Police</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.try_theme" xml:space="preserve">
+    <value>Aperçu : {theme}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.theme.classic" xml:space="preserve">
+    <value>Classique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.theme.horizon" xml:space="preserve">
+    <value>Horizon</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.theme.airsea" xml:space="preserve">
+    <value>Air et mer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.theme.classic.hint" xml:space="preserve">
+    <value>La page standard : image principale à côté du titre, puis suivi, services, étapes et adresses.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.theme.horizon.hint" xml:space="preserve">
+    <value>Une ouverture sombre et marquante avec un dessin d'itinéraire, vos chiffres clés, puis des sections sombres et claires en alternance.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.theme.airsea.hint" xml:space="preserve">
+    <value>Une page lumineuse avec une grande photo, l'aérien et le maritime côte à côte, et vos adresses en haut de page. Téléversez vos photos aérien et maritime ci-dessous.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.font.default" xml:space="preserve">
+    <value>Standard</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.font.manrope" xml:space="preserve">
+    <value>Manrope</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.font.plus-jakarta-sans" xml:space="preserve">
+    <value>Plus Jakarta Sans</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.font.dm-sans" xml:space="preserve">
+    <value>DM Sans</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.font.lora" xml:space="preserve">
+    <value>Lora (titres à empattement)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.image.air" xml:space="preserve">
+    <value>Photo fret aérien</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.image.sea" xml:space="preserve">
+    <value>Photo fret maritime</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.image.air_sea_hint" xml:space="preserve">
+    <value>Affichée par le thème Air et mer. Tant que vous n'avez pas téléversé votre photo, une illustration simple s'affiche.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.shipments.plan_limit_reached" xml:space="preserve">
+    <value>Les expéditions de votre forfait pour ce mois sont épuisées (plus de 150 %). Changez de forfait pour créer de nouvelles expéditions ; la réception, les paiements et les remises continuent de fonctionner.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.shipments.requests_paused" xml:space="preserve">
+    <value>Les nouvelles demandes d'expédition sont suspendues pour le moment. Veuillez nous contacter.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plan_cap.title" xml:space="preserve">
+    <value>Les expéditions de votre forfait ce mois-ci</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plan_cap.used" xml:space="preserve">
+    <value>{used} expéditions sur {cap} utilisées en {month}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plan_cap.charged" xml:space="preserve">
+    <value>Chaque expédition au-delà de {cap} est facturée {price} sur votre prochaine facture.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plan_cap.stop_at" xml:space="preserve">
+    <value>Les nouvelles expéditions s'arrêtent à {block} ce mois-ci, sauf si vous changez de forfait.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plan_cap.grace" xml:space="preserve">
+    <value>Ce mois est votre mois de grâce unique : les nouvelles expéditions ne sont pas arrêtées et chaque expédition supplémentaire reste facturée. La prochaine fois, elles s'arrêteront à 150 %.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plan_cap.stopped" xml:space="preserve">
+    <value>Les nouvelles expéditions au comptoir et dans le portail sont arrêtées jusqu'à un changement de forfait ou la fin du mois. La réception, les paiements, les expéditions groupées et les remises continuent de fonctionner.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plan_cap.billing" xml:space="preserve">
+    <value>Voir votre forfait</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.shipment_cap_near.subject" xml:space="preserve">
+    <value>{company} : 80 % des expéditions de votre forfait utilisées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.shipment_cap_near.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+{used} des {cap} expéditions de {month} sont utilisées. Au-delà de {cap}, chaque expédition est facturée {price} sur votre prochaine facture, et les nouvelles expéditions s'arrêtent à {block}.
+
+Pour augmenter votre limite, demandez un forfait supérieur. Votre forfait et vos factures :
+
+{link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.shipment_cap_reached.subject" xml:space="preserve">
+    <value>{company} : les expéditions de votre forfait pour {month} sont utilisées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.shipment_cap_reached.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Vous avez créé {used} expéditions en {month}, soit les {cap} de votre forfait. Désormais, chaque expédition est facturée {price} sur votre prochaine facture, et les nouvelles expéditions s'arrêtent à {block}.
+
+Pour augmenter votre limite, demandez un forfait supérieur. Votre forfait et vos factures :
+
+{link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.shipment_cap_last.subject" xml:space="preserve">
+    <value>{company} : les nouvelles expéditions s'arrêtent à {block} ce mois-ci</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.shipment_cap_last.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Vous avez créé {used} expéditions en {month} ; votre forfait en comprend {cap}. Les nouvelles expéditions au comptoir et dans le portail s'arrêtent à {block}, sauf si vous changez de forfait. Chaque expédition au-delà de {cap} est facturée {price}.
+
+Pour augmenter votre limite, demandez un forfait supérieur. Votre forfait et vos factures :
+
+{link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.shipment_cap_grace.subject" xml:space="preserve">
+    <value>{company} : votre mois de grâce unique</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.shipment_cap_grace.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Vous avez dépassé 150 % des expéditions de votre forfait en {month} ({used} sur {cap}). Cette fois, les nouvelles expéditions ne sont pas arrêtées : c'est votre mois de grâce unique. Chaque expédition au-delà de {cap} reste facturée {price}. La prochaine fois, les nouvelles expéditions s'arrêteront à 150 % jusqu'à un changement de forfait.
+
+Pour augmenter votre limite, demandez un forfait supérieur. Votre forfait et vos factures :
+
+{link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.shipment_cap_stopped.subject" xml:space="preserve">
+    <value>{company} : les nouvelles expéditions sont arrêtées pour {month}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.shipment_cap_stopped.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Vous avez atteint {block} expéditions en {month}, soit 150 % des {cap} de votre forfait. Les nouvelles expéditions au comptoir et dans le portail sont arrêtées jusqu'à un changement de forfait ou la fin du mois. La réception, les paiements, les expéditions groupées et les remises continuent de fonctionner.
+
+Pour augmenter votre limite, demandez un forfait supérieur. Votre forfait et vos factures :
+
+{link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.new" xml:space="preserve">
+    <value>Nouveau client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.new_hint" xml:space="preserve">
+    <value>Votre forfait n'a pas de portail client : vous saisissez vos clients ici. Ils reçoivent tout de suite un code client et leurs avis par courriel.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.first_name" xml:space="preserve">
+    <value>Prénom</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.last_name" xml:space="preserve">
+    <value>Nom</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.company_name" xml:space="preserve">
+    <value>Entreprise (facultatif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.email" xml:space="preserve">
+    <value>Courriel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.language" xml:space="preserve">
+    <value>Langue</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.create" xml:space="preserve">
+    <value>Créer le client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.customers.portal_unavailable" xml:space="preserve">
+    <value>Le portail client n'est pas disponible pour cette entreprise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.customers.entry_needs_no_portal" xml:space="preserve">
+    <value>Vos clients s'inscrivent eux-mêmes sur votre portail : ils ne peuvent pas être saisis ici.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.shipments.insurance_unavailable" xml:space="preserve">
+    <value>L'assurance n'est pas incluse dans le forfait de votre entreprise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.common.not_in_plan" xml:space="preserve">
+    <value>Ceci n'est pas inclus dans le forfait de votre entreprise. Demandez au propriétaire un forfait plus complet.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.figures.title" xml:space="preserve">
+    <value>Chiffres clés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.figures.delivered" xml:space="preserve">
+    <value>colis livrés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.figures.time.air" xml:space="preserve">
+    <value>livraison par fret aérien</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.figures.time.ocean" xml:space="preserve">
+    <value>livraison par fret maritime</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.figures.pickup_point" xml:space="preserve">
+    <value>point de retrait</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.figures.pickup_points" xml:space="preserve">
+    <value>points de retrait</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.hero.promises" xml:space="preserve">
+    <value>Nos engagements</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.story.time" xml:space="preserve">
+    <value>Livraison : {time}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.rates.title" xml:space="preserve">
+    <value>Des prix clairs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.rates.intro" xml:space="preserve">
+    <value>Nos prix publiés par service. Estimez un colis ci-dessous ; le montant final figure sur votre facture.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.rates.all" xml:space="preserve">
+    <value>Voir tous les prix</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.rates.estimate_title" xml:space="preserve">
+    <value>Estimez votre colis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.rates.service" xml:space="preserve">
+    <value>Service</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.rates.destination" xml:space="preserve">
+    <value>Retrait à</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.rates.weight" xml:space="preserve">
+    <value>Poids ({unit})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.rates.estimate" xml:space="preserve">
+    <value>Estimer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.rates.result" xml:space="preserve">
+    <value>Coût estimé : {amount}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.rates.result_note" xml:space="preserve">
+    <value>Une estimation selon nos prix publiés. Droits de douane, taxes et assurance non compris.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.rates.not_priced" xml:space="preserve">
+    <value>Nous n’avons pas de prix publié pour ce choix. Contactez-nous pour un devis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.testimonials.title" xml:space="preserve">
+    <value>Ce que disent nos clients</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.testimonials.rating" xml:space="preserve">
+    <value>Note : {rating} sur 5</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="site.why.title" xml:space="preserve">
+    <value>Pourquoi {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.showDelivered" xml:space="preserve">
+    <value>Afficher les colis livrés (selon vos données, à partir de 500)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.showRates" xml:space="preserve">
+    <value>Afficher les tarifs et l’estimation (Air et mer, si vous publiez vos prix)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.showTestimonials" xml:space="preserve">
+    <value>Afficher les témoignages clients</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.group.chip" xml:space="preserve">
+    <value>Engagements sous le titre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.group.time" xml:space="preserve">
+    <value>Délais de livraison</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.group.figure" xml:space="preserve">
+    <value>Votre chiffre clé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.group.story" xml:space="preserve">
+    <value>Récits aérien et maritime</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.group.why" xml:space="preserve">
+    <value>Pourquoi nous choisir</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.site.group.closing" xml:space="preserve">
+    <value>Appel à l’action final</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.eyebrow" xml:space="preserve">
+    <value>Petite ligne au-dessus du titre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.chip" xml:space="preserve">
+    <value>Engagement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.time.air" xml:space="preserve">
+    <value>Délai fret aérien (ex. 5 à 7 jours)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.time.ocean" xml:space="preserve">
+    <value>Délai fret maritime</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.figure.value" xml:space="preserve">
+    <value>Chiffre (ex. 0 $)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.figure.label" xml:space="preserve">
+    <value>Ce qu’il signifie (ex. adresse US incluse)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.figure.since" xml:space="preserve">
+    <value>Sous les colis livrés (ex. depuis 2019)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.story.air.title" xml:space="preserve">
+    <value>Aérien : titre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.story.air.text" xml:space="preserve">
+    <value>Aérien : texte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.story.air.point" xml:space="preserve">
+    <value>Aérien : engagement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.story.ocean.title" xml:space="preserve">
+    <value>Maritime : titre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.story.ocean.text" xml:space="preserve">
+    <value>Maritime : texte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.story.ocean.point" xml:space="preserve">
+    <value>Maritime : engagement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.why.heading" xml:space="preserve">
+    <value>Titre de la section</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.why.title" xml:space="preserve">
+    <value>Titre de la carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.why.text" xml:space="preserve">
+    <value>Texte de la carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.closing.title" xml:space="preserve">
+    <value>Titre final</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.text.closing.text" xml:space="preserve">
+    <value>Texte final</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.saved.testimonial" xml:space="preserve">
+    <value>Témoignages enregistrés. Le site affiche le changement tout de suite.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.manage" xml:space="preserve">
+    <value>Témoignages clients</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.title" xml:space="preserve">
+    <value>Témoignages clients</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.back" xml:space="preserve">
+    <value>Retour à votre site</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.list" xml:space="preserve">
+    <value>Témoignages</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.hint" xml:space="preserve">
+    <value>Votre site affiche jusqu’à {count} témoignages visibles, dans cet ordre, quand les témoignages sont activés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.none" xml:space="preserve">
+    <value>Aucun témoignage pour l’instant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.quote" xml:space="preserve">
+    <value>Ce que le client a dit</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.name" xml:space="preserve">
+    <value>Nom tel que le client accepte de l’afficher</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.place" xml:space="preserve">
+    <value>Lieu (facultatif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.rating" xml:space="preserve">
+    <value>Note</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.source" xml:space="preserve">
+    <value>Où cela a été dit (facultatif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.source_hint" xml:space="preserve">
+    <value>Google, Facebook, au comptoir…</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.shown" xml:space="preserve">
+    <value>Sur le site</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.yes" xml:space="preserve">
+    <value>Affiché</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.no" xml:space="preserve">
+    <value>Masqué</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.show" xml:space="preserve">
+    <value>Afficher</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.hide" xml:space="preserve">
+    <value>Masquer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.remove" xml:space="preserve">
+    <value>Supprimer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.new" xml:space="preserve">
+    <value>Ajouter un témoignage</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.new_hint" xml:space="preserve">
+    <value>Utilisez les mots du client. N’ajoutez qu’un témoignage que le client accepte de voir sur votre site.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.agreed" xml:space="preserve">
+    <value>Le client accepte d’être cité sur notre site</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.add" xml:space="preserve">
+    <value>Ajouter</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.testimonial_name_required" xml:space="preserve">
+    <value>Saisissez le nom du client tel qu’il accepte de l’afficher.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.testimonial_quote_required" xml:space="preserve">
+    <value>Saisissez ce que le client a dit.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.testimonial_too_long" xml:space="preserve">
+    <value>Un champ du témoignage est trop long.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.testimonial_rating_invalid" xml:space="preserve">
+    <value>La note va de 1 à 5.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.testimonial_consent_required" xml:space="preserve">
+    <value>Confirmez que le client accepte d’être cité.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.testimonial_not_found" xml:space="preserve">
+    <value>Ce témoignage n’existe plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.testimonial_limit_reached" xml:space="preserve">
+    <value>Vous avez atteint la limite de 30 témoignages. Supprimez-en un d’abord.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.status.banned" xml:space="preserve">
+    <value>Banni</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.action.suspended" xml:space="preserve">
+    <value>Suspendre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.action.active" xml:space="preserve">
+    <value>Réactiver</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.action.closed" xml:space="preserve">
+    <value>Fermer le compte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.action.banned" xml:space="preserve">
+    <value>Bannir (non-respect des conditions, définitif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.suspended_until" xml:space="preserve">
+    <value>Réactiver automatiquement le (facultatif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.suspended_until_on" xml:space="preserve">
+    <value>Suspendu jusqu’au {date} ; réactivé automatiquement ce jour-là.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.reason_hint" xml:space="preserve">
+    <value>Pourquoi (reste interne)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.banned_final" xml:space="preserve">
+    <value>Ce client est banni. Le compte ne peut pas être rouvert, et son e-mail et son téléphone ne peuvent pas ouvrir un nouveau compte.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.shipments" xml:space="preserve">
+    <value>Envois</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.shipments_none" xml:space="preserve">
+    <value>Aucun envoi pour l’instant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.shipments_latest" xml:space="preserve">
+    <value>Les 20 envois les plus récents.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.shipment_number" xml:space="preserve">
+    <value>Envoi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.shipment_date" xml:space="preserve">
+    <value>Créé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.shipment_service" xml:space="preserve">
+    <value>Service</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.shipment_route" xml:space="preserve">
+    <value>De → à</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.shipment_parcels" xml:space="preserve">
+    <value>Colis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.shipment_state" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.shipment_state.waiting" xml:space="preserve">
+    <value>En attente d’instructions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.shipment_state.open" xml:space="preserve">
+    <value>Ouvert</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.shipment_state.booked" xml:space="preserve">
+    <value>Réservé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.shipment_state.picked_up" xml:space="preserve">
+    <value>Retiré</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.shipment_state.delivered" xml:space="preserve">
+    <value>Livré</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.counter.standing.banned" xml:space="preserve">
+    <value>Le compte est banni : aucun nouvel envoi ni colis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.customers.suspended_until_invalid" xml:space="preserve">
+    <value>Le jour de réactivation doit être après aujourd’hui, et seulement pour une suspension.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.customers.banned_contact" xml:space="preserve">
+    <value>Cet e-mail ou ce téléphone appartient à un client banni et ne peut pas servir à un compte.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.customer.account_suspended.subject" xml:space="preserve">
+    <value>{company} : votre compte est suspendu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.customer.account_suspended.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Votre compte {company} est suspendu. Pendant la suspension, vous ne pouvez ni vous connecter ni envoyer de nouveaux colis. Les colis déjà chez nous suivent leur cours normal.
+
+Contactez-nous pour en savoir plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.customer.account_suspended_until.subject" xml:space="preserve">
+    <value>{company} : votre compte est suspendu jusqu’au {until}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.customer.account_suspended_until.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Votre compte {company} est suspendu jusqu’au {until}. Il sera de nouveau actif ce jour-là. D’ici là, vous ne pouvez ni vous connecter ni envoyer de nouveaux colis. Les colis déjà chez nous suivent leur cours normal.
+
+Contactez-nous pour en savoir plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.customer.account_reactivated.subject" xml:space="preserve">
+    <value>{company} : votre compte est de nouveau actif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.customer.account_reactivated.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Votre compte {company} est de nouveau actif. Connectez-vous ici :
+
+{link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.customer.account_reactivated.button" xml:space="preserve">
+    <value>Se connecter</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.customer.account_closed.subject" xml:space="preserve">
+    <value>{company} : votre compte est fermé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.customer.account_closed.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Votre compte {company} est fermé. Les colis déjà chez nous seront tout de même traités ; contactez-nous à leur sujet.
+
+Si vous pensez qu’il s’agit d’une erreur, contactez-nous.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.customer.account_banned.subject" xml:space="preserve">
+    <value>{company} : votre compte est fermé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.customer.account_banned.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Votre compte {company} a été fermé car nos conditions de service n’ont pas été respectées. Il ne peut pas être rouvert. Les colis déjà chez nous seront remis une fois les montants dus payés ; contactez-nous à leur sujet.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.services.label_code" xml:space="preserve">
+    <value>Code étiquette</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.services.label_code_hint" xml:space="preserve">
+    <value>Exactement 3 lettres, imprimées en grand sur l'étiquette d'expédition pour que l'entrepôt trie d'un coup d'œil.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.services.label_code_invalid" xml:space="preserve">
+    <value>Saisissez un code étiquette d'exactement {length} lettres, de A à Z.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.nav.items_review" xml:space="preserve">
+    <value>Articles à vérifier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.nav.item_catalogue" xml:space="preserve">
+    <value>Catalogue d'articles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.title" xml:space="preserve">
+    <value>Articles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.missing" xml:space="preserve">
+    <value>{count} à compléter</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.none" xml:space="preserve">
+    <value>Rien n'a encore été déclaré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.hint" xml:space="preserve">
+    <value>Les mots, la quantité et la valeur du client restent tels que déclarés. Ajoutez la description pour les documents, le code douanier et le pays d'origine indiqué sur l'étiquette (« Made in… »). Choisissez une description du catalogue pour remplir son code.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.declared" xml:space="preserve">
+    <value>Déclaré par le client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.quantity" xml:space="preserve">
+    <value>Qté</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.value_each" xml:space="preserve">
+    <value>Valeur unitaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.description" xml:space="preserve">
+    <value>Description sur les documents</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.code" xml:space="preserve">
+    <value>Code douanier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.code_hint" xml:space="preserve">
+    <value>6 à 10 chiffres, par exemple 6404.11</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.origin" xml:space="preserve">
+    <value>Origine</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.origin_hint" xml:space="preserve">
+    <value>Pays d'origine, deux lettres (CN, US, VN…)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.unit" xml:space="preserve">
+    <value>Unité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.unit.pieces" xml:space="preserve">
+    <value>Pièces</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.unit.pairs" xml:space="preserve">
+    <value>Paires</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.unit.kilograms" xml:space="preserve">
+    <value>kg</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.unit.litres" xml:space="preserve">
+    <value>Litres</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.unit.sets" xml:space="preserve">
+    <value>Ensembles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.add_to_catalogue" xml:space="preserve">
+    <value>Ajouter au catalogue</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.used" xml:space="preserve">
+    <value>usagé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.save" xml:space="preserve">
+    <value>Enregistrer les articles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.done" xml:space="preserve">
+    <value>Articles enregistrés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.review.title" xml:space="preserve">
+    <value>Articles à vérifier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.review.hint" xml:space="preserve">
+    <value>Colis à l'origine dont un article n'a pas encore de code douanier ou de pays d'origine.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.review.hint_required" xml:space="preserve">
+    <value>Colis à l'origine dont un article n'a pas encore de code douanier ou de pays d'origine. Ils ne peuvent pas entrer dans un lot avant.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.review.none" xml:space="preserve">
+    <value>Rien à vérifier.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.review.parcel" xml:space="preserve">
+    <value>Colis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.review.warehouse" xml:space="preserve">
+    <value>Entrepôt</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.review.received" xml:space="preserve">
+    <value>Reçu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.review.missing" xml:space="preserve">
+    <value>À compléter</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.review.no_items" xml:space="preserve">
+    <value>Aucun article</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.rule.title" xml:space="preserve">
+    <value>Avant la mise en lot</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.rule.hint" xml:space="preserve">
+    <value>Lorsque cette règle est active, un colis reçu à partir de ce moment doit avoir un code douanier et un pays d'origine pour chaque article avant d'entrer dans un lot ou un carton, et avant la clôture de son expédition. Les colis reçus avant ne sont jamais bloqués.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.rule.on_since" xml:space="preserve">
+    <value>Exigé depuis le {date}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.rule.switch_on" xml:space="preserve">
+    <value>Exiger codes et origine</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.rule.switch_off" xml:space="preserve">
+    <value>Ne plus les exiger</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.catalogue.title" xml:space="preserve">
+    <value>Catalogue d'articles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.catalogue.count" xml:space="preserve">
+    <value>{count} articles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.catalogue.hint" xml:space="preserve">
+    <value>Articles courants avec leur code douanier. Quand les mots d'un client correspondent à un article ou à ses autres mots, le code est proposé. Adaptez-le à votre entreprise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.catalogue.search" xml:space="preserve">
+    <value>Chaussures, 6403, téléphone…</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.catalogue.find" xml:space="preserve">
+    <value>Chercher</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.catalogue.description" xml:space="preserve">
+    <value>Description sur les documents</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.catalogue.matches" xml:space="preserve">
+    <value>Correspond aussi à (mots séparés par des virgules)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.catalogue.used" xml:space="preserve">
+    <value>Utilisé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.catalogue.actions" xml:space="preserve">
+    <value>Actions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.catalogue.add" xml:space="preserve">
+    <value>Ajouter l'article</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.catalogue.save" xml:space="preserve">
+    <value>Enregistrer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.items.catalogue.remove" xml:space="preserve">
+    <value>Supprimer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.counter.more_items" xml:space="preserve">
+    <value>Autres articles dans ce carton</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.counter.item" xml:space="preserve">
+    <value>Article</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.counter.item_quantity" xml:space="preserve">
+    <value>Quantité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.counter.item_value" xml:space="preserve">
+    <value>Valeur unitaire ({currency})</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.counter.item_condition" xml:space="preserve">
+    <value>Neuf ou usagé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.counter.item_new" xml:space="preserve">
+    <value>Neuf</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.counter.item_used" xml:space="preserve">
+    <value>Usagé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.words_required" xml:space="preserve">
+    <value>Décrivez chaque article en quelques mots (au plus {maxLength} caractères).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.quantity_invalid" xml:space="preserve">
+    <value>Indiquez la quantité de chaque article, à partir de 1.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.value_invalid" xml:space="preserve">
+    <value>Indiquez la valeur d'une unité, à partir de 0.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.too_many" xml:space="preserve">
+    <value>Un colis peut compter au plus {max} articles.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.code_invalid" xml:space="preserve">
+    <value>Saisissez un code douanier de 6 à 10 chiffres, par exemple 6404.11.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.origin_invalid" xml:space="preserve">
+    <value>Saisissez le pays d'origine en deux lettres, par exemple CN.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.unit_invalid" xml:space="preserve">
+    <value>Choisissez une unité.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.description_invalid" xml:space="preserve">
+    <value>Saisissez une description d'au plus {maxLength} caractères, sans &lt; ni &gt;.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.matches_invalid" xml:space="preserve">
+    <value>Saisissez les autres mots en au plus {maxLength} caractères, sans &lt; ni &gt;.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.catalogue_full" xml:space="preserve">
+    <value>Le catalogue est plein ({max} articles). Supprimez ceux que vous n'utilisez plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.catalogue_not_found" xml:space="preserve">
+    <value>Cet article du catalogue n'existe plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.not_found" xml:space="preserve">
+    <value>Cet article n'existe plus. Rouvrez le colis.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.items.incomplete" xml:space="preserve">
+    <value>Le colis {parcel} ne peut pas encore avancer : l'article « {item} » doit avoir son code douanier et son pays d'origine. Complétez ses articles, puis réessayez.</value>
+    <comment>needs-review</comment>
   </data>
 </root>

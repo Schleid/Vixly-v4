@@ -153,11 +153,11 @@ What the new tests cover:
 
 *Question 1 was answered on 2026-10-18 (staging as proposed, wildcard supported): see the [Slice 1E record](SLICE-1E-VERIFICATION.md), section 7.*
 
-1. **Staging on `vixly.freedns.org`:** base domains are configuration (H-1), so staging needs only an `appsettings.Staging.json` for each host. The proposed names:
-   - `vixly.freedns.org` for the public site;
-   - `control.vixly.freedns.org` for the console;
-   - `api.vixly.freedns.org` for the API;
-   - `{slug}.vixly.freedns.org` for the tenants.
+1. **Staging on `vixly.freeddns.org`:** base domains are configuration (H-1), so staging needs only an `appsettings.Staging.json` for each host. The proposed names:
+   - `vixly.freeddns.org` for the public site;
+   - `control.vixly.freeddns.org` for the console;
+   - `api.vixly.freeddns.org` for the API;
+   - `{slug}.vixly.freeddns.org` for the tenants.
 
-   This needs a **wildcard DNS record** (`*.vixly.freedns.org`). FreeDNS offers wildcards only on some plans and domains. If a wildcard is not possible, each staging tenant needs its own record. Which do you have?
+   This needs a **wildcard DNS record** (`*.vixly.freeddns.org`). FreeDNS offers wildcards only on some plans and domains. If a wildcard is not possible, each staging tenant needs its own record. Which do you have?
 2. **Passkeys:** a slice of their own after 1E (proposed), or before?

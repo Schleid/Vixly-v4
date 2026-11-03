@@ -80,8 +80,11 @@ internal sealed class OperationsReceivingRepository : IOperationsReceivingReposi
     public async Task<IReadOnlyList<OperationsParcel>> ListDeliveryParcelsAsync(Guid deliveryId, CancellationToken cancellationToken) =>
         await _context.Parcels.AsNoTracking().Where(item => item.DeliveryId == deliveryId).OrderBy(item => item.CreatedUtc).ThenBy(item => item.Number).ToListAsync(cancellationToken);
 
-    public Task<OperationsParcel?> FindParcelByNumberAsync(string number, CancellationToken cancellationToken) =>
-        _context.Parcels.AsNoTracking().FirstOrDefaultAsync(item => item.Number == number, cancellationToken);
+    // The exact number first; then without separators, since a scan is cleaned to letters and digits and numbers moved from V3 keep their dashes (owner, 2026-10-27).
+    public async Task<OperationsParcel?> FindParcelByNumberAsync(string number, CancellationToken cancellationToken) =>
+        await _context.Parcels.AsNoTracking().FirstOrDefaultAsync(item => item.Number == number, cancellationToken)
+        ?? await _context.Parcels.AsNoTracking().Where(item => item.Number!.Replace("-", "").Replace(" ", "").Replace("/", "").Replace(".", "").Replace("_", "") == number)
+            .OrderByDescending(item => item.CreatedUtc).FirstOrDefaultAsync(cancellationToken);
 
     public async Task<IReadOnlyList<OperationsParcel>> ListShipmentParcelsAsync(Guid shipmentId, CancellationToken cancellationToken) =>
         await _context.Parcels.AsNoTracking().Where(item => item.ShipmentId == shipmentId).OrderBy(item => item.CreatedUtc).Take(200).ToListAsync(cancellationToken);
@@ -146,8 +149,8 @@ internal sealed class OperationsReceivingRepository : IOperationsReceivingReposi
 
         List<Guid> shown = warehouses.ToList();
         const OperationsParcelFlags waiting = OperationsParcelFlags.AwaitingCheck | OperationsParcelFlags.InspectionPending;
-        // Slice 5C: a final shipment still needs its labels.
-        IQueryable<Guid> shipments = _context.Shipments.Where(item => (item.Status == OperationsShipmentStatus.Open || item.Status == OperationsShipmentStatus.Booked) && item.DestinationCountryCode != null).Select(item => item.Id);
+        // Owner, 2026-10-28 (option A): only shipments with their tracking number (paid, on account or collect) get shipping labels.
+        IQueryable<Guid> shipments = _context.Shipments.Where(item => item.Status == OperationsShipmentStatus.Booked && item.TrackingNumber != null).Select(item => item.Id);
 
         return await _context.Parcels.AsNoTracking()
             .Where(item => item.WarehouseId != null && shown.Contains(item.WarehouseId.Value) && item.ShippingLabelUtc == null
@@ -161,6 +164,9 @@ internal sealed class OperationsReceivingRepository : IOperationsReceivingReposi
 
     public Task<OperationsShipment?> GetShipmentAsync(Guid shipmentId, CancellationToken cancellationToken) =>
         _context.Shipments.FirstOrDefaultAsync(item => item.Id == shipmentId, cancellationToken);
+
+    public Task<OperationsShipment?> FindShipmentByTrackingNumberAsync(string trackingNumber, CancellationToken cancellationToken) =>
+        _context.Shipments.AsNoTracking().FirstOrDefaultAsync(item => item.TrackingNumber == trackingNumber, cancellationToken);
 
     public async Task<IReadOnlyList<OperationsShipment>> ListCustomerShipmentsAsync(Guid customerId, CancellationToken cancellationToken) =>
         await _context.Shipments.AsNoTracking().Where(item => item.CustomerId == customerId && item.Status != OperationsShipmentStatus.Cancelled)
@@ -389,6 +395,10 @@ internal sealed class OperationsReceivingRepository : IOperationsReceivingReposi
         _context.Parcels.FirstOrDefaultAsync(item => item.CustomerId == customerId && item.CarrierTrackingNumber == carrierTrackingNumber
             && (item.Milestone == null || item.Milestone < OperationsMilestone.DepartedOrigin), cancellationToken);
 
+    public Task<OperationsParcel?> FindCustomerParcelByCarrierNumberAsync(Guid customerId, string carrierTrackingNumber, CancellationToken cancellationToken) =>
+        _context.Parcels.AsNoTracking().Where(item => item.CustomerId == customerId && item.CarrierTrackingNumber == carrierTrackingNumber)
+            .OrderByDescending(item => item.CreatedUtc).FirstOrDefaultAsync(cancellationToken);
+
     public async Task<(IReadOnlyList<OperationsParcel> Items, int TotalCount)> ListParcelsAsync(OperationsParcelFilter filter, int page, int pageSize, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(filter);
@@ -398,6 +408,46 @@ internal sealed class OperationsReceivingRepository : IOperationsReceivingReposi
             return (Array.Empty<OperationsParcel>(), 0);
         }
 
+        IQueryable<OperationsParcel> query = Filtered(filter);
+        int total = await query.CountAsync(cancellationToken);
+
+        // On hand (parcel inventory): oldest first, what has waited longest comes up first.
+        IOrderedQueryable<OperationsParcel> ordered = filter.OnHandOnly
+            ? query.OrderBy(item => item.CreatedUtc).ThenBy(item => item.Id)
+            : query.OrderByDescending(item => item.CreatedUtc).ThenBy(item => item.Id);
+        List<OperationsParcel> items = await ordered.Skip((Math.Max(page, 1) - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+        return (items, total);
+    }
+
+    public async Task<(int Count, decimal WeightKg)> ParcelTotalsAsync(OperationsParcelFilter filter, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(filter);
+
+        if (filter.Warehouses.Count == 0)
+        {
+            return (0, 0m);
+        }
+
+        var totals = await Filtered(filter).GroupBy(_ => 1)
+            .Select(group => new { Count = group.Count(), WeightKg = group.Sum(item => item.WeightKg ?? 0m) })
+            .FirstOrDefaultAsync(cancellationToken);
+        return totals is null ? (0, 0m) : (totals.Count, totals.WeightKg);
+    }
+
+    public async Task<IReadOnlyDictionary<Guid, string>> ShipmentNumbersAsync(IReadOnlyCollection<Guid> shipmentIds, CancellationToken cancellationToken)
+    {
+        if (shipmentIds is not { Count: > 0 })
+        {
+            return new Dictionary<Guid, string>();
+        }
+
+        List<Guid> ids = shipmentIds.Take(500).ToList();
+        return await _context.Shipments.AsNoTracking().Where(item => ids.Contains(item.Id) && item.Number != null)
+            .ToDictionaryAsync(item => item.Id, item => item.Number!, cancellationToken);
+    }
+
+    private IQueryable<OperationsParcel> Filtered(OperationsParcelFilter filter)
+    {
         List<Guid> warehouses = filter.Warehouses.ToList();
         IQueryable<OperationsParcel> query = _context.Parcels.AsNoTracking().Where(item => item.WarehouseId != null && warehouses.Contains(item.WarehouseId.Value));
         string text = new((filter.Search ?? string.Empty).Where(character => !char.IsWhiteSpace(character) && character != '-').Take(MaxSearchLength).ToArray());
@@ -424,10 +474,33 @@ internal sealed class OperationsReceivingRepository : IOperationsReceivingReposi
             query = query.Where(item => item.HoldReasons != OperationsHoldReasons.None);
         }
 
-        int total = await query.CountAsync(cancellationToken);
-        List<OperationsParcel> items = await query.OrderByDescending(item => item.CreatedUtc).ThenBy(item => item.Id)
-            .Skip((Math.Max(page, 1) - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
-        return (items, total);
+        // Parcel inventory (owner, 2026-10-22): what is physically on hand, where, and since when.
+        if (filter.OnHandOnly)
+        {
+            query = query.Where(item => item.Milestone == null || item.Milestone < OperationsMilestone.DepartedOrigin);
+        }
+
+        if (filter.LocationId is { } locationId)
+        {
+            query = query.Where(item => item.StorageLocationId == locationId);
+        }
+        else if (filter.Zone is { } zone)
+        {
+            IQueryable<Guid> shelves = _context.StorageLocations.Where(location => location.Zone == zone).Select(location => location.Id);
+            query = query.Where(item => item.StorageLocationId != null && shelves.Contains(item.StorageLocationId.Value));
+        }
+
+        if (filter.UnshelvedOnly)
+        {
+            query = query.Where(item => item.StorageLocationId == null);
+        }
+
+        if (filter.ReceivedBefore is { } before)
+        {
+            query = query.Where(item => item.CreatedUtc <= before);
+        }
+
+        return query;
     }
 
     public async Task<IReadOnlyList<OperationsParcel>> ListCustomerParcelsAsync(Guid customerId, CancellationToken cancellationToken) =>

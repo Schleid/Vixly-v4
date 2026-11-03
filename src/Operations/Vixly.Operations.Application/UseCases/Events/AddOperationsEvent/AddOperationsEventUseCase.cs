@@ -200,7 +200,7 @@ public sealed class AddOperationsEventUseCase
                     if (await _receiving.GetShipmentAsync(shipmentId, cancellationToken) is { } shipment)
                     {
                         _outbox.Write(OperationsEventNotice.MessageType, context.RequiredTenantId, shipment.Id, new OperationsEventNotice(shipment.CustomerId, request.PortalSlug,
-                            shipment.Number ?? string.Empty, request.EventKind == OperationsEventKind.Exception, cause.Code, cause.TextEn, cause.TextFr, cause.TextEs, message));
+                            shipment.NumberForCustomer, request.EventKind == OperationsEventKind.Exception, cause.Code, cause.TextEn, cause.TextFr, cause.TextEs, message));
                     }
                 }
 

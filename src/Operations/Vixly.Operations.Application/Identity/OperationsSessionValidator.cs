@@ -29,13 +29,17 @@ public sealed class OperationsSessionValidator
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly IOperationsIdleTimesReader? _idle;
+
     public OperationsSessionValidator(
         IOperationsSessionRepository sessions,
         IOperationsUserRepository users,
         IOperationsSecretGenerator secrets,
         IOperationsUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IOperationsIdleTimesReader? idle = null)
     {
+        _idle = idle;
         _sessions = sessions ?? throw new ArgumentNullException(nameof(sessions));
         _users = users ?? throw new ArgumentNullException(nameof(users));
         _secrets = secrets ?? throw new ArgumentNullException(nameof(secrets));
@@ -58,8 +62,9 @@ public sealed class OperationsSessionValidator
         }
 
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();
+        OperationsIdleTimes idle = await IdleTimesAsync(cancellationToken);
 
-        if (session.ExpiryReasonAt(utcNow) is OperationsSessionEndReason expired)
+        if (session.ExpiryReasonAt(utcNow, idle.Staff) is OperationsSessionEndReason expired)
         {
             session.End(expired, utcNow);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -80,6 +85,12 @@ public sealed class OperationsSessionValidator
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
-        return new OperationsValidatedSession(user.Id, session.Id, user.FullName, user.PreferredLanguage.Value, user.IsOwner, session.IsSetupSession, user.IsAdministrator);
+        return new OperationsValidatedSession(user.Id, session.Id, user.FullName, user.PreferredLanguage.Value, user.IsOwner, session.IsSetupSession, user.IsAdministrator)
+        {
+            IdleTimes = idle
+        };
     }
+
+    private async Task<Vixly.Operations.Application.Identity.OperationsIdleTimes> IdleTimesAsync(CancellationToken cancellationToken) =>
+        _idle is null ? Vixly.Operations.Application.Identity.OperationsIdleTimes.Default : await _idle.GetAsync(cancellationToken);
 }

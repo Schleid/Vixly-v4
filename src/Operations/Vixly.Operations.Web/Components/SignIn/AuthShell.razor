@@ -16,12 +16,14 @@ IMPORTANT NOTES:
 *@
 @inject IStringLocalizer<OperationsText> T
 @inject IStringLocalizer<OperationsWorkbenchText> L
+@inject IHttpContextAccessor IdleHttp
 
 <!DOCTYPE html>
 <html lang="@Lang" data-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/img/operations-icon.svg" type="image/svg+xml" />
     <meta name="referrer" content="no-referrer" />
     <meta name="robots" content="noindex" />
     <title>@Title · @CompanyName</title>
@@ -34,10 +36,10 @@ IMPORTANT NOTES:
         <script src="/js/ops-session.js" defer></script>
     }
 </head>
-<body class="vx-auth ops-auth" data-idle-warn="@(SignedIn ? "780" : null)" data-idle-end="@(SignedIn ? "900" : null)">
+<body class="vx-auth ops-auth" data-idle-warn="@(SignedIn ? Vixly.Operations.Web.Security.OperationsIdlePage.WarnSeconds(IdleHttp.HttpContext) : null)" data-idle-end="@(SignedIn ? Vixly.Operations.Web.Security.OperationsIdlePage.EndSeconds(IdleHttp.HttpContext) : null)">
     <header class="vx-auth__topbar">
         <div class="vx-auth__topbar-inner">
-            <a href="/" class="vx-auth__brand-title">@CompanyName</a>
+            <a href="/" class="vx-auth__brand-title"><span class="ops-auth__mark"><OperationsMark Size="16" /></span>@CompanyName</a>
             <nav class="vx-auth__languages" aria-label="@T["ui.language"]">
                 <a href="/culture/en?returnUrl=@ReturnHere" hreflang="en" lang="en" aria-current="@(Lang == "en" ? "true" : null)">EN</a>
                 <a href="/culture/fr?returnUrl=@ReturnHere" hreflang="fr" lang="fr" aria-current="@(Lang == "fr" ? "true" : null)">FR</a>
@@ -65,6 +67,7 @@ IMPORTANT NOTES:
     {
         <div class="vx-auth__idle" role="alertdialog" aria-live="assertive" data-idle-warning hidden>
             <p>@T["ui.session.idle_warning"]</p>
+            <p class="ops-idle__time">@T["ui.session.time_left"] <strong data-idle-countdown aria-live="off">2:00</strong></p>
             <button type="button" class="vx-button vx-button--primary" data-idle-stay>@T["ui.session.stay"]</button>
         </div>
         @* The idle timer signs out through this form (ops-session.js). *@

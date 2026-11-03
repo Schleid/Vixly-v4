@@ -16,6 +16,7 @@ IMPORTANT NOTES:
 *@
 <section class="ops-editor__panel" aria-labelledby="extras-title">
     <h2 id="extras-title">@T["ui.charges.extras.title"]</h2>
+    <Vixly.Operations.Web.Components.Help.OperationsHelpArticleLink Slug="extras-and-item-types" />
     @if (Extras.Count == 0) { <p>@T["ui.charges.extras.none"]</p> }
     @foreach (OperationsChargeExtra extra in Extras)
     {

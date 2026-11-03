@@ -13,6 +13,7 @@ namespace Vixly.Platform.Application.Payments;
 //
 // IMPORTANT NOTES:
 // - Plain data; no behaviour
+// - StatementSuffix comes from the merchant account settings; null means none
 // =========================================================
 public sealed record PlatformCardChargeRequest(
     string CustomerId,
@@ -21,4 +22,5 @@ public sealed record PlatformCardChargeRequest(
     string CurrencyCode,
     string Description,
     IReadOnlyDictionary<string, string> Metadata,
-    string IdempotencyKey);
+    string IdempotencyKey,
+    string? StatementSuffix = null);

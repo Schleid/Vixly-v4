@@ -75,6 +75,7 @@ public sealed partial class OperationsCustomerFlowTests : IClassFixture<Operatio
             new[]
             {
                 "--environment=Production",
+                "--VixlySettingsCheck:Enabled=false",
                 "--applicationName=Vixly.Customer.Web",
                 "--AllowedHosts=*",
                 "--ConnectionStrings:Customer=Server=127.0.0.1,1;Database=None;User Id=none;Password=none;Connect Timeout=1;TrustServerCertificate=True",
@@ -127,6 +128,17 @@ public sealed partial class OperationsCustomerFlowTests : IClassFixture<Operatio
         string token = _api.Mailer.LastToken("ana@example.com");
         HttpResponseMessage verified = await ana.PostAsync("/customer/verify?token=" + Uri.EscapeDataString(token), "/customer/verify", new() { ["token"] = token });
         Assert.Equal("/customer/?done=welcome", verified.Headers.Location?.OriginalString);
+
+        // The first visit asks for the home address; a missing city is refused with what was typed kept.
+        Assert.DoesNotContain("Hello Ana", await ana.GetStringAsync("/customer/?done=welcome"), StringComparison.Ordinal);
+        string refused = await Read(await ana.PostAsync("/customer/address", "/customer/address", new() { ["line1"] = "12 Rue Geffrard", ["city"] = "", ["country"] = "HT" }));
+        Assert.Contains("12 Rue Geffrard", refused, StringComparison.Ordinal);
+        await GiveAddressAsync(ana);
+        await WithDatabaseAsync(_north, async context =>
+        {
+            OperationsCustomer saved = await context.Customers.SingleAsync(item => item.Email == Vixly.Shared.Kernel.ValueObjects.EmailAddress.Create("ana@example.com"));
+            Assert.Equal(("Les Cayes", "HT"), (saved.HomeAddress?.City, saved.HomeAddress?.CountryCode));
+        });
 
         string home = await ana.GetStringAsync("/customer/?done=welcome");
         Match code = CustomerCode().Match(home);
@@ -299,6 +311,49 @@ public sealed partial class OperationsCustomerFlowTests : IClassFixture<Operatio
         Assert.Contains("The email or password is not correct", refused, StringComparison.Ordinal);
     }
 
+    // Slice 9: the customer chooses how notices reach them, among what the company offers, with their consent to texts.
+    [SqlServerFact]
+    public async Task Customer_ChoosesTextNotices_OnlyWhenOffered_AndWithConsent()
+    {
+        Browser zoe = await ConfirmedAsync(NorthSlug, "zoe.texts@example.com");
+        Assert.DoesNotContain("data-notices", await zoe.GetStringAsync("/customer/profile"), StringComparison.Ordinal);
+
+        await WithDatabaseAsync(_north, async context =>
+        {
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            context.Add(Vixly.Operations.Domain.Texts.OperationsTextProvider.Connect(_north, "AC" + new string('a', 32), new string('b', 32), "protected", "North Twilio",
+                "+13055550123", null, Guid.NewGuid(), now));
+            Vixly.Operations.Domain.Settings.OperationsTenantSettings? settings = await context.TenantSettings.FirstOrDefaultAsync();
+
+            if (settings is null)
+            {
+                settings = Vixly.Operations.Domain.Settings.OperationsTenantSettings.CreateDefault(_north, now);
+                context.Add(settings);
+            }
+
+            settings.ChangeTextNotices(Vixly.Operations.Domain.Texts.OperationsTextNotices.ReadyForPickup, now);
+            await context.SaveChangesAsync();
+        });
+
+        string profile = await zoe.GetStringAsync("/customer/profile");
+        Assert.Contains("data-notices", profile, StringComparison.Ordinal);
+        Assert.Contains("value=\"sms\"", profile, StringComparison.Ordinal);
+        Assert.DoesNotContain("value=\"whatsapp\"", profile, StringComparison.Ordinal);
+        Assert.Contains("Tick the box to agree", await Read(await zoe.PostAsync("/customer/profile", "/customer/profile/notices", new() { ["channel"] = "sms" })),
+            StringComparison.Ordinal);
+        Assert.Contains("not offered", await Read(await zoe.PostAsync("/customer/profile", "/customer/profile/notices", new() { ["channel"] = "whatsapp", ["consent"] = "true" })),
+            StringComparison.Ordinal);
+        Assert.Equal("/customer/profile?done=1#notices", (await zoe.PostAsync("/customer/profile", "/customer/profile/notices",
+            new() { ["channel"] = "sms", ["consent"] = "true" })).Headers.Location?.OriginalString);
+
+        await WithDatabaseAsync(_north, async context =>
+        {
+            Vixly.Operations.Domain.Customers.OperationsCustomer zoeRecord = await context.Customers.AsNoTracking().SingleAsync(item => item.Email == EmailAddress.Create("zoe.texts@example.com"));
+            Assert.Equal(Vixly.Operations.Domain.Texts.OperationsNoticeChannel.Sms, zoeRecord.NoticeChannel);
+            Assert.NotNull(zoeRecord.NoticeChannelUtc);
+        });
+    }
+
     private async Task<Browser> ConfirmedAsync(string slug, string email)
     {
         Browser browser = OpenBrowser(slug);
@@ -306,7 +361,16 @@ public sealed partial class OperationsCustomerFlowTests : IClassFixture<Operatio
         string token = _api.Mailer.LastToken(email);
         HttpResponseMessage verified = await browser.PostAsync("/customer/verify?token=" + Uri.EscapeDataString(token), "/customer/verify", new() { ["token"] = token });
         Assert.Equal(HttpStatusCode.Redirect, verified.StatusCode);
+        await GiveAddressAsync(browser);
         return browser;
+    }
+
+    // The home address asked at the first sign-in (owner, 2026-10-26).
+    private static async Task GiveAddressAsync(Browser browser)
+    {
+        HttpResponseMessage saved = await browser.PostAsync("/customer/address", "/customer/address",
+            new() { ["line1"] = "12 Rue Geffrard", ["city"] = "Les Cayes", ["region"] = "Sud", ["country"] = "HT" });
+        Assert.Equal("/customer/", saved.Headers.Location?.OriginalString);
     }
 
     private static Dictionary<string, string> SignUpForm(string email) => new()
@@ -326,7 +390,7 @@ public sealed partial class OperationsCustomerFlowTests : IClassFixture<Operatio
             DateTimeOffset now = DateTimeOffset.UtcNow;
             OperationsTenantBrand brand = OperationsTenantBrand.Create(tenantId, name, now);
             brand.Publish(now);
-            OperationsBranch branch = OperationsBranch.Create(tenantId, Details("MIA", "Miami", street), OperationsBranchSide.Origin, now);
+            OperationsBranch branch = OperationsBranch.Create(tenantId, Details("MIA", "Miami", street), "US", OperationsBranchLegal.None, now);
             context.Add(brand);
             context.Add(branch);
             context.Add(OperationsWarehouse.Create(tenantId, branch.Id, Details("WH1", "Receiving", street), OperationsWarehouseRoles.Receiving, true, now));

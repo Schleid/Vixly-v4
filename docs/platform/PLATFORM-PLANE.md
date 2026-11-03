@@ -9,6 +9,8 @@
 
 ## 1. What the Platform plane is
 
+Control's in-app help is being built under [HELP-2](../help/HELP-2-CONTROL.md), with progress and checks in [HELP-2 verification](../help/HELP-2-VERIFICATION.md). Signed-in help lives at `/help` and `/help/{Slug}`. The System menu and top-bar question mark open help; sign-in pages retain their existing inline hints. Home, search, direct article requests, related articles and contextual links are filtered using the existing GetMyPlatformAccess use case. Hidden and unknown articles answer 404. Resources embeds the en/fr/es Markdown; Web references Shared.Help for validation, rendering and search. This work changes no business actions.
+
 The plane Vixly itself runs: it knows who the tenants are, what they pay for, whether they may log in, and which devices are licensed. It never holds shipment or customer-operational data. Other planes learn about tenants only through `Vixly.Contracts.Platform`.
 
 It owns: `Platform.Domain|Application|Infrastructure|Api|Web|Worker`, `Contracts.Platform`, `Public.Web` (Stage 2, goes live with Platform) and `Vixly.Edge` (Stage 5).

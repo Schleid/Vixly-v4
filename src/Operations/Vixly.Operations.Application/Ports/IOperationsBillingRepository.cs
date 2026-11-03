@@ -28,6 +28,9 @@ public interface IOperationsBillingRepository
     // Read only.
     Task<Domain.Billing.OperationsInvoice?> FindShipmentInvoiceAsync(Guid shipmentId, CancellationToken cancellationToken);
 
+    // Owner, 2026-10-28: printed on the shipment's invoice and receipts once it has one.
+    Task<string?> FindTrackingNumberAsync(Guid shipmentId, CancellationToken cancellationToken);
+
     // Read only.
     Task<Domain.Billing.OperationsInvoice?> FindOrderInvoiceAsync(Guid supplySaleId, CancellationToken cancellationToken);
 

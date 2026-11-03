@@ -3,6 +3,7 @@ using Vixly.Platform.Application.Security;
 using Vixly.Platform.Application.Tests.Fakes;
 using Vixly.Platform.Application.UseCases.TenantAccount.GetTenantCompanyChange;
 using Vixly.Platform.Application.UseCases.TenantAccount.SubmitTenantCompanyChange;
+using Vixly.Platform.Application.UseCases.TenantAccount.UpdateTenantCompanyProfile;
 using Vixly.Platform.Application.UseCases.TenantAccount.WithdrawTenantCompanyChange;
 using Vixly.Platform.Application.UseCases.Tenants;
 using Vixly.Platform.Application.UseCases.Tenants.ApprovePlatformTenantChange;
@@ -136,6 +137,75 @@ public sealed class PlatformTenantChangeUseCaseTests
         Assert.Contains(_kit.Tenants.Outbox, message => message.Type == PlatformMessageTypes.TenantCompanyChangeDecided);
         Assert.Equal(PlatformTenantChangeErrors.NotPending, (await approve.ExecuteAsync(
             _kit.Staff(PlatformPermissions.TenantsReviewChanges), new ApprovePlatformTenantChangeRequest { RequestId = requestId }, CancellationToken.None)).Error);
+    }
+
+    // Owner, 2026-10-25: the company keeps its own profile; only the legal name needs approval.
+    [Fact]
+    public async Task Profile_TheOwnerSavesItDirectly_TheLegalNameStays()
+    {
+        PlatformTenant tenant = _kit.Tenant(active: true);
+        PlatformCompanyInput input = TenantTestKit.Input();
+        UpdateTenantCompanyProfileUseCase update = new(Changes());
+        UpdateTenantCompanyProfileRequest moved = new()
+        {
+            Company = new PlatformCompanyInput
+            {
+                LegalName = "Ignored Name LLC",
+                TradingName = "Northwind Express",
+                Email = "hello@northwind.example",
+                Phone = "+13055550100",
+                AddressLine1 = "1 New Street",
+                City = "Miami",
+                StateProvince = input.StateProvince,
+                PostalCode = "33101",
+                CountryCode = "US"
+            }
+        };
+
+        Assert.False((await update.ExecuteAsync(As(tenant.Id, PlatformTenantActorRole.Staff), moved, CancellationToken.None)).Succeeded);
+        Assert.False((await update.ExecuteAsync(As(tenant.Id, stepUp: false), moved, CancellationToken.None)).Succeeded);
+
+        UpdateTenantCompanyProfileResponse response = await update.ExecuteAsync(As(tenant.Id), moved, CancellationToken.None);
+
+        Assert.True(response.Succeeded, response.Error?.Code);
+        Assert.Equal("Northwind Freight Inc.", tenant.Company.LegalName);
+        Assert.Equal("Northwind Express", tenant.Company.TradingName);
+        Assert.Equal("Miami", tenant.Company.Address.City);
+        Assert.Equal("+13055550100", tenant.Company.Phone.Value);
+        Assert.Empty(_requests.Requests);
+        Assert.Equal("platform.tenants.company_profile_updated", Assert.Single(_kit.Store.AuditEntries).ActionCode);
+        Assert.True((await update.ExecuteAsync(As(tenant.Id), moved, CancellationToken.None)).Succeeded);
+        Assert.Single(_kit.Store.AuditEntries);
+    }
+
+    // A pending legal name request must not undo profile changes made after it was sent.
+    [Fact]
+    public async Task Approve_ChangesTheLegalNameOnly_KeepingTheProfileAsItIsNow()
+    {
+        PlatformTenant tenant = _kit.Tenant(active: true);
+        PlatformCompanyInput input = TenantTestKit.Input();
+        Guid requestId = (await SubmitAsync(tenant)).RequestId;
+        await new UpdateTenantCompanyProfileUseCase(Changes()).ExecuteAsync(As(tenant.Id), new UpdateTenantCompanyProfileRequest
+        {
+            Company = new PlatformCompanyInput
+            {
+                TradingName = input.TradingName,
+                Email = input.Email,
+                Phone = input.Phone,
+                AddressLine1 = "99 Moved Avenue",
+                City = input.City,
+                StateProvince = input.StateProvince,
+                PostalCode = input.PostalCode,
+                CountryCode = input.CountryCode
+            }
+        }, CancellationToken.None);
+
+        ApprovePlatformTenantChangeResponse response = await new ApprovePlatformTenantChangeUseCase(Changes()).ExecuteAsync(
+            _kit.Staff(PlatformPermissions.TenantsReviewChanges), new ApprovePlatformTenantChangeRequest { RequestId = requestId }, CancellationToken.None);
+
+        Assert.True(response.Succeeded, response.Error?.Code);
+        Assert.Equal("Northwind Logistics Ltd.", tenant.Company.LegalName);
+        Assert.Equal("99 Moved Avenue", tenant.Company.Address.Line1);
     }
 
     [Fact]

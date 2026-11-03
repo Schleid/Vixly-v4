@@ -100,7 +100,7 @@ public sealed class SignUpOperationsCustomerUseCase
             {
                 await _accounts.SendLinkAsync(existing, OperationsCustomerTokenPurpose.Verification, request.PortalSlug, cancellationToken);
             }
-            else if (existing.Status != OperationsCustomerStatus.Closed)
+            else if (existing.Status is not (OperationsCustomerStatus.Closed or OperationsCustomerStatus.Banned))
             {
                 await _accounts.SendAsync(existing, OperationsCustomerMailKind.AccountExists, _accounts.SignInLink(request.PortalSlug), cancellationToken);
             }
@@ -112,6 +112,12 @@ public sealed class SignUpOperationsCustomerUseCase
         if (await _staff.IsStaffEmailAnywhereAsync(email, cancellationToken))
         {
             await _accounts.SendNotAllowedAsync(email, request.FirstName, language, request.PortalSlug, cancellationToken);
+            return SignUpOperationsCustomerResponse.Success();
+        }
+
+        // Owner, 2026-10-31: a banned customer's phone never opens another account; the same answer on screen, no email.
+        if (await new OperationsBannedContacts(_customers).IsBannedAsync(null, request.Phone, cancellationToken))
+        {
             return SignUpOperationsCustomerResponse.Success();
         }
 

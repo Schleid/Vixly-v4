@@ -42,6 +42,8 @@ public sealed class ScanIntoOperationsRepackBoxUseCase
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly Vixly.Operations.Application.Items.OperationsItemCheck _itemCheck;
+
     public ScanIntoOperationsRepackBoxUseCase(
         OperationsBundleDesk desk,
         IOperationsBundleRepository bundles,
@@ -49,8 +51,10 @@ public sealed class ScanIntoOperationsRepackBoxUseCase
         IOperationsTrackingRepository tracking,
         OperationsBundling bundling,
         IOperationsUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        Vixly.Operations.Application.Items.OperationsItemCheck itemCheck)
     {
+        _itemCheck = itemCheck ?? throw new ArgumentNullException(nameof(itemCheck));
         _desk = desk ?? throw new ArgumentNullException(nameof(desk));
         _bundles = bundles ?? throw new ArgumentNullException(nameof(bundles));
         _receiving = receiving ?? throw new ArgumentNullException(nameof(receiving));
@@ -110,6 +114,12 @@ public sealed class ScanIntoOperationsRepackBoxUseCase
         if (OperationsBundling.Ready(parcel, await _receiving.GetShipmentAsync(box.ShipmentId, cancellationToken)) is { } notReady)
         {
             return ScanIntoOperationsRepackBoxResponse.Failure(notReady);
+        }
+
+        // Owner, 2026-11-01: sealed in a box, it can no longer be looked at; its items are complete first (when the company requires it).
+        if (await _itemCheck.RefuseAsync(new[] { parcel }, cancellationToken) is { } incomplete)
+        {
+            return ScanIntoOperationsRepackBoxResponse.Failure(incomplete);
         }
 
         // On a bundle's list (review): it goes into that bundle loose, or off the list first.

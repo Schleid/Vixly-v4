@@ -60,6 +60,12 @@ public sealed class OperationsSiteImage : OperationsEntity
             throw new DomainException(OperationsBrandingErrors.ImageTypeNotAllowed);
         }
 
+        // The document logo is a PNG, so its black and white label copy can be made from it.
+        if (kind is OperationsSiteImageKind.DocumentLogo or OperationsSiteImageKind.LabelLogo && contentType != "image/png")
+        {
+            throw new DomainException(OperationsBrandingErrors.DocumentLogoPngOnly);
+        }
+
         if (content.Length == 0 || content.Length > (kind == OperationsSiteImageKind.Favicon ? MaxFaviconBytes : MaxBytes))
         {
             throw new DomainException(OperationsBrandingErrors.ImageTooLarge);
@@ -68,7 +74,7 @@ public sealed class OperationsSiteImage : OperationsEntity
         (int maxWidth, int maxHeight) = kind switch
         {
             OperationsSiteImageKind.Favicon => (512, 512),
-            OperationsSiteImageKind.Hero => (4000, 3000),
+            OperationsSiteImageKind.Hero or OperationsSiteImageKind.Air or OperationsSiteImageKind.Sea => (4000, 3000),
             _ => (2000, 2000)
         };
 

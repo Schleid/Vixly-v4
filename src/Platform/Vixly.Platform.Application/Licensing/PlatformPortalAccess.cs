@@ -22,4 +22,5 @@ public sealed record PlatformPortalAccess(
     PlatformSubscriptionAccess Access,
     string? CanonicalSlug = null,
     string? DefaultLanguage = null,
-    Vixly.Platform.Domain.Legal.PlatformLegalStatus Legal = Vixly.Platform.Domain.Legal.PlatformLegalStatus.NotRequired);
+    Vixly.Platform.Domain.Legal.PlatformLegalStatus Legal = Vixly.Platform.Domain.Legal.PlatformLegalStatus.NotRequired,
+    string? TimeZone = null);

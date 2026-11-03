@@ -23,6 +23,15 @@ public sealed class GetOperationsCounterShipmentResponse
 
     public bool Succeeded { get; private init; }
 
+    // Freight collect offered at the counter when the company allows it (owner, 2026-10-27); shown only to people who take payments.
+    public bool AllowCollect { get; private set; }
+
+    public GetOperationsCounterShipmentResponse WithAllowCollect(bool allow)
+    {
+        AllowCollect = allow;
+        return this;
+    }
+
     // Slice 5F: its invoice once issued.
     public Vixly.Operations.Domain.Billing.OperationsInvoice? Invoice { get; private set; }
 

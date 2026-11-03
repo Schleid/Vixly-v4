@@ -96,6 +96,12 @@ public sealed class GrantOperationsRoleUseCase
             return GrantOperationsRoleResponse.Failure(OperationsRoleErrors.PartnerAgentNoRoles);
         }
 
+        // Owner, 2026-10-29 (S-5): an outside account is never an Administrator.
+        if (user.IsOutside && role.IsAdministrator)
+        {
+            return GrantOperationsRoleResponse.Failure(Vixly.Operations.Domain.Identity.OperationsOutsideErrors.NotForThisAccount);
+        }
+
         if (!role.IsActive)
         {
             return GrantOperationsRoleResponse.Failure(OperationsRoleErrors.RoleInactive);

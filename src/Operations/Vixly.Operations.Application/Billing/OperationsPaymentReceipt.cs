@@ -15,4 +15,5 @@ namespace Vixly.Operations.Application.Billing;
 // IMPORTANT NOTES:
 // - Printed in the invoice's language
 // =========================================================
-public sealed record OperationsPaymentReceipt(OperationsPayment Payment, OperationsInvoice Invoice, IReadOnlyDictionary<OperationsPaymentMethod, string> OtherNames, DateOnly Day);
+public sealed record OperationsPaymentReceipt(OperationsPayment Payment, OperationsInvoice Invoice, IReadOnlyDictionary<OperationsPaymentMethod, string> OtherNames, DateOnly Day,
+    string? TrackingNumber = null);

@@ -36,6 +36,9 @@ internal sealed class OperationsBillingRepository : IOperationsBillingRepository
     public Task<OperationsInvoice?> FindShipmentInvoiceAsync(Guid shipmentId, CancellationToken cancellationToken) =>
         _context.Invoices.AsNoTracking().FirstOrDefaultAsync(invoice => invoice.ShipmentId == shipmentId && invoice.Kind == OperationsInvoiceKind.Shipment, cancellationToken);
 
+    public Task<string?> FindTrackingNumberAsync(Guid shipmentId, CancellationToken cancellationToken) =>
+        _context.Shipments.Where(item => item.Id == shipmentId).Select(item => item.TrackingNumber).FirstOrDefaultAsync(cancellationToken);
+
     public Task<OperationsInvoice?> FindOrderInvoiceAsync(Guid supplySaleId, CancellationToken cancellationToken) =>
         _context.Invoices.AsNoTracking().FirstOrDefaultAsync(invoice => invoice.SupplySaleId == supplySaleId && invoice.Kind == OperationsInvoiceKind.SupplyOrder, cancellationToken);
 

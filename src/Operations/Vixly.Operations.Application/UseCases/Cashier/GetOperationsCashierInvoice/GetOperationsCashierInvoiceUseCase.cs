@@ -48,8 +48,10 @@ public sealed class GetOperationsCashierInvoiceUseCase
         IOperationsCreditRepository credit,
         OperationsCreditBook book,
         TimeProvider timeProvider,
-        IOperationsCardRepository cards)
+        IOperationsCardRepository cards,
+        Vixly.Operations.Application.Plans.OperationsPlanGate plan)
     {
+        _plan = plan ?? throw new ArgumentNullException(nameof(plan));
         _cards = cards ?? throw new ArgumentNullException(nameof(cards));
         _desk = desk ?? throw new ArgumentNullException(nameof(desk));
         _billing = billing ?? throw new ArgumentNullException(nameof(billing));
@@ -59,6 +61,9 @@ public sealed class GetOperationsCashierInvoiceUseCase
         _book = book ?? throw new ArgumentNullException(nameof(book));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
+
+    // Vixly Lite (owner, 2026-10-30): the modules in the company's plan.
+    private readonly Vixly.Operations.Application.Plans.OperationsPlanGate _plan;
 
     public async Task<GetOperationsCashierInvoiceResponse> ExecuteAsync(
         OperationsAuthorizationContext context,
@@ -81,7 +86,7 @@ public sealed class GetOperationsCashierInvoiceUseCase
 
         OperationsTenantSettings settings = await _settings.FindAsync(cancellationToken) ?? OperationsTenantSettings.CreateDefault(context.RequiredTenantId, _timeProvider.GetUtcNow());
         OperationsWarehouse at = warehouses.First(warehouse => warehouse.Id == invoice.WarehouseId);
-        OperationsCreditAccount? account = settings.AllowCredit ? await _credit.FindByCustomerAsync(invoice.CustomerId, cancellationToken) : null;
+        OperationsCreditAccount? account = settings.AllowCredit && (await _plan.IncludesAsync(Vixly.Operations.Application.Plans.OperationsPlanModules.CreditAccounts, cancellationToken)) ? await _credit.FindByCustomerAsync(invoice.CustomerId, cancellationToken) : null;
         OperationsCreditPosition? position = account is null ? null
             : (await _book.ReadAsync(account, invoice.CustomerId, OperationsCreditBook.Today(settings, _timeProvider.GetUtcNow()), cancellationToken)).Position;
         return GetOperationsCashierInvoiceResponse.Success(invoice, settings, OperationsPaymentNames.Accepted(settings),

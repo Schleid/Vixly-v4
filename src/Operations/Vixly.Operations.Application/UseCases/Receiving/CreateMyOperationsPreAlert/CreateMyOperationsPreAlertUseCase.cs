@@ -80,7 +80,8 @@ public sealed class CreateMyOperationsPreAlertUseCase
         }
 
         (OperationsPreAlert? preAlert, OperationsParcel? parcel, Error? refused) = await _preAlerts.AnnounceAsync(context.RequiredTenantId, signedIn.Customer.Id, warehouse, shipment,
-            new OperationsPackageDraft(request.Carrier, request.TrackingNumber, request.Store, request.Contents, request.DeclaredValue, request.ExpectedDate), _accounts.UtcNow, cancellationToken);
+            new OperationsPackageDraft(request.Carrier, request.TrackingNumber, request.Store, request.Contents, request.DeclaredValue, request.ExpectedDate, request.Items), _accounts.UtcNow,
+            cancellationToken);
 
         if (preAlert is null)
         {

@@ -237,6 +237,19 @@ public sealed class SignInFlowTests
         Assert.DoesNotContain(_store.Sessions, session => session.PlatformUserId == invited.PlatformUserId);
     }
 
+    // Owner, 2026-10-23: the mail server refusing never looks like a failed invitation: the person is saved, the message says so, the history keeps it.
+    [Fact]
+    public async Task Invitation_WhoseEmailFails_SavesThePerson_AndSaysSo()
+    {
+        _store.MailFails = true;
+
+        InvitePlatformUserResponse invited = await Invite(SuperUserContext(), "mailless@example.com", PlatformUserAuthorityLevel.Standard);
+
+        Assert.Equal(PlatformCommonErrors.InvitationSavedMailFailed, invited.Error);
+        Assert.Contains(_store.Users, user => user.Email.Value == "mailless@example.com");
+        Assert.Contains(_store.AuditEntries, entry => entry.ActionCode == "platform.users.invitation_mail_failed");
+    }
+
     [Fact]
     public async Task Invite_AboveStandard_NeedsChangeAuthority()
     {
@@ -251,6 +264,19 @@ public sealed class SignInFlowTests
             PlatformAuthErrors.AuthorityNotAllowed,
             (await Invite(context, "boss@example.com", PlatformUserAuthorityLevel.SuperUser)).Error);
         Assert.True((await Invite(context, "staff@example.com", PlatformUserAuthorityLevel.Standard)).Succeeded);
+    }
+
+    // Owner, 2026-10-25: Control staff get TC-0001, TC-0002 ... automatically, never typed, never reused.
+    [Fact]
+    public async Task Invite_GivesTheNextEmployeeNumber()
+    {
+        _store.LastEmployeeNumber = 41;
+
+        Assert.True((await Invite(SuperUserContext(), "first@example.com", PlatformUserAuthorityLevel.Standard)).Succeeded);
+        Assert.True((await Invite(SuperUserContext(), "second@example.com", PlatformUserAuthorityLevel.Standard)).Succeeded);
+
+        Assert.Equal("TC-0042", _store.Users.Single(user => user.Email.Value == "first@example.com").EmployeeNumber);
+        Assert.Equal("TC-0043", _store.Users.Single(user => user.Email.Value == "second@example.com").EmployeeNumber);
     }
 
     [Fact]
@@ -396,7 +422,7 @@ public sealed class SignInFlowTests
 
     private PlatformSignInSteps Steps()
     {
-        return new PlatformSignInSteps(_store, _store, _store, _crypto, _store, Audit(), _store, _clock);
+        return new PlatformSignInSteps(_store, _store, _store, _crypto, _store, Audit(), _store, _clock, new FakeSecuritySettings());
     }
 
     private PlatformAuditTrail Audit()

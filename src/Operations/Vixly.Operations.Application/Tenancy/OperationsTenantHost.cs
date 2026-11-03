@@ -13,7 +13,7 @@
 // - Built only by ResolveOperationsTenant
 // - Legal is Platform's Terms status: not_required, accepted, due, overdue (Slice 8)
 // =========================================================
-public sealed record OperationsTenantHost(OperationsTenantState State, Guid? TenantId, OperationsTenantAccess Access, string? CanonicalSlug, string? DefaultLanguage, string Legal = "not_required")
+public sealed record OperationsTenantHost(OperationsTenantState State, Guid? TenantId, OperationsTenantAccess Access, string? CanonicalSlug, string? DefaultLanguage, string Legal = "not_required", string? TimeZone = null)
 {
     public static OperationsTenantHost NotFound { get; } = new(OperationsTenantState.NotFound, null, OperationsTenantAccess.None, null, null);
 }

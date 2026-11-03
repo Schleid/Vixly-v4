@@ -93,8 +93,18 @@ public sealed class AcceptInvitationUseCase
             return AcceptInvitationResponse.Failure(PlatformAuthErrors.LinkInvalid);
         }
 
-        string challengeToken = _steps.IssueChallenge(user, utcNow);
         _audit.Record(user.Id, "platform.auth.invitation_accepted", null, nameof(PlatformUser), user.Id);
+
+        if (await _steps.PasswordIsEnoughAsync(user, cancellationToken))
+        {
+            PlatformIssuedSession? issued = await _steps.StartSessionAsync(user, "password", cancellationToken);
+
+            return issued is null
+                ? AcceptInvitationResponse.Failure(PlatformCommonErrors.ConcurrencyConflict)
+                : AcceptInvitationResponse.SignedIn(issued.Token);
+        }
+
+        string challengeToken = _steps.IssueChallenge(user, utcNow);
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken)
             ? AcceptInvitationResponse.Success(challengeToken)

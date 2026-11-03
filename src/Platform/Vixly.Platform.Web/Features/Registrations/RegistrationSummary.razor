@@ -34,8 +34,8 @@ IMPORTANT NOTES:
         <dl class="vx-facts">
             <dt>@T["ui.tenants.status"]</dt><dd><VxStatusBadge Status="@PlatformDisplay.RegistrationBadge(registration.Status)" Text="@T[PlatformDisplay.RegistrationStatusKey(registration.Status)]" /></dd>
             <dt>@T["ui.tenants.slug"]</dt><dd>@registration.Slug</dd>
-            <dt>@T["ui.tenants.owner"]</dt><dd>@registration.OwnerName, @registration.OwnerEmail, @registration.OwnerPhone</dd>
-            <dt>@T["ui.tenants.company_email"]</dt><dd>@registration.CompanyEmail, @registration.CompanyPhone</dd>
+            <dt>@T["ui.tenants.owner"]</dt><dd>@registration.OwnerName, @registration.OwnerEmail, @Vixly.Shared.Localization.VixlyPhone.International(registration.OwnerPhone)</dd>
+            <dt>@T["ui.tenants.company_email"]</dt><dd>@registration.CompanyEmail, @Vixly.Shared.Localization.VixlyPhone.International(registration.CompanyPhone)</dd>
             <dt>@T["ui.tenants.country"]</dt><dd>@PlatformDisplay.CountryName(T, registration.CountryCode)</dd>
             <dt>@T["ui.tenants.language"]</dt><dd>@T["ui.language." + registration.Language]</dd>
             <dt>@T["ui.tenants.time_zone"]</dt><dd>@registration.TimeZone</dd>

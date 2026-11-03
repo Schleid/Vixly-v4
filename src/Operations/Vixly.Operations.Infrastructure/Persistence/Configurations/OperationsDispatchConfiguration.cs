@@ -52,5 +52,7 @@ internal sealed class OperationsDispatchConfiguration : IEntityTypeConfiguration
         // Slice 7: the warehouse that receives it.
         builder.HasOne<Vixly.Operations.Domain.Locations.OperationsWarehouse>().WithMany().HasForeignKey(dispatch => dispatch.ReceivingWarehouseId).OnDelete(DeleteBehavior.Restrict);
         builder.HasIndex(dispatch => new { dispatch.TenantId, dispatch.ReceivingWarehouseId, dispatch.Status });
+        // Slice 11: reports by departure.
+        builder.HasIndex(item => new { item.TenantId, item.DepartedUtc }).HasFilter("[DepartedUtc] IS NOT NULL");
     }
 }

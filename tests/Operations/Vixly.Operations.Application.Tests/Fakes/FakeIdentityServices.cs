@@ -78,6 +78,12 @@ internal sealed class FakeIdentityServices : IOperationsPasswordHasher, IOperati
         return Task.CompletedTask;
     }
 
+    public Task SendDeviceBlockedAsync(OperationsDeviceBlockedMail mail, CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task SendTicketEscalatedAsync(OperationsTicketEscalatedMail mail, CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public Task SendShipmentCapAsync(OperationsShipmentCapMail mail, CancellationToken cancellationToken) => Task.CompletedTask;
+
     public Task SendOwnerInvitationAsync(OperationsOwnerInvitationMail mail, CancellationToken cancellationToken)
     {
         if (MailFails)

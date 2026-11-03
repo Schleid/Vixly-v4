@@ -11,6 +11,7 @@ namespace Vixly.Operations.Application.Ports;
 //
 // RESPONSIBILITIES:
 // - Add, read and list tickets; the packages that resemble a ticket, for staff
+// - The ticket desk's list by topic and warehouse, and the tickets waiting for an escalation
 //
 // IMPORTANT NOTES:
 // - Scoped to the current tenant by the query filter
@@ -27,9 +28,15 @@ public interface IOperationsTicketRepository
     // The customer's own, newest first.
     Task<IReadOnlyList<OperationsTicket>> ListForCustomerAsync(Guid customerId, int take, CancellationToken cancellationToken);
 
-    // Staff: the tickets of the warehouses, oldest open first; null status: every ticket.
-    Task<(IReadOnlyList<OperationsTicket> Items, int TotalCount)> ListAsync(IReadOnlyCollection<Guid> warehouses, OperationsTicketStatus? status, int page, int pageSize,
-        CancellationToken cancellationToken);
+    // Staff (ticket desk, owner 2026-10-29): the tickets of each topic at the warehouses where the person sees it; escalated first, then the oldest.
+    Task<(IReadOnlyList<OperationsTicket> Items, int TotalCount)> ListAsync(IReadOnlyDictionary<OperationsTicketTopic, IReadOnlyCollection<Guid>> scope,
+        Vixly.Operations.Application.Tickets.OperationsTicketDeskFilter filter, int page, int pageSize, CancellationToken cancellationToken);
+
+    // Not resolved, with an escalation step left, opened before this time (the escalation job checks each).
+    Task<IReadOnlyList<OperationsTicket>> ListEscalatableAsync(DateTimeOffset openedBefore, int take, CancellationToken cancellationToken);
+
+    // System scope: the companies with such tickets.
+    Task<IReadOnlyList<Guid>> ListTenantsWithEscalatableAsync(DateTimeOffset openedBefore, CancellationToken cancellationToken);
 
     // Packages at the ticket's warehouse nobody could place (or already the ticket's customer's), with the same tracking number (or its end), or the same carrier near the day it was delivered.
     Task<IReadOnlyList<OperationsParcel>> ListLookalikesAsync(OperationsTicket ticket, int take, CancellationToken cancellationToken);

@@ -168,6 +168,12 @@ public static class PlatformIdentityErrors
     public static Error UserRequired { get; } =
         Error.Create("platform.identity.user_required");
 
+    public static Error IdleInvalid { get; } =
+        Error.Create("platform.identity.idle_invalid", ("min", PlatformIdentityLimits.IdleMinutesMin), ("max", PlatformIdentityLimits.IdleMinutesMax));
+
+    public static Error IdleWarnInvalid { get; } =
+        Error.Create("platform.identity.idle_warn_invalid", ("min", PlatformIdentityLimits.IdleWarnMinutesMin), ("max", PlatformIdentityLimits.IdleWarnMinutesMax));
+
     public static Error AuditActionInvalid { get; } =
         Error.Create("platform.identity.audit_action_invalid");
 

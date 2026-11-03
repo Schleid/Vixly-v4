@@ -329,3 +329,14 @@
         scroll-behavior: auto !important;
     }
 }
+
+/* Maintenance notice before a window (Control backlog 2026-10-22); the Frontend/UI team may restyle it. */
+.vx-maintenance-banner {
+    margin: 0;
+    padding: 0.5rem 1rem;
+    background: #fff4ce;
+    color: #3b2f00;
+    border-bottom: 1px solid #e8d48a;
+    font-size: 0.875rem;
+    text-align: center;
+}

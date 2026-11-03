@@ -26,10 +26,11 @@ IMPORTANT NOTES:
         }
         @if (Milestones is { Count: > 0 })
         {
+            <p class="site-message" role="status">@Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.Format(Vixly.Operations.Domain.Shipments.OperationsTrackingNumbers.Read(Number))</p>
             <ol class="site-milestones">
                 @foreach (OperationsPublicMilestone milestone in Milestones)
                 {
-                    <li><strong>@T["ops.milestone." + milestone.Code]</strong> <time datetime="@milestone.ReachedUtc.ToString("O")">@milestone.ReachedUtc.ToString("d", System.Globalization.CultureInfo.CurrentCulture)</time></li>
+                    <li><strong>@T["ui.milestone." + milestone.Code]</strong> <time datetime="@milestone.ReachedUtc.ToString("O")">@milestone.ReachedUtc.ToString("d", System.Globalization.CultureInfo.CurrentCulture)</time></li>
                 }
             </ol>
         }

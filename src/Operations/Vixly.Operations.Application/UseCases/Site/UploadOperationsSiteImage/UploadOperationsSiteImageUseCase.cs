@@ -20,6 +20,7 @@ namespace Vixly.Operations.Application.UseCases.Site.UploadOperationsSiteImage;
 //
 // IMPORTANT NOTES:
 // - The file type comes from its bytes: SVG and anything unknown are refused
+// - The air and sea photos need the plan's theme customisation (website themes, step 1)
 // =========================================================
 public sealed class UploadOperationsSiteImageUseCase
 {
@@ -35,14 +36,18 @@ public sealed class UploadOperationsSiteImageUseCase
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly IOperationsPlanFeatures _features;
+
     public UploadOperationsSiteImageUseCase(
         IOperationsSiteRepository site,
         IOperationsImageInspector inspector,
         OperationsOwnerCheck owner,
         OperationsAuditTrail audit,
         IOperationsUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IOperationsPlanFeatures features)
     {
+        _features = features ?? throw new ArgumentNullException(nameof(features));
         _site = site ?? throw new ArgumentNullException(nameof(site));
         _inspector = inspector ?? throw new ArgumentNullException(nameof(inspector));
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
@@ -69,6 +74,18 @@ public sealed class UploadOperationsSiteImageUseCase
         if (brand is null)
         {
             return UploadOperationsSiteImageResponse.Failure(OperationsCommonErrors.NotFound);
+        }
+
+        if (request.Kind is not (OperationsSiteImageKind.Logo or OperationsSiteImageKind.LogoDark or OperationsSiteImageKind.Favicon or OperationsSiteImageKind.Hero
+                or OperationsSiteImageKind.Air or OperationsSiteImageKind.Sea))
+        {
+            return UploadOperationsSiteImageResponse.Failure(OperationsBrandingErrors.ImageTypeNotAllowed);
+        }
+
+        if (request.Kind is OperationsSiteImageKind.Air or OperationsSiteImageKind.Sea
+            && !(await _features.GetAsync(context.RequiredTenantId, cancellationToken)).ThemeCustomization)
+        {
+            return UploadOperationsSiteImageResponse.Failure(OperationsBrandingErrors.ThemeLocked);
         }
 
         if (request.Content.Length > OperationsSiteImage.MaxBytes)

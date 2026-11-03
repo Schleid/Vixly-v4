@@ -63,4 +63,7 @@
   <data name="email_placeholder" xml:space="preserve">
     <value>staff@company.com</value>
   </data>
+  <data name="subtitle_company" xml:space="preserve">
+    <value>Sign in to the {company} workspace.</value>
+  </data>
 </root>

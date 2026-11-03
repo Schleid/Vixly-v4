@@ -18,6 +18,7 @@ namespace Vixly.Operations.Application.Shipments;
 // RESPONSIBILITIES:
 // - Check the package, refuse a second open announcement of the same number
 // - A package that arrived first takes the announcement at once and goes where the pre-alert is (its shipment, or the waiting shipment)
+// - Owner, 2026-11-01: the customer's items, matched to the catalogue; they make the contents and the declared value
 //
 // IMPORTANT NOTES:
 // - The caller saves; nothing is saved here
@@ -36,9 +37,12 @@ public sealed class OperationsPreAlertIntake
 
     private readonly OperationsPackageMover _mover;
 
+    private readonly Vixly.Operations.Application.Items.OperationsItemDeclaration _declaration;
+
     public OperationsPreAlertIntake(IOperationsReceivingRepository receiving, IOperationsSettingsRepository settings, OperationsTracker tracker,
-        Vixly.Operations.Application.Inspection.OperationsInspectionSelection selection, OperationsPackageMover mover)
+        Vixly.Operations.Application.Inspection.OperationsInspectionSelection selection, OperationsPackageMover mover, Vixly.Operations.Application.Items.OperationsItemDeclaration declaration)
     {
+        _declaration = declaration ?? throw new ArgumentNullException(nameof(declaration));
         _selection = selection ?? throw new ArgumentNullException(nameof(selection));
         _receiving = receiving ?? throw new ArgumentNullException(nameof(receiving));
         _settings = settings ?? throw new ArgumentNullException(nameof(settings));
@@ -68,12 +72,17 @@ public sealed class OperationsPreAlertIntake
 
         string currency = (await _settings.FindAsync(cancellationToken))?.CurrencyCode ?? OperationsTenantSettings.DefaultCurrency;
         OperationsPreAlert preAlert;
+        IReadOnlyList<Vixly.Operations.Application.Items.OperationsItemDraft> lines = Vixly.Operations.Application.Items.OperationsItemDeclaration.Filled(draft.Items);
+        IReadOnlyList<Vixly.Operations.Domain.Items.OperationsParcelItem> items;
 
         try
         {
+            // Owner, 2026-11-01: declared item by item, the items make the contents and the value.
+            (string? contents, decimal value) = lines.Count > 0 ? Vixly.Operations.Application.Items.OperationsItemDeclaration.Summary(lines) : (draft.Contents, draft.DeclaredValue);
+            items = await _declaration.PrepareAsync(tenantId, lines, currency, utcNow, cancellationToken);
             preAlert = shipment is null
-                ? OperationsPreAlert.Announce(tenantId, customerId, warehouseId, draft.Carrier, draft.TrackingNumber, draft.Store, draft.Contents, draft.DeclaredValue, currency, draft.ExpectedDate, utcNow)
-                : OperationsPreAlert.Create(shipment, draft.Carrier, draft.TrackingNumber, draft.Store, draft.Contents, draft.DeclaredValue, currency, draft.ExpectedDate, utcNow);
+                ? OperationsPreAlert.Announce(tenantId, customerId, warehouseId, draft.Carrier, draft.TrackingNumber, draft.Store, contents, value, currency, draft.ExpectedDate, utcNow)
+                : OperationsPreAlert.Create(shipment, draft.Carrier, draft.TrackingNumber, draft.Store, contents, value, currency, draft.ExpectedDate, utcNow);
         }
         catch (DomainException exception)
         {
@@ -108,6 +117,7 @@ public sealed class OperationsPreAlertIntake
         // A cancel of the shipment at the same moment clashes on its row version.
         shipment?.TakePackage(utcNow);
         _receiving.Add(preAlert);
+        _declaration.AddForPreAlert(items, preAlert, utcNow);
 
         if (parcel is null)
         {

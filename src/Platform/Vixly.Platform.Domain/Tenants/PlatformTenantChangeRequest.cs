@@ -119,7 +119,12 @@ public sealed class PlatformTenantChangeRequest : AuditableEntity
         }
 
         Decide(PlatformTenantChangeStatus.Approved, note, required: false, staffUserId, utcNow);
-        return tenant.ApplyCompanyChange(Proposed, Id, staffUserId, utcNow);
+
+        // 2026-10-25: a request changes the legal name only; the rest of the profile is the company's own and may
+        // have changed since the request was sent, so it is kept as it is now.
+        PlatformCompanyDetails current = tenant.Company;
+        return tenant.ApplyCompanyChange(
+            PlatformCompanyDetails.Create(Proposed.LegalName, current.TradingName, current.Email, current.Phone, current.Address), Id, staffUserId, utcNow);
     }
 
     public void Reject(string? note, Guid staffUserId, DateTimeOffset utcNow)

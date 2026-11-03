@@ -22,4 +22,7 @@ public sealed class BeginOperationsSignInRequest
     public Guid? DeviceId { get; init; }
 
     public string? DeviceSecret { get; init; }
+
+    // The company's address, for the link in the administrators' email when the device is blocked (owner, R-6).
+    public string? PortalSlug { get; init; }
 }

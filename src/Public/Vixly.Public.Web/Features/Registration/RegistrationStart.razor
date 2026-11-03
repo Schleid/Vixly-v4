@@ -29,6 +29,7 @@ IMPORTANT NOTES:
 <ErrorBox Error="_error" />
 <EditForm Model="Form" FormName="register-start" OnSubmit="StartAsync" class="pub-form pub-form--grid">
     <input type="hidden" name="Form.OfferToken" value="@Form!.OfferToken" />
+    <input type="hidden" name="Form.TimeZone" value="" data-vx-time-zone />
     <fieldset class="pub-field--full">
         <legend>@T["public.register.company"]</legend>
         <RegistrationField Id="reg-legal" Label="@T["public.register.legal_name"]" Class="pub-field--name"><InputText id="reg-legal" class="vx-input" @bind-Value="Form!.LegalName" required maxlength="200" autocomplete="organization" /></RegistrationField>
@@ -61,7 +62,7 @@ IMPORTANT NOTES:
     </fieldset>
     <fieldset class="pub-field--full">
         <legend>@T["public.register.portal"]</legend>
-        <RegistrationField Id="reg-slug" Label="@T["public.register.slug"]" Class="pub-field--slug"><InputText id="reg-slug" class="vx-input" @bind-Value="Form!.Slug" required maxlength="40" pattern="[a-z0-9-]+" /></RegistrationField>
+        <RegistrationField Id="reg-slug" Label="@T["public.register.slug"]" Class="pub-field--slug"><InputText id="reg-slug" class="vx-input" @bind-Value="Form!.Slug" required maxlength="40" pattern="[a-z0-9\-]+" /></RegistrationField>
         <p class="pub-hint pub-field--full">@T["public.register.slug_help"]</p>
     </fieldset>
     <label class="pub-field--full">
@@ -77,6 +78,8 @@ IMPORTANT NOTES:
 </EditForm>
 
 @code {
+    private static readonly System.Text.RegularExpressions.Regex PlanCode = new("^[A-Za-z0-9_-]{1,40}$", System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+
     private PlatformApiError? _error;
 
     private Vixly.Contracts.Platform.Registration.PlatformRegistrationOffer? _offer;
@@ -92,6 +95,9 @@ IMPORTANT NOTES:
 
     [Parameter]
     public bool Ended { get; set; }
+
+    [Parameter]
+    public string? Plan { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -124,6 +130,11 @@ IMPORTANT NOTES:
             if (!string.IsNullOrWhiteSpace(Form.OfferToken))
             {
                 RegistrationCookies.Write(HttpContext, RegistrationCookies.Offer, Form.OfferToken, access.ExpiresUtc);
+            }
+
+            if (PlanCode.IsMatch(Plan ?? string.Empty))
+            {
+                RegistrationCookies.Write(HttpContext, RegistrationCookies.Plan, Plan!, access.ExpiresUtc);
             }
 
             Navigation.NavigateTo(PublicLanguage.Page(PublicLanguage.Current, "register/email"));

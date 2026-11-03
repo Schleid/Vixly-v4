@@ -73,6 +73,7 @@ public sealed class GetOperationsInvoiceDocumentUseCase
             return GetOperationsInvoiceDocumentResponse.Failure(OperationsBillingErrors.CreditNotFound);
         }
 
-        return GetOperationsInvoiceDocumentResponse.Success(OperationsInvoicePdf.Render(_renderer, new OperationsInvoiceDocument(invoice, note)), (note?.Number ?? invoice.Number) + ".pdf");
+        string? tracking = invoice.ShipmentId is { } shipmentId ? await _billing.FindTrackingNumberAsync(shipmentId, cancellationToken) : null;
+        return GetOperationsInvoiceDocumentResponse.Success(OperationsInvoicePdf.Render(_renderer, new OperationsInvoiceDocument(invoice, note, tracking)), (note?.Number ?? invoice.Number) + ".pdf");
     }
 }

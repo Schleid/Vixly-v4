@@ -164,6 +164,111 @@ public sealed class PublicSiteHttpTests
         Assert.Contains("Legal name", page, StringComparison.Ordinal);
     }
 
+    // Owner, 2026-10-22: sign-up must be smooth. The plan picked on the plans page is still chosen at the plan step.
+    [Fact]
+    public async Task SignUp_FromThePlansPage_KeepsThePlan_UntilThePlanStep()
+    {
+        await using PublicSiteTestHost host = await PublicSiteTestHost.StartAsync(registrationOpen: true);
+        host.Platform.Answer(HttpMethod.Get, "legal/terms?language=en", HttpStatusCode.OK,
+            "{\"documentId\":\"" + Guid.NewGuid() + "\",\"version\":\"2026-10\",\"language\":\"en\",\"sha256\":\"x\",\"fileUrl\":\"/legal\",\"parts\":[]}");
+        host.Platform.Answer(HttpMethod.Post, "registration", HttpStatusCode.OK, "{\"accessToken\":\"access-1\",\"expiresUtc\":\"2030-01-01T00:00:00Z\"}");
+        host.Platform.Answer(HttpMethod.Get, "registration/status", HttpStatusCode.OK,
+            "{\"step\":\"pending_plan_selection\",\"maskedEmail\":\"a**@rivera.example\",\"slug\":\"rivera\",\"verificationDeadlineUtc\":\"2030-01-01T00:00:00Z\"}");
+        host.Platform.Answer(HttpMethod.Get, "registration/plans", HttpStatusCode.OK,
+            "[{\"code\":\"BASIC\",\"name\":\"Basic\",\"currencyCode\":\"USD\",\"monthlyPricePerLicence\":12,\"annualPricePerLicence\":120,\"setupFee\":0,\"minimumLicences\":1,\"maxLicensedDevices\":5,\"maxWarehouses\":1,\"features\":[],\"trialDays\":14},"
+            + "{\"code\":\"GROWTH\",\"name\":\"Growth\",\"currencyCode\":\"USD\",\"monthlyPricePerLicence\":25,\"annualPricePerLicence\":250,\"setupFee\":0,\"minimumLicences\":1,\"maxLicensedDevices\":20,\"maxWarehouses\":3,\"features\":[],\"trialDays\":30}]");
+        HttpClient client = host.Client();
+
+        (Dictionary<string, string> form, string cookies) = await OpenFormAsync(client, "/en/register?plan=GROWTH");
+        form["Form.LegalName"] = "Rivera Freight LLC";
+        form["Form.CompanyEmail"] = "office@rivera.example";
+        form["Form.CompanyPhone"] = "+13055550100";
+        form["Form.AddressLine1"] = "100 Main St";
+        form["Form.City"] = "Miami";
+        form["Form.CountryCode"] = "US";
+        form["Form.AddressConfirmed"] = "true";
+        form["Form.OwnerName"] = "Ana Rivera";
+        form["Form.OwnerEmail"] = "ana@rivera.example";
+        form["Form.OwnerPhone"] = "+13055550101";
+        form["Form.Slug"] = "rivera";
+        form["Form.AcceptedTerms"] = "true";
+        Assert.Equal(string.Empty, form["Form.TimeZone"]);
+        form["Form.TimeZone"] = "America/New_York";
+
+        HttpResponseMessage started = await PostAsync(client, "/en/register?plan=GROWTH", form, cookies);
+
+        Assert.Equal(HttpStatusCode.Redirect, started.StatusCode);
+        Assert.Contains("\"timeZone\":\"America/New_York\"", Assert.Single(host.Platform.Requests, request => request.Path == "registration").Body, StringComparison.Ordinal);
+        Assert.EndsWith("/en/register/email", started.Headers.Location!.OriginalString, StringComparison.Ordinal);
+        string stepCookies = Cookies(started);
+        Assert.Contains("__Host-vx4-plan=GROWTH", stepCookies, StringComparison.Ordinal);
+
+        using HttpRequestMessage plan = new(HttpMethod.Get, "/en/register/plan");
+        plan.Headers.TryAddWithoutValidation("Cookie", stepCookies);
+        string page = await (await client.SendAsync(plan)).Content.ReadAsStringAsync();
+
+        Assert.Matches("<input[^>]*value=\"GROWTH\"[^>]*checked|<input[^>]*checked[^>]*value=\"GROWTH\"", page);
+        Assert.DoesNotMatch("<input[^>]*value=\"BASIC\"[^>]*checked|<input[^>]*checked[^>]*value=\"BASIC\"", page);
+    }
+
+    // The first invoice is issued a moment after the plan is chosen: the visitor waits on a page that refreshes itself, never on an error.
+    [Fact]
+    public async Task Pay_WhileTheFirstInvoiceIsPrepared_WaitsAndRefreshes()
+    {
+        await using PublicSiteTestHost host = await PublicSiteTestHost.StartAsync(registrationOpen: true);
+        host.Platform.Answer(HttpMethod.Get, "registration/status", HttpStatusCode.OK,
+            "{\"step\":\"pending_payment\",\"maskedEmail\":\"a**@rivera.example\",\"slug\":\"rivera\",\"verificationDeadlineUtc\":\"2030-01-01T00:00:00Z\"}");
+        host.Platform.Answer(HttpMethod.Get, "registration/invoice", HttpStatusCode.Conflict,
+            "{\"code\":\"platform.payments.invoice_preparing\",\"message\":\"Your invoice is being prepared.\"}");
+
+        using HttpRequestMessage request = new(HttpMethod.Get, "/en/register/pay");
+        request.Headers.TryAddWithoutValidation("Cookie", "__Host-vx4-registration=access-1");
+        HttpResponseMessage response = await host.Client().SendAsync(request);
+        string page = WebUtility.HtmlDecode(await response.Content.ReadAsStringAsync());
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("We are preparing your invoice.", page, StringComparison.Ordinal);
+        Assert.Contains("http-equiv=\"refresh\"", page, StringComparison.Ordinal);
+        Assert.Contains("content=\"10;url=/en/register/pay?wait=1\"", page, StringComparison.Ordinal);
+        Assert.DoesNotContain("Your invoice is being prepared.", page, StringComparison.Ordinal);
+    }
+
+    // 2026-10-25: refreshing every 3 seconds used Platform's hourly limit up in minutes. After 5 minutes the page stops and offers a button.
+    [Fact]
+    public async Task Pay_AfterFiveMinutesOfWaiting_StopsRefreshing_AndOffersAButton()
+    {
+        await using PublicSiteTestHost host = await PublicSiteTestHost.StartAsync(registrationOpen: true);
+        host.Platform.Answer(HttpMethod.Get, "registration/status", HttpStatusCode.OK,
+            "{\"step\":\"pending_payment\",\"maskedEmail\":\"a**@rivera.example\",\"slug\":\"rivera\",\"verificationDeadlineUtc\":\"2030-01-01T00:00:00Z\"}");
+        host.Platform.Answer(HttpMethod.Get, "registration/invoice", HttpStatusCode.Conflict,
+            "{\"code\":\"platform.payments.invoice_preparing\",\"message\":\"Your invoice is being prepared.\"}");
+
+        using HttpRequestMessage request = new(HttpMethod.Get, "/en/register/pay?wait=30");
+        request.Headers.TryAddWithoutValidation("Cookie", "__Host-vx4-registration=access-1");
+        string page = WebUtility.HtmlDecode(await (await host.Client().SendAsync(request)).Content.ReadAsStringAsync());
+
+        Assert.DoesNotContain("http-equiv=\"refresh\"", page, StringComparison.Ordinal);
+        Assert.Contains("taking longer than usual", page, StringComparison.Ordinal);
+        Assert.Contains("href=\"/en/register/pay\"", page, StringComparison.Ordinal);
+    }
+
+    // Platform's rate limiter answers 429 with no body: the visitor is told to wait, not that the service is down.
+    [Fact]
+    public async Task Pay_WhenPlatformLimitsTheVisitor_SaysToWait_NotThatTheServiceIsDown()
+    {
+        await using PublicSiteTestHost host = await PublicSiteTestHost.StartAsync(registrationOpen: true);
+        host.Platform.Answer(HttpMethod.Get, "registration/status", HttpStatusCode.OK,
+            "{\"step\":\"pending_payment\",\"maskedEmail\":\"a**@rivera.example\",\"slug\":\"rivera\",\"verificationDeadlineUtc\":\"2030-01-01T00:00:00Z\"}");
+        host.Platform.Answer(HttpMethod.Get, "registration/invoice", HttpStatusCode.TooManyRequests, string.Empty);
+
+        using HttpRequestMessage request = new(HttpMethod.Get, "/en/register/pay");
+        request.Headers.TryAddWithoutValidation("Cookie", "__Host-vx4-registration=access-1");
+        string page = WebUtility.HtmlDecode(await (await host.Client().SendAsync(request)).Content.ReadAsStringAsync());
+
+        Assert.Contains("Too many attempts", page, StringComparison.Ordinal);
+        Assert.DoesNotContain("cannot reach", page, StringComparison.OrdinalIgnoreCase);
+    }
+
     [Fact]
     public async Task Contact_Post_SendsTheLeadToPlatform_WithASignedVisitorAddress()
     {

@@ -54,8 +54,12 @@ public sealed class BillOperationsAccountUseCase
         OperationsAuditTrail audit,
         IOperationsSettingsRepository settings,
         IOperationsUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        Vixly.Operations.Application.Plans.OperationsPlanGate plan,
+        IOperationsCustomerRepository customers)
     {
+        _customers = customers ?? throw new ArgumentNullException(nameof(customers));
+        _plan = plan ?? throw new ArgumentNullException(nameof(plan));
         _desk = desk ?? throw new ArgumentNullException(nameof(desk));
         _billing = billing ?? throw new ArgumentNullException(nameof(billing));
         _credit = credit ?? throw new ArgumentNullException(nameof(credit));
@@ -65,6 +69,11 @@ public sealed class BillOperationsAccountUseCase
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
+
+    private readonly IOperationsCustomerRepository _customers;
+
+    // Vixly Lite (owner, 2026-10-30): the modules in the company's plan.
+    private readonly Vixly.Operations.Application.Plans.OperationsPlanGate _plan;
 
     public async Task<BillOperationsAccountResponse> ExecuteAsync(
         OperationsAuthorizationContext context,
@@ -93,9 +102,15 @@ public sealed class BillOperationsAccountUseCase
 
         OperationsTenantSettings settings = await _settings.FindAsync(cancellationToken) ?? OperationsTenantSettings.CreateDefault(context.RequiredTenantId, _timeProvider.GetUtcNow());
 
-        if (!settings.AllowCredit)
+        if (!settings.AllowCredit || !await _plan.IncludesAsync(Vixly.Operations.Application.Plans.OperationsPlanModules.CreditAccounts, cancellationToken))
         {
             return BillOperationsAccountResponse.Failure(OperationsCreditErrors.CreditOff);
+        }
+
+        // Owner, 2026-10-31: no new credit for a suspended, closed or banned customer; they pay before their goods are released.
+        if (await _customers.GetAsync(invoice.CustomerId, cancellationToken) is not { Status: Vixly.Operations.Domain.Customers.OperationsCustomerStatus.Active })
+        {
+            return BillOperationsAccountResponse.Failure(Vixly.Operations.Domain.Customers.OperationsCustomerErrors.NotActive);
         }
 
         if (await _credit.FindByCustomerAsync(invoice.CustomerId, cancellationToken) is not { IsActive: true } account)

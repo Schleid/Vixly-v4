@@ -49,6 +49,10 @@ internal sealed class OperationsUserRepository : IOperationsUserRepository
     }
 
     // Slice 7 step 4 (R-8): this company's partner agents of one warehouse (the tenant filter applies).
+    public async Task<IReadOnlyList<OperationsUser>> ListAdministratorsAsync(CancellationToken cancellationToken) =>
+        await _context.Users.Where(user => (user.IsOwner || user.IsAdministrator) && user.Account.Status == OperationsUserAccountStatus.Active)
+            .OrderBy(user => user.FullName).Take(50).ToListAsync(cancellationToken);
+
     public async Task<IReadOnlyList<OperationsUser>> ListPartnerAgentsAsync(Guid warehouseId, CancellationToken cancellationToken) =>
         await _context.Users.Where(user => user.PartnerWarehouseId == warehouseId).OrderBy(user => user.FullName).Take(200).ToListAsync(cancellationToken);
 

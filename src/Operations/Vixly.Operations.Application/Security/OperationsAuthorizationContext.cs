@@ -15,13 +15,17 @@
 // =========================================================
 public sealed record OperationsAuthorizationContext
 {
-    private OperationsAuthorizationContext(Guid? tenantId, Guid? userId, Guid? sessionId, bool isSettingUp = false)
+    private OperationsAuthorizationContext(Guid? tenantId, Guid? userId, Guid? sessionId, bool isSettingUp = false, bool isScheduledWork = false)
     {
         TenantId = tenantId;
         UserId = userId;
         SessionId = sessionId;
         IsSettingUp = isSettingUp;
+        IsScheduledWork = isScheduledWork;
     }
+
+    // A scheduled job acting for a person: refused everywhere except where a use case loads it on purpose (OperationsAccess.LoadScheduledAsync).
+    public bool IsScheduledWork { get; }
 
     // Resolving which tenant a host name belongs to happens before any tenant is known.
     public static OperationsAuthorizationContext Host { get; } = new(null, null, null);
@@ -43,6 +47,10 @@ public sealed record OperationsAuthorizationContext
             ? throw new ArgumentException("A tenant id is required.", nameof(tenantId))
             : new OperationsAuthorizationContext(tenantId, null, null, settingUp);
     }
+
+    // A scheduled job acting for a staff member (Slice 11: a report sent with that person's own rights); no session, no step-up.
+    public static OperationsAuthorizationContext ForScheduledWork(Guid tenantId, Guid userId) =>
+        tenantId == Guid.Empty || userId == Guid.Empty ? throw new ArgumentException("A tenant and a user are required.") : new(tenantId, userId, null, false, true);
 
     public OperationsAuthorizationContext WithUser(Guid userId, Guid sessionId)
     {

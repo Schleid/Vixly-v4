@@ -1,6 +1,6 @@
 # Vixly.Operations.Resources
 
-`.resx` text for the Operations plane in English, French and Spanish: error texts, enum labels, email and document text.
+`.resx` text for the Operations plane in English, French and Spanish: error texts, enum labels, email and document text. Embedded Markdown under `Help/{en,fr,es}/` holds company-branded, permission-filtered Operations help (ADR-0023).
 
 | | |
 |---|---|

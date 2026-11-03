@@ -22,4 +22,16 @@ public interface IOperationsSiteRepository
     void AddImage(OperationsSiteImage image);
 
     Task<OperationsSiteImage?> GetImageAsync(Guid imageId, CancellationToken cancellationToken);
+
+    // Customer testimonials (owner, 2026-10-30), in the company's order.
+    Task<IReadOnlyList<OperationsSiteTestimonial>> ListTestimonialsAsync(CancellationToken cancellationToken);
+
+    Task<OperationsSiteTestimonial?> GetTestimonialAsync(Guid testimonialId, CancellationToken cancellationToken);
+
+    void AddTestimonial(OperationsSiteTestimonial testimonial);
+
+    void RemoveTestimonial(OperationsSiteTestimonial testimonial);
+
+    // Packages of shipments picked up or delivered, from the company's records (owner, 2026-10-30).
+    Task<int> CountDeliveredPackagesAsync(CancellationToken cancellationToken);
 }

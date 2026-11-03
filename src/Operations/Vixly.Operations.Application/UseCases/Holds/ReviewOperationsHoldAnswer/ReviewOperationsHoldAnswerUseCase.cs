@@ -52,6 +52,8 @@ public sealed class ReviewOperationsHoldAnswerUseCase
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly Vixly.Operations.Application.Items.OperationsItemDeclaration _declaration;
+
     public ReviewOperationsHoldAnswerUseCase(
         OperationsOwnerCheck owner,
         OperationsReceivingScope scope,
@@ -61,8 +63,10 @@ public sealed class ReviewOperationsHoldAnswerUseCase
         OperationsOutboxWriter outbox,
         OperationsAuditTrail audit,
         IOperationsUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        Vixly.Operations.Application.Items.OperationsItemDeclaration declaration)
     {
+        _declaration = declaration ?? throw new ArgumentNullException(nameof(declaration));
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
         _scope = scope ?? throw new ArgumentNullException(nameof(scope));
         _holds = holds ?? throw new ArgumentNullException(nameof(holds));
@@ -132,6 +136,9 @@ public sealed class ReviewOperationsHoldAnswerUseCase
                 if (answer.Kind == OperationsHoldAnswerKind.Value)
                 {
                     parcel.Declare(answer.Contents!, answer.DeclaredValue!.Value, answer.CurrencyCode!, utcNow);
+
+                    // Owner, 2026-11-01: the corrected declaration replaces the items, to classify again.
+                    await _declaration.ReplaceAsync(parcel, answer.Contents!, answer.DeclaredValue!.Value, answer.CurrencyCode!, utcNow, cancellationToken);
                 }
             }
             else

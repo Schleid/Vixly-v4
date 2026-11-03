@@ -11,10 +11,13 @@ namespace Vixly.Platform.Domain.Payments;
 // RESPONSIBILITIES:
 // - Hold provider, mode, publishable key, accepted currencies and whether card payments are on
 // - Record the result of the last connection check
+// - Hold the checkout page look (name, logo, icon, colours) and the bank statement wording
 //
 // IMPORTANT NOTES:
 // - One row; holds no secret (keys come from configuration, S-11)
 // - Card payments are offered only when on, checked and the currency is accepted
+// - Empty look fields mean the provider dashboard's own branding is used
+// - The statement prefix is set at the provider (shortened descriptor); Vixly stores it only to tell tenants how the charge reads
 // =========================================================
 public sealed class PlatformMerchantAccount : AuditableEntity
 {
@@ -53,6 +56,26 @@ public sealed class PlatformMerchantAccount : AuditableEntity
     public string? LastCheckCode { get; private set; }
 
     public Guid? UpdatedByUserId { get; private set; }
+
+    public string? CheckoutDisplayName { get; private set; }
+
+    public string? CheckoutLogoUrl { get; private set; }
+
+    public string? CheckoutIconUrl { get; private set; }
+
+    // "#RRGGBB"
+    public string? CheckoutBackgroundColor { get; private set; }
+
+    public string? CheckoutButtonColor { get; private set; }
+
+    // The account's shortened descriptor at the provider, e.g. "TECHCRAFT" (2 to 10 characters, as set at the provider).
+    public string? StatementPrefix { get; private set; }
+
+    // Added to every charge, e.g. "VIXLY".
+    public string? StatementSuffix { get; private set; }
+
+    // How the charge reads on the payer's statement, e.g. "TECHCRAFT* VIXLY"; null when not known.
+    public string? StatementWording => StatementPrefix is null || StatementSuffix is null ? null : StatementPrefix + "* " + StatementSuffix;
 
     public IReadOnlyList<string> Currencies => AcceptedCurrencies.Length == 0
         ? Array.Empty<string>()
@@ -120,6 +143,49 @@ public sealed class PlatformMerchantAccount : AuditableEntity
         MarkAsModified(utcNow);
     }
 
+    public void UpdateCheckout(
+        string? displayName,
+        string? logoUrl,
+        string? iconUrl,
+        string? backgroundColor,
+        string? buttonColor,
+        string? statementPrefix,
+        string? statementSuffix,
+        Guid actorUserId,
+        DateTimeOffset utcNow)
+    {
+        if (actorUserId == Guid.Empty)
+        {
+            throw new DomainException(PlatformPaymentsErrors.ActorRequired);
+        }
+
+        string? name = Optional(displayName);
+
+        if (name is not null && (name.Length > PlatformPaymentsLimits.CheckoutDisplayNameMaxLength || name.Any(char.IsControl)))
+        {
+            throw new DomainException(PlatformPaymentsErrors.CheckoutSettingInvalid);
+        }
+
+        string? prefix = Statement(statementPrefix);
+        string? suffix = Statement(statementSuffix);
+
+        if ((prefix is not null && (prefix.Length < PlatformPaymentsLimits.StatementPrefixMinLength || prefix.Length > PlatformPaymentsLimits.StatementPrefixMaxLength))
+            || (suffix is not null && suffix.Length > PlatformPaymentsLimits.StatementMaxLength - 2 - (prefix?.Length ?? PlatformPaymentsLimits.StatementPrefixMinLength)))
+        {
+            throw new DomainException(PlatformPaymentsErrors.StatementSuffixInvalid);
+        }
+
+        CheckoutDisplayName = name;
+        CheckoutLogoUrl = ImageUrl(logoUrl);
+        CheckoutIconUrl = ImageUrl(iconUrl);
+        CheckoutBackgroundColor = Color(backgroundColor);
+        CheckoutButtonColor = Color(buttonColor);
+        StatementPrefix = prefix;
+        StatementSuffix = suffix;
+        UpdatedByUserId = actorUserId;
+        MarkAsModified(utcNow);
+    }
+
     public void RecordCheck(bool succeeded, string? code, DateTimeOffset utcNow)
     {
         LastCheckedUtc = utcNow;
@@ -133,5 +199,60 @@ public sealed class PlatformMerchantAccount : AuditableEntity
     public bool Accepts(string currencyCode)
     {
         return IsReady && Currencies.Contains(currencyCode, StringComparer.Ordinal);
+    }
+
+    private static string? Optional(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+    }
+
+    // Absolute https address of an image the provider downloads.
+    private static string? ImageUrl(string? value)
+    {
+        string? url = Optional(value);
+
+        if (url is null)
+        {
+            return null;
+        }
+
+        return url.Length <= PlatformPaymentsLimits.CheckoutImageUrlMaxLength
+            && !url.Any(char.IsWhiteSpace)
+            && Uri.TryCreate(url, UriKind.Absolute, out Uri? address)
+            && address.Scheme == Uri.UriSchemeHttps
+            ? url
+            : throw new DomainException(PlatformPaymentsErrors.CheckoutSettingInvalid);
+    }
+
+    private static string? Color(string? value)
+    {
+        string? color = Optional(value);
+
+        if (color is null)
+        {
+            return null;
+        }
+
+        return color.Length == 7 && color[0] == '#' && color.Skip(1).All(char.IsAsciiHexDigit)
+            ? color.ToUpperInvariant()
+            : throw new DomainException(PlatformPaymentsErrors.CheckoutSettingInvalid);
+    }
+
+    // Provider rule: Latin letters, digits, spaces, dots and dashes, with at least one letter; stored in capitals.
+    private static string? Statement(string? value)
+    {
+        string? text = Optional(value);
+
+        if (text is null)
+        {
+            return null;
+        }
+
+        string upper = text.ToUpperInvariant();
+
+        return upper.All(character => char.IsAsciiLetterUpper(character) || char.IsAsciiDigit(character) || character is ' ' or '.' or '-')
+            && upper.Any(char.IsAsciiLetterUpper)
+            ? upper
+            : throw new DomainException(PlatformPaymentsErrors.StatementSuffixInvalid);
     }
 }

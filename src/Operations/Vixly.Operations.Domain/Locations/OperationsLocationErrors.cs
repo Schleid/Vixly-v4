@@ -58,4 +58,15 @@ public static class OperationsLocationErrors
 
     // Owner, 2026-10-21: the mailbox is an active warehouse that receives and accepts deliveries.
     public static Error MailboxInvalid { get; } = Error.Create("ops.locations.mailbox_invalid");
+
+    // Owner, 2026-10-29: a branch is one country; its office and its warehouses are in it.
+    public static Error AddressOutsideCountry { get; } = Error.Create("ops.locations.address_outside_country");
+
+    public static Error WarehouseOutsideCountry { get; } = Error.Create("ops.locations.warehouse_outside_country");
+
+    public static Error LegalNameTooLong { get; } = Error.Create("ops.locations.legal_name_too_long", ("maxLength", OperationsBranch.LegalNameMaxLength));
+
+    public static Error TaxNumberTooLong { get; } = Error.Create("ops.locations.tax_number_too_long", ("maxLength", OperationsBranch.TaxNumberMaxLength));
+
+    public static Error LegalNotesTooLong { get; } = Error.Create("ops.locations.legal_notes_too_long", ("maxLength", OperationsBranch.LegalNotesMaxLength));
 }

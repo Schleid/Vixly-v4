@@ -110,4 +110,4 @@ What the new tests cover:
 
 - **Database:** run the newest global SQL script (migrations `OwnerSupport` on Platform, `ContactPhones` on Operations).
 - **Platform:** the links in the Welcome and recovery emails are `https://{slug}.` plus `PlatformTenants:TenantBaseDomain`; nothing to set in production. Development sets `PlatformTenants:PortalUrlTemplate` to `https://{slug}.localhost:7404`.
-- **Staging domain:** the owner registered **`vixly.freedns.org`** for staging (2026-10-18). Nothing uses it yet. The host names under it are an open question for the owner (see the Slice 1D record, section 5).
+- **Staging domain:** the owner registered **`vixly.freeddns.org`** for staging (2026-10-18). Nothing uses it yet. The host names under it are an open question for the owner (see the Slice 1D record, section 5).

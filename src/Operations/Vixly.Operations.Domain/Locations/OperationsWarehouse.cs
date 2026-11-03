@@ -193,7 +193,10 @@ public sealed class OperationsWarehouse : OperationsEntity
     private void Apply(Guid branchId, OperationsLocationDetails details, OperationsWarehouseRoles roles, bool acceptingDeliveries)
     {
         ArgumentNullException.ThrowIfNull(details);
-        ArgumentNullException.ThrowIfNull(details.Address);
+        if (details.Address is null)
+        {
+            throw new DomainException(OperationsLocationErrors.AddressRequired);
+        }
 
         BranchId = branchId == Guid.Empty ? throw new DomainException(OperationsLocationErrors.BranchRequired) : branchId;
         Roles = (roles & (OperationsWarehouseRoles.Receiving | OperationsWarehouseRoles.DispatchHub | OperationsWarehouseRoles.PickupPoint | OperationsWarehouseRoles.Storage)) is var known && known != OperationsWarehouseRoles.None

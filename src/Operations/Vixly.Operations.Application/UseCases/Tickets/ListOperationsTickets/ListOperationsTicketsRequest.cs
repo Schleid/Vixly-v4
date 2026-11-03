@@ -18,7 +18,13 @@ public sealed class ListOperationsTicketsRequest
 {
     public Guid? WarehouseId { get; init; }
 
-    public OperationsTicketStatus? Status { get; init; } = OperationsTicketStatus.Open;
+    // Ticket desk (owner, 2026-10-29): new, taken, open, answered, resolved, escalated, or all (null).
+    public string? State { get; init; } = "open";
+
+    public OperationsTicketTopic? Topic { get; init; }
+
+    // Only the tickets the person took.
+    public bool Mine { get; init; }
 
     public int Page { get; init; } = 1;
 }

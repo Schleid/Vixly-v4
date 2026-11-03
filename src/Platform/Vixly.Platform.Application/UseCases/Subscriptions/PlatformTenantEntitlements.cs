@@ -22,4 +22,6 @@ public sealed record PlatformTenantEntitlements(
     IReadOnlyList<PlatformPlanFeature> Features,
     IReadOnlyDictionary<PlatformPlanLimitKind, int> Limits,
     PlatformNonPaymentInfo? NonPayment = null,
-    PlatformLegalInfo? Legal = null);
+    PlatformLegalInfo? Legal = null,
+    decimal ExtraShipmentPrice = 0m,
+    string? CurrencyCode = null);

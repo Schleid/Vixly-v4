@@ -89,6 +89,8 @@ public sealed class SaveOperationsShippingServicesUseCase
                     ? null
                     : OperationsUnits.ToStoredDivisor(shown, settings.DimensionUnit, settings.WeightUnit);
                 setup.Change(row.Offered, row.Label, row.MinDays, row.MaxDays, stored, service.DefaultVolumetricDivisor is not null, utcNow);
+                // Owner, 2026-10-31: always three letters; a row without one keeps the code it has (or the catalogue's default).
+                setup.ChangeLabelCode(string.IsNullOrWhiteSpace(row.LabelCode) ? setup.LabelCode ?? service.DefaultLabelCode : row.LabelCode, utcNow);
             }
         }
         catch (DomainException exception)
@@ -97,7 +99,7 @@ public sealed class SaveOperationsShippingServicesUseCase
         }
 
         _audit.Record(access!.User.Id, "ops.services.changed", nameof(OperationsShippingServiceSetup), null,
-            after: setups.Values.Where(setup => setup.Offered).Select(setup => new { code = setup.ServiceCode, setup.MinDays, setup.MaxDays, divisor = setup.VolumetricDivisor }).ToArray());
+            after: setups.Values.Where(setup => setup.Offered).Select(setup => new { code = setup.ServiceCode, setup.MinDays, setup.MaxDays, divisor = setup.VolumetricDivisor, labelCode = setup.LabelCode }).ToArray());
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken)
             ? SaveOperationsShippingServicesResponse.Success()

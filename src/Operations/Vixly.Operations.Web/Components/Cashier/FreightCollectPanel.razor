@@ -1,0 +1,35 @@
+﻿@*
+=========================================================
+FILE: FreightCollectPanel.razor
+
+PURPOSE:
+Pay at the destination (freight collect) or here, chosen at the cashier or the counter (owner, 2026-10-27).
+
+RESPONSIBILITIES:
+- Show which way the shipment is paid, and the button to switch, with an optional reason
+- After a switch the waybill printed before shows the old term: say to reprint it
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Shown only to people who take payments, when the company allows freight collect; the rules are checked again on the server
+=========================================================
+*@
+<section class="ops-editor__panel ops-collect" aria-labelledby="collect-title" data-collect="@(Collect ? "on" : "off")">
+    <h2 id="collect-title">@T["ui.collect.title"]</h2>
+    <p><strong>@(Collect ? T["ui.collect.now_on"] : T["ui.collect.now_off"])</strong></p>
+    <form method="post" action="@Action" class="ops-editor__inline">
+        <AntiforgeryToken />
+        <input type="hidden" name="collect" value="@(Collect ? "false" : "true")" />
+        <label>@T["ui.collect.reason"] <input name="reason" maxlength="200" size="32" /></label>
+        <button type="submit" class="vx-button vx-button--secondary">@(Collect ? T["ui.collect.make_off"] : T["ui.collect.make_on"])</button>
+    </form>
+    <p class="ops-editor__hint">@T["ui.collect.hint"]</p>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public string Action { get; set; } = string.Empty;
+
+    [Parameter] public bool Collect { get; set; }
+}

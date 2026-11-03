@@ -27,4 +27,10 @@ public static class OperationsStaffErrors
     public static Error PartnerWarehouseInvalid { get; } = Error.Create("ops.staff.partner_warehouse_invalid");
 
     public static Error PartnerAgentsOff { get; } = Error.Create("ops.staff.partner_agents_off");
+
+    // Slice 12A: a PIN is four digits, not all the same and not a run (1234, 9876).
+    public static Error PinInvalid { get; } = Error.Create("ops.staff.pin_invalid");
+
+    // A PIN is set after a full sign-in, never from a badge or PIN session.
+    public static Error PinNeedsFullSignIn { get; } = Error.Create("ops.staff.pin_needs_full_sign_in");
 }

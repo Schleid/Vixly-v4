@@ -36,10 +36,20 @@ IMPORTANT NOTES:
         
         @foreach (OperationsLabelPrinter printer in Printers)
         {
-            <PrinterForm T="T" WarehouseId="Warehouse.Id" Printer="printer" />
+            @if (printer.AgentId is not null)
+            {
+                @* Slice 12E: a phone's portable printer is changed from the phone. *@
+                <p class="ops-editor__hint" data-phone-printer><strong>@printer.Name</strong> · @T["ui.printers.phone_printer"] · @(printer.IsActive ? T["ui.printers.active"].Value : T["ui.printers.stopped"].Value)</p>
+            }
+            else
+            {
+                <PrinterForm T="T" WarehouseId="Warehouse.Id" Printer="printer" />
+            }
         }
         <PrinterForm T="T" WarehouseId="Warehouse.Id" Printer="null" />
     </section>
+
+    <PhonePairingPanel WarehouseId="@Warehouse.Id" Pairing="@Pairing" AppName="@PrintAppName" />
 
     <section class="ops-editor__panel" aria-labelledby="agents-title">
         <h2 id="agents-title" class="ops-panel__title">@T["ui.printers.agents"]</h2>
@@ -91,6 +101,11 @@ IMPORTANT NOTES:
     [Parameter] public IReadOnlyList<OperationsPrintAgent> Agents { get; set; } = Array.Empty<OperationsPrintAgent>();
 
     [Parameter] public string? NewKey { get; set; }
+
+    // Slice 12E: a phone's one-time code, just made.
+    [Parameter] public PhonePairingView? Pairing { get; set; }
+
+    [Parameter] public string PrintAppName { get; set; } = string.Empty;
 
     [Parameter] public string? Error { get; set; }
 
