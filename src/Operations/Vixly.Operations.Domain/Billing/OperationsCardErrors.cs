@@ -18,6 +18,9 @@ public static class OperationsCardErrors
 {
     public static Error KeysInvalid { get; } = Error.Create("ops.cards.keys_invalid");
 
+    // A restricted key without what card payments need (2026-11-03).
+    public static Error PermissionsMissing { get; } = Error.Create("ops.cards.permissions_missing");
+
     public static Error NotConnected { get; } = Error.Create("ops.cards.not_connected");
 
     public static Error ProviderRefused { get; } = Error.Create("ops.cards.provider_refused");

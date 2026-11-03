@@ -21,7 +21,7 @@ No connection or network health values are simulated.
 <div class="vx-shell">
     <!-- Left Executive Sidebar Navigation -->
     <aside class="vx-sidebar" id="vx-control-sidebar" aria-label="@T["ui.nav.label"]">
-        <button type="button" hidden data-vx-nav-close class="vx-sidebar__close-btn" aria-label="@T["ui.common.close"]"><span aria-hidden="true">&times;</span></button>
+        <button type="button" data-vx-nav-close class="vx-sidebar__close-btn" aria-label="@T["ui.common.close"]"><span aria-hidden="true">&times;</span></button>
         <!-- Brand Header -->
         <div class="vx-sidebar__brand">
             <a href="/" class="vx-sidebar__brand-link" aria-label="@T["ui.app.name"]">
@@ -197,13 +197,13 @@ No connection or network health values are simulated.
             </Authorized>
         </AuthorizeView>
     </aside>
-    <button type="button" hidden data-vx-nav-backdrop class="vx-sidebar__backdrop" aria-label="@T["ui.common.close"]" tabindex="-1"></button>
+    <button type="button" data-vx-nav-backdrop class="vx-sidebar__backdrop" aria-label="@T["ui.common.close"]" tabindex="-1"></button>
 
     <!-- Main Workspace Area -->
     <div class="vx-shell__body">
         <!-- Top Executive Command Bar -->
         <header class="vx-topbar">
-            <button type="button" hidden data-vx-nav-toggle class="vx-topbar__menu-btn" aria-controls="vx-control-sidebar" aria-expanded="false" aria-label="@T["ui.nav.label"]">
+            <button type="button" data-vx-nav-toggle class="vx-topbar__menu-btn" aria-controls="vx-control-sidebar" aria-expanded="false" aria-label="@T["ui.nav.label"]">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
             <form class="vx-topbar__search" method="get" action="/tenants" role="search" data-enhance="false">

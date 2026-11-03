@@ -2509,6 +2509,11 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
             ("webhookSecret", webhookSecret))).Response.Headers.Location?.OriginalString, StringComparison.Ordinal);
         Assert.Contains("card=ops.cards.keys_invalid", (await owner.PostAsync(connect, settingsPage, ("secretKey", "sk_test_wrong1234567890ABCD"),
             ("publishableKey", "pk_test_0123456789abcdefghij"), ("webhookSecret", webhookSecret))).Response.Headers.Location?.OriginalString, StringComparison.Ordinal);
+        // 2026-11-03: a restricted key without Checkout Sessions is refused, and nothing is kept.
+        _host.Cards.KeyWithoutCheckout = "sk_test_good51234567890NOCO";
+        Assert.Contains("card=ops.cards.permissions_missing", (await owner.PostAsync(connect, settingsPage, ("secretKey", "sk_test_good51234567890NOCO"),
+            ("publishableKey", "pk_test_0123456789abcdefghij"), ("webhookSecret", webhookSecret))).Response.Headers.Location?.OriginalString, StringComparison.Ordinal);
+        Assert.Contains("rk_", WebUtility.HtmlDecode(settingsPage), StringComparison.Ordinal);
         Assert.Equal("/staff/settings/payments?done=connected#cards", (await owner.PostAsync(connect, settingsPage, ("secretKey", secret),
             ("publishableKey", "pk_test_0123456789abcdefghij"), ("webhookSecret", webhookSecret))).Response.Headers.Location?.OriginalString);
         (HttpResponseMessage _, string connected) = await owner.GetAsync("/staff/settings/payments");

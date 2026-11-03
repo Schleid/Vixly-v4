@@ -97,6 +97,11 @@ public sealed class ConnectOperationsCardProviderUseCase
         try
         {
             accountName = await _gateway.CheckAsync(secret, cancellationToken);
+
+            if ((await _gateway.MissingPermissionsAsync(secret, cancellationToken)).Count > 0)
+            {
+                return ConnectOperationsCardProviderResponse.Failure(OperationsCardErrors.PermissionsMissing);
+            }
         }
         catch (OperationsCardRefusedException)
         {
@@ -112,7 +117,7 @@ public sealed class ConnectOperationsCardProviderUseCase
         string? before = provider?.KeyHint;
 
         // Review: another key may be another Stripe account; what was started on the old one is closed there first.
-        if (provider is not null && _protector.Unprotect(provider.SecretKeyProtected) is var oldKey && !string.Equals(oldKey, secret, StringComparison.Ordinal)
+        if (provider is not null && OperationsCardDesk.ReadSecretKey(_protector, provider) is var oldKey && !string.Equals(oldKey, secret, StringComparison.Ordinal)
             && !await _desk.CloseOpenAsync(oldKey, cancellationToken))
         {
             _unitOfWork.DiscardChanges();
@@ -123,12 +128,14 @@ public sealed class ConnectOperationsCardProviderUseCase
         {
             if (provider is null)
             {
-                provider = OperationsCardProvider.Connect(context.RequiredTenantId, secret, _protector.Protect(secret), publishable, _protector.Protect(webhook), accountName, access!.User.Id, utcNow);
+                provider = OperationsCardProvider.Connect(context.RequiredTenantId, secret, OperationsCardDesk.ProtectSecretKey(_protector, context.RequiredTenantId, secret), publishable,
+                    OperationsCardDesk.ProtectWebhookSecret(_protector, context.RequiredTenantId, webhook), accountName, access!.User.Id, utcNow);
                 _cards.Add(provider);
             }
             else
             {
-                provider.Change(secret, _protector.Protect(secret), publishable, _protector.Protect(webhook), accountName, access!.User.Id, utcNow);
+                provider.Change(secret, OperationsCardDesk.ProtectSecretKey(_protector, context.RequiredTenantId, secret), publishable,
+                    OperationsCardDesk.ProtectWebhookSecret(_protector, context.RequiredTenantId, webhook), accountName, access!.User.Id, utcNow);
             }
         }
         catch (DomainException exception)

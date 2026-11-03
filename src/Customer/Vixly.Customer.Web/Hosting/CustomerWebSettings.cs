@@ -23,6 +23,7 @@ public static class CustomerWebSettings
     public static IReadOnlyList<VixlySettingRule> All { get; } = new[]
     {
         VixlySettingRule.Need("ConnectionStrings:Customer", VixlySettingKind.Text, "The customer portal database (its keys)."),
+        VixlySettingRule.Need(Vixly.Shared.Hosting.Security.VixlyKeyRingEncryption.KeySetting, VixlySettingKind.Secret, "Locks the portal's key ring kept in the database (32 random bytes, base64; environment variable).", minLength: Vixly.Shared.Hosting.Security.VixlyKeyRingEncryption.KeyTextLength),
         VixlySettingRule.Need("TenantHosting:BaseDomains", VixlySettingKind.List, "The domains under which company addresses are found."),
         VixlySettingRule.Need("CustomerOperations:BaseUrl", VixlySettingKind.Url, "Operations API's address."),
         VixlySettingRule.Need("CustomerOperations:CallerKeyId", VixlySettingKind.Text, "The key id Operations knows the portal by."),

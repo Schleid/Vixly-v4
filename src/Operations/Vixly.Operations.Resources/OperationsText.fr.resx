@@ -16452,4 +16452,12 @@ Votre compte {company} a été fermé car nos conditions de service n’ont pas 
     <value>Le colis {parcel} ne peut pas encore avancer : l'article « {item} » doit avoir son code douanier et son pays d'origine. Complétez ses articles, puis réessayez.</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ops.cards.permissions_missing" xml:space="preserve">
+    <value>Cette clé restreinte n'a pas accès à tout ce dont les paiements par carte ont besoin. Dans Stripe, modifiez la clé pour mettre Checkout Sessions, PaymentIntents et Charges and Refunds en écriture (Write), puis enregistrez de nouveau les clés ici.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.cards.restricted_key_hint" xml:space="preserve">
+    <value>Le mieux : une clé restreinte (rk_) créée pour ce système dans Stripe (Développeurs, Clés API, Créer une clé restreinte), avec Checkout Sessions, PaymentIntents et Charges and Refunds en écriture (Write), plus Terminal Readers si vous utilisez des lecteurs de cartes. Une clé secrète complète (sk_) fonctionne aussi, mais permet bien plus que ce dont les paiements par carte ont besoin.</value>
+    <comment>needs-review</comment>
+  </data>
 </root>

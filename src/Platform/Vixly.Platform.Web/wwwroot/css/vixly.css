@@ -3216,95 +3216,54 @@ details.vx-nav-group .vx-nav-item { margin-block: var(--vx-space-1); }
 
 /* =========================================================
    Mobile Navigation Drawer (Platform Control)
-   Progressive enhancement for viewports <= 1024px.
+   Responsive styles for viewports <= 1024px.
    ========================================================= */
-.vx-topbar__menu-btn {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    padding: 0;
-    background: var(--vx-color-surface);
-    border: 1px solid var(--vx-color-border);
-    border-radius: var(--vx-radius-sm);
-    color: var(--vx-color-text);
-    cursor: pointer;
-    flex-shrink: 0;
-}
-
-.vx-topbar__menu-btn:hover {
-    background: var(--vx-color-surface-sunken);
-    border-color: var(--vx-color-border-control);
-}
-
-.vx-topbar__menu-btn svg {
-    width: 1.25rem;
-    height: 1.25rem;
-    display: block;
-}
-
-.vx-sidebar__close-btn {
-    display: none;
-    position: absolute;
-    top: 0.85rem;
-    right: 0.85rem;
-    width: 2rem;
-    height: 2rem;
-    padding: 0;
-    align-items: center;
-    justify-content: center;
-    background: color-mix(in srgb, var(--vx-color-chrome-active) 80%, transparent);
-    border: 1px solid var(--vx-color-chrome-border);
-    border-radius: var(--vx-radius-sm);
-    color: var(--vx-color-chrome-text-strong);
-    font-size: 1.35rem;
-    line-height: 1;
-    cursor: pointer;
-    z-index: 10;
-}
-
-.vx-sidebar__close-btn:hover {
-    background: var(--vx-color-chrome-hover);
-    color: var(--vx-color-chrome-text-strong);
-}
-
+.vx-topbar__menu-btn,
+.vx-sidebar__close-btn,
 .vx-sidebar__backdrop {
     display: none;
 }
 
-.vx-sidebar__backdrop:not([hidden]) {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 90;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    background: var(--vx-color-overlay, rgba(15, 23, 42, 0.6));
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    cursor: pointer;
-}
-
 @media screen and (max-width: 1024px) {
-    .vx-shell--enhanced .vx-topbar__menu-btn:not([hidden]) {
-        display: inline-flex;
+    .vx-topbar__menu-btn {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        padding: 0;
+        background: var(--vx-color-surface);
+        border: 1px solid var(--vx-color-border);
+        border-radius: var(--vx-radius-sm);
+        color: var(--vx-color-text);
+        cursor: pointer;
+        flex-shrink: 0;
         order: 1;
     }
 
-    .vx-shell--enhanced .vx-topbar__actions {
+    .vx-topbar__menu-btn:hover {
+        background: var(--vx-color-surface-sunken);
+        border-color: var(--vx-color-border-control);
+    }
+
+    .vx-topbar__menu-btn svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        display: block;
+    }
+
+    .vx-topbar__actions {
         order: 2;
         margin-inline-start: auto;
     }
 
-    .vx-shell--enhanced .vx-topbar__search {
+    .vx-topbar__search {
         order: 3;
         width: 100%;
         margin-top: 0.25rem;
     }
 
-    .vx-shell--enhanced .vx-topbar {
+    .vx-topbar {
         height: auto;
         min-height: var(--vx-control-min);
         padding: 0.65rem 1rem;
@@ -3312,7 +3271,7 @@ details.vx-nav-group .vx-nav-item { margin-block: var(--vx-space-1); }
         gap: 0.5rem 0.75rem;
     }
 
-    .vx-shell--enhanced .vx-sidebar {
+    .vx-sidebar {
         position: fixed !important;
         inset: 0 auto 0 0 !important;
         width: min(20rem, 85vw) !important;
@@ -3329,26 +3288,47 @@ details.vx-nav-group .vx-nav-item { margin-block: var(--vx-space-1); }
         border-bottom: none !important;
     }
 
-    .vx-shell--enhanced.vx-shell--nav-open .vx-sidebar {
+    .vx-shell--nav-open .vx-sidebar {
         visibility: visible !important;
         transform: none !important;
     }
 
-    .vx-shell--enhanced .vx-sidebar__brand {
+    .vx-sidebar__brand {
         padding-right: 3.5rem !important;
     }
 
-    .vx-shell--enhanced .vx-sidebar__close-btn:not([hidden]) {
+    .vx-sidebar__close-btn {
         display: inline-flex !important;
+        position: absolute;
+        top: 0.85rem;
+        right: 0.85rem;
+        width: 2rem;
+        height: 2rem;
+        padding: 0;
+        align-items: center;
+        justify-content: center;
+        background: color-mix(in srgb, var(--vx-color-chrome-active) 80%, transparent);
+        border: 1px solid var(--vx-color-chrome-border);
+        border-radius: var(--vx-radius-sm);
+        color: var(--vx-color-chrome-text-strong);
+        font-size: 1.35rem;
+        line-height: 1;
+        cursor: pointer;
+        z-index: 10;
     }
 
-    .vx-shell--enhanced .vx-sidebar__nav {
+    .vx-sidebar__close-btn:hover {
+        background: var(--vx-color-chrome-hover);
+        color: var(--vx-color-chrome-text-strong);
+    }
+
+    .vx-sidebar__nav {
         max-height: none !important;
         flex: 1 1 auto !important;
         overflow-y: auto !important;
     }
 
-    .vx-shell--enhanced .vx-sidebar__footer {
+    .vx-sidebar__footer {
         flex-shrink: 0 !important;
         margin-top: auto !important;
     }
@@ -3358,7 +3338,21 @@ details.vx-nav-group .vx-nav-item { margin-block: var(--vx-space-1); }
         overflow: hidden !important;
     }
 
-    .vx-shell--enhanced .vx-sidebar__backdrop:not([hidden]) {
+    .vx-sidebar__backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 90;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        background: var(--vx-color-overlay, rgba(15, 23, 42, 0.6));
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        cursor: pointer;
+    }
+
+    .vx-shell--nav-open .vx-sidebar__backdrop {
         display: block !important;
     }
 }

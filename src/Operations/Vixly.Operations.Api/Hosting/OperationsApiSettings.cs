@@ -23,6 +23,7 @@ public static class OperationsApiSettings
     public static IReadOnlyList<VixlySettingRule> All { get; } = new[]
     {
         VixlySettingRule.Need("ConnectionStrings:Operations", VixlySettingKind.Text, "The Operations database."),
+        VixlySettingRule.Need(Vixly.Shared.Hosting.Security.VixlyKeyRingEncryption.KeySetting, VixlySettingKind.Secret, "Locks the key ring kept in the database (32 random bytes, base64; environment variable). The same value on Operations Web and Operations API.", minLength: Vixly.Shared.Hosting.Security.VixlyKeyRingEncryption.KeyTextLength),
         VixlySettingRule.Need("OperationsPlatform:BaseUrl", VixlySettingKind.Url, "Platform API's address, for companies, licences and the event feed."),
         VixlySettingRule.Need("OperationsPlatform:CallerKeyId", VixlySettingKind.Text, "The key id Platform knows Operations by."),
         VixlySettingRule.Need("OperationsPlatform:CallerPrivateKey", VixlySettingKind.EcPrivateKey, "The private key Operations signs its Platform calls with (environment variable)."),

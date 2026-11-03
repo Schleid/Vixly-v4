@@ -51,6 +51,7 @@ IMPORTANT NOTES:
             <AntiforgeryToken />
             <h3>@T[Card.Connected ? "ui.cards.replace" : "ui.cards.connect"]</h3>
             <label>@T["ui.cards.secret_key"] <input type="password" name="secretKey" maxlength="255" required autocomplete="off" spellcheck="false" /></label>
+            <p class="ops-editor__hint">@T["ui.cards.restricted_key_hint"]</p>
             <label>@T["ui.cards.publishable_key"] <input name="publishableKey" maxlength="255" required autocomplete="off" spellcheck="false" /></label>
             <label>@T["ui.cards.webhook_secret"] <input type="password" name="webhookSecret" maxlength="255" required autocomplete="off" spellcheck="false" /></label>
             <p class="ops-editor__hint">@VixlyText.Format(T, "ui.cards.webhook_hint", "url", WebhookUrl)</p>

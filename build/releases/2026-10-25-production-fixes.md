@@ -553,3 +553,27 @@ Then copy Operations Web, Operations API, the customer portal and Control (Platf
 **Checks:**
 1. Control › Sales feed: *Sending: On*; *Waiting to be sent* drops to 0 within a minute; *Received by TechOS* counts up.
 2. Rejected event #2 (`invoice.issued`, INV-2026-000001): click **Correct and send**. It leaves the rejected list; a new event is sent at the next run with `periodStart` 2026-10-25 and `periodEnd` 2027-10-25.
+
+## 36. Thirty-second update (2026-11-03): companies' card keys locked; restricted Stripe keys
+**Database: no.** Set the new setting first, then copy **Operations Web**, **Operations API** and the **customer portal**. No script.
+
+**New setting (environment variable; never in web.config):** `DataProtection__KeyEncryptionKey`, 32 random bytes in base64 (44 characters). Make one in PowerShell on your PC (not the server):
+`[Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))`
+
+| Pool | Value |
+|---|---|
+| Operations Web and Operations API | the **same** value (they share one key ring) |
+| Customer portal | its own value (it has its own key ring) |
+| Staging | different values from production |
+
+Keep each value in your password manager: without it the sites can no longer read the companies' saved keys (card, text messages, webhooks, authenticator apps). A site without it shows "This site is not set up yet" with the name to set.
+
+- **Key ring locked:** the master keys that encrypt every secret a company saves were stored in the database in clear, next to what they protect, so a copy of the database was enough to read them. New master keys are now locked with the key above, which is never in the database. At the first start with the setting, a new locked key comes into use; secrets saved earlier stay readable.
+- **Card keys tied to their company:** a company's Stripe secret key and webhook secret are kept under their own purpose bound to the company; a value copied to another company's row cannot be read.
+- **Restricted Stripe keys:** the card panel asks for a restricted key (rk_) and names the permissions: Checkout Sessions, PaymentIntents and Charges and Refunds on Write (Terminal Readers too with readers). A restricted key missing one of them is refused when saved. New help article *Connect your Stripe account*.
+- **Stripe's newest event format:** checked that webhooks created today (2026-10-28.endive) are read correctly while calls stay on 2024-06-20.
+
+**Checks:**
+1. After setting the variable and copying: Operations `/health/ready` is Healthy; staff sign-in works; a customer can sign in to the portal.
+2. Staging, with a Stripe test account: create a restricted key with only Charges and Refunds; saving it is refused (*cannot reach everything card payments need*). Add the other permissions; saving works.
+3. Take a $1 test card payment at the cashier (payment page), refund it, and check the webhook deliveries in Stripe are 200.

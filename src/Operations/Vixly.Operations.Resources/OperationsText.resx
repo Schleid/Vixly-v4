@@ -15916,4 +15916,10 @@ Your {company} account has been closed because our terms of service were not res
   <data name="ops.items.incomplete" xml:space="preserve">
     <value>Parcel {parcel} cannot go on yet: the item "{item}" needs its customs code and country of origin. Complete its items, then try again.</value>
   </data>
+  <data name="ops.cards.permissions_missing" xml:space="preserve">
+    <value>This restricted key cannot reach everything card payments need. In Stripe, edit the key so that Checkout Sessions, PaymentIntents and Charges and Refunds are set to Write, then save the keys here again.</value>
+  </data>
+  <data name="ui.cards.restricted_key_hint" xml:space="preserve">
+    <value>Best: a restricted key (rk_) made for this system in Stripe (Developers, API keys, Create restricted key) with Checkout Sessions, PaymentIntents and Charges and Refunds set to Write, plus Terminal Readers if you use card readers. A full secret key (sk_) also works but can do far more than card payments need.</value>
+  </data>
 </root>

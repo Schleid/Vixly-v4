@@ -39,6 +39,12 @@ internal sealed class FakeCardGateway : IOperationsCardGateway
     public Task<string> CheckAsync(string secretKey, CancellationToken cancellationToken) =>
         secretKey.StartsWith(AcceptedKeyStart, StringComparison.Ordinal) ? Task.FromResult("Cash Co Stripe") : throw new OperationsCardRefusedException("invalid_api_key");
 
+    // A restricted key the test made without Checkout Sessions.
+    public string? KeyWithoutCheckout { get; set; }
+
+    public Task<IReadOnlyList<string>> MissingPermissionsAsync(string secretKey, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<string>>(secretKey == KeyWithoutCheckout ? new[] { "checkout_sessions" } : Array.Empty<string>());
+
     public Task<OperationsCardPage> CreatePageAsync(string secretKey, OperationsCardPageRequest request, CancellationToken cancellationToken)
     {
         string id = "cs_test_" + request.ChargeId.ToString("N");

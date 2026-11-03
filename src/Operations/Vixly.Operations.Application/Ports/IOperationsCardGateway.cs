@@ -20,6 +20,9 @@ public interface IOperationsCardGateway
     // The account's name when the key works.
     Task<string> CheckAsync(string secretKey, CancellationToken cancellationToken);
 
+    // What a restricted key cannot reach among what card payments need (2026-11-03): checkout_sessions, payment_intents, refunds. Empty for a full key.
+    Task<IReadOnlyList<string>> MissingPermissionsAsync(string secretKey, CancellationToken cancellationToken);
+
     Task<OperationsCardPage> CreatePageAsync(string secretKey, OperationsCardPageRequest request, CancellationToken cancellationToken);
 
     Task<OperationsCardState> GetPageAsync(string secretKey, string checkoutSessionId, CancellationToken cancellationToken);

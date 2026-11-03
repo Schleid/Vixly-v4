@@ -66,6 +66,25 @@ public sealed class OperationsStripeGateway : IOperationsCardGateway
         return Text(root, "settings", "dashboard", "display_name") ?? Text(root, "business_profile", "name") ?? string.Empty;
     }
 
+    // A restricted key without a permission is refused with 403 even to read; reading is enough to tell, nothing is made.
+    // Write includes read, so a permission set to None is caught; one left on Read only shows at the first payment.
+    public async Task<IReadOnlyList<string>> MissingPermissionsAsync(string secretKey, CancellationToken cancellationToken)
+    {
+        List<string> missing = new();
+
+        foreach ((string name, string path) in new[] { ("checkout_sessions", "v1/checkout/sessions?limit=1"), ("payment_intents", "v1/payment_intents?limit=1"), ("refunds", "v1/refunds?limit=1") })
+        {
+            using JsonDocument? answer = await SendAsync(secretKey, HttpMethod.Get, path, null, null, cancellationToken, allowForbidden: true);
+
+            if (answer is null)
+            {
+                missing.Add(name);
+            }
+        }
+
+        return missing;
+    }
+
     public async Task<OperationsCardPage> CreatePageAsync(string secretKey, OperationsCardPageRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);

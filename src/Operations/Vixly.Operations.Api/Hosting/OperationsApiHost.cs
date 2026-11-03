@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Vixly.Shared.Hosting.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,6 +45,7 @@ public static class OperationsApiHost
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddScoped<Vixly.Operations.Application.Ports.IOperationsRequestMetadata, OperationsApiRequestMetadata>();
         builder.Services.AddOperationsInfrastructure(builder.Configuration, "Vixly.V4.Operations.Api");
+        builder.Services.AddVixlyKeyRingEncryption(builder.Configuration);
         builder.Services.AddMemoryCache();
         builder.Services.Configure<OperationsInternalOptions>(builder.Configuration.GetSection(OperationsInternalOptions.SectionName));
         builder.Services.AddSingleton<OperationsCallerTokenValidator>();

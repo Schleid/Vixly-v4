@@ -27,6 +27,39 @@ public sealed class OperationsStripeGatewayTests
 
     private static readonly DateTimeOffset Now = new(2026, 10, 22, 4, 0, 0, TimeSpan.Zero);
 
+    // 2026-11-03: a company creates its webhook today in Stripe's newest format (2026-10-28.endive), while calls pin 2024-06-20.
+    // The fields Vixly reads are the same in both; these are trimmed copies of real endive events.
+    [Theory]
+    [InlineData("checkout.session.completed",
+        "{\"id\":\"cs_test_a1\",\"object\":\"checkout.session\",\"adaptive_pricing\":{\"enabled\":true},\"allowed_payment_method_types\":[\"card\"],\"amount_subtotal\":287900,"
+        + "\"amount_total\":287900,\"branding_settings\":{\"display_name\":\"Galeo\"},\"currency\":\"usd\",\"livemode\":false,\"metadata\":{\"vixly_charge\":\"6f9619ff-8b86-d011-b42d-00c04fc964ff\"},"
+        + "\"mode\":\"payment\",\"payment_intent\":\"pi_3UX\",\"payment_method_types\":[\"card\"],\"payment_status\":\"paid\",\"status\":\"complete\",\"ui_mode\":\"hosted_page\",\"wallet_options\":null}")]
+    [InlineData("payment_intent.succeeded",
+        "{\"id\":\"pi_3UX\",\"object\":\"payment_intent\",\"allowed_payment_method_types\":[\"card\"],\"amount\":287900,\"amount_details\":{\"tip\":{}},\"amount_received\":287900,"
+        + "\"capture_method\":\"automatic_async\",\"currency\":\"usd\",\"livemode\":false,\"metadata\":{\"vixly_charge\":\"6f9619ff-8b86-d011-b42d-00c04fc964ff\"},"
+        + "\"payment_details\":{\"order_reference\":\"cs_test_a1\"},\"payment_method_types\":[\"card\"],\"status\":\"succeeded\"}")]
+    public void Webhook_InTheNewestStripeFormat_IsRead(string type, string item)
+    {
+        string payload = "{\"id\":\"evt_1\",\"object\":\"event\",\"api_version\":\"2026-10-28.endive\",\"context\":\"acct_1\",\"created\":1793667777,\"data\":{\"object\":" + item
+            + "},\"livemode\":false,\"pending_webhooks\":1,\"request\":{\"id\":null},\"type\":\"" + type + "\"}";
+        OperationsStripeGateway gateway = Gateway(new Answer(HttpStatusCode.OK, "{}"));
+
+        OperationsCardEvent? read = gateway.ReadEvent(payload, Header(payload, Secret, Now), Secret, Now);
+
+        Assert.NotNull(read);
+        Assert.Equal(new Guid("6f9619ff-8b86-d011-b42d-00c04fc964ff"), read.ChargeId);
+        Assert.Equal(new OperationsCardState(true, false, "pi_3UX", 2879m, "USD") { Live = false }, read.State);
+    }
+
+    // 2026-11-03: a restricted key without a permission is refused with 403; a full key reads everything.
+    [Fact]
+    public async Task MissingPermissions_NamesWhatARestrictedKeyCannotReach()
+    {
+        Assert.Equal(new[] { "checkout_sessions", "payment_intents", "refunds" },
+            await Gateway(new Answer(HttpStatusCode.Forbidden, "{\"error\":{\"type\":\"invalid_request_error\"}}")).MissingPermissionsAsync("rk_test_1", CancellationToken.None));
+        Assert.Empty(await Gateway(new Answer(HttpStatusCode.OK, "{\"object\":\"list\",\"data\":[]}")).MissingPermissionsAsync("rk_test_1", CancellationToken.None));
+    }
+
     [Fact]
     public void Webhook_IsTrusted_OnlySignedRight_AndRecent()
     {

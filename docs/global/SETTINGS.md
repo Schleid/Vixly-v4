@@ -59,6 +59,7 @@
 | `OperationsPlatform:BaseUrl` | R | `https://api.vixly.ltd/` |
 | `OperationsPlatform:CallerKeyId` | R | The key id Platform knows Operations by (in Platform's `PlatformInternal:Callers:operations:Keys`) |
 | `OperationsPlatform:CallerPrivateKey` | R, S | P-256 private key, base64 PKCS#8 |
+| `DataProtection:KeyEncryptionKey` | R, S | Locks the key ring in the database: 32 random bytes, base64 (44 characters). **The same value on Operations Web and Operations API.** Keep a copy: without it the companies' saved keys cannot be read. To change it, set the new value and put the old one in `DataProtection:PreviousKeyEncryptionKeys` |
 | `OperationsLinks:PortalUrlTemplate` | R | `https://{slug}.vixly.ltd` |
 | `OperationsFiles:Root` | R | Uploads. **Outside every site folder**, existing, writable, and **shared with Operations API**. A folder inside the site is refused, because an update would erase it. |
 | `OperationsMail:FromAddress`, `SmtpHost` | R | As Control |
@@ -72,7 +73,7 @@
 
 | Setting | | What it is |
 |---|---|---|
-| `ConnectionStrings:Operations`, `OperationsPlatform:*`, `OperationsLinks:PortalUrlTemplate`, `OperationsFiles:Root`, `OperationsMail:*` | R / W | As Operations Web, with **the same** `OperationsFiles:Root` |
+| `ConnectionStrings:Operations`, `OperationsPlatform:*`, `OperationsLinks:PortalUrlTemplate`, `OperationsFiles:Root`, `OperationsMail:*`, `DataProtection:KeyEncryptionKey` | R / W | As Operations Web, with **the same** `OperationsFiles:Root` and **the same** key-encryption key |
 | `OperationsInternal:Hosts[]` | R | `ops-internal.vixly.ltd` |
 | `OperationsInternal:Callers` | R | `customer`: `Scopes` = `["customer"]`, `Keys:{keyId}` = the portal's **public** key |
 
@@ -85,6 +86,7 @@
 | `CustomerOperations:BaseUrl` | R | `https://ops-internal.vixly.ltd/` |
 | `CustomerOperations:CallerKeyId` | R | Matches Operations API's `OperationsInternal:Callers:customer:Keys` |
 | `CustomerOperations:CallerPrivateKey` | R, S | P-256 private key, base64 PKCS#8 |
+| `DataProtection:KeyEncryptionKey` | R, S | Locks the portal's key ring: 32 random bytes, base64; its own value |
 | `CustomerBotCheck:SiteKey`, `SecretKey` | R (secret S) | Cloudflare Turnstile, unless `CustomerBotCheck:Enabled=false` |
 
 ## Public site

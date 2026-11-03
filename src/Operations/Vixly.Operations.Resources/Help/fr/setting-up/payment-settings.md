@@ -7,7 +7,7 @@ order: 150
 permissions: [ops.settings.view]
 conditions: []
 routes: [/staff/settings/payments]
-related: [invoice-settings, credit-settings]
+related: [invoice-settings, credit-settings, card-payments-stripe]
 sources:
   - src/Operations/Vixly.Operations.Web/Components/Cashier/PaymentSettingsPage.razor
   - src/Operations/Vixly.Operations.Web/Components/Cashier/CardSettingsPanel.razor

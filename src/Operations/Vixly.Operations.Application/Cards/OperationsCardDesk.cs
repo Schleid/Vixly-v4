@@ -66,10 +66,25 @@ public sealed class OperationsCardDesk
 
     // The company's secret key, or none when no account is connected (or the key cannot be read back).
     public async Task<string?> SecretKeyAsync(CancellationToken cancellationToken) =>
-        await _cards.GetProviderAsync(cancellationToken) is { } provider ? _protector.Unprotect(provider.SecretKeyProtected) : null;
+        await _cards.GetProviderAsync(cancellationToken) is { } provider ? ReadSecretKey(_protector, provider) : null;
 
     public async Task<string?> WebhookSecretAsync(CancellationToken cancellationToken) =>
-        await _cards.GetProviderAsync(cancellationToken) is { } provider ? _protector.Unprotect(provider.WebhookSecretProtected) : null;
+        await _cards.GetProviderAsync(cancellationToken) is { } provider ? ReadWebhookSecret(_protector, provider) : null;
+
+    // Card keys are kept under their own purpose, bound to the company (2026-11-03); keys saved before that read back the old way.
+    public static string ProtectSecretKey(IOperationsSecretProtector protector, Guid tenantId, string secretKey) =>
+        protector.Protect(secretKey, OperationsSecretPurposes.ForTenant(OperationsSecretPurposes.CardSecretKey, tenantId));
+
+    public static string ProtectWebhookSecret(IOperationsSecretProtector protector, Guid tenantId, string webhookSecret) =>
+        protector.Protect(webhookSecret, OperationsSecretPurposes.ForTenant(OperationsSecretPurposes.CardWebhookSecret, tenantId));
+
+    public static string? ReadSecretKey(IOperationsSecretProtector protector, OperationsCardProvider provider) =>
+        protector.Unprotect(provider.SecretKeyProtected, OperationsSecretPurposes.ForTenant(OperationsSecretPurposes.CardSecretKey, provider.TenantId))
+        ?? protector.Unprotect(provider.SecretKeyProtected);
+
+    public static string? ReadWebhookSecret(IOperationsSecretProtector protector, OperationsCardProvider provider) =>
+        protector.Unprotect(provider.WebhookSecretProtected, OperationsSecretPurposes.ForTenant(OperationsSecretPurposes.CardWebhookSecret, provider.TenantId))
+        ?? protector.Unprotect(provider.WebhookSecretProtected);
 
     // Cards are offered when the company accepts them and its account is connected.
     public static bool Offered(OperationsTenantSettings? settings, bool connected) => connected && settings?.Accepts(OperationsPaymentMethod.Card) == true;

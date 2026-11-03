@@ -23,6 +23,8 @@ internal sealed class FakeCardGateway : IOperationsCardGateway
 
     public Task<string> CheckAsync(string secretKey, CancellationToken cancellationToken) => Task.FromResult("Test account");
 
+    public Task<IReadOnlyList<string>> MissingPermissionsAsync(string secretKey, CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<string>>(Array.Empty<string>());
+
     public Task<OperationsCardPage> CreatePageAsync(string secretKey, OperationsCardPageRequest request, CancellationToken cancellationToken)
     {
         string id = "cs_test_" + request.ChargeId.ToString("N");

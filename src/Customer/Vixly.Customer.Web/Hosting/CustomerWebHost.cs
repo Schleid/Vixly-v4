@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Vixly.Shared.Hosting.Security;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
 using Vixly.Customer.Infrastructure.DependencyInjection;
@@ -45,6 +46,7 @@ public static class CustomerWebHost
         }
 
         builder.Services.AddCustomerInfrastructure(builder.Configuration);
+        builder.Services.AddVixlyKeyRingEncryption(builder.Configuration);
         builder.Services.AddVixlyForwardedHeaders(builder.Configuration);
         builder.Services.AddOptions<CustomerHostingOptions>().Bind(builder.Configuration.GetSection(CustomerHostingOptions.SectionName));
         builder.Services.AddOptions<CustomerOperationsOptions>().Bind(builder.Configuration.GetSection(CustomerOperationsOptions.SectionName));

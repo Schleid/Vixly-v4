@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Vixly.Shared.Hosting.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Vixly.Operations.Application.Ports;
@@ -46,6 +47,7 @@ public static class OperationsWebHost
         }
 
         builder.Services.AddOperationsInfrastructure(builder.Configuration, "Vixly.V4.Operations.Web");
+        builder.Services.AddVixlyKeyRingEncryption(builder.Configuration);
         builder.Services.AddVixlyForwardedHeaders(builder.Configuration);
         builder.Services.AddOptions<OperationsHostingOptions>().Bind(builder.Configuration.GetSection(OperationsHostingOptions.SectionName));
         builder.Services.AddHostedService<OperationsOutboxWorker>();
