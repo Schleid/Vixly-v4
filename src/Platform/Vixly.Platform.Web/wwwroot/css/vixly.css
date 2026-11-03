@@ -3206,3 +3206,159 @@ details.vx-nav-group .vx-nav-item { margin-block: var(--vx-space-1); }
     font-weight: 600;
     color: var(--vx-color-text);
 }
+
+/* Idle warning (keepalive.js; owner, 2026-10-25) */
+.vx-idle[hidden] { display: none !important; }
+.vx-idle { position: fixed; z-index: 1000; inset: auto 1rem 1rem; max-width: 34rem; margin: auto; padding: 1.25rem 1.5rem; background: var(--vx-color-surface); color: var(--vx-color-text); border: 1px solid var(--vx-color-warning); border-radius: 0.75rem; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18); }
+.vx-idle p { margin: 0 0 0.75rem; }
+.vx-idle__time strong { font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+
+
+/* =========================================================
+   Mobile Navigation Drawer (Platform Control)
+   Progressive enhancement for viewports <= 1024px.
+   ========================================================= */
+.vx-topbar__menu-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    background: var(--vx-color-surface);
+    border: 1px solid var(--vx-color-border);
+    border-radius: var(--vx-radius-sm);
+    color: var(--vx-color-text);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.vx-topbar__menu-btn:hover {
+    background: var(--vx-color-surface-sunken);
+    border-color: var(--vx-color-border-control);
+}
+
+.vx-topbar__menu-btn svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    display: block;
+}
+
+.vx-sidebar__close-btn {
+    display: none;
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--vx-color-chrome-active) 80%, transparent);
+    border: 1px solid var(--vx-color-chrome-border);
+    border-radius: var(--vx-radius-sm);
+    color: var(--vx-color-chrome-text-strong);
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.vx-sidebar__close-btn:hover {
+    background: var(--vx-color-chrome-hover);
+    color: var(--vx-color-chrome-text-strong);
+}
+
+.vx-sidebar__backdrop {
+    display: none;
+}
+
+.vx-sidebar__backdrop:not([hidden]) {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: var(--vx-color-overlay, rgba(15, 23, 42, 0.6));
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    cursor: pointer;
+}
+
+@media screen and (max-width: 1024px) {
+    .vx-shell--enhanced .vx-topbar__menu-btn:not([hidden]) {
+        display: inline-flex;
+        order: 1;
+    }
+
+    .vx-shell--enhanced .vx-topbar__actions {
+        order: 2;
+        margin-inline-start: auto;
+    }
+
+    .vx-shell--enhanced .vx-topbar__search {
+        order: 3;
+        width: 100%;
+        margin-top: 0.25rem;
+    }
+
+    .vx-shell--enhanced .vx-topbar {
+        height: auto;
+        min-height: var(--vx-control-min);
+        padding: 0.65rem 1rem;
+        flex-wrap: wrap;
+        gap: 0.5rem 0.75rem;
+    }
+
+    .vx-shell--enhanced .vx-sidebar {
+        position: fixed !important;
+        inset: 0 auto 0 0 !important;
+        width: min(20rem, 85vw) !important;
+        height: 100dvh !important;
+        max-height: none !important;
+        z-index: 100 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        visibility: hidden;
+        transform: translateX(-100%);
+        transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), visibility 220ms ease;
+        box-shadow: 4px 0 24px rgba(15, 23, 42, 0.35) !important;
+        border-right: 1px solid var(--vx-color-chrome-border) !important;
+        border-bottom: none !important;
+    }
+
+    .vx-shell--enhanced.vx-shell--nav-open .vx-sidebar {
+        visibility: visible !important;
+        transform: none !important;
+    }
+
+    .vx-shell--enhanced .vx-sidebar__brand {
+        padding-right: 3.5rem !important;
+    }
+
+    .vx-shell--enhanced .vx-sidebar__close-btn:not([hidden]) {
+        display: inline-flex !important;
+    }
+
+    .vx-shell--enhanced .vx-sidebar__nav {
+        max-height: none !important;
+        flex: 1 1 auto !important;
+        overflow-y: auto !important;
+    }
+
+    .vx-shell--enhanced .vx-sidebar__footer {
+        flex-shrink: 0 !important;
+        margin-top: auto !important;
+    }
+
+    html.vx-shell--nav-open,
+    body.vx-shell--nav-open {
+        overflow: hidden !important;
+    }
+
+    .vx-shell--enhanced .vx-sidebar__backdrop:not([hidden]) {
+        display: block !important;
+    }
+}
