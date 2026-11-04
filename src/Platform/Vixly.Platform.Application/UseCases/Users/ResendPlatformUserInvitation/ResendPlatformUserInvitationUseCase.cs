@@ -97,7 +97,17 @@ public sealed class ResendPlatformUserInvitationUseCase
             return ResendPlatformUserInvitationResponse.Failure(PlatformCommonErrors.ConcurrencyConflict);
         }
 
-        await _mailer.SendInvitationAsync(user, token.Value, cancellationToken);
+        try
+        {
+            await _mailer.SendInvitationAsync(user, token.Value, cancellationToken);
+        }
+        catch (Exception exception) when (exception is not OperationCanceledException)
+        {
+            _audit.Record(context.PlatformUserId, "platform.users.invitation_mail_failed", PlatformPermissions.UsersInvite, nameof(PlatformUser), user.Id,
+                after: new { error = exception.GetType().Name });
+            await _unitOfWork.SaveChangesAsync(CancellationToken.None);
+            return ResendPlatformUserInvitationResponse.Failure(PlatformCommonErrors.InvitationMailFailed);
+        }
 
         return ResendPlatformUserInvitationResponse.Success();
     }

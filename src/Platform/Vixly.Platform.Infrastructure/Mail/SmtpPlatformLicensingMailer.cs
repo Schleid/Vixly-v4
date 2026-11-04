@@ -35,6 +35,12 @@ internal sealed class SmtpPlatformLicensingMailer : IPlatformLicensingMailer
 
         CultureInfo culture = CultureInfo.GetCultureInfo(tenant.DefaultLanguage.Value);
         string kind = Key(mail.Kind, mail.Approved);
+
+        // Which support action the "support started" email names.
+        if (mail.Kind == PlatformLicensingNoticeKind.OwnerSupportStarted)
+        {
+            kind += mail.SupportKind == Vixly.Platform.Domain.Licensing.PlatformOwnerSupportKind.SecondFactorReset ? ".second_factor" : ".device";
+        }
         Dictionary<string, object> values = new(StringComparer.Ordinal)
         {
             ["name"] = recipient.Name,
@@ -44,7 +50,9 @@ internal sealed class SmtpPlatformLicensingMailer : IPlatformLicensingMailer
             ["device"] = mail.DeviceName ?? string.Empty,
             ["number"] = mail.DeviceNumber ?? string.Empty,
             ["count"] = mail.Count,
-            ["support"] = _sender.SupportAddress
+            ["support"] = _sender.SupportAddress,
+            ["staff"] = mail.StaffLink ?? string.Empty,
+            ["site"] = mail.SiteLink ?? string.Empty
         };
 
         return _sender.SendAsync(
@@ -65,6 +73,10 @@ internal sealed class SmtpPlatformLicensingMailer : IPlatformLicensingMailer
             PlatformLicensingNoticeKind.DeviceReplaced => "device_replaced",
             PlatformLicensingNoticeKind.ReleaseDecided => approved == true ? "release_approved" : "release_refused",
             PlatformLicensingNoticeKind.DevicesRevoked => "devices_revoked",
+            PlatformLicensingNoticeKind.Welcome => "welcome",
+            PlatformLicensingNoticeKind.OwnerSupportStarted => "support_started",
+            PlatformLicensingNoticeKind.SecondFactorResetLink => "second_factor_link",
+            PlatformLicensingNoticeKind.SecondFactorResetDone => "second_factor_done",
             _ => "credential_reused"
         };
     }

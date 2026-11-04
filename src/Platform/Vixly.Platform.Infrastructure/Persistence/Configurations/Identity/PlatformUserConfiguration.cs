@@ -59,6 +59,7 @@ internal sealed class PlatformUserConfiguration : IEntityTypeConfiguration<Platf
         builder.Property(user => user.AuthorityLevel).IsRequired();
 
         builder.HasIndex(user => user.Email).IsUnique();
+        builder.HasIndex(user => user.EmployeeNumber).IsUnique().HasFilter("[EmployeeNumber] IS NOT NULL");
         builder.Ignore(user => user.IsActiveSuperUser);
         builder.Ignore(user => user.HasSecondFactor);
         builder.Ignore(user => user.UnusedRecoveryCodeCount);

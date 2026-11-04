@@ -15,5 +15,8 @@
 public enum PlatformDeviceLinkKind
 {
     FirstDevice = 1,
-    OwnerRecovery = 2
+    OwnerRecovery = 2,
+
+    // Not a device: lets the Owner enrol a new second factor (support, D-O13).
+    SecondFactorReset = 3
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Vixly.Contracts.Platform.Internal.Billing;
+using Vixly.Contracts.Platform.Internal.Entitlements;
 using Vixly.Contracts.Platform.Internal.Legal;
 using Vixly.Contracts.Platform.Internal.Subscription;
 using Vixly.Contracts.Platform.Internal.Tenant;
@@ -14,14 +15,19 @@ using Vixly.Platform.Application.UseCases.Legal.GetPlatformTenantLegalStatus;
 using Vixly.Platform.Application.UseCases.TenantAccount.ChangeTenantSubscription;
 using Vixly.Platform.Application.UseCases.TenantAccount.CreateTenantPayLink;
 using Vixly.Platform.Application.UseCases.TenantAccount.GetTenantAccount;
+using Vixly.Platform.Application.UseCases.TenantAccount.GetTenantCompanyChange;
+using Vixly.Platform.Application.UseCases.TenantAccount.SubmitTenantCompanyChange;
+using Vixly.Platform.Application.UseCases.TenantAccount.WithdrawTenantCompanyChange;
 using Vixly.Platform.Application.UseCases.TenantAccount.GetTenantBillingDocument;
 using Vixly.Platform.Application.UseCases.TenantAccount.GetTenantEntitlements;
 using Vixly.Platform.Application.UseCases.TenantAccount.GetTenantSubscription;
 using Vixly.Platform.Application.UseCases.TenantAccount.ListTenantBillingDocuments;
 using Vixly.Platform.Application.UseCases.TenantAccount.ListTenantInvoices;
 using Vixly.Platform.Application.UseCases.TenantAccount.ListTenantPlanOptions;
+using Vixly.Platform.Application.UseCases.TenantAccount.ReportTenantShipmentUsage;
 using Vixly.Platform.Application.UseCases.TenantAccount.PreviewTenantSubscriptionChange;
 using Vixly.Platform.Application.UseCases.TenantAccount.UpdateTenantAccount;
+using Vixly.Platform.Application.UseCases.TenantAccount.UpdateTenantCompanyProfile;
 using Vixly.Platform.Application.UseCases.Tenants;
 using Vixly.Platform.Domain.Billing;
 using Vixly.Platform.Domain.Subscriptions;
@@ -82,6 +88,14 @@ public static class PlatformInternalTenantEndpoints
         {
             GetTenantEntitlementsResponse response = await useCase.ExecuteAsync(PlatformInternalRequest.Tenant(http), new GetTenantEntitlementsRequest(), cancellationToken);
             return response.Succeeded ? PlatformInternalCache.Ok(http, PlatformInternalMapping.Entitlements(response.Entitlements!), PlatformInternalCache.TenantSeconds) : errors.InternalProblem(response.Error!);
+        });
+
+        // Shipment cap (owner, 2026-10-29): Operations reports the month's shipments; a final report charges what is above the cap.
+        tenant.MapPost("/usage/shipments", async (PlatformShipmentUsageBody body, ReportTenantShipmentUsageUseCase useCase, HttpContext http, PlatformApiErrors errors, CancellationToken cancellationToken) =>
+        {
+            ReportTenantShipmentUsageResponse response = await useCase.ExecuteAsync(PlatformInternalRequest.Tenant(http),
+                new ReportTenantShipmentUsageRequest { Month = body.Month ?? string.Empty, Shipments = body.Shipments, IsFinal = body.IsFinal }, cancellationToken);
+            return response.Succeeded ? Results.NoContent() : errors.InternalProblem(response.Error!);
         });
 
         tenant.MapGet("/subscription", async (string? language, GetTenantSubscriptionUseCase useCase, HttpContext http, PlatformApiErrors errors, CancellationToken cancellationToken) =>
@@ -166,6 +180,90 @@ public static class PlatformInternalTenantEndpoints
             http.Response.Headers.CacheControl = "private, max-age=3600";
             http.Response.Headers.XContentTypeOptions = "nosniff";
             return Results.File(response.Content!, "application/pdf", response.FileName);
+        });
+
+        // 2026-10-25: the owner keeps the company profile (trading name, email, phone, address) without approval.
+        // The same body as a change request; its legal name, reason and proof are not used.
+        tenant.MapPut("/company", async (PlatformCompanyChangeBody body, UpdateTenantCompanyProfileUseCase useCase, HttpContext http, PlatformApiErrors errors, CancellationToken cancellationToken) =>
+        {
+            UpdateTenantCompanyProfileResponse response = await useCase.ExecuteAsync(PlatformInternalRequest.Tenant(http), new UpdateTenantCompanyProfileRequest
+            {
+                Company = new PlatformCompanyInput
+                {
+                    TradingName = body.TradingName,
+                    Email = body.Email,
+                    Phone = body.Phone,
+                    AddressLine1 = body.AddressLine1,
+                    AddressLine2 = body.AddressLine2,
+                    City = body.City,
+                    StateProvince = body.StateProvince,
+                    PostalCode = body.PostalCode,
+                    CountryCode = body.CountryCode
+                }
+            }, cancellationToken);
+
+            return response.Succeeded ? Results.NoContent() : errors.InternalProblem(response.Error!);
+        });
+
+        // B12: the tenant owner asks TechCrafters to change the company's legal name.
+        tenant.MapGet("/company-change", async (GetTenantCompanyChangeUseCase useCase, HttpContext http, PlatformApiErrors errors, CancellationToken cancellationToken) =>
+        {
+            GetTenantCompanyChangeResponse response = await useCase.ExecuteAsync(PlatformInternalRequest.Tenant(http), new GetTenantCompanyChangeRequest(), cancellationToken);
+
+            if (!response.Succeeded)
+            {
+                return errors.InternalProblem(response.Error!);
+            }
+
+            http.Response.Headers.CacheControl = "no-store";
+            return response.Change is { } change ? Results.Ok(PlatformInternalMapping.CompanyChange(change)) : Results.NoContent();
+        });
+
+        tenant.MapPost("/company-change", async (PlatformCompanyChangeBody body, SubmitTenantCompanyChangeUseCase useCase, HttpContext http, PlatformApiErrors errors, CancellationToken cancellationToken) =>
+        {
+            byte[]? proof = null;
+
+            if (!string.IsNullOrWhiteSpace(body.ProofBase64))
+            {
+                proof = new byte[body.ProofBase64.Length * 3 / 4 + 3];
+
+                if (!Convert.TryFromBase64String(body.ProofBase64, proof, out int written))
+                {
+                    return errors.InternalProblem(PlatformCommonErrors.RequestInvalid);
+                }
+
+                proof = proof[..written];
+            }
+
+            SubmitTenantCompanyChangeResponse response = await useCase.ExecuteAsync(PlatformInternalRequest.Tenant(http), new SubmitTenantCompanyChangeRequest
+            {
+                Company = new PlatformCompanyInput
+                {
+                    LegalName = body.LegalName,
+                    TradingName = body.TradingName,
+                    Email = body.Email,
+                    Phone = body.Phone,
+                    AddressLine1 = body.AddressLine1,
+                    AddressLine2 = body.AddressLine2,
+                    City = body.City,
+                    StateProvince = body.StateProvince,
+                    PostalCode = body.PostalCode,
+                    CountryCode = body.CountryCode
+                },
+                Reason = body.Reason,
+                ProofFileName = body.ProofFileName,
+                ProofContent = proof
+            }, cancellationToken);
+
+            return response.Succeeded
+                ? Results.Created("/internal/v1/tenant/company-change", new PlatformCompanyChangeReceipt(response.RequestId))
+                : errors.InternalProblem(response.Error!);
+        });
+
+        tenant.MapDelete("/company-change", async (WithdrawTenantCompanyChangeUseCase useCase, HttpContext http, PlatformApiErrors errors, CancellationToken cancellationToken) =>
+        {
+            WithdrawTenantCompanyChangeResponse response = await useCase.ExecuteAsync(PlatformInternalRequest.Tenant(http), new WithdrawTenantCompanyChangeRequest(), cancellationToken);
+            return response.Succeeded ? Results.NoContent() : errors.InternalProblem(response.Error!);
         });
 
         tenant.MapGet("/legal", async (string? language, GetPlatformTenantLegalStatusUseCase useCase, HttpContext http, PlatformApiErrors errors, CancellationToken cancellationToken) =>

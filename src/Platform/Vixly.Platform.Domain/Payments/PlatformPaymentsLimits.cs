@@ -29,6 +29,20 @@ public static class PlatformPaymentsLimits
 
     public const int FailureCodeMaxLength = 60;
 
+    public const int CheckoutDisplayNameMaxLength = 100;
+
+    public const int WalletMaxLength = 20;
+
+    public const int CheckoutImageUrlMaxLength = 500;
+
+    // A bank statement line holds 22 characters: "PREFIX* SUFFIX" (provider rule).
+    public const int StatementMaxLength = 22;
+
+    public const int StatementPrefixMinLength = 2;
+
+    // The account's shortened descriptor (provider rule: 2 to 10 characters); the whole line stays within 22 characters.
+    public const int StatementPrefixMaxLength = 10;
+
     public const int EventTypeMaxLength = 100;
 
     public const int OutcomeMaxLength = 40;

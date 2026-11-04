@@ -1,0 +1,29 @@
+﻿@*
+=========================================================
+FILE: ContactFields.razor
+
+PURPOSE:
+The phone, email and opening hours fields of a location form.
+
+RESPONSIBILITIES:
+- Render the phone, email and opening hours fields of a location form
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); owner only (the use cases refuse others)
+- Static forms with antiforgery and the form guard (ADR-0019); placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<label>@T["ui.editor.phone.internal"] <input type="tel" name="phone" value="@Phone" maxlength="@OperationsLocationLimits.PhoneMaxLength" /></label>
+<label>@T["ui.editor.email"] <input type="email" name="email" value="@Email" maxlength="@OperationsLocationLimits.EmailMaxLength" /></label>
+<label>@T["ui.editor.hours"] <input name="openingHours" value="@OpeningHours" maxlength="@OperationsLocationLimits.HoursMaxLength" /></label>
+
+@code {
+    [Parameter] public string? Phone { get; set; }
+
+    [Parameter] public string? Email { get; set; }
+
+    [Parameter] public string? OpeningHours { get; set; }
+}

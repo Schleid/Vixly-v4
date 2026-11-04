@@ -32,5 +32,10 @@ public sealed class PlanDraftModel
 
     public int MaxWarehouses { get; set; }
 
+    // Shipment cap (owner, 2026-10-29): 0 means no cap.
+    public int MaxShipmentsPerMonth { get; set; }
+
+    public decimal ExtraShipmentPrice { get; set; }
+
     public HashSet<PlatformPlanFeature> Features { get; } = new();
 }

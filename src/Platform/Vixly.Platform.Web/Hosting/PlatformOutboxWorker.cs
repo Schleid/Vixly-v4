@@ -29,8 +29,12 @@ public sealed class PlatformOutboxWorker : BackgroundService
 
     private readonly ILogger<PlatformOutboxWorker> _logger;
 
-    public PlatformOutboxWorker(IServiceScopeFactory scopes, IOptions<PlatformOutboxOptions> options, ILogger<PlatformOutboxWorker> logger)
+    // P-5: the jobs of a site start one after another.
+    private readonly Vixly.Shared.Hosting.Jobs.VixlyJobStagger _stagger;
+
+    public PlatformOutboxWorker(IServiceScopeFactory scopes, IOptions<PlatformOutboxOptions> options, ILogger<PlatformOutboxWorker> logger, Vixly.Shared.Hosting.Jobs.VixlyJobStagger stagger)
     {
+        _stagger = stagger ?? throw new ArgumentNullException(nameof(stagger));
         _scopes = scopes ?? throw new ArgumentNullException(nameof(scopes));
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -43,6 +47,9 @@ public sealed class PlatformOutboxWorker : BackgroundService
             return;
         }
 
+        // P-5 (owner, 2026-11-04): not every job at the same moment as the first visitor after a start-up.
+        await _stagger.WaitTurnAsync(stoppingToken);
+
         using PeriodicTimer timer = new(TimeSpan.FromSeconds(Math.Max(1, _options.IntervalSeconds)));
 
         do
@@ -50,7 +57,7 @@ public sealed class PlatformOutboxWorker : BackgroundService
             try
             {
                 await using AsyncServiceScope scope = _scopes.CreateAsyncScope();
-                int handled = await scope.ServiceProvider.GetRequiredService<PlatformOutboxDispatcher>().DispatchAsync(stoppingToken);
+                int handled = await scope.ServiceProvider.GetRequiredService<PlatformOutboxDispatcher>().DispatchAsync(LogFailure, stoppingToken);
 
                 if (handled > 0)
                 {
@@ -67,6 +74,18 @@ public sealed class PlatformOutboxWorker : BackgroundService
             }
         }
         while (await NextTickAsync(timer, stoppingToken));
+    }
+
+    // The id and type find the message in the outbox table; the payload is never logged.
+    private void LogFailure(PlatformOutboxFailure failure)
+    {
+        _logger.LogError(
+            failure.Exception,
+            "Outbox handler failed for message {MessageId} ({MessageType}): {ErrorCode}, attempt {Attempts}.",
+            failure.MessageId,
+            failure.Type,
+            failure.ErrorCode,
+            failure.Attempts);
     }
 
     // Stopping the host cancels the wait: a normal end, not an error.

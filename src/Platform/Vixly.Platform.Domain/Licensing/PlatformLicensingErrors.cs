@@ -49,5 +49,13 @@ public static class PlatformLicensingErrors
 
     public static Error RegistrationNotReady { get; } = Error.Create("platform.licensing.registration_not_ready");
 
+    public static Error SupportReasonRequired { get; } = Error.Create("platform.licensing.support_reason_required");
+
+    public static Error IdentityCheckRequired { get; } = Error.Create("platform.licensing.identity_check_required");
+
+    public static Error ApproverMustDiffer { get; } = Error.Create("platform.licensing.approver_must_differ");
+
+    public static Error SupportNotPending { get; } = Error.Create("platform.licensing.support_not_pending");
+
     public static Error TooManyLinks { get; } = Error.Create("platform.licensing.too_many_links");
 }

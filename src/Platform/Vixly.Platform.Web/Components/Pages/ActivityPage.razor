@@ -1,0 +1,28 @@
+﻿@*
+=========================================================
+FILE: ActivityPage.razor
+
+PURPOSE:
+Member activity: sign-ins to Control (owner, 2026-10-21).
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/activity"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.activity.title"]</PageTitle>
+
+<h1>@T["ui.activity.title"]</h1>
+<SignInActivity UserId="@User" Page="@(Page ?? 1)" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public Guid? User { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

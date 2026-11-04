@@ -3,8 +3,8 @@
 FILE: TenantProfileEditor.razor
 
 PURPOSE:
-The company profile section: legal details, address, language
-and time zone.
+The company profile section: legal details and address (read
+only, B12), language and time zone (editable).
 
 IMPORTANT NOTES:
 - Feature component (ADR-0001): behaviour lives in the
@@ -30,7 +30,7 @@ IMPORTANT NOTES:
     @if (Presenter.State.Editing)
     {
         <form class="vx-form" @onsubmit="SaveAsync">
-            <TenantCompanyFields Model="_form" Prefix="tenant-profile" />
+            <TenantSettingsFields Model="_form" Prefix="tenant-profile" />
             <div class="vx-actions">
                 <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.departments.save"]</VxButton>
                 <VxButton OnClick="Presenter.Cancel">@T["ui.common.cancel"]</VxButton>
@@ -43,7 +43,7 @@ IMPORTANT NOTES:
             <dt>@T["ui.tenants.legal_name"]</dt><dd>@Tenant.LegalName</dd>
             <dt>@T["ui.tenants.trading_name"]</dt><dd>@(Tenant.TradingName ?? T["ui.common.none"].Value)</dd>
             <dt>@T["ui.tenants.company_email"]</dt><dd>@Tenant.CompanyEmail</dd>
-            <dt>@T["ui.tenants.company_phone"]</dt><dd>@Tenant.CompanyPhone</dd>
+            <dt>@T["ui.tenants.company_phone"]</dt><dd>@Vixly.Shared.Localization.VixlyPhone.International(Tenant.CompanyPhone, Tenant.CountryCode)</dd>
             <dt>@T["ui.tenants.postal_address"]</dt>
             <dd>
                 @Tenant.AddressLine1<br />
@@ -55,9 +55,10 @@ IMPORTANT NOTES:
                 @PlatformDisplay.CountryName(T, Tenant.CountryCode)
             </dd>
         </dl>
+        <p class="vx-hint">@T["ui.tenants.company_locked"] <a href="/tenants/changes?status=All&amp;tenant=@Tenant.PlatformTenantId">@T["ui.tenant_changes.title"]</a></p>
         @if (CanEdit)
         {
-            <VxButton OnClick="StartEdit">@T["ui.departments.edit"]</VxButton>
+            <VxButton OnClick="StartEdit">@T["ui.tenants.edit_settings"]</VxButton>
         }
     }
 </VxCard></div>

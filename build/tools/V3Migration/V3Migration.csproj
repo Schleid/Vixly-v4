@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    One-off tool: copies one company's people and open work from V3 into V4 (ADR-0002 O-2, Global Standard M-2).
+    Lives under build/, referenced by no plane project. Reads V3 only; writes V4 through the V4 domain and services.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>vixly-v3-migration</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Operations\Vixly.Operations.Infrastructure\Vixly.Operations.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

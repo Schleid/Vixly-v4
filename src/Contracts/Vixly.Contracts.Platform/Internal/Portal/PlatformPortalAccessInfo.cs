@@ -15,5 +15,6 @@
 // - Cache 60 seconds (D-K6)
 // - Wire type: BCL only (C-0); never a domain type
 // - Version 1: add fields only; consumers ignore unknown fields (D-K4)
+// - TimeZone: the company's IANA time zone (Operations copies it once into its own settings, 2026-11-02)
 // =========================================================
-public sealed record PlatformPortalAccessInfo(bool Found, Guid? TenantId, string? Status, string Access, string? CanonicalSlug, string? DefaultLanguage, string Legal);
+public sealed record PlatformPortalAccessInfo(bool Found, Guid? TenantId, string? Status, string Access, string? CanonicalSlug, string? DefaultLanguage, string Legal, string? TimeZone = null);

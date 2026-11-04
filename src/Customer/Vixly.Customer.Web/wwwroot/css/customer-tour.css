@@ -1,0 +1,27 @@
+/* The dialog and highlight use the company's existing theme. */
+.customer-tour {
+    position: fixed;
+    inset: auto 1rem 1rem auto;
+    width: min(27rem, calc(100vw - 2rem));
+    max-height: calc(100dvh - 2rem);
+    overflow: auto;
+    margin: 0;
+    padding: 1.25rem;
+    box-sizing: border-box;
+    border: 2px solid var(--customer-primary, var(--vx-color-primary));
+    border-radius: var(--vx-radius-md, .75rem);
+    background: var(--vx-color-surface);
+    color: var(--vx-color-text);
+    box-shadow: var(--vx-shadow-3);
+    z-index: 1000;
+}
+.customer-tour::backdrop { background: rgb(0 0 0 / 12%); }
+.customer-tour-active { padding-bottom: 24rem; }
+.customer-tour h2 { margin: .5rem 0; font-size: 1.15rem; }
+.customer-tour__progress { margin: 0; font-size: .8rem; font-weight: 700; }
+.customer-tour__hint { font-size: .8rem; }
+.customer-tour__actions, .customer-tour__actions form { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.customer-tour-highlight { outline: 4px solid var(--customer-accent, var(--vx-color-primary)); outline-offset: 5px; scroll-margin-block: 8rem 24rem; }
+@media (max-width: 480px) {
+    .customer-tour-active .customer-home-actions { grid-template-columns: minmax(0, 1fr); }
+}

@@ -1,0 +1,61 @@
+@*
+=========================================================
+FILE: ReportRulesPage.razor
+
+PURPOSE:
+Settings → Reports (Slice 11; owner, 2026-10-22: on time is a company setting).
+
+RESPONSIBILITIES:
+- Hours of grace before a departed leg counts as late
+- Days after arrival for a parcel of each service to be ready (pickup or delivery)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.reports.rules_title"]" Company="@Company" Section="report_settings" Error="@Error" Info="@Info">
+    <form method="post" action="/staff/settings/reports" class="ops-editor__panel ops-editor__form" data-report-rules>
+        <AntiforgeryToken />
+        <p class="ops-editor__hint" style="margin-bottom: 0.75rem;">@T["ui.reports.rules_intro"]</p>
+        <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.8125rem; font-weight: 500; max-width: 16rem; margin-bottom: 0.85rem;">
+            <span>@T["ui.reports.grace_hours"]</span>
+            <input type="number" name="graceHours" min="0" max="@OperationsTenantSettings.DispatchGraceHoursLimit" value="@GraceHours" disabled="@(!CanEdit)" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" />
+        </label>
+        <OperationsTableViewport Label="@T["ui.reports.ready_targets"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col">@T["ui.reports.service"]</th><th scope="col" style="width: 10rem;">@T["ui.reports.ready_days"]</th></tr></thead>
+                <tbody>
+                    @foreach (OperationsShippingServiceSetup service in Services)
+                    {
+                        <tr>
+                            <td>@(service.Label ?? service.ServiceCode)</td>
+                            <td><input type="number" name="ready_@service.ServiceCode" min="1" max="@OperationsShippingServiceSetup.ReadyTargetDaysLimit" value="@service.ReadyTargetDays" disabled="@(!CanEdit)" aria-label="@T["ui.reports.ready_days"]" style="height: 28px; width: 6rem; padding: 0.2rem 0.5rem; font-size: 0.8125rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+        @if (CanEdit)
+        {
+            <div style="margin-top: 0.85rem;">
+                <button type="submit" class="vx-button vx-button--primary" style="height: 32px; padding: 0 0.85rem;">@T["ui.editor.save"]</button>
+            </div>
+        }
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public int GraceHours { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsShippingServiceSetup> Services { get; set; } = Array.Empty<OperationsShippingServiceSetup>();
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

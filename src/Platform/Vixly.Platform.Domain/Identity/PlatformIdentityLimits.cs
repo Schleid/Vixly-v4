@@ -56,6 +56,17 @@ public static class PlatformIdentityLimits
 
     public static readonly TimeSpan SessionIdleTimeout = TimeSpan.FromMinutes(5);
 
+    // Control's inactivity sign-out, set by the security administrator (owner, 2026-10-27): 5 to 30 minutes, the warning 1 to 5 minutes before.
+    public const int IdleMinutesMin = 5;
+
+    public const int IdleMinutesMax = 30;
+
+    public const int IdleWarnMinutesDefault = 1;
+
+    public const int IdleWarnMinutesMin = 1;
+
+    public const int IdleWarnMinutesMax = 5;
+
     public static readonly TimeSpan SessionAbsoluteLifetime = TimeSpan.FromHours(12);
 
     public static readonly TimeSpan StepUpWindow = TimeSpan.FromMinutes(5);

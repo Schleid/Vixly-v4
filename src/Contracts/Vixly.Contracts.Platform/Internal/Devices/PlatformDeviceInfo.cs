@@ -12,6 +12,7 @@
 // IMPORTANT NOTES:
 // - Wire type: BCL only (C-0); never a domain type
 // - Version 1: add fields only; consumers ignore unknown fields (D-K4)
+// - Browser and ApprovedByName (none: the Owner's email link) for the company's own list; never the address or the system (owner, 2026-10-21)
 // =========================================================
 public sealed record PlatformDeviceInfo(
     Guid DeviceId,
@@ -28,4 +29,6 @@ public sealed record PlatformDeviceInfo(
     DateTimeOffset? ReleaseRequestedUtc,
     DateTimeOffset? EndedUtc,
     DateTimeOffset? LastSeenUtc,
-    bool Idle);
+    bool Idle,
+    string? Browser = null,
+    string? ApprovedByName = null);

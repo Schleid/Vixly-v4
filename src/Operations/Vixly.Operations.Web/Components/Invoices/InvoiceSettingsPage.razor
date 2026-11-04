@@ -1,0 +1,89 @@
+@*
+=========================================================
+FILE: InvoiceSettingsPage.razor
+
+PURPOSE:
+Settings → Invoices (Slice 5F, F-5, I-4 and I-10): the tax name and number, a rate per kind, one tax line or one per kind, and the note at the foot of every invoice.
+
+RESPONSIBILITIES:
+- Show the settings; the form for people who may change them
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- A rate of 0 means no tax on that kind; supplies marked not taxed and government fees are never taxed
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.invoice_settings.title"]" Company="@Company" Section="invoice_settings" Error="@Error" Info="@Info">
+    @if (Settings is { } settings)
+    {
+    <form method="post" action="/staff/settings/invoices" class="ops-editor__form">
+        <AntiforgeryToken />
+        <fieldset class="ops-editor__panel" disabled="@(!CanEdit)">
+            <legend>@T["ui.invoice_settings.tax"]</legend>
+            <div class="ops-charges-duo">
+                <div><label>@T["ui.invoice_settings.tax_name"] <input name="taxName" value="@settings.TaxName" maxlength="40" placeholder="@T["ui.invoices.tax"]" /></label></div>
+                <div><label>@T["ui.invoice_settings.tax_number"] <input name="taxNumber" value="@settings.TaxNumber" maxlength="40" /></label></div>
+            </div>
+            <div class="ops-charges-duo" style="margin-top: 0.5rem;">
+                @foreach ((string field, OperationsTaxKind kind, decimal rate) in Rates(settings))
+                {
+                    <div>
+                        <label>@VixlyText.Format(T, "ui.invoice_settings.rate", "kind", T["ui.invoice.tax_kind." + kind].Value)
+                            <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 0.25rem;">
+                                <input name="@field" value="@rate.ToString("0.###", CultureInfo.InvariantCulture)" inputmode="decimal" size="7" style="height: 32px;" />
+                                <span style="font-weight: 600; font-size: 0.8125rem;">%</span>
+                            </div>
+                        </label>
+                    </div>
+                }
+            </div>
+            <p class="ops-editor__hint" style="margin: 0.5rem 0;">@T["ui.invoice_settings.rate_hint"]</p>
+            <fieldset style="margin-top: 0.75rem; padding: 0.75rem; border: 1px solid var(--vx-color-border); border-radius: 0.5rem;">
+                <legend style="font-size: 0.8125rem; font-weight: 600; padding: 0 0.25rem;">@T["ui.invoice_settings.show"]</legend>
+                <div class="ops-checkbox-group">
+                    <label class="ops-checkbox-label"><input type="radio" name="perKind" value="false" checked="@(!settings.TaxPerKind)" /> <span>@T["ui.invoice_settings.single"]</span></label>
+                    <label class="ops-checkbox-label"><input type="radio" name="perKind" value="true" checked="@settings.TaxPerKind" /> <span>@T["ui.invoice_settings.per_kind"]</span></label>
+                </div>
+            </fieldset>
+        </fieldset>
+        <fieldset class="ops-editor__panel" disabled="@(!CanEdit)" style="margin-top: 1rem;">
+            <legend>@T["ui.invoice_settings.note"]</legend>
+            <p class="ops-editor__hint">@T["ui.invoice_settings.note_hint"]</p>
+            <div class="ops-charges-trio" style="margin-top: 0.5rem;">
+                <div><label>@T["ui.invoice_settings.note_en"] <textarea name="noteEn" rows="3" maxlength="1000">@settings.InvoiceNoteEn</textarea></label></div>
+                <div><label>@T["ui.invoice_settings.note_fr"] <textarea name="noteFr" rows="3" maxlength="1000">@settings.InvoiceNoteFr</textarea></label></div>
+                <div><label>@T["ui.invoice_settings.note_es"] <textarea name="noteEs" rows="3" maxlength="1000">@settings.InvoiceNoteEs</textarea></label></div>
+            </div>
+        </fieldset>
+        @if (CanEdit)
+        {
+            <div style="margin-top: 1rem;">
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.invoice_settings.save"]</button>
+            </div>
+        }
+        <p class="ops-editor__hint">@T["ui.invoice_settings.numbering_hint"]</p>
+    </form>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsTenantSettings? Settings { get; set; }
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private static IEnumerable<(string Field, OperationsTaxKind Kind, decimal Rate)> Rates(OperationsTenantSettings settings) => new[]
+    {
+        ("freightRate", OperationsTaxKind.Freight, settings.FreightTaxPercent),
+        ("insuranceRate", OperationsTaxKind.Insurance, settings.InsuranceTaxPercent),
+        ("suppliesRate", OperationsTaxKind.Supplies, settings.SuppliesTaxPercent),
+        ("chargesRate", OperationsTaxKind.Charges, settings.ChargesTaxPercent)
+    };
+}

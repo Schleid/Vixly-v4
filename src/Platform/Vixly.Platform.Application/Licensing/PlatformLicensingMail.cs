@@ -19,4 +19,7 @@ public sealed record PlatformLicensingMail(
     string? DeviceNumber,
     string? DeviceName,
     bool? Approved,
-    int Count);
+    int Count,
+    string? StaffLink = null,
+    string? SiteLink = null,
+    Vixly.Platform.Domain.Licensing.PlatformOwnerSupportKind? SupportKind = null);

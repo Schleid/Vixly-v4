@@ -53,3 +53,7 @@ Corrected the broad adjacent-sibling selector: it selected every feature with a 
 - Organization: `feature-organization.webp`, branch supervisors coordinating operations.
 
 Four new images generated with built-in imagegen and visually inspected. Shared prompt: premium editorial logistics photography, natural daylight, navy/cobalt accents, authentic environment, landscape crop, no logos, readable text, watermark or interface overlays. Scene prompts are the descriptions above. Optimized WebP assets live in Public wwwroot/images; originals remain in Codex generated-images storage. No markup, backend or resource changes. CSS and asset-reference checks pass. Live browser verification remains pending.
+
+## Shared font foundation completed
+
+Inter is now self-hosted in Shared.UI with its OFL license and font-display: swap. Public inherits this typography through its existing theme stylesheet; its marketing layout and images are preserved. Details: [shared workbench record](../shared/ENTERPRISE-WORKBENCH-2026-10-16.md).

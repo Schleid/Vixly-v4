@@ -26,6 +26,16 @@ public sealed class AcceptInvitationResponse
 
     public string ChallengeToken { get; private init; } = string.Empty;
 
+    // Set when Require MFA is No: signed in at once, no second factor to set up.
+    public string SessionToken { get; private init; } = string.Empty;
+
+    public static AcceptInvitationResponse SignedIn(string sessionToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sessionToken);
+
+        return new AcceptInvitationResponse { Succeeded = true, SessionToken = sessionToken };
+    }
+
     public static AcceptInvitationResponse Success(string challengeToken)
     {
         return new AcceptInvitationResponse { Succeeded = true, ChallengeToken = challengeToken };

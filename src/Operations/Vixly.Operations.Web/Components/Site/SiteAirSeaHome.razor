@@ -1,0 +1,90 @@
+﻿@*
+=========================================================
+FILE: SiteAirSeaHome.razor
+
+PURPOSE:
+The Air & Sea home page: a full-width illustrated hero, real key figures, the company's story, rates, customers' words (website themes; landing page marketing, owner 2026-10-30).
+
+RESPONSIBILITIES:
+- Arrange the company's real content in the Air & Sea layout, from the hero to the closing call to action
+- Show the company's own hero, air and ocean images, else original illustrations
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText and the tenant texts; values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); every value is HTML-encoded by Razor
+- Every section shows only with real content behind it (figures, rates, testimonials, why us)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<SiteShell Page="@Page" Title="@(Page.Company + " | " + Page.Text(T, "headline", "site.default.headline"))" Description="@Page.Text(T, "meta_description", "site.default.meta_description")">
+    <section class="as-hero">
+        <div class="as-hero__media">
+            @if (Page.Image(Settings.HeroImageId ?? Settings.AirImageId ?? Settings.SeaImageId) is { } photo)
+            {
+                <img src="@photo" alt="" width="1536" height="1024" fetchpriority="high" decoding="async" />
+            }
+            else
+            {
+                <SiteCargoArt Kind="sea" />
+            }
+        </div>
+        <div class="as-hero__panel">
+            @if (Page.Site.Text("eyebrow") is { Length: > 0 } eyebrow) { <p class="as-eyebrow">@eyebrow</p> }
+            <h1>@Page.Text(T, "headline", "site.default.headline")</h1>
+            <p>@Page.Text(T, "intro", "site.default.intro")</p>
+            <div class="site-hero__actions">
+                @if (Page.Site.PortalShown)
+                {
+                    <a class="site-button" href="/customer/sign-up">@T["site.hero.create_account"] <span aria-hidden="true">↗</span></a>
+                    <a class="site-button site-button--outline" href="#track">@T["site.hero.track"]</a>
+                }
+                else
+                {
+                    <a class="site-button" href="#track">@T["site.hero.track"]</a>
+                }
+            </div>
+            @if (Chips.Count > 0)
+            {
+                <ul class="as-chips" aria-label="@T["site.hero.promises"]">
+                    @foreach (string chip in Chips) { <li>@chip</li> }
+                </ul>
+            }
+        </div>
+    </section>
+    <div class="site-tracking-band as-tracking"><SiteTrackForm Page="@Page" /></div>
+    <SiteKeyFigures Page="@Page" />
+    <SiteSteps Page="@Page" />
+    <SiteStoryPanels Page="@Page" />
+    @if (Others.Count > 0)
+    {
+        <section class="site-section" aria-labelledby="more-title">
+            <h2 id="more-title">@T[HasStories ? "site.services.more" : "site.services.title"]</h2>
+            <ul class="site-cards">
+                @foreach (string code in Others)
+                {
+                    <li class="site-card site-service"><SiteServiceIcon Code="@(code)" /><h3>@T["site.service." + code + ".title"]</h3><p>@Page.Text(T, "service." + code, "site.service." + code + ".text")</p></li>
+                }
+            </ul>
+        </section>
+    }
+    <SiteRates Page="@Page" />
+    <SiteTestimonials Page="@Page" />
+    <SiteWhyUs Page="@Page" />
+    <SiteLocations Page="@Page" />
+    <SiteFaq Page="@Page" />
+    <SiteClosing Page="@Page" />
+</SiteShell>
+
+@code {
+    private OperationsBrandSettings Settings => Page.Site.Settings;
+
+    private IReadOnlyList<string> Chips => OperationsSiteHome.Texts(Page, "chip.", OperationsSiteTextKeys.Chips);
+
+    private bool HasStories => OperationsSiteHome.Services(Page).Any(code => code is "air" or "ocean");
+
+    private IReadOnlyList<string> Others => OperationsSiteHome.Services(Page).Where(code => code is not ("air" or "ocean")).ToList();
+
+    [Parameter, EditorRequired]
+    public OperationsSitePage Page { get; set; } = null!;
+}

@@ -265,7 +265,7 @@ public sealed class PlatformUserAdministrationTests
 
     private ConfirmSecondFactorUseCase Confirm()
     {
-        return new ConfirmSecondFactorUseCase(new PlatformStepUpSteps(_store, _store, Audit(), _store, _clock), _crypto, _crypto);
+        return new ConfirmSecondFactorUseCase(new PlatformStepUpSteps(_store, _store, Audit(), _store, _clock, new FakeSecuritySettings()), _crypto, _crypto, _crypto);
     }
 
     private GetMyPlatformAccessUseCase Access()

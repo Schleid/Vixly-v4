@@ -1,0 +1,119 @@
+﻿@*
+=========================================================
+FILE: TenantChangeView.razor
+
+PURPOSE:
+One company change request: the details before and asked for, the proof, and the decision (B12).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the presenter
+- Text comes from PlatformText (UI-10); Frontend/UI restyles it
+- Approve applies the new details; a rejection note is emailed to the tenant owner
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantChangePresenter>
+@using Vixly.Platform.Application.Queries
+@using Vixly.Platform.Domain.Tenants
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+@if (Presenter.State.DoneKey is { } done)
+{
+    <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+}
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+@if (!Presenter.State.Loaded)
+{
+    <p role="status">@T["ui.common.loading"]</p>
+}
+else if (Presenter.State.Change is { } change)
+{
+    <h1>@T["ui.tenant_changes.request"] · @change.TenantName</h1>
+    <p><a href="/tenants/@change.PlatformTenantId">@change.TenantName</a> · <a href="/tenants/changes">@T["ui.tenant_changes.title"]</a></p>
+    <div id="tenant-change"><VxCard Title="@T["ui.tenant_changes.request"]">
+        <dl class="vx-facts">
+            <dt>@T["ui.tenant_changes.status"]</dt>
+            <dd><VxStatusBadge Status="@TenantChangeDisplay.Badge(change.Status)" Text="@T[TenantChangeDisplay.StatusKey(change.Status)]" /></dd>
+            <dt>@T["ui.tenant_changes.submitted"]</dt>
+            <dd>@PlatformDisplay.Utc(T, change.SubmittedUtc) <span class="vx-hint">@change.SubmittedByName</span></dd>
+            <dt>@T["ui.tenant_changes.reason"]</dt>
+            <dd class="vx-pre">@change.Reason</dd>
+            <dt>@T["ui.tenant_changes.proof"]</dt>
+            <dd><a href="/tenants/changes/@change.RequestId/proof" target="_blank" rel="noopener">@change.ProofFileName</a> <span class="vx-hint">@(change.ProofSizeBytes / 1024) KB</span></dd>
+            @if (change.DecidedUtc is { } decided)
+            {
+                <dt>@T["ui.tenant_changes.decided"]</dt>
+                <dd>@PlatformDisplay.Utc(T, decided) <span class="vx-hint">@change.DecidedByName</span></dd>
+            }
+            @if (change.DecisionNote is { } note)
+            {
+                <dt>@T["ui.tenant_changes.note"]</dt>
+                <dd class="vx-pre">@note</dd>
+            }
+        </dl>
+    </VxCard></div>
+    <div id="tenant-change-before"><VxCard Title="@T["ui.tenant_changes.from"]">
+        <TenantCompanyFacts Company="change.Previous" />
+    </VxCard></div>
+    <div id="tenant-change-after"><VxCard Title="@T["ui.tenant_changes.to"]">
+        <TenantCompanyFacts Company="change.Proposed" />
+    </VxCard></div>
+
+    @if (Presenter.State.CanDecide)
+    {
+        <div id="tenant-change-decide"><VxCard Title="@T["ui.tenant_changes.decide"]">
+            <p class="vx-hint">@T["ui.tenant_changes.decide_help"]</p>
+            <form class="vx-form" @onsubmit="ApproveAsync">
+                <label for="change-approve-note">@T["ui.tenant_changes.note_optional"]</label>
+                <textarea id="change-approve-note" @bind="_approveNote" maxlength="@PlatformTenantChangeLimits.NoteMaxLength" rows="2"></textarea>
+                <div class="vx-actions">
+                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.tenant_changes.approve"]</VxButton>
+                </div>
+            </form>
+            <form class="vx-form" @onsubmit="RejectAsync">
+                <label for="change-reject-note">@T["ui.tenant_changes.reject_note"]</label>
+                <textarea id="change-reject-note" @bind="_rejectNote" maxlength="@PlatformTenantChangeLimits.NoteMaxLength" rows="2" required></textarea>
+                <div class="vx-actions">
+                    <VxButton Variant="VxButtonVariant.Danger" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.tenant_changes.reject"]</VxButton>
+                </div>
+            </form>
+        </VxCard></div>
+    }
+    @if (Presenter.State.StepUpPending)
+    {
+        <StepUpDialog OnConfirmed="Presenter.ConfirmStepUpAsync" OnCancelled="Presenter.CancelStepUp" />
+    }
+}
+
+@code {
+    private string? _approveNote;
+
+    private string? _rejectNote;
+
+    private Guid _loaded;
+
+    [Parameter, EditorRequired]
+    public Guid RequestId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_loaded != RequestId)
+        {
+            _loaded = RequestId;
+            await Presenter.LoadAsync(RequestId);
+        }
+    }
+
+    private Task ApproveAsync()
+    {
+        return Presenter.ApproveAsync(RequestId, _approveNote);
+    }
+
+    private Task RejectAsync()
+    {
+        return Presenter.RejectAsync(RequestId, _rejectNote);
+    }
+}

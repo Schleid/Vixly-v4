@@ -1,0 +1,90 @@
+﻿@*
+=========================================================
+FILE: PayMethodPage.razor
+
+PURPOSE:
+Pay an invoice on the portal by Zelle or bank transfer (owner, 2026-10-27).
+
+RESPONSIBILITIES:
+- Zelle: the QR picture, tag, email or phone and name, and the company's terms to accept
+- Bank transfer: the company's instructions
+- The amount and the invoice number to write in the memo or reference; the customer then gives the reference
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- The whole amount left; the invoice waits for the company to confirm the money (P-9, C-6)
+=========================================================
+*@
+@using System.Globalization
+@using Vixly.Contracts.Operations.Billing
+@using Vixly.Contracts.Operations.Customers
+@using Vixly.Customer.Web.Portal
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.pay.method." + Method]" SignedIn="true" Error="@Error" ReturnHere="/customer/invoices">
+    @if (Pay is { } pay)
+    {
+        <section class="customer-portal__panel customer-pay" data-pay-method="@Method">
+            <h2>@pay.InvoiceNumber · @pay.Amount.ToString("N2", CultureInfo.CurrentCulture) @pay.CurrencyCode</h2>
+            <div class="customer-pay__how">
+                @if (Method == CustomerPayMethods.Zelle)
+                {
+                    @if (pay.HasQr)
+                    {
+                        <img class="customer-pay__qr" src="/customer/invoices/zelle-qr" alt="@T["ui.pay.zelle_qr"]" width="180" height="180" />
+                    }
+                    <dl class="customer-pay__payee">
+                        @if (!string.IsNullOrWhiteSpace(pay.Tag)) { <dt>@T["ui.pay.zelle_tag"]</dt><dd>@pay.Tag</dd> }
+                        @if (!string.IsNullOrWhiteSpace(pay.Contact)) { <dt>@T["ui.pay.zelle_contact"]</dt><dd>@pay.Contact</dd> }
+                        @if (!string.IsNullOrWhiteSpace(pay.Name)) { <dt>@T["ui.pay.zelle_name"]</dt><dd>@pay.Name</dd> }
+                        <dt>@T["ui.pay.amount"]</dt><dd>@pay.Amount.ToString("N2", CultureInfo.CurrentCulture) @pay.CurrencyCode</dd>
+                        <dt>@T["ui.pay.memo"]</dt><dd><strong>@pay.Memo</strong></dd>
+                    </dl>
+                }
+                else
+                {
+                    <div class="customer-pay__instructions">@pay.Text</div>
+                    <dl class="customer-pay__payee">
+                        <dt>@T["ui.pay.amount"]</dt><dd>@pay.Amount.ToString("N2", CultureInfo.CurrentCulture) @pay.CurrencyCode</dd>
+                        <dt>@T["ui.pay.memo"]</dt><dd><strong>@pay.Memo</strong></dd>
+                    </dl>
+                }
+            </div>
+            <p class="customer-portal__hint">@T["ui.pay.memo_hint"]</p>
+            <form method="post" action="/customer/invoices/@InvoiceId/pay/@Method" class="customer-pay__form">
+                <AntiforgeryToken />
+                <input type="hidden" name="key" value="@Key" />
+                @if (Method == CustomerPayMethods.Zelle)
+                {
+                    <div class="customer-pay__terms">@pay.Text</div>
+                    <label class="customer-pay__accept"><input type="checkbox" name="terms" value="true" required /> @T["ui.pay.accept_terms"]</label>
+                }
+                <label>@T["ui.pay.reference." + Method] <input name="reference" maxlength="60" required autocomplete="off" value="@Reference" /></label>
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.pay.sent"]</button>
+            </form>
+            <p class="customer-portal__hint">@T["ui.pay.wait_hint"]</p>
+            <p><a href="/customer/invoices">@T["ui.pay.back"]</a></p>
+        </section>
+    }
+    else
+    {
+        <p><a href="/customer/invoices">@T["ui.pay.back"]</a></p>
+    }
+</CustomerShell>
+
+@code {
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public Guid InvoiceId { get; set; }
+
+    [Parameter] public string Method { get; set; } = CustomerPayMethods.Zelle;
+
+    [Parameter] public CustomerPayDto? Pay { get; set; }
+
+    // Kept when the page comes back with an error, so a second send records nothing more.
+    [Parameter] public string Key { get; set; } = Guid.NewGuid().ToString("N");
+
+    [Parameter] public string? Reference { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+}

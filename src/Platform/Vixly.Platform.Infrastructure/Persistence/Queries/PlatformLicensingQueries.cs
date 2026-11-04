@@ -120,6 +120,12 @@ internal sealed class PlatformLicensingQueries : IPlatformLicensingQueries
         return new PlatformDeviceItem(
             device.Id, device.PlatformTenantId, tenantName, device.Number, device.Name, device.Kind, device.Proof, device.Status, device.SeatHeld, device.Reason,
             device.RequestedByName, device.CreatedUtc, device.ApprovedUtc, device.ReleaseRequestedUtc, device.EndedUtc, device.LastSeenUtc,
-            device.Status == PlatformDeviceStatus.Active && (device.LastSeenUtc ?? device.ApprovedUtc ?? device.CreatedUtc) < utcNow - IdleAfter);
+            device.Status == PlatformDeviceStatus.Active && (device.LastSeenUtc ?? device.ApprovedUtc ?? device.CreatedUtc) < utcNow - IdleAfter)
+        {
+            RegisteredIp = device.RegisteredIp,
+            RegisteredUserAgent = device.RegisteredUserAgent,
+            RegisteredCountry = device.RegisteredCountry,
+            ApprovedByName = device.ApprovedByName
+        };
     }
 }

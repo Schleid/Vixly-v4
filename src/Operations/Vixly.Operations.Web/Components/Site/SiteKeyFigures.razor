@@ -1,0 +1,74 @@
+@*
+=========================================================
+FILE: SiteKeyFigures.razor
+
+PURPOSE:
+The key figures strip under the hero (landing page marketing, owner 2026-10-30).
+
+RESPONSIBILITIES:
+- Packages delivered from the company's records, delivery times per service, pickup points, and one figure of the company's own
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText and the tenant texts
+- Real data only: a figure without a value is not shown, and the strip disappears when empty
+- Tenant surface: never says "Vixly"
+=========================================================
+*@
+@using System.Globalization
+@inject IStringLocalizer<OperationsText> T
+
+@if (Items.Count > 0)
+{
+    <section class="as-figures" aria-label="@T["site.figures.title"]">
+        <dl>
+            @foreach ((string value, string label, string? note) in Items)
+            {
+                <div class="as-figure">
+                    <dt>@label</dt>
+                    <dd>@value</dd>
+                    @if (note is not null) { <dd class="as-figure__note">@note</dd> }
+                </div>
+            }
+        </dl>
+    </section>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public OperationsSitePage Page { get; set; } = null!;
+
+    private List<(string Value, string Label, string? Note)> Items
+    {
+        get
+        {
+            List<(string, string, string?)> items = new();
+
+            if (Page.Site.DeliveredPackages is { } delivered)
+            {
+                items.Add((delivered.ToString("N0", CultureInfo.CurrentCulture) + "+", T["site.figures.delivered"], Page.Site.Text("figure.since")));
+            }
+
+            foreach (string service in OperationsSiteTextKeys.StoryServices.Where(OperationsSiteHome.Services(Page).Contains))
+            {
+                if (Page.Site.Text("time." + service) is { Length: > 0 } time)
+                {
+                    items.Add((time, T["site.figures.time." + service], null));
+                }
+            }
+
+            int pickup = OperationsSiteHome.PickupPoints(Page).Count;
+
+            if (pickup > 0)
+            {
+                items.Add((pickup.ToString(CultureInfo.CurrentCulture), T[pickup == 1 ? "site.figures.pickup_point" : "site.figures.pickup_points"], null));
+            }
+
+            if (Page.Site.Text("figure.value") is { Length: > 0 } own && Page.Site.Text("figure.label") is { Length: > 0 } ownLabel)
+            {
+                items.Add((own, ownLabel, null));
+            }
+
+            return items;
+        }
+    }
+}

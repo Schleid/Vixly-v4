@@ -1,0 +1,118 @@
+@*
+=========================================================
+FILE: OnHandPage.razor
+
+PURPOSE:
+The packages physically on hand in the viewer's warehouses, oldest first, with their totals (owner, 2026-10-22: parcel inventory).
+
+RESPONSIBILITIES:
+- Filter by warehouse, shelf or zone, without a shelf, on hold, days on hand, a search
+- Show shelf, customer, shipment, status, days on hand and weight; total the pieces and the weight
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); the use case limits the list to covered warehouses
+=========================================================
+*@
+@using Vixly.Operations.Application.UseCases.Receiving.ListOperationsOnHandParcels
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.onhand.title"]" Company="@Company" Section="inventory" Error="@Error">
+    <InventoryTabs Current="on_hand" />
+    <p class="ops-editor__hint">@T["ui.onhand.intro"]</p>
+    <form method="get" action="/staff/parcels/on-hand" class="ops-list-bar ops-onhand__filters">
+        <div class="ops-list-bar__search">
+            <input name="search" value="@Filter.Search" placeholder="@T["ui.parcels.search"]" aria-label="@T["ui.parcels.search"]" maxlength="60" autocomplete="off" />
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.onhand.filter"]</button>
+        </div>
+        <div class="ops-list-bar__filters" style="display: inline-flex; align-items: center; gap: 0.75rem 1rem; flex-wrap: wrap;">
+            @if (Result.Warehouses.Count > 1)
+            {
+                <select name="warehouse" aria-label="@T["ui.receiving.warehouse"]">
+                    <option value="">@T["ui.parcels.all_warehouses"]</option>
+                    @foreach (OperationsWarehouse warehouse in Result.Warehouses)
+                    {
+                        <option value="@warehouse.Id" selected="@(warehouse.Id == Filter.WarehouseId)">@warehouse.Code</option>
+                    }
+                </select>
+            }
+            @if (Result.Locations.Count > 0)
+            {
+                <select name="location" aria-label="@T["ui.onhand.shelf"]">
+                    <option value="">@T["ui.onhand.any_shelf"]</option>
+                    @foreach (OperationsStorageLocation location in Result.Locations)
+                    {
+                        <option value="@location.Id" selected="@(location.Id == Filter.LocationId)">@location.Code</option>
+                    }
+                </select>
+            }
+            <select name="zone" aria-label="@T["ui.storage.zone"]">
+                <option value="">@T["ui.onhand.any_zone"]</option>
+                @foreach (OperationsStorageZone zone in Enum.GetValues<OperationsStorageZone>())
+                {
+                    <option value="@zone.ToString().ToLowerInvariant()" selected="@(zone == Filter.Zone)">@T["ui.storage.zone." + zone.ToString().ToLowerInvariant()]</option>
+                }
+            </select>
+            <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.45rem; height: 32px; min-height: 32px; white-space: nowrap; cursor: pointer;">
+                <input type="checkbox" name="unshelved" value="true" checked="@Filter.Unshelved" />
+                <span>@T["ui.onhand.unshelved"]</span>
+            </label>
+            <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.45rem; height: 32px; min-height: 32px; white-space: nowrap; cursor: pointer;">
+                <input type="checkbox" name="held" value="true" checked="@Filter.Held" />
+                <span>@T["ui.onhand.held"]</span>
+            </label>
+            <label class="ops-onhand__days-label" style="display: inline-flex; align-items: center; gap: 0.45rem; height: 32px; min-height: 32px; white-space: nowrap;">
+                <span>@T["ui.onhand.days"]</span>
+                <input type="number" name="days" min="1" max="3650" value="@Filter.MinDays" inputmode="numeric" style="width: 4.5rem; min-width: 4.5rem; max-width: 4.5rem; text-align: center; height: 32px; flex: 0 0 4.5rem;" />
+            </label>
+        </div>
+    </form>
+    <section class="ops-editor__panel">
+        <p class="ops-editor__list-footer" data-totals="true">@VixlyText.Format(T, "ui.onhand.totals", new Dictionary<string, object>(StringComparer.Ordinal) { ["count"] = Result.TotalCount, ["weight"] = Weight(Result.TotalWeightKg) })</p>
+        @if (Result.Parcels.Count == 0)
+        {
+            <div class="ops-editor__empty"><h2>@T["ui.onhand.none"]</h2></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.onhand.title"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.parcels.number"]</th><th scope="col">@T["ui.onhand.shelf"]</th><th scope="col">@T["ui.customers.code"]</th><th scope="col">@T["ui.onhand.shipment"]</th><th scope="col">@T["ui.parcels.milestone"]</th><th scope="col">@T["ui.onhand.days_on_hand"]</th><th scope="col">@T["ui.parcels.weight"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsParcelSummary parcel in Result.Parcels)
+                        {
+                            <tr data-unshelved="@(parcel.StorageLocationCode is null ? "true" : null)">
+                                <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/parcels/@parcel.ParcelId">@parcel.Number</a></td>
+                                <td class="ops-editor__code">@parcel.WarehouseCode <small>@(parcel.StorageLocationCode ?? T["ui.onhand.no_shelf"].Value)</small></td>
+                                <td class="ops-editor__code">@(parcel.CustomerCode ?? T["ui.hold.Unidentified"]) @if (parcel.CustomerName is { } name) { <small>@name</small> }</td>
+                                <td class="ops-editor__code">@parcel.ShipmentNumber</td>
+                                <td>@(parcel.Milestone is { } milestone ? T["ui.milestone." + milestone].Value : null) @if (parcel.HoldReasons != OperationsHoldReasons.None) { <small>@T["ui.onhand.held"]</small> }</td>
+                                <td>@Math.Max(0, (int)(Result.UtcNow - parcel.ReceivedUtc).TotalDays)</td>
+                                <td>@(parcel.WeightKg is { } kg ? Weight(kg) : null)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+        <nav class="ops-list-pager" aria-label="@T["ui.customers.pages"]">
+            @if (Filter.Page > 1) { <a href="@Filter.Link(Filter.Page - 1)" class="vx-button vx-button--secondary">@T["ui.customers.previous"]</a> }
+            <span>@Filter.Page</span>
+            @if (Filter.Page * PageSize < Result.TotalCount) { <a href="@Filter.Link(Filter.Page + 1)" class="vx-button vx-button--secondary">@T["ui.customers.next"]</a> }
+        </nav>
+    </section>
+</EditorShell>
+
+@code {
+    public const int PageSize = 50;
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OnHandFilter Filter { get; set; } = null!;
+
+    [Parameter, EditorRequired] public ListOperationsOnHandParcelsResponse Result { get; set; } = null!;
+
+    [Parameter] public string? Error { get; set; }
+
+    private string Weight(decimal kg) =>
+        OperationsUnits.ToShownWeight(kg, Result.WeightUnit).ToString("0.###", System.Globalization.CultureInfo.CurrentCulture) + " " + (Result.WeightUnit == OperationsWeightUnit.Pound ? "lb" : "kg");
+}

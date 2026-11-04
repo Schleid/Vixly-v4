@@ -1,0 +1,37 @@
+﻿@*
+=========================================================
+FILE: AccessLimitedPage.razor
+
+PURPOSE:
+The page shown when a change is refused because the company is read-only.
+
+RESPONSIBILITIES:
+- Render the page shown when a change is refused because the company is read-only
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<AuthShell Title="@T["ui.access.limited.title"]" Subtitle="@T["ui.access." + Reason]" Company="@Company" SignedIn="true" ReturnHere="/staff/limited">
+    @if (Reason == "payment_required")
+    {
+        <p>@T["ui.access.payment_who"]</p>
+    }
+    @if (Reason == "legal")
+    {
+        <p><a class="vx-button vx-button--primary" href="/staff/legal">@T["ui.access.legal_link"]</a></p>
+    }
+    <p><a href="/staff">@T["ui.access.back"]</a></p>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string? Company { get; set; }
+
+    [Parameter]
+    public string Reason { get; set; } = "read_only";
+}

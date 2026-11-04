@@ -1,0 +1,677 @@
+{
+  "checked": "2026-10-25",
+  "checks": [
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/what-vixly-does",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/choose-a-plan",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/licences-and-devices",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/sign-up-overview",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/company-details",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/confirm-your-email",
+      "images": 2,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/choose-your-plan-at-sign-up",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/pay-to-start",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/after-sign-up",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/sign-up-by-invitation",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/sign-up-questions",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/pay-an-invoice-link",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/save-a-card",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/pay-by-zelle",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/terms-and-privacy",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 1280,
+      "link": "/en/help/contact-sales",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/what-vixly-does",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/choose-a-plan",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/licences-and-devices",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/sign-up-overview",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/company-details",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/confirm-your-email",
+      "images": 2,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/choose-your-plan-at-sign-up",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/pay-to-start",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/after-sign-up",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/sign-up-by-invitation",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/sign-up-questions",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/pay-an-invoice-link",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/save-a-card",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/pay-by-zelle",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/terms-and-privacy",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "en",
+      "width": 375,
+      "link": "/en/help/contact-sales",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/what-vixly-does",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/choose-a-plan",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/licences-and-devices",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/sign-up-overview",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/company-details",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/confirm-your-email",
+      "images": 2,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/choose-your-plan-at-sign-up",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/pay-to-start",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/after-sign-up",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/sign-up-by-invitation",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/sign-up-questions",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/pay-an-invoice-link",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/save-a-card",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/pay-by-zelle",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/terms-and-privacy",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 1280,
+      "link": "/fr/help/contact-sales",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/what-vixly-does",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/choose-a-plan",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/licences-and-devices",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/sign-up-overview",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/company-details",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/confirm-your-email",
+      "images": 2,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/choose-your-plan-at-sign-up",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/pay-to-start",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/after-sign-up",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/sign-up-by-invitation",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/sign-up-questions",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/pay-an-invoice-link",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/save-a-card",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/pay-by-zelle",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/terms-and-privacy",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "fr",
+      "width": 375,
+      "link": "/fr/help/contact-sales",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/what-vixly-does",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/choose-a-plan",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/licences-and-devices",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/sign-up-overview",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/company-details",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/confirm-your-email",
+      "images": 2,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/choose-your-plan-at-sign-up",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/pay-to-start",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/after-sign-up",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/sign-up-by-invitation",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/sign-up-questions",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/pay-an-invoice-link",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/save-a-card",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/pay-by-zelle",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/terms-and-privacy",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 1280,
+      "link": "/es/help/contact-sales",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/what-vixly-does",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/choose-a-plan",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/licences-and-devices",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/sign-up-overview",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/company-details",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/confirm-your-email",
+      "images": 2,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/choose-your-plan-at-sign-up",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/pay-to-start",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/after-sign-up",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/sign-up-by-invitation",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/sign-up-questions",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/pay-an-invoice-link",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/save-a-card",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/pay-by-zelle",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/terms-and-privacy",
+      "images": 1,
+      "passed": true
+    },
+    {
+      "language": "es",
+      "width": 375,
+      "link": "/es/help/contact-sales",
+      "images": 1,
+      "passed": true
+    }
+  ]
+}

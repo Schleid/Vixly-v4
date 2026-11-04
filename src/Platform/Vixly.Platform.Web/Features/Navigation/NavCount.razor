@@ -1,0 +1,54 @@
+﻿@*
+=========================================================
+FILE: NavCount.razor
+
+PURPOSE:
+The number of things waiting on a page, beside its menu entry (owner, 2026-11-04).
+
+RESPONSIBILITIES:
+- Show the count when it is above zero; refresh it when the person moves to another page
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the presenter
+- Text comes from PlatformText (UI-10); placeholder look until the Frontend/UI team designs it
+=========================================================
+*@
+@inherits PlatformPresenterComponent<NavCountPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject NavigationManager Navigation
+
+@if (Presenter.State.Count is > 0 and var count)
+{
+    <span class="vx-badge vx-badge--primary vx-nav-count"><span aria-hidden="true">@count</span><span class="vx-visually-hidden">@VixlyText.Format(T, "ui.nav.waiting", "count", count)</span></span>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public Vixly.Platform.Application.Queries.PlatformAttention Attention { get; set; }
+
+    private bool _listening;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!_listening)
+        {
+            Navigation.LocationChanged += Moved;
+            _listening = true;
+        }
+
+        await Presenter.LoadAsync(Attention);
+    }
+
+    private void Moved(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs args) =>
+        _ = InvokeAsync(() => Presenter.LoadAsync(Attention));
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            Navigation.LocationChanged -= Moved;
+        }
+
+        base.Dispose(disposing);
+    }
+}

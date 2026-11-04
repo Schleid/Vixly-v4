@@ -1,0 +1,75 @@
+﻿@*
+=========================================================
+FILE: InsuranceChoice.razor
+
+PURPOSE:
+The customer's insurance choice at the counter: no insurance, or one of the company's products with its price and what it covers (Slice 5D).
+
+RESPONSIBILITIES:
+- No insurance, then each product in the company's order: name, price rule, the premium for this shipment when its parcels are known
+- The company's pitch, else the generated words; what it covers on request
+- The customer's acceptance of the chosen product's terms, recorded by the clerk
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The server checks the product fits the service's mode and that the terms were accepted
+=========================================================
+*@
+@using Vixly.Operations.Domain.Charges
+@using Vixly.Operations.Web.Components.Charges
+@inject IStringLocalizer<OperationsText> T
+
+<fieldset class="ops-counter__insurance">
+    <legend>@T[Legend]</legend>
+    <label class="ops-counter__product-none"><input type="radio" name="insurance" value="" checked="@(Selected is null)" /> @T["ui.counter.insurance_none"]
+        @if (Premiums is not null && BaseTotal is { } baseTotal) { <span class="ops-counter__premium">@VixlyText.Format(T, "ui.counter.insurance_total", "total", OperationsChargeWords.Money(baseTotal, Currency))</span> }
+    </label>
+    @foreach (OperationsInsurancePlan product in Products)
+    {
+        if (product.VersionAt(UtcNow) is not { } terms) { continue; }
+        string? pitch = OperationsInsuranceWords.Pitch(product);
+        <div class="ops-counter__product" data-mode="@product.Mode">
+            <label>
+                <input type="radio" name="insurance" value="@product.Id" checked="@(Selected == product.Id)" />
+                <strong>@product.Name</strong>@(Modes > 1 ? " · " + T["ui.charges.mode." + product.Mode].Value : null)
+                · <span>@OperationsInsuranceWords.Rule(T, terms, Currency)</span>
+                @if (Premiums is not null)
+                {
+                    <span class="ops-counter__premium">
+                        @(Premiums.TryGetValue(product.Id, out decimal? premium) && premium is { } amount
+                            ? VixlyText.Format(T, "ui.counter.insurance_premium", new Dictionary<string, object> { ["premium"] = OperationsChargeWords.Money(amount, Currency), ["total"] = OperationsChargeWords.Money((BaseTotal ?? 0m) + amount, Currency) })
+                            : T["ui.counter.insurance_not_possible"].Value)
+                    </span>
+                }
+            </label>
+            @if (pitch is not null) { <p class="ops-counter__pitch">@pitch</p> }
+            <details>
+                <summary>@T["ui.counter.insurance_covers"]</summary>
+                <ul>
+                    @foreach (string line in OperationsInsuranceWords.Covers(T, terms, Currency)) { <li>@line</li> }
+                </ul>
+            </details>
+        </div>
+    }
+    <label class="ops-counter__accepted"><input type="checkbox" name="insuranceAccepted" value="true" /> @T["ui.counter.insurance_accepted"]</label>
+</fieldset>
+
+@code {
+    [Parameter] public IReadOnlyList<OperationsInsurancePlan> Products { get; set; } = Array.Empty<OperationsInsurancePlan>();
+
+    [Parameter] public Guid? Selected { get; set; }
+
+    // The legend's text key: "Insurance" on a new shipment, "Change the insurance" on an existing one.
+    [Parameter] public string Legend { get; set; } = "ui.counter.insurance";
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+
+    [Parameter] public DateTimeOffset UtcNow { get; set; }
+
+    // On a shipment with parcels: each product's premium for them (null: this value cannot be insured with it), and the total without insurance.
+    [Parameter] public IReadOnlyDictionary<Guid, decimal?>? Premiums { get; set; }
+
+    [Parameter] public decimal? BaseTotal { get; set; }
+
+    private int Modes => Products.Select(product => product.Mode).Distinct().Count();
+}

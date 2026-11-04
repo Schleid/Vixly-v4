@@ -1,0 +1,30 @@
+﻿@* =========================================================
+FILE: InspectionSketch.razor
+
+PURPOSE:
+Illustrate a parcel, scale and inspection scanner.
+
+RESPONSIBILITIES:
+- Render decorative code-native inspection artwork
+
+IMPORTANT NOTES:
+- No real barcode, measurements or live device state
+========================================================= *@
+<svg class="ops-inspection-sketch" viewBox="0 0 340 220" fill="none" aria-hidden="true">
+    <ellipse cx="172" cy="181" rx="137" ry="20" class="ops-inspection-sketch__ground" />
+    <path d="M25 163h288M43 45h34m-17-17v34M289 56h17m-8-8v17" class="ops-inspection-sketch__detail" />
+    <path d="m90 142 89-24 78 36-85 30z" class="ops-inspection-sketch__platform" />
+    <path d="m90 142 82 31 85-19v15l-85 24-82-33z" class="ops-inspection-sketch__base" />
+    <path d="m110 72 65-25 64 29-65 26z" class="ops-inspection-sketch__top" />
+    <path d="m110 72 64 30v63l-64-30z" class="ops-inspection-sketch__box" />
+    <path d="m174 102 65-26v64l-65 25z" class="ops-inspection-sketch__side" />
+    <path d="m143 59 64 30v23l-13 5V95l-65-30" class="ops-inspection-sketch__tape" />
+    <path d="m122 103 27 12v24l-27-12z" class="ops-inspection-sketch__label" />
+    <path d="m128 113 14 6m-14 1 10 5M187 151l20-8" class="ops-inspection-sketch__detail" />
+    <path d="m241 47 15-9 30 19-10 14-28-13zM254 62l-15 34 12 6 20-35" class="ops-inspection-sketch__scanner" />
+    <path d="m246 54 23 13M242 97l8 4" class="ops-inspection-sketch__detail" />
+    <path d="m245 60-36 43m39-39-32 44" class="ops-inspection-sketch__beam" />
+    <rect x="49" y="119" width="43" height="34" rx="7" class="ops-inspection-sketch__screen" />
+    <path d="M60 130h20m-20 7h12" class="ops-inspection-sketch__detail" />
+    <path d="M69 154v13m-10 0h20" class="ops-inspection-sketch__detail" />
+</svg>

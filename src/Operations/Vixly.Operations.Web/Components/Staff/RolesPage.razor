@@ -1,0 +1,98 @@
+@*
+=========================================================
+FILE: RolesPage.razor
+
+PURPOSE:
+The roles of the tenant.
+
+RESPONSIBILITIES:
+- Render the roles of the tenant
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019); sensitive actions ask for step-up first
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inherits OperationsAllowedComponent
+@using Vixly.Operations.Domain.Access
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.roles.title"]" Company="@Company" Section="roles" Error="@Error" Info="@Info">
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
+        <h1 style="font-size: 1.25rem; font-weight: 700; margin: 0;">@T["ui.roles.title"]</h1>
+        @if (Can(OperationsPermissions.RolesCreate))
+        {
+            <a class="vx-button vx-button--primary" href="/staff/roles/new">@T["ui.roles.add"]</a>
+        }
+    </div>
+    <section class="ops-editor__panel">
+        <OperationsTableViewport Label="@T["ui.roles.title"]">
+            <table class="ops-editor__table">
+                <thead>
+                    <tr>
+                        <th scope="col">@T["ui.roles.name"]</th>
+                        <th scope="col"><span class="vx-visually-hidden">@VixlyText.Format(T, "ui.roles.permission_count", "count", 0)</span></th>
+                        <th scope="col">@T["ui.staff.title"]</th>
+                        <th scope="col">@T["ui.editor.status"]</th>
+                        <th scope="col" style="text-align: right;"><span class="vx-visually-hidden">@T["ui.roles.edit"]</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (OperationsRoleSummary role in Roles)
+                    {
+                        <tr>
+                            <td>
+                                @if (role.IsAdministrator)
+                                {
+                                    <strong>@T["ui.roles.administrator"]</strong>
+                                    <span class="ops-editor__hint" style="display: block;">@T["ui.roles.administrator_hint"]</span>
+                                }
+                                else
+                                {
+                                    <a href="/staff/roles/@role.RoleId"><strong>@role.Name</strong></a>
+                                }
+                            </td>
+                            <td>
+                                @if (!role.IsAdministrator)
+                                {
+                                    <span class="ops-badge">@VixlyText.Format(T, "ui.roles.permission_count", "count", role.Permissions.Count)</span>
+                                }
+                                else
+                                {
+                                    <span>—</span>
+                                }
+                            </td>
+                            <td>@VixlyText.Format(T, "ui.roles.holders", "count", role.Holders)</td>
+                            <td>
+                                <span class="ops-editor__status" data-status="@(role.IsActive ? "active" : "inactive")">
+                                    @(role.IsActive ? T["ui.editor.status.active"].Value : T["ui.roles.inactive"].Value)
+                                </span>
+                            </td>
+                            <td style="text-align: right; white-space: nowrap;">
+                                @if (!role.IsAdministrator && Can(OperationsPermissions.RolesEdit))
+                                {
+                                    <form method="post" action="/staff/roles/@role.RoleId/active" style="display: inline; margin: 0;">
+                                        <AntiforgeryToken />
+                                        <input type="hidden" name="active" value="@(role.IsActive ? "false" : "true")" />
+                                        <button type="submit" class="vx-button vx-button--secondary">@T[role.IsActive ? "ui.roles.deactivate" : "ui.roles.reactivate"]</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsRoleSummary> Roles { get; set; } = Array.Empty<OperationsRoleSummary>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

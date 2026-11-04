@@ -66,4 +66,42 @@ public sealed class SmtpPlatformSubscriptionMailer : IPlatformSubscriptionMailer
                     })),
             cancellationToken);
     }
+
+    public Task SendRenewalReminderAsync(
+        PlatformTenant tenant,
+        PlatformTenantContact recipient,
+        string planName,
+        DateTimeOffset renewsUtc,
+        string cardBrand,
+        string cardLast4,
+        string? statementWording,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(tenant);
+        ArgumentNullException.ThrowIfNull(recipient);
+
+        CultureInfo culture = CultureInfo.GetCultureInfo(tenant.DefaultLanguage.Value);
+
+        return _sender.SendAsync(
+            recipient.Email.Value,
+            recipient.Name,
+            tenant.DefaultLanguage,
+            text => (
+                VixlyText.Format(text, "email.renewal_reminder.subject", "plan", planName),
+                VixlyText.Format(
+                    text,
+                    "email.renewal_reminder.body",
+                    new Dictionary<string, object>(StringComparer.Ordinal)
+                    {
+                        ["name"] = recipient.Name,
+                        ["company"] = tenant.Company.DisplayName,
+                        ["plan"] = planName,
+                        ["date"] = renewsUtc.UtcDateTime.ToString("D", culture),
+                        ["brand"] = cardBrand,
+                        ["last4"] = cardLast4,
+                        ["support"] = _sender.SupportAddress
+                    })
+                    + (statementWording is null ? string.Empty : "\n\n" + VixlyText.Format(text, "email.renewal_reminder.statement", "wording", statementWording))),
+            cancellationToken);
+    }
 }

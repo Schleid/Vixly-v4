@@ -1,0 +1,26 @@
+﻿@*
+=========================================================
+FILE: SiteLocationsPage.razor
+
+PURPOSE:
+All locations of the tenant, by country.
+
+RESPONSIBILITIES:
+- Render all locations of the tenant, by country
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText and the tenant texts; values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); every value is HTML-encoded by Razor
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<SiteShell Page="@Page" Title="@(T["site.locations.title"] + " | " + Page.Company)" Description="@Page.Text(T, "meta_description", "site.default.meta_description")">
+    <SiteLocations Page="@Page" />
+</SiteShell>
+
+@code {
+    [Parameter, EditorRequired]
+    public OperationsSitePage Page { get; set; } = null!;
+}

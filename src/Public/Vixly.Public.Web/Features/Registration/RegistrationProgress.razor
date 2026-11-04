@@ -1,0 +1,67 @@
+﻿@*
+=========================================================
+FILE: RegistrationProgress.razor
+
+PURPOSE:
+Where the registrant is: finished, paying, or waiting for the workspace (Slices 2 and 5).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Sign-up is switched off until Stage 3 (owner decision D-U4); RegistrationGate shows the closed page
+- Account setup belongs to Operations (ADR-0003): the owner gets an email from there
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+@inject PlatformApi Api
+@inject NavigationManager Navigation
+
+<ErrorBox Error="_error" />
+@if (PaymentStatus == "cancelled")
+{
+    <VxMessage Type="VxMessageType.Warning">@T["public.pay.cancelled"]</VxMessage>
+    <p class="pub-actions"><a class="vx-button vx-button--primary" href="@PublicLanguage.Page(PublicLanguage.Current, "register/pay")">@T["public.register.pay_again"]</a></p>
+}
+else if (_status is { Step: "pending_payment" })
+{
+    <VxMessage Type="VxMessageType.Info">@T[PaymentStatus is "done" or "zelle" ? "public.register.payment_processing" : "public.register.payment_waiting"]</VxMessage>
+    <p class="pub-actions"><a class="vx-button" href="@PublicLanguage.Page(PublicLanguage.Current, "register/pay")">@T["public.register.pay_again"]</a></p>
+}
+else if (_status is { } status)
+{
+    <h2>@T["public.register.done_title"]</h2>
+    <p class="pub-lead">@VixlyText.Format(T, "public.register.done_text", "slug", status.Slug)</p>
+    <p>@VixlyText.Format(T, "public.register.done_email", "email", status.MaskedEmail)</p>
+}
+
+@code {
+    private Vixly.Contracts.Platform.Registration.PlatformRegistrationStatus? _status;
+
+    private PlatformApiError? _error;
+
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    [Parameter]
+    public string? PaymentStatus { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (RegistrationCookies.Read(HttpContext, RegistrationCookies.Access) is not { } access)
+        {
+            Navigation.NavigateTo(PublicLanguage.Page(PublicLanguage.Current, "register"));
+            return;
+        }
+
+        PlatformApiResult<Vixly.Contracts.Platform.Registration.PlatformRegistrationStatus> result = await Api.StatusAsync(access, CancellationToken.None);
+
+        if (result.Value is { Step: "pending_email_verification" or "pending_plan_selection" or "cancelled" or "expired" } earlier)
+        {
+            Navigation.NavigateTo(RegistrationSteps.PageFor(earlier.Step));
+            return;
+        }
+
+        _status = result.Value;
+        _error = result.Error;
+    }
+}

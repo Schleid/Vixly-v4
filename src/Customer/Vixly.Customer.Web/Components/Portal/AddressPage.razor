@@ -1,0 +1,36 @@
+﻿@*
+=========================================================
+FILE: AddressPage.razor
+
+PURPOSE:
+Asks a signed-in customer for their home address before they use the portal (owner, 2026-10-26).
+
+RESPONSIBILITIES:
+- Render the address form, with what was entered when it was refused
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); values come from the endpoint
+- Static form with antiforgery and the form guard (ADR-0019); never says "Vixly"
+- Shown once: the home page sends a customer here while they have no address
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Packages
+@using Vixly.Contracts.Operations.Customers
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.address.title"]" SignedIn="true" Error="@Error" ReturnHere="/customer/address">
+    <form method="post" action="/customer/address" class="customer-portal__form">
+        <AntiforgeryToken />
+        <p>@T["ui.address.intro"]</p>
+        <HomeAddressFields T="T" Entered="Entered" />
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.address.save"]</button>
+    </form>
+</CustomerShell>
+
+@code {
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public CustomerAddressDto? Entered { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+}

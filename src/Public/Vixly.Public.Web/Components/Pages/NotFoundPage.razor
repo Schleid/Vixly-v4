@@ -1,0 +1,22 @@
+﻿@*
+=========================================================
+FILE: NotFoundPage.razor
+
+PURPOSE:
+The page for an address that does not exist.
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Page (UI-6): route and composition only
+=========================================================
+*@
+@page "/not-found"
+@inject IStringLocalizer<PublicText> T
+
+<PageHead TitleKey="public.not_found.title" Indexed="false" />
+<section class="pub-section pub-section--narrow">
+    <h1>@T["public.not_found.title"]</h1>
+    <p>@T["public.not_found.text"]</p>
+    <p><a href="@PublicLanguage.Page(PublicLanguage.Current)">@T["public.not_found.home"]</a></p>
+</section>

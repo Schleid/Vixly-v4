@@ -1,0 +1,27 @@
+﻿@*
+=========================================================
+FILE: EditorMessagePage.razor
+
+PURPOSE:
+A staff page that only says why it cannot show anything.
+
+RESPONSIBILITIES:
+- Render the refusal inside the editor frame
+
+IMPORTANT NOTES:
+- Markup only; the message comes from OperationsErrorText
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@Title" Company="@Company" Section="@Section" Error="@Error" />
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public string? Section { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+}

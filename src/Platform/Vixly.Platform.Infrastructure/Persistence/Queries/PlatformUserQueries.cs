@@ -27,10 +27,17 @@ internal sealed class PlatformUserQueries : IPlatformUserQueries
 {
     private readonly PlatformDbContext _context;
 
-    public PlatformUserQueries(PlatformDbContext context)
+    private readonly Vixly.Platform.Application.Ports.IPlatformIdleTimesReader? _idle;
+
+    public PlatformUserQueries(PlatformDbContext context, Vixly.Platform.Application.Ports.IPlatformIdleTimesReader? idle = null)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
+        _idle = idle;
     }
+
+    // Control's inactivity time (owner, 2026-10-27).
+    private async Task<TimeSpan> IdleAsync(CancellationToken cancellationToken) =>
+        _idle is null ? PlatformIdentityLimits.SessionIdleTimeout : (await _idle.GetAsync(cancellationToken)).Idle;
 
     public async Task<PagedResult<PlatformUserListItem>> ListAsync(
         PlatformUserListFilter filter,
@@ -91,7 +98,7 @@ internal sealed class PlatformUserQueries : IPlatformUserQueries
             return null;
         }
 
-        DateTimeOffset idleCutoff = utcNow - PlatformIdentityLimits.SessionIdleTimeout - TimeSpan.FromMinutes(1);
+        DateTimeOffset idleCutoff = utcNow - await IdleAsync(cancellationToken) - TimeSpan.FromMinutes(1);
 
         List<PlatformUserSessionItem> sessions = await _context.UserSessions
             .AsNoTracking()
@@ -139,7 +146,7 @@ internal sealed class PlatformUserQueries : IPlatformUserQueries
         DateTimeOffset utcNow,
         CancellationToken cancellationToken)
     {
-        DateTimeOffset idleCutoff = utcNow - PlatformIdentityLimits.SessionIdleTimeout - TimeSpan.FromMinutes(1);
+        DateTimeOffset idleCutoff = utcNow - await IdleAsync(cancellationToken) - TimeSpan.FromMinutes(1);
 
         return await _context.Users
             .AsNoTracking()
@@ -155,6 +162,50 @@ internal sealed class PlatformUserQueries : IPlatformUserQueries
                     && session.LastSeenUtc > idleCutoff)))
             .FirstOrDefaultAsync(cancellationToken);
     }
+
+    public async Task<PagedResult<PlatformSignInItem>> ListSignInsAsync(
+        Guid? platformUserId,
+        DateTimeOffset utcNow,
+        PagedRequest page,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(page);
+
+        IQueryable<PlatformUserSession> sessions = _context.UserSessions.AsNoTracking();
+
+        if (platformUserId is { } userId)
+        {
+            sessions = sessions.Where(session => session.PlatformUserId == userId);
+        }
+
+        int total = await sessions.CountAsync(cancellationToken);
+        var rows = await sessions
+            .OrderByDescending(session => session.CreatedUtc)
+            .Skip(page.Skip)
+            .Take(page.PageSize)
+            .Join(_context.Users, session => session.PlatformUserId, user => user.Id, (session, user) => new { session, user.FirstName, user.LastName })
+            .ToListAsync(cancellationToken);
+
+        TimeSpan idle = await IdleAsync(cancellationToken);
+        return new PagedResult<PlatformSignInItem>(rows.Select(row => Item(row.session, row.FirstName + " " + row.LastName, utcNow, idle)).ToList(), page, total);
+    }
+
+    // A session nobody ended stops at the first of its idle and absolute limits: shown as ended there.
+    private static PlatformSignInItem Item(PlatformUserSession session, string name, DateTimeOffset utcNow, TimeSpan idle)
+    {
+        DateTimeOffset idleAt = session.LastSeenUtc + idle;
+        (DateTimeOffset limit, string reason) = idleAt < session.ExpiresUtc ? (idleAt, "idle_timeout") : (session.ExpiresUtc, "absolute_lifetime");
+        (DateTimeOffset? outUtc, string? ended) = session.EndedUtc is { } endedUtc
+            ? (endedUtc, Snake((session.EndReason ?? PlatformSessionEndReason.SignedOut).ToString()))
+            : limit <= utcNow
+                ? (limit, reason)
+                : ((DateTimeOffset?)null, (string?)null);
+
+        return new PlatformSignInItem(session.Id, session.PlatformUserId, name.Trim(), session.CreatedUtc, outUtc, ended, session.IpAddress, session.UserAgent, session.Country);
+    }
+
+    private static string Snake(string value) =>
+        string.Concat(value.Select((letter, index) => index > 0 && char.IsUpper(letter) ? "_" + char.ToLowerInvariant(letter) : char.ToLowerInvariant(letter).ToString()));
 
     private static string EscapeLike(string value)
     {

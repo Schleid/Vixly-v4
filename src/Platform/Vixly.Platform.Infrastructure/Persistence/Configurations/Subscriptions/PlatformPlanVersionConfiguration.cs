@@ -36,6 +36,7 @@ internal sealed class PlatformPlanVersionConfiguration : IEntityTypeConfiguratio
         builder.Property(version => version.MonthlyPricePerLicence).HasPrecision(19, 4);
         builder.Property(version => version.AnnualPricePerLicence).HasPrecision(19, 4);
         builder.Property(version => version.SetupFee).HasPrecision(19, 4);
+        builder.Property(version => version.ExtraShipmentPrice).HasPrecision(19, 4);
         builder.HasIndex(version => new { version.PlatformPlanId, version.Number }).IsUnique();
         builder.HasIndex(version => version.PlatformPlanId, "IX_PlanVersions_OneDraft")
             .IsUnique()

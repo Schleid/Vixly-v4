@@ -1,0 +1,65 @@
+@*
+=========================================================
+FILE: CustomerStatusPanel.razor
+
+PURPOSE:
+What staff may do with a customer's account (owner, 2026-10-31): suspend, reactivate, close, reopen or ban.
+
+RESPONSIBILITIES:
+- Offer only the changes the account's status allows, and ban and reopen only to the Owner and administrators
+- Ask a reason every time, and for a suspension an optional day it ends by itself
+
+IMPORTANT NOTES:
+- Markup only; the caller passes its localizer. The use case decides and tells the customer by email
+- A banned account cannot be reopened: nothing is offered
+=========================================================
+*@
+@if (Choices.Count > 0)
+{
+    <form method="post" action="/staff/customers/@Customer.CustomerId/status" class="ops-editor__panel ops-panel--restricted ops-customer-status-panel" aria-labelledby="customer-status">
+        <AntiforgeryToken />
+        <h2 id="customer-status">@T["ui.customers.status"]</h2>
+        <p class="ops-editor__hint">@T["ui.customers.status_hint"]</p>
+        <div class="ops-customer-status-bar">
+            <label class="ops-customer-status-action">
+                @T["ui.customers.new_status"]
+                <select name="status">
+                    @foreach (string choice in Choices) { <option value="@choice">@T["ui.customers.action." + choice]</option> }
+                </select>
+            </label>
+            @if (Choices.Contains("suspended"))
+            {
+                <label class="ops-customer-status-date">
+                    @T["ui.customers.suspended_until"]
+                    <input type="date" name="until" min="@DateTime.UtcNow.AddDays(1).ToString("yyyy-MM-dd")" />
+                </label>
+            }
+            <label class="ops-customer-status-reason">
+                @T["ui.customers.reason"]
+                <input name="reason" maxlength="300" required placeholder="@T["ui.customers.reason_hint"]" />
+            </label>
+            <button type="submit" class="vx-button vx-button--primary ops-customer-status-btn">@T["ui.customers.status_submit"]</button>
+        </div>
+    </form>
+}
+else if (Customer.Status == OperationsCustomerStatus.Banned)
+{
+    <p class="ops-editor__notice ops-customer-status-panel">@T["ui.customers.banned_final"]</p>
+}
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsCustomerProfile Customer { get; set; } = null!;
+
+    [Parameter] public bool CanBan { get; set; }
+
+    private IReadOnlyList<string> Choices => (Customer.Status switch
+    {
+        OperationsCustomerStatus.Active => new[] { "suspended", "closed", "banned" },
+        OperationsCustomerStatus.Suspended => new[] { "active", "suspended", "closed", "banned" },
+        OperationsCustomerStatus.PendingVerification => new[] { "closed", "banned" },
+        OperationsCustomerStatus.Closed => CanBan ? new[] { "active", "banned" } : Array.Empty<string>(),
+        _ => Array.Empty<string>()
+    }).Where(choice => CanBan || choice != "banned").ToList();
+}

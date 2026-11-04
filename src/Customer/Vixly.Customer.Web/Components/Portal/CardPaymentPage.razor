@@ -1,0 +1,60 @@
+@*
+=========================================================
+FILE: CardPaymentPage.razor
+
+PURPOSE:
+The customer's card payment (Slice 5F step 4): on to Stripe's secure
+page, then back here to see it paid.
+
+RESPONSIBILITIES:
+- While it waits: the amount and the link to Stripe's page
+- Paid, not paid, or paid but not applied
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- The card is typed on Stripe's page, never here; "paid" comes only from Stripe
+=========================================================
+*@
+@using System.Globalization
+@using Vixly.Contracts.Operations.Billing
+@using Vixly.Contracts.Operations.Customers
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.card.title"]" SignedIn="true" Error="@Error" ReturnHere="/customer/invoices">
+    @if (Payment is { } payment)
+    {
+        <section class="customer-portal__panel" data-card-status="@payment.Status">
+            <h2>@payment.InvoiceNumber · @payment.Amount.ToString("N2", CultureInfo.CurrentCulture) @payment.CurrencyCode</h2>
+            @switch (payment.Status)
+            {
+                case "paid":
+                    <p role="status">@T["ui.card.paid"]</p>
+                    break;
+                case "paid_not_applied":
+                    <p role="alert">@T["ui.card.paid_not_applied"]</p>
+                    break;
+                case "cancelled":
+                    <p>@T["ui.card.cancelled"]</p>
+                    break;
+                default:
+                    <p>@T["ui.card.continue_hint"]</p>
+                    @if (payment.PageUrl is { } url)
+                    {
+                        <p><a class="vx-button vx-button--primary" href="@url" rel="noopener noreferrer">@T["ui.card.continue"]</a></p>
+                    }
+                    break;
+            }
+        </section>
+    }
+    <div class="customer-portal__actions">
+        <a href="/customer/invoices" class="vx-button vx-button--secondary">@T["ui.card.back"]</a>
+    </div>
+</CustomerShell>
+
+@code {
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public CustomerCardPaymentDto? Payment { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+}

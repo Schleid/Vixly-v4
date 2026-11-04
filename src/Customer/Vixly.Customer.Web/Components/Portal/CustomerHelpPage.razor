@@ -1,0 +1,18 @@
+﻿@using Vixly.Customer.Web.Features.Help
+@inject IStringLocalizer<CustomerText> T
+@* =========================================================
+   FILE: CustomerHelpPage.razor
+   PURPOSE:
+   Composes verified help in the company portal shell.
+   RESPONSIBILITIES:
+   - Keep help routing and customer checks in the endpoint.
+   IMPORTANT NOTES:
+   - Article HTML has already passed the shared help validator.
+   ========================================================= *@
+<CustomerShell Brand="@State.Brand" Title="@(State.Article?.Metadata.Title ?? T["ui.help.title"].Value)" SignedIn="@State.SignedIn" ReturnHere="/customer/help">
+    <CustomerHelpBrowser State="@State" />
+</CustomerShell>
+
+@code {
+    [Parameter, EditorRequired] public CustomerHelpState State { get; set; } = null!;
+}

@@ -24,5 +24,11 @@ public sealed class CompletePlatformDeviceLinkRequest
 
     public string? PublicKey { get; init; }
 
+    // Where the person registering is, as the tenant's server saw them (owner, 2026-10-21).
+    public PlatformDeviceOrigin? Origin { get; init; }
+
     public Guid? ReplaceDeviceId { get; init; }
+
+    // The tenant of the host the link was opened on (from the caller token); a link of another tenant is refused.
+    public Guid? ExpectedTenantId { get; init; }
 }

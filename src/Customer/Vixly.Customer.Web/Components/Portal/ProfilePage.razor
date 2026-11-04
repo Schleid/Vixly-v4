@@ -1,0 +1,90 @@
+@*
+=========================================================
+FILE: ProfilePage.razor
+
+PURPOSE:
+The signed-in customer's profile and password.
+
+RESPONSIBILITIES:
+- Render the signed-in customer's profile and password
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019)
+- Placeholder look: Frontend/UI designs the final experience; never says "Vixly"
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Customers
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.profile.title"]" SignedIn="true" Error="@Error" Info="@Info" ReturnHere="/customer/profile">
+    <div class="customer-portal__profile-grid">
+    <form method="post" action="/customer/profile" class="customer-portal__form">
+        <AntiforgeryToken />
+        <p>@Customer.Email · @Customer.Code</p>
+        <div class="customer-field-duo">
+            <label class="customer-portal__field"><span>@T["ui.field.first_name"]</span> <input name="firstName" value="@Customer.FirstName" autocomplete="given-name" maxlength="100" required /></label>
+            <label class="customer-portal__field"><span>@T["ui.field.last_name"]</span> <input name="lastName" value="@Customer.LastName" autocomplete="family-name" maxlength="100" required /></label>
+        </div>
+        <div class="customer-field-duo">
+            <label class="customer-portal__field"><span>@T["ui.field.company"]</span> <input name="companyName" value="@Customer.CompanyName" autocomplete="organization" maxlength="150" /></label>
+            <label class="customer-portal__field"><span>@T["ui.field.phone"]</span> <input type="tel" name="phone" value="@Customer.Phone" autocomplete="tel" maxlength="20" required /></label>
+        </div>
+        <label class="customer-portal__field">
+            <span>@T["ui.field.language"]</span>
+            <select name="language">
+                <option value="en" selected="@(Customer.Language == "en")">English</option>
+                <option value="fr" selected="@(Customer.Language == "fr")">Français</option>
+                <option value="es" selected="@(Customer.Language == "es")">Español</option>
+            </select>
+        </label>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.save"]</button>
+    </form>
+    @* The home address, given at the first sign-in (owner, 2026-10-26). *@
+    <form method="post" action="/customer/address" class="customer-portal__form" id="address">
+        <AntiforgeryToken />
+        <input type="hidden" name="from" value="profile" />
+        <h2>@T["ui.profile.address"]</h2>
+        <HomeAddressFields T="T" Entered="Customer.HomeAddress" />
+        <button type="submit" class="vx-button vx-button--secondary">@T["ui.save"]</button>
+    </form>
+    @* Operations Slice 9: how the company's notices reach the customer, offered only when the company sends texts. *@
+    @if (Notices is { } notices && notices.Offered.Count > 1)
+    {
+        <form method="post" action="/customer/profile/notices" class="customer-portal__form" id="notices" data-notices>
+            <AntiforgeryToken />
+            <h2>@T["ui.profile.notices"]</h2>
+            <div class="customer-channel-options">
+                @foreach (string channel in notices.Offered)
+                {
+                    <label><input type="radio" name="channel" value="@channel" checked="@(notices.Channel == channel)" /> <span>@T["ui.profile.notices." + channel]</span></label>
+                }
+            </div>
+            <label><input type="checkbox" name="consent" value="true" checked="@(notices.Channel != "email")" /> <span>@VixlyText.Format(T, "ui.profile.notices_consent", new Dictionary<string, object> { ["phone"] = notices.Phone, ["company"] = Brand?.DisplayName ?? string.Empty })</span></label>
+            <p class="customer-portal__hint">@T["ui.profile.notices_stop"]</p>
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.save"]</button>
+        </form>
+    }
+    <form method="post" action="/customer/profile/password" class="customer-portal__form">
+        <AntiforgeryToken />
+        <h2>@T["ui.profile.password"]</h2>
+        <div class="customer-field-duo">
+            <label class="customer-portal__field"><span>@T["ui.field.current_password"]</span> <input type="password" name="currentPassword" autocomplete="current-password" maxlength="64" required /></label>
+            <label class="customer-portal__field"><span>@T["ui.field.new_password"]</span> <input type="password" name="newPassword" autocomplete="new-password" minlength="12" maxlength="64" required /></label>
+        </div>
+        <button type="submit" class="vx-button vx-button--secondary">@T["ui.profile.change_password"]</button>
+    </form>
+    </div>
+</CustomerShell>
+
+@code {
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter, EditorRequired] public CustomerProfileDto Customer { get; set; } = null!;
+
+    [Parameter] public CustomerNoticesDto? Notices { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

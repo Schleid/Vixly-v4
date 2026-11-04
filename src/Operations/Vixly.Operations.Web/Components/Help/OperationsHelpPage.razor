@@ -1,0 +1,21 @@
+﻿@using Vixly.Operations.Web.Features.Help
+@inject IStringLocalizer<OperationsText> T
+@* =========================================================
+   FILE: OperationsHelpPage.razor
+
+   PURPOSE:
+   Composes signed-in company help in the staff workspace shell.
+
+   RESPONSIBILITIES:
+   - Keep the page thin and pass already-filtered presentation.
+
+   IMPORTANT NOTES:
+   - The endpoint applies the existing staff and device gates.
+   ========================================================= *@
+<EditorShell Title="@(State.Article?.Metadata.Title ?? T["ui.help.title"].Value)" Company="@State.Company" Section="help">
+    <OperationsHelpBrowser State="@State" />
+</EditorShell>
+
+@code {
+    [Parameter, EditorRequired] public OperationsHelpState State { get; set; } = OperationsHelpState.Empty;
+}

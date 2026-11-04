@@ -75,14 +75,23 @@ public sealed class PlatformTenantDatabaseTests : IClassFixture<PlatformDatabase
         await using (PlatformDbContext context = _database.NewContext())
         {
             PlatformTenant tenant = await context.Tenants.SingleAsync(item => item.Id == tenantId);
-            tenant.UpdateCompany(
+            // B12: legal details change only through an approved request.
+            PlatformTenantChangeRequest change = PlatformTenantChangeRequest.Submit(
+                tenant,
                 PlatformCompanyDetails.Create(
                     "Northwind Logistics Ltd.",
                     null,
                     EmailAddress.Create("hello@northwind.example"),
                     PhoneNumber.Create("+1 514 555 0199"),
                     PlatformPostalAddress.Create("2 Dock Street", "Unit 4", "Laval", null, null, "CA")),
+                "Merger.",
+                "proof.pdf",
+                "%PDF-1.7"u8.ToArray(),
+                "ops-1",
+                "Grace Hopper",
                 Now);
+            context.TenantChangeRequests.Add(change);
+            context.TenantLifecycleEvents.Add(change.Approve(tenant, null, _database.ActorUserId, Now.AddSeconds(30)));
             PlatformTenantLifecycleEvent activated = tenant.Activate(Guid.NewGuid(), Now.AddMinutes(1));
             context.TenantLifecycleEvents.Add(activated);
             await context.SaveChangesAsync();
@@ -91,7 +100,8 @@ public sealed class PlatformTenantDatabaseTests : IClassFixture<PlatformDatabase
         await using (PlatformDbContext context = _database.NewContext())
         {
             PlatformTenant tenant = await context.Tenants.AsNoTracking().SingleAsync(item => item.Id == tenantId);
-            Assert.Equal(("Northwind Logistics Ltd.", null, "Unit 4"), (tenant.Company.LegalName, tenant.Company.TradingName, tenant.Company.Address.Line2));
+            // 2026-10-25: an approved request changes the legal name only; the rest of the profile stays the company's own.
+            Assert.Equal(("Northwind Logistics Ltd.", "Northwind", null), (tenant.Company.LegalName, tenant.Company.TradingName, tenant.Company.Address.Line2));
             Assert.Equal(PlatformTenantStatus.Active, tenant.Status);
             Assert.Equal(new[] { "enterprise", "pilot" }, tenant.Tags.Select(tag => tag.Value).Order(StringComparer.Ordinal));
             Assert.Equal("owner@northwind.example", tenant.ContactFor(PlatformTenantContactRole.Owner).Email.Value);
@@ -99,7 +109,7 @@ public sealed class PlatformTenantDatabaseTests : IClassFixture<PlatformDatabase
             PagedResult<PlatformTenantEventItem> history = await new PlatformTenantQueries(context)
                 .ListEventsAsync(tenantId, PagedRequest.First, CancellationToken.None);
             Assert.Equal(
-                new[] { PlatformTenantEventCodes.Activated, PlatformTenantEventCodes.CreatedByStaff },
+                new[] { PlatformTenantEventCodes.Activated, PlatformTenantEventCodes.CompanyChanged, PlatformTenantEventCodes.CreatedByStaff },
                 history.Items.Select(item => item.EventCode));
         }
     }

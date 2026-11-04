@@ -50,4 +50,11 @@ public interface IPlatformLicensingRepository
     Task<IReadOnlyList<PlatformDeviceLink>> ListOpenLinksAsync(Guid platformTenantId, PlatformDeviceLinkKind kind, CancellationToken cancellationToken);
 
     Task<int> CountLinkRequestsSinceAsync(Guid platformTenantId, DateTimeOffset sinceUtc, CancellationToken cancellationToken);
+
+    void AddSupportRequest(PlatformOwnerSupportRequest request);
+
+    Task<PlatformOwnerSupportRequest?> GetSupportRequestAsync(Guid requestId, CancellationToken cancellationToken);
+
+    // Pending, and approved but not completed, newest first.
+    Task<IReadOnlyList<PlatformOwnerSupportRequest>> ListOpenSupportRequestsAsync(Guid platformTenantId, CancellationToken cancellationToken);
 }

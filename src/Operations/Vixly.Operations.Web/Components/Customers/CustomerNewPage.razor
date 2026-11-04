@@ -1,0 +1,58 @@
+@*
+=========================================================
+FILE: CustomerNewPage.razor
+
+PURPOSE:
+Staff enter a customer when the company's plan has no customer portal (Vixly Lite, owner 2026-10-30).
+
+RESPONSIBILITIES:
+- Render the new-customer form: names, company, email, phone, language
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1)
+- Static form with antiforgery and the form guard (ADR-0019); the use case refuses it while the plan has the portal
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.customers.new"]" Company="@Company" Section="customers" Error="@Error">
+    <div class="ops-record-top">
+        <a href="/staff/customers" class="ops-editor__back-link">← @T["ui.customers.back"]</a>
+    </div>
+    <form method="post" action="/staff/customers/new" class="ops-editor__panel ops-editor__form ops-customer-new-form">
+        <AntiforgeryToken />
+        <div class="ops-customer-new__header span-full">
+            <h2>@T["ui.customers.new"]</h2>
+            <p class="ops-editor__hint">@T["ui.customers.new_hint"]</p>
+        </div>
+        <label class="ops-editor__form-span-3">@T["ui.customers.first_name"] <input name="firstName" value="@Form.FirstName" maxlength="100" required autocomplete="off" /></label>
+        <label class="ops-editor__form-span-3">@T["ui.customers.last_name"] <input name="lastName" value="@Form.LastName" maxlength="100" required autocomplete="off" /></label>
+        <label class="ops-editor__form-span-3">@T["ui.customers.company_name"] <input name="companyName" value="@Form.CompanyName" maxlength="150" autocomplete="off" /></label>
+        <label class="ops-editor__form-span-3">@T["ui.customers.email"] <input type="email" name="email" value="@Form.Email" maxlength="254" required autocomplete="off" /></label>
+        <label class="ops-editor__form-span-3">@T["ui.customers.phone"] <input type="tel" name="phone" value="@Form.Phone" maxlength="30" required autocomplete="off" /></label>
+        <label class="ops-editor__form-span-3">@T["ui.customers.language"]
+            <select name="language">
+                @foreach (string language in new[] { "en", "fr", "es" })
+                {
+                    <option value="@language" selected="@(language == Form.Language)">@language.ToUpperInvariant()</option>
+                }
+            </select>
+        </label>
+        <div class="ops-editor__form-actions span-full">
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.customers.create"]</button>
+            <a href="/staff/customers" class="vx-button vx-button--secondary">@T["ui.editor.cancel"]</a>
+        </div>
+    </form>
+</EditorShell>
+
+@code {
+    [Parameter]
+    public string? Company { get; set; }
+
+    [Parameter]
+    public Vixly.Operations.Application.UseCases.Customers.CreateOperationsCustomer.CreateOperationsCustomerRequest Form { get; set; } = new();
+
+    [Parameter]
+    public string? Error { get; set; }
+}

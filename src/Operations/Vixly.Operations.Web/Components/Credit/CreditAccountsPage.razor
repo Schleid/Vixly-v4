@@ -1,0 +1,89 @@
+@*
+=========================================================
+FILE: CreditAccountsPage.razor
+
+PURPOSE:
+The credit department's accounts (Slice 5F step 2b, K-6).
+
+RESPONSIBILITIES:
+- Open an account for a customer by code, with a limit and terms
+- List the accounts: state, limit, owed, available, overdue
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Changes ask for the second check
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.credit.title"]" Company="@Company" Section="credit" Error="@Error" Info="@Info">
+    @if (!CreditOn)
+    {
+        <p class="ops-editor__notice">@T["ui.credit.off"] <a href="/staff/settings">@T["ui.editor.nav.settings"]</a></p>
+    }
+    <form method="post" action="/staff/credit/accounts" class="ops-list-bar" aria-labelledby="open-title">
+        <AntiforgeryToken />
+        <strong id="open-title" style="font-size: 0.8125rem;">@T["ui.credit.open"]:</strong>
+        <label style="display: inline-flex; align-items: center; gap: 0.4rem; margin: 0;">@T["ui.credit.customer_code"] <input name="code" maxlength="20" required autocomplete="off" style="width: 8rem; min-width: 6rem;" /></label>
+        <label style="display: inline-flex; align-items: center; gap: 0.4rem; margin: 0;">@VixlyText.Format(T, "ui.credit.limit", "currency", CurrencyCode) <input name="limit" inputmode="decimal" size="10" required placeholder="0.00" style="width: 7rem; min-width: 5rem;" /></label>
+        <label style="display: inline-flex; align-items: center; gap: 0.4rem; margin: 0;">@T["ui.credit.terms"] <input name="terms" inputmode="numeric" size="4" placeholder="30" style="width: 4rem; min-width: 3rem;" /></label>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.credit.open_button"]</button>
+        <a class="vx-button vx-button--secondary" href="/staff/credit/charges" style="margin-left: auto;">@VixlyText.Format(T, "ui.credit.charges_link", "count", Awaiting)</a>
+    </form>
+    @if (Marked.Count > 0)
+    {
+        <section class="ops-editor__panel" aria-labelledby="marked-title">
+            <h2 id="marked-title">@T["ui.credit.marked"]</h2>
+            <p class="ops-editor__hint">@T["ui.credit.marked_hint"]</p>
+            <ul>
+                @foreach ((Guid id, string? number, string name) in Marked)
+                {
+                    <li><a href="/staff/credit/customers/@id">@name</a> <small class="ops-editor__code">@number</small></li>
+                }
+            </ul>
+        </section>
+    }
+    @if (Rows.Count == 0)
+    {
+        <div class="ops-editor__empty"><p>@T["ui.credit.none"]</p></div>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.credit.title"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.credit.customer"]</th><th scope="col">@T["ui.credit.state"]</th><th scope="col" class="ops-editor__number">@T["ui.credit.limit_short"]</th><th scope="col" class="ops-editor__number">@T["ui.credit.owed"]</th><th scope="col" class="ops-editor__number">@T["ui.credit.available"]</th><th scope="col" class="ops-editor__number">@T["ui.credit.overdue"]</th></tr></thead>
+                <tbody>
+                    @foreach (OperationsCreditRow row in Rows)
+                    {
+                        <tr data-status="@row.Account.Status">
+                            <td class="ops-editor__identity-cell"><a href="/staff/credit/customers/@row.Account.CustomerId">@(row.Customer?.FullName ?? "—")</a> <small class="ops-editor__code">@row.Customer?.Code</small></td>
+                            <td><span class="ops-editor__status" data-status="@row.Account.Status.ToString().ToLowerInvariant()">@T["ui.credit.status." + row.Account.Status]</span></td>
+                            <td class="ops-editor__number">@OperationsInvoiceWords.Money(row.Account.Limit, CurrencyCode)</td>
+                            <td class="ops-editor__number">@OperationsInvoiceWords.Money(row.Position.Owed, CurrencyCode)</td>
+                            <td class="ops-editor__number">@OperationsInvoiceWords.Money(row.Position.Available, CurrencyCode)</td>
+                            <td class="ops-editor__number" data-overdue="@(row.Position.Overdue > 0m)">@OperationsInvoiceWords.Money(row.Position.Overdue, CurrencyCode)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsCreditRow> Rows { get; set; } = Array.Empty<OperationsCreditRow>();
+
+    [Parameter] public int Awaiting { get; set; }
+
+    [Parameter] public bool CreditOn { get; set; }
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    [Parameter] public IReadOnlyList<(Guid CustomerId, string? Code, string Name)> Marked { get; set; } = Array.Empty<(Guid, string?, string)>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

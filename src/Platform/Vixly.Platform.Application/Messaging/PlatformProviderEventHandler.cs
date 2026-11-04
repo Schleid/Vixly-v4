@@ -71,8 +71,13 @@ public sealed class PlatformProviderEventHandler : IPlatformOutboxHandler
                 return transaction is null
                     ? "unknown_transaction"
                     : await _settlement.ChargeSucceededAsync(transaction, card.PaymentId, cancellationToken) + await SaveCardIfAskedAsync(card, cancellationToken);
+            case PlatformCardEventKind.CheckoutProcessing:
+                return BankDebitStarted(transaction, card.PaymentId);
+            case PlatformCardEventKind.CheckoutPaymentSucceeded:
+                return transaction is null ? "unknown_transaction" : await _settlement.ChargeSucceededAsync(transaction, card.PaymentId, cancellationToken);
             case PlatformCardEventKind.PaymentFailed:
             case PlatformCardEventKind.PaymentRequiresAction:
+            case PlatformCardEventKind.CheckoutPaymentFailed:
                 return await ProblemAsync(card, transaction, cancellationToken);
             case PlatformCardEventKind.RefundSucceeded:
                 return transaction is null ? "unknown_transaction" : await _settlement.RefundSucceededAsync(transaction, card.RefundId, cancellationToken);
@@ -108,6 +113,24 @@ public sealed class PlatformProviderEventHandler : IPlatformOutboxHandler
         return outcome;
     }
 
+    // The tenant chose a bank debit: the invoice stays unpaid until the bank answers.
+    private string BankDebitStarted(PlatformCardTransaction? transaction, string? paymentId)
+    {
+        if (transaction is null || transaction.Kind != PlatformCardTransactionKind.Charge)
+        {
+            return "unknown_transaction";
+        }
+
+        if (!transaction.MarkDelayed(paymentId, _payments.UtcNow))
+        {
+            return "no_change";
+        }
+
+        _payments.Audit(null, "platform.payments.bank_payment_processing", null, nameof(PlatformInvoice), transaction.PlatformInvoiceId,
+            new { amount = PlatformPaymentsLimits.Format(transaction.Amount), currency = transaction.CurrencyCode });
+        return "processing";
+    }
+
     // Saves the card when the checkout asked for it and the event names one; "" otherwise. Saving twice is a no-op.
     private async Task<string> SaveCardIfAskedAsync(PlatformCardEvent card, CancellationToken cancellationToken)
     {
@@ -129,7 +152,9 @@ public sealed class PlatformProviderEventHandler : IPlatformOutboxHandler
         }
 
         // Inside a hosted checkout the tenant can still try another card; the checkout result decides.
-        if (transaction.Origin is PlatformCardTransactionOrigin.PayLink or PlatformCardTransactionOrigin.Registration)
+        // A bank debit has already left the checkout: its failure is final.
+        if (transaction.Origin is PlatformCardTransactionOrigin.PayLink or PlatformCardTransactionOrigin.Registration
+            && !transaction.Delayed && card.Kind != PlatformCardEventKind.CheckoutPaymentFailed)
         {
             return "checkout_retry";
         }

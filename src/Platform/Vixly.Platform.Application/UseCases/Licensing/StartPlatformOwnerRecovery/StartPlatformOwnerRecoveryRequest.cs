@@ -15,4 +15,12 @@
 public sealed class StartPlatformOwnerRecoveryRequest
 {
     public Guid PlatformTenantId { get; init; }
+
+    public string Reason { get; init; } = string.Empty;
+
+    // How support confirmed the caller is the Owner (D-O13).
+    public string IdentityCheck { get; init; } = string.Empty;
+
+    // The lost device that gives its seat when none is free.
+    public Guid? ReplaceDeviceId { get; init; }
 }

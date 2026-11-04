@@ -1,0 +1,52 @@
+﻿@*
+=========================================================
+FILE: BundleParcelsTable.razor
+
+PURPOSE:
+The parcels in a bundle (Slice 6A), newest first, with a take-out button at the fill station.
+
+RESPONSIBILITIES:
+- One row per parcel: number, shipment, repack box, weight
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Taking out a parcel of a repack box takes the whole box out
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<OperationsTableViewport Label="@T["ui.bundles.parcels"]">
+    <table class="ops-editor__table">
+        <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.parcels.number"]</th><th scope="col">@T["ui.bundles.shipment"]</th><th scope="col">@T["ui.bundles.box"]</th><th scope="col" class="ops-editor__number">@T["ui.bundles.weight"]</th>@if (TakeOutFrom is not null) { <th scope="col"></th> }</tr></thead>
+        <tbody>
+            @foreach (OperationsBundleParcelRow parcel in Parcels)
+            {
+                <tr>
+                    <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/parcels/@parcel.ParcelId">@parcel.Number</a></td>
+                    <td class="ops-editor__code">@parcel.ShipmentNumber</td>
+                    <td class="ops-editor__code">@parcel.BoxNumber</td>
+                    <td class="ops-editor__number">@(parcel.WeightKg is { } kg ? OperationsBundleWords.Weight(kg, WeightUnit) : "—")</td>
+                    @if (TakeOutFrom is { } bundleId)
+                    {
+                        <td>
+                            <form method="post" action="/staff/bundles/@bundleId/take-out" class="ops-editor__inline">
+                                <AntiforgeryToken />
+                                <input type="hidden" name="parcel" value="@parcel.ParcelId" />
+                                <button type="submit" class="vx-button vx-button--secondary">@(parcel.BoxId is null ? T["ui.bundles.take_out"] : T["ui.bundles.take_out_box"])</button>
+                            </form>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</OperationsTableViewport>
+
+@code {
+    [Parameter] public IReadOnlyList<OperationsBundleParcelRow> Parcels { get; set; } = Array.Empty<OperationsBundleParcelRow>();
+
+    [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
+
+    // The open bundle at the fill station: each row can be taken out.
+    [Parameter] public Guid? TakeOutFrom { get; set; }
+}

@@ -1,0 +1,39 @@
+﻿@*
+=========================================================
+FILE: MessagePage.razor
+
+PURPOSE:
+A short message page: an email was sent, or a link no longer works.
+
+RESPONSIBILITIES:
+- Render a short message page: an email was sent, or a link no longer works
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019)
+- Placeholder look: Frontend/UI designs the final experience; never says "Vixly"
+=========================================================
+*@
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@Title" Error="@Error" ReturnHere="/customer/">
+    <p>@Body</p>
+    @if (LinkHref is not null)
+    {
+        <p><a class="vx-button vx-button--primary" href="@LinkHref">@LinkText</a></p>
+    }
+</CustomerShell>
+
+@code {
+    [Parameter] public Vixly.Contracts.Operations.Customers.CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+
+    [Parameter] public string? Body { get; set; }
+
+    [Parameter] public string? LinkHref { get; set; }
+
+    [Parameter] public string? LinkText { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+}

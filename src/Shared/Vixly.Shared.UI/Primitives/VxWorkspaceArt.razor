@@ -1,0 +1,61 @@
+﻿@*
+=========================================================
+FILE: VxWorkspaceArt.razor
+PURPOSE: Decorative workflow drawings for workspace headings.
+RESPONSIBILITIES: Render distinct, data-free scenes selected by the consumer.
+IMPORTANT NOTES: Presentation only; hidden from assistive technology.
+=========================================================
+*@
+<svg class="vx-workspace-art" viewBox="0 0 240 140" fill="none" aria-hidden="true" focusable="false">
+    <ellipse cx="124" cy="124" rx="100" ry="8" fill="currentColor" opacity=".06" />
+    @switch (Kind)
+    {
+        case "warehouse":
+            <path d="M32 118V30h176v88M32 72h176M88 30v88M152 30v88" stroke="currentColor" stroke-width="3" />
+            <path d="M43 41h32v30H43zM104 88h32v29h-32zM164 41h32v30h-32zM164 88h32v29h-32z" fill="currentColor" opacity=".12" stroke="currentColor" />
+            <path d="M59 41v11m121-11v11m-60 36v10m60-10v10" stroke="currentColor" stroke-width="2" />
+            break;
+        case "parcel":
+            <path d="m55 52 64-27 65 27-65 29zM55 52v52l64 28 65-28V52M119 81v51M86 39l65 28v20" fill="currentColor" fill-opacity=".07" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+            <path d="M71 86v13m6-10v13m6-10v13M165 26h40m-30-10 10 10-10 10" stroke="currentColor" stroke-width="2" />
+            break;
+        case "people":
+            <rect x="40" y="24" width="160" height="96" rx="9" stroke="currentColor" stroke-width="2" />
+            <circle cx="87" cy="62" r="15" fill="currentColor" opacity=".14" />
+            <path d="M62 105c0-33 50-33 50 0M126 56h52m-52 15h37m-37 27h42" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            break;
+        case "support":
+            <path d="M39 27h135a9 9 0 0 1 9 9v49a9 9 0 0 1-9 9H89l-25 21V94H39a9 9 0 0 1-9-9V36a9 9 0 0 1 9-9Z" fill="currentColor" fill-opacity=".07" stroke="currentColor" stroke-width="2" />
+            <path d="M58 49h95M58 64h66M193 56h11a8 8 0 0 1 8 8v40h-17v18l-23-18h-51" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            break;
+        case "document":
+            <path d="M66 16h78l29 29v83H66zM144 16v29h29" fill="currentColor" fill-opacity=".06" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+            <path d="M83 57h42M83 72h72M83 88h31m15 0h26M83 104h31m15 0h26" stroke="currentColor" stroke-width="2" />
+            <circle cx="179" cy="99" r="25" fill="var(--vx-color-surface)" stroke="currentColor" stroke-width="2" />
+            <path d="m168 99 8 8 15-17" stroke="currentColor" stroke-width="3" />
+            break;
+        case "security":
+            <path d="m120 16 49 19v36c0 29-24 48-49 60-25-12-49-31-49-60V35z" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-width="2" />
+            <rect x="99" y="63" width="42" height="34" rx="6" stroke="currentColor" stroke-width="2" />
+            <path d="M107 63V51a13 13 0 0 1 26 0v12m-13 13v10M40 51h18m124 51h18" stroke="currentColor" stroke-width="2" />
+            break;
+        case "settings":
+            <rect x="36" y="25" width="169" height="94" rx="9" stroke="currentColor" stroke-width="2" />
+            <path d="M36 45h169M61 65h119M61 84h119M61 103h119" stroke="currentColor" stroke-width="2" />
+            <circle cx="91" cy="65" r="6" fill="var(--vx-color-surface)" stroke="currentColor" stroke-width="2" />
+            <circle cx="151" cy="84" r="6" fill="var(--vx-color-surface)" stroke="currentColor" stroke-width="2" />
+            <circle cx="116" cy="103" r="6" fill="var(--vx-color-surface)" stroke="currentColor" stroke-width="2" />
+            break;
+        default:
+            <path d="M47 99 109 41l78 58M47 99h140M109 41v58" stroke="currentColor" stroke-opacity=".4" stroke-width="2" stroke-dasharray="4 5" />
+            <rect x="24" y="79" width="46" height="38" rx="7" fill="var(--vx-color-surface)" stroke="currentColor" stroke-width="2" />
+            <rect x="88" y="19" width="46" height="43" rx="7" fill="currentColor" fill-opacity=".12" stroke="currentColor" stroke-width="2" />
+            <rect x="164" y="79" width="46" height="38" rx="7" fill="var(--vx-color-surface)" stroke="currentColor" stroke-width="2" />
+            <path d="M35 91h24m-24 9h16m64-69v18m-9-9h18m51 52h24m-24 9h16" stroke="currentColor" stroke-width="2" />
+            break;
+    }
+</svg>
+
+@code {
+    [Parameter] public string Kind { get; set; } = "network";
+}

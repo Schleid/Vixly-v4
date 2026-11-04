@@ -3,8 +3,12 @@
 FILE: AuthShell.razor
 
 PURPOSE:
-The full HTML document around every sign-in page. Static; the only script is
-passkeys.js, which adds the passkey button when the browser supports it.
+The full HTML document around every sign-in page. Static; the scripts are
+passkeys.js, which adds the passkey button when the browser supports it, and
+vixly-forms.js, which blocks repeated submits (ADR-0019).
+
+RESPONSIBILITIES:
+- Compose the localized authentication shell and optional login illustration
 
 IMPORTANT NOTES:
 - Markup only. Text comes from PlatformText (L-10); values
@@ -25,9 +29,11 @@ IMPORTANT NOTES:
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-theme.css" />
     <link rel="stylesheet" href="/css/vixly.css" />
     <link rel="stylesheet" href="/_content/Vixly.Shared.UI/vixly-primitives.css" />
+    <link rel="stylesheet" href="/css/control-login.css" />
     <script src="/js/passkeys.js" defer></script>
+    <script src="/_content/Vixly.Shared.UI/vixly-forms.js" defer></script>
 </head>
-<body class="vx-auth">
+<body class="vx-auth @(Illustrated ? "vx-auth--illustrated" : null)">
     <!-- Atmospheric backdrop & micro-mesh -->
     <div class="vx-auth__backdrop" aria-hidden="true">
         <div class="vx-auth__glow-primary"></div>
@@ -66,13 +72,30 @@ IMPORTANT NOTES:
 
     <!-- Main Content Stage: Focused Command Terminal -->
     <main id="main-content" class="vx-auth__stage" aria-labelledby="vx-page-title">
+        <div class="@(Illustrated ? "vx-auth__workspace" : "vx-auth__workspace--plain")">
+        @if (Illustrated)
+        {
+            <figure class="vx-auth__illustration" aria-hidden="true">
+                <figcaption>
+                    <span class="vx-auth__illustration-brand">
+                        <img src="/img/vixly-icon.png" alt="" width="40" height="40" />
+                        <span>@T["ui.app.name"]</span>
+                    </span>
+                    <span>@T["ui.auth.badge"]</span>
+                </figcaption>
+                <img src="/img/control-login-security-cutout.webp" alt="" width="960" height="720" decoding="async" fetchpriority="high" />
+            </figure>
+        }
         <div class="vx-auth__terminal">
             <div class="vx-auth__horizon-line" aria-hidden="true"></div>
             
             <header class="vx-auth__header">
-                <div class="vx-auth__portal-badge" aria-hidden="true">
-                    <img src="/img/vixly-icon.png" alt="Vixly" class="vx-auth__portal-badge-img" width="48" height="48" />
-                </div>
+                @if (!Illustrated)
+                {
+                    <div class="vx-auth__portal-badge" aria-hidden="true">
+                        <img src="/img/vixly-icon.png" alt="Vixly" class="vx-auth__portal-badge-img" width="48" height="48" />
+                    </div>
+                }
                 <h1 id="vx-page-title" class="vx-auth__title">@Title</h1>
                 @if (!string.IsNullOrWhiteSpace(Subtitle))
                 {
@@ -91,6 +114,7 @@ IMPORTANT NOTES:
                 <span>@T["ui.auth.authorized_only"]</span>
             </div>
         </div>
+        </div>
     </main>
 
     <!-- Global System Footer -->
@@ -102,6 +126,9 @@ IMPORTANT NOTES:
 
 @code {
     private string CurrentLang => System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+    [Parameter]
+    public bool Illustrated { get; set; }
 
     [Parameter, EditorRequired]
     public string Title { get; set; } = string.Empty;

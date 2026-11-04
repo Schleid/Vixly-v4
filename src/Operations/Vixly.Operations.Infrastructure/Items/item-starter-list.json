@@ -1,0 +1,888 @@
+{
+ "version": 1,
+ "note": "Starter item catalogue: everyday courier items with their 6-digit Harmonized System (HS 2022) codes. Loaded once per company; the company edits it freely.",
+ "items": [
+  {
+   "description": "Shoes, sports, textile upper",
+   "matches": "sneakers, tennis shoes, trainers, running shoes, basketball shoes, baskets, tenis, zapatillas, tenni",
+   "code": "640411",
+   "unit": "pairs"
+  },
+  {
+   "description": "Shoes, leather upper",
+   "matches": "leather shoes, dress shoes, souliers en cuir, zapatos de cuero, soulye kwi",
+   "code": "640399",
+   "unit": "pairs"
+  },
+  {
+   "description": "Boots, leather",
+   "matches": "boots, leather boots, bottes, botas, bot",
+   "code": "640391",
+   "unit": "pairs"
+  },
+  {
+   "description": "Shoes, textile upper",
+   "matches": "shoes, canvas shoes, slip ons, chaussures, zapatos, soulye",
+   "code": "640419",
+   "unit": "pairs"
+  },
+  {
+   "description": "Sandals, rubber or plastic",
+   "matches": "sandals, slides, crocs, sandales, sandalias, sapat",
+   "code": "640299",
+   "unit": "pairs"
+  },
+  {
+   "description": "Flip-flops, rubber or plastic",
+   "matches": "flip flops, thongs, tongs, chancletas, chanklet",
+   "code": "640220",
+   "unit": "pairs"
+  },
+  {
+   "description": "Slippers, textile",
+   "matches": "slippers, house shoes, pantoufles, pantuflas",
+   "code": "640520",
+   "unit": "pairs"
+  },
+  {
+   "description": "T-shirt, cotton, knitted",
+   "matches": "t shirt, tshirt, tee, tees, maillot, camiseta, mayo",
+   "code": "610910",
+   "unit": "pieces"
+  },
+  {
+   "description": "T-shirt, man-made fibres, knitted",
+   "matches": "polyester t shirt, dri fit, sport shirt",
+   "code": "610990",
+   "unit": "pieces"
+  },
+  {
+   "description": "Polo shirt, men's, cotton, knitted",
+   "matches": "polo, polos, polo shirt",
+   "code": "610510",
+   "unit": "pieces"
+  },
+  {
+   "description": "Shirt, men's, cotton, woven",
+   "matches": "shirt, dress shirt, button down, chemise, camisa, chemiz",
+   "code": "620520",
+   "unit": "pieces"
+  },
+  {
+   "description": "Blouse, women's, cotton, woven",
+   "matches": "blouse, blusa, women shirt",
+   "code": "620630",
+   "unit": "pieces"
+  },
+  {
+   "description": "Jeans, men's, cotton denim",
+   "matches": "jeans, mens jeans, denim pants, jean, pantalon jean, pantalones vaqueros",
+   "code": "620342",
+   "unit": "pieces"
+  },
+  {
+   "description": "Jeans, women's, cotton denim",
+   "matches": "womens jeans, ladies jeans",
+   "code": "620462",
+   "unit": "pieces"
+  },
+  {
+   "description": "Trousers, men's, man-made fibres",
+   "matches": "pants, trousers, slacks, pantalon, pantalones, pantalon gason",
+   "code": "620343",
+   "unit": "pieces"
+  },
+  {
+   "description": "Shorts, cotton, woven",
+   "matches": "shorts, bermuda, bermudas",
+   "code": "620342",
+   "unit": "pieces"
+  },
+  {
+   "description": "Dress, women's, man-made fibres, woven",
+   "matches": "dress, dresses, robe, vestido, wob",
+   "code": "620443",
+   "unit": "pieces"
+  },
+  {
+   "description": "Dress, women's, knitted",
+   "matches": "knit dress, bodycon dress, maxi dress",
+   "code": "610443",
+   "unit": "pieces"
+  },
+  {
+   "description": "Skirt, women's, man-made fibres",
+   "matches": "skirt, jupe, falda, jip",
+   "code": "620453",
+   "unit": "pieces"
+  },
+  {
+   "description": "Leggings, women's, knitted, man-made fibres",
+   "matches": "leggings, yoga pants, tights pants",
+   "code": "610463",
+   "unit": "pieces"
+  },
+  {
+   "description": "Sweatshirt or hoodie, cotton, knitted",
+   "matches": "sweatshirt, hoodie, sweater, pullover, sudadera, swetè",
+   "code": "611020",
+   "unit": "pieces"
+  },
+  {
+   "description": "Sweater, man-made fibres, knitted",
+   "matches": "cardigan, knit sweater, jersey",
+   "code": "611030",
+   "unit": "pieces"
+  },
+  {
+   "description": "Jacket, man-made fibres",
+   "matches": "jacket, coat, windbreaker, veste, chaqueta, jakèt",
+   "code": "620140",
+   "unit": "pieces"
+  },
+  {
+   "description": "Underwear, men's, cotton, knitted",
+   "matches": "boxers, briefs, underwear men, calzoncillos, kalson",
+   "code": "610711",
+   "unit": "pieces"
+  },
+  {
+   "description": "Underwear, women's, cotton, knitted",
+   "matches": "panties, underwear women, bragas, culotte",
+   "code": "610821",
+   "unit": "pieces"
+  },
+  {
+   "description": "Bra",
+   "matches": "bra, bras, brassiere, soutien gorge, sosten, sityen",
+   "code": "621210",
+   "unit": "pieces"
+  },
+  {
+   "description": "Socks, cotton",
+   "matches": "socks, chaussettes, calcetines, chosèt",
+   "code": "611595",
+   "unit": "pieces"
+  },
+  {
+   "description": "Pyjamas, cotton, knitted",
+   "matches": "pajamas, pyjamas, sleepwear, pijama",
+   "code": "610831",
+   "unit": "pieces"
+  },
+  {
+   "description": "Baby clothes, cotton, knitted",
+   "matches": "baby clothes, onesie, babies clothing, bodysuit, rad bebe",
+   "code": "611120",
+   "unit": "pieces"
+  },
+  {
+   "description": "Tracksuit, man-made fibres, knitted",
+   "matches": "tracksuit, sweatsuit, jogging suit, survetement",
+   "code": "611212",
+   "unit": "pieces"
+  },
+  {
+   "description": "Swimsuit, women's, man-made fibres",
+   "matches": "swimsuit, bathing suit, bikini, maillot de bain, traje de bano",
+   "code": "611241",
+   "unit": "pieces"
+  },
+  {
+   "description": "Cap or hat, knitted",
+   "matches": "cap, hat, beanie, casquette, gorra, kaskèt",
+   "code": "650500",
+   "unit": "pieces"
+  },
+  {
+   "description": "Belt, leather",
+   "matches": "belt, ceinture, cinturon, sentiwon",
+   "code": "420330",
+   "unit": "pieces"
+  },
+  {
+   "description": "Worn clothing and footwear",
+   "matches": "used clothes, used clothing, second hand clothes, used shoes, old clothes, ropa usada, vieux vetements, rad itilize",
+   "code": "630900",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Handbag, leather",
+   "matches": "leather handbag, leather purse, sac en cuir",
+   "code": "420221",
+   "unit": "pieces"
+  },
+  {
+   "description": "Handbag, plastic or textile",
+   "matches": "handbag, purse, bag, sac a main, bolso, bols, sakit",
+   "code": "420222",
+   "unit": "pieces"
+  },
+  {
+   "description": "Backpack, textile",
+   "matches": "backpack, school bag, bookbag, sac a dos, mochila, sakado",
+   "code": "420292",
+   "unit": "pieces"
+  },
+  {
+   "description": "Suitcase, plastic",
+   "matches": "suitcase, luggage, valise, maleta, valiz",
+   "code": "420212",
+   "unit": "pieces"
+  },
+  {
+   "description": "Wallet, leather",
+   "matches": "leather wallet, portefeuille",
+   "code": "420231",
+   "unit": "pieces"
+  },
+  {
+   "description": "Wallet, plastic or textile",
+   "matches": "wallet, billetera, cartera, bous",
+   "code": "420232",
+   "unit": "pieces"
+  },
+  {
+   "description": "Phone case, plastic",
+   "matches": "phone case, phone cover, coque, funda, case telephone",
+   "code": "392690",
+   "unit": "pieces"
+  },
+  {
+   "description": "Phone case, leather",
+   "matches": "leather phone case, leather phone cover",
+   "code": "420231",
+   "unit": "pieces"
+  },
+  {
+   "description": "Watch, quartz",
+   "matches": "watch, wristwatch, montre, reloj, mont",
+   "code": "910211",
+   "unit": "pieces"
+  },
+  {
+   "description": "Smartwatch",
+   "matches": "smartwatch, smart watch, apple watch, fitness watch",
+   "code": "851762",
+   "unit": "pieces"
+  },
+  {
+   "description": "Imitation jewellery, base metal",
+   "matches": "jewelry, jewellery, necklace, earrings, bracelet, chain, bijoux, joyas, bijou",
+   "code": "711719",
+   "unit": "pieces"
+  },
+  {
+   "description": "Jewellery, gold",
+   "matches": "gold jewelry, gold chain, bijoux en or, oro, bijou lò",
+   "code": "711319",
+   "unit": "pieces"
+  },
+  {
+   "description": "Sunglasses",
+   "matches": "sunglasses, lunettes de soleil, gafas de sol, linèt solèy",
+   "code": "900410",
+   "unit": "pieces"
+  },
+  {
+   "description": "Wig, synthetic fibres",
+   "matches": "wig, wigs, perruque, peluca, perik",
+   "code": "670411",
+   "unit": "pieces"
+  },
+  {
+   "description": "Hair extensions, synthetic",
+   "matches": "hair extensions, braiding hair, weave, tresses, extensiones, mèch",
+   "code": "670419",
+   "unit": "pieces"
+  },
+  {
+   "description": "Wig or hair extensions, human hair",
+   "matches": "human hair, human hair wig, bundles, virgin hair, cheve natirèl",
+   "code": "670420",
+   "unit": "pieces"
+  },
+  {
+   "description": "Mobile phone",
+   "matches": "cell phone, cellphone, smartphone, iphone, samsung, phone, telephone, celular, telefon",
+   "code": "851713",
+   "unit": "pieces"
+  },
+  {
+   "description": "Mobile phone, basic",
+   "matches": "basic phone, flip phone, feature phone",
+   "code": "851714",
+   "unit": "pieces"
+  },
+  {
+   "description": "Laptop computer",
+   "matches": "laptop, notebook computer, macbook, chromebook, ordinateur portable, laptop computer, odinatè",
+   "code": "847130",
+   "unit": "pieces"
+  },
+  {
+   "description": "Tablet",
+   "matches": "tablet, ipad, tablette, tableta",
+   "code": "847130",
+   "unit": "pieces"
+  },
+  {
+   "description": "Computer monitor",
+   "matches": "monitor, computer screen, ecran",
+   "code": "852852",
+   "unit": "pieces"
+  },
+  {
+   "description": "Television",
+   "matches": "tv, television, smart tv, televiseur, televisor, televizyon",
+   "code": "852872",
+   "unit": "pieces"
+  },
+  {
+   "description": "Headphones or earbuds",
+   "matches": "headphones, earphones, earbuds, airpods, headset, ecouteurs, audifonos",
+   "code": "851830",
+   "unit": "pieces"
+  },
+  {
+   "description": "Bluetooth speaker",
+   "matches": "speaker, bluetooth speaker, enceinte, bocina, parlante, opalè",
+   "code": "851822",
+   "unit": "pieces"
+  },
+  {
+   "description": "Phone charger",
+   "matches": "charger, phone charger, power adapter, chargeur, cargador, chajè",
+   "code": "850440",
+   "unit": "pieces"
+  },
+  {
+   "description": "USB cable",
+   "matches": "usb cable, charging cable, cable, cord, kab",
+   "code": "854442",
+   "unit": "pieces"
+  },
+  {
+   "description": "Power bank, lithium-ion",
+   "matches": "power bank, portable charger, battery pack, batterie externe",
+   "code": "850760",
+   "unit": "pieces"
+  },
+  {
+   "description": "Video game console",
+   "matches": "playstation, ps5, ps4, xbox, nintendo switch, game console, console de jeux",
+   "code": "950450",
+   "unit": "pieces"
+  },
+  {
+   "description": "Video games",
+   "matches": "video game, game disc, jeux video, videojuego",
+   "code": "852349",
+   "unit": "pieces"
+  },
+  {
+   "description": "Digital camera",
+   "matches": "camera, digital camera, appareil photo, camara",
+   "code": "852589",
+   "unit": "pieces"
+  },
+  {
+   "description": "Instant camera",
+   "matches": "instant camera, polaroid, instax",
+   "code": "900640",
+   "unit": "pieces"
+  },
+  {
+   "description": "Printer",
+   "matches": "printer, imprimante, impresora",
+   "code": "844332",
+   "unit": "pieces"
+  },
+  {
+   "description": "Hair dryer",
+   "matches": "hair dryer, blow dryer, seche cheveux, secador",
+   "code": "851631",
+   "unit": "pieces"
+  },
+  {
+   "description": "Hair straightener or curling iron",
+   "matches": "flat iron, hair straightener, curling iron, fer a lisser, plancha",
+   "code": "851632",
+   "unit": "pieces"
+  },
+  {
+   "description": "Hair clipper",
+   "matches": "hair clipper, clippers, trimmer, tondeuse, cortadora de pelo",
+   "code": "851020",
+   "unit": "pieces"
+  },
+  {
+   "description": "Electric shaver",
+   "matches": "shaver, electric razor, rasoir electrique",
+   "code": "851010",
+   "unit": "pieces"
+  },
+  {
+   "description": "Blender",
+   "matches": "blender, mixeur, licuadora, blenndè",
+   "code": "850940",
+   "unit": "pieces"
+  },
+  {
+   "description": "Microwave oven",
+   "matches": "microwave, micro ondes, microondas",
+   "code": "851650",
+   "unit": "pieces"
+  },
+  {
+   "description": "Rice cooker or electric cooker",
+   "matches": "rice cooker, slow cooker, air fryer, electric cooker, pressure cooker electric",
+   "code": "851660",
+   "unit": "pieces"
+  },
+  {
+   "description": "Electric iron",
+   "matches": "iron, clothes iron, fer a repasser, plancha de ropa",
+   "code": "851640",
+   "unit": "pieces"
+  },
+  {
+   "description": "Electric fan",
+   "matches": "fan, ventilateur, ventilador, vantilatè",
+   "code": "841451",
+   "unit": "pieces"
+  },
+  {
+   "description": "Air conditioner, window",
+   "matches": "air conditioner, ac unit, climatiseur, aire acondicionado",
+   "code": "841510",
+   "unit": "pieces"
+  },
+  {
+   "description": "Refrigerator, household",
+   "matches": "fridge, refrigerator, refrigerateur, refrigerador, frijidè",
+   "code": "841821",
+   "unit": "pieces"
+  },
+  {
+   "description": "Washing machine, household",
+   "matches": "washing machine, washer, machine a laver, lavadora",
+   "code": "845011",
+   "unit": "pieces"
+  },
+  {
+   "description": "Generator, petrol",
+   "matches": "generator, generatrice, generador, dèlko",
+   "code": "850220",
+   "unit": "pieces"
+  },
+  {
+   "description": "Solar panel",
+   "matches": "solar panel, solar panels, panneau solaire, panel solar, panno solè",
+   "code": "854143",
+   "unit": "pieces"
+  },
+  {
+   "description": "Power inverter",
+   "matches": "inverter, onduleur, inversor, envètè",
+   "code": "850440",
+   "unit": "pieces"
+  },
+  {
+   "description": "LED bulb",
+   "matches": "led bulb, light bulb, ampoule, bombilla",
+   "code": "853952",
+   "unit": "pieces"
+  },
+  {
+   "description": "Flashlight",
+   "matches": "flashlight, torch, lampe de poche, linterna, flach",
+   "code": "851310",
+   "unit": "pieces"
+  },
+  {
+   "description": "Extension cord",
+   "matches": "extension cord, power strip, rallonge, extension",
+   "code": "854442",
+   "unit": "pieces"
+  },
+  {
+   "description": "Cooking pots and pans, aluminium",
+   "matches": "pots, pans, cookware, casseroles, ollas, chodyè",
+   "code": "761510",
+   "unit": "pieces"
+  },
+  {
+   "description": "Kitchenware, stainless steel",
+   "matches": "stainless steel pots, kitchen utensils metal, ustensiles",
+   "code": "732393",
+   "unit": "pieces"
+  },
+  {
+   "description": "Kitchenware and tableware, plastic",
+   "matches": "plastic plates, plastic cups, kitchen utensils, tupperware, vaisselle plastique",
+   "code": "392410",
+   "unit": "pieces"
+  },
+  {
+   "description": "Plates and dishes, ceramic",
+   "matches": "plates, dishes, bowls, assiettes, platos, asyèt",
+   "code": "691200",
+   "unit": "pieces"
+  },
+  {
+   "description": "Drinking glasses",
+   "matches": "glasses, cups glass, verres, vasos",
+   "code": "701337",
+   "unit": "pieces"
+  },
+  {
+   "description": "Bed sheets, cotton",
+   "matches": "bed sheets, sheets, bedding, draps, sabanas, dra",
+   "code": "630231",
+   "unit": "pieces"
+  },
+  {
+   "description": "Towels, cotton",
+   "matches": "towels, bath towel, serviettes, toallas, sèvyèt",
+   "code": "630260",
+   "unit": "pieces"
+  },
+  {
+   "description": "Curtains, man-made fibres",
+   "matches": "curtains, rideaux, cortinas, rido",
+   "code": "630392",
+   "unit": "pieces"
+  },
+  {
+   "description": "Blanket, man-made fibres",
+   "matches": "blanket, comforter, couverture, cobija, manta, lenn",
+   "code": "630140",
+   "unit": "pieces"
+  },
+  {
+   "description": "Pillow",
+   "matches": "pillow, cushion, oreiller, almohada, zòrye",
+   "code": "940490",
+   "unit": "pieces"
+  },
+  {
+   "description": "Mattress, foam",
+   "matches": "mattress, matelas, colchon, matla",
+   "code": "940421",
+   "unit": "pieces"
+  },
+  {
+   "description": "Plastic storage containers",
+   "matches": "storage bins, plastic containers, buckets, bokit",
+   "code": "392490",
+   "unit": "pieces"
+  },
+  {
+   "description": "Furniture, wooden",
+   "matches": "furniture, table, chair, dresser, meubles, muebles, mèb",
+   "code": "940360",
+   "unit": "pieces"
+  },
+  {
+   "description": "Make-up and skin care",
+   "matches": "makeup, cosmetics, foundation, face cream, lotion, body lotion, maquillage, maquillaje, kosmetik",
+   "code": "330499",
+   "unit": "pieces"
+  },
+  {
+   "description": "Lipstick",
+   "matches": "lipstick, lip gloss, rouge a levres, pintalabios",
+   "code": "330410",
+   "unit": "pieces"
+  },
+  {
+   "description": "Nail polish",
+   "matches": "nail polish, vernis a ongles, esmalte",
+   "code": "330430",
+   "unit": "pieces"
+  },
+  {
+   "description": "Perfume",
+   "matches": "perfume, cologne, fragrance, parfum, pafen",
+   "code": "330300",
+   "unit": "pieces"
+  },
+  {
+   "description": "Shampoo",
+   "matches": "shampoo, shampooing, champu, chanpou",
+   "code": "330510",
+   "unit": "pieces"
+  },
+  {
+   "description": "Hair products",
+   "matches": "hair gel, hair relaxer, conditioner, hair oil, edge control, produits cheveux",
+   "code": "330590",
+   "unit": "pieces"
+  },
+  {
+   "description": "Deodorant",
+   "matches": "deodorant, antiperspirant, desodorante",
+   "code": "330720",
+   "unit": "pieces"
+  },
+  {
+   "description": "Toothpaste",
+   "matches": "toothpaste, dentifrice, pasta dental, pat dantifris",
+   "code": "330610",
+   "unit": "pieces"
+  },
+  {
+   "description": "Soap, bar",
+   "matches": "soap, bar soap, savon, jabon",
+   "code": "340111",
+   "unit": "pieces"
+  },
+  {
+   "description": "Vitamins and food supplements",
+   "matches": "vitamins, supplements, multivitamin, protein powder, vitamines, vitaminas",
+   "code": "210690",
+   "unit": "pieces"
+  },
+  {
+   "description": "Medicine, packaged doses",
+   "matches": "medicine, tylenol, advil, pain reliever, medicament, medicamentos, medikaman",
+   "code": "300490",
+   "unit": "pieces"
+  },
+  {
+   "description": "Diapers",
+   "matches": "diapers, nappies, pampers, couches, panales, kouchèt",
+   "code": "961900",
+   "unit": "pieces"
+  },
+  {
+   "description": "Sanitary pads",
+   "matches": "sanitary pads, pads, serviettes hygieniques, toallas sanitarias",
+   "code": "961900",
+   "unit": "pieces"
+  },
+  {
+   "description": "Baby formula",
+   "matches": "baby formula, infant formula, lait bebe, formula infantil",
+   "code": "190110",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Rice",
+   "matches": "rice, riz, arroz, diri",
+   "code": "100630",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Pasta",
+   "matches": "spaghetti, pasta, macaroni, pates, espagueti, espageti",
+   "code": "190219",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Cooking oil, soybean",
+   "matches": "cooking oil, vegetable oil, soybean oil, huile, aceite, lwil",
+   "code": "150790",
+   "unit": "litres"
+  },
+  {
+   "description": "Sugar",
+   "matches": "sugar, sucre, azucar, sik",
+   "code": "170199",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Wheat flour",
+   "matches": "flour, farine, harina, farin",
+   "code": "110100",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Coffee, roasted",
+   "matches": "coffee, cafe, kafe",
+   "code": "090121",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Sardines, canned",
+   "matches": "sardines, canned fish, sardinas, sadin",
+   "code": "160413",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Corned beef, canned",
+   "matches": "corned beef, canned meat, carne en lata",
+   "code": "160250",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Milk powder",
+   "matches": "milk powder, powdered milk, lait en poudre, leche en polvo, lèt an poud",
+   "code": "040221",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Bouillon cubes and seasoning",
+   "matches": "bouillon, maggi, seasoning, cubes, sazon, epis",
+   "code": "210410",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Candy",
+   "matches": "candy, sweets, bonbons, dulces, sirèt",
+   "code": "170490",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Chocolate",
+   "matches": "chocolate, chocolat",
+   "code": "180690",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Biscuits and cookies",
+   "matches": "cookies, biscuits, galletas, bonbon sèl",
+   "code": "190531",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Soft drinks",
+   "matches": "soda, soft drinks, juice drinks, gaseosa, kola",
+   "code": "220210",
+   "unit": "litres"
+  },
+  {
+   "description": "Toys",
+   "matches": "toys, toy, doll, dolls, jouets, juguetes, jwèt",
+   "code": "950300",
+   "unit": "pieces"
+  },
+  {
+   "description": "Bicycle",
+   "matches": "bicycle, bike, velo, bicicleta, bisiklèt",
+   "code": "871200",
+   "unit": "pieces"
+  },
+  {
+   "description": "Ball, inflatable",
+   "matches": "ball, football, soccer ball, basketball ball, ballon, pelota, balon",
+   "code": "950662",
+   "unit": "pieces"
+  },
+  {
+   "description": "Fitness equipment",
+   "matches": "dumbbells, weights, exercise equipment, fitness",
+   "code": "950691",
+   "unit": "pieces"
+  },
+  {
+   "description": "Books, printed",
+   "matches": "book, books, livres, libros, liv",
+   "code": "490199",
+   "unit": "pieces"
+  },
+  {
+   "description": "Exercise books and notebooks",
+   "matches": "notebook, notebooks, exercise book, cahier, cuaderno, kaye",
+   "code": "482020",
+   "unit": "pieces"
+  },
+  {
+   "description": "Pens",
+   "matches": "pen, pens, stylo, boligrafo, plim",
+   "code": "960810",
+   "unit": "pieces"
+  },
+  {
+   "description": "Keyboard, musical",
+   "matches": "keyboard piano, synthesizer, clavier",
+   "code": "920710",
+   "unit": "pieces"
+  },
+  {
+   "description": "Guitar",
+   "matches": "guitar, guitare, guitarra, gita",
+   "code": "920290",
+   "unit": "pieces"
+  },
+  {
+   "description": "Printed documents",
+   "matches": "documents, papers, letters, papiers, documentos",
+   "code": "491199",
+   "unit": "pieces"
+  },
+  {
+   "description": "Car parts",
+   "matches": "auto parts, car parts, pieces auto, repuestos, pyès machin",
+   "code": "870899",
+   "unit": "pieces"
+  },
+  {
+   "description": "Brake pads",
+   "matches": "brake pads, brakes, plaquettes de frein, pastillas de freno",
+   "code": "870830",
+   "unit": "pieces"
+  },
+  {
+   "description": "Tyres, car, new",
+   "matches": "tires, tyres, pneus, llantas, kawotchou",
+   "code": "401110",
+   "unit": "pieces"
+  },
+  {
+   "description": "Motorcycle parts",
+   "matches": "motorcycle parts, moto parts, pieces moto, pyès moto",
+   "code": "871410",
+   "unit": "pieces"
+  },
+  {
+   "description": "Battery, lead-acid, vehicle",
+   "matches": "car battery, truck battery, batterie de voiture, bateria de carro, batri machin",
+   "code": "850710",
+   "unit": "pieces"
+  },
+  {
+   "description": "Hand tools, set",
+   "matches": "tool set, tools, outils, herramientas, zouti",
+   "code": "820600",
+   "unit": "sets"
+  },
+  {
+   "description": "Power drill",
+   "matches": "drill, power drill, perceuse, taladro",
+   "code": "846721",
+   "unit": "pieces"
+  },
+  {
+   "description": "Screws and bolts",
+   "matches": "screws, bolts, vis, tornillos",
+   "code": "731815",
+   "unit": "kilograms"
+  },
+  {
+   "description": "Paint",
+   "matches": "paint, peinture, pintura, penti",
+   "code": "320910",
+   "unit": "litres"
+  },
+  {
+   "description": "Plumbing fittings, plastic",
+   "matches": "pvc fittings, plumbing, pipe fittings, tuyauterie",
+   "code": "391740",
+   "unit": "pieces"
+  },
+  {
+   "description": "Padlock",
+   "matches": "padlock, lock, cadenas, candado, kadna",
+   "code": "830110",
+   "unit": "pieces"
+  },
+  {
+   "description": "Sewing machine, household",
+   "matches": "sewing machine, machine a coudre, maquina de coser, machin a koud",
+   "code": "845210",
+   "unit": "pieces"
+  }
+ ]
+}

@@ -1,0 +1,68 @@
+﻿@*
+=========================================================
+FILE: SupplyMovementsPage.razor
+
+PURPOSE:
+The stock movements of a supply at a warehouse, newest first (Slice 5E, S-4).
+
+RESPONSIBILITIES:
+- Show on hand, then each movement: when, what, how many, the reason, note, supplier, reference and cost
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The last 200 movements
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.supplies.stock.history"]" Company="@Company" Section="supplies_stock" Error="@Error">
+    <p><a href="/staff/supplies/stock?warehouse=@Warehouse?.Id">@T["ui.supplies.stock.back"]</a></p>
+    @if (Supply is { } supply && Warehouse is { } warehouse)
+    {
+    <section class="ops-editor__panel" aria-labelledby="movements-title">
+        <h2 id="movements-title">@supply.Code · @supply.Name(Language) · @warehouse.Code</h2>
+        <p>@VixlyText.Format(T, "ui.supplies.stock.on_hand_now", "count", Stock?.OnHand ?? 0)</p>
+        @if (Movements.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.supplies.stock.no_movement"]</p></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.supplies.stock.history"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.supplies.stock.when"]</th><th scope="col">@T["ui.supplies.stock.what"]</th><th scope="col" class="ops-editor__number">@T["ui.supplies.stock.quantity"]</th><th scope="col">@T["ui.supplies.stock.details"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsSupplyMovement movement in Movements)
+                        {
+                            <tr data-kind="@movement.Kind">
+                                <td>@movement.CreatedUtc.ToString("g", CultureInfo.CurrentCulture)</td>
+                                <td>@T["ui.supplies.movement." + movement.Kind]@if (movement.Reason is { } reason) { <span> · @T["ui.supplies.reason." + reason]</span> }</td>
+                                <td class="ops-editor__number">@(movement.Quantity > 0 ? "+" : string.Empty)@movement.Quantity</td>
+                                <td>@string.Join(" · ", new[] { movement.Note, movement.Supplier, movement.Reference, movement.UnitCost is { } cost ? OperationsChargeWords.Money(cost, Currency) : null }.Where(text => !string.IsNullOrEmpty(text)))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+    </section>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsSupply? Supply { get; set; }
+
+    [Parameter] public OperationsWarehouse? Warehouse { get; set; }
+
+    [Parameter] public OperationsSupplyStock? Stock { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsSupplyMovement> Movements { get; set; } = Array.Empty<OperationsSupplyMovement>();
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+
+    [Parameter] public string? Error { get; set; }
+
+    private static string Language => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+}

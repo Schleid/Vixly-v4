@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: CollectionsPage.razor
 
@@ -15,8 +15,15 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<PlatformText> T
 
 <PageTitle>@T["ui.collections.title"]</PageTitle>
-<h1>@T["ui.collections.title"]</h1>
-<p><a href="/invoices">@T["ui.invoices.title"]</a> · <a href="/collections/settings">@T["ui.collections_settings.title"]</a></p>
+<div class="vx-summary-strip">
+    <div class="vx-summary-strip__main">
+        <h1 class="vx-summary-strip__title">@T["ui.collections.title"]</h1>
+    </div>
+    <div class="vx-summary-strip__actions">
+        <a href="/invoices" class="vx-button vx-button--secondary">@T["ui.invoices.title"]</a>
+        <a href="/collections/settings" class="vx-button vx-button--secondary">@T["ui.collections_settings.title"]</a>
+    </div>
+</div>
 <CollectionsOverview Status="@Status" Stage="@Stage" Currency="@Currency" Extension="@(Extension ?? false)" Search="@Search" Page="@Page" />
 
 @code {

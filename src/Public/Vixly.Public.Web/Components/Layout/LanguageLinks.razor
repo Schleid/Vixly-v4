@@ -1,0 +1,37 @@
+﻿@*
+=========================================================
+FILE: LanguageLinks.razor
+
+PURPOSE:
+Links to the same page in the other languages, and the matching hreflang alternates (ADR-0005).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Pages from email links (no language in the address) switch through the cookie
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+@inject NavigationManager Navigation
+
+<nav class="pub-languages" aria-label="@T["public.language.label"]">
+    @foreach (string language in PublicLanguage.Codes)
+    {
+        @if (language == PublicLanguage.Current)
+        {
+            <span aria-current="true" lang="@language">@T["public.language." + language]</span>
+        }
+        else
+        {
+            <a href="@Link(language)" hreflang="@language" lang="@language">@T["public.language." + language]</a>
+        }
+    }
+</nav>
+
+@code {
+    private string Link(string language)
+    {
+        string path = "/" + Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0];
+        return PublicLanguage.FromPath(new PathString(path)) is null ? path + "?lang=" + language : PublicLanguage.Swap(path, language);
+    }
+}

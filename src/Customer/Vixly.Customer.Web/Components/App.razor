@@ -1,0 +1,31 @@
+﻿@*
+=========================================================
+FILE: App.razor
+
+PURPOSE:
+The customer portal document at /customer (Slice 0: static pages only).
+
+RESPONSIBILITIES:
+- Render the HTML shell
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10)
+- base href is /customer/ so every link stays inside the portal
+=========================================================
+*@
+<!DOCTYPE html>
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <base href="/customer/" />
+    <link rel="stylesheet" href="@Assets["_content/Vixly.Shared.UI/vixly-theme.css"]" />
+    <link rel="stylesheet" href="@Assets["_content/Vixly.Shared.UI/vixly-primitives.css"]" />
+    <script src="@Assets["_content/Vixly.Shared.UI/vixly-forms.js"]" defer></script>
+    <link rel="stylesheet" href="css/customer-status.css" />
+    <HeadOutlet />
+</head>
+<body>
+    <Routes />
+</body>
+</html>

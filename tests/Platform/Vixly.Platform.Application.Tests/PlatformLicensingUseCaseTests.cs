@@ -15,6 +15,7 @@ using Vixly.Platform.Application.UseCases.Licensing.ReleasePlatformDevice;
 using Vixly.Platform.Application.UseCases.Licensing.RequestPlatformFirstDeviceLink;
 using Vixly.Platform.Application.UseCases.Licensing.StartPlatformOwnerRecovery;
 using Vixly.Platform.Application.UseCases.Licensing.VerifyPlatformDevice;
+using Vixly.Platform.Application.UseCases.TenantAccount.GetTenantDeviceSeats;
 using Vixly.Platform.Domain.Licensing;
 using Vixly.Platform.Domain.Subscriptions;
 using Vixly.Platform.Domain.Tenants;
@@ -83,6 +84,23 @@ public sealed class PlatformLicensingUseCaseTests
         PlatformDeviceEnrolment waiting = await EnrolAsync(unpaid.Id);
         _kit.Kit.Tenants.Clock.Advance(TimeSpan.FromDays(30));
         Assert.Equal("platform.licensing.access_not_full", await ApproveAsync(unpaid.Id, waiting.DeviceId));
+    }
+
+    // Owner, 2026-10-21: the Licences tab counts the licences bought and in use.
+    [Fact]
+    public async Task Seats_CountWhatIsBoughtAndInUse()
+    {
+        (PlatformTenant tenant, _) = _kit.Tenant(licences: 3);
+        PlatformDeviceEnrolment first = await EnrolAsync(tenant.Id);
+        await EnrolAsync(tenant.Id);
+        Assert.Null(await ApproveAsync(tenant.Id, first.DeviceId));
+
+        GetTenantDeviceSeatsResponse seats = await new GetTenantDeviceSeatsUseCase(_kit.Administration()).ExecuteAsync(
+            LicensingTestKit.Caller(tenant.Id), new GetTenantDeviceSeatsRequest(), CancellationToken.None);
+
+        Assert.Equal(3, seats.Seats);
+        Assert.Equal(1, seats.InUse);
+        Assert.Null(seats.ScheduledSeats);
     }
 
     [Fact]
@@ -219,14 +237,26 @@ public sealed class PlatformLicensingUseCaseTests
         string token = mail.Link!.Split('#')[1];
 
         CompletePlatformDeviceLinkUseCase complete = new(_kit.Administration());
+
+        // Opened on another tenant's host: refused, and the link still works on its own host.
+        Assert.Equal("platform.licensing.link_invalid", (await complete.ExecuteAsync(PlatformAnonymousAuthorizationContext.Instance,
+            new CompletePlatformDeviceLinkRequest { Token = token, Name = "Owner laptop", Kind = PlatformDeviceKind.Pc, ExpectedTenantId = Guid.NewGuid() }, CancellationToken.None)).Error!.Code);
+
         var done = await complete.ExecuteAsync(PlatformAnonymousAuthorizationContext.Instance,
-            new CompletePlatformDeviceLinkRequest { Token = token, Name = "Owner laptop", Kind = PlatformDeviceKind.Pc }, CancellationToken.None);
+            new CompletePlatformDeviceLinkRequest { Token = token, Name = "Owner laptop", Kind = PlatformDeviceKind.Pc, ExpectedTenantId = tenant.Id }, CancellationToken.None);
 
         Assert.True(done.Succeeded, done.Error?.Code);
         Assert.Equal(PlatformDeviceStatus.Active, done.Enrolment!.Status);
         Assert.Equal(PlatformTenantRegistrationStatus.Completed, registration.Status);
         Assert.Equal(PlatformTenantStatus.Active, tenant.Status);
         Assert.Contains(_kit.Kit.Tenants.Tenants.Outbox, item => item.Type == PlatformMessageTypes.TenantStatusChanged);
+
+        // The welcome email is the last one, with the staff sign-in and the public site.
+        await _kit.DeliverAsync();
+        PlatformLicensingMail welcome = _kit.Store.Mails.Single(item => item.Mail.Kind == PlatformLicensingNoticeKind.Welcome).Mail;
+        Assert.Equal("https://orbit-freight.vixly.test/staff", welcome.StaffLink);
+        Assert.Equal("https://orbit-freight.vixly.test/", welcome.SiteLink);
+
         Assert.Equal("platform.licensing.link_invalid", (await complete.ExecuteAsync(PlatformAnonymousAuthorizationContext.Instance,
             new CompletePlatformDeviceLinkRequest { Token = token, Name = "Second", Kind = PlatformDeviceKind.Pc }, CancellationToken.None)).Error!.Code);
     }
@@ -241,9 +271,9 @@ public sealed class PlatformLicensingUseCaseTests
         await ApproveAsync(tenant.Id, b.DeviceId);
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(() => new StartPlatformOwnerRecoveryUseCase(_kit.Administration()).ExecuteAsync(
-            _kit.Kit.Staff(PlatformPermissions.LicensingView), new StartPlatformOwnerRecoveryRequest { PlatformTenantId = tenant.Id }, CancellationToken.None));
+            _kit.Kit.Staff(PlatformPermissions.LicensingView), new StartPlatformOwnerRecoveryRequest { PlatformTenantId = tenant.Id, Reason = "Lost laptop", IdentityCheck = "Called back" }, CancellationToken.None));
         Assert.True((await new StartPlatformOwnerRecoveryUseCase(_kit.Administration()).ExecuteAsync(
-            _kit.Kit.Staff(PlatformPermissions.LicensingManage), new StartPlatformOwnerRecoveryRequest { PlatformTenantId = tenant.Id }, CancellationToken.None)).Succeeded);
+            _kit.Kit.Staff(PlatformPermissions.LicensingManage), new StartPlatformOwnerRecoveryRequest { PlatformTenantId = tenant.Id, Reason = "Lost laptop", IdentityCheck = "Called back the owner phone on file" }, CancellationToken.None)).Succeeded);
         await _kit.DeliverAsync();
         string token = _kit.Store.Mails.Single(item => item.Mail.Kind == PlatformLicensingNoticeKind.RecoveryLink).Mail.Link!.Split('#')[1];
 
@@ -292,5 +322,20 @@ public sealed class PlatformLicensingUseCaseTests
         var found = await portal.ExecuteAsync(PlatformInternalAuthorizationContext.Instance, new GetPlatformPortalAccessRequest { Slug = tenant.CurrentSlug.ToUpperInvariant() }, CancellationToken.None);
         Assert.True(found.Access!.Found);
         Assert.Equal(PlatformSubscriptionAccess.Full, found.Access.Access);
+    }
+
+    [Fact]
+    public async Task PortalAccess_ShowsATenantBeingSetUp_OnlyWhenAsked()
+    {
+        PlatformTenant tenant = _kit.Kit.Tenants.Tenant("setup-" + Guid.NewGuid().ToString("N")[..6]);
+        GetPlatformPortalAccessUseCase portal = new(_kit.Administration());
+
+        var edge = await portal.ExecuteAsync(PlatformInternalAuthorizationContext.Instance, new GetPlatformPortalAccessRequest { Slug = tenant.CurrentSlug }, CancellationToken.None);
+        Assert.False(edge.Access!.Found);
+
+        var operations = await portal.ExecuteAsync(PlatformInternalAuthorizationContext.Instance, new GetPlatformPortalAccessRequest { Slug = tenant.CurrentSlug, IncludeSettingUp = true }, CancellationToken.None);
+        Assert.True(operations.Access!.Found);
+        Assert.Equal(PlatformTenantStatus.Draft, operations.Access.Status);
+        Assert.Equal(PlatformSubscriptionAccess.None, operations.Access.Access);
     }
 }

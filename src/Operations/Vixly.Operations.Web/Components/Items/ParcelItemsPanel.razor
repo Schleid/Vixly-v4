@@ -1,0 +1,144 @@
+@*
+=========================================================
+FILE: ParcelItemsPanel.razor
+
+PURPOSE:
+The items of a parcel on its page: what the customer declared, and the customs classification staff add (owner, 2026-11-01).
+
+RESPONSIBILITIES:
+- Show each item: the customer's words, quantity, value of one, new or used
+- For staff who check parcels: description on documents (catalogue suggestions), customs code, country of origin, unit, add to the catalogue
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Static form with antiforgery (ADR-0019); the suggestions are a datalist, no script
+- D-C6: the customer's declaration is never edited here
+=========================================================
+*@
+@using Vixly.Operations.Application.Items
+@using Vixly.Operations.Domain.Items
+@inject IStringLocalizer<OperationsText> T
+
+<section class="ops-editor__panel ops-items" id="items" aria-labelledby="parcel-items">
+    <div class="ops-items__header">
+        <h2 id="parcel-items">
+            @T["ui.items.title"]
+            @if (Missing > 0)
+            {
+                <span class="ops-status-pill" data-status="missing">@VixlyText.Format(T, "ui.items.missing", "count", Missing)</span>
+            }
+        </h2>
+        @if (Items.Count > 0 && CanEdit)
+        {
+            <p class="ops-editor__hint">@T["ui.items.hint"]</p>
+        }
+    </div>
+
+    @if (Items.Count == 0)
+    {
+        <p class="ops-editor__hint">@T["ui.items.none"]</p>
+    }
+    else if (CanEdit)
+    {
+        <form method="post" action="/staff/parcels/@ParcelId/items">
+            <AntiforgeryToken />
+            <datalist id="item-catalogue">
+                @foreach (OperationsItemCatalogueEntry entry in Catalogue)
+                {
+                    <option value="@entry.Description" label="@OperationsHsCode.Format(entry.HsCode)"></option>
+                }
+            </datalist>
+            <OperationsTableViewport Label="@T["ui.items.title"]">
+                <table class="ops-editor__table ops-items__table">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="min-width: 10rem;">@T["ui.items.declared"]</th>
+                            <th scope="col" class="ops-editor__number" style="width: 4.5rem;">@T["ui.items.quantity"]</th>
+                            <th scope="col" class="ops-editor__number" style="width: 6.5rem;">@T["ui.items.value_each"]</th>
+                            <th scope="col" style="min-width: 12rem;">@T["ui.items.description"]</th>
+                            <th scope="col" style="width: 8rem;">@T["ui.items.code"]</th>
+                            <th scope="col" style="width: 4.5rem; text-align: center;">@T["ui.items.origin"]</th>
+                            <th scope="col" style="width: 7.5rem;">@T["ui.items.unit"]</th>
+                            <th scope="col" style="width: 4.5rem; text-align: center;">@T["ui.items.add_to_catalogue"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int index = 0; index < Items.Count; index++)
+                        {
+                            OperationsItemRow item = Items[index];
+                            <tr data-complete="@(item.Complete ? "true" : "false")" class="@(item.Complete ? "ops-items__row--complete" : "ops-items__row--incomplete")">
+                                <td>
+                                    <input type="hidden" name="item_id" value="@(item.ItemId?.ToString() ?? string.Empty)" />
+                                    <span class="ops-item-words">@item.Words</span>
+                                    @if (item.Used) { <span class="ops-item-used-tag">@T["ui.items.used"]</span> }
+                                </td>
+                                <td class="ops-editor__number">@item.Quantity.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)</td>
+                                <td class="ops-editor__number">@item.ValueEach.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) <span class="ops-currency-code">@item.CurrencyCode</span></td>
+                                <td><input name="description" list="item-catalogue" maxlength="200" value="@item.Description" aria-label="@T["ui.items.description"]" class="ops-item-desc-input" /></td>
+                                <td><input name="code" maxlength="13" size="12" inputmode="numeric" pattern="[0-9. ]{6,13}" value="@item.HsCode" aria-label="@T["ui.items.code"]" title="@T["ui.items.code_hint"]" class="ops-item-code-input" /></td>
+                                <td style="text-align: center;"><input name="origin" maxlength="2" size="3" pattern="[A-Za-z]{2}" autocapitalize="characters" value="@item.OriginCountryCode" aria-label="@T["ui.items.origin"]" title="@T["ui.items.origin_hint"]" class="ops-item-origin-input" /></td>
+                                <td>
+                                    <select name="unit" aria-label="@T["ui.items.unit"]" class="ops-item-unit-select">
+                                        @foreach (OperationsItemUnit unit in Enum.GetValues<OperationsItemUnit>())
+                                        {
+                                            <option value="@unit" selected="@(unit == item.Unit)">@T["ui.items.unit." + unit.ToString().ToLowerInvariant()]</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td style="text-align: center;"><input type="checkbox" name="add" value="@index" aria-label="@T["ui.items.add_to_catalogue"]" class="ops-item-add-check" /></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+            <div class="ops-editor__form-actions ops-items__actions">
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.items.save"]</button>
+            </div>
+        </form>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.items.title"]">
+            <table class="ops-editor__table ops-items__table">
+                <thead>
+                    <tr>
+                        <th scope="col">@T["ui.items.declared"]</th>
+                        <th scope="col" class="ops-editor__number">@T["ui.items.quantity"]</th>
+                        <th scope="col" class="ops-editor__number">@T["ui.items.value_each"]</th>
+                        <th scope="col">@T["ui.items.description"]</th>
+                        <th scope="col">@T["ui.items.code"]</th>
+                        <th scope="col">@T["ui.items.origin"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (OperationsItemRow item in Items)
+                    {
+                        <tr data-complete="@(item.Complete ? "true" : "false")" class="@(item.Complete ? "ops-items__row--complete" : "ops-items__row--incomplete")">
+                            <td>
+                                <span class="ops-item-words">@item.Words</span>
+                                @if (item.Used) { <span class="ops-item-used-tag">@T["ui.items.used"]</span> }
+                            </td>
+                            <td class="ops-editor__number">@item.Quantity.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture)</td>
+                            <td class="ops-editor__number">@item.ValueEach.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) <span class="ops-currency-code">@item.CurrencyCode</span></td>
+                            <td>@item.Description</td>
+                            <td>@item.HsCode</td>
+                            <td>@item.OriginCountryCode</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    }
+</section>
+
+@code {
+    [Parameter] public Guid ParcelId { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsItemRow> Items { get; set; } = Array.Empty<OperationsItemRow>();
+
+    [Parameter] public IReadOnlyList<OperationsItemCatalogueEntry> Catalogue { get; set; } = Array.Empty<OperationsItemCatalogueEntry>();
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public int Missing { get; set; }
+}

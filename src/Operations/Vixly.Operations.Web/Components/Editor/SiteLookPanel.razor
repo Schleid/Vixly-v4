@@ -1,0 +1,51 @@
+@*
+=========================================================
+FILE: SiteLookPanel.razor
+
+PURPOSE:
+The theme and font choice of the website draft.
+
+RESPONSIBILITIES:
+- Render the theme and font selects, locked with a hint when the plan lacks theme customisation
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); part of the website editor (SiteEditorPage)
+- Website themes, step 1 (2026-10-29)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<fieldset class="ops-site-fieldset ops-site-look" disabled="@(!Features.ThemeCustomization)">
+    <legend>@T["ui.editor.site.look"]</legend>
+    <p class="ops-editor__hint">@T[Features.ThemeCustomization ? "ui.editor.site.look_hint" : "ui.editor.site.look_locked"]</p>
+    <div class="ops-site-brand-grid">
+        <label class="ops-site-field">
+            <span>@T["ui.editor.site.theme"]</span>
+            <select name="theme" aria-describedby="theme-hint">
+                @foreach (OperationsSiteTheme theme in Enum.GetValues<OperationsSiteTheme>())
+                {
+                    <option value="@theme" selected="@(theme == Draft.Theme)">@T["ui.editor.theme." + OperationsSiteLooks.Slug(theme)]</option>
+                }
+            </select>
+            <small id="theme-hint" class="ops-editor__hint">@T["ui.editor.theme." + OperationsSiteLooks.Slug(Draft.Theme) + ".hint"]</small>
+        </label>
+        <label class="ops-site-field">
+            <span>@T["ui.editor.site.font"]</span>
+            <select name="font">
+                @foreach (OperationsSiteFont font in Enum.GetValues<OperationsSiteFont>())
+                {
+                    <option value="@font" selected="@(font == Draft.Font)">@T["ui.editor.font." + OperationsSiteLooks.Slug(font)]</option>
+                }
+            </select>
+        </label>
+    </div>
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired]
+    public OperationsBrandSettings Draft { get; set; } = null!;
+
+    [Parameter]
+    public Vixly.Operations.Application.Ports.OperationsPlanFeatures Features { get; set; } = Vixly.Operations.Application.Ports.OperationsPlanFeatures.All;
+}

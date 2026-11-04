@@ -21,6 +21,8 @@ namespace Vixly.Platform.Application.Messaging;
 //   for it
 // - Each message is saved on its own, so one failure does not
 //   hold back the others
+// - Each failure is reported to the caller with the message id
+//   (onFailure), so the host can log it; Application has no logger
 // =========================================================
 public sealed class PlatformOutboxDispatcher
 {
@@ -50,7 +52,12 @@ public sealed class PlatformOutboxDispatcher
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
-    public async Task<int> DispatchAsync(CancellationToken cancellationToken)
+    public Task<int> DispatchAsync(CancellationToken cancellationToken)
+    {
+        return DispatchAsync(null, cancellationToken);
+    }
+
+    public async Task<int> DispatchAsync(Action<PlatformOutboxFailure>? onFailure, CancellationToken cancellationToken)
     {
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();
         IReadOnlyList<Guid> leased = await _outbox.LeaseDueAsync(BatchSize, utcNow, utcNow.Add(LeaseDuration), cancellationToken);
@@ -82,10 +89,12 @@ public sealed class PlatformOutboxDispatcher
             catch (DomainException exception)
             {
                 message.MarkFailed(exception.Error.Code, _timeProvider.GetUtcNow());
+                onFailure?.Invoke(new PlatformOutboxFailure(message.Id, message.Type, exception.Error.Code, message.Attempts, exception));
             }
-            catch (Exception)
+            catch (Exception exception)
             {
                 message.MarkFailed(HandlerFailed, _timeProvider.GetUtcNow());
+                onFailure?.Invoke(new PlatformOutboxFailure(message.Id, message.Type, HandlerFailed, message.Attempts, exception));
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);

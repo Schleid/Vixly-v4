@@ -1,0 +1,42 @@
+@*
+=========================================================
+FILE: HomeAddressFields.razor
+
+PURPOSE:
+The fields of the customer's home address (owner, 2026-10-26).
+
+RESPONSIBILITIES:
+- Street, more, city, region, postal code and country
+
+IMPORTANT NOTES:
+- Markup only; the caller passes its localizer and the form around it
+- Street, city and country are required; Operations checks every part again
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Packages
+@using Vixly.Customer.Web.Portal
+
+<label>@T["ui.shipments.line1"] <input name="line1" value="@Entered?.Line1" maxlength="200" autocomplete="address-line1" required /></label>
+<label>@T["ui.shipments.line2"] <input name="line2" value="@Entered?.Line2" maxlength="200" autocomplete="address-line2" /></label>
+<div class="customer-field-duo">
+    <label>@T["ui.shipments.city"] <input name="city" value="@Entered?.City" maxlength="100" autocomplete="address-level2" required /></label>
+    <label>@T["ui.shipments.region"] <input name="region" value="@Entered?.Region" maxlength="100" autocomplete="address-level1" /></label>
+</div>
+<div class="customer-field-duo">
+    <label>@T["ui.shipments.postal_code"] <input name="postalCode" value="@Entered?.PostalCode" maxlength="20" autocomplete="postal-code" /></label>
+    <label>@T["ui.shipments.country"]
+        <select name="country" autocomplete="country" required>
+            <option value="">@T["ui.address.choose_country"]</option>
+            @foreach ((string iso, string name) in CustomerCountries.Sorted())
+            {
+                <option value="@iso" selected="@(iso == Entered?.CountryCode)">@name</option>
+            }
+        </select>
+    </label>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<CustomerText> T { get; set; } = null!;
+
+    [Parameter] public CustomerAddressDto? Entered { get; set; }
+}

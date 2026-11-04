@@ -1,0 +1,96 @@
+﻿@*
+=========================================================
+FILE: TenantLicenceList.razor
+
+PURPOSE:
+The tenant's licences in Control (owner, 2026-10-21): each
+licence bound to a device or free, then the devices requested
+and those that ended. The device's name opens its page.
+
+IMPORTANT NOTES:
+- Loads every device of the tenant itself (TenantLicenceListPresenter)
+- Not who authorised a device: that is the company's own business (owner, 2026-10-21)
+- Text comes from PlatformText (UI-10); placeholder look until the Frontend/UI team designs it
+=========================================================
+*@
+@using Vixly.Platform.Application.Queries
+@using Vixly.Platform.Domain.Licensing
+@inherits PlatformPresenterComponent<TenantLicenceListPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<h3>@T["ui.licences.title"]</h3>
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+<VxDataTable Items="Rows" IsLoading="@(!Presenter.State.Loaded)">
+    <HeaderContent>
+        <th scope="col">@T["ui.licences.licence"]</th>
+        <th scope="col">@T["ui.licences.device_id"]</th>
+        <th scope="col">@T["ui.devices.name"]</th>
+        <th scope="col">@T["ui.device.kind"]</th>
+        <th scope="col">@T["ui.devices.status"]</th>
+        <th scope="col">@T["ui.devices.requested"]</th>
+    </HeaderContent>
+    <RowTemplate Context="row">
+        <td>@(row.Licence?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "-")</td>
+        @if (row.Device is { } device)
+        {
+            <td>@device.Number</td>
+            <td><a href="/devices/@device.DeviceId">@device.Name</a></td>
+            <td>@T[LicensingDisplay.KindKey(device.Kind)]</td>
+            <td><VxStatusBadge Status="@LicensingDisplay.Badge(device.Status, device.SeatHeld)" Text="@T[LicensingDisplay.StatusKey(device.Status)]" /></td>
+            <td>@PlatformDisplay.Utc(T, device.RequestedUtc)</td>
+        }
+        else
+        {
+            <td>-</td>
+            <td colspan="3"><VxStatusBadge Status="VxBadgeStatus.Info" Text="@T["ui.licences.free"]" /></td>
+            <td>-</td>
+        }
+    </RowTemplate>
+</VxDataTable>
+
+@code {
+    [Parameter, EditorRequired]
+    public int Seats { get; set; }
+
+    [Parameter, EditorRequired]
+    public Guid TenantId { get; set; }
+
+    private Guid _loaded;
+
+    private IReadOnlyList<PlatformDeviceItem> Devices => Presenter.State.Devices;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_loaded != TenantId)
+        {
+            _loaded = TenantId;
+            await Presenter.LoadAsync(TenantId);
+        }
+    }
+
+    // Bound licences first (oldest first), the free ones, then the devices requested, then those that ended (newest first).
+    private IReadOnlyList<(int? Licence, PlatformDeviceItem? Device)> Rows
+    {
+        get
+        {
+            List<PlatformDeviceItem> bound = Devices.Where(device => device.Status is PlatformDeviceStatus.Active or PlatformDeviceStatus.ReleasePending
+                    || (device.Status == PlatformDeviceStatus.Revoked && device.SeatHeld))
+                .OrderBy(device => device.ApprovedUtc ?? device.RequestedUtc).ToList();
+            List<(int?, PlatformDeviceItem?)> rows = new();
+
+            for (int index = 0; index < Math.Max(Seats, bound.Count); index++)
+            {
+                rows.Add((index + 1, index < bound.Count ? bound[index] : null));
+            }
+
+            rows.AddRange(Devices.Where(device => !bound.Contains(device))
+                .OrderBy(device => device.Status == PlatformDeviceStatus.Pending ? 0 : 1).ThenByDescending(device => device.RequestedUtc)
+                .Select(device => ((int?)null, (PlatformDeviceItem?)device)));
+            return rows;
+        }
+    }
+}

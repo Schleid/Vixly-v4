@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup><AssemblyName>Vixly.CustomerHelpCapture</AssemblyName><RootNamespace>Vixly.CustomerHelpCapture</RootNamespace></PropertyGroup>
+  <ItemGroup><ProjectReference Include="..\..\src\Customer\Vixly.Customer.Web\Vixly.Customer.Web.csproj" /></ItemGroup>
+</Project>

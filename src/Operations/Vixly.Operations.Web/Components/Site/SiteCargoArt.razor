@@ -1,0 +1,62 @@
+﻿@*
+=========================================================
+FILE: SiteCargoArt.razor
+
+PURPOSE:
+The neutral illustrations shown until a company uploads its own air or ocean photo (website themes, step 1).
+
+RESPONSIBILITIES:
+- Draw an air cargo or an ocean cargo scene in the company colours
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText and the tenant texts; values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); every value is HTML-encoded by Razor
+- Original artwork, decorative (hidden from screen readers); flat shapes, no text, light enough to inline
+=========================================================
+*@
+@if (Kind == "air")
+{
+    <svg class="site-art" viewBox="0 0 720 480" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+        <rect width="720" height="480" fill="var(--site-art-sky)" />
+        <circle cx="580" cy="110" r="46" fill="var(--site-art-sun)" />
+        <g fill="#fff" opacity=".85"><ellipse cx="160" cy="120" rx="70" ry="18" /><ellipse cx="210" cy="108" rx="44" ry="20" /><ellipse cx="520" cy="230" rx="60" ry="14" /></g>
+        <g transform="translate(150 190) rotate(-8)">
+            <path d="M0 60 Q 10 40 60 38 L 380 30 Q 430 30 440 50 Q 430 70 380 70 L 60 78 Q 10 78 0 60 Z" fill="#fff" />
+            <path d="M200 52 L 120 150 L 160 150 L 270 54 Z" fill="var(--site-primary)" />
+            <path d="M210 40 L 150 -30 L 185 -30 L 275 38 Z" fill="var(--site-primary)" opacity=".85" />
+            <path d="M360 38 L 400 -10 L 425 -10 L 412 40 Z" fill="var(--site-accent)" />
+            <g fill="var(--site-primary)" opacity=".5"><circle cx="100" cy="54" r="4" /><circle cx="125" cy="53" r="4" /><circle cx="150" cy="52" r="4" /><circle cx="300" cy="48" r="4" /><circle cx="325" cy="47" r="4" /></g>
+        </g>
+        <rect y="400" width="720" height="80" fill="var(--site-art-ground)" />
+        <g fill="var(--site-accent)"><rect x="70" y="350" width="90" height="50" rx="4" /><rect x="170" y="362" width="70" height="38" rx="4" opacity=".8" /></g>
+    </svg>
+}
+else
+{
+    <svg class="site-art" viewBox="0 0 720 480" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+        <rect width="720" height="480" fill="var(--site-art-sky)" />
+        <circle cx="140" cy="100" r="40" fill="var(--site-art-sun)" />
+        <path d="M0 330 H720 V480 H0 Z" fill="var(--site-art-sea)" />
+        <g transform="translate(150 200)">
+            <path d="M0 110 L 40 160 H 420 L 460 110 Z" fill="var(--site-primary)" />
+            <rect x="330" y="50" width="70" height="60" fill="#fff" />
+            <rect x="345" y="20" width="40" height="30" fill="#fff" opacity=".9" />
+            <g>
+                <rect x="40" y="70" width="60" height="40" fill="var(--site-accent)" />
+                <rect x="104" y="70" width="60" height="40" fill="#fff" opacity=".9" />
+                <rect x="168" y="70" width="60" height="40" fill="var(--site-accent)" opacity=".75" />
+                <rect x="232" y="70" width="60" height="40" fill="var(--site-primary)" opacity=".55" />
+                <rect x="72" y="26" width="60" height="40" fill="var(--site-primary)" opacity=".55" />
+                <rect x="136" y="26" width="60" height="40" fill="var(--site-accent)" />
+                <rect x="200" y="26" width="60" height="40" fill="#fff" opacity=".9" />
+            </g>
+        </g>
+        <g fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"><path d="M40 390 q20 -10 40 0 t40 0" /><path d="M520 420 q20 -10 40 0 t40 0" /><path d="M300 450 q20 -10 40 0 t40 0" /></g>
+    </svg>
+}
+
+@code {
+    // "air" or "ocean"; anything else draws the ocean scene.
+    [Parameter, EditorRequired]
+    public string Kind { get; set; } = string.Empty;
+}

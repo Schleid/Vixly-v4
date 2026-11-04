@@ -166,4 +166,20 @@ public sealed class PlatformInternalHttpTests : IDisposable
         Assert.Equal("platform.internal.tenant_required", error?.Code);
         Assert.Contains("client", error?.Message, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public async Task CompanyChange_IsForOperations_WithATenantClaim()
+    {
+        (WebApplication app, HttpClient client) = await StartAsync();
+        await using WebApplication _ = app;
+
+        // B12: only Operations sends a company change, always for one tenant.
+        HttpRequestMessage edge = new(HttpMethod.Post, "internal/v1/tenant/company-change") { Content = JsonContent.Create(new { reason = "x" }) };
+        edge.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _edge.Sign(new Dictionary<string, object?> { ["tid"] = Guid.NewGuid().ToString() }));
+        Assert.Equal("platform.internal.scope_not_allowed", await CodeAsync(await client.SendAsync(edge)));
+
+        HttpRequestMessage noTenant = new(HttpMethod.Get, "internal/v1/tenant/company-change");
+        noTenant.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _operations.Sign());
+        Assert.Equal("platform.internal.tenant_required", await CodeAsync(await client.SendAsync(noTenant)));
+    }
 }

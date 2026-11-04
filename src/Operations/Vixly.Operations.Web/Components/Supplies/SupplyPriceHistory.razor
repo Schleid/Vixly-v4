@@ -1,0 +1,55 @@
+﻿@*
+=========================================================
+FILE: SupplyPriceHistory.razor
+
+PURPOSE:
+The prices of a supply: in force, scheduled and past (Slice 5E, S-2), as the price list history (Slice 4B).
+
+RESPONSIBILITIES:
+- List the prices newest first with their start, breaks and warehouse prices; mark the current one
+- Offer to remove a scheduled price
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- A price that has started is read-only; the last ten are shown
+=========================================================
+*@
+<ul class="ops-editor__list">
+    @foreach (OperationsSupplyPrice price in Supply.Prices.OrderByDescending(item => item.EffectiveFromUtc).Take(10))
+    {
+        bool scheduled = price.EffectiveFromUtc > UtcNow;
+        bool current = !scheduled && Supply.PriceAt(UtcNow)?.Id == price.Id;
+        <li data-price="@(scheduled ? "scheduled" : current ? "current" : "past")">
+            <strong>@(scheduled ? T["ui.charges.version.scheduled"] : current ? T["ui.charges.version.current"] : T["ui.charges.version.past"])</strong>
+            · @VixlyText.Format(T, "ui.charges.version.from", "date", price.EffectiveFromUtc.ToString("d", CultureInfo.CurrentCulture))
+            · <strong>@OperationsChargeWords.Money(price.Price, Currency)</strong>
+            @foreach (OperationsSupplyBreak step in price.Breaks)
+            {
+                <span> · @VixlyText.Format(T, "ui.supplies.break_shown", new Dictionary<string, object> { ["quantity"] = step.FromQuantity, ["price"] = OperationsChargeWords.Money(step.Price, Currency) })</span>
+            }
+            @foreach (OperationsSupplyWarehousePrice place in price.Warehouses)
+            {
+                <span> · @(Warehouses.FirstOrDefault(warehouse => warehouse.Id == place.WarehouseId)?.Code ?? "?"): @OperationsChargeWords.Money(place.Price, Currency)</span>
+            }
+            @if (scheduled)
+            {
+                <form method="post" action="/staff/supplies/@Supply.Id/prices/@price.Id/remove" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.charges.version.remove"]</button>
+                </form>
+            }
+        </li>
+    }
+</ul>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsSupply Supply { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public DateTimeOffset UtcNow { get; set; }
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+}

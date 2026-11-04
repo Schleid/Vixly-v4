@@ -1,0 +1,17 @@
+﻿@*
+=========================================================
+FILE: FeaturesPage.razor
+
+PURPOSE:
+The features page in each language.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+=========================================================
+*@
+@page "/en/features"
+@page "/fr/features"
+@page "/es/features"
+@attribute [OutputCache(Duration = 600)]
+<PageHead TitleKey="public.features.page_title" DescriptionKey="public.features.description" Page="features" />
+<FeatureCatalogue />

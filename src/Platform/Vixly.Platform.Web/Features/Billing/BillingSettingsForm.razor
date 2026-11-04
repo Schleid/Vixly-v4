@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: BillingSettingsForm.razor
 
@@ -42,47 +42,102 @@ IMPORTANT NOTES:
         {
             <VxMessage Type="VxMessageType.Warning">@T["platform.billing.profile_missing"]</VxMessage>
         }
-        <VxCard Title="@T["ui.billing_settings.documents"]">
-            <form class="vx-form" @onsubmit="SaveSettingsAsync">
-                <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)">
-                    <label for="billing-terms">@T["ui.billing_settings.payment_terms"]</label>
-                    <input id="billing-terms" type="number" min="0" max="365" @bind="_settings.PaymentTermsDays" aria-describedby="billing-terms-help" />
-                    <p id="billing-terms-help" class="vx-hint">@T["ui.billing_settings.payment_terms_help"]</p>
-                    <label for="billing-invoice-prefix">@T["ui.billing_settings.invoice_prefix"]</label>
-                    <input id="billing-invoice-prefix" @bind="_settings.InvoicePrefix" maxlength="8" required />
-                    <label for="billing-credit-prefix">@T["ui.billing_settings.credit_note_prefix"]</label>
-                    <input id="billing-credit-prefix" @bind="_settings.CreditNotePrefix" maxlength="8" required />
-                    <label for="billing-receipt-prefix">@T["ui.billing_settings.receipt_prefix"]</label>
-                    <input id="billing-receipt-prefix" @bind="_settings.ReceiptPrefix" maxlength="8" required aria-describedby="billing-prefix-help" />
-                    <p id="billing-prefix-help" class="vx-hint">@T["ui.billing_settings.prefix_help"]</p>
-                    <label for="billing-paper">@T["ui.billing_settings.paper_size"]</label>
-                    <select id="billing-paper" @bind="_settings.PaperSize">
-                        @foreach (PlatformPaperSize size in Enum.GetValues<PlatformPaperSize>())
-                        {
-                            <option value="@size">@T["ui.billing_settings.paper." + BillingDisplay.Snake(size.ToString())]</option>
-                        }
-                    </select>
-                    <label><input type="checkbox" @bind="_settings.EmailDocuments" /> @T["ui.billing_settings.email_documents"]</label>
-                    @foreach (BillingSettingsModel.TextRow row in _settings.Texts)
+        <div class="vx-tabs" role="tablist" style="margin-bottom: 1.25rem;">
+            <button type="button" class="vx-tab-btn @(_activeTab == "profile" ? "active" : "")" role="tab" aria-selected="@(_activeTab == "profile")" @onclick='() => _activeTab = "profile"'>
+                @T["ui.billing_settings.company_profile"]
+            </button>
+            <button type="button" class="vx-tab-btn @(_activeTab == "documents" ? "active" : "")" role="tab" aria-selected="@(_activeTab == "documents")" @onclick='() => _activeTab = "documents"'>
+                @T["ui.billing_settings.documents"]
+            </button>
+        </div>
+
+        @if (_activeTab == "profile")
+        {
+            <CompanyProfileForm Profile="settings.Profile" CanEdit="Presenter.State.CanEdit" Version="Presenter.State.Version" IsBusy="Presenter.IsBusy" OnSave="SaveProfileAsync" OnLogo="SaveLogoAsync" OnRefused="Presenter.Fail" />
+        }
+        else
+        {
+            <VxCard Title="@T["ui.billing_settings.documents"]">
+                <form class="vx-form" @onsubmit="SaveSettingsAsync" style="max-width: 100%;">
+                    <fieldset class="vx-fieldset" disabled="@(!Presenter.State.CanEdit)" style="border: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.5rem;">
+                        <!-- Terms, Paper Size and Email Toggle -->
+                        <div class="vx-form-grid-3" style="align-items: start;">
+                            <div class="vx-field-compact">
+                                <label for="billing-terms">@T["ui.billing_settings.payment_terms"]</label>
+                                <div class="vx-input-group-unit">
+                                    <input id="billing-terms" type="number" min="0" max="365" @bind="_settings.PaymentTermsDays" aria-describedby="billing-terms-help" />
+                                    <span class="vx-input-group-unit__suffix">days</span>
+                                </div>
+                                <p id="billing-terms-help" class="vx-hint">@T["ui.billing_settings.payment_terms_help"]</p>
+                            </div>
+                            <div class="vx-field-compact">
+                                <label for="billing-paper">@T["ui.billing_settings.paper_size"]</label>
+                                <select id="billing-paper" @bind="_settings.PaperSize">
+                                    @foreach (PlatformPaperSize size in Enum.GetValues<PlatformPaperSize>())
+                                    {
+                                        <option value="@size">@T["ui.billing_settings.paper." + BillingDisplay.Snake(size.ToString())]</option>
+                                    }
+                                </select>
+                            </div>
+                            <div style="padding-top: 1.25rem;">
+                                <div class="vx-toggle-box">
+                                    <input type="checkbox" id="billing-email-checkbox" @bind="_settings.EmailDocuments" />
+                                    <label for="billing-email-checkbox" class="vx-toggle-box__label" style="cursor: pointer; margin: 0;">@T["ui.billing_settings.email_documents"]</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Numbering Prefixes -->
+                        <div style="padding-top: 1rem; border-top: 1px solid var(--vx-color-border);">
+                            <div class="vx-form-grid-3">
+                                <div class="vx-field-compact">
+                                    <label for="billing-invoice-prefix">@T["ui.billing_settings.invoice_prefix"]</label>
+                                    <input id="billing-invoice-prefix" @bind="_settings.InvoicePrefix" maxlength="8" required style="font-family: var(--vx-font-mono, monospace); font-weight: 600;" />
+                                </div>
+                                <div class="vx-field-compact">
+                                    <label for="billing-credit-prefix">@T["ui.billing_settings.credit_note_prefix"]</label>
+                                    <input id="billing-credit-prefix" @bind="_settings.CreditNotePrefix" maxlength="8" required style="font-family: var(--vx-font-mono, monospace); font-weight: 600;" />
+                                </div>
+                                <div class="vx-field-compact">
+                                    <label for="billing-receipt-prefix">@T["ui.billing_settings.receipt_prefix"]</label>
+                                    <input id="billing-receipt-prefix" @bind="_settings.ReceiptPrefix" maxlength="8" required aria-describedby="billing-prefix-help" style="font-family: var(--vx-font-mono, monospace); font-weight: 600;" />
+                                </div>
+                            </div>
+                            <p id="billing-prefix-help" class="vx-hint" style="margin-top: 0.5rem; margin-bottom: 0;">@T["ui.billing_settings.prefix_help"]</p>
+                        </div>
+
+                        <!-- Multilingual Payment Instructions & Footers -->
+                        <div style="padding-top: 1rem; border-top: 1px solid var(--vx-color-border);">
+                            <div class="vx-form-grid-3" style="align-items: stretch;">
+                                @foreach (BillingSettingsModel.TextRow row in _settings.Texts)
+                                {
+                                    <div style="background: var(--vx-color-surface-sunken); border: 1px solid var(--vx-color-border); border-radius: var(--vx-radius-workbench, 0.5rem); padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--vx-color-border); padding-bottom: 0.5rem;">
+                                            <strong style="font-size: 0.84rem; text-transform: uppercase; color: var(--vx-color-primary);">@T["ui.language." + row.Language]</strong>
+                                            <span class="vx-kpi-card__badge">@row.Language.ToUpperInvariant()</span>
+                                        </div>
+                                        <div class="vx-field-compact">
+                                            <label for="billing-instructions-@row.Language">@T["ui.billing_document.how_to_pay"]</label>
+                                            <textarea id="billing-instructions-@row.Language" @bind="row.PaymentInstructions" maxlength="1000" rows="3" style="resize: vertical; font-size: 0.8125rem;"></textarea>
+                                        </div>
+                                        <div class="vx-field-compact">
+                                            <label for="billing-footer-@row.Language">@T["ui.billing_settings.footer"]</label>
+                                            <textarea id="billing-footer-@row.Language" @bind="row.Footer" maxlength="500" rows="2" style="resize: vertical; font-size: 0.8125rem;"></textarea>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </fieldset>
+                    @if (Presenter.State.CanEdit)
                     {
-                        <fieldset class="vx-fieldset">
-                            <legend>@T["ui.language." + row.Language]</legend>
-                            <label for="billing-instructions-@row.Language">@T["ui.billing_document.how_to_pay"]</label>
-                            <textarea id="billing-instructions-@row.Language" @bind="row.PaymentInstructions" maxlength="1000"></textarea>
-                            <label for="billing-footer-@row.Language">@T["ui.billing_settings.footer"]</label>
-                            <textarea id="billing-footer-@row.Language" @bind="row.Footer" maxlength="500"></textarea>
-                        </fieldset>
+                        <div class="vx-actions" style="margin-top: 0.75rem;">
+                            <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.billing_settings.save"]</VxButton>
+                        </div>
                     }
-                </fieldset>
-                @if (Presenter.State.CanEdit)
-                {
-                    <div class="vx-actions">
-                        <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.billing_settings.save"]</VxButton>
-                    </div>
-                }
-            </form>
-        </VxCard>
-        <CompanyProfileForm Profile="settings.Profile" CanEdit="Presenter.State.CanEdit" Version="Presenter.State.Version" IsBusy="Presenter.IsBusy" OnSave="SaveProfileAsync" OnLogo="SaveLogoAsync" OnRefused="Presenter.Fail" />
+                </form>
+            </VxCard>
+        }
         @if (Presenter.State.StepUpPending)
         {
             <StepUpDialog OnConfirmed="RetryAsync" OnCancelled="Presenter.CancelStepUp" />
@@ -91,6 +146,8 @@ IMPORTANT NOTES:
 </div>
 
 @code {
+    private string _activeTab = "profile";
+
     private BillingSettingsModel _settings = new();
 
     private Func<Task>? _last;

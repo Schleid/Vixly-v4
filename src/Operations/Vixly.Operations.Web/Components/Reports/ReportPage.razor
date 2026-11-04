@@ -1,0 +1,99 @@
+@*
+=========================================================
+FILE: ReportPage.razor
+
+PURPOSE:
+One report (Slice 11): its filters, a chart, the table with totals and the period before, and its files.
+
+RESPONSIBILITIES:
+- Filters: days (or as of), cut by day, week or month, rows by, warehouse, inactive days
+- Downloads: CSV, Excel, PDF with the same filters
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Money columns are not shown to whoever may not see them
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@(Run.Report is { } shownReport ? OperationsReportWords.Title(T, shownReport) : T["ui.reports.title"].Value)" Company="@Company" Section="reports" Error="@Error" Info="@Info">
+    <p class="ops-editor__actions"><a href="/staff/reports" class="vx-button vx-button--secondary">← @T["ui.reports.back"]</a></p>
+    @if (Run.Report is { } report && Run.Table is { } table)
+    {
+        IReadOnlyList<(OperationsReportColumn Column, int Index)> shown = OperationsReportWords.Shown(report, Run.SeesMoney);
+        <p class="ops-editor__hint">@T["ui.reports.about." + report.Key]</p>
+        <form method="get" action="/staff/reports/@report.Key" class="ops-list-bar ops-editor__inline" data-report-filters>
+            @if (!report.AsOf)
+            {
+                <label>@T["ui.reports.from"] <input type="date" name="from" value="@OperationsReportPeriods.Iso(Run.From)" required /></label>
+            }
+            @if (!report.Now)
+            {
+                <label>@T[report.AsOf ? "ui.reports.as_of_label" : "ui.reports.to"] <input type="date" name="to" value="@OperationsReportPeriods.Iso(Run.To)" required /></label>
+            }
+            @if (report.OverTime || report.Dimensions.Contains(OperationsReportDimension.Period))
+            {
+                <label>@T["ui.reports.grain"] <select name="grain">@foreach (OperationsReportGrain grain in Enum.GetValues<OperationsReportGrain>()) { <option value="@grain.ToString().ToLowerInvariant()" selected="@(grain == Run.Grain)">@T["ui.reports.grain." + grain]</option> }</select></label>
+            }
+            @if (report.Dimensions.Count > 1)
+            {
+                <label>@T["ui.reports.by"] <select name="by">@foreach (OperationsReportDimension dimension in report.Dimensions) { <option value="@dimension.ToString().ToLowerInvariant()" selected="@(dimension == Run.Dimension)">@T["ui.reports.by." + dimension]</option> }</select></label>
+            }
+            @if (!report.CompanyWide)
+            {
+                <label>@T["ui.reports.warehouse"] <select name="warehouse"><option value="">@T["ui.reports.all_warehouses"]</option>@foreach (OperationsReportPlace place in Run.Places) { <option value="@place.Id" selected="@(place.Id == Run.WarehouseId)">@place.Code · @place.Name</option> }</select></label>
+            }
+            @if (report.UsesDays)
+            {
+                <label>@T["ui.reports.days"] <input type="number" name="days" min="7" max="730" value="@Run.Days" /></label>
+            }
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.reports.show"]</button>
+        </form>
+        <p class="ops-editor__actions" data-report-files>
+            @foreach (string format in new[] { "csv", "xlsx", "pdf" })
+            {
+                <a class="vx-button vx-button--secondary" href="/staff/reports/@report.Key/export?format=@format&@OperationsReportWords.Query(Run)">@T["ui.reports.file." + format]</a>
+            }
+        </p>
+        <ReportScheduleForm Run="Run" Staff="Staff" />
+        @if (shown.FirstOrDefault(item => item.Index == report.ChartColumn) is { Column: not null } chart)
+        {
+            <ReportChart Title="@OperationsReportWords.Header(T, chart.Column)" Line="@(report.OverTime && Run.Dimension == OperationsReportDimension.Period)"
+                         Points="@(table.Rows.Select(row => (OperationsReportWords.Label(T, row.Label, Run.Grain), row.Values[chart.Index] ?? 0m)).ToList())" />
+        }
+        <OperationsTableViewport Label="@OperationsReportWords.Title(T, report)">
+            <table class="ops-editor__table" data-report="@report.Key">
+                <thead><tr><th scope="col">@T[report.OverTime && Run.Dimension == OperationsReportDimension.Period ? "ui.reports.when" : "ui.reports.what"]</th>@foreach ((OperationsReportColumn Column, int Index) item in shown) { <th scope="col" class="ops-editor__number">@OperationsReportWords.Header(T, item.Column)</th> }</tr></thead>
+                <tbody>
+                    @foreach (OperationsReportRow row in table.Rows)
+                    {
+                        <tr><th scope="row">@OperationsReportWords.Label(T, row.Label, Run.Grain)</th>@foreach ((OperationsReportColumn Column, int Index) item in shown) { <td class="ops-editor__number">@OperationsReportWords.Value(row.Values[item.Index], item.Column, Run.CurrencyCode, Run.WeightUnit)</td> }</tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr data-report-total><th scope="row">@T["ui.reports.total"]</th>@foreach ((OperationsReportColumn Column, int Index) item in shown) { <td class="ops-editor__number">@OperationsReportWords.Value(table.Totals[item.Index], item.Column, Run.CurrencyCode, Run.WeightUnit)</td> }</tr>
+                    @if (Run.Previous is { } previous)
+                    {
+                        <tr data-report-previous><th scope="row">@OperationsReportWords.Period(T, "ui.reports.previous_period", Run.PreviousFrom, Run.PreviousTo)</th>@foreach ((OperationsReportColumn Column, int Index) item in shown) { <td class="ops-editor__number">@OperationsReportWords.Value(previous[item.Index], item.Column, Run.CurrencyCode, Run.WeightUnit) <small data-change>@OperationsReportWords.Change(table.Totals[item.Index], previous[item.Index], item.Column)</small></td> }</tr>
+                    }
+                </tfoot>
+            </table>
+        </OperationsTableViewport>
+        @if (table.Truncated)
+        {
+            <p class="ops-editor__hint">@T["ui.reports.truncated"]</p>
+        }
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public RunOperationsReportResponse Run { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsUser> Staff { get; set; } = Array.Empty<OperationsUser>();
+
+    [Parameter] public string? Info { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+}

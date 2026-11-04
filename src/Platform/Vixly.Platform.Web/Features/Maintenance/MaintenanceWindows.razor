@@ -1,0 +1,209 @@
+@*
+=========================================================
+FILE: MaintenanceWindows.razor
+
+PURPOSE:
+Maintenance windows (Control backlog 2026-10-22, section 1):
+Vixly IT publishes a start, an end, the sites closed, the
+advance notice and a message; the sites show a banner before
+and the maintenance page during the window.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Times are UTC; the pass link is shown once, after publishing
+- Control is never closed, so a window can always be ended here
+=========================================================
+*@
+@inherits PlatformPresenterComponent<MaintenancePresenter>
+@using Vixly.Platform.Application.Maintenance
+@using Vixly.Platform.Domain.Maintenance
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+@if (Presenter.State.DoneKey is { } done)
+{
+    <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+}
+@if (Presenter.State.PassToken is { } pass)
+{
+    <div class="vx-maintenance-pass-card">
+        <VxMessage Type="VxMessageType.Info">
+            <div class="vx-maintenance-pass-content">
+                <p class="vx-maintenance-pass-intro">@T["ui.maintenance.pass_intro"]</p>
+                <div class="vx-maintenance-pass-grid">
+                    <div class="vx-maintenance-pass-item">
+                        <span class="vx-maintenance-pass-tag">Web / Customer:</span>
+                        <code class="vx-maintenance-code">/maintenance-pass/@pass</code>
+                    </div>
+                    <div class="vx-maintenance-pass-item">
+                        <span class="vx-maintenance-pass-tag">Staff workspace:</span>
+                        <code class="vx-maintenance-code">/staff/maintenance-pass/@pass</code>
+                    </div>
+                </div>
+                <p class="vx-hint vx-maintenance-pass-hint">@T["ui.maintenance.pass_once"]</p>
+            </div>
+        </VxMessage>
+    </div>
+}
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+
+<VxDataTable Items="Presenter.State.Open" IsLoading="@(!Presenter.State.Loaded)" Caption="@T["ui.maintenance.open"]">
+    <HeaderContent>
+        <th scope="col">@T["ui.maintenance.starts"]</th>
+        <th scope="col">@T["ui.maintenance.ends"]</th>
+        <th scope="col">@T["ui.maintenance.sites"]</th>
+        <th scope="col">@T["ui.maintenance.status"]</th>
+        <th scope="col">@T["ui.maintenance.message"]</th>
+        <th scope="col"><span class="vx-visually-hidden">@T["ui.maintenance.actions"]</span></th>
+    </HeaderContent>
+    <RowTemplate Context="window">
+        <td>@PlatformDisplay.Utc(T, window.StartsUtc)</td>
+        <td>@PlatformDisplay.Utc(T, window.EndsUtc)</td>
+        <td>@Sites(window)</td>
+        <td><VxStatusBadge Status="@Badge(window.Status)" Text="@T["ui.maintenance.status." + window.Status.ToString().ToLowerInvariant()]" /></td>
+        <td>@(window.MessageEn ?? "-")</td>
+        <td>
+            @if (Presenter.State.CanManage)
+            {
+                <VxButton Variant="VxButtonVariant.Subtle" IsBusy="@Presenter.IsBusy" OnClick="() => StopAsync(window.Id)">
+                    @T[window.Status == PlatformMaintenanceStatus.Running ? "ui.maintenance.end_now" : "ui.maintenance.cancel"]
+                </VxButton>
+            }
+        </td>
+    </RowTemplate>
+    <EmptyContent>
+        <VxEmptyState Title="@T["ui.maintenance.none_open"]" />
+    </EmptyContent>
+</VxDataTable>
+
+@if (Presenter.State.CanManage)
+{
+    <VxCard Title="@T["ui.maintenance.new"]">
+        <form class="vx-form" @onsubmit="ScheduleAsync">
+            <div class="vx-form-grid-2">
+                <div class="vx-field-compact">
+                    <label for="maintenance-starts" class="vx-label">@T["ui.maintenance.starts_utc"]</label>
+                    <input id="maintenance-starts" type="datetime-local" class="vx-input" @bind="_model.StartsUtc" required />
+                </div>
+                <div class="vx-field-compact">
+                    <label for="maintenance-ends" class="vx-label">@T["ui.maintenance.ends_utc"]</label>
+                    <input id="maintenance-ends" type="datetime-local" class="vx-input" @bind="_model.EndsUtc" required />
+                </div>
+            </div>
+            <fieldset class="vx-fieldset vx-maintenance-sites">
+                <legend class="vx-label">@T["ui.maintenance.sites"]</legend>
+                <div class="vx-maintenance-sites-grid">
+                    <label class="vx-checkbox-label"><input type="checkbox" class="vx-checkbox" @bind="_model.PublicSite" /> <span>@T["ui.maintenance.site.public"]</span></label>
+                    <label class="vx-checkbox-label"><input type="checkbox" class="vx-checkbox" @bind="_model.CompanyWebsites" /> <span>@T["ui.maintenance.site.companies"]</span></label>
+                    <label class="vx-checkbox-label"><input type="checkbox" class="vx-checkbox" @bind="_model.CustomerPortals" /> <span>@T["ui.maintenance.site.customers"]</span></label>
+                    <label class="vx-checkbox-label"><input type="checkbox" class="vx-checkbox" @bind="_model.StaffWorkspaces" /> <span>@T["ui.maintenance.site.staff"]</span></label>
+                </div>
+                <p class="vx-hint">@T["ui.maintenance.control_stays_open"]</p>
+            </fieldset>
+            <div class="vx-field-compact">
+                <label for="maintenance-notice" class="vx-label">@T["ui.maintenance.notice_hours"]</label>
+                <input id="maintenance-notice" type="number" min="0" max="168" class="vx-input" @bind="_model.NoticeHours" aria-describedby="maintenance-notice-help" />
+                <span id="maintenance-notice-help" class="vx-hint">@T["ui.maintenance.notice_hours_help"]</span>
+            </div>
+            <div class="vx-field-compact">
+                <label for="maintenance-message-en" class="vx-label">@T["ui.maintenance.message_en"]</label>
+                <textarea id="maintenance-message-en" class="vx-input" maxlength="500" rows="2" @bind="_model.MessageEn"></textarea>
+            </div>
+            <div class="vx-field-compact">
+                <label for="maintenance-message-fr" class="vx-label">@T["ui.maintenance.message_fr"]</label>
+                <textarea id="maintenance-message-fr" class="vx-input" maxlength="500" rows="2" @bind="_model.MessageFr"></textarea>
+            </div>
+            <div class="vx-field-compact">
+                <label for="maintenance-message-es" class="vx-label">@T["ui.maintenance.message_es"]</label>
+                <textarea id="maintenance-message-es" class="vx-input" maxlength="500" rows="2" @bind="_model.MessageEs"></textarea>
+                <span class="vx-hint">@T["ui.maintenance.message_help"]</span>
+            </div>
+            <div class="vx-actions">
+                <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.maintenance.publish"]</VxButton>
+            </div>
+        </form>
+    </VxCard>
+}
+
+<h2 class="vx-maintenance-past-title">@T["ui.maintenance.past"]</h2>
+<VxDataTable Items="Presenter.State.Past" IsLoading="@(!Presenter.State.Loaded)">
+    <HeaderContent>
+        <th scope="col">@T["ui.maintenance.starts"]</th>
+        <th scope="col">@T["ui.maintenance.ends"]</th>
+        <th scope="col">@T["ui.maintenance.sites"]</th>
+        <th scope="col">@T["ui.maintenance.status"]</th>
+    </HeaderContent>
+    <RowTemplate Context="window">
+        <td>@PlatformDisplay.Utc(T, window.StartsUtc)</td>
+        <td>@PlatformDisplay.Utc(T, window.EndsUtc)</td>
+        <td>@Sites(window)</td>
+        <td>
+            <VxStatusBadge Status="@Badge(window.Status)" Text="@T["ui.maintenance.status." + window.Status.ToString().ToLowerInvariant()]" />
+            @if (window.EndedEarlyUtc is not null)
+            {
+                <span class="vx-hint">@T["ui.maintenance.ended_early"]</span>
+            }
+        </td>
+    </RowTemplate>
+    <EmptyContent>
+        <VxEmptyState Title="@T["ui.maintenance.none_past"]" />
+    </EmptyContent>
+</VxDataTable>
+@if (Presenter.State.Loaded && Presenter.State.Past.Count > 0)
+{
+    <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="GoToPage" />
+}
+@if (Presenter.State.StepUpPending)
+{
+    <StepUpDialog OnConfirmed="RetryAsync" OnCancelled="Presenter.CancelStepUp" />
+}
+
+@code {
+    [Parameter]
+    public int Page { get; set; } = 1;
+
+    private MaintenanceFormModel _model = new();
+
+    private Func<Task>? _pending;
+
+    protected override Task OnParametersSetAsync() => Presenter.LoadAsync(Page);
+
+    private async Task ScheduleAsync()
+    {
+        _pending = ScheduleAsync;
+
+        if (await Presenter.ScheduleAsync(_model, Page))
+        {
+            _model = new MaintenanceFormModel();
+        }
+    }
+
+    private Task StopAsync(Guid windowId)
+    {
+        _pending = () => StopAsync(windowId);
+        return Presenter.StopAsync(windowId, Page);
+    }
+
+    private Task RetryAsync() => _pending?.Invoke() ?? Task.CompletedTask;
+
+    private void GoToPage(int page) => Navigation.NavigateTo(page > 1 ? "/maintenance?page=" + page : "/maintenance");
+
+    private string Sites(PlatformMaintenanceWindowItem window) =>
+        string.Join(", ", window.Sites.Select(site => T["ui.maintenance.site." + site].Value));
+
+    private static VxBadgeStatus Badge(PlatformMaintenanceStatus status) => status switch
+    {
+        PlatformMaintenanceStatus.Running => VxBadgeStatus.Danger,
+        PlatformMaintenanceStatus.Announced => VxBadgeStatus.Warning,
+        PlatformMaintenanceStatus.Scheduled => VxBadgeStatus.Info,
+        PlatformMaintenanceStatus.Finished => VxBadgeStatus.Success,
+        _ => VxBadgeStatus.Deactivated
+    };
+}

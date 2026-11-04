@@ -21,9 +21,15 @@ namespace Vixly.Platform.Web.Hosting;
 //   with PlatformDemoData:SeedOnStartup = false
 // - Both seeds add only what is missing, so restarts are safe
 // - Never stops the console: failures are logged
+// - On a new database it waits for the first SuperUser (checking every 15 seconds for up to an hour), so the
+//   demo tenants appear without restarting the console; Operations.Web waits for them in turn
 // =========================================================
 public sealed class PlatformDemoDataWorker : BackgroundService
 {
+    private static readonly TimeSpan WaitStep = TimeSpan.FromSeconds(15);
+
+    private const int WaitSteps = 240;
+
     private readonly IServiceScopeFactory _scopes;
 
     private readonly PlatformDemoDataOptions _options;
@@ -46,9 +52,13 @@ public sealed class PlatformDemoDataWorker : BackgroundService
 
         try
         {
-            await using AsyncServiceScope scope = _scopes.CreateAsyncScope();
-            string tenants = await ActivatorUtilities.CreateInstance<PlatformDemoTenants>(scope.ServiceProvider).SeedAsync(stoppingToken);
+            string tenants = await TenantsAsync(stoppingToken);
             _logger.LogInformation("Demo data: {Result}", tenants);
+
+            if (tenants == PlatformDemoTenants.NeedsSuperUser)
+            {
+                return;
+            }
 
             await using AsyncServiceScope second = _scopes.CreateAsyncScope();
             string subscriptions = await ActivatorUtilities.CreateInstance<PlatformDemoSubscriptions>(second.ServiceProvider).SeedAsync(stoppingToken);
@@ -80,6 +90,28 @@ public sealed class PlatformDemoDataWorker : BackgroundService
         catch (Exception exception)
         {
             _logger.LogError(exception, "Demo data could not be added.");
+        }
+    }
+
+    // A new database has no staff yet: wait for the first SuperUser instead of giving up until the next start.
+    private async Task<string> TenantsAsync(CancellationToken stoppingToken)
+    {
+        for (int step = 0; ; step++)
+        {
+            await using AsyncServiceScope scope = _scopes.CreateAsyncScope();
+            string result = await ActivatorUtilities.CreateInstance<PlatformDemoTenants>(scope.ServiceProvider).SeedAsync(stoppingToken);
+
+            if (result != PlatformDemoTenants.NeedsSuperUser || step >= WaitSteps)
+            {
+                return result;
+            }
+
+            if (step == 0)
+            {
+                _logger.LogInformation("Demo data: waiting for the first SuperUser; the demo tenants are added as soon as one exists.");
+            }
+
+            await Task.Delay(WaitStep, stoppingToken);
         }
     }
 }

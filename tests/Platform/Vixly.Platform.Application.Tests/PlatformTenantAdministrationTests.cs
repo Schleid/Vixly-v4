@@ -9,7 +9,6 @@ using Vixly.Platform.Application.UseCases.Tenants.AddPlatformTenantNote;
 using Vixly.Platform.Application.UseCases.Tenants.AssignPlatformTenantAccountManager;
 using Vixly.Platform.Application.UseCases.Tenants.BanPlatformTenant;
 using Vixly.Platform.Application.UseCases.Tenants.CorrectPlatformTenantSlug;
-using Vixly.Platform.Application.UseCases.Tenants.CreatePlatformTenant;
 using Vixly.Platform.Application.UseCases.Tenants.SuspendPlatformTenant;
 using Vixly.Platform.Application.UseCases.Tenants.UpdatePlatformTenantContacts;
 using Vixly.Platform.Domain.Identity;
@@ -24,7 +23,7 @@ namespace Vixly.Platform.Application.Tests;
 // FILE: PlatformTenantAdministrationTests.cs
 //
 // PURPOSE:
-// Proves the staff tenant use cases: creation, lifecycle, slug
+// Proves the staff tenant use cases: lifecycle, slug
 // correction, contacts, account manager and notes.
 //
 // RESPONSIBILITIES:
@@ -34,53 +33,12 @@ namespace Vixly.Platform.Application.Tests;
 //
 // IMPORTANT NOTES:
 // - Tests assert error codes, never text (L-1)
+// - Staff no longer create tenants: a tenant comes only from its
+//   own registration (Slice 2 sign-off correction, D-T8)
 // =========================================================
 public sealed class PlatformTenantAdministrationTests
 {
     private readonly TenantTestKit _kit = new();
-
-    [Fact]
-    public async Task Create_NeedsThePermission()
-    {
-        PlatformAuthorizationContext context = _kit.Staff(PlatformPermissions.TenantsView);
-
-        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => CreateAsync(context, "northwind"));
-        Assert.Empty(_kit.Tenants.Tenants);
-    }
-
-    [Theory]
-    [InlineData("www", "platform.tenants.slug_reserved")]
-    [InlineData("billing", "platform.tenants.slug_reserved")]
-    [InlineData("taken", "platform.tenants.slug_taken")]
-    [InlineData("bad--slug", "platform.tenants.slug_invalid")]
-    public async Task Create_RefusesUnusableSlugs(string slug, string code)
-    {
-        _kit.Tenant("taken");
-        PlatformAuthorizationContext context = _kit.Staff(PlatformPermissions.TenantsCreate);
-
-        CreatePlatformTenantResponse response = await CreateAsync(context, slug);
-
-        Assert.Equal(code, response.Error!.Code);
-        Assert.Single(_kit.Tenants.Tenants);
-    }
-
-    [Fact]
-    public async Task Create_MakesADraftTenant_WithAPermanentSlugHistoryAndAudit()
-    {
-        PlatformAuthorizationContext context = _kit.Staff(PlatformPermissions.TenantsCreate);
-
-        CreatePlatformTenantResponse response = await CreateAsync(context, " North-Wind ");
-
-        PlatformTenant tenant = Assert.Single(_kit.Tenants.Tenants);
-        Assert.True(response.Succeeded);
-        Assert.Equal(tenant.TenantCode, response.TenantCode);
-        Assert.Matches("^TEN-[0-9A-Z]{6}$", tenant.TenantCode);
-        Assert.Equal(PlatformTenantStatus.Draft, tenant.Status);
-        PlatformPortalSlug claim = Assert.Single(_kit.Tenants.Slugs);
-        Assert.Equal(("north-wind", PlatformPortalSlugState.Permanent, tenant.Id), (claim.Slug, claim.State, claim.PlatformTenantId));
-        Assert.Equal(PlatformTenantEventCodes.CreatedByStaff, Assert.Single(_kit.Tenants.Events).EventCode);
-        Assert.Equal("platform.tenants.created", Assert.Single(_kit.Store.AuditEntries).ActionCode);
-    }
 
     [Fact]
     public async Task Suspend_NeedsStepUp_ThenRecordsHistoryAuditAndOutbox_WithoutTheReason()
@@ -238,32 +196,6 @@ public sealed class PlatformTenantAdministrationTests
         Assert.True(response.Succeeded);
         Assert.Equal("Prefers calls after 3pm", Assert.Single(_kit.Tenants.Notes).Body);
         Assert.DoesNotContain("3pm", Assert.Single(_kit.Store.AuditEntries).ArgumentsJson ?? string.Empty, StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public async Task FailedSave_OfACreation_IsReportedAsSlugTaken()
-    {
-        PlatformAuthorizationContext context = _kit.Staff(PlatformPermissions.TenantsCreate);
-        _kit.Store.FailNextSave = true;
-
-        Assert.Equal(PlatformTenantErrors.SlugTaken, (await CreateAsync(context, "northwind")).Error);
-    }
-
-    private Task<CreatePlatformTenantResponse> CreateAsync(PlatformAuthorizationContext context, string slug)
-    {
-        return new CreatePlatformTenantUseCase(_kit.Gate(), _kit.Administration(), _kit.Slugs(), _kit.Tenants, _kit.Tenants, _kit.Audit(), _kit.Store)
-            .ExecuteAsync(
-                context,
-                new CreatePlatformTenantRequest
-                {
-                    Company = TenantTestKit.Input(),
-                    Slug = slug,
-                    OwnerName = "Grace Hopper",
-                    OwnerEmail = "owner@northwind.example",
-                    Language = "fr",
-                    TimeZone = "America/Toronto"
-                },
-                CancellationToken.None);
     }
 
     private Task<SuspendPlatformTenantResponse> SuspendAsync(PlatformAuthorizationContext context, PlatformTenant tenant)

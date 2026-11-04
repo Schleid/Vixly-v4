@@ -28,6 +28,22 @@ public sealed class PlatformConsoleHttpTests
         ["returnUrl"] = "/"
     });
 
+    // A failed request comes back to the error page with its own method; a failed form post used to meet a GET-only page (2026-10-18).
+    [Fact]
+    public async Task ErrorPage_AnswersEveryMethod()
+    {
+        await using PlatformConsoleHost host = await PlatformConsoleHost.StartAsync();
+
+        foreach (HttpMethod method in new[] { HttpMethod.Get, HttpMethod.Post })
+        {
+            using HttpRequestMessage request = new(method, "/error");
+            HttpResponseMessage response = await host.Client().SendAsync(request);
+
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.Contains("Something went wrong", await response.Content.ReadAsStringAsync(), StringComparison.Ordinal);
+        }
+    }
+
     [Fact]
     public async Task SignIn_WithoutTheAntiforgeryToken_IsRefused()
     {
@@ -71,10 +87,29 @@ public sealed class PlatformConsoleHttpTests
         Assert.Contains("__RequestVerificationToken", page, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public async Task SignInPage_AfterTheIdleSignOut_SaysWhy_AndAnAnonymousPageHasNoIdleTimer()
+    {
+        await using PlatformConsoleHost host = await PlatformConsoleHost.StartAsync();
+
+        string idle = await host.Client().GetStringAsync("/sign-in?done=idle");
+        string plain = await host.Client().GetStringAsync("/sign-in");
+
+        Assert.Contains("signed out after 5 minutes without activity", idle, StringComparison.Ordinal);
+        Assert.DoesNotContain("without activity", plain, StringComparison.Ordinal);
+        Assert.DoesNotContain("data-idle-warning", plain, StringComparison.Ordinal);
+    }
+
     [Theory]
     [InlineData("/users")]
     [InlineData("/tenants")]
     [InlineData("/tenants/registrations")]
+    [InlineData("/leads")]
+    [InlineData("/tenants/changes")]
+    [InlineData("/jobs")]
+    [InlineData("/maintenance")]
+    [InlineData("/payments/settings")]
+    [InlineData("/sales-feed")]
     public async Task ProtectedPage_SendsAnAnonymousVisitorToSignIn(string path)
     {
         await using PlatformConsoleHost host = await PlatformConsoleHost.StartAsync();

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: CollectionsSettingsForm.razor
 
@@ -34,53 +34,143 @@ IMPORTANT NOTES:
     }
     else if (Presenter.State.Settings is { } settings)
     {
-        <form class="vx-form" @onsubmit="SaveAsync">
-            <fieldset class="vx-fieldset" disabled="@(!settings.CanEdit)">
+        <form class="vx-form" @onsubmit="SaveAsync" style="max-width: 100%;">
+            <fieldset class="vx-fieldset" disabled="@(!settings.CanEdit)" style="border: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.25rem;">
+                <!-- Card 1: Timeline Progression -->
                 <VxCard Title="@T["ui.collections_settings.timeline"]">
-                    <label><input id="collections-enabled" type="checkbox" @bind="_input.Enabled" /> @T["ui.collections_settings.enabled"]</label>
-                    <p class="vx-hint">@T["ui.collections_settings.timeline_help"]</p>
-                    <label for="collections-reminder1">@T["ui.collections_settings.reminder1"]</label>
-                    <input id="collections-reminder1" type="number" min="1" max="60" @bind="_input.Reminder1Day" />
-                    <label for="collections-reminder2">@T["ui.collections_settings.reminder2"]</label>
-                    <input id="collections-reminder2" type="number" min="1" max="60" @bind="_input.Reminder2Day" />
-                    <label for="collections-final">@T["ui.collections_settings.final_warning"]</label>
-                    <input id="collections-final" type="number" min="1" max="60" @bind="_input.FinalWarningDay" />
-                    <label for="collections-block">@T["ui.collections_settings.block_day"]</label>
-                    <input id="collections-block" type="number" min="1" max="60" @bind="_input.BlockDay" />
-                    <label for="collections-notice">@T["ui.collections_settings.minimum_notice"]</label>
-                    <input id="collections-notice" type="number" min="1" max="30" @bind="_input.MinimumNoticeDays" aria-describedby="collections-notice-help" />
-                    <p id="collections-notice-help" class="vx-hint">@T["ui.collections_settings.minimum_notice_help"]</p>
-                    <label for="collections-retries">@T["ui.collections_settings.retry_days"]</label>
-                    <input id="collections-retries" @bind="_input.RetryDays" maxlength="40" aria-describedby="collections-retries-help" />
-                    <p id="collections-retries-help" class="vx-hint">@T["ui.collections_settings.retry_days_help"]</p>
+                    <div class="vx-toggle-box" style="margin-bottom: 1rem;">
+                        <input id="collections-enabled" type="checkbox" @bind="_input.Enabled" />
+                        <div>
+                            <span class="vx-toggle-box__label">@T["ui.collections_settings.enabled"]</span>
+                            <p class="vx-hint" style="margin: 0.15rem 0 0 0;">@T["ui.collections_settings.timeline_help"]</p>
+                        </div>
+                    </div>
+
+                    <div class="vx-timeline-grid">
+                        <div class="vx-timeline-step-card">
+                            <div class="vx-timeline-step-card__header">
+                                <span class="vx-timeline-step-card__num">1</span>
+                                <label for="collections-reminder1" class="vx-timeline-step-card__title">@T["ui.collections_settings.reminder1"]</label>
+                            </div>
+                            <div class="vx-input-group-unit">
+                                <input id="collections-reminder1" type="number" min="1" max="60" @bind="_input.Reminder1Day" />
+                                <span class="vx-input-group-unit__suffix">days</span>
+                            </div>
+                        </div>
+
+                        <div class="vx-timeline-step-card">
+                            <div class="vx-timeline-step-card__header">
+                                <span class="vx-timeline-step-card__num">2</span>
+                                <label for="collections-reminder2" class="vx-timeline-step-card__title">@T["ui.collections_settings.reminder2"]</label>
+                            </div>
+                            <div class="vx-input-group-unit">
+                                <input id="collections-reminder2" type="number" min="1" max="60" @bind="_input.Reminder2Day" />
+                                <span class="vx-input-group-unit__suffix">days</span>
+                            </div>
+                        </div>
+
+                        <div class="vx-timeline-step-card">
+                            <div class="vx-timeline-step-card__header">
+                                <span class="vx-timeline-step-card__num">3</span>
+                                <label for="collections-final" class="vx-timeline-step-card__title">@T["ui.collections_settings.final_warning"]</label>
+                            </div>
+                            <div class="vx-input-group-unit">
+                                <input id="collections-final" type="number" min="1" max="60" @bind="_input.FinalWarningDay" />
+                                <span class="vx-input-group-unit__suffix">days</span>
+                            </div>
+                        </div>
+
+                        <div class="vx-timeline-step-card" style="border-color: color-mix(in srgb, #dc2626 40%, var(--vx-color-border));">
+                            <div class="vx-timeline-step-card__header">
+                                <span class="vx-timeline-step-card__num" style="background: #dc2626;">4</span>
+                                <label for="collections-block" class="vx-timeline-step-card__title" style="color: #dc2626;">@T["ui.collections_settings.block_day"]</label>
+                            </div>
+                            <div class="vx-input-group-unit">
+                                <input id="collections-block" type="number" min="1" max="60" @bind="_input.BlockDay" />
+                                <span class="vx-input-group-unit__suffix">days</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vx-form-grid-2" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--vx-color-border);">
+                        <div class="vx-field-compact">
+                            <label for="collections-notice">@T["ui.collections_settings.minimum_notice"]</label>
+                            <div class="vx-input-group-unit">
+                                <input id="collections-notice" type="number" min="1" max="30" @bind="_input.MinimumNoticeDays" aria-describedby="collections-notice-help" />
+                                <span class="vx-input-group-unit__suffix">days</span>
+                            </div>
+                            <p id="collections-notice-help" class="vx-hint">@T["ui.collections_settings.minimum_notice_help"]</p>
+                        </div>
+                        <div class="vx-field-compact">
+                            <label for="collections-retries">@T["ui.collections_settings.retry_days"]</label>
+                            <input id="collections-retries" @bind="_input.RetryDays" maxlength="40" aria-describedby="collections-retries-help" placeholder="3, 7" />
+                            <p id="collections-retries-help" class="vx-hint">@T["ui.collections_settings.retry_days_help"]</p>
+                        </div>
+                    </div>
                 </VxCard>
-                <VxCard Title="@T["ui.collections_settings.blocking"]">
-                    <p class="vx-hint">@T["ui.collections_settings.blocking_help"]</p>
-                    <label for="collections-readonly">@T["ui.collections_settings.read_only_days"]</label>
-                    <input id="collections-readonly" type="number" min="0" max="90" @bind="_input.BlockedReadOnlyDays" aria-describedby="collections-readonly-help" />
-                    <p id="collections-readonly-help" class="vx-hint">@T["ui.collections_settings.read_only_days_help"]</p>
-                    <label><input id="collections-stay-read-only" type="checkbox" @bind="_input.StayReadOnly" /> @T["ui.collections_settings.stay_read_only"]</label>
-                    <label for="collections-pending">@T["ui.collections_settings.pending_days"]</label>
-                    <input id="collections-pending" type="number" min="0" max="60" @bind="_input.PendingPaymentReadOnlyDays" aria-describedby="collections-pending-help" />
-                    <p id="collections-pending-help" class="vx-hint">@T["ui.collections_settings.pending_days_help"]</p>
-                    <label for="collections-long">@T["ui.collections_settings.long_block_days"]</label>
-                    <input id="collections-long" type="number" min="7" max="365" @bind="_input.LongBlockDays" aria-describedby="collections-long-help" />
-                    <p id="collections-long-help" class="vx-hint">@T["ui.collections_settings.long_block_days_help"]</p>
-                </VxCard>
-                <VxCard Title="@T["ui.collections_settings.extensions"]">
-                    <label for="collections-ext-days">@T["ui.collections_settings.extension_days"]</label>
-                    <input id="collections-ext-days" type="number" min="1" max="60" @bind="_input.ExtensionMaxDays" />
-                    <label for="collections-ext-count">@T["ui.collections_settings.extensions_per_case"]</label>
-                    <input id="collections-ext-count" type="number" min="0" max="10" @bind="_input.ExtensionsPerCase" aria-describedby="collections-ext-count-help" />
-                    <p id="collections-ext-count-help" class="vx-hint">@T["ui.collections_settings.extensions_per_case_help"]</p>
-                </VxCard>
-            </fieldset>
-            @if (settings.CanEdit)
-            {
-                <div class="vx-actions">
-                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.collections_settings.save"]</VxButton>
+
+                <!-- Cards 2 & 3: Side-by-Side Duo for Blocking and Extensions -->
+                <div class="vx-cards-duo">
+                    <VxCard Title="@T["ui.collections_settings.blocking"]">
+                        <p class="vx-hint" style="margin-top: 0;">@T["ui.collections_settings.blocking_help"]</p>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div class="vx-field-compact">
+                                <label for="collections-readonly">@T["ui.collections_settings.read_only_days"]</label>
+                                <div class="vx-input-group-unit">
+                                    <input id="collections-readonly" type="number" min="0" max="90" @bind="_input.BlockedReadOnlyDays" aria-describedby="collections-readonly-help" />
+                                    <span class="vx-input-group-unit__suffix">days</span>
+                                </div>
+                                <p id="collections-readonly-help" class="vx-hint">@T["ui.collections_settings.read_only_days_help"]</p>
+                            </div>
+                            <div class="vx-toggle-box">
+                                <input id="collections-stay-read-only" type="checkbox" @bind="_input.StayReadOnly" />
+                                <span class="vx-toggle-box__label">@T["ui.collections_settings.stay_read_only"]</span>
+                            </div>
+                            <div class="vx-field-compact">
+                                <label for="collections-pending">@T["ui.collections_settings.pending_days"]</label>
+                                <div class="vx-input-group-unit">
+                                    <input id="collections-pending" type="number" min="0" max="60" @bind="_input.PendingPaymentReadOnlyDays" aria-describedby="collections-pending-help" />
+                                    <span class="vx-input-group-unit__suffix">days</span>
+                                </div>
+                                <p id="collections-pending-help" class="vx-hint">@T["ui.collections_settings.pending_days_help"]</p>
+                            </div>
+                            <div class="vx-field-compact">
+                                <label for="collections-long">@T["ui.collections_settings.long_block_days"]</label>
+                                <div class="vx-input-group-unit">
+                                    <input id="collections-long" type="number" min="7" max="365" @bind="_input.LongBlockDays" aria-describedby="collections-long-help" />
+                                    <span class="vx-input-group-unit__suffix">days</span>
+                                </div>
+                                <p id="collections-long-help" class="vx-hint">@T["ui.collections_settings.long_block_days_help"]</p>
+                            </div>
+                        </div>
+                    </VxCard>
+
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <VxCard Title="@T["ui.collections_settings.extensions"]">
+                            <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                                <div class="vx-field-compact">
+                                    <label for="collections-ext-days">@T["ui.collections_settings.extension_days"]</label>
+                                    <div class="vx-input-group-unit">
+                                        <input id="collections-ext-days" type="number" min="1" max="60" @bind="_input.ExtensionMaxDays" />
+                                        <span class="vx-input-group-unit__suffix">days</span>
+                                    </div>
+                                </div>
+                                <div class="vx-field-compact">
+                                    <label for="collections-ext-count">@T["ui.collections_settings.extensions_per_case"]</label>
+                                    <input id="collections-ext-count" type="number" min="0" max="10" @bind="_input.ExtensionsPerCase" aria-describedby="collections-ext-count-help" />
+                                    <p id="collections-ext-count-help" class="vx-hint">@T["ui.collections_settings.extensions_per_case_help"]</p>
+                                </div>
+                            </div>
+                        </VxCard>
+                        @if (settings.CanEdit)
+                        {
+                            <div class="vx-actions" style="margin-top: 0; display: flex; justify-content: flex-start;">
+                                <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.collections_settings.save"]</VxButton>
+                            </div>
+                        }
+                    </div>
                 </div>
-            }
+            </fieldset>
         </form>
         @if (Presenter.State.StepUpPending)
         {

@@ -8887,7 +8887,7 @@ Merci : nous avons reçu le paiement et l’accès complet à Vixly est rétabli
     <comment>needs-review</comment>
   </data>
   <data name="ui.device.kind.phone" xml:space="preserve">
-    <value>Téléphone</value>
+    <value>Mobile</value>
     <comment>needs-review</comment>
   </data>
   <data name="ui.device.kind.scanner" xml:space="preserve">
@@ -10166,6 +10166,1742 @@ Des questions ? Écrivez-nous à {support}.</value>
   </data>
   <data name="platform.internal.too_many_items" xml:space="preserve">
     <value>Envoyez au plus {max} éléments à la fois.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.company_required" xml:space="preserve">
+    <value>Indiquez le nom de l’entreprise (200 caractères au plus).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.name_required" xml:space="preserve">
+    <value>Indiquez votre nom (120 caractères au plus).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.email_invalid" xml:space="preserve">
+    <value>Indiquez une adresse e-mail professionnelle valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.phone_invalid" xml:space="preserve">
+    <value>Indiquez un numéro de téléphone valide, ou laissez le champ vide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.country_invalid" xml:space="preserve">
+    <value>Choisissez un pays dans la liste.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.kind_invalid" xml:space="preserve">
+    <value>Choisissez le type d’activité que vous exercez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.message_too_long" xml:space="preserve">
+    <value>Le message peut compter au plus {max} caractères.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.note_too_long" xml:space="preserve">
+    <value>La note peut compter au plus {max} caractères.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.status_invalid" xml:space="preserve">
+    <value>Choisissez un statut.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.lead_not_found" xml:space="preserve">
+    <value>La demande est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.leads.bot_check_failed" xml:space="preserve">
+    <value>Nous n’avons pas pu confirmer que vous êtes une personne. Veuillez réessayer.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.leads.view" xml:space="preserve">
+    <value>Voir les demandes de contact</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.leads.manage" xml:space="preserve">
+    <value>Suivre les demandes de contact</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.leads" xml:space="preserve">
+    <value>Demandes de contact</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.leads.received" xml:space="preserve">
+    <value>Demande de contact reçue</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.leads.status_changed" xml:space="preserve">
+    <value>Demande de contact mise à jour</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.title" xml:space="preserve">
+    <value>Demandes de contact</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.request" xml:space="preserve">
+    <value>Demande de contact</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.search" xml:space="preserve">
+    <value>Rechercher</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.status.all" xml:space="preserve">
+    <value>Toutes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.status.new" xml:space="preserve">
+    <value>Nouvelle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.status.contacted" xml:space="preserve">
+    <value>Contactée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.status.closed" xml:space="preserve">
+    <value>Fermée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.count" xml:space="preserve">
+    <value>{count} demandes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.received" xml:space="preserve">
+    <value>Reçue</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.company" xml:space="preserve">
+    <value>Entreprise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.contact" xml:space="preserve">
+    <value>Contact</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.email" xml:space="preserve">
+    <value>E-mail</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.phone" xml:space="preserve">
+    <value>Téléphone</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.country" xml:space="preserve">
+    <value>Pays</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.kind" xml:space="preserve">
+    <value>Activité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.kind.courier" xml:space="preserve">
+    <value>Entreprise de messagerie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.kind.freight" xml:space="preserve">
+    <value>Transport de fret</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.kind.warehouse" xml:space="preserve">
+    <value>Entreposage</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.kind.multi_branch" xml:space="preserve">
+    <value>Logistique multi-sites</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.kind.other" xml:space="preserve">
+    <value>Autre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.language" xml:space="preserve">
+    <value>Langue</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.message" xml:space="preserve">
+    <value>Message</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.handled" xml:space="preserve">
+    <value>Dernière mise à jour par</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.follow_up" xml:space="preserve">
+    <value>Suivi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.note" xml:space="preserve">
+    <value>Note interne</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.save" xml:space="preserve">
+    <value>Enregistrer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.leads.saved" xml:space="preserve">
+    <value>Demande mise à jour.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.lead.subject" xml:space="preserve">
+    <value>Nouvelle demande de contact : {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.lead.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Une demande de contact est arrivée depuis le site public.
+
+Entreprise : {company}
+Contact : {contact}
+E-mail : {email}
+Téléphone : {phone}
+Pays : {country}
+Activité : {kind}
+Langue : {language}
+
+Message :
+{message}
+
+Ouvrez-la dans la console : {link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.registrations.invitation_required" xml:space="preserve">
+    <value>Les inscriptions se font sur invitation pour le moment. Utilisez le lien envoyé par Vixly ou contactez notre équipe commerciale.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.reason_required" xml:space="preserve">
+    <value>Indiquez pourquoi les informations de l’entreprise changent.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.reason_too_long" xml:space="preserve">
+    <value>Le motif est trop long.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.no_difference" xml:space="preserve">
+    <value>Les nouvelles informations sont identiques aux actuelles.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.proof_required" xml:space="preserve">
+    <value>Joignez un document qui prouve le changement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.proof_type_invalid" xml:space="preserve">
+    <value>La preuve doit être un fichier PDF, JPEG ou PNG.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.proof_too_large" xml:space="preserve">
+    <value>Le fichier de preuve dépasse 10 Mo.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.not_pending" xml:space="preserve">
+    <value>Cette demande a déjà été traitée ou retirée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.note_required" xml:space="preserve">
+    <value>Ajoutez une note expliquant pourquoi au client.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.note_too_long" xml:space="preserve">
+    <value>La note est trop longue.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.already_pending" xml:space="preserve">
+    <value>Une demande de modification est déjà en attente.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.not_found" xml:space="preserve">
+    <value>La demande de modification est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.title" xml:space="preserve">
+    <value>Changements d’entreprise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.lead" xml:space="preserve">
+    <value>Les clients demandent ici à modifier leurs informations légales. Vérifiez la preuve, puis approuvez ou refusez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.request" xml:space="preserve">
+    <value>Demande de modification</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.count" xml:space="preserve">
+    <value>{count} demandes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.status.all" xml:space="preserve">
+    <value>Tous les statuts</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.status.pending" xml:space="preserve">
+    <value>En attente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.status.approved" xml:space="preserve">
+    <value>Approuvée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.status.rejected" xml:space="preserve">
+    <value>Refusée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.status.withdrawn" xml:space="preserve">
+    <value>Retirée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.submitted" xml:space="preserve">
+    <value>Envoyée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.tenant" xml:space="preserve">
+    <value>Client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.from" xml:space="preserve">
+    <value>Informations actuelles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.to" xml:space="preserve">
+    <value>Informations demandées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.reason" xml:space="preserve">
+    <value>Motif</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.proof" xml:space="preserve">
+    <value>Preuve</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.decided" xml:space="preserve">
+    <value>Traitée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.note" xml:space="preserve">
+    <value>Note</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.decide" xml:space="preserve">
+    <value>Décision</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.decide_help" xml:space="preserve">
+    <value>L’approbation remplace les informations légales du client. Les factures déjà émises gardent les anciennes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.note_optional" xml:space="preserve">
+    <value>Note (facultative)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.reject_note" xml:space="preserve">
+    <value>Motif du refus (envoyé au client)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.approve" xml:space="preserve">
+    <value>Approuver</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.reject" xml:space="preserve">
+    <value>Refuser</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.approved" xml:space="preserve">
+    <value>La modification est approuvée et les nouvelles informations sont en place.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_changes.rejected" xml:space="preserve">
+    <value>La modification est refusée. Le client a été informé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.company_locked" xml:space="preserve">
+    <value>L’entreprise gère elle-même son profil depuis son espace. Sa raison sociale ne change que sur demande, avec justificatif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenants.edit_settings" xml:space="preserve">
+    <value>Modifier les paramètres</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tenant_history.company_changed" xml:space="preserve">
+    <value>Informations de l’entreprise modifiées (demande approuvée)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.company_change_submitted" xml:space="preserve">
+    <value>Changement d’entreprise demandé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.company_change_withdrawn" xml:space="preserve">
+    <value>Changement d’entreprise retiré</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.company_change_approved" xml:space="preserve">
+    <value>Changement d’entreprise approuvé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.company_change_rejected" xml:space="preserve">
+    <value>Changement d’entreprise refusé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.tenants.review_changes" xml:space="preserve">
+    <value>Approuver les changements d’entreprise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.company_change.submitted_subject" xml:space="preserve">
+    <value>Changement d’entreprise à examiner : {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.company_change.submitted_body" xml:space="preserve">
+    <value>Bonjour {name},
+
+{company} ({code}) demande à modifier ses informations légales et a joint une preuve.
+
+Examinez la demande ici : {link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.company_change.approved_subject" xml:space="preserve">
+    <value>Vos informations d’entreprise sont à jour : {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.company_change.approved_body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Nous avons approuvé votre demande. Votre entreprise apparaît désormais comme {company} sur les nouvelles factures. Les factures déjà émises gardent les anciennes informations.
+
+{note}
+
+Des questions ? Écrivez à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.company_change.rejected_subject" xml:space="preserve">
+    <value>Votre changement d’entreprise n’a pas été approuvé : {company}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.company_change.rejected_body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Nous n’avons pas pu approuver le changement vers {company}. Notre motif :
+
+{note}
+
+Vous pouvez envoyer une nouvelle demande avec une preuve à jour. Des questions ? Écrivez à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.control.workspace" xml:space="preserve"><value>Administration de la plateforme</value><comment>needs-review</comment></data>
+  <data name="ui.control.shortcuts" xml:space="preserve"><value>Raccourcis d’administration</value><comment>needs-review</comment></data>
+  <data name="ui.control.view_all" xml:space="preserve"><value>Tout afficher</value><comment>needs-review</comment></data>
+  <data name="ui.control.tenants_context" xml:space="preserve"><value>Annuaire des locataires · 5 premiers résultats</value><comment>needs-review</comment></data>
+  <data name="ui.control.subscriptions_context" xml:space="preserve"><value>Abonnements en cours · 5 premiers résultats</value><comment>needs-review</comment></data>
+  <data name="ui.control.invoices_context" xml:space="preserve"><value>Factures en retard · 5 premiers résultats</value><comment>needs-review</comment></data>
+  <data name="ui.control.approvals_context" xml:space="preserve"><value>Vos approbations · 5 premiers résultats</value><comment>needs-review</comment></data>
+  <data name="ui.control.overdue_invoices" xml:space="preserve"><value>Factures en retard</value><comment>needs-review</comment></data>
+  <data name="ui.control.filtered_results" xml:space="preserve"><value>Selon les filtres actuels</value><comment>needs-review</comment></data>
+  <data name="ui.control.overview" xml:space="preserve"><value>Vue d’ensemble</value><comment>needs-review</comment></data>
+  <data name="ui.control.organizations" xml:space="preserve"><value>Organisations</value><comment>needs-review</comment></data>
+  <data name="ui.control.commercial" xml:space="preserve"><value>Commercial</value><comment>needs-review</comment></data>
+  <data name="ui.control.security" xml:space="preserve"><value>Sécurité et accès</value><comment>needs-review</comment></data>
+  <data name="ui.control.system" xml:space="preserve"><value>Paramètres</value><comment>needs-review</comment></data>
+  <data name="ui.control.theme" xml:space="preserve"><value>Changer le thème clair ou sombre</value><comment>needs-review</comment></data>
+  <data name="ui.control.skip" xml:space="preserve"><value>Aller à l’espace de travail</value><comment>needs-review</comment></data>
+  <data name="email.licensing.welcome.subject" xml:space="preserve">
+    <value>{company} est prêt</value>
+  </data>
+  <data name="email.licensing.welcome.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Bienvenue ! La configuration de {company} est terminée : votre premier ordinateur est enregistré et votre entreprise est maintenant active sur Vixly.
+
+Votre personnel se connecte ici :
+{staff}
+
+Vos clients vous trouvent ici :
+{site}
+
+Prochaines étapes : ajoutez vos agences et entrepôts, vos numéros de téléphone par pays, ainsi que votre logo et vos couleurs, depuis Site web et Adresses une fois connecté.
+
+Des questions ? Écrivez à {support}.</value>
+  </data>
+  <data name="platform.licensing.support_reason_required" xml:space="preserve">
+    <value>Indiquez le motif de cette action du support.</value>
+  </data>
+  <data name="platform.licensing.identity_check_required" xml:space="preserve">
+    <value>Indiquez comment vous avez vérifié que l’appelant est le propriétaire (par exemple, un rappel au téléphone du propriétaire enregistré).</value>
+  </data>
+  <data name="platform.licensing.approver_must_differ" xml:space="preserve">
+    <value>Un autre membre du personnel doit approuver cette réinitialisation, pas celui qui l’a demandée.</value>
+  </data>
+  <data name="platform.licensing.support_not_pending" xml:space="preserve">
+    <value>Cette demande a déjà été traitée.</value>
+  </data>
+  <data name="email.licensing.support_started.device.subject" xml:space="preserve">
+    <value>{company} : le support Vixly a lancé une récupération d’appareil</value>
+  </data>
+  <data name="email.licensing.support_started.device.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Le support Vixly a lancé une récupération d’appareil pour le propriétaire de {company}, à sa demande. Le propriétaire reçoit un lien à usage unique pour enregistrer un nouvel appareil.
+
+Si personne chez {company} ne l’a demandé, contactez-nous immédiatement à {support}.</value>
+  </data>
+  <data name="email.licensing.support_started.second_factor.subject" xml:space="preserve">
+    <value>{company} : le support Vixly réinitialise le second facteur du propriétaire</value>
+  </data>
+  <data name="email.licensing.support_started.second_factor.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Le support Vixly a approuvé la réinitialisation du second facteur (application d’authentification) du propriétaire de {company}, à sa demande. Le propriétaire reçoit un lien à usage unique pour en enregistrer un nouveau.
+
+Si personne chez {company} ne l’a demandé, contactez-nous immédiatement à {support}.</value>
+  </data>
+  <data name="email.licensing.second_factor_link.subject" xml:space="preserve">
+    <value>Configurez une nouvelle application d’authentification pour {company}</value>
+  </data>
+  <data name="email.licensing.second_factor_link.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Le support Vixly a approuvé la réinitialisation de votre second facteur pour {company}. Ouvrez ce lien, confirmez votre e-mail et votre mot de passe, puis scannez le nouveau code avec votre application d’authentification :
+{link}
+
+Le lien ne fonctionne qu’une fois et expire le {expires} (UTC). Si vous ne l’avez pas demandé, contactez-nous immédiatement à {support}.</value>
+  </data>
+  <data name="email.licensing.second_factor_done.subject" xml:space="preserve">
+    <value>{company} : le second facteur du propriétaire a été remplacé</value>
+  </data>
+  <data name="email.licensing.second_factor_done.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+Le propriétaire de {company} a enregistré un nouveau second facteur grâce à un lien du support Vixly. Toutes les sessions précédentes du propriétaire ont été fermées.
+
+Si personne chez {company} ne l’a demandé, contactez-nous immédiatement à {support}.</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.second_factor_reset_requested" xml:space="preserve">
+    <value>Réinitialisation du second facteur du propriétaire demandée</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.second_factor_reset_approved" xml:space="preserve">
+    <value>Réinitialisation du second facteur du propriétaire approuvée</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.second_factor_reset_refused" xml:space="preserve">
+    <value>Réinitialisation du second facteur du propriétaire refusée</value>
+  </data>
+  <data name="ui.audit.action.platform.licensing.second_factor_reset_completed" xml:space="preserve">
+    <value>Réinitialisation du second facteur du propriétaire terminée</value>
+  </data>
+  <data name="ui.licensing.support_title" xml:space="preserve">
+    <value>Support au propriétaire</value>
+  </data>
+  <data name="ui.licensing.support_help" xml:space="preserve">
+    <value>Uniquement quand le propriétaire a appelé et que vous avez vérifié que c’est lui : rappelez le téléphone du propriétaire enregistré, jamais un numéro donné pendant l’appel.</value>
+  </data>
+  <data name="ui.licensing.identity_check" xml:space="preserve">
+    <value>Comment vous avez vérifié l’appelant</value>
+  </data>
+  <data name="ui.licensing.identity_check_hint" xml:space="preserve">
+    <value>Rappel au téléphone du propriétaire enregistré ; détails de l’entreprise confirmés</value>
+  </data>
+  <data name="ui.licensing.support_reason" xml:space="preserve">
+    <value>Motif</value>
+  </data>
+  <data name="ui.licensing.replace_device" xml:space="preserve">
+    <value>Appareil perdu à remplacer (quand toutes les licences sont utilisées)</value>
+  </data>
+  <data name="ui.licensing.replace_none" xml:space="preserve">
+    <value>Aucun</value>
+  </data>
+  <data name="ui.licensing.request_reset" xml:space="preserve">
+    <value>Demander la réinitialisation du second facteur du propriétaire</value>
+  </data>
+  <data name="ui.licensing.support_open" xml:space="preserve">
+    <value>Demandes de support ouvertes</value>
+  </data>
+  <data name="ui.licensing.support_kind.devicerecovery" xml:space="preserve">
+    <value>Récupération d’appareil</value>
+  </data>
+  <data name="ui.licensing.support_kind.secondfactorreset" xml:space="preserve">
+    <value>Réinitialisation du second facteur</value>
+  </data>
+  <data name="ui.licensing.support_status.pending" xml:space="preserve">
+    <value>En attente d’un second membre du personnel</value>
+  </data>
+  <data name="ui.licensing.support_status.approved" xml:space="preserve">
+    <value>Lien envoyé, pas encore utilisé</value>
+  </data>
+  <data name="ui.licensing.support_status.refused" xml:space="preserve">
+    <value>Refusée</value>
+  </data>
+  <data name="ui.licensing.support_status.completed" xml:space="preserve">
+    <value>Terminée</value>
+  </data>
+  <data name="ui.licensing.unknown_staff" xml:space="preserve">
+    <value>Membre du personnel inconnu</value>
+  </data>
+  <data name="ui.licensing.decision_note" xml:space="preserve">
+    <value>Note (facultative)</value>
+  </data>
+  <data name="ui.licensing.approve_reset" xml:space="preserve">
+    <value>Approuver et envoyer le lien</value>
+  </data>
+  <data name="ui.licensing.refuse_reset" xml:space="preserve">
+    <value>Refuser</value>
+  </data>
+  <data name="ui.licensing.reset_requested" xml:space="preserve">
+    <value>Demande enregistrée. Un autre membre du personnel doit l’approuver.</value>
+  </data>
+  <data name="ui.licensing.reset_approved" xml:space="preserve">
+    <value>Approuvée. Le lien a été envoyé au propriétaire ; les contacts propriétaire et facturation ont été prévenus.</value>
+  </data>
+  <data name="ui.licensing.reset_refused" xml:space="preserve">
+    <value>Refusée. Rien n’a été envoyé.</value>
+  </data>
+  <data name="ui.error.title" xml:space="preserve">
+    <value>Un problème est survenu</value>
+  </data>
+  <data name="ui.error.body" xml:space="preserve">
+    <value>Cela n'a pas fonctionné. Revenez en arrière et réessayez ; si cela se reproduit, prévenez l'équipe technique.</value>
+  </data>
+  <data name="ui.error.back" xml:space="preserve">
+    <value>Retour à la console</value>
+  </data>
+  <data name="ui.devices.system" xml:space="preserve">
+    <value>Système d’exploitation</value>
+  </data>
+  <data name="ui.devices.browser" xml:space="preserve">
+    <value>Navigateur</value>
+  </data>
+  <data name="ui.devices.address" xml:space="preserve">
+    <value>Adresse IP</value>
+  </data>
+  <data name="ui.device.approved_by_link" xml:space="preserve">
+    <value>Le lien envoyé par e-mail au propriétaire</value>
+  </data>
+  <data name="ui.device.kind.desktop" xml:space="preserve">
+    <value>Ordinateur de bureau</value>
+  </data>
+  <data name="ui.device.kind.laptop" xml:space="preserve">
+    <value>Ordinateur portable</value>
+  </data>
+  <data name="ui.activity.title" xml:space="preserve">
+    <value>Activité de connexion</value>
+  </data>
+  <data name="ui.activity.filtered" xml:space="preserve">
+    <value>Connexions d'une seule personne.</value>
+  </data>
+  <data name="ui.activity.everyone" xml:space="preserve">
+    <value>Afficher tout le monde</value>
+  </data>
+  <data name="ui.activity.count" xml:space="preserve">
+    <value>{count} connexions</value>
+  </data>
+  <data name="ui.activity.who" xml:space="preserve">
+    <value>Qui</value>
+  </data>
+  <data name="ui.activity.signed_in" xml:space="preserve">
+    <value>Connecté</value>
+  </data>
+  <data name="ui.activity.signed_out" xml:space="preserve">
+    <value>Déconnecté</value>
+  </data>
+  <data name="ui.activity.address" xml:space="preserve">
+    <value>Adresse IP</value>
+  </data>
+  <data name="ui.activity.country" xml:space="preserve">
+    <value>Pays</value>
+  </data>
+  <data name="ui.activity.browser" xml:space="preserve">
+    <value>Navigateur</value>
+  </data>
+  <data name="ui.activity.system" xml:space="preserve">
+    <value>Système d’exploitation</value>
+  </data>
+  <data name="ui.activity.empty" xml:space="preserve">
+    <value>Aucune connexion pour l'instant.</value>
+  </data>
+  <data name="ui.activity.still_signed_in" xml:space="preserve">
+    <value>Toujours connecté</value>
+  </data>
+  <data name="ui.activity.ended.signed_out" xml:space="preserve">
+    <value>déconnexion</value>
+  </data>
+  <data name="ui.activity.ended.ended_by_user" xml:space="preserve">
+    <value>terminée par la personne</value>
+  </data>
+  <data name="ui.activity.ended.ended_by_administrator" xml:space="preserve">
+    <value>terminée par un administrateur</value>
+  </data>
+  <data name="ui.activity.ended.account_restricted" xml:space="preserve">
+    <value>compte restreint</value>
+  </data>
+  <data name="ui.activity.ended.idle_timeout" xml:space="preserve">
+    <value>inactivité</value>
+  </data>
+  <data name="ui.activity.ended.absolute_lifetime" xml:space="preserve">
+    <value>durée maximale</value>
+  </data>
+  <data name="ui.activity.ended.password_changed" xml:space="preserve">
+    <value>mot de passe changé</value>
+  </data>
+  <data name="ui.activity.ended.second_factor_reset" xml:space="preserve">
+    <value>deuxième étape réinitialisée</value>
+  </data>
+  <data name="ui.activity.ended.step_up_failed" xml:space="preserve">
+    <value>confirmation échouée</value>
+  </data>
+  <data name="ui.activity.country.tor" xml:space="preserve">
+    <value>Tor</value>
+  </data>
+  <data name="ui.activity.country.unknown" xml:space="preserve">
+    <value>Inconnu</value>
+  </data>
+  <data name="ui.licences.title" xml:space="preserve">
+    <value>Licences</value>
+  </data>
+  <data name="ui.licences.licence" xml:space="preserve">
+    <value>Licence</value>
+  </data>
+  <data name="ui.licences.device_id" xml:space="preserve">
+    <value>ID de l’appareil</value>
+  </data>
+  <data name="ui.licences.free" xml:space="preserve">
+    <value>Libre</value>
+  </data>
+  <data name="ui.plans.feature.partner_agents" xml:space="preserve">
+    <value>Agents partenaires</value>
+  </data>
+  <data name="ui.plans.feature.text_messages" xml:space="preserve">
+    <value>Avis par SMS et WhatsApp</value>
+  </data>
+  <data name="ui.plans.feature.quick_books_sync" xml:space="preserve">
+    <value>Synchronisation QuickBooks Online</value>
+  </data>
+  <data name="ui.plans.feature.tenant_api" xml:space="preserve">
+    <value>API et webhooks</value>
+  </data>
+  <data name="ui.plans.feature.carrier_data" xml:space="preserve">
+    <value>Données transporteurs (dates automatiques)</value>
+  </data>
+  <data name="platform.payments.invoice_preparing" xml:space="preserve">
+    <value>Votre facture est en cours de préparation. Réessayez dans quelques secondes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.stepup.intro_password" xml:space="preserve">
+    <value>Saisissez votre mot de passe pour continuer.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.stepup.password_label" xml:space="preserve">
+    <value>Mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.security.title" xml:space="preserve">
+    <value>Sécurité de connexion</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.security.help" xml:space="preserve">
+    <value>S’applique à toutes les personnes qui se connectent à Control.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.security.require_mfa" xml:space="preserve">
+    <value>Exiger l’authentification à deux facteurs (une deuxième étape à la connexion)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.security.require_mfa_yes" xml:space="preserve">
+    <value>Chacun doit configurer une application d’authentification ou une clé d’accès et l’utiliser à chaque connexion.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.security.require_mfa_no" xml:space="preserve">
+    <value>Personne n’est obligé d’en configurer une. Les personnes qui n’en ont pas se connectent avec leur mot de passe et confirment les actions sensibles avec celui-ci ; celles qui en ont configuré une continuent de l’utiliser.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.security.updated" xml:space="preserve">
+    <value>Modifié par {name}, {time}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.security.superuser_only" xml:space="preserve">
+    <value>Seul un SuperUser peut modifier ce réglage.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.security.saved" xml:space="preserve">
+    <value>Sécurité de connexion enregistrée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.security.require_mfa_changed" xml:space="preserve">
+    <value>A modifié l’exigence d’authentification à deux facteurs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.target.PlatformSecuritySettings" xml:space="preserve">
+    <value>Sécurité de connexion</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="nav.help" xml:space="preserve">
+    <value>Aide</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.title" xml:space="preserve">
+    <value>Aide de Control</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.summary" xml:space="preserve">
+    <value>Trouvez des conseils pour votre travail dans Vixly Control.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.search" xml:space="preserve">
+    <value>Rechercher dans l’aide</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.search_go" xml:space="preserve">
+    <value>Rechercher</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.results" xml:space="preserve">
+    <value>Résultats de recherche</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.clear" xml:space="preserve">
+    <value>Afficher toute l’aide</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.back" xml:space="preserve">
+    <value>Retour à l’aide</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.related" xml:space="preserve">
+    <value>Articles associés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.empty" xml:space="preserve">
+    <value>Aucun article ne correspond à votre recherche.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.context" xml:space="preserve">
+    <value>Aide pour cette page</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.not_found" xml:space="preserve">
+    <value>Page introuvable</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.getting-started" xml:space="preserve">
+    <value>Premiers pas</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.companies" xml:space="preserve">
+    <value>Entreprises</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.commercial" xml:space="preserve">
+    <value>Forfaits et abonnements</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.billing-and-payments" xml:space="preserve">
+    <value>Facturation et paiements</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.licences-and-devices" xml:space="preserve">
+    <value>Licences et appareils</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.legal" xml:space="preserve">
+    <value>Conditions juridiques</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.team-and-security" xml:space="preserve">
+    <value>Équipe et sécurité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.help.section.settings" xml:space="preserve">
+    <value>Paramètres</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.users.invitation_saved_mail_failed" xml:space="preserve">
+    <value>La personne a été enregistrée, mais l’e-mail d’invitation n’a pas pu être envoyé. Vérifiez les réglages de messagerie, puis utilisez Renvoyer l’invitation sur sa page.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.users.invitation_mail_failed" xml:space="preserve">
+    <value>L’e-mail d’invitation n’a pas pu être envoyé. Vérifiez les réglages de messagerie et réessayez.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.users.invitation_mail_failed" xml:space="preserve">
+    <value>E-mail d’invitation non envoyé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.jobs.view" xml:space="preserve">
+    <value>Voir les tâches de fond et leurs exécutions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.jobs" xml:space="preserve">
+    <value>Tâches de fond</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.title" xml:space="preserve">
+    <value>Tâches</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.intro" xml:space="preserve">
+    <value>Control exécute ces tâches toutes les heures. Chaque exécution est conservée 90 jours. Une étape en échec n’arrête pas les suivantes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.latest" xml:space="preserve">
+    <value>Dernière exécution de chaque tâche</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.history" xml:space="preserve">
+    <value>Historique des exécutions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.job" xml:space="preserve">
+    <value>Tâche</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.last_run" xml:space="preserve">
+    <value>Dernière exécution</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.last_success" xml:space="preserve">
+    <value>Dernier succès</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.failed_recently" xml:space="preserve">
+    <value>Échecs, 24 dernières heures</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.outcome" xml:space="preserve">
+    <value>Résultat</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.started" xml:space="preserve">
+    <value>Début</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.duration" xml:space="preserve">
+    <value>Durée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.handled" xml:space="preserve">
+    <value>Éléments traités</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.never" xml:space="preserve">
+    <value>Jamais exécutée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.succeeded" xml:space="preserve">
+    <value>Réussie</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.failed" xml:space="preserve">
+    <value>Échec</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.unfinished" xml:space="preserve">
+    <value>Non terminée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.seconds" xml:space="preserve">
+    <value>{seconds} s</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.count" xml:space="preserve">
+    <value>{count} exécutions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.empty" xml:space="preserve">
+    <value>Aucune exécution pour le moment.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.all_jobs" xml:space="preserve">
+    <value>Toutes les tâches</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.all_runs" xml:space="preserve">
+    <value>Toutes les exécutions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.failures_only" xml:space="preserve">
+    <value>Échecs seulement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.job.subscriptions" xml:space="preserve">
+    <value>Abonnements : essais, renouvellements et changements dus</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.job.billing" xml:space="preserve">
+    <value>Facturation : factures en retard</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.job.payments" xml:space="preserve">
+    <value>Paiements par carte : prélèvements automatiques et remboursements</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.job.collections" xml:space="preserve">
+    <value>Recouvrement : relances, nouvelles tentatives et blocages</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.job.licensing" xml:space="preserve">
+    <value>Licences : demandes d’appareil expirées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.job.legal" xml:space="preserve">
+    <value>Conditions : avis et rappels</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.job.event_feed" xml:space="preserve">
+    <value>Flux d’événements : anciens événements supprimés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.job.leads" xml:space="preserve">
+    <value>Demandes de contact : supprimées 24 mois après clôture</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.job.sign_in_cleanup" xml:space="preserve">
+    <value>Nettoyage des connexions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.job.job_run_cleanup" xml:space="preserve">
+    <value>Nettoyage de l’historique des tâches</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.maintenance.times_invalid" xml:space="preserve">
+    <value>La fin doit être après le début, et le début maintenant ou plus tard, dans l’année.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.maintenance.too_long" xml:space="preserve">
+    <value>Une maintenance dure au plus 7 jours.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.maintenance.sites_required" xml:space="preserve">
+    <value>Choisissez au moins un site.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.maintenance.notice_invalid" xml:space="preserve">
+    <value>Le préavis est de 0 à 168 heures.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.maintenance.message_too_long" xml:space="preserve">
+    <value>Un message compte au plus 500 caractères.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.maintenance.already_over" xml:space="preserve">
+    <value>Cette maintenance est déjà terminée ou annulée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.maintenance.window_not_found" xml:space="preserve">
+    <value>Cette maintenance est introuvable.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.maintenance.view" xml:space="preserve">
+    <value>Voir les maintenances</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission.platform.maintenance.manage" xml:space="preserve">
+    <value>Publier, annuler et terminer les maintenances</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.permission_area.maintenance" xml:space="preserve">
+    <value>Maintenance</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.maintenance.scheduled" xml:space="preserve">
+    <value>Maintenance publiée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.maintenance.stopped" xml:space="preserve">
+    <value>Maintenance annulée ou terminée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.title" xml:space="preserve">
+    <value>Maintenance</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.intro" xml:space="preserve">
+    <value>Publiez quand les sites ferment pour maintenance. Ils affichent un avis avant et une page de maintenance pendant. Control ne ferme jamais.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.open" xml:space="preserve">
+    <value>À venir et en cours</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.past" xml:space="preserve">
+    <value>Maintenances passées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.starts" xml:space="preserve">
+    <value>Début</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.ends" xml:space="preserve">
+    <value>Fin</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.starts_utc" xml:space="preserve">
+    <value>Début (UTC)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.ends_utc" xml:space="preserve">
+    <value>Fin (UTC)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.sites" xml:space="preserve">
+    <value>Sites fermés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.site.public" xml:space="preserve">
+    <value>Site public</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.site.companies" xml:space="preserve">
+    <value>Sites des entreprises</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.site.customers" xml:space="preserve">
+    <value>Portails clients</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.site.staff" xml:space="preserve">
+    <value>Espaces du personnel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.control_stays_open" xml:space="preserve">
+    <value>Control reste ouvert : vous pouvez terminer la maintenance à tout moment.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.status" xml:space="preserve">
+    <value>Statut</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.status.scheduled" xml:space="preserve">
+    <value>Planifiée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.status.announced" xml:space="preserve">
+    <value>Annoncée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.status.running" xml:space="preserve">
+    <value>En cours</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.status.finished" xml:space="preserve">
+    <value>Terminée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.status.cancelled" xml:space="preserve">
+    <value>Annulée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.ended_early" xml:space="preserve">
+    <value>Terminée plus tôt</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.message" xml:space="preserve">
+    <value>Message</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.message_en" xml:space="preserve">
+    <value>Message en anglais</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.message_fr" xml:space="preserve">
+    <value>Message en français</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.message_es" xml:space="preserve">
+    <value>Message en espagnol</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.message_help" xml:space="preserve">
+    <value>Facultatif. Affiché aussi sur les sites et portails des entreprises : n’y écrivez pas « Vixly ».</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.notice_hours" xml:space="preserve">
+    <value>Préavis (heures)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.notice_hours_help" xml:space="preserve">
+    <value>Les sites affichent un bandeau ce nombre d’heures avant le début.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.new" xml:space="preserve">
+    <value>Publier une maintenance</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.publish" xml:space="preserve">
+    <value>Publier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.cancel" xml:space="preserve">
+    <value>Annuler</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.end_now" xml:space="preserve">
+    <value>Terminer maintenant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.actions" xml:space="preserve">
+    <value>Actions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.scheduled" xml:space="preserve">
+    <value>La maintenance est publiée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.stopped" xml:space="preserve">
+    <value>La maintenance est annulée ou terminée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.pass_intro" xml:space="preserve">
+    <value>Pour passer pendant la maintenance, ouvrez cette adresse sur un des sites fermés :</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.pass_once" xml:space="preserve">
+    <value>Copiez-la maintenant : elle n’est affichée qu’une fois.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.none_open" xml:space="preserve">
+    <value>Aucune maintenance n’est prévue.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.none_past" xml:space="preserve">
+    <value>Aucune maintenance passée.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.layout.button" xml:space="preserve">
+    <value>Ouvrir</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.layout.copy_link" xml:space="preserve">
+    <value>Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.layout.footer_support" xml:space="preserve">
+    <value>Des questions ? Écrivez à {support}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.layout.footer_company" xml:space="preserve">
+    <value>Vixly · Tech Crafters LLC · 501 N Dixie Hwy, Suite 3004, Hallandale Beach, FL 33009, États-Unis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.invitation.button" xml:space="preserve">
+    <value>Choisir mon mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.registration.button" xml:space="preserve">
+    <value>Confirmer mon e-mail</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.reset.button" xml:space="preserve">
+    <value>Choisir un nouveau mot de passe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.save_card.button" xml:space="preserve">
+    <value>Enregistrer ma carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.card_failed.button" xml:space="preserve">
+    <value>Payer la facture</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.card_action_required.button" xml:space="preserve">
+    <value>Confirmer le paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.first_device.button" xml:space="preserve">
+    <value>Configurer cet appareil</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.recovery.button" xml:space="preserve">
+    <value>Poursuivre la récupération</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.second_factor_link.button" xml:space="preserve">
+    <value>Configurer mon authentificateur</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.licensing.welcome.button" xml:space="preserve">
+    <value>Ouvrir la connexion du personnel</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.legal.published.button" xml:space="preserve">
+    <value>Lire et accepter</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.legal.reminder.button" xml:space="preserve">
+    <value>Lire et accepter</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.legal.overdue.button" xml:space="preserve">
+    <value>Accepter maintenant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.legal.notice.button" xml:space="preserve">
+    <value>Lire les conditions</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.tenant_changes.legal_name_needs_request" xml:space="preserve">
+    <value>La raison sociale ne change que par une demande avec justificatif.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.tenants.company_profile_updated" xml:space="preserve">
+    <value>Profil de l’entreprise modifié par l’entreprise</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.session.idle_warning" xml:space="preserve">
+    <value>Vous allez bientôt être déconnecté faute d’activité.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.session.time_left" xml:space="preserve">
+    <value>Temps restant :</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.session.stay" xml:space="preserve">
+    <value>Rester connecté</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.session.signed_out_idle" xml:space="preserve">
+    <value>Vous avez été déconnecté après 5 minutes sans activité. Reconnectez-vous pour continuer.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.idle_invalid" xml:space="preserve">
+    <value>La déconnexion après inactivité doit être comprise entre {min} et {max} minutes.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.identity.idle_warn_invalid" xml:space="preserve">
+    <value>L’avertissement doit venir {min} à {max} minutes avant la déconnexion.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.security.idle_changed" xml:space="preserve">
+    <value>Déconnexion après inactivité modifiée</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.security.idle" xml:space="preserve">
+    <value>Déconnexion après inactivité</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.security.idle_minutes" xml:space="preserve">
+    <value>Déconnecter après (minutes, 5 à 30)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.security.idle_warn" xml:space="preserve">
+    <value>Avertir avant (minutes, 1 à 5)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.security.idle_save" xml:space="preserve">
+    <value>Enregistrer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.security.idle_hint" xml:space="preserve">
+    <value>Le personnel de Control inactif pendant ce temps est déconnecté ; un avertissement avec compte à rebours vient d’abord. Un changement s’applique en moins d’une minute.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.security.idle_admin_only" xml:space="preserve">
+    <value>Seul l’administrateur de la sécurité modifie ces délais.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.logo_profile_first" xml:space="preserve">
+    <value>Enregistrez d'abord le profil de l'entreprise, puis ajoutez le logo ici.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.logo_upload" xml:space="preserve">
+    <value>Envoyer un logo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.logo_replace" xml:space="preserve">
+    <value>Remplacer le logo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.logo_remove" xml:space="preserve">
+    <value>Retirer le logo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.billing_settings.logo_removed" xml:space="preserve">
+    <value>Logo retiré. Les documents affichent le nom de l'entreprise.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.job.edge_sync" xml:space="preserve">
+    <value>Maintenance envoyée à Cloudflare</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.maintenance.pass_staff" xml:space="preserve">
+    <value>Pour un espace du personnel, ouvrez-la sous /staff :</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.limit.max_shipments_per_month" xml:space="preserve">
+    <value>Expéditions par mois</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.extra_shipment_price" xml:space="preserve">
+    <value>Prix par expédition supplémentaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.shipments_hint" xml:space="preserve">
+    <value>0 signifie aucun plafond. Au-delà du plafond, chaque expédition est facturée à ce prix sur la prochaine facture ; au-delà de 150 %, les nouvelles expéditions s'arrêtent jusqu'à ce que l'entreprise change de forfait (une seule fois par entreprise, le premier mois n'est pas arrêté).</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.shipments_cap" xml:space="preserve">
+    <value>{count} par mois, puis {price} chacune</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.no_cap" xml:space="preserve">
+    <value>Aucun plafond</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.shipments_used" xml:space="preserve">
+    <value>{count} expéditions en {month}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscription_history.shipments_charged" xml:space="preserve">
+    <value>Expéditions supplémentaires facturées pour {month} : {extra}, {amount} {currency}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.subscriptions.shipments_charged" xml:space="preserve">
+    <value>Expéditions supplémentaires facturées</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.usage_month_invalid" xml:space="preserve">
+    <value>Le mois doit avoir la forme 2026-10.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.usage_count_invalid" xml:space="preserve">
+    <value>Le nombre d'expéditions n'est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.subscriptions.usage_already_charged" xml:space="preserve">
+    <value>Ce mois a déjà été facturé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.feature.customer_portal" xml:space="preserve">
+    <value>Portail client et boîte postale</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.feature.insurance" xml:space="preserve">
+    <value>Assurance</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.feature.credit_accounts" xml:space="preserve">
+    <value>Comptes de crédit clients</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.feature.supplies" xml:space="preserve">
+    <value>Fournitures et stock</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.feature.home_delivery" xml:space="preserve">
+    <value>Livraison à domicile et chauffeurs</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.feature.support_desk" xml:space="preserve">
+    <value>Agents de support et guichet de tickets</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.plans.feature.payables" xml:space="preserve">
+    <value>Factures fournisseurs et marge par expédition</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.subscriptions.shipments" xml:space="preserve">
+    <value>Expéditions (mois)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments.method.bank_debit" xml:space="preserve">
+    <value>Compte bancaire (ACH)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.checkout_setting_invalid" xml:space="preserve">
+    <value>Vérifiez les réglages de la page de paiement : les images ont besoin d'une adresse https, les couleurs s'écrivent #1A2B3C, le nom fait au plus 100 caractères.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.payments.statement_suffix_invalid" xml:space="preserve">
+    <value>Le libellé du relevé n'utilise que des lettres, chiffres, espaces, points et tirets, avec au moins une lettre ; le préfixe fait 2 à 20 caractères et la ligne entière au plus 22.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.receipt.statement" xml:space="preserve">
+    <value>Ce paiement apparaît sur votre relevé de carte sous le libellé {wording}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.checkout" xml:space="preserve">
+    <value>Page de paiement et relevé bancaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.checkout_help" xml:space="preserve">
+    <value>L'apparence de la page de paiement du prestataire pour ces paiements, et le libellé des débits sur les relevés. Un champ vide garde l'image définie dans le tableau de bord du prestataire.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.checkout_name" xml:space="preserve">
+    <value>Nom affiché sur la page de paiement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.checkout_logo" xml:space="preserve">
+    <value>Adresse du logo</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.checkout_icon" xml:space="preserve">
+    <value>Adresse de l'icône</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.checkout_image_help" xml:space="preserve">
+    <value>Adresses https complètes d'images PNG ou JPG que le prestataire télécharge.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.checkout_background" xml:space="preserve">
+    <value>Couleur de fond</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.checkout_button" xml:space="preserve">
+    <value>Couleur des boutons</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.checkout_color_help" xml:space="preserve">
+    <value>Couleurs hexadécimales à six chiffres, par exemple #1A2B3C.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.statement_prefix" xml:space="preserve">
+    <value>Préfixe du relevé (défini chez le prestataire)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.statement_prefix_help" xml:space="preserve">
+    <value>Le libellé abrégé du compte dans le tableau de bord du prestataire, par exemple TECHCRAFT (2 à 10 caractères). Sert seulement à dire aux clients comment le débit apparaît.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.statement_suffix" xml:space="preserve">
+    <value>Suffixe du relevé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.statement_suffix_help" xml:space="preserve">
+    <value>Ajouté à chaque débit par carte, par exemple VIXLY.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.payments_settings.statement_wording" xml:space="preserve">
+    <value>Libellé sur les relevés de carte</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.checkout_settings_updated" xml:space="preserve">
+    <value>Réglages de la page de paiement et du relevé modifiés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.payments.bank_payment_processing" xml:space="preserve">
+    <value>Paiement par compte bancaire lancé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.renewal_reminder.subject" xml:space="preserve">
+    <value>Votre abonnement {plan} se renouvelle dans 7 jours</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.renewal_reminder.body" xml:space="preserve">
+    <value>Bonjour {name},
+
+L'abonnement annuel {plan} de {company} se renouvelle le {date}. Nous débiterons la carte {brand} enregistrée se terminant par {last4}.
+
+Pour changer de carte ou arrêter le renouvellement, écrivez-nous à {support} avant cette date.
+
+Vixly</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.renewal_reminder.statement" xml:space="preserve">
+    <value>Le débit apparaîtra sur votre relevé de carte sous le libellé {wording}.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.job.sales_feed" xml:space="preserve">
+    <value>Flux des ventes vers TechOS</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.jobs.job.renewal_reminders" xml:space="preserve">
+    <value>Rappels de renouvellement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.title" xml:space="preserve">
+    <value>Flux des ventes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.intro" xml:space="preserve">
+    <value>Chaque vente Vixly est envoyée à TechOS sous forme d'événement signé : factures, paiements, annulations, avoirs, changements d'abonnement et totaux du jour.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.status" xml:space="preserve">
+    <value>État</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.configured" xml:space="preserve">
+    <value>Envoi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.on" xml:space="preserve">
+    <value>Activé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.off" xml:space="preserve">
+    <value>Désactivé : adresse ou secret absent sur ce serveur (les événements attendent)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.stopped" xml:space="preserve">
+    <value>Arrêté par la réponse de TechOS</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.last_success" xml:space="preserve">
+    <value>Dernière réponse de TechOS</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.failing_since" xml:space="preserve">
+    <value>En échec depuis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.next_attempt" xml:space="preserve">
+    <value>Prochain essai</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.pending" xml:space="preserve">
+    <value>En attente d'envoi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.parked" xml:space="preserve">
+    <value>Rejetés par TechOS</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.sent" xml:space="preserve">
+    <value>Reçus par TechOS</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.retry" xml:space="preserve">
+    <value>Réessayer maintenant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.retried" xml:space="preserve">
+    <value>Le flux reprend à son prochain passage.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.parked_title" xml:space="preserve">
+    <value>Événements rejetés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.parked_help" xml:space="preserve">
+    <value>TechOS a refusé ces événements ; les autres ont été envoyés normalement. Corrigez la cause, puis renvoyez-les tels quels. Si l'événement lui-même était incomplet, utilisez Corriger et envoyer : Vixly le réécrit à partir de ses données sous un nouveau numéro et l'événement refusé est conservé comme remplacé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.sequence" xml:space="preserve">
+    <value>N°</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.type" xml:space="preserve">
+    <value>Événement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.occurred" xml:space="preserve">
+    <value>Survenu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.error" xml:space="preserve">
+    <value>Erreur de TechOS</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.answered" xml:space="preserve">
+    <value>Répondu</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.send_again" xml:space="preserve">
+    <value>Renvoyer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.sent_again" xml:space="preserve">
+    <value>L'événement sera renvoyé au prochain passage.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.sales_feed.event_not_found" xml:space="preserve">
+    <value>Cet événement n'existe plus.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.sales_feed.not_parked" xml:space="preserve">
+    <value>Seuls les événements rejetés peuvent être renvoyés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.sales_feed.event_invalid" xml:space="preserve">
+    <value>L'événement de vente n'est pas valide.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.sales_feed.event_sent_again" xml:space="preserve">
+    <value>Événement du flux des ventes renvoyé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.audit.action.platform.sales_feed.retried" xml:space="preserve">
+    <value>Flux des ventes relancé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.sales_feed.subject.parked" xml:space="preserve">
+    <value>Flux des ventes : TechOS a rejeté des événements</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.sales_feed.subject.stopped" xml:space="preserve">
+    <value>Flux des ventes arrêté : vérifiez les réglages TechOS</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.sales_feed.subject.no_answer" xml:space="preserve">
+    <value>Flux des ventes : aucune réponse de TechOS depuis 24 heures</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.sales_feed.body.parked" xml:space="preserve">
+    <value>Bonjour {name},
+
+TechOS a rejeté {count} événement(s) de vente ({code}). Les autres événements ont été envoyés normalement.
+
+Voir l'erreur de TechOS et les renvoyer : {link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.sales_feed.body.stopped" xml:space="preserve">
+    <value>Bonjour {name},
+
+TechOS a refusé le flux des ventes ({code}) : l'adresse, le secret ou le nom de la source est faux. L'envoi est arrêté ; {count} événement(s) sont gardés et attendent.
+
+Corrigez la variable d'environnement PlatformSales__TechOs__Url ou PlatformSales__TechOs__Secret, puis cliquez sur Réessayer maintenant : {link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="email.sales_feed.body.no_answer" xml:space="preserve">
+    <value>Bonjour {name},
+
+TechOS n'a pas pris le flux des ventes depuis 24 heures (dernière réponse : {code}). {count} événement(s) attendent ; l'envoi continue avec des pauses.
+
+Détails : {link}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.setting.url_missing" xml:space="preserve">
+    <value>PlatformSales__TechOs__Url n'est pas défini dans le pool d'applications de ce site.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.setting.url_not_https" xml:space="preserve">
+    <value>PlatformSales__TechOs__Url doit être une adresse complète commençant par https://.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.setting.url_no_path" xml:space="preserve">
+    <value>PlatformSales__TechOs__Url ne donne que le site : il faut l'adresse complète des événements de TechOS, par exemple https://techcrafters.ltd/api/sales-sources/vixly/events.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.setting.secret_missing" xml:space="preserve">
+    <value>PlatformSales__TechOs__Secret n'est pas défini dans le pool d'applications de ce site.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.setting.source_missing" xml:space="preserve">
+    <value>PlatformSales:TechOs:Source est absent : l'appsettings.json de ce serveur est antérieur au flux des ventes. Copiez le nouvel appsettings.json ou définissez PlatformSales__TechOs__Source à vixly.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.rebuild" xml:space="preserve">
+    <value>Corriger et envoyer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.sales_feed.rebuilt" xml:space="preserve">
+    <value>L'événement a été réécrit à partir des données de Vixly et sera envoyé au prochain passage.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="platform.sales_feed.rebuild_not_possible" xml:space="preserve">
+    <value>Cet événement ne peut pas être réécrit : sa donnée d'origine n'existe plus, ou c'est un total quotidien.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.resend_email" xml:space="preserve">
+    <value>Courriel du propriétaire</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.resend_help" xml:space="preserve">
+    <value>Le propriétaire n'a pas encore confirmé son courriel. Corrigez l'adresse ici si elle a été mal saisie, puis renvoyez le lien.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.nav.waiting" xml:space="preserve">
+    <value>{count} en attente</value>
     <comment>needs-review</comment>
   </data>
 </root>

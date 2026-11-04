@@ -11,6 +11,7 @@
     <ProjectReference Include="..\..\Shared\Vixly.Shared.Localization\Vixly.Shared.Localization.csproj" />
     <ProjectReference Include="..\..\Shared\Vixly.Shared.Hosting\Vixly.Shared.Hosting.csproj" />
     <ProjectReference Include="..\..\Shared\Vixly.Shared.UI\Vixly.Shared.UI.csproj" />
+    <ProjectReference Include="..\..\Shared\Vixly.Shared.Help\Vixly.Shared.Help.csproj" />
   </ItemGroup>
 
   <ItemGroup>

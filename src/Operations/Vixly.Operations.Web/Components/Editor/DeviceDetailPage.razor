@@ -1,0 +1,104 @@
+@*
+=========================================================
+FILE: DeviceDetailPage.razor
+
+PURPOSE:
+One device of the company (owner, 2026-10-21): its licence,
+where and when it was registered, who authorised it; approve or
+deny a request, release a licence.
+
+RESPONSIBILITIES:
+- Render the device and the actions the person may take
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Each action asks for a fresh authenticator code (step-up)
+=========================================================
+*@
+@inherits OperationsAllowedComponent
+@using Vixly.Operations.Application.Ports
+@using Vixly.Operations.Domain.Access
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@Device.Name" Company="@Company" Section="company" Error="@Error">
+    <CompanyTabs Current="licences" />
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <a href="/staff/devices" class="vx-button vx-button--secondary">@T["ui.licences.back"]</a>
+        </div>
+        <div class="ops-list-bar__actions">
+            <span class="ops-editor__status" data-status="@Device.Status">@T["ui.licences.status." + Device.Status]</span>
+        </div>
+    </div>
+    <section class="ops-editor__panel">
+        <dl class="ops-facts-grid">
+            <div class="ops-fact-cell"><dt>@T["ui.licences.device_id"]</dt><dd class="ops-editor__code">@Device.Number</dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.licences.status"]</dt><dd><span class="ops-editor__status" data-status="@Device.Status">@T["ui.licences.status." + Device.Status]</span></dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.devices.kind"]</dt><dd>@T["ui.devices.kind." + Device.Kind]</dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.devices.browser"]</dt><dd>@(Device.Browser ?? "-")</dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.devices.registered"]</dt><dd>@Time(Device.RequestedUtc)</dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.devices.requested_by"]</dt><dd>@(Device.RequestedByName ?? "-")</dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.devices.authorised_by"]</dt><dd>@(Device.ApprovedUtc is { } approved ? (Device.ApprovedByName ?? T["ui.devices.authorised_by_link"].Value) + ", " + Time(approved) : "-")</dd></div>
+            <div class="ops-fact-cell"><dt>@T["ui.devices.last_seen"]</dt><dd>@(Device.LastSeenUtc is { } seen ? Time(seen) : "-")</dd></div>
+        </dl>
+    </section>
+    @if (Block is { } block)
+    {
+        <section class="ops-editor__panel ops-panel--restricted" data-blocked="true">
+            <h2>@T["ui.licences.blocked_title"]</h2>
+            <p>@VixlyText.Format(T, "ui.licences.blocked_text", new Dictionary<string, object>(StringComparer.Ordinal) { ["country"] = block.Country, ["registered"] = block.RegisteredCountry, ["time"] = Time(block.CreatedUtc) })</p>
+            @if (Can(OperationsPermissions.DevicesApprove))
+            {
+                <form method="post" action="/staff/devices/@Device.DeviceId/unblock" class="ops-inline-action-bar" style="margin-top: 0.5rem;">
+                    <AntiforgeryToken />
+                    <StepUpCodeInput PasswordConfirms="@PasswordConfirms" />
+                    <button type="submit" class="vx-button vx-button--primary" style="height: 32px; padding: 0 0.85rem;">@T["ui.licences.unblock"]</button>
+                </form>
+            }
+        </section>
+    }
+    @if (Device.Status == "pending" && Can(OperationsPermissions.DevicesApprove))
+    {
+        <section class="ops-editor__panel">
+            <h2>@T["ui.licences.decide"]</h2>
+            <form method="post" action="/staff/devices/@Device.DeviceId/decide" class="ops-inline-action-bar" style="margin-top: 0.5rem;">
+                <AntiforgeryToken />
+                <StepUpCodeInput PasswordConfirms="@PasswordConfirms" />
+                <button type="submit" name="approve" value="true" class="vx-button vx-button--primary" style="height: 32px; padding: 0 0.85rem;">@T["ui.devices.approve"]</button>
+                <button type="submit" name="approve" value="false" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.devices.deny"]</button>
+            </form>
+        </section>
+    }
+    else if (Device.Status == "active" && Can(OperationsPermissions.DevicesRelease))
+    {
+        <section class="ops-editor__panel">
+            <h2>@T["ui.licences.release_title"]</h2>
+            <form method="post" action="/staff/devices/@Device.DeviceId/release" class="ops-inline-action-bar" style="margin-top: 0.5rem;">
+                <AntiforgeryToken />
+                <select name="reason" aria-label="@T["ui.devices.reason"]" class="ops-inline-action-bar__select" style="min-width: 14rem;">
+                    @foreach (string reason in Vixly.Operations.Application.UseCases.Devices.ReleaseOperationsDevice.ReleaseOperationsDeviceUseCase.Reasons)
+                    {
+                        <option value="@reason">@T["ui.devices.reason." + reason]</option>
+                    }
+                </select>
+                <StepUpCodeInput PasswordConfirms="@PasswordConfirms" />
+                <button type="submit" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.devices.release"]</button>
+            </form>
+        </section>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsDevice Device { get; set; } = null!;
+
+    [Parameter] public string? Error { get; set; }
+
+    // Owner, R-6: the open block of this device, if it was used from another country.
+    [Parameter] public Vixly.Operations.Domain.Identity.OperationsDeviceBlock? Block { get; set; }
+
+    [Parameter] public bool PasswordConfirms { get; set; }
+
+    private static string Time(DateTimeOffset utc) => utc.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture) + " UTC";
+}

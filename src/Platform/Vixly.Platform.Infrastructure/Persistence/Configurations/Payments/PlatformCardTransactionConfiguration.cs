@@ -35,6 +35,7 @@ internal sealed class PlatformCardTransactionConfiguration : IEntityTypeConfigur
         builder.Property(item => item.ProviderPaymentId).HasMaxLength(PlatformPaymentsLimits.ProviderIdMaxLength).IsUnicode(false);
         builder.Property(item => item.ProviderRefundId).HasMaxLength(PlatformPaymentsLimits.ProviderIdMaxLength).IsUnicode(false);
         builder.Property(item => item.FailureCode).HasMaxLength(PlatformPaymentsLimits.FailureCodeMaxLength).IsUnicode(false);
+        builder.Property(item => item.Wallet).HasMaxLength(PlatformPaymentsLimits.WalletMaxLength).IsUnicode(false);
         builder.HasIndex(item => item.ProviderCheckoutId).HasFilter("[ProviderCheckoutId] IS NOT NULL");
         builder.HasIndex(item => item.ProviderPaymentId).HasFilter("[ProviderPaymentId] IS NOT NULL");
         builder.HasIndex(item => item.ProviderRefundId).HasFilter("[ProviderRefundId] IS NOT NULL");

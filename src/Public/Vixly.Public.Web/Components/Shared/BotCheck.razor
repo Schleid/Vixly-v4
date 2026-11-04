@@ -1,0 +1,30 @@
+﻿@*
+=========================================================
+FILE: BotCheck.razor
+
+PURPOSE:
+The Cloudflare Turnstile widget on the contact and sign-up forms (D-T12).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Off when no site key is set (Development); Platform then skips its check too
+- Its answer is posted as cf-turnstile-response and checked by Platform
+- vixly-forms.js holds the form until the check is done and shows the
+  message below (ADR-0019); Platform still checks every answer
+- Development uses Cloudflare's public test keys, which always pass
+=========================================================
+*@
+@inject IOptions<PublicSiteOptions> Site
+@inject IStringLocalizer<PublicText> T
+
+@if (Site.Value.BotCheckOn)
+{
+    <div class="cf-turnstile" data-sitekey="@Site.Value.TurnstileSiteKey" data-language="@PublicLanguage.Current"></div>
+    <p class="vx-hint" role="alert" data-vx-bot-check-message hidden>@T["public.bot_check.required"]</p>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+}
+
+@code {
+    public const string FieldName = "cf-turnstile-response";
+}

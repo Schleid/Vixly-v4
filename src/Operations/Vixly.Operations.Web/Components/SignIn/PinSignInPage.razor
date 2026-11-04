@@ -1,0 +1,71 @@
+﻿@*
+=========================================================
+FILE: PinSignInPage.razor
+
+PURPOSE:
+Sign-in on a licensed device with a 4-digit PIN (Slice 12A, owner H-8).
+
+RESPONSIBILITIES:
+- List the people who signed in on this device lately; the PIN field for the one chosen
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<AuthShell Title="@T["ui.quick.pin_title"]" Subtitle="@(Chosen is null ? T["ui.quick.pin_who"] : Chosen.Name)" Company="@Company" ReturnHere="/staff/sign-in/pin">
+    <FormMessage Error="@Error" />
+    @if (Chosen is { Locked: false })
+    {
+        <form method="post" action="/staff/sign-in/pin" class="vx-form">
+            <AntiforgeryToken />
+            <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+            <input type="hidden" name="userId" value="@Chosen.UserId" />
+            <div class="vx-field">
+                <label for="pin" class="vx-label">@T["ui.quick.pin"]</label>
+                <input id="pin" name="pin" type="password" class="vx-input" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" autocomplete="off" required autofocus />
+            </div>
+            <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["ui.quick.submit"]</VxButton>
+        </form>
+        <p><a href="/staff/sign-in/pin?returnUrl=@Uri.EscapeDataString(ReturnUrl)">@T["ui.quick.pin_someone_else"]</a></p>
+    }
+    else if (Chosen is { Locked: true })
+    {
+        <FormMessage Error="@T["ops.auth.pin_locked"]" />
+        <p><a href="/staff?email=1">@T["ui.quick.use_email"]</a></p>
+    }
+    else if (People.Count == 0)
+    {
+        <p>@T["ui.quick.pin_nobody"]</p>
+    }
+    else
+    {
+        <ul class="ops-quick-people">
+            @foreach (Vixly.Operations.Application.Identity.OperationsQuickPerson person in People)
+            {
+                <li><a class="vx-button vx-button--secondary" href="/staff/sign-in/pin?person=@person.UserId&returnUrl=@Uri.EscapeDataString(ReturnUrl)">@person.Name</a></li>
+            }
+        </ul>
+    }
+    <p><a href="/staff/sign-in/badge">@T["ui.quick.use_badge"]</a></p>
+    <p><a href="/staff?email=1">@T["ui.quick.use_email"]</a></p>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string? Company { get; set; }
+
+    [Parameter]
+    public string ReturnUrl { get; set; } = "/staff";
+
+    [Parameter]
+    public IReadOnlyList<Vixly.Operations.Application.Identity.OperationsQuickPerson> People { get; set; } = Array.Empty<Vixly.Operations.Application.Identity.OperationsQuickPerson>();
+
+    [Parameter]
+    public Vixly.Operations.Application.Identity.OperationsQuickPerson? Chosen { get; set; }
+
+    [Parameter]
+    public string? Error { get; set; }
+}

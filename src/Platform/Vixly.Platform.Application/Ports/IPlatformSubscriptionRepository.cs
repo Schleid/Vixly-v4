@@ -34,6 +34,9 @@ public interface IPlatformSubscriptionRepository
 
     Task<IReadOnlyList<PlatformSubscription>> ListWithUnnoticedDiscountsAsync(int max, CancellationToken cancellationToken);
 
+    // Active annual subscriptions renewing in (fromUtc, toUtc], not cancelled at period end, not reminded for that period end.
+    Task<IReadOnlyList<PlatformSubscription>> ListRenewalRemindersDueAsync(DateTimeOffset fromUtc, DateTimeOffset toUtc, int max, CancellationToken cancellationToken);
+
     void Add(PlatformSubscription subscription);
 
     void AddEvents(IEnumerable<PlatformSubscriptionEvent> events);

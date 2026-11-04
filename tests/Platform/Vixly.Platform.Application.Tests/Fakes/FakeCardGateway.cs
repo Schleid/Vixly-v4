@@ -88,6 +88,13 @@ internal sealed class FakeCardGateway : IPlatformCardGateway
         return Task.FromResult(new PlatformCardDetails(paymentMethodId, "visa", "4242", 12, 2030));
     }
 
+    public string? Wallet { get; set; }
+
+    public Task<string?> GetWalletAsync(string paymentId, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(Wallet);
+    }
+
     public Task DetachCardAsync(string paymentMethodId, CancellationToken cancellationToken)
     {
         Detached.Add(paymentMethodId);

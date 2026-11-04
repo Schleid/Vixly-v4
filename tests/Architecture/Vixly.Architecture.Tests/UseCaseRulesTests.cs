@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
+using Vixly.Operations.Application.Security;
 using Vixly.Platform.Application.Security;
 using Vixly.Shared.Kernel.Errors;
 
@@ -33,7 +34,8 @@ public sealed class UseCaseRulesTests
 {
     private static readonly Assembly[] ApplicationAssemblies =
     {
-        typeof(PlatformAuthorizationContext).Assembly
+        typeof(PlatformAuthorizationContext).Assembly,
+        typeof(OperationsAuthorizationContext).Assembly
     };
 
     private static IEnumerable<Type> UseCases()
@@ -47,6 +49,7 @@ public sealed class UseCaseRulesTests
     public void ApplicationAssemblies_AreInspected()
     {
         Assert.Equal("Vixly.Platform.Application", ApplicationAssemblies[0].GetName().Name);
+        Assert.Equal("Vixly.Operations.Application", ApplicationAssemblies[1].GetName().Name);
     }
 
     [Fact]

@@ -30,7 +30,9 @@ public sealed record PlatformPlanVersionItem(
     DateTimeOffset? PublishedUtc,
     string? PublishedByName,
     DateTimeOffset? SubmittedUtc = null,
-    string? RejectionReason = null)
+    string? RejectionReason = null,
+    int MaxShipmentsPerMonth = 0,
+    decimal ExtraShipmentPrice = 0m)
 {
     public static PlatformPlanVersionItem From(PlatformPlanVersion version, string? publishedByName)
     {
@@ -52,6 +54,8 @@ public sealed record PlatformPlanVersionItem(
             version.PublishedUtc,
             publishedByName,
             version.SubmittedUtc,
-            version.RejectionReason);
+            version.RejectionReason,
+            version.Limit(PlatformPlanLimitKind.MaxShipmentsPerMonth),
+            version.ExtraShipmentPrice);
     }
 }

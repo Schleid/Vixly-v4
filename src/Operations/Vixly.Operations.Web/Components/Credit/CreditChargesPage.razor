@@ -1,0 +1,64 @@
+﻿@*
+=========================================================
+FILE: CreditChargesPage.razor
+
+PURPOSE:
+Charges above a limit waiting for the credit department (Slice 5F step 2b, K-3).
+
+RESPONSIBILITIES:
+- Each charge: invoice, customer, amount, what the account has available; approve or refuse
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- A person never decides a charge they asked for
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.credit.charges_title"]" Company="@Company" Section="credit" Error="@Error" Info="@Info">
+    <p><a href="/staff/credit">@T["ui.credit.back"]</a></p>
+    @if (Invoices.Count == 0)
+    {
+        <div class="ops-editor__empty"><p>@T["ui.credit.charges_none"]</p></div>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.credit.charges_title"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.statement.invoice"]</th><th scope="col">@T["ui.credit.customer"]</th><th scope="col" class="ops-editor__number">@T["ui.statement.owed"]</th><th scope="col" class="ops-editor__number">@T["ui.credit.available"]</th><th scope="col"></th></tr></thead>
+                <tbody>
+                    @foreach (OperationsInvoice invoice in Invoices)
+                    {
+                        OperationsCreditRow? row = Accounts.GetValueOrDefault(invoice.CustomerId);
+                        <tr>
+                            <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/invoices/@invoice.Id">@invoice.Number</a> <small>@invoice.Reference</small></td>
+                            <td><a href="/staff/credit/customers/@invoice.CustomerId">@(row?.Customer?.FullName ?? OperationsBillingRows.Customer(invoice))</a></td>
+                            <td class="ops-editor__number">@OperationsInvoiceWords.Money(invoice.Owed, invoice.CurrencyCode)</td>
+                            <td class="ops-editor__number">@(row is null ? "—" : OperationsInvoiceWords.Money(row.Position.Available, invoice.CurrencyCode))</td>
+                            <td>
+                                <form method="post" action="/staff/credit/charges/@invoice.Id" class="ops-editor__inline">
+                                    <AntiforgeryToken />
+                                    <input name="note" maxlength="300" placeholder="@T["ui.credit.note"]" aria-label="@T["ui.credit.note"]" />
+                                    <button type="submit" name="approve" value="true" class="vx-button vx-button--primary">@T["ui.credit.approve"]</button>
+                                    <button type="submit" name="approve" value="false" class="vx-button vx-button--secondary">@T["ui.credit.refuse"]</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsInvoice> Invoices { get; set; } = Array.Empty<OperationsInvoice>();
+
+    [Parameter] public IReadOnlyDictionary<Guid, OperationsCreditRow> Accounts { get; set; } = new Dictionary<Guid, OperationsCreditRow>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

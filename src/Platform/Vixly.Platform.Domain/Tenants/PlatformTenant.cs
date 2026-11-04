@@ -361,12 +361,43 @@ public sealed class PlatformTenant : AuditableEntity
         MarkAsModified(utcNow);
     }
 
-    public void UpdateCompany(PlatformCompanyDetails company, DateTimeOffset utcNow)
+    // Owner, 2026-10-25: the company keeps its own profile (trading name, email, phone, address) without TechCrafters;
+    // only the legal name goes through an approved change request. False when nothing changed.
+    public bool UpdateCompanyProfile(PlatformCompanyDetails profile, DateTimeOffset utcNow)
+    {
+        ArgumentNullException.ThrowIfNull(profile);
+
+        if (profile.LegalName != Company.LegalName)
+        {
+            throw new DomainException(PlatformTenantChangeErrors.LegalNameNeedsRequest);
+        }
+
+        if (PlatformTenantChangeRequest.Same(Company, profile))
+        {
+            return false;
+        }
+
+        Company = profile;
+        MarkAsModified(utcNow);
+        return true;
+    }
+
+    // B12: the legal name changes only through an approved change request.
+    internal PlatformTenantLifecycleEvent ApplyCompanyChange(PlatformCompanyDetails company, Guid requestId, Guid actorUserId, DateTimeOffset utcNow)
     {
         ArgumentNullException.ThrowIfNull(company);
 
+        Dictionary<string, string> arguments = new(StringComparer.Ordinal)
+        {
+            ["from"] = Company.LegalName,
+            ["to"] = company.LegalName,
+            ["request"] = requestId.ToString("D")
+        };
+
         Company = company;
         MarkAsModified(utcNow);
+
+        return PlatformTenantLifecycleEvent.Record(this, PlatformTenantEventCodes.CompanyChanged, Status, actorUserId, utcNow, arguments: arguments);
     }
 
     public void UpdateSettings(LanguageCode defaultLanguage, string? timeZone, DateTimeOffset utcNow)

@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: CollectionsOverview.razor
 
@@ -27,57 +27,114 @@ IMPORTANT NOTES:
 }
 @if (Presenter.State.Dashboard is { } dashboard)
 {
-    <div id="collections-dashboard"><VxCard Title="@T["ui.collections.dashboard"]">
-        <dl class="vx-facts">
-            @foreach (PlatformCollectionStage stage in Enum.GetValues<PlatformCollectionStage>())
-            {
-                <dt>@T[CollectionsDisplay.StageKey(stage)]</dt>
-                <dd><a href="@Url(1, stage.ToString(), "Open")">@(dashboard.OpenByStage.TryGetValue(stage, out int count) ? count : 0)</a></dd>
-            }
-            <dt>@T["ui.collections.blocked_subscriptions"]</dt>
-            <dd>@dashboard.Blocked</dd>
-            <dt>@T["ui.collections.overdue_total"]</dt>
-            <dd>@CollectionsDisplay.Amounts(dashboard.Overdue)</dd>
-            @foreach (IGrouping<int, PlatformAgeingItem> bucket in dashboard.Ageing.GroupBy(item => item.Bucket))
-            {
-                <dt>@T[CollectionsDisplay.AgeingKey(bucket.Key)]</dt>
-                <dd>@CollectionsDisplay.Amounts(bucket.Select(item => new PlatformMoneyItem(item.CurrencyCode, item.Amount)).ToArray())</dd>
-            }
-            <dt>@T["ui.collections.extensions_ending"]</dt>
-            <dd>@dashboard.ExtensionsEndingSoon</dd>
-            <dt>@T["ui.collections.long_blocks"]</dt>
-            <dd>@dashboard.LongBlocks</dd>
-            <dt>@T["ui.collections.failed_retries"]</dt>
-            <dd>@dashboard.FailedRetries</dd>
-            <dt>@T["ui.collections.recovered"]</dt>
-            <dd>@CollectionsDisplay.Amounts(dashboard.Recovered)</dd>
-        </dl>
-    </VxCard></div>
+    <div id="collections-dashboard" class="vx-collections-dashboard-grid">
+        <!-- Card 1: Lifecycle Pipeline by Stage -->
+        <div class="vx-kpi-card">
+            <div class="vx-kpi-card__header">
+                <h2 class="vx-kpi-card__title">@T["ui.collections.stage"]</h2>
+                <span class="vx-kpi-card__badge">@T["ui.collections.dashboard"]</span>
+            </div>
+            <div class="vx-stage-pipeline">
+                @foreach (PlatformCollectionStage stage in Enum.GetValues<PlatformCollectionStage>())
+                {
+                    <a href="@Url(1, stage.ToString(), "Open")" class="vx-stage-step">
+                        <span class="vx-stage-step__label">@T[CollectionsDisplay.StageKey(stage)]</span>
+                        <span class="vx-stage-step__count">@(dashboard.OpenByStage.TryGetValue(stage, out int count) ? count : 0)</span>
+                    </a>
+                }
+            </div>
+        </div>
+
+        <!-- Card 2: Financial Exposure & Recoveries -->
+        <div class="vx-kpi-card">
+            <div class="vx-kpi-card__header">
+                <h2 class="vx-kpi-card__title">@T["ui.collections.overdue"]</h2>
+                <span class="vx-kpi-card__badge">@T["ui.invoices.title"]</span>
+            </div>
+            <div class="vx-financial-stat">
+                <div class="vx-financial-stat__label">@T["ui.collections.overdue_total"]</div>
+                <div class="vx-financial-stat__value vx-financial-stat__value--highlight">@CollectionsDisplay.Amounts(dashboard.Overdue)</div>
+            </div>
+            <div class="vx-stat-rows">
+                @foreach (IGrouping<int, PlatformAgeingItem> bucket in dashboard.Ageing.GroupBy(item => item.Bucket))
+                {
+                    <div class="vx-stat-row">
+                        <span class="vx-stat-row__label">@T[CollectionsDisplay.AgeingKey(bucket.Key)]</span>
+                        <span class="vx-stat-row__value">@CollectionsDisplay.Amounts(bucket.Select(item => new PlatformMoneyItem(item.CurrencyCode, item.Amount)).ToArray())</span>
+                    </div>
+                }
+                <div class="vx-stat-row" style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--vx-color-border);">
+                    <span class="vx-stat-row__label">@T["ui.collections.recovered"]</span>
+                    <span class="vx-stat-row__value" style="color: #16a34a;">@CollectionsDisplay.Amounts(dashboard.Recovered)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Subscription Status & System Flags -->
+        <div class="vx-kpi-card">
+            <div class="vx-kpi-card__header">
+                <h2 class="vx-kpi-card__title">@T["ui.collections.case"]</h2>
+                <span class="vx-kpi-card__badge">@T["ui.tenants.status"]</span>
+            </div>
+            <div class="vx-stat-rows">
+                <div class="vx-stat-row">
+                    <span class="vx-stat-row__label">@T["ui.collections.blocked_subscriptions"]</span>
+                    <span class="vx-stat-row__value" style="color: @(dashboard.Blocked > 0 ? "#dc2626" : "inherit");">@dashboard.Blocked</span>
+                </div>
+                <div class="vx-stat-row">
+                    <span class="vx-stat-row__label">@T["ui.collections.extensions_ending"]</span>
+                    <span class="vx-stat-row__value" style="color: @(dashboard.ExtensionsEndingSoon > 0 ? "#d97706" : "inherit");">@dashboard.ExtensionsEndingSoon</span>
+                </div>
+                <div class="vx-stat-row">
+                    <span class="vx-stat-row__label">@T["ui.collections.long_blocks"]</span>
+                    <span class="vx-stat-row__value" style="color: @(dashboard.LongBlocks > 0 ? "#dc2626" : "inherit");">@dashboard.LongBlocks</span>
+                </div>
+                <div class="vx-stat-row">
+                    <span class="vx-stat-row__label">@T["ui.collections.failed_retries"]</span>
+                    <span class="vx-stat-row__value">@dashboard.FailedRetries</span>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
-<form class="vx-toolbar" role="search" @onsubmit="Apply">
-    <label for="collections-search">@T["ui.collections.search"]</label>
-    <input id="collections-search" @bind="_search" maxlength="100" />
-    <label for="collections-status">@T["ui.collections.status"]</label>
-    <select id="collections-status" @bind="_status">
-        <option value="">@T["ui.invoices.status.all"]</option>
-        @foreach (PlatformCollectionCaseStatus status in Enum.GetValues<PlatformCollectionCaseStatus>())
-        {
-            <option value="@status">@T[CollectionsDisplay.StatusKey(status)]</option>
-        }
-    </select>
-    <label for="collections-stage">@T["ui.collections.stage"]</label>
-    <select id="collections-stage" @bind="_stage">
-        <option value="">@T["ui.collections.stage.all"]</option>
-        @foreach (PlatformCollectionStage stage in Enum.GetValues<PlatformCollectionStage>())
-        {
-            <option value="@stage">@T[CollectionsDisplay.StageKey(stage)]</option>
-        }
-    </select>
-    <label for="collections-currency">@T["ui.collections.currency"]</label>
-    <input id="collections-currency" @bind="_currency" maxlength="3" size="4" />
-    <label><input type="checkbox" @bind="_extension" /> @T["ui.collections.in_extension"]</label>
-    <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
+<form class="vx-toolbar" role="search" @onsubmit="Apply" style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.75rem; margin-bottom: 0.5rem;">
+    <div style="flex: 1 1 14rem; min-width: 12rem;">
+        <label for="collections-search" style="display: block; font-size: 0.72rem; font-weight: 700; color: var(--vx-color-text-muted); text-transform: uppercase; margin-bottom: 0.25rem;">@T["ui.collections.search"]</label>
+        <input id="collections-search" @bind="_search" maxlength="100" style="width: 100%;" placeholder="@T["ui.collections.search"]" />
+    </div>
+    <div style="flex: 0 1 10rem;">
+        <label for="collections-status" style="display: block; font-size: 0.72rem; font-weight: 700; color: var(--vx-color-text-muted); text-transform: uppercase; margin-bottom: 0.25rem;">@T["ui.collections.status"]</label>
+        <select id="collections-status" @bind="_status" style="width: 100%;">
+            <option value="">@T["ui.invoices.status.all"]</option>
+            @foreach (PlatformCollectionCaseStatus status in Enum.GetValues<PlatformCollectionCaseStatus>())
+            {
+                <option value="@status">@T[CollectionsDisplay.StatusKey(status)]</option>
+            }
+        </select>
+    </div>
+    <div style="flex: 0 1 11rem;">
+        <label for="collections-stage" style="display: block; font-size: 0.72rem; font-weight: 700; color: var(--vx-color-text-muted); text-transform: uppercase; margin-bottom: 0.25rem;">@T["ui.collections.stage"]</label>
+        <select id="collections-stage" @bind="_stage" style="width: 100%;">
+            <option value="">@T["ui.collections.stage.all"]</option>
+            @foreach (PlatformCollectionStage stage in Enum.GetValues<PlatformCollectionStage>())
+            {
+                <option value="@stage">@T[CollectionsDisplay.StageKey(stage)]</option>
+            }
+        </select>
+    </div>
+    <div style="flex: 0 1 5rem;">
+        <label for="collections-currency" style="display: block; font-size: 0.72rem; font-weight: 700; color: var(--vx-color-text-muted); text-transform: uppercase; margin-bottom: 0.25rem;">@T["ui.collections.currency"]</label>
+        <input id="collections-currency" @bind="_currency" maxlength="3" size="4" style="width: 100%; text-transform: uppercase;" placeholder="USD" />
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.5rem; height: 36px; padding-bottom: 4px;">
+        <label style="display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8125rem; font-weight: 500; cursor: pointer; text-transform: none; margin: 0;">
+            <input type="checkbox" @bind="_extension" /> @T["ui.collections.in_extension"]
+        </label>
+    </div>
+    <div style="padding-bottom: 4px;">
+        <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
+    </div>
 </form>
 <p class="vx-hint">@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.collections.count", "count", Presenter.State.TotalCount) : T["ui.common.loading"].Value)</p>
 <div id="collections-cases"><CollectionCaseTable Items="Presenter.State.Items" /></div>

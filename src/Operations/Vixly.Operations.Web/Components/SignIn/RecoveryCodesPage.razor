@@ -1,0 +1,41 @@
+﻿@*
+=========================================================
+FILE: RecoveryCodesPage.razor
+
+PURPOSE:
+The ten recovery codes, shown once after enrolment.
+
+RESPONSIBILITIES:
+- Render the ten recovery codes, shown once after enrolment
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: shows the tenant name, never "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<AuthShell Title="@T["ui.codes.title"]" Subtitle="@T["ui.codes.intro"]" Company="@Company" SignedIn="true">
+    <ol class="vx-auth__codes">
+        @foreach (string item in Codes)
+        {
+            <li><code>@item</code></li>
+        }
+    </ol>
+    <p><a class="vx-button vx-button--primary" href="@ReturnUrl">@T["ui.codes.continue"]</a></p>
+</AuthShell>
+
+@code {
+    [Parameter]
+    public string? Company { get; set; }
+
+    [Parameter]
+    public string ReturnUrl { get; set; } = "/";
+
+    [Parameter]
+    public string? Error { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<string> Codes { get; set; } = Array.Empty<string>();
+}

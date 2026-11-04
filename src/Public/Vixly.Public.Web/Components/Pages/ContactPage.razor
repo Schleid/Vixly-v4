@@ -1,0 +1,28 @@
+﻿@*
+=========================================================
+FILE: ContactPage.razor
+
+PURPOSE:
+The contact sales page in each language.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Contact posts: 5 per hour per visitor IP
+=========================================================
+*@
+@page "/en/contact"
+@page "/fr/contact"
+@page "/es/contact"
+@attribute [EnableRateLimiting(PublicRateLimits.Contact)]
+@inject IStringLocalizer<PublicText> T
+<PageHead TitleKey="public.contact.page_title" DescriptionKey="public.contact.description" Page="contact" />
+<section class="pub-section pub-section--narrow">
+    <h1>@T["public.contact.title"]</h1>
+    <p class="pub-lead">@T["public.contact.lead"]</p>
+    <ContactForm Sent="@(Sent == 1)" />
+</section>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int? Sent { get; set; }
+}

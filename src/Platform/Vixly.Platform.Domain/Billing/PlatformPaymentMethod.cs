@@ -12,6 +12,7 @@
 // IMPORTANT NOTES:
 // - Persisted as numbers; never renumber
 // - Card is recorded only by the payment provider (Slice 5)
+// - BankDebit is a US bank account debit (ACH) paid in the provider's checkout; recorded only by the provider
 // =========================================================
 public enum PlatformPaymentMethod
 {
@@ -20,5 +21,6 @@ public enum PlatformPaymentMethod
     Cheque = 3,
     Zelle = 4,
     Other = 5,
-    Card = 6
+    Card = 6,
+    BankDebit = 7
 }

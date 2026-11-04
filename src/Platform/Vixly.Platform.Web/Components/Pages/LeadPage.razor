@@ -1,0 +1,23 @@
+﻿@*
+=========================================================
+FILE: LeadPage.razor
+
+PURPOSE:
+One contact request.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/leads/{LeadId:guid}"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.leads.request"]</PageTitle>
+<LeadView LeadId="LeadId" />
+
+@code {
+    [Parameter]
+    public Guid LeadId { get; set; }
+}

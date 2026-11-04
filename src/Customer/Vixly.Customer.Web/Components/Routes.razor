@@ -1,0 +1,19 @@
+﻿@*
+=========================================================
+FILE: Routes.razor
+
+PURPOSE:
+Routing for the customer pages.
+
+RESPONSIBILITIES:
+- Route to pages; unknown paths show the not-found page
+
+IMPORTANT NOTES:
+- Markup only
+=========================================================
+*@
+<Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFoundPage)">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(StatusLayout)" />
+    </Found>
+</Router>

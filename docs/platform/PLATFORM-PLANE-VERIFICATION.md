@@ -37,7 +37,7 @@ Platform.Api, public host. Limits are per client IP.
 | `POST /registration/email`, `/resend`, `/plan` | Change a registration (access token) | 10 per hour |
 | `GET /registration/plans` | Plan catalogue | 60 per minute |
 | `GET /registration/promotions/{code}`, `POST /registration/offer` | Promotion and offer checks | 30 per minute |
-| `GET /registration/status`, `/registration/invoice` | Registration status and invoice (access token) | 60 per hour |
+| `GET /registration/status`, `/registration/invoice` | Registration status and invoice (access token) | 300 per hour each (raised 2026-10-25: the pay page polls both while the first invoice is prepared) |
 | `POST /registration/checkout`, `/registration/zelle` | Pay the first invoice | 20 per hour |
 | `GET /payment-links/{token}`, `POST /payment-links/{token}/checkout`, `/zelle` | Pay and save-card links | 60 per hour, 20 per hour |
 | `GET /payments/zelle/qr` | Zelle QR image | 60 per hour |
@@ -67,6 +67,9 @@ Platform.Api, internal hosts only, `/internal/v1`, ES256 service token on every 
 | `POST /tenant/devices/{id}/approve`, `/deny`, `/release`, `/withdraw-release` | tenant | owner, admin | yes | 600 | no-store |
 | `POST /tenant/devices/first-device-link`, `/owner-recovery` | tenant | owner | no | 600 (and 3 links per hour per tenant) | no-store |
 | `POST /tenant/legal/accept` | tenant | owner | no | 600 | no-store |
+| `GET /tenant/company-change` | tenant | owner, admin | no | 600 | no-store |
+| `POST /tenant/company-change` (body up to 15 MB) | tenant | owner | yes | 600 | no-store |
+| `DELETE /tenant/company-change` | tenant | owner | no | 600 | no-store |
 | `POST /device-links/complete` | tenant (no tenant claim) | none: the emailed token | no | 600 | no-store |
 | `GET /events` | events | none (Edge: three types) | no | 240 per caller | no-store |
 
@@ -129,8 +132,8 @@ Platform.Api, internal hosts only, `/internal/v1`, ES256 service token on every 
 | Agree each call shape with the Operations and Edge teams (C-2) | As they build |
 | Shipping catalogue, maintenance status, tenant activity calls | With their consumers (D-K9) |
 | Stripe test-mode run | Owner (Slice 5) |
-| Slice 2 correction noted at sign-off | Slice 2 record, section 5 |
-| Outbox: log handler failures with the message id (sweep finding) | Next Platform change |
+| Slice 2 correction noted at sign-off | Done 2026-10-16: staff form removed, invite-only registration (Slice 2 design, D-T8). Company legal data read-only with staff-approved change requests: done 2026-10-16 (B12) |
+| Outbox: log handler failures with the message id (sweep finding) | Done 2026-10-16: the outbox worker logs id, type, error code and attempt; never the payload |
 | Replay cache is per process | Fine on shared hosting (one process); shared cache if Platform.Api ever runs on several servers |
 
 ## 10. Build and test counts, and sign-off
@@ -138,12 +141,12 @@ Platform.Api, internal hosts only, `/internal/v1`, ES256 service token on every 
 | | |
 |---|---|
 | Release build | `Vixly.Platform.slnx`: no errors, no warnings |
-| Platform.Domain.Tests | 286 |
-| Platform.Application.Tests | 216 |
-| Platform.Infrastructure.Tests (SQL Server) | 56 |
-| Platform.Api.Tests | 14 |
-| Platform.Web.Tests | 31 |
-| Architecture.Tests | 6,094 |
+| Platform.Domain.Tests | 301 |
+| Platform.Application.Tests | 231 |
+| Platform.Infrastructure.Tests (SQL Server) | 62 |
+| Platform.Api.Tests | 18 |
+| Platform.Web.Tests | 33 |
+| Architecture.Tests | 6,528 |
 | Shared.Kernel.Tests | 81 |
 
 Owner sign-off: ______________________ Date: __________

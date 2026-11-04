@@ -1,0 +1,15 @@
+﻿/* Customer screen (Slice 5F step 3): a tablet the customer reads at arm's length. Placeholder look: Frontend/UI designs the final experience. */
+.ops-screen { margin: 0; min-height: 100vh; background: var(--vx-color-surface, #fff); color: var(--vx-color-text, #111827); font-size: 1.25rem; }
+.ops-screen__top { padding: 1rem 1.5rem; border-bottom: 1px solid var(--vx-color-border, #e5e7eb); }
+.ops-screen__company { font-weight: 700; font-size: 1.5rem; }
+.ops-screen__main { max-width: 60rem; margin: 0 auto; padding: 1.5rem; }
+.ops-screen__panel h1 { font-size: 1.75rem; }
+.ops-screen__big { font-size: 2.25rem; font-weight: 700; }
+.ops-screen__choices { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1.5rem 0; }
+.ops-screen__choices .vx-button, .ops-screen__choice .vx-button { min-height: 3.5rem; min-width: 12rem; font-size: 1.25rem; }
+.ops-screen__warning { padding: 1rem; border: 2px solid #b45309; border-radius: 0.5rem; font-weight: 700; }
+.ops-screen__terms { white-space: pre-line; padding: 1rem; border: 1px solid var(--vx-color-border, #e5e7eb); border-radius: 0.5rem; max-height: 40vh; overflow: auto; }
+.ops-screen__problem { padding: 1rem; border-radius: 0.5rem; background: #fef2f2; color: #991b1b; }
+.ops-screen__pad { width: 100%; max-width: 45rem; height: auto; border: 2px dashed var(--vx-color-border, #9ca3af); border-radius: 0.5rem; background: #fff; }
+.ops-screen__zelle { display: flex; flex-wrap: wrap; gap: 2rem; align-items: flex-start; }
+.ops-screen-code { font-size: 2.5rem; font-weight: 700; letter-spacing: 0.15em; font-family: ui-monospace, monospace; }

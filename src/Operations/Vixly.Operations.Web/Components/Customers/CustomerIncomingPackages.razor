@@ -1,0 +1,96 @@
+@*
+=========================================================
+FILE: CustomerIncomingPackages.razor
+
+PURPOSE:
+The packages coming to a customer, on the staff customer page (owner, 2026-10-18).
+
+RESPONSIBILITIES:
+- Announced packages and parcels at an origin warehouse, newest first, each parcel linked to its page
+- A link to all the customer's parcels
+
+IMPORTANT NOTES:
+- Markup only; the caller passes its localizer
+- Compact table layout per Brief Section 5
+- No mailbox street address: staff see what is coming, not where the mailbox is
+=========================================================
+*@
+<section class="ops-editor__panel ops-incoming-panel" aria-labelledby="customer-incoming">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+        <h2 id="customer-incoming" style="margin: 0;">@T["ui.customers.incoming"]</h2>
+        @if (!string.IsNullOrWhiteSpace(CustomerCode))
+        {
+            <a class="vx-button vx-button--subtle" href="/staff/parcels?search=@Uri.EscapeDataString(CustomerCode)">@T["ui.customers.incoming.all"]</a>
+        }
+    </div>
+    @if (Packages.Count == 0)
+    {
+        <div class="ops-editor__empty"><p>@T["ui.customers.incoming_none"]</p></div>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.customers.incoming"]">
+            <table class="ops-editor__table">
+                <thead>
+                    <tr>
+                        <th scope="col" class="ops-editor__identity-cell">@T["ui.parcels.number"]</th>
+                        <th scope="col">@T["ui.parcels.tracking"]</th>
+                        <th scope="col">@T["ui.receiving.warehouse"]</th>
+                        <th scope="col">@T["ui.parcels.contents"]</th>
+                        <th scope="col">@T["ui.parcels.state"]</th>
+                        <th scope="col">@T["ui.parcels.received"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (OperationsIncomingPackage package in Packages)
+                    {
+                        <tr data-state="@(package.ParcelId is null ? "announced" : package.OnHold ? "hold" : "arrived")">
+                            <td class="ops-editor__identity-cell ops-editor__code">
+                                @if (package.ParcelId is { } parcel)
+                                {
+                                    <a href="/staff/parcels/@parcel">@package.ParcelNumber</a>
+                                }
+                                else
+                                {
+                                    <span class="ops-editor__status" data-status="draft">@T["ui.customers.incoming.announced"]</span>
+                                }
+                            </td>
+                            <td>
+                                <strong>@package.Carrier</strong>
+                                @if (!string.IsNullOrWhiteSpace(package.TrackingNumber))
+                                {
+                                    <span class="ops-editor__code"> · @package.TrackingNumber</span>
+                                }
+                            </td>
+                            <td>@(package.WarehouseCode ?? "—")</td>
+                            <td>@(string.IsNullOrWhiteSpace(package.Contents) ? "—" : package.Contents)</td>
+                            <td>
+                                @if (package.OnHold)
+                                {
+                                    <span class="ops-editor__status" data-status="hold">@T["ui.customers.incoming.on_hold"]</span>
+                                }
+                                else if (package.ParcelId is not null)
+                                {
+                                    <span class="ops-editor__status" data-status="arrived">@T["ui.customers.status.active"]</span>
+                                }
+                                else
+                                {
+                                    <span class="ops-editor__status" data-status="draft">@T["ui.customers.incoming.announced"]</span>
+                                }
+                            </td>
+                            <td>@package.Since.ToString("yyyy-MM-dd")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public string? CustomerCode { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsIncomingPackage> Packages { get; set; } = Array.Empty<OperationsIncomingPackage>();
+}

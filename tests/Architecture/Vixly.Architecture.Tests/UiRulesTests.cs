@@ -16,7 +16,8 @@ namespace Vixly.Architecture.Tests;
 // - UI-7: markup files stay under 250 lines; presenters take at
 //   most 7 dependencies
 // - UI-10: every literal text key used in markup exists in the
-//   plane resources
+//   plane resources (PlatformText for Platform.Web, PublicText
+//   for Public.Web)
 //
 // IMPORTANT NOTES:
 // - Source checks, so the test needs no reference to the Web
@@ -38,18 +39,18 @@ public sealed class UiRulesTests
 
     public static TheoryData<string> MarkupFiles()
     {
-        return Data(Directory.EnumerateFiles(WebRoot(), "*.razor", SearchOption.AllDirectories));
+        return Data(WebRoots().SelectMany(root => Directory.EnumerateFiles(root, "*.razor", SearchOption.AllDirectories)));
     }
 
     public static TheoryData<string> PageFiles()
     {
-        return Data(Directory.EnumerateFiles(WebRoot(), "*.razor", SearchOption.AllDirectories)
+        return Data(WebRoots().SelectMany(root => Directory.EnumerateFiles(root, "*.razor", SearchOption.AllDirectories))
             .Where(path => File.ReadLines(path).Any(line => line.StartsWith("@page ", StringComparison.Ordinal))));
     }
 
     public static TheoryData<string> PresenterFiles()
     {
-        return Data(Directory.EnumerateFiles(WebRoot(), "*Presenter.cs", SearchOption.AllDirectories));
+        return Data(WebRoots().SelectMany(root => Directory.EnumerateFiles(root, "*Presenter.cs", SearchOption.AllDirectories)));
     }
 
     [Theory]
@@ -57,13 +58,13 @@ public sealed class UiRulesTests
     public void Markup_StaysWithinItsBudget_AndUsesOnlyKnownTextKeys(string relativePath)
     {
         string[] lines = File.ReadAllLines(FullPath(relativePath));
-        HashSet<string> keys = ResourceKeys();
+        (HashSet<string> keys, string resource) = ResourceKeys(relativePath);
 
         Assert.True(lines.Length <= MarkupLineBudget, $"{relativePath}: {lines.Length} lines, budget {MarkupLineBudget} (UI-7).");
 
         foreach (Match match in TextKey.Matches(string.Join('\n', lines)))
         {
-            Assert.True(keys.Contains(match.Groups["key"].Value), $"{relativePath}: text key '{match.Groups["key"].Value}' is not in PlatformText.resx (UI-10).");
+            Assert.True(keys.Contains(match.Groups["key"].Value), $"{relativePath}: text key '{match.Groups["key"].Value}' is not in {resource} (UI-10).");
         }
     }
 
@@ -103,19 +104,31 @@ public sealed class UiRulesTests
         return data;
     }
 
-    private static string WebRoot()
+    private static IEnumerable<string> WebRoots()
     {
-        return Path.Combine(RepositoryLocator.Root, "src", "Platform", "Vixly.Platform.Web");
+        yield return Path.Combine(RepositoryLocator.Root, "src", "Platform", "Vixly.Platform.Web");
+        yield return Path.Combine(RepositoryLocator.Root, "src", "Public", "Vixly.Public.Web");
+        yield return Path.Combine(RepositoryLocator.Root, "src", "Operations", "Vixly.Operations.Web");
+        yield return Path.Combine(RepositoryLocator.Root, "src", "Customer", "Vixly.Customer.Web");
     }
 
-    private static HashSet<string> ResourceKeys()
+    private static (HashSet<string> Keys, string Resource) ResourceKeys(string relativePath)
     {
-        string path = Path.Combine(RepositoryLocator.Root, "src", "Platform", "Vixly.Platform.Resources", "PlatformText.resx");
+        string plane = relativePath.Replace('\\', '/').Split('/')[1];
+        string path = plane switch
+        {
+            "Public" => Path.Combine(RepositoryLocator.Root, "src", "Public", "Vixly.Public.Web", "Resources", "PublicText.resx"),
+            "Operations" => Path.Combine(RepositoryLocator.Root, "src", "Operations", "Vixly.Operations.Resources", "OperationsText.resx"),
+            "Customer" => Path.Combine(RepositoryLocator.Root, "src", "Customer", "Vixly.Customer.Resources", "CustomerText.resx"),
+            _ => Path.Combine(RepositoryLocator.Root, "src", "Platform", "Vixly.Platform.Resources", "PlatformText.resx")
+        };
 
-        return XDocument.Load(path)
+        HashSet<string> keys = XDocument.Load(path)
             .Descendants("data")
             .Select(element => (string?)element.Attribute("name") ?? string.Empty)
             .ToHashSet(StringComparer.Ordinal);
+
+        return (keys, Path.GetFileName(path));
     }
 
     private static string FullPath(string relativePath)

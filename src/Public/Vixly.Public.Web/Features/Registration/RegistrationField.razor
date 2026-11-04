@@ -1,0 +1,29 @@
+﻿@*
+=========================================================
+FILE: RegistrationField.razor
+
+PURPOSE:
+One labelled field of the sign-up form.
+
+IMPORTANT NOTES:
+- Markup only
+=========================================================
+*@
+<div class="@($"vx-field {Class}".Trim())">
+    <label class="vx-label" for="@Id">@Label</label>
+    @ChildContent
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Id { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; } = default!;
+}

@@ -1,0 +1,75 @@
+﻿@*
+=========================================================
+FILE: ShelfCountsPage.razor
+
+PURPOSE:
+The basic shelf count (Slice 12D, owner H-7): start one by scanning a shelf; the latest counts.
+
+RESPONSIBILITIES:
+- The shelf scan field (with the warehouse when there are several)
+- The latest counts, each linked
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@using Vixly.Operations.Application.Receiving
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.shelfcount.title"]" Company="@Company" Section="inventory" Error="@Error">
+    <InventoryTabs Current="shelf_counts" />
+    <section class="ops-editor__panel" aria-labelledby="start-title">
+        <h2 id="start-title" class="ops-section-title">@T["ui.shelfcount.start"]</h2>
+        <p class="ops-editor__hint">@T["ui.shelfcount.intro"]</p>
+        <form method="post" action="/staff/parcels/shelf-counts/" class="ops-editor__inline">
+            <AntiforgeryToken />
+            @if (Warehouses.Count > 1)
+            {
+                <select name="warehouse" aria-label="@T["ui.arrivals.warehouse"]">
+                    @foreach (Vixly.Operations.Domain.Locations.OperationsWarehouse warehouse in Warehouses)
+                    {
+                        <option value="@warehouse.Id">@warehouse.Name</option>
+                    }
+                </select>
+            }
+            <label>@T["ui.shelfcount.shelf"] <input name="shelf" required maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" autofocus /></label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.shelfcount.start_button"]</button>
+        </form>
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="latest-title">
+        <h2 id="latest-title" class="ops-section-title">@T["ui.shelfcount.latest"]</h2>
+        @if (Counts.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.shelfcount.none"]</p></div>
+        }
+        else
+        {
+            <ul class="ops-editor__list">
+                @foreach (OperationsShelfCountView count in Counts)
+                {
+                    <li>
+                        <a href="/staff/parcels/shelf-counts/@count.Id"><span class="ops-editor__code">@count.ShelfCode</span> · @count.WarehouseName · @count.StartedUtc.ToLocalTime().ToString("g", System.Globalization.CultureInfo.CurrentCulture)</a>
+                        @if (count.IsOpen)
+                        {
+                            <span class="ops-editor__status" data-status="open">@T["ui.shelfcount.open"]</span>
+                        }
+                        else
+                        {
+                            <span>@VixlyText.Format(T, "ui.shelfcount.summary", new Dictionary<string, object> { ["found"] = count.Found.Count, ["missing"] = count.Missing.Count, ["extra"] = count.Extra.Count, ["unknown"] = count.Unknown.Count })</span>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsShelfCountView> Counts { get; set; } = Array.Empty<OperationsShelfCountView>();
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Locations.OperationsWarehouse> Warehouses { get; set; } = Array.Empty<Vixly.Operations.Domain.Locations.OperationsWarehouse>();
+
+    [Parameter] public string? Error { get; set; }
+}

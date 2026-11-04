@@ -1,0 +1,83 @@
+@*
+=========================================================
+FILE: CounterSupplyOrderPage.razor
+
+PURPOSE:
+An order of supplies on its own at the counter (Slice 5E, S-14): the customer, the supplies, and confirming or cancelling it.
+
+RESPONSIBILITIES:
+- Show the customer and the order's state and number
+- Add and change supplies while open; confirm (numbered, stock moved, to pay) or cancel
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Paid with billing (Slice 5F); a collect shipment never carries supplies, so they are ordered here (owner, F-2)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@(Sale?.Number ?? T["ui.counter.supplies.order"].Value)" Company="@Company" Section="counter" Error="@Error" Info="@Info">
+    <CounterFindBar />
+    @if (Sale is { } sale && Customer is { } customer)
+    {
+    <div class="ops-counter__order-bar">
+        <span><strong>@customer.FirstName @customer.LastName</strong>@if (customer.Code is { } customerCode) { <span> · @customerCode</span> } · @Warehouse · <span class="ops-editor__status" data-status="@sale.Status">@T["ui.counter.supplies.status." + sale.Status]</span></span>
+        <a class="vx-button vx-button--secondary ops-counter__close" href="/staff/counter/customers/@customer.Id" accesskey="x">@T["ui.counter.close_shipment"]</a>
+    </div>
+    <CounterSuppliesPanel T="T" Sale="sale" AddAction="@("/staff/counter/orders/" + sale.Id + "/supplies")" Changeable="@(sale.Status == OperationsSupplySaleStatus.Open)" Focus="true"
+        Hint="@(DiscountsAllowed ? VixlyText.Format(T, "ui.counter.supplies.policy", new Dictionary<string, object> { ["line"] = LinePercent.ToString("0.##", CultureInfo.CurrentCulture), ["order"] = OrderPercent.ToString("0.##", CultureInfo.CurrentCulture) }) : T["ui.counter.supplies.policy_none"].Value)" />
+    @if (sale.Status == OperationsSupplySaleStatus.Open)
+    {
+        <div class="ops-editor__actions">
+            @if (sale.Lines.Count > 0)
+            {
+                <form method="post" action="/staff/counter/orders/@sale.Id/confirm" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.counter.supplies.confirm"]</button>
+                </form>
+            }
+            <form method="post" action="/staff/counter/orders/@sale.Id/cancel" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.counter.supplies.cancel"]</button>
+            </form>
+        </div>
+    }
+    else if (sale.Status == OperationsSupplySaleStatus.Confirmed && Invoice is not null)
+    {
+        @* Slice 5F (I-7): with its invoice, a confirmed order is cancelled by the approved void of that invoice. *@
+        <CounterInvoiceNote T="T" Invoice="Invoice" />
+        <p class="ops-editor__hint">@T["ui.counter.supplies.void_hint"]</p>
+    }
+    else if (sale.Status == OperationsSupplySaleStatus.Confirmed)
+    {
+        <p class="ops-editor__notice">@T["ui.counter.supplies.to_pay"]</p>
+        <form method="post" action="/staff/counter/orders/@sale.Id/cancel" class="ops-editor__inline">
+            <AntiforgeryToken />
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.counter.supplies.cancel"]</button>
+        </form>
+    }
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsSupplySale? Sale { get; set; }
+
+    [Parameter] public Vixly.Operations.Domain.Customers.OperationsCustomer? Customer { get; set; }
+
+    [Parameter] public string Warehouse { get; set; } = string.Empty;
+
+    [Parameter] public bool DiscountsAllowed { get; set; }
+
+    [Parameter] public decimal LinePercent { get; set; }
+
+    [Parameter] public decimal OrderPercent { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    // Slice 5F: its invoice once confirmed.
+    [Parameter] public Vixly.Operations.Domain.Billing.OperationsInvoice? Invoice { get; set; }
+}

@@ -1,0 +1,33 @@
+﻿@*
+=========================================================
+FILE: CounterInvoiceNote.razor
+
+PURPOSE:
+The invoice of a shipment or order at the counter (Slice 5F, I-8): its number, total, what is owed and its PDF.
+
+RESPONSIBILITIES:
+- Show the invoice once issued
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The counter prints the invoices of its own warehouse
+=========================================================
+*@
+@if (Invoice is { } invoice)
+{
+    <p class="ops-editor__notice ops-counter__invoice">
+        @VixlyText.Format(T, "ui.counter.invoice", new Dictionary<string, object> { ["number"] = invoice.Number, ["total"] = Vixly.Operations.Web.Components.Invoices.OperationsInvoiceWords.Money(invoice.Total, invoice.CurrencyCode), ["owed"] = Vixly.Operations.Web.Components.Invoices.OperationsInvoiceWords.Money(invoice.Owed, invoice.CurrencyCode) })
+        <span class="ops-editor__status" data-status="@Vixly.Operations.Web.Components.Cashier.OperationsPaymentWords.State(invoice.PaymentState)">@T["ui.payments.state." + Vixly.Operations.Web.Components.Cashier.OperationsPaymentWords.State(invoice.PaymentState)]</span>
+        <a class="vx-button vx-button--secondary" href="/staff/invoices/@invoice.Id/pdf" target="_blank" rel="noopener">@T["ui.invoices.pdf"]</a>
+        @if (invoice.Owed > 0m)
+        {
+            <a class="vx-button vx-button--primary" href="/staff/cashier/invoices/@invoice.Id">@T["ui.cashier.pay"]</a>
+        }
+    </p>
+}
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public Vixly.Operations.Domain.Billing.OperationsInvoice? Invoice { get; set; }
+}

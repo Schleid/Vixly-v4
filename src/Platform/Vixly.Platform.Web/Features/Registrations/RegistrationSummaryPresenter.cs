@@ -15,7 +15,8 @@ namespace Vixly.Platform.Web.Features.Registrations;
 //
 // RESPONSIBILITIES:
 // - Load the registration
-// - Resend its verification link; cancel it with a reason
+// - Resend its verification link, to a corrected email if given;
+//   cancel it with a reason
 //
 // IMPORTANT NOTES:
 // - Cancelling frees a pending slug; nothing is deleted (D-T11)
@@ -66,10 +67,13 @@ public sealed class RegistrationSummaryPresenter : PlatformPresenter<Registratio
         SetState(State with { ConfirmingCancel = false, Error = null });
     }
 
-    public Task ResendAsync(Guid registrationId)
+    public Task ResendAsync(Guid registrationId, string? email = null)
     {
         return RunAndReloadAsync(registrationId, "ui.registrations.resent", async (context, cancellationToken) =>
-            (await _resend.ExecuteAsync(context, new ResendRegistrationVerificationRequest { RegistrationId = registrationId }, cancellationToken)).Error);
+            (await _resend.ExecuteAsync(
+                context,
+                new ResendRegistrationVerificationRequest { RegistrationId = registrationId, Email = email },
+                cancellationToken)).Error);
     }
 
     public Task CancelAsync(Guid registrationId, string? reason)

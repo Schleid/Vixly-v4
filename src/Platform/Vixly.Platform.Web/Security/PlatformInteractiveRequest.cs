@@ -32,10 +32,13 @@ public sealed class PlatformInteractiveRequest
 
     public string? CorrelationId { get; private set; }
 
+    public string? Country { get; private set; }
+
     public bool IsCaptured { get; private set; }
 
-    public void Capture(string? clientIp, string? userAgent, string? correlationId)
+    public void Capture(string? clientIp, string? userAgent, string? correlationId, string? country = null)
     {
+        Country = country;
         ClientIp = clientIp;
         UserAgent = userAgent;
         CorrelationId = correlationId;
@@ -47,7 +50,7 @@ public sealed class PlatformInteractiveRequest
         ArgumentNullException.ThrowIfNull(circuit);
         ArgumentNullException.ThrowIfNull(user);
 
-        Capture(circuit.ClientIp, circuit.UserAgent, circuit.CorrelationId);
+        Capture(circuit.ClientIp, circuit.UserAgent, circuit.CorrelationId, circuit.Country);
         User = user;
     }
 }

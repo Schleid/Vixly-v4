@@ -1,0 +1,31 @@
+﻿@*
+=========================================================
+FILE: ErrorBox.razor
+
+PURPOSE:
+Shows a refusal: Platform's text in the page language, or the site's own when Platform cannot be reached, with the correlation id (S-9).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Never shows raw HTTP or exception text
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+
+@if (Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">
+        @(Error.Code == PlatformApi.Busy ? T["public.too_many"].Value
+            : Error.Code == PlatformApi.Unavailable || string.IsNullOrWhiteSpace(Error.Message) ? T["public.error.unavailable"].Value : Error.Message)
+        @if (!string.IsNullOrEmpty(Error.CorrelationId))
+        {
+            <br /><span class="pub-hint">@VixlyText.Format(T, "public.error.reference", "id", Error.CorrelationId)</span>
+        }
+    </VxMessage>
+}
+
+@code {
+    [Parameter]
+    public PlatformApiError? Error { get; set; }
+}

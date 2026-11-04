@@ -15,7 +15,7 @@ IMPORTANT NOTES:
 *@
 @inject PlatformInteractiveRequest Request
 
-<Router AppAssembly="typeof(Program).Assembly">
+<Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Vixly.Platform.Web.Components.Pages.HelpNotFoundPage)">
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
             <NotAuthorized>
@@ -35,8 +35,11 @@ IMPORTANT NOTES:
     [Parameter]
     public string? CorrelationId { get; set; }
 
+    [Parameter]
+    public string? Country { get; set; }
+
     protected override void OnInitialized()
     {
-        Request.Capture(ClientIp, UserAgent, CorrelationId);
+        Request.Capture(ClientIp, UserAgent, CorrelationId, Country);
     }
 }

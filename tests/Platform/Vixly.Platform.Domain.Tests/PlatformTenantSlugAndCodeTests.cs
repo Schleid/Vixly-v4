@@ -61,6 +61,8 @@ public sealed class PlatformTenantSlugAndCodeTests
     [InlineData("vixly-api")]
     [InlineData("acme-staging")]
     [InlineData("staging")]
+    [InlineData("ops-internal")]
+    [InlineData("vixly-ops-internal")]
     public void ReservedFloor_CannotBeRemovedByConfiguration(string slug)
     {
         Assert.True(PlatformPortalSlugFormat.IsReserved(slug, Array.Empty<string>()));

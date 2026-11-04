@@ -29,4 +29,8 @@
     <InternalsVisibleTo Include="Vixly.Platform.Infrastructure.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Mail\vixly-mail-logo.png" LogicalName="Vixly.Platform.Mail.Logo.png" />
+  </ItemGroup>
+
 </Project>

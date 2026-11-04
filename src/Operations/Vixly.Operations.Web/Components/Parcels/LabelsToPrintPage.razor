@@ -1,0 +1,147 @@
+@*
+=========================================================
+FILE: LabelsToPrintPage.razor
+
+PURPOSE:
+The cleared parcels whose shipping label was never printed: cleared after the station (a hold answered, an inspection passed, put in a shipment) (Slice 4D step 2).
+
+RESPONSIBILITIES:
+- List them per warehouse, oldest first, with the shelf to pick them from
+- Print one, or all of a warehouse, on a printer holding shipping labels; or download one
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); the use case limits the list to covered warehouses
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.shipping_label.list_title"]" Company="@Company" Section="parcels" Error="@Error" Info="@Info">
+    <div class="ops-list-bar" style="margin-bottom: 1rem;">
+        <nav class="ops-tab-nav" aria-label="@T["ui.parcels.views"]" style="display: flex; gap: 0.5rem;">
+            <a href="/staff/parcels" class="vx-button vx-button--secondary">@T["ui.parcels.view.all"]</a>
+            <a href="/staff/parcels/incoming" class="vx-button vx-button--secondary">@T["ui.incoming.title"]</a>
+            <a href="/staff/parcels/labels" class="vx-button vx-button--primary" aria-current="page">@T["ui.shipping_label.list_title"]</a>
+        </nav>
+        
+        @if (Warehouses.Count > 1)
+        {
+            <form method="get" action="/staff/parcels/labels" class="ops-list-bar__actions" style="display: flex; align-items: center; gap: 0.5rem;">
+                <select name="warehouse" aria-label="@T["ui.receiving.warehouse"]" class="ops-inline-action-bar__control" style="height: 32px;">
+                    <option value="">@T["ui.parcels.all_warehouses"]</option>
+                    @foreach (OperationsWarehouse warehouse in Warehouses)
+                    {
+                        <option value="@warehouse.Id" selected="@(warehouse.Id == WarehouseId)">@warehouse.Code</option>
+                    }
+                </select>
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.staff.search_submit"]</button>
+            </form>
+        }
+    </div>
+
+    <section class="ops-editor__panel">
+        <p class="ops-editor__hint" style="margin-top: 0; margin-bottom: 1rem;">@T["ui.shipping_label.list_hint"]</p>
+        
+        @if (Parcels.Count == 0)
+        {
+            <div class="ops-editor__empty"><h2>@T["ui.shipping_label.none"]</h2></div>
+        }
+        else
+        {
+            @if (WarehouseId is { } chosen && Printers.Count > 0)
+            {
+                <div class="ops-inline-action-bar" style="margin-bottom: 1rem; padding: 0.75rem 1rem; background: var(--vx-surface-sunken, #f8fafc); border: 1px solid var(--vx-border-subtle, #e2e8f0); border-radius: 6px;">
+                    <form method="post" action="/staff/parcels/labels/print" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="warehouse" value="@chosen" />
+                        <span class="ops-inline-action-bar__label">@T["ui.parcels.print_on"]:</span>
+                        <select name="printer" aria-label="@T["ui.parcels.print_on"]" class="ops-inline-action-bar__control" style="height: 32px;">
+                            @foreach (Vixly.Operations.Domain.Printing.OperationsLabelPrinter printer in Printers.Where(printer => printer.WarehouseId == chosen))
+                            {
+                                <option value="@printer.Id">@printer.Name</option>
+                            }
+                        </select>
+                        <button type="submit" class="vx-button vx-button--primary">@T["ui.shipping_label.print_all"]</button>
+                    </form>
+                </div>
+            }
+
+            <OperationsTableViewport Label="@T["ui.shipping_label.list_title"]">
+                <table class="ops-editor__table">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="ops-editor__identity-cell">@T["ui.parcels.number"]</th>
+                            <th scope="col">@T["ui.customers.code"]</th>
+                            <th scope="col">@T["ui.parcels.warehouse"]</th>
+                            <th scope="col" class="ops-editor__actions-header">@T["ui.shipping_label.title"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (OperationsParcelSummary parcel in Parcels)
+                        {
+                            <tr>
+                                <td class="ops-editor__identity-cell ops-editor__code">
+                                    <a href="/staff/parcels/@parcel.ParcelId" class="ops-link--mono">@parcel.Number</a>
+                                </td>
+                                <td class="ops-editor__code">@parcel.CustomerCode</td>
+                                <td class="ops-editor__code">
+                                    <span>@parcel.WarehouseCode</span>
+                                    @if (parcel.StorageLocationCode is { } shelf)
+                                    {
+                                        <span class="ops-status-pill ops-status-pill--neutral" style="margin-left: 0.35rem; font-size: 0.75rem;">@shelf</span>
+                                    }
+                                </td>
+                                <td class="ops-editor__actions-cell">
+                                    <div class="ops-field--inline" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                                        @if (Printers.Any(printer => printer.WarehouseId == parcel.WarehouseId))
+                                        {
+                                            <form method="post" action="/staff/parcels/@parcel.ParcelId/shipping-label" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                                                <AntiforgeryToken />
+                                                <input type="hidden" name="back" value="labels" />
+                                                @if (WarehouseId is { } shown)
+                                                {
+                                                    <input type="hidden" name="warehouse" value="@shown" />
+                                                }
+                                                <select name="printer" aria-label="@T["ui.parcels.print_on"]" class="ops-inline-action-bar__control" style="height: 30px; font-size: 0.8125rem;">
+                                                    @foreach (Vixly.Operations.Domain.Printing.OperationsLabelPrinter printer in Printers.Where(printer => printer.WarehouseId == parcel.WarehouseId))
+                                                    {
+                                                        <option value="@printer.Id">@printer.Name</option>
+                                                    }
+                                                </select>
+                                                <button type="submit" class="vx-button vx-button--secondary" style="height: 30px; padding: 0 0.65rem;">@T["ui.shipping_label.print"]</button>
+                                            </form>
+                                        }
+                                        <form method="post" action="/staff/parcels/@parcel.ParcelId/shipping-label/pdf" style="display: inline;">
+                                            <AntiforgeryToken />
+                                            <input type="hidden" name="back" value="labels" />
+                                            @if (WarehouseId is { } kept)
+                                            {
+                                                <input type="hidden" name="warehouse" value="@kept" />
+                                            }
+                                            <button type="submit" class="vx-button vx-button--secondary" style="height: 30px; padding: 0 0.65rem;">@T["ui.shipping_label.download"] ↓</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public Guid? WarehouseId { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsParcelSummary> Parcels { get; set; } = Array.Empty<OperationsParcelSummary>();
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Printing.OperationsLabelPrinter> Printers { get; set; } = Array.Empty<Vixly.Operations.Domain.Printing.OperationsLabelPrinter>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

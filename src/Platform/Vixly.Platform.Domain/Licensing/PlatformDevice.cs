@@ -86,6 +86,15 @@ public sealed class PlatformDevice : AuditableEntity
 
     public DateTimeOffset? LastSeenUtc { get; private set; }
 
+    // Owner, 2026-10-21: where the device was registered from, and who approved it (none: the Owner's email link).
+    public string? RegisteredIp { get; private set; }
+
+    public string? RegisteredUserAgent { get; private set; }
+
+    public string? RegisteredCountry { get; private set; }
+
+    public string? ApprovedByName { get; private set; }
+
     public bool HoldsSeat => Status is PlatformDeviceStatus.Active or PlatformDeviceStatus.ReleasePending || (Status == PlatformDeviceStatus.Revoked && SeatHeld);
 
     public bool AwaitsReview => Status == PlatformDeviceStatus.ReleasePending || (Status == PlatformDeviceStatus.Revoked && SeatHeld);
@@ -98,7 +107,8 @@ public sealed class PlatformDevice : AuditableEntity
         string? publicKey,
         string? secretHash,
         PlatformDeviceActor actor,
-        DateTimeOffset utcNow)
+        DateTimeOffset utcNow,
+        PlatformDeviceOrigin? origin = null)
     {
         ArgumentNullException.ThrowIfNull(actor);
         string text = name?.Trim() ?? string.Empty;
@@ -122,7 +132,12 @@ public sealed class PlatformDevice : AuditableEntity
             throw new DomainException(PlatformLicensingErrors.PublicKeyInvalid);
         }
 
-        PlatformDevice device = new(tenantId, number, text, kind, hasKey ? PlatformDeviceProof.KeyPair : PlatformDeviceProof.Secret, hasKey ? publicKey!.Trim() : null, hasSecret ? secretHash : null, actor, utcNow);
+        PlatformDevice device = new(tenantId, number, text, kind, hasKey ? PlatformDeviceProof.KeyPair : PlatformDeviceProof.Secret, hasKey ? publicKey!.Trim() : null, hasSecret ? secretHash : null, actor, utcNow)
+        {
+            RegisteredIp = origin?.Ip,
+            RegisteredUserAgent = origin?.UserAgent,
+            RegisteredCountry = origin?.Country
+        };
         return (device, device.Record(PlatformDeviceEventCodes.Requested, actor, utcNow, arguments: Args(("kind", kind.ToString()), ("proof", device.Proof.ToString()))));
     }
 
@@ -134,6 +149,7 @@ public sealed class PlatformDevice : AuditableEntity
         Require(PlatformDeviceStatus.Pending);
         Status = PlatformDeviceStatus.Active;
         ApprovedUtc = utcNow;
+        ApprovedByName = actor.Name;
         MarkAsModified(utcNow);
         return new PlatformDeviceChange(Record(eventCode, actor, utcNow), true, false);
     }
@@ -322,6 +338,19 @@ public sealed class PlatformDevice : AuditableEntity
     }
 
     // Last seen is written at most once an hour, so checks stay cheap.
+    // A device registered before countries were kept takes the first one it is used from (review 2026-10-21); never unknown or Tor.
+    public bool KeepCountry(string? country, DateTimeOffset utcNow)
+    {
+        if (RegisteredCountry is not null || new PlatformDeviceOrigin(null, null, country).Country is not { } code)
+        {
+            return false;
+        }
+
+        RegisteredCountry = code;
+        MarkAsModified(utcNow);
+        return true;
+    }
+
     public bool Touch(DateTimeOffset utcNow)
     {
         if (LastSeenUtc is { } seen && utcNow - seen < PlatformLicensingLimits.LastSeenEvery)

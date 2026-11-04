@@ -13,6 +13,7 @@ namespace Vixly.Platform.Application.UseCases.Payments;
 //
 // IMPORTANT NOTES:
 // - Plain record; no card data beyond brand, last four and expiry
+// - Checkout carries the checkout page look and statement wording
 // =========================================================
 public sealed record PlatformMerchantAccountItem(
     PlatformCardProvider Provider,
@@ -26,4 +27,5 @@ public sealed record PlatformMerchantAccountItem(
     bool ProviderConfigured,
     PlatformPaymentMode? ProviderMode,
     string? ProviderProblemCode,
-    bool Ready);
+    bool Ready,
+    PlatformCheckoutSettingsItem? Checkout = null);

@@ -1,0 +1,79 @@
+@*
+=========================================================
+FILE: PreAlertFormPage.razor
+
+PURPOSE:
+Announce a package on its own, before any shipment (Slice 4D; owner, 2026-10-19).
+
+RESPONSIBILITIES:
+- The warehouse it is shipped to (when the customer has several mailbox addresses)
+- The package (PackageFields), and optionally one of the customer's open shipments to put it in
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- The shipment can be chosen later on the packages page; Operations checks everything again
+- Brief §5 & §8 compliant styling with aligned action buttons
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Customers
+@using Vixly.Contracts.Operations.Packages
+@using Vixly.Customer.Web.Portal
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.prealert.new"]" SignedIn="true" Error="@Error" ReturnHere="/customer/packages/new" TourStep="@TourStep">
+    @if (Choices is { } choices)
+    {
+        <form method="post" action="/customer/packages/new" class="customer-portal__form customer-prealert-form">
+            <AntiforgeryToken />
+            @if (choices.Origins.Count == 0)
+            {
+                <p class="customer-portal__notice">@T["ui.shipments.no_mailbox"]</p>
+            }
+            else if (choices.Origins.Count > 1)
+            {
+                <label>@T["ui.prealert.warehouse"]
+                    <select name="warehouse" required>
+                        @foreach (CustomerChoiceDto origin in choices.Origins) { <option value="@origin.Id" selected="@(origin.Id == Entered?.WarehouseId)">@origin.Name · @origin.Detail</option> }
+                    </select>
+                </label>
+            }
+            <PackageFields T="T" Entered="Entered" />
+            @* Pre-alerts always go to the mailbox (owner, 2026-10-21): only shipments leaving from it. *@
+            @{ IReadOnlyList<CustomerShipmentDto> fromMailbox = Shipments.Where(shipment => shipment.OriginId is { } origin && choices.Origins.Any(item => item.Id == origin)).ToList(); }
+            @if (fromMailbox.Count > 0)
+            {
+                <label>@T["ui.prealert.shipment"]
+                    <select name="shipment">
+                        <option value="">@T["ui.packages.move.none"]</option>
+                        @foreach (CustomerShipmentDto shipment in fromMailbox)
+                        {
+                            <option value="@shipment.ShipmentId" selected="@(shipment.ShipmentId == Entered?.ShipmentId)">@shipment.Origin → @(shipment.Delivery == "pickup" ? shipment.BranchName : shipment.Address?.City + ", " + shipment.CountryCode) · @shipment.RecipientName</option>
+                        }
+                    </select>
+                </label>
+                <p class="customer-portal__hint">@T["ui.prealert.shipment_hint"]</p>
+            }
+            <div class="customer-portal__actions" style="grid-column: 1 / -1;">
+                @if (choices.Origins.Count > 0)
+                {
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.prealert.submit"]</button>
+                }
+                <a href="/customer/packages" class="vx-button vx-button--secondary">@T["ui.packages.back"]</a>
+            </div>
+        </form>
+    }
+</CustomerShell>
+
+@code {
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public CustomerShipmentChoicesDto? Choices { get; set; }
+
+    // The customer's open shipments with instructions; only those leaving from the mailbox are offered (Operations refuses the others).
+    [Parameter] public IReadOnlyList<CustomerShipmentDto> Shipments { get; set; } = Array.Empty<CustomerShipmentDto>();
+
+    [Parameter] public CustomerPreAlertBody? Entered { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+    [Parameter] public int TourStep { get; set; }
+}

@@ -1,4 +1,5 @@
 ﻿using Vixly.Platform.Application.Ports;
+using Vixly.Shared.Hosting;
 
 namespace Vixly.Platform.Web.Security;
 
@@ -41,4 +42,8 @@ public sealed class PlatformHttpRequestMetadata : IPlatformRequestMetadata
     public string? CorrelationId => _interactive.IsCaptured
         ? _interactive.CorrelationId
         : _accessor.HttpContext?.TraceIdentifier;
+
+    public string? Country => _interactive.IsCaptured
+        ? _interactive.Country
+        : VixlyClientCountry.Of(_accessor.HttpContext);
 }

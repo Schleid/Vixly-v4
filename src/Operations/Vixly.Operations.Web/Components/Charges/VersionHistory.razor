@@ -1,0 +1,53 @@
+﻿@*
+=========================================================
+FILE: VersionHistory.razor
+
+PURPOSE:
+The versions of a price list: in force, scheduled and past (Slice 4B design section 5).
+
+RESPONSIBILITIES:
+- List the versions newest first with their start and bands; mark the current one
+- Offer to remove a scheduled version
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- A version that has started is read-only; the last five are shown (Q-Z3)
+=========================================================
+*@
+<ul class="ops-editor__list">
+    @foreach (OperationsPriceVersion version in Card.Versions.OrderByDescending(item => item.EffectiveFromUtc).Take(Shown))
+    {
+        bool scheduled = version.EffectiveFromUtc > UtcNow;
+        bool current = !scheduled && Card.VersionAt(UtcNow)?.Id == version.Id;
+        <li>
+            <strong>@(scheduled ? T["ui.charges.version.scheduled"] : current ? T["ui.charges.version.current"] : T["ui.charges.version.past"])</strong>
+            · @VixlyText.Format(T, "ui.charges.version.from", "date", version.EffectiveFromUtc.ToString("d", CultureInfo.CurrentCulture))
+            · @string.Join(" · ", version.Bands.Select(band => OperationsChargeWords.Band(T, band, Unit, Currency)))
+            @if (scheduled)
+            {
+                <form method="post" action="/staff/charges/versions/remove" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="tab" value="@Card.Mode" />
+                    <input type="hidden" name="owner" value="PriceList" />
+                    <input type="hidden" name="owner_id" value="@Card.Id" />
+                    <input type="hidden" name="version" value="@version.Id" />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.charges.version.remove"]</button>
+                </form>
+            }
+        </li>
+    }
+</ul>
+
+@code {
+    private const int Shown = 5;
+
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsRateCard Card { get; set; } = null!;
+
+    [Parameter] public DateTimeOffset UtcNow { get; set; }
+
+    [Parameter] public string Unit { get; set; } = string.Empty;
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+}

@@ -27,6 +27,9 @@ namespace Vixly.Platform.Application.UseCases.Registration.StartPlatformTenantRe
 // - The same email may register more than once: the answer never
 //   says whether an address is known
 // - The access token is returned once; only its hash is stored
+// - While sign-up is invite-only (PlatformTenants:RegistrationInviteOnly),
+//   a valid offer link for this owner email is required; an
+//   unknown, used or mismatched link gets the same answer
 // =========================================================
 public sealed class StartPlatformTenantRegistrationUseCase
 {
@@ -56,6 +59,8 @@ public sealed class StartPlatformTenantRegistrationUseCase
 
     private readonly IPlatformLegalRepository _legal;
 
+    private readonly IPlatformOfferRepository _offers;
+
     public StartPlatformTenantRegistrationUseCase(
         IPlatformBotCheck botCheck,
         IPlatformRequestMetadata metadata,
@@ -69,8 +74,10 @@ public sealed class StartPlatformTenantRegistrationUseCase
         PlatformAuditTrail audit,
         IPlatformUnitOfWork unitOfWork,
         TimeProvider timeProvider,
-        IPlatformLegalRepository legal)
+        IPlatformLegalRepository legal,
+        IPlatformOfferRepository offers)
     {
+        _offers = offers ?? throw new ArgumentNullException(nameof(offers));
         _legal = legal ?? throw new ArgumentNullException(nameof(legal));
         _botCheck = botCheck ?? throw new ArgumentNullException(nameof(botCheck));
         _metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
@@ -97,6 +104,20 @@ public sealed class StartPlatformTenantRegistrationUseCase
         if (!await _botCheck.VerifyAsync(request.BotToken, _metadata.ClientIp, cancellationToken))
         {
             return StartPlatformTenantRegistrationResponse.Failure(PlatformRegistrationFlowErrors.BotCheckFailed);
+        }
+
+        // Invite-only sign-up (Slice 2 correction, D-T8): only an offer link sent to this owner email lets a company register.
+        bool invited = false;
+
+        if (!string.IsNullOrWhiteSpace(request.OfferToken))
+        {
+            Vixly.Platform.Domain.Sales.PlatformOffer? offer = await _offers.GetByTokenHashAsync(_secrets.HashToken(request.OfferToken.Trim()), cancellationToken);
+            invited = offer is not null && offer.Refusal(request.OwnerEmail, _timeProvider.GetUtcNow()) is null;
+        }
+
+        if (_policy.RegistrationInviteOnly && !invited)
+        {
+            return StartPlatformTenantRegistrationResponse.Failure(PlatformRegistrationFlowErrors.InvitationRequired);
         }
 
         if (!request.AcceptedTerms)
@@ -174,7 +195,7 @@ public sealed class StartPlatformTenantRegistrationUseCase
             null,
             nameof(PlatformTenantRegistration),
             registration.Id,
-            after: new { slug = registration.Slug, language = registration.Language.Value, terms = registration.TermsVersion, privacy = registration.PrivacyVersion });
+            after: new { slug = registration.Slug, language = registration.Language.Value, terms = registration.TermsVersion, privacy = registration.PrivacyVersion, invited });
 
         if (!await _unitOfWork.SaveChangesAsync(cancellationToken))
         {

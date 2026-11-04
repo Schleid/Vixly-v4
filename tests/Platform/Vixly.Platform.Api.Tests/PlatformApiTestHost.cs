@@ -25,7 +25,7 @@ namespace Vixly.Platform.Api.Tests;
 // =========================================================
 internal static class PlatformApiTestHost
 {
-    public const string Host = "vixly-api.techcrafters.ltd";
+    public const string Host = "api.vixly.ltd";
 
     public static async Task<(WebApplication App, HttpClient Client)> StartAsync(IReadOnlyDictionary<string, string?>? settings = null)
     {
@@ -33,6 +33,7 @@ internal static class PlatformApiTestHost
             new[]
             {
                 "--environment=Production",
+                "--VixlySettingsCheck:Enabled=false",
                 "--applicationName=Vixly.Platform.Api",
                 "--ConnectionStrings:Platform=Server=127.0.0.1,1;Database=None;User Id=none;Password=none;Connect Timeout=1;TrustServerCertificate=True"
             },

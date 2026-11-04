@@ -1,0 +1,96 @@
+@*
+=========================================================
+FILE: SupplyStockSettingsPanel.razor
+
+PURPOSE:
+The company's supplies stock settings (Slice 5E, S-9), on the supplies page.
+
+RESPONSIBILITIES:
+- Count the stock or not
+- Selling at the counter with no stock left: allow with a warning, or refuse
+- Discounts allowed at counter, limits per line and order, reason requirement
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- ops.charges.configure
+=========================================================
+*@
+<form method="post" action="/staff/supplies/settings" class="ops-settings-form" aria-labelledby="supplies-settings">
+    <AntiforgeryToken />
+    <div class="ops-charges-duo">
+        <section class="ops-editor__panel ops-setting-card" aria-labelledby="supplies-stock-title">
+            <h3 id="supplies-stock-title">@T["ui.supplies.settings.title"]</h3>
+            <div class="ops-checkbox-group" style="margin-bottom: 0.5rem;">
+                <label class="ops-checkbox-label">
+                    <input type="checkbox" name="count" value="true" checked="@CountsStock" />
+                    <span>@T["ui.supplies.settings.count"]</span>
+                </label>
+            </div>
+            <p class="ops-editor__hint" style="margin-bottom: 0.75rem;">@T["ui.supplies.settings.count_hint"]</p>
+            <div>
+                <span class="ops-label-text" style="min-height: auto; margin-bottom: 0.35rem;">@T["ui.supplies.settings.stock_out"]</span>
+                <div class="ops-setting-options-grid">
+                    @foreach (OperationsSupplyStockOut choice in Enum.GetValues<OperationsSupplyStockOut>())
+                    {
+                        <label class="ops-toggle-card">
+                            <input type="radio" name="stock_out" value="@choice" checked="@(StockOut == choice)" />
+                            <div class="ops-toggle-card__content">
+                                <span class="ops-toggle-card__title">@T["ui.supplies.settings.stock_out." + choice]</span>
+                            </div>
+                        </label>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="ops-editor__panel ops-setting-card" aria-labelledby="supplies-discounts-title">
+            <h3 id="supplies-discounts-title">@T["ui.supplies.settings.discounts"]</h3>
+            <div class="ops-checkbox-group" style="margin-bottom: 0.75rem;">
+                <label class="ops-checkbox-label">
+                    <input type="checkbox" name="discounts" value="true" checked="@(Settings?.SupplyDiscountsAllowed ?? true)" />
+                    <span>@T["ui.supplies.settings.discounts_allowed"]</span>
+                </label>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <div>
+                    <label>
+                        <span class="ops-label-text">@T["ui.supplies.settings.discount_line"]</span>
+                        <div class="ops-input-adornment">
+                            <input name="discount_line" inputmode="decimal" value="@((Settings?.SupplyDiscountLinePercent ?? 10m).ToString("0.##", CultureInfo.InvariantCulture))" />
+                            <span class="ops-input-adornment__addon">%</span>
+                        </div>
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <span class="ops-label-text">@T["ui.supplies.settings.discount_order"]</span>
+                        <div class="ops-input-adornment">
+                            <input name="discount_order" inputmode="decimal" value="@((Settings?.SupplyDiscountOrderPercent ?? 10m).ToString("0.##", CultureInfo.InvariantCulture))" />
+                            <span class="ops-input-adornment__addon">%</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <div class="ops-checkbox-group" style="margin-bottom: 0.5rem;">
+                <label class="ops-checkbox-label">
+                    <input type="checkbox" name="discount_reason" value="true" checked="@(Settings?.SupplyDiscountReasonRequired ?? true)" />
+                    <span>@T["ui.supplies.settings.discount_reason"]</span>
+                </label>
+            </div>
+            <p class="ops-editor__hint">@T["ui.supplies.settings.discounts_hint"]</p>
+        </section>
+    </div>
+    <div style="margin-top: 0.5rem; display: flex; justify-content: flex-start;">
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button>
+    </div>
+</form>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public bool CountsStock { get; set; } = true;
+
+    [Parameter] public OperationsSupplyStockOut StockOut { get; set; } = OperationsSupplyStockOut.AllowWithWarning;
+
+    [Parameter] public Vixly.Operations.Domain.Settings.OperationsTenantSettings? Settings { get; set; }
+}

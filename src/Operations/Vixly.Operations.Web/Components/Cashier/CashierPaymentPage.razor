@@ -1,0 +1,49 @@
+﻿@*
+=========================================================
+FILE: CashierPaymentPage.razor
+
+PURPOSE:
+A payment just taken (Slice 5F, C-3): the change to give in large type, each tender, and the receipt.
+
+RESPONSIBILITIES:
+- Show the change, the tenders and their state, the receipt button and the next customer
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@(Payment?.Number ?? T["ui.cashier.title"].Value)" Company="@Company" Section="cashier" Error="@Error">
+    @if (Payment is { } payment && Invoice is { } invoice)
+    {
+    <section class="ops-editor__panel ops-cashier__done" aria-labelledby="done-title">
+        <h2 id="done-title">@VixlyText.Format(T, "ui.cashier.taken", new Dictionary<string, object> { ["number"] = payment.Number, ["invoice"] = invoice.Number, ["total"] = OperationsInvoiceWords.Money(payment.Total, payment.CurrencyCode) })</h2>
+        @if (payment.Change > 0m)
+        {
+            <p class="ops-cashier__change" data-change>@VixlyText.Format(T, "ui.cashier.change", "amount", OperationsInvoiceWords.Money(payment.Change, payment.CurrencyCode))</p>
+        }
+        @if (payment.Pending)
+        {
+            <p class="ops-editor__notice">@T["ui.cashier.awaiting_hint"]</p>
+        }
+        <p>
+            <a class="vx-button vx-button--primary" href="/staff/cashier/payments/@payment.Id/receipt" target="_blank" rel="noopener">@T["ui.cashier.receipt"]</a>
+            <a class="vx-button vx-button--secondary" href="/staff/cashier" accesskey="n">@T["ui.cashier.next"]</a>
+        </p>
+    </section>
+    <PaymentsList T="T" Payments="new[] { payment }" Others="OtherNames" />
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsPayment? Payment { get; set; }
+
+    [Parameter] public OperationsInvoice? Invoice { get; set; }
+
+    [Parameter] public IReadOnlyDictionary<OperationsPaymentMethod, string> OtherNames { get; set; } = new Dictionary<OperationsPaymentMethod, string>();
+
+    [Parameter] public string? Error { get; set; }
+}

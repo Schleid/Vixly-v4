@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 using Vixly.Platform.Domain.Licensing;
 using Vixly.Platform.Domain.Tenants;
 
@@ -29,5 +29,6 @@ internal sealed class PlatformDeviceLinkConfiguration : IEntityTypeConfiguration
         builder.HasIndex(item => new { item.PlatformTenantId, item.Kind });
         builder.HasOne<PlatformTenant>().WithMany().HasForeignKey(item => item.PlatformTenantId).OnDelete(DeleteBehavior.Restrict);
         builder.HasOne<PlatformTenantRegistration>().WithMany().HasForeignKey(item => item.PlatformTenantRegistrationId).OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne<PlatformOwnerSupportRequest>().WithMany().HasForeignKey(item => item.SupportRequestId).OnDelete(DeleteBehavior.Restrict);
     }
 }

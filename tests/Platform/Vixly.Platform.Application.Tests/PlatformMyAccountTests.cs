@@ -136,7 +136,7 @@ public sealed class PlatformMyAccountTests
 
     private ChangeMyPasswordUseCase ChangePassword()
     {
-        return new ChangeMyPasswordUseCase(new PlatformStepUpSteps(_store, _store, Audit(), _store, _clock), _crypto, _store, _store, Audit(), _store);
+        return new ChangeMyPasswordUseCase(new PlatformStepUpSteps(_store, _store, Audit(), _store, _clock, new FakeSecuritySettings()), _crypto, _store, _store, Audit(), _store);
     }
 
     private EndMySessionsUseCase EndSessions()

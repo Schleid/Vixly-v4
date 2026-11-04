@@ -1,0 +1,42 @@
+﻿@using Vixly.Shared.UI.Gallery.Resources
+@* =========================================================
+   FILE: ShipmentComponentsDemo.razor
+
+   PURPOSE:
+   Demonstrate lifecycle, segmented detail views and table states.
+
+   RESPONSIBILITIES:
+   Show presentation fixtures, never shipment calculations.
+
+   IMPORTANT NOTES:
+   All values are examples; DIM divisor is explicitly illustrative.
+   ========================================================= *@
+<section class="wb-stack" id="wb-detail" tabindex="-1">
+    <h2>@L("detail") · <span class="vx-table__number">@($"VX-2026-{SampleId:000000}")</span></h2>
+    <VxLifecycleStepper Steps="@Steps" CurrentIndex="2" Label="@L("lifecycle")" />
+    <section class="wb-panel">
+        <fieldset class="wb-tabs"><legend class="vx-visually-hidden">@L("views")</legend>
+            @for (int i = 0; i < Views.Length; i++) { int view = i; <label class="wb-tabs__item"><input type="radio" name="sample-detail-view" value="@view" checked="@(View == view)" @onchange="() => View = view" /><span>@L(Views[view])</span></label> }
+        </fieldset>
+        <div class="wb-detail">
+            @if (View == 0) {
+                <dl class="wb-facts"><div><dt>@L("dimensions")</dt><dd class="vx-table__number">60 × 40 × 35</dd></div><div><dt>@L("actual")</dt><dd class="vx-table__number">@((12.4m + SampleId).ToString("N2", System.Globalization.CultureInfo.GetCultureInfo(Language is "fr" or "es" ? Language : "en")))</dd></div><div><dt>@L("dim")</dt><dd class="vx-table__number">16.80</dd></div></dl><p class="wb-meta">@L("formula")</p>
+            } else if (View == 1) {
+                <ul class="wb-feed">@foreach (int i in Enumerable.Range(1,3)) { <li><span class="vx-table__number">@($"VX-2026-{SampleId:000000}-P{i:00}")</span><VxStatusBadge Text="@L("staged")" Status="VxBadgeStatus.Warning" /></li> }</ul>
+            } else if (View == 2) {
+                <dl class="wb-facts"><div><dt>@L("amount")</dt><dd class="vx-table__number">@((80m + SampleId * 3).ToString("N2", System.Globalization.CultureInfo.GetCultureInfo(Language is "fr" or "es" ? Language : "en")))</dd></div><div><dt>@L("status")</dt><dd><VxStatusBadge Text="@L("registered")" Status="VxBadgeStatus.Info" /></dd></div></dl>
+            } else {
+                <ol class="wb-feed"><li><time class="vx-table__number">08:31:12</time><span>@L("intake")</span></li><li><time class="vx-table__number">08:42:18</time><span>@L("scan")</span></li></ol>
+            }
+        </div>
+    </section>
+    <section class="wb-panel"><header class="wb-panel__header"><h2>@L("loading")</h2></header><VxDataTable TItem="int" IsLoading="true" Caption="@L("loading")" /></section>
+</section>
+@code {
+    [Parameter] public string Language { get; set; } = "en";
+    [Parameter] public int SampleId { get; set; } = 1;
+    private int View;
+    private string L(string key) => WorkbenchLabels.Get(key, Language);
+    private static readonly string[] Views = { "cargo", "barcodes", "ledger", "audit" };
+    private IReadOnlyList<string> Steps => new[] { L("intake"), L("scan"), L("bundle"), L("dispatchstep"), L("delivery") };
+}

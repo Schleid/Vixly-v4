@@ -80,7 +80,7 @@ The run used the console as a SuperUser, Platform.Api over HTTPS, and the app lo
 | French and Spanish native review | Before release |
 | Console layout and styling of the new screens | Frontend/UI (FE report to be updated) |
 | Turnstile site key and secret for staging and production | Owner or operations, through user secrets or the host |
-| Replace staff tenant creation with an invitation link; make company legal data read-only in the console (the slug correction before first activation stays); the tenant edits its profile in Operations | Later slice; see the design note, "Owner decisions after sign-off" |
+| Replace staff tenant creation with an invitation link; make company legal data read-only in the console (the slug correction before first activation stays); the tenant edits its profile in Operations | Done 2026-10-16: invite-only registration (B11); legal data read-only with change requests (B12, design note "Company change requests"). The Operations profile screen comes with Stage 3 |
 | Tenant page: subscription, finance, licensing and activity sections | Slices 3, 4, 5, 7 and Stage 3; see the design note |
 | Demo data for development | Done: `dotnet run -- --seed-demo-tenants` (Development only), built through registrations |
 
@@ -91,4 +91,4 @@ The run used the console as a SuperUser, Platform.Api over HTTPS, and the app lo
 | Decision | Approved |
 | Signed by | Jude (owner) |
 | Date | 2026-10-14 |
-| Correction for later | **Tenant data comes from registration, not entered by staff.** This revises D-T8. The console's "New tenant" form (`CreatePlatformTenant`) is to be replaced in a later slice; tracked in the design note, decision D-T8 |
+| Correction for later | **Tenant data comes from registration, not entered by staff.** This revises D-T8. The console's "New tenant" form (`CreatePlatformTenant`) is to be replaced in a later slice; tracked in the design note, decision D-T8. **Done 2026-10-16:** the form and use case are removed; registration is invite-only through Sales offer links until public sign-up opens |

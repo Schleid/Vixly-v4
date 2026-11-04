@@ -1,0 +1,125 @@
+@*
+=========================================================
+FILE: SalesFeedView.razor
+
+PURPOSE:
+The sales feed page: how Vixly's sale events reach TechOS -
+configured or off, stopped, last success, retries, pending and
+parked events with TechOS's error, and "send again".
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- Times are UTC; the page never shows the address or the secret
+=========================================================
+*@
+@inherits PlatformPresenterComponent<SalesFeedPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+
+<div id="sales-feed">
+    @if (Presenter.State.DoneKey is { } done)
+    {
+        <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
+    }
+    @if (Presenter.State.Error is not null)
+    {
+        <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+    }
+    @if (!Presenter.State.Loaded)
+    {
+        <p role="status">@T["ui.common.loading"]</p>
+    }
+    else if (Presenter.State.Feed is { } feed)
+    {
+        <VxCard Title="@T["ui.sales_feed.status"]">
+            <dl class="vx-facts">
+                <dt>@T["ui.sales_feed.configured"]</dt>
+                <dd>
+                    <VxStatusBadge Status="@(feed.Configured ? VxBadgeStatus.Success : VxBadgeStatus.Deactivated)" Text="@T[feed.Configured ? "ui.sales_feed.on" : "ui.sales_feed.off"]" />
+                    @if (!feed.Configured && feed.SettingsProblem is { } setting)
+                    {
+                        <p class="vx-hint">@T["ui.sales_feed.setting." + setting]</p>
+                    }
+                </dd>
+                @if (feed.Problem is { } problem)
+                {
+                    <dt>@T["ui.sales_feed.stopped"]</dt>
+                    <dd>
+                        <VxStatusBadge Status="VxBadgeStatus.Danger" Text="@problem" />
+                        @PlatformDisplay.Utc(T, feed.ProblemUtc)
+                    </dd>
+                }
+                <dt>@T["ui.sales_feed.last_success"]</dt>
+                <dd>@(feed.LastSuccessUtc is null ? T["ui.common.none"].Value : PlatformDisplay.Utc(T, feed.LastSuccessUtc))</dd>
+                @if (feed.FailingSinceUtc is not null)
+                {
+                    <dt>@T["ui.sales_feed.failing_since"]</dt>
+                    <dd>@PlatformDisplay.Utc(T, feed.FailingSinceUtc) · @feed.LastFailure</dd>
+                    <dt>@T["ui.sales_feed.next_attempt"]</dt>
+                    <dd>@PlatformDisplay.Utc(T, feed.NextAttemptUtc)</dd>
+                }
+                <dt>@T["ui.sales_feed.pending"]</dt>
+                <dd>@feed.Pending.ToString(System.Globalization.CultureInfo.CurrentCulture)</dd>
+                <dt>@T["ui.sales_feed.parked"]</dt>
+                <dd>@feed.Parked.ToString(System.Globalization.CultureInfo.CurrentCulture)</dd>
+                <dt>@T["ui.sales_feed.sent"]</dt>
+                <dd>@feed.Sent.ToString(System.Globalization.CultureInfo.CurrentCulture)</dd>
+            </dl>
+            @if (Presenter.State.CanManage && (feed.Problem is not null || feed.FailingSinceUtc is not null))
+            {
+                <div class="vx-actions">
+                    <VxButton OnClick="Presenter.RetryAsync" IsBusy="@Presenter.IsBusy">@T["ui.sales_feed.retry"]</VxButton>
+                </div>
+            }
+        </VxCard>
+
+        <h2>@T["ui.sales_feed.parked_title"]</h2>
+        <VxDataTable Items="feed.ParkedEvents" IsLoading="false" Caption="@T["ui.sales_feed.parked_help"]">
+            <HeaderContent>
+                <th scope="col">@T["ui.sales_feed.sequence"]</th>
+                <th scope="col">@T["ui.sales_feed.type"]</th>
+                <th scope="col">@T["ui.sales_feed.occurred"]</th>
+                <th scope="col">@T["ui.sales_feed.error"]</th>
+                <th scope="col">@T["ui.sales_feed.answered"]</th>
+                <th scope="col" class="vx-table-actions-header"><span class="vx-visually-hidden">@T["ui.sales_feed.send_again"]</span></th>
+            </HeaderContent>
+            <RowTemplate Context="item">
+                <td>@item.Sequence.ToString(System.Globalization.CultureInfo.InvariantCulture)</td>
+                <td>
+                    @if (item.PlatformTenantId is Guid tenantId)
+                    {
+                        <a href="@("/tenants/" + tenantId.ToString("D"))">@item.Type</a>
+                    }
+                    else
+                    {
+                        @item.Type
+                    }
+                </td>
+                <td>@PlatformDisplay.Utc(T, item.OccurredUtc)</td>
+                <td>@item.Error</td>
+                <td>@PlatformDisplay.Utc(T, item.AnsweredUtc)</td>
+                <td>
+                    @if (Presenter.State.CanManage)
+                    {
+                        <div class="vx-table-actions">
+                            <VxButton OnClick="@(() => Presenter.SendAgainAsync(item.Id))" IsBusy="@Presenter.IsBusy">@T["ui.sales_feed.send_again"]</VxButton>
+                            <VxButton OnClick="@(() => Presenter.RebuildAsync(item.Id))" IsBusy="@Presenter.IsBusy">@T["ui.sales_feed.rebuild"]</VxButton>
+    
+                        </div>
+
+                    }
+                </td>
+            </RowTemplate>
+        </VxDataTable>
+    }
+</div>
+
+@code {
+    protected override Task OnParametersSetAsync()
+    {
+        return Presenter.LoadAsync();
+    }
+}

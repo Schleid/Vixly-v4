@@ -25,6 +25,12 @@ namespace Vixly.Shared.Hosting;
 //   headers are ignored and the socket address is used
 // - V3 rate-limited by the Cloudflare edge address, so one
 //   edge could block many users; this fixes that
+// - Behind the Cloudflare Worker of the side-by-side rollout,
+//   the company's address also comes forwarded
+//   (X-Forwarded-Host), only for Hosting:EdgeHosts and only
+//   with the Worker's secret (VixlyEdgeHost)
+// - Behind IIS out of process, IIS's own hop is undone first
+//   (VixlyIisHop), so these rules see Cloudflare as the peer
 // =========================================================
 public static class VixlyForwardedHeaders
 {
@@ -36,12 +42,26 @@ public static class VixlyForwardedHeaders
         ArgumentNullException.ThrowIfNull(configuration);
 
         string[] networks = configuration.GetSection("Hosting:TrustedProxyNetworks").Get<string[]>() ?? Array.Empty<string>();
+        VixlyEdgeSettings edge = VixlyEdgeSettings.From(configuration);
+        services.AddSingleton(edge);
+        services.AddSingleton(VixlyIisHop.From(configuration));
 
         services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             options.ForwardedForHeaderName = "CF-Connecting-IP";
             options.ForwardLimit = 1;
+
+            if (edge.Enabled)
+            {
+                options.ForwardedHeaders |= ForwardedHeaders.XForwardedHost;
+                options.AllowedHosts.Clear();
+
+                foreach (string host in edge.Hosts)
+                {
+                    options.AllowedHosts.Add(host);
+                }
+            }
             options.KnownIPNetworks.Clear();
             options.KnownProxies.Clear();
 

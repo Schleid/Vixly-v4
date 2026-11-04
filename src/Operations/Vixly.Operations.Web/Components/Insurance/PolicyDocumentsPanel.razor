@@ -1,0 +1,80 @@
+@*
+=========================================================
+FILE: PolicyDocumentsPanel.razor
+
+PURPOSE:
+The documents of an insurance policy: list them, open them, upload new documents, and remove them (Slice 5B).
+
+RESPONSIBILITIES:
+- List every uploaded document with its kind, file name, and upload date
+- Provide download links, upload form, and removal actions
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Guarded by CanManage permissions
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<section class="ops-editor__panel" id="policy-documents" aria-labelledby="documents-title" style="margin-top: 1.5rem;">
+    <h2 id="documents-title">@T["ui.insurance_module.documents"]</h2>
+    @if (Policy.Documents.Count == 0)
+    {
+        <div class="ops-editor__empty" style="margin-bottom: 1rem;"><p>@T["ui.insurance_module.no_documents"]</p></div>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.insurance_module.documents"]">
+            <table class="ops-editor__table ops-table--compact">
+                <thead>
+                    <tr>
+                        <th scope="col" class="ops-editor__identity-cell">@T["ui.editor.name"]</th>
+                        <th scope="col">@T["ui.insurance_module.document_kind"]</th>
+                        <th scope="col">@T["ui.customers.created"]</th>
+                        <th scope="col" style="text-align: right;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (OperationsPolicyDocument document in Policy.Documents)
+                    {
+                        <tr>
+                            <td class="ops-editor__identity-cell"><a href="/staff/insurance/policies/@Policy.Id/documents/@document.Id" target="_blank" rel="noopener"><strong>@document.FileName</strong></a></td>
+                            <td>@T["ui.insurance_module.document." + document.Kind]</td>
+                            <td class="ops-editor__code">@document.UploadedUtc.ToString("yyyy-MM-dd")</td>
+                            <td style="text-align: right;">
+                                @if (CanManage)
+                                {
+                                    <form method="post" action="/staff/insurance/policies/@Policy.Id/documents/@document.Id/remove" class="ops-editor__inline" style="margin: 0; display: inline-flex;">
+                                        <AntiforgeryToken />
+                                        <button type="submit" class="vx-button vx-button--secondary" style="height: 28px; padding: 0 0.5rem; font-size: 0.75rem;">@T["ui.insurance_module.remove"]</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    }
+    @if (CanManage)
+    {
+        <form method="post" action="/staff/insurance/policies/@Policy.Id/documents" enctype="multipart/form-data" class="ops-inline-action-bar" style="margin-top: 1rem; padding: 0.75rem; background: var(--vx-color-surface-sunken, #f8fafc); border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem;">
+            <AntiforgeryToken />
+            <label class="ops-inline-action-bar__label">
+                <span>@T["ui.insurance_module.document_kind"]</span>
+            </label>
+            <select name="kind" aria-label="@T["ui.insurance_module.document_kind"]" class="ops-inline-action-bar__select" style="min-width: 12rem;">
+                @foreach (string kind in OperationsPolicyDocument.Kinds) { <option value="@kind">@T["ui.insurance_module.document." + kind]</option> }
+            </select>
+            <input type="file" name="document" accept="application/pdf,image/png,image/jpeg" required style="font-size: 0.8125rem;" />
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.insurance_module.upload"]</button>
+            <p class="ops-editor__hint" style="width: 100%; margin: 0.35rem 0 0 0;">@T["ui.insurance_module.upload_hint"]</p>
+        </form>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public OperationsInsurancePolicy Policy { get; set; } = null!;
+
+    [Parameter] public bool CanManage { get; set; }
+}

@@ -2,6 +2,7 @@
 using Vixly.Platform.Application.Ports;
 using Vixly.Platform.Application.Queries;
 using Vixly.Platform.Application.Security;
+using Vixly.Platform.Application.UseCases.Legal;
 using Vixly.Platform.Application.UseCases.Licensing;
 using Vixly.Platform.Domain.Licensing;
 using Vixly.Platform.Domain.Subscriptions;
@@ -46,20 +47,39 @@ public sealed class GetPlatformPortalAccessUseCase
         // Only a tenant's own addresses resolve; a slug still held by a registration does not (D-T11).
         PlatformTenant? tenant = row is { State: PlatformPortalSlugState.Permanent, PlatformTenantId: Guid tenantId } ? await _licensing.Tenants.GetAsync(tenantId, cancellationToken) : null;
 
+        // Operations serves the owner's setup pages while the tenant is still being set up (Stage 3, Slice 0):
+        // a registration's tenant stays Draft until its first device activates it.
+        if (tenant is { Status: PlatformTenantStatus.Draft or PlatformTenantStatus.PendingActivation } && request.IncludeSettingUp)
+        {
+            return GetPlatformPortalAccessResponse.Success(new PlatformPortalAccess(
+                true,
+                tenant.Id,
+                tenant.Status,
+                PlatformSubscriptionAccess.None,
+                tenant.CurrentSlug,
+                tenant.DefaultLanguage.Value,
+                (await _licensing.LegalAsync(tenant, cancellationToken)).Status,
+                tenant.TimeZone));
+        }
+
         // Unknown, never-active and closed tenants all look the same from outside.
         if (tenant is null || tenant.Status is PlatformTenantStatus.Draft or PlatformTenantStatus.PendingActivation or PlatformTenantStatus.Deactivated or PlatformTenantStatus.Banned)
         {
             return GetPlatformPortalAccessResponse.Success(new PlatformPortalAccess(false, null, null, PlatformSubscriptionAccess.None));
         }
 
+        // Harmonization H-13: the legal state worked out once, from the tenant already loaded (it was twice, each reloading the tenant).
+        PlatformTenantLegalState legal = await _licensing.LegalAsync(tenant, cancellationToken);
+
         // An old address answers the current one, so Edge can redirect (slug corrections, Slice 2).
         return GetPlatformPortalAccessResponse.Success(new PlatformPortalAccess(
             true,
             tenant.Id,
             tenant.Status,
-            await _licensing.AccessAsync(tenant.Id, cancellationToken),
+            await _licensing.AccessAsync(tenant.Id, legal, cancellationToken),
             tenant.CurrentSlug,
             tenant.DefaultLanguage.Value,
-            (await _licensing.LegalAsync(tenant.Id, cancellationToken)).Status));
+            legal.Status,
+            tenant.TimeZone));
     }
 }

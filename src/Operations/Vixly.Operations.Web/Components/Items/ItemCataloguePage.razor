@@ -1,0 +1,146 @@
+@*
+=========================================================
+FILE: ItemCataloguePage.razor
+
+PURPOSE:
+The company's item catalogue: how everyday items are described and coded for customs (owner, 2026-11-01).
+
+RESPONSIBILITIES:
+- The rule: items need a customs code and a country of origin before bundling (from now on)
+- Find, add, change and remove catalogue items
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Static forms with antiforgery (ADR-0019)
+- Compact enterprise styling with top-aligned inline edit controls
+=========================================================
+*@
+@using Vixly.Operations.Domain.Items
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.items.catalogue.title"]" Company="@Company" Section="item_catalogue" Error="@Error" Info="@Info">
+    <section class="ops-editor__panel ops-items-rule-panel" aria-labelledby="items-rule">
+        <div class="ops-items-rule__content">
+            <h2 id="items-rule">@T["ui.items.rule.title"]</h2>
+            <p class="ops-editor__hint">@T["ui.items.rule.hint"]</p>
+            @if (RequiredSinceUtc is { } since)
+            {
+                <span class="ops-items-rule__active">@VixlyText.Format(T, "ui.items.rule.on_since", "date", since.ToString("yyyy-MM-dd"))</span>
+            }
+        </div>
+        @if (CanEdit)
+        {
+            <form method="post" action="/staff/settings/items/rule" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <input type="hidden" name="required" value="@(RequiredSinceUtc is null ? "true" : "false")" />
+                <button type="submit" class="vx-button @(RequiredSinceUtc is null ? "vx-button--primary" : "vx-button--secondary")">@T[RequiredSinceUtc is null ? "ui.items.rule.switch_on" : "ui.items.rule.switch_off"]</button>
+            </form>
+        }
+    </section>
+
+    <section class="ops-editor__panel ops-items-catalogue-panel" aria-labelledby="items-catalogue">
+        <div class="ops-items-catalogue__header">
+            <h2 id="items-catalogue">
+                @T["ui.items.catalogue.title"]
+                <span class="ops-items-catalogue__count">@VixlyText.Format(T, "ui.items.catalogue.count", "count", Entries.Count)</span>
+            </h2>
+            <p class="ops-editor__hint">@T["ui.items.catalogue.hint"]</p>
+        </div>
+
+        <form method="get" action="/staff/settings/items" class="ops-list-bar" role="search">
+            <input type="search" name="q" value="@Search" maxlength="60" placeholder="@T["ui.items.catalogue.search"]" aria-label="@T["ui.items.catalogue.search"]" class="ops-editor__search-input" />
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.items.catalogue.find"]</button>
+            @if (!string.IsNullOrWhiteSpace(Search))
+            {
+                <a href="/staff/settings/items" class="vx-button vx-button--subtle">@T["ui.customers.clear"]</a>
+            }
+        </form>
+
+        @if (CanEdit)
+        {
+            <form method="post" action="/staff/settings/items" class="ops-editor__form ops-items-add-form">
+                <AntiforgeryToken />
+                <label class="ops-editor__form-span-2">@T["ui.items.catalogue.description"] <input name="description" maxlength="200" required /></label>
+                <label class="ops-editor__form-span-2">@T["ui.items.catalogue.matches"] <input name="matches" maxlength="400" /></label>
+                <label class="ops-editor__form-span-1">@T["ui.items.code"] <input name="code" maxlength="13" required inputmode="numeric" pattern="[0-9. ]{6,13}" title="@T["ui.items.code_hint"]" /></label>
+                <label class="ops-editor__form-span-1">@T["ui.items.unit"]
+                    <select name="unit">
+                        @foreach (OperationsItemUnit unit in Enum.GetValues<OperationsItemUnit>()) { <option value="@unit">@T["ui.items.unit." + unit.ToString().ToLowerInvariant()]</option> }
+                    </select>
+                </label>
+                <div class="ops-editor__form-actions span-full"><button type="submit" class="vx-button vx-button--primary">@T["ui.items.catalogue.add"]</button></div>
+            </form>
+        }
+
+        <OperationsTableViewport Label="@T["ui.items.catalogue.title"]">
+            <table class="ops-editor__table ops-items-catalogue-table">
+                <thead>
+                    <tr>
+                        <th scope="col" style="min-width: 14rem;">@T["ui.items.catalogue.description"]</th>
+                        <th scope="col" style="min-width: 12rem;">@T["ui.items.catalogue.matches"]</th>
+                        <th scope="col" style="width: 8rem;">@T["ui.items.code"]</th>
+                        <th scope="col" style="width: 7.5rem;">@T["ui.items.unit"]</th>
+                        <th scope="col" class="ops-editor__number" style="width: 4.5rem;">@T["ui.items.catalogue.used"]</th>
+                        @if (CanEdit) { <th scope="col" style="width: 9rem; text-align: right;"><span class="ops-visually-hidden">@T["ui.items.catalogue.actions"]</span></th> }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (OperationsItemCatalogueEntry entry in Shown)
+                    {
+                        @if (CanEdit)
+                        {
+                            <tr>
+                                <td><input form="entry-@entry.Id" name="description" maxlength="200" required value="@entry.Description" aria-label="@T["ui.items.catalogue.description"]" /></td>
+                                <td><input form="entry-@entry.Id" name="matches" maxlength="400" value="@entry.Matches" aria-label="@T["ui.items.catalogue.matches"]" /></td>
+                                <td><input form="entry-@entry.Id" name="code" maxlength="13" size="12" required inputmode="numeric" pattern="[0-9. ]{6,13}" value="@OperationsHsCode.Format(entry.HsCode)" aria-label="@T["ui.items.code"]" class="ops-item-code-input" /></td>
+                                <td>
+                                    <select form="entry-@entry.Id" name="unit" aria-label="@T["ui.items.unit"]">
+                                        @foreach (OperationsItemUnit unit in Enum.GetValues<OperationsItemUnit>()) { <option value="@unit" selected="@(unit == entry.Unit)">@T["ui.items.unit." + unit.ToString().ToLowerInvariant()]</option> }
+                                    </select>
+                                </td>
+                                <td class="ops-editor__number">@entry.UseCount</td>
+                                <td class="ops-table-actions-cell">
+                                    <div class="ops-table-actions">
+                                        <form id="entry-@entry.Id" method="post" action="/staff/settings/items/@entry.Id"><AntiforgeryToken /><button type="submit" class="vx-button vx-button--secondary">@T["ui.items.catalogue.save"]</button></form>
+                                        <form method="post" action="/staff/settings/items/@entry.Id/remove"><AntiforgeryToken /><button type="submit" class="vx-button vx-button--subtle">@T["ui.items.catalogue.remove"]</button></form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td><strong>@entry.Description</strong></td>
+                                <td>@entry.Matches</td>
+                                <td><code>@OperationsHsCode.Format(entry.HsCode)</code></td>
+                                <td>@T["ui.items.unit." + entry.Unit.ToString().ToLowerInvariant()]</td>
+                                <td class="ops-editor__number">@entry.UseCount</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsItemCatalogueEntry> Entries { get; set; } = Array.Empty<OperationsItemCatalogueEntry>();
+
+    [Parameter] public DateTimeOffset? RequiredSinceUtc { get; set; }
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public string? Search { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    // Found by description, matching words or code.
+    private IEnumerable<OperationsItemCatalogueEntry> Shown => string.IsNullOrWhiteSpace(Search) ? Entries
+        : Entries.Where(entry => OperationsItemWords.Plain(entry.Description + " " + entry.Matches).Contains(OperationsItemWords.Plain(Search), StringComparison.Ordinal)
+            || entry.HsCode.StartsWith(new string(Search.Where(char.IsAsciiDigit).ToArray()) is { Length: > 0 } digits ? digits : "\u0000", StringComparison.Ordinal));
+}

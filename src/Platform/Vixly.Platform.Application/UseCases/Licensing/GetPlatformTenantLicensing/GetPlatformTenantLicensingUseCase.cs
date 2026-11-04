@@ -27,10 +27,14 @@ public sealed class GetPlatformTenantLicensingUseCase
 {
     private readonly PlatformLicensingAdministration _licensing;
 
+    private readonly IPlatformSubscriptionQueries _names;
+
     public GetPlatformTenantLicensingUseCase(
-        PlatformLicensingAdministration licensing)
+        PlatformLicensingAdministration licensing,
+        IPlatformSubscriptionQueries names)
     {
         _licensing = licensing ?? throw new ArgumentNullException(nameof(licensing));
+        _names = names ?? throw new ArgumentNullException(nameof(names));
     }
 
     public async Task<GetPlatformTenantLicensingResponse> ExecuteAsync(
@@ -55,6 +59,14 @@ public sealed class GetPlatformTenantLicensingUseCase
             && (tenant?.Status == PlatformTenantStatus.Active
                 || registration?.Status is PlatformTenantRegistrationStatus.PendingAccountSetup or PlatformTenantRegistrationStatus.PendingFirstDeviceRegistration);
 
+        IReadOnlyList<PlatformOwnerSupportRequest> open = await _licensing.Store.ListOpenSupportRequestsAsync(request.PlatformTenantId, cancellationToken);
+        IReadOnlyDictionary<Guid, string> names = await _names.StaffNamesAsync(open.Select(item => item.RequestedBy), cancellationToken);
+        IReadOnlyList<PlatformDeviceOption> devices = (await _licensing.Store.ListOpenDevicesAsync(request.PlatformTenantId, cancellationToken))
+            .Where(device => device.HoldsSeat)
+            .OrderBy(device => device.Number, StringComparer.Ordinal)
+            .Select(device => new PlatformDeviceOption(device.Id, device.Number, device.Name))
+            .ToList();
+
         return GetPlatformTenantLicensingResponse.Success(new PlatformTenantLicensingSummary(
             bought,
             subscription?.ScheduledChange is { } change && change.TargetLicences != bought ? change.TargetLicences : null,
@@ -63,6 +75,9 @@ public sealed class GetPlatformTenantLicensingUseCase
             firstDevice,
             new PlatformLicensingAbilities(
                 await _licensing.HoldsAsync(context, PlatformPermissions.LicensingManage, cancellationToken),
-                await _licensing.HoldsAsync(context, PlatformPermissions.LicensingApproveRelease, cancellationToken))));
+                await _licensing.HoldsAsync(context, PlatformPermissions.LicensingApproveRelease, cancellationToken)),
+            open.Select(item => new PlatformOwnerSupportItem(item.Id, item.Kind, item.Status, item.RequestedBy,
+                names.TryGetValue(item.RequestedBy, out string? name) ? name : null, item.RequestedUtc, item.Reason, item.IdentityCheck)).ToList(),
+            devices));
     }
 }

@@ -61,12 +61,15 @@ public static class PlatformSubscriptionEventCodes
     public const string BlockedForNonPayment = "platform.subscription_history.blocked_for_non_payment";
     public const string BlockLifted = "platform.subscription_history.block_lifted";
 
+    // Shipment cap (owner, 2026-10-29): the shipments above the plan's cap, charged on the next invoice.
+    public const string ShipmentsCharged = "platform.subscription_history.shipments_charged";
+
     public static IReadOnlyList<string> All { get; } = new[]
     {
         StartedTrial, StartedAwaitingPayment, Activated, OfflinePaymentRecorded, TrialExtended, TrialEnded, TrialExpired,
         Changed, ChangeScheduled, ScheduledChangeCancelled, Renewed, CancellationRequested, Resumed, Ended,
         SuspendedWithTenant, RestoredWithTenant, ActivatedNothingDue, DiscountRequested, DiscountApplied, DiscountApproved,
         DiscountRejected, DiscountEnded, ChargeAdded, ChargeCancelled, SetupFeeChanged, PastDue, InvoicePaid,
-        BlockedForNonPayment, BlockLifted
+        BlockedForNonPayment, BlockLifted, ShipmentsCharged
     };
 }

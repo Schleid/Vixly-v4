@@ -1,0 +1,22 @@
+﻿@*
+=========================================================
+FILE: SalesFeedPage.razor
+
+PURPOSE:
+The feed of Vixly sale events to TechOS (2026-11-02): status,
+pending and parked events.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/sales-feed"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.sales_feed.title"]</PageTitle>
+<h1>@T["ui.sales_feed.title"]</h1>
+<p class="vx-hint">@T["ui.sales_feed.intro"]</p>
+<p><a href="/invoices">@T["ui.invoices.title"]</a> · <a href="/payments/settings">@T["ui.payments_settings.title"]</a> · <a href="/jobs?job=sales_feed">@T["ui.jobs.title"]</a></p>
+<SalesFeedView />

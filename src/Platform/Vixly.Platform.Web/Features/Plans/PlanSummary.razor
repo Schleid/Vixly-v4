@@ -3,16 +3,14 @@
 FILE: PlanSummary.razor
 
 PURPOSE:
-One plan: overview, catalogue settings, retire or reactivate,
-then the draft, the versions and the translations.
+One plan: summary strip, tabs for draft, versions,
+translations, catalogue settings, and approval.
 
 IMPORTANT NOTES:
 - Feature component (ADR-0001): behaviour lives in the
   presenter; this file holds markup and UI glue only
-- Text comes from PlatformText (UI-10); placeholder look until
-  the Frontend/UI team designs it
-- Retiring a plan hides it from new subscribers; existing
-  subscriptions keep it (D-S2)
+- Text comes from PlatformText (UI-10)
+- Brief §5 record page anatomy: summary strip and tabs
 =========================================================
 *@
 @inherits PlatformPresenterComponent<PlanPresenter>
@@ -22,11 +20,39 @@ IMPORTANT NOTES:
 
 @if (Presenter.State.Plan is { } plan)
 {
-    <PageTitle>@plan.Name</PageTitle>
-    <h1>
-        @plan.Name
-        <VxStatusBadge Status="@SubscriptionDisplay.PlanBadge(plan.Status)" Text="@T[SubscriptionDisplay.PlanStatusKey(plan.Status)]" />
-    </h1>
+    <PageTitle>@plan.Name · @T["ui.plans.title"]</PageTitle>
+
+    <div class="vx-summary-strip">
+        <div class="vx-summary-strip__main">
+            <h1 class="vx-summary-strip__title">
+                @plan.Name
+                <VxStatusBadge Status="@SubscriptionDisplay.PlanBadge(plan.Status)" Text="@T[SubscriptionDisplay.PlanStatusKey(plan.Status)]" />
+            </h1>
+            <div class="vx-summary-strip__facts">
+                <span class="vx-summary-strip__fact">
+                    <span class="vx-summary-strip__fact-label">@T["ui.plans.code"]:</span>
+                    <span class="vx-summary-strip__fact-value">@plan.Code</span>
+                </span>
+                <span class="vx-summary-strip__fact">
+                    <span class="vx-summary-strip__fact-label">@T["ui.plans.version"]:</span>
+                    <span class="vx-summary-strip__fact-value">@(plan.Current is { } current ? VixlyText.Format(T, "ui.plans.version_number", "number", current.Number) : T["ui.plans.not_published"].Value)</span>
+                </span>
+                <span class="vx-summary-strip__fact">
+                    <span class="vx-summary-strip__fact-label">@T["ui.plans.currency"]:</span>
+                    <span class="vx-summary-strip__fact-value">@(plan.Current?.CurrencyCode ?? plan.Draft?.CurrencyCode)</span>
+                </span>
+                <span class="vx-summary-strip__fact">
+                    <span class="vx-summary-strip__fact-label">@T["ui.plans.subscribers"]:</span>
+                    <a href="/subscriptions?plan=@plan.PlatformPlanId" class="vx-summary-strip__fact-value">@plan.Subscribers</a>
+                </span>
+                <span class="vx-summary-strip__fact">
+                    <span class="vx-summary-strip__fact-label">@T["ui.roles.created"]:</span>
+                    <span class="vx-summary-strip__fact-value">@PlatformDisplay.Utc(T, plan.CreatedUtc)</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
     @if (Presenter.State.DoneKey is { } done)
     {
         <VxMessage Type="VxMessageType.Success">@T[done]</VxMessage>
@@ -35,42 +61,77 @@ IMPORTANT NOTES:
     {
         <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
     }
-    <div id="plan-overview"><VxCard Title="@T["ui.plans.overview"]">
-        <dl class="vx-facts">
-            <dt>@T["ui.plans.code"]</dt><dd>@plan.Code</dd>
-            <dt>@T["ui.plans.version"]</dt><dd>@(plan.Current is { } current ? VixlyText.Format(T, "ui.plans.version_number", "number", current.Number) : T["ui.plans.not_published"].Value)</dd>
-            <dt>@T["ui.plans.currency"]</dt><dd>@(plan.Current?.CurrencyCode ?? plan.Draft?.CurrencyCode)</dd>
-            <dt>@T["ui.plans.subscribers"]</dt><dd><a href="/subscriptions?plan=@plan.PlatformPlanId">@plan.Subscribers</a></dd>
-            <dt>@T["ui.roles.created"]</dt><dd>@PlatformDisplay.Utc(T, plan.CreatedUtc)</dd>
-        </dl>
-        @if (Presenter.State.Abilities.CanManage)
+
+    <nav class="vx-tabs" aria-label="@T["ui.plans.title"]">
+        <button type="button" class="vx-tab-btn @(_activeTab == "draft" ? "active" : null)" @onclick='() => _activeTab = "draft"'>
+            @T["ui.plans.draft"]
+            @if (plan.Draft is not null)
+            {
+                <span class="vx-tab-badge">v@(plan.Draft.Number)</span>
+            }
+        </button>
+        <button type="button" class="vx-tab-btn @(_activeTab == "versions" ? "active" : null)" @onclick='() => _activeTab = "versions"'>
+            @T["ui.plans.versions"]
+            <span class="vx-tab-badge">@plan.Versions.Count</span>
+        </button>
+        <button type="button" class="vx-tab-btn @(_activeTab == "translations" ? "active" : null)" @onclick='() => _activeTab = "translations"'>
+            @T["ui.plans.translations"]
+        </button>
+        <button type="button" class="vx-tab-btn @(_activeTab == "catalogue" ? "active" : null)" @onclick='() => _activeTab = "catalogue"'>
+            @T["ui.plans.overview"]
+        </button>
+        @if (Presenter.State.Abilities.CanDecide || plan.Draft?.SubmittedUtc is not null)
         {
-            <form class="vx-form" @onsubmit="SaveCatalogueAsync">
-                <label><input type="checkbox" @bind="_isPublic" /> @T["ui.plans.public_help"]</label>
-                <label for="plan-display-order">@T["ui.plans.display_order"]</label>
-                <input id="plan-display-order" type="number" min="0" max="1000" @bind="_displayOrder" />
-                <div class="vx-actions">
-                    <VxButton Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.plans.save_catalogue"]</VxButton>
-                    @if (plan.Status == PlatformPlanStatus.Active)
-                    {
-                        <VxButton Variant="VxButtonVariant.Danger" OnClick="() => Presenter.RetireAsync(PlanId)">@T["ui.plans.retire"]</VxButton>
-                    }
-                    else
-                    {
-                        <VxButton OnClick="() => Presenter.ReactivateAsync(PlanId)">@T["ui.plans.reactivate"]</VxButton>
-                    }
-                </div>
-            </form>
+            <button type="button" class="vx-tab-btn @(_activeTab == "approval" ? "active" : null)" @onclick='() => _activeTab = "approval"'>
+                @T["ui.plans.approval"]
+            </button>
         }
-        else
-        {
-            <p>@(plan.IsPublic ? T["ui.plans.is_public"] : T["ui.plans.is_private"])</p>
-        }
-    </VxCard></div>
-    <PlanApproval Plan="plan" CanDecide="Presenter.State.Abilities.CanDecide" OnChanged="ReloadAsync" />
-    <PlanDraftEditor Plan="plan" Abilities="Presenter.State.Abilities" Version="Presenter.State.Version" OnChanged="ReloadAsync" />
-    <PlanVersions Versions="plan.Versions" />
-    <PlanTranslations Translations="plan.Translations" CanEdit="Presenter.State.Abilities.CanManage" IsBusy="Presenter.IsBusy" OnSave="SaveTranslationAsync" />
+    </nav>
+
+    @if (_activeTab == "draft")
+    {
+        <PlanDraftEditor Plan="plan" Abilities="Presenter.State.Abilities" Version="Presenter.State.Version" OnChanged="ReloadAsync" />
+    }
+    else if (_activeTab == "versions")
+    {
+        <PlanVersions Versions="plan.Versions" />
+    }
+    else if (_activeTab == "translations")
+    {
+        <PlanTranslations Translations="plan.Translations" CanEdit="Presenter.State.Abilities.CanManage" IsBusy="Presenter.IsBusy" OnSave="SaveTranslationAsync" />
+    }
+    else if (_activeTab == "catalogue")
+    {
+        <div id="plan-overview"><VxCard Title="@T["ui.plans.overview"]">
+            @if (Presenter.State.Abilities.CanManage)
+            {
+                <form class="vx-form" @onsubmit="SaveCatalogueAsync">
+                    <label><input type="checkbox" @bind="_isPublic" /> @T["ui.plans.public_help"]</label>
+                    <label for="plan-display-order">@T["ui.plans.display_order"]</label>
+                    <input id="plan-display-order" type="number" min="0" max="1000" @bind="_displayOrder" />
+                    <div class="vx-actions">
+                        <VxButton Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.plans.save_catalogue"]</VxButton>
+                        @if (plan.Status == PlatformPlanStatus.Active)
+                        {
+                            <VxButton Variant="VxButtonVariant.Danger" OnClick="() => Presenter.RetireAsync(PlanId)">@T["ui.plans.retire"]</VxButton>
+                        }
+                        else
+                        {
+                            <VxButton OnClick="() => Presenter.ReactivateAsync(PlanId)">@T["ui.plans.reactivate"]</VxButton>
+                        }
+                    </div>
+                </form>
+            }
+            else
+            {
+                <p>@(plan.IsPublic ? T["ui.plans.is_public"] : T["ui.plans.is_private"])</p>
+            }
+        </VxCard></div>
+    }
+    else if (_activeTab == "approval")
+    {
+        <PlanApproval Plan="plan" CanDecide="Presenter.State.Abilities.CanDecide" OnChanged="ReloadAsync" />
+    }
 }
 else if (Presenter.State.Error is not null)
 {
@@ -82,6 +143,8 @@ else
 }
 
 @code {
+    private string _activeTab = "draft";
+
     private bool _isPublic;
 
     private int _displayOrder;

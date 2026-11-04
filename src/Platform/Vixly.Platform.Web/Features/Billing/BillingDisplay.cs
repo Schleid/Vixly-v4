@@ -49,7 +49,7 @@ public static class BillingDisplay
         return "ui.payments.method." + Snake(method.ToString());
     }
 
-    public static IReadOnlyList<PlatformPaymentMethod> ManualMethods { get; } = Enum.GetValues<PlatformPaymentMethod>().Where(method => method != PlatformPaymentMethod.Card).ToArray();
+    public static IReadOnlyList<PlatformPaymentMethod> ManualMethods { get; } = Enum.GetValues<PlatformPaymentMethod>().Where(method => method is not (PlatformPaymentMethod.Card or PlatformPaymentMethod.BankDebit)).ToArray();
 
     public static string PaymentStatusKey(PlatformPaymentStatus status)
     {

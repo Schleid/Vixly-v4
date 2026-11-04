@@ -15,7 +15,7 @@ A staff member is invited, sets a password and enrols a passkey or authenticator
 
 | Class | Table | Notes |
 |---|---|---|
-| `PlatformUser` | `Users` | Name, email (`EmailAddress`, unique), optional employee number and phone, `PreferredLanguage`, `ThemePreference`, `AuthorityLevel`. No date of birth |
+| `PlatformUser` | `Users` | Name, email (`EmailAddress`, unique), employee number (`TC-0001` …, given automatically at invitation from the `platform.EmployeeNumbers` sequence since 2026-10-25; never typed or reused), optional phone, `PreferredLanguage`, `ThemePreference`, `AuthorityLevel`. No date of birth |
 | `PlatformUserAccount` | `UserAccounts` | One per user. Status (Invited, Active, Suspended, Locked, Deactivated) with reason and actor; BCrypt hash; failed-attempt count and lockout end; last sign-in |
 | `PlatformUserPasskey` | `UserPasskeys` | Credential id, public key, sign count, AAGUID, user-given name, created and last used |
 | `PlatformUserAuthenticatorApp` | `UserAuthenticatorApps` | TOTP secret encrypted with Data Protection; confirmed time; last accepted time step (no code reuse) |

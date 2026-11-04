@@ -1,0 +1,29 @@
+@*
+=========================================================
+FILE: SiteThemePreviews.razor
+
+PURPOSE:
+The links that open the draft in each theme, side by side, without saving.
+
+RESPONSIBILITIES:
+- Offer one preview link per theme in the editor language
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); part of the website editor (SiteEditorPage)
+- Website themes, step 1 (2026-10-29)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<div class="ops-publication-bar__previews ops-site-theme-previews">
+    @foreach (OperationsSiteTheme theme in Enum.GetValues<OperationsSiteTheme>())
+    {
+        <a class="vx-button vx-button--secondary" href="/@(Language)?preview=true&amp;theme=@OperationsSiteLooks.Slug(theme)" target="_blank" rel="noopener">@VixlyText.Format(T, "ui.editor.site.try_theme", "theme", T["ui.editor.theme." + OperationsSiteLooks.Slug(theme)])</a>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Language { get; set; } = "en";
+}

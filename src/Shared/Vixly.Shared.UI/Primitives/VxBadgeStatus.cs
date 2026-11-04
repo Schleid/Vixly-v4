@@ -22,5 +22,6 @@ public enum VxBadgeStatus
     Info = 5,
     Warning = 6,
     Danger = 7,
-    Success = 8
+    Success = 8,
+    Progress = 9
 }

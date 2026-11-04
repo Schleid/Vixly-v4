@@ -1,0 +1,89 @@
+﻿@*
+=========================================================
+FILE: ChargeExtraFields.razor
+
+PURPOSE:
+The fields of an extra charge: what it is, where it applies and its amount from a day (Slice 4 and 4B; mode and route, Slice 4C).
+
+RESPONSIBILITIES:
+- Name, government fee, when it applies, words, mode, service, country, route and delivery
+- Amount, fixed or percent, what it counts, and the day the amount starts
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+<label>@T["ui.charges.extra.name"] <input name="name" value="@Extra?.Name" maxlength="@OperationsChargeLimits.NameMaxLength" required /></label>
+<label><input type="checkbox" name="government" value="true" checked="@(Extra?.IsGovernmentFee == true)" /> @T["ui.charges.extra.government"]</label>
+<label>@T["ui.charges.extra.amount"] <input name="amount" inputmode="decimal" value="@OperationsChargeWords.Number(Current?.Amount)" required /></label>
+<label>@T["ui.charges.extra.calculation"]
+    <select name="calculation">
+        @foreach (OperationsExtraCalculation choice in Enum.GetValues<OperationsExtraCalculation>())
+        {
+            <option value="@choice" selected="@(Current?.Calculation == choice)">@VixlyText.Format(T, "ui.charges.extra.calculation." + choice, "currency", Currency)</option>
+        }
+    </select>
+</label>
+<label>@T["ui.charges.extra.per"]
+    <select name="per">
+        @foreach (OperationsExtraPer choice in Enum.GetValues<OperationsExtraPer>())
+        {
+            <option value="@choice" selected="@(Current?.Per == choice)">@T["ui.charges.extra.per." + choice]</option>
+        }
+    </select>
+</label>
+<label>@T["ui.charges.extra.trigger"]
+    <select name="trigger">
+        @foreach (OperationsExtraTrigger choice in Enum.GetValues<OperationsExtraTrigger>())
+        {
+            <option value="@choice" selected="@(Extra?.Trigger == choice)">@T["ui.charges.extra.trigger." + choice]</option>
+        }
+    </select>
+</label>
+<label>@T["ui.charges.extra.words"] <input name="words" value="@Extra?.Words" maxlength="@OperationsChargeLimits.WordsMaxLength" placeholder="iphone, ipad" /></label>
+<label>@T["ui.charges.extra.service"]
+    <select name="service">
+        <option value="">@T["ui.charges.every_service"]</option>
+        @* An extra keeps its service when it is no longer offered on this tab: saving never widens where it applies. *@
+        @if (Extra?.ServiceCode is { } kept && !Services.Contains(kept)) { <option value="@kept" selected>@T["ui.services.name." + kept]</option> }
+        @foreach (string serviceCode in Services)
+        {
+            <option value="@serviceCode" selected="@(Extra?.ServiceCode == serviceCode)">@T["ui.services.name." + serviceCode]</option>
+        }
+    </select>
+</label>
+<label>@T["ui.charges.extra.country"] <input name="country" value="@Extra?.CountryCode" maxlength="2" placeholder="HT" autocapitalize="characters" /></label>
+<label>@T["ui.charges.extra.mode"]
+    <select name="mode">
+        <option value="@Mode" selected="@(Extra is null || Extra.Mode is not null)">@T["ui.charges.mode." + Mode]</option>
+        <option value="" selected="@(Extra is not null && Extra.Mode is null)">@T["ui.charges.extra.mode.all"]</option>
+    </select>
+</label>
+<RouteFields T="T" Origins="Origins" Destinations="Destinations" Origin="Extra?.OriginWarehouseId" Destination="Extra?.DestinationWarehouseId" />
+<label>@T["ui.charges.extra.delivery"]
+    <select name="delivery">
+        <option value="None" selected="@(Extra?.Delivery is null or OperationsDeliveryModes.None)">@T["ui.charges.extra.delivery.None"]</option>
+        <option value="Pickup" selected="@(Extra?.Delivery == OperationsDeliveryModes.Pickup)">@T["ui.charges.extra.delivery.Pickup"]</option>
+        <option value="HomeDelivery" selected="@(Extra?.Delivery == OperationsDeliveryModes.HomeDelivery)">@T["ui.charges.extra.delivery.HomeDelivery"]</option>
+    </select>
+</label>
+<label>@T["ui.charges.effective"] <input name="effective" type="date" /></label>
+<p class="ops-editor__hint">@T["ui.charges.extra.hint"]</p>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public OperationsChargeExtra? Extra { get; set; }
+
+    [Parameter] public OperationsExtraVersion? Current { get; set; }
+
+    [Parameter] public IReadOnlyList<string> Services { get; set; } = Array.Empty<string>();
+
+    [Parameter] public OperationsTransportMode Mode { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Origins { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Destinations { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+}

@@ -96,7 +96,8 @@ public static class PlatformRegistrationEndpoints
                     AcceptedTerms = body.AcceptedTerms,
                     TermsVersion = body.TermsVersion,
                     PrivacyVersion = body.PrivacyVersion,
-                    BotToken = body.BotToken
+                    BotToken = body.BotToken,
+                    OfferToken = body.OfferToken
                 },
                 cancellationToken);
 
@@ -175,7 +176,7 @@ public static class PlatformRegistrationEndpoints
                 plan.MaxLicensedDevices,
                 plan.MaxWarehouses,
                 plan.Features.Select(FeatureCode).ToArray(),
-                plan.TrialDays)).ToArray());
+                plan.TrialDays) { MaxShipmentsPerMonth = plan.MaxShipmentsPerMonth, ExtraShipmentPrice = plan.ExtraShipmentPrice }).ToArray());
         }).RequireRateLimiting(PlatformApiRateLimits.Catalogue).RequireCors(PlatformApiHost.CorsPolicy);
 
         group.MapPost("/plan", async (
@@ -291,7 +292,15 @@ public static class PlatformRegistrationEndpoints
             PlatformPlanFeature.CustomDomain => "custom_domain",
             PlatformPlanFeature.WhiteLabelPortal => "white_label_portal",
             PlatformPlanFeature.AdvancedAnalytics => "advanced_analytics",
-            _ => "data_export"
+            PlatformPlanFeature.PartnerAgents => "partner_agents",
+            PlatformPlanFeature.TextMessages => "text_messages",
+            PlatformPlanFeature.QuickBooksSync => "quick_books_sync",
+            PlatformPlanFeature.TenantApi => "tenant_api",
+            PlatformPlanFeature.CarrierData => "carrier_data",
+            PlatformPlanFeature.DataExport => "data_export",
+
+            // Plan modules (Vixly Lite, 2026-10-30) and any later feature: its stable wire code, never another feature's label.
+            _ => Vixly.Platform.Application.Messaging.PlatformWireCodes.Of(feature)
         };
     }
 

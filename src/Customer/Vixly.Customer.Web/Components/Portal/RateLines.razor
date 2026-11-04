@@ -1,0 +1,51 @@
+﻿@*
+=========================================================
+FILE: RateLines.razor
+
+PURPOSE:
+The lines and total of one estimate or quote (Slice 4).
+
+RESPONSIBILITIES:
+- Name each line, its amount and the total
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10)
+=========================================================
+*@
+@using System.Globalization
+@using Vixly.Contracts.Operations.Rates
+<CustomerTableViewport Label="@Caption">
+<table class="customer-portal__table">
+    <caption>@Caption</caption>
+    <tbody>
+        @foreach (CustomerChargeLineDto line in Lines)
+        {
+            <tr>
+                <td>@Name(line)</td>
+                <td>@Money(line.Amount)</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot><tr><th scope="row">@T["ui.rates.total"]</th><td><strong>@Money(Total)</strong></td></tr></tfoot>
+</table>
+</CustomerTableViewport>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<CustomerText> T { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<CustomerChargeLineDto> Lines { get; set; } = Array.Empty<CustomerChargeLineDto>();
+
+    [Parameter] public decimal Total { get; set; }
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+
+    [Parameter] public string Caption { get; set; } = string.Empty;
+
+    private string Money(decimal amount) => amount.ToString("N2", CultureInfo.CurrentCulture) + " " + Currency;
+
+    private string Name(CustomerChargeLineDto line)
+    {
+        string name = line.Label ?? T["ui.rates.line." + line.Kind].Value;
+        return line.Piece is { } piece ? VixlyText.Format(T, "ui.rates.line.piece", "name", name + " " + piece) : name;
+    }
+}

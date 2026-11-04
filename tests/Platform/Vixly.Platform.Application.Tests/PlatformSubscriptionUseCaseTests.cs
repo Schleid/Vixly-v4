@@ -194,6 +194,9 @@ public sealed class PlatformSubscriptionUseCaseTests
         Assert.NotNull(chosen.TrialEndsUtc);
         Assert.Equal(PlatformSubscriptionStatus.Trialing, Assert.Single(_kit.Store.Subscriptions).Status);
         Assert.Equal("platform.registrations.plan_already_chosen", again.Error!.Code);
+        PlatformRegistrationAccountSetupReady ready = PlatformOutboxWriter.Read<PlatformRegistrationAccountSetupReady>(
+            Assert.Single(_kit.Tenants.Tenants.Outbox, message => message.Type == PlatformMessageTypes.RegistrationAccountSetupReady));
+        Assert.NotEqual(Guid.Empty, ready.PlatformTenantId);
     }
 
     [Fact]
@@ -298,7 +301,7 @@ public sealed class PlatformSubscriptionUseCaseTests
         PlatformAuthorizationContext context = _kit.Staff(PlatformPermissions.SubscriptionsView, PlatformPermissions.SubscriptionsManage);
         _kit.Plan();
 
-        GetPlatformTenantSubscriptionResponse view = await new GetPlatformTenantSubscriptionUseCase(_kit.Subscriptions(), _kit.Store, _kit.Tenants.Tenants).ExecuteAsync(
+        GetPlatformTenantSubscriptionResponse view = await new GetPlatformTenantSubscriptionUseCase(_kit.Subscriptions(), _kit.Store, _kit.Tenants.Tenants, _kit.Store).ExecuteAsync(
             context,
             new GetPlatformTenantSubscriptionRequest { PlatformTenantId = tenant.Id, Language = "en" },
             CancellationToken.None);
@@ -364,7 +367,7 @@ public sealed class PlatformSubscriptionUseCaseTests
     {
         TenantTestKit kit = _kit.Tenants;
         await new StartPlatformTenantRegistrationUseCase(
-            kit.Tenants, kit.Store, kit.Tenants, kit.Slugs(), kit.Tenants, kit.Tenants, kit.Links(), kit.Crypto, kit.Tenants, kit.Audit(), kit.Store, kit.Clock, kit.Legal).ExecuteAsync(
+            kit.Tenants, kit.Store, kit.Tenants, kit.Slugs(), kit.Tenants, kit.Tenants, kit.Links(), kit.Crypto, kit.Tenants, kit.Audit(), kit.Store, kit.Clock, kit.Legal, _kit.Sales).ExecuteAsync(
                 PlatformAnonymousAuthorizationContext.Instance,
                 new StartPlatformTenantRegistrationRequest
                 {

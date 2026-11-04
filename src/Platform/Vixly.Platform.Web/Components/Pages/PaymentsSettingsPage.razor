@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: PaymentsSettingsPage.razor
 
@@ -15,7 +15,14 @@ IMPORTANT NOTES:
 @inject IStringLocalizer<PlatformText> T
 
 <PageTitle>@T["ui.payments_settings.title"]</PageTitle>
-<h1>@T["ui.payments_settings.title"]</h1>
-<p><a href="/payments/transactions">@T["ui.card_payments.list_title"]</a> · <a href="/billing/settings">@T["ui.billing_settings.title"]</a></p>
+<div class="vx-summary-strip">
+    <div class="vx-summary-strip__main">
+        <h1 class="vx-summary-strip__title">@T["ui.payments_settings.title"]</h1>
+    </div>
+    <div class="vx-summary-strip__actions">
+        <a href="/payments/transactions" class="vx-button vx-button--secondary">@T["ui.card_payments.list_title"]</a>
+        <a href="/billing/settings" class="vx-button vx-button--secondary">@T["ui.billing_settings.title"]</a>
+    </div>
+</div>
 <PaymentsSettingsForm />
 <ZelleSettingsForm />

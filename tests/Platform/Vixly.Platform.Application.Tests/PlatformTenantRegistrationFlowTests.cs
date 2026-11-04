@@ -10,10 +10,12 @@ using Vixly.Platform.Application.UseCases.Registration.ResendMyRegistrationVerif
 using Vixly.Platform.Application.UseCases.Registration.StartPlatformTenantRegistration;
 using Vixly.Platform.Application.UseCases.Registration.VerifyRegistrationEmail;
 using Vixly.Platform.Application.UseCases.Registrations.CancelPlatformTenantRegistration;
+using Vixly.Platform.Application.UseCases.Registrations.ResendRegistrationVerification;
 using Vixly.Platform.Application.UseCases.Tenants;
 using Vixly.Platform.Domain.Identity;
 using Vixly.Platform.Domain.Messaging;
 using Vixly.Platform.Domain.Tenants;
+using Vixly.Shared.Kernel.Errors;
 using Vixly.Shared.Kernel.Localization;
 using Vixly.Shared.Kernel.ValueObjects;
 
@@ -40,6 +42,8 @@ public sealed class PlatformTenantRegistrationFlowTests
 {
     private readonly TenantTestKit _kit = new();
 
+    private readonly FakeSalesStore _offers = new();
+
     [Fact]
     public async Task Start_ChecksTheBotTokenBeforeAnythingElse()
     {
@@ -55,6 +59,18 @@ public sealed class PlatformTenantRegistrationFlowTests
     {
         Assert.Equal(PlatformRegistrationErrors.TermsNotAccepted, (await StartAsync(accepted: false)).Error);
         Assert.Equal(PlatformRegistrationErrors.LegalVersionInvalid, (await StartAsync(terms: "2025-01")).Error);
+    }
+
+    [Theory]
+    [InlineData("America/Vancouver", "America/Vancouver")]
+    [InlineData(null, "America/Toronto")]
+    [InlineData("Not a zone", "America/Toronto")]
+    public async Task Start_KeepsTheBrowserTimeZone_OrTakesTheAddressOne(string? browser, string expected)
+    {
+        StartPlatformTenantRegistrationResponse response = await StartAsync(timeZone: browser);
+
+        Assert.True(response.Succeeded);
+        Assert.Equal(expected, Assert.Single(_kit.Tenants.Registrations).TimeZone);
     }
 
     [Fact]
@@ -177,6 +193,53 @@ public sealed class PlatformTenantRegistrationFlowTests
     }
 
     [Fact]
+    public async Task StaffResend_CorrectsAMistypedEmail_AndSendsTheLinkThere()
+    {
+        await StartAsync();
+        Guid registrationId = _kit.Tenants.Registrations[0].Id;
+        ResendRegistrationVerificationUseCase resend = new(_kit.Gate(), _kit.Tenants, _kit.Links(), _kit.Audit(), _kit.Store, _kit.Clock, _kit.Tenants);
+
+        ResendRegistrationVerificationResponse corrected = await resend.ExecuteAsync(
+            _kit.Staff(PlatformPermissions.TenantsEdit),
+            new ResendRegistrationVerificationRequest { RegistrationId = registrationId, Email = " Grace.Hopper@northwind.example " },
+            CancellationToken.None);
+        int auditCount = _kit.Store.AuditEntries.Count;
+        _kit.Clock.Advance(TimeSpan.FromMinutes(2));
+        ResendRegistrationVerificationResponse same = await resend.ExecuteAsync(
+            _kit.Staff(PlatformPermissions.TenantsEdit),
+            new ResendRegistrationVerificationRequest { RegistrationId = registrationId, Email = "grace.hopper@northwind.example" },
+            CancellationToken.None);
+
+        Assert.True(corrected.Succeeded);
+        Assert.True(same.Succeeded);
+        Assert.Equal("grace.hopper@northwind.example", _kit.Tenants.Registrations[0].OwnerEmail.Value);
+        Assert.Equal("grace.hopper@northwind.example", _kit.Tenants.Mail[^1].To);
+        Assert.Contains(_kit.Store.AuditEntries, entry => entry.ActionCode == "platform.registrations.email_corrected");
+        Assert.DoesNotContain(_kit.Store.AuditEntries.Skip(auditCount), entry => entry.ActionCode == "platform.registrations.email_corrected");
+    }
+
+    [Fact]
+    public async Task StaffResend_RefusesABadEmail_AndNeedsTenantsEdit()
+    {
+        await StartAsync();
+        Guid registrationId = _kit.Tenants.Registrations[0].Id;
+        ResendRegistrationVerificationUseCase resend = new(_kit.Gate(), _kit.Tenants, _kit.Links(), _kit.Audit(), _kit.Store, _kit.Clock, _kit.Tenants);
+        int mails = _kit.Tenants.Mail.Count;
+
+        ResendRegistrationVerificationResponse bad = await resend.ExecuteAsync(
+            _kit.Staff(PlatformPermissions.TenantsEdit),
+            new ResendRegistrationVerificationRequest { RegistrationId = registrationId, Email = "not-an-email" },
+            CancellationToken.None);
+
+        Assert.Equal(KernelErrors.EmailInvalid, bad.Error);
+        Assert.Equal(mails, _kit.Tenants.Mail.Count);
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => resend.ExecuteAsync(
+            _kit.Staff(),
+            new ResendRegistrationVerificationRequest { RegistrationId = registrationId },
+            CancellationToken.None));
+    }
+
+    [Fact]
     public async Task Status_ExpiresAnUnverifiedRegistration_AfterItsDeadline()
     {
         StartPlatformTenantRegistrationResponse started = await StartAsync();
@@ -250,6 +313,62 @@ public sealed class PlatformTenantRegistrationFlowTests
         Assert.Equal(1, message.Attempts);
     }
 
+    [Fact]
+    public async Task Dispatcher_ReportsAFailingHandler_WithTheMessageId_AndNoPayload()
+    {
+        Guid stream = Guid.NewGuid();
+        _kit.Outbox().Write(PlatformMessageTypes.TenantStatusChanged, stream, "not a status change");
+        PlatformOutboxDispatcher dispatcher = new(_kit.Tenants, new[] { new PlatformTenantNoticeHandler(_kit.Tenants, _kit.Tenants) }, _kit.Store, _kit.Clock);
+        List<PlatformOutboxFailure> failures = new();
+
+        Assert.Equal(0, await dispatcher.DispatchAsync(failures.Add, CancellationToken.None));
+
+        PlatformOutboxMessage message = Assert.Single(_kit.Tenants.Outbox);
+        PlatformOutboxFailure failure = Assert.Single(failures);
+        Assert.Equal(message.Id, failure.MessageId);
+        Assert.Equal(PlatformMessageTypes.TenantStatusChanged, failure.Type);
+        Assert.Equal(message.LastErrorCode, failure.ErrorCode);
+        Assert.Equal(1, failure.Attempts);
+        Assert.NotNull(failure.Exception);
+    }
+
+    [Fact]
+    public async Task InviteOnly_WithoutAnOfferLink_StoresNothing()
+    {
+        _kit.Tenants.RegistrationInviteOnly = true;
+
+        StartPlatformTenantRegistrationResponse response = await StartAsync();
+
+        Assert.Equal(PlatformRegistrationFlowErrors.InvitationRequired.Code, response.Error?.Code);
+        Assert.Empty(_kit.Tenants.Registrations);
+    }
+
+    [Theory]
+    [InlineData("grace@northwind.example", true)]
+    [InlineData("GRACE@northwind.example", true)]
+    [InlineData("someone@else.example", false)]
+    public async Task InviteOnly_NeedsALinkBoundToTheOwnerEmail(string email, bool starts)
+    {
+        _kit.Tenants.RegistrationInviteOnly = true;
+        string token = IssueOffer("grace@northwind.example");
+
+        StartPlatformTenantRegistrationResponse response = await StartAsync(email: email, offerToken: token);
+
+        Assert.Equal(starts, response.Succeeded);
+        Assert.Equal(starts ? null : PlatformRegistrationFlowErrors.InvitationRequired.Code, response.Error?.Code);
+    }
+
+    [Fact]
+    public async Task InviteOnly_RefusesAnUnknownLink_WithTheSameAnswer()
+    {
+        _kit.Tenants.RegistrationInviteOnly = true;
+        IssueOffer(null);
+
+        StartPlatformTenantRegistrationResponse response = await StartAsync(offerToken: "guessed-token");
+
+        Assert.Equal(PlatformRegistrationFlowErrors.InvitationRequired.Code, response.Error?.Code);
+    }
+
     [Theory]
     [InlineData(PlatformTenantStatus.Draft, PlatformTenantStatus.Active, false)]
     [InlineData(PlatformTenantStatus.Suspended, PlatformTenantStatus.Active, true)]
@@ -264,7 +383,9 @@ public sealed class PlatformTenantRegistrationFlowTests
         string botToken = "human",
         bool accepted = true,
         string terms = "2026-10",
-        string email = "grace@northwind.example")
+        string email = "grace@northwind.example",
+        string? offerToken = null,
+        string? timeZone = "America/Toronto")
     {
         return new StartPlatformTenantRegistrationUseCase(
             _kit.Tenants,
@@ -279,7 +400,8 @@ public sealed class PlatformTenantRegistrationFlowTests
             _kit.Audit(),
             _kit.Store,
             _kit.Clock,
-            _kit.Legal).ExecuteAsync(
+            _kit.Legal,
+            _offers).ExecuteAsync(
                 PlatformAnonymousAuthorizationContext.Instance,
                 new StartPlatformTenantRegistrationRequest
                 {
@@ -288,14 +410,27 @@ public sealed class PlatformTenantRegistrationFlowTests
                     OwnerEmail = email,
                     OwnerPhone = "+1 514 555 0101",
                     Language = "es",
-                    TimeZone = "America/Toronto",
+                    TimeZone = timeZone,
                     Slug = "Northwind",
                     AcceptedTerms = accepted,
                     TermsVersion = terms,
                     PrivacyVersion = "2026-09",
-                    BotToken = botToken
+                    BotToken = botToken,
+                    OfferToken = offerToken
                 },
                 CancellationToken.None);
+    }
+
+    // An issued offer link bound to one email, as Sales sends it (D-S21).
+    private string IssueOffer(string? email)
+    {
+        const string Token = "offer-link-token";
+        Vixly.Platform.Domain.Sales.PlatformOffer offer = Vixly.Platform.Domain.Sales.PlatformOffer.Prepare(
+            "Northwind", email, "Invitation", Guid.NewGuid(), Vixly.Platform.Domain.Subscriptions.PlatformSubscriptionTerm.Monthly, 3, null, null,
+            Array.Empty<(string, decimal)>(), false, TenantTestKit.Now.AddDays(14), 1, Guid.NewGuid(), TenantTestKit.Now);
+        offer.Submit(false, _kit.Crypto.HashToken(Token), TenantTestKit.Now);
+        _offers.Offers.Add(offer);
+        return Token;
     }
 
     private Task<VerifyRegistrationEmailResponse> VerifyAsync(string link)

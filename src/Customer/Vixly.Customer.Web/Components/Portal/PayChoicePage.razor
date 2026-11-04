@@ -1,0 +1,58 @@
+﻿@*
+=========================================================
+FILE: PayChoicePage.razor
+
+PURPOSE:
+Pay an invoice on the portal: the customer chooses how (owner, 2026-10-27).
+
+RESPONSIBILITIES:
+- Show what is owed and each way the company offers on the portal
+- Zelle and bank transfer open their page; card goes to Stripe's page
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- Shown only when there is more than one way; one way opens directly
+=========================================================
+*@
+@using System.Globalization
+@using Vixly.Contracts.Operations.Billing
+@using Vixly.Contracts.Operations.Customers
+@using Vixly.Customer.Web.Portal
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.pay.title"]" SignedIn="true" Error="@Error" ReturnHere="/customer/invoices">
+    @if (Invoice is { } invoice)
+    {
+        <section class="customer-portal__panel customer-pay">
+            <h2>@invoice.Number · @invoice.Owed.ToString("N2", CultureInfo.CurrentCulture) @invoice.CurrencyCode</h2>
+            <p class="customer-portal__hint">@T["ui.pay.choose"]</p>
+            <div class="customer-pay__methods">
+                @foreach (string method in Methods)
+                {
+                    @if (method == CustomerPayMethods.Card)
+                    {
+                        <form method="post" action="/customer/invoices/@invoice.InvoiceId/card" class="customer-portal__inline">
+                            <AntiforgeryToken />
+                            <button type="submit" class="vx-button vx-button--primary">@T["ui.pay.method.card"]</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a class="vx-button vx-button--primary" href="/customer/invoices/@invoice.InvoiceId/pay/@method">@T["ui.pay.method." + method]</a>
+                    }
+                }
+            </div>
+            <p><a href="/customer/invoices">@T["ui.pay.back"]</a></p>
+        </section>
+    }
+</CustomerShell>
+
+@code {
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public CustomerInvoiceDto? Invoice { get; set; }
+
+    [Parameter] public IReadOnlyList<string> Methods { get; set; } = Array.Empty<string>();
+
+    [Parameter] public string? Error { get; set; }
+}

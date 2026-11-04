@@ -18,5 +18,9 @@ public enum PlatformDeviceKind
     Phone = 2,
     Scanner = 3,
     Tablet = 4,
-    Other = 5
+    Other = 5,
+
+    // Owner, 2026-10-21: the type given at registration (desktop, laptop or mobile; mobile is Phone).
+    Desktop = 6,
+    Laptop = 7
 }

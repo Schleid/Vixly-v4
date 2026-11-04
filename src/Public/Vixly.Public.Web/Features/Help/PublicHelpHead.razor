@@ -1,0 +1,39 @@
+﻿@inject IOptions<PublicSiteOptions> Site
+@* =========================================================
+   FILE: PublicHelpHead.razor
+
+   PURPOSE:
+   Supplies help titles, descriptions and language alternates.
+
+   RESPONSIBILITIES:
+   - Keep published article addresses stable across languages.
+
+   IMPORTANT NOTES:
+   - Search results are not indexed.
+   ========================================================= *@
+<PageTitle>@Title</PageTitle>
+<HeadContent>
+    <meta name="description" content="@Summary" />
+    @if (Search)
+    {
+        <meta name="robots" content="noindex, follow" />
+    }
+    else
+    {
+        <link rel="canonical" href="@Absolute(PublicLanguage.Current)" />
+        @foreach (string language in PublicLanguage.Codes)
+        {
+            <link rel="alternate" hreflang="@language" href="@Absolute(language)" />
+        }
+        <link rel="alternate" hreflang="x-default" href="@Absolute("en")" />
+    }
+</HeadContent>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Summary { get; set; } = string.Empty;
+    [Parameter] public string? Slug { get; set; }
+    [Parameter] public bool Search { get; set; }
+    private string Absolute(string language) => Site.Value.CanonicalBaseUrl.TrimEnd('/') +
+        (Slug is null ? PublicHelpCatalogue.Home(language) : PublicHelpCatalogue.Address(language, Slug));
+}

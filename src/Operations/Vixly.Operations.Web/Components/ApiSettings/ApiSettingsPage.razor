@@ -1,0 +1,103 @@
+@*
+=========================================================
+FILE: ApiSettingsPage.razor
+
+PURPOSE:
+Settings → API and webhooks (Slice 10): keys for the company’s own programs, and the addresses that receive its events.
+
+RESPONSIBILITIES:
+- The keys (name, last characters, made, last used, revoke); make a key, shown once
+- The webhooks panel
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- A key and a signing secret are shown once, when made; never again
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.api.title"]" Company="@Company" Section="api_settings" Error="@Error" Info="@Info">
+    <p class="ops-editor__hint" style="margin-bottom: 0.75rem;">@T["ui.api.intro"]</p>
+    @if (!InPlan)
+    {
+        <div class="ops-editor__empty" data-not-in-plan><p>@T["ui.api.not_in_plan"]</p></div>
+    }
+    else
+    {
+        @if (Shown is { } shown)
+        {
+            <div class="ops-editor__panel" role="status" data-shown-once style="background: var(--vx-color-surface-sunken, #f8fafc); border-left: 4px solid var(--vx-color-primary, #3b82f6);">
+                <p><strong>@T["ui.api.shown_once"]</strong></p>
+                <p><code class="ops-editor__code" data-secret style="font-size: 0.9375rem; user-select: all;">@shown</code></p>
+            </div>
+        }
+        <section class="ops-editor__panel" aria-labelledby="keys-title" id="keys">
+            <h2 id="keys-title">@T["ui.api.keys"]</h2>
+            <p class="ops-editor__hint" style="margin-bottom: 0.75rem;">@T["ui.api.keys_hint"]</p>
+            @if (Keys.Count == 0)
+            {
+                <div class="ops-editor__empty"><p>@T["ui.api.keys_none"]</p></div>
+            }
+            else
+            {
+                <OperationsTableViewport Label="@T["ui.api.keys"]">
+                    <table class="ops-editor__table">
+                        <thead><tr><th scope="col">@T["ui.api.key_name"]</th><th scope="col">@T["ui.api.key"]</th><th scope="col">@T["ui.api.made"]</th><th scope="col">@T["ui.api.last_used"]</th><th scope="col">@T["ui.api.state"]</th><th scope="col"></th></tr></thead>
+                        <tbody>
+                            @foreach (OperationsApiKey key in Keys)
+                            {
+                                <tr data-key-active="@key.Active.ToString().ToLowerInvariant()">
+                                    <td>@key.Name</td>
+                                    <td class="ops-editor__code">ak_@(key.KeyId)_…@key.Hint</td>
+                                    <td>@key.CreatedUtc.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)</td>
+                                    <td>@(key.LastUsedUtc?.ToLocalTime().ToString("g", CultureInfo.CurrentCulture) ?? T["ui.api.never"].Value)</td>
+                                    <td><span class="ops-editor__status" data-status="@(key.Active ? "active" : "revoked")">@T[key.Active ? "ui.api.active" : "ui.api.revoked"]</span></td>
+                                    <td>
+                                        @if (CanEdit && key.Active)
+                                        {
+                                            <form method="post" action="/staff/settings/api/keys/@key.Id/revoke" class="ops-editor__inline" style="margin: 0;">
+                                                <AntiforgeryToken />
+                                                <button type="submit" class="vx-button vx-button--secondary" style="height: 28px; padding: 0 0.65rem; font-size: 0.75rem;">@T["ui.api.revoke"]</button>
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </OperationsTableViewport>
+            }
+            @if (CanEdit)
+            {
+                <form method="post" action="/staff/settings/api/keys" class="ops-inline-action-bar" style="margin-top: 0.75rem; padding: 0.5rem 0;">
+                    <AntiforgeryToken />
+                    <label for="api-key-name" class="ops-inline-action-bar__label">@T["ui.api.key_name"]</label>
+                    <input id="api-key-name" name="name" required maxlength="@OperationsApiKey.NameMaxLength" class="ops-inline-action-bar__select" style="min-width: 16rem;" />
+                    <button type="submit" class="vx-button vx-button--primary" style="height: 32px; padding: 0 0.85rem;">@T["ui.api.make_key"]</button>
+                </form>
+            }
+        </section>
+        <WebhooksPanel Endpoints="Endpoints" Deliveries="Deliveries" CanEdit="CanEdit" />
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public bool InPlan { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsApiKey> Keys { get; set; } = Array.Empty<OperationsApiKey>();
+
+    [Parameter] public IReadOnlyList<OperationsWebhookEndpoint> Endpoints { get; set; } = Array.Empty<OperationsWebhookEndpoint>();
+
+    [Parameter] public IReadOnlyList<OperationsWebhookDelivery> Deliveries { get; set; } = Array.Empty<OperationsWebhookDelivery>();
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    // A key or a signing secret just made: shown this once.
+    [Parameter] public string? Shown { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

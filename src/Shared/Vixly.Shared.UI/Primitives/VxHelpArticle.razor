@@ -1,0 +1,36 @@
+﻿@* =========================================================
+   FILE: VxHelpArticle.razor
+
+   PURPOSE:
+   Presents a trusted help article and its visible related articles.
+
+   RESPONSIBILITIES:
+   - Keep article content readable and related links accessible.
+
+   IMPORTANT NOTES:
+   - Html must come from the checked help catalogue.
+   - The caller filters related articles and localizes labels.
+   ========================================================= *@
+<article class="vx-help-article">
+    <h1>@Title</h1>
+    <div class="vx-help-article__body">@((MarkupString)Html)</div>
+    @if (Related.Count > 0)
+    {
+        <nav aria-label="@RelatedLabel">
+            <h2>@RelatedLabel</h2>
+            <ul>
+                @foreach (var link in Related)
+                {
+                    <li><a href="@link.Href">@link.Title</a></li>
+                }
+            </ul>
+        </nav>
+    }
+</article>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Html { get; set; } = string.Empty;
+    [Parameter] public IReadOnlyList<VxHelpRelatedLink> Related { get; set; } = [];
+    [Parameter, EditorRequired] public string RelatedLabel { get; set; } = string.Empty;
+}

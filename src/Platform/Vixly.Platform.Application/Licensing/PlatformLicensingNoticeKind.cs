@@ -20,5 +20,15 @@ public enum PlatformLicensingNoticeKind
     DeviceReplaced = 4,
     ReleaseDecided = 5,
     DevicesRevoked = 6,
-    CredentialReused = 7
+    CredentialReused = 7,
+
+    // The last email of the onboarding: the tenant is active (owner, 2026-10-18).
+    Welcome = 8,
+
+    // Vixly support started a recovery or a second-factor reset (Owner and Billing, D-O13).
+    OwnerSupportStarted = 9,
+
+    SecondFactorResetLink = 10,
+
+    SecondFactorResetDone = 11
 }

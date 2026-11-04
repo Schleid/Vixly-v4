@@ -174,6 +174,8 @@ public sealed class SimulatedCardGateway : IPlatformCardGateway
 
     public Task DetachCardAsync(string paymentMethodId, CancellationToken cancellationToken) => Task.CompletedTask;
 
+    public Task<string?> GetWalletAsync(string paymentId, CancellationToken cancellationToken) => Task.FromResult<string?>(null);
+
     public PlatformCardEvent ParseEvent(string payload, string? signature)
     {
         ArgumentNullException.ThrowIfNull(payload);

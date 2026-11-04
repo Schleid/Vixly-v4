@@ -65,6 +65,8 @@ public sealed class PlatformEntitlementsReader
             nonPayment,
             legal.Status is Vixly.Platform.Domain.Legal.PlatformLegalStatus.Due or Vixly.Platform.Domain.Legal.PlatformLegalStatus.Overdue
                 ? new PlatformLegalInfo(legal.Status, legal.DeadlineUtc, legal.RequiredVersion)
-                : null);
+                : null,
+            version?.ExtraShipmentPrice ?? 0m,
+            plan?.CurrencyCode);
     }
 }

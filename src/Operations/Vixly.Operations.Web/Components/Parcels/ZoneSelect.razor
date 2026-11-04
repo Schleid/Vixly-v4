@@ -1,0 +1,26 @@
+﻿@*
+=========================================================
+FILE: ZoneSelect.razor
+
+PURPOSE:
+A choice of storage zone (Slice 3B).
+
+RESPONSIBILITIES:
+- Render the zones with the chosen one selected
+
+IMPORTANT NOTES:
+- Markup only; the caller passes its localizer
+=========================================================
+*@
+<select name="zone" aria-label="@T["ui.storage.zone"]">
+    @foreach (OperationsStorageZone zone in Enum.GetValues<OperationsStorageZone>())
+    {
+        <option value="@zone.ToString().ToLowerInvariant()" selected="@(zone == Selected)">@T["ui.storage.zone." + zone.ToString().ToLowerInvariant()]</option>
+    }
+</select>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public OperationsStorageZone Selected { get; set; }
+}

@@ -36,12 +36,16 @@ public static class PlatformEventTypes
 
     public const string TermsAccepted = "platform.legal.terms_accepted.v1";
 
+    // Operations Slice 1: the owner may now set up the account; Operations invites the owner.
+    public const string RegistrationAccountSetupReady = "platform.registration.account_setup_ready.v1";
+
     // Edge reads only what it needs to resolve and redirect portals.
     public static IReadOnlyList<string> ForEdge { get; } = new[] { TenantStatusChanged, TenantSlugCorrected, SubscriptionStatusChanged };
 
     public static IReadOnlyList<string> All { get; } = new[]
     {
         TenantStatusChanged, TenantSlugCorrected, SubscriptionStatusChanged, PlanVersionPublished,
-        DeviceApproved, DeviceReleased, DeviceRevoked, SeatsChanged, LegalVersionPublished, TermsAccepted
+        DeviceApproved, DeviceReleased, DeviceRevoked, SeatsChanged, LegalVersionPublished, TermsAccepted,
+        RegistrationAccountSetupReady
     };
 }

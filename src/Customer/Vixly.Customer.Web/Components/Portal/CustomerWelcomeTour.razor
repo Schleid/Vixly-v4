@@ -1,0 +1,39 @@
+﻿@inject IStringLocalizer<CustomerText> T
+@* =========================================================
+   FILE: CustomerWelcomeTour.razor
+   PURPOSE:
+   Gives a short, optional orientation to the three customer tasks.
+   RESPONSIBILITIES:
+   - Keep navigation separate from all package and shipment submits.
+   IMPORTANT NOTES:
+   - Only Skip or Finish posts the protected account dismissal.
+   - The normal forms remain unchanged behind the modal tour.
+   ========================================================= *@
+<dialog open class="customer-tour" data-customer-tour data-tour-target="@Target" aria-labelledby="customer-tour-title" aria-describedby="customer-tour-progress customer-tour-description">
+    <p id="customer-tour-progress" class="customer-tour__progress">@VixlyText.Format(T, "ui.tour.step", "step", Step)</p>
+    <h2 id="customer-tour-title">@T["ui.tour.title." + Step]</h2>
+    <p id="customer-tour-description">@T["ui.tour.body." + Step]</p>
+    <p class="customer-tour__hint">@T["ui.tour.no_submit"]</p>
+    @if (Error) { <p role="alert">@T["ui.tour.save_failed"]</p> }
+    <div class="customer-tour__actions">
+        <form method="post" action="/customer/tour/dismiss" data-tour-dismiss>
+            <AntiforgeryToken />
+            <button type="submit" class="vx-button vx-button--secondary" data-tour-skip>@T["ui.tour.skip"]</button>
+            @if (Step == 3) { <button type="submit" class="vx-button vx-button--primary">@T["ui.tour.finish"]</button> }
+        </form>
+        @if (Step < 3) { <a class="vx-button vx-button--primary" href="@Next">@T["ui.tour.next"]</a> }
+    </div>
+</dialog>
+<script src="js/customer-tour.js?v=20261027-1" defer></script>
+
+@code {
+    [Parameter, EditorRequired] public int Step { get; set; }
+    [Parameter] public bool Error { get; set; }
+    private string Target => Step switch
+    {
+        1 => ".customer-portal__mailbox",
+        2 => "input[name='tracking']",
+        _ => ".customer-destination-fieldset"
+    };
+    private string Next => Step == 1 ? "/customer/packages/new?tour=2" : "/customer/packages/shipments/new?tour=3";
+}

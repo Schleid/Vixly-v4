@@ -37,14 +37,25 @@ internal sealed class PlatformConsoleHost : IAsyncDisposable
 
     public static async Task<PlatformConsoleHost> StartAsync()
     {
+        return await StartAsync(null);
+    }
+
+    public IReadOnlySet<string> Routes => _app.Services.GetRequiredService<Microsoft.AspNetCore.Routing.EndpointDataSource>()
+        .Endpoints.OfType<Microsoft.AspNetCore.Routing.RouteEndpoint>()
+        .Select(endpoint => endpoint.RoutePattern.RawText!).ToHashSet(StringComparer.Ordinal);
+
+    public static async Task<PlatformConsoleHost> StartAsync(Action<IServiceCollection>? configureServices)
+    {
         WebApplication app = PlatformWebHost.Build(
             new[]
             {
                 "--environment=Production",
+                "--VixlySettingsCheck:Enabled=false",
                 "--applicationName=Vixly.Platform.Web",
                 "--ConnectionStrings:Platform=Server=127.0.0.1,1;Database=None;User Id=none;Password=none;Connect Timeout=1;TrustServerCertificate=True",
                 "--PlatformOutbox:Enabled=false",
-                "--PlatformSubscriptionClock:Enabled=false"
+                "--PlatformSubscriptionClock:Enabled=false",
+                "--PlatformSales:TechOs:Enabled=false"
             },
             builder =>
             {
@@ -59,6 +70,8 @@ internal sealed class PlatformConsoleHost : IAsyncDisposable
                 {
                     builder.Services.Remove(startup);
                 }
+
+                configureServices?.Invoke(builder.Services);
             });
 
         await app.StartAsync();
@@ -69,11 +82,11 @@ internal sealed class PlatformConsoleHost : IAsyncDisposable
     public HttpClient Client(bool followRedirects = false)
     {
         HttpClient client = _app.GetTestServer().CreateClient();
-        client.BaseAddress = new Uri("https://vixly-control.techcrafters.ltd");
+        client.BaseAddress = new Uri("https://control.vixly.ltd");
 
         return followRedirects
             ? client
-            : new HttpClient(_app.GetTestServer().CreateHandler()) { BaseAddress = new Uri("https://vixly-control.techcrafters.ltd") };
+            : new HttpClient(_app.GetTestServer().CreateHandler()) { BaseAddress = new Uri("https://control.vixly.ltd") };
     }
 
     public async ValueTask DisposeAsync()

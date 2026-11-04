@@ -1,0 +1,89 @@
+﻿@*
+=========================================================
+FILE: SupplyStockPage.razor
+
+PURPOSE:
+Supplies stock (Slice 5E step 2): warehouse tabs, on hand,
+low stock indicators, transfers in transit, and actions in tabs.
+
+IMPORTANT NOTES:
+- Page component (UI-6): <= 80 lines
+- Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.supplies.stock.page_title"]" Company="@Company" Section="supplies_stock" Error="@Error" Info="@Info">
+    @if (Warehouse is { } warehouse)
+    {
+        @if (Warehouses.Count > 1)
+        {
+            <nav class="ops-filter-chips" aria-label="@T["ui.supplies.stock.warehouses"]" style="margin-bottom: 1.25rem;">
+                @foreach (OperationsWarehouse item in Warehouses)
+                {
+                    <a href="/staff/supplies/stock?warehouse=@item.Id" class="ops-filter-chip @(item.Id == warehouse.Id ? "active" : null)">@item.Code · @item.Name</a>
+                }
+            </nav>
+        }
+        @if (!CountsStock)
+        {
+            <p class="ops-editor__notice">@T["ui.supplies.stock.off"]</p>
+        }
+        else
+        {
+            <div class="ops-compact-tabs" data-section-tabs="supply-stock" data-tabs-label="@T["ui.supplies.stock.page_title"]">
+                <section class="ops-editor__panel" data-tab-label="@T["ui.supplies.stock.on_hand"]" data-tab-default aria-labelledby="stock-title">
+                    <h2 id="stock-title" class="vx-visually-hidden">@VixlyText.Format(T, "ui.supplies.stock.title_at", "warehouse", warehouse.Code + " · " + warehouse.Name)</h2>
+                    @if (Stock.Count(item => item.IsLow) is > 0 and var low)
+                    {
+                        <div class="ops-list-badge" role="status">@VixlyText.Format(T, "ui.supplies.stock.low_count", "count", low)</div>
+                    }
+                    <SupplyStockTable T="T" WarehouseId="warehouse.Id" Supplies="Supplies" Stock="Stock" />
+                </section>
+
+                @if (Transfers.Count > 0)
+                {
+                    <section class="ops-editor__panel" data-tab-label="@T["ui.supplies.stock.in_transit"] (@Transfers.Count)" aria-labelledby="stock-transit">
+                        <h2 id="stock-transit">@T["ui.supplies.stock.in_transit"]</h2>
+                        <ul class="ops-editor__list">
+                            @foreach (OperationsSupplyTransfer transfer in Transfers)
+                            {
+                                bool incoming = transfer.ToWarehouseId == warehouse.Id;
+                                <li>
+                                    <strong>@Code(transfer.FromWarehouseId) → @Code(transfer.ToWarehouseId)</strong> · @transfer.CreatedUtc.ToString("g", CultureInfo.CurrentCulture)
+                                    · @string.Join(", ", transfer.Lines.Select(line => line.Quantity + " × " + (Supplies.FirstOrDefault(supply => supply.Id == line.SupplyId)?.Code ?? "?")))
+                                    @if (transfer.Note is { } note) { <small> · @note</small> }
+                                    @if (incoming)
+                                    {
+                                        <form method="post" action="/staff/supplies/stock/transfers/@transfer.Id/receive" class="ops-editor__inline">
+                                            <AntiforgeryToken />
+                                            <button type="submit" class="vx-button vx-button--primary">@T["ui.supplies.stock.transfer_receive"]</button>
+                                        </form>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </section>
+                }
+
+                <SupplyStockForms T="T" WarehouseId="warehouse.Id" Supplies="Supplies" AllWarehouses="AllWarehouses" OpenCountId="OpenCount?.Id" />
+            </div>
+        }
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+    [Parameter] public OperationsWarehouse? Warehouse { get; set; }
+    [Parameter] public IReadOnlyList<OperationsWarehouse> AllWarehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+    [Parameter] public IReadOnlyList<OperationsSupply> Supplies { get; set; } = Array.Empty<OperationsSupply>();
+    [Parameter] public IReadOnlyList<OperationsSupplyStock> Stock { get; set; } = Array.Empty<OperationsSupplyStock>();
+    [Parameter] public IReadOnlyList<OperationsSupplyTransfer> Transfers { get; set; } = Array.Empty<OperationsSupplyTransfer>();
+    [Parameter] public OperationsSupplyCount? OpenCount { get; set; }
+    [Parameter] public bool CountsStock { get; set; } = true;
+    [Parameter] public string? Error { get; set; }
+    [Parameter] public string? Info { get; set; }
+
+    private string Code(Guid warehouseId) => AllWarehouses.FirstOrDefault(item => item.Id == warehouseId)?.Code ?? "?";
+}

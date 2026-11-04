@@ -1,0 +1,150 @@
+@*
+=========================================================
+FILE: CustomerPage.razor
+
+PURPOSE:
+One customer: details, the packages coming to them, their shipments and their account status (Slice 2).
+
+RESPONSIBILITIES:
+- Show the customer and the packages coming to them; never the mailbox's street address (owner, 2026-10-18)
+- Suspend, reactivate, close, reopen or ban (owner, 2026-10-31); the customer's shipments. The details are the customer's own (owner, 2026-10-18)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); the endpoint loads the data
+- Compact label-over-value facts grid (Brief §3, §5)
+- Credit is shown, never changed here (owner, 2026-10-31); the use cases decide
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@Customer.FullName" Company="@Company" Section="customers" Error="@Error" Info="@Info">
+    <div class="ops-record-top">
+        <a href="/staff/customers" class="ops-editor__back-link">← @T["ui.customers.back"]</a>
+    </div>
+
+    <div class="ops-record-header">
+        <div class="ops-record-header__identity">
+            <h1 class="ops-record-header__title">
+                @Customer.FullName
+                <span class="ops-editor__status" data-status="@Customer.Status.ToString().ToLowerInvariant()">@T["ui.customers.status." + Customer.Status.ToString().ToLowerInvariant()]</span>
+            </h1>
+            @if (Customer.StatusReason is { } statusReason)
+            {
+                <p class="ops-record-header__subtitle">@statusReason</p>
+            }
+            @if (Customer.SuspendedUntil is { } until)
+            {
+                <p class="ops-record-header__subtitle">@VixlyText.Format(T, "ui.customers.suspended_until_on", "date", until.ToString("yyyy-MM-dd"))</p>
+            }
+        </div>
+        @* Owner, 2026-10-27: no "New shipment" here; shipments are made at the counter by the people allowed to. *@
+    </div>
+
+    <div class="ops-customer-tabs ops-compact-tabs" data-section-tabs="customer" data-tabs-label="@T["ui.customers.details"]">
+        <section class="ops-editor__panel ops-record-summary" aria-labelledby="customer-details">
+            <h2 id="customer-details">@T["ui.customers.details"]</h2>
+            <dl class="ops-facts-grid">
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.code"]</dt>
+                    <dd class="ops-editor__code">@(Customer.Code ?? T["ui.customers.no_code"])</dd>
+                </div>
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.editor.email"]</dt>
+                    <dd>@Customer.Email @(Customer.EmailVerified ? null : "· " + T["ui.customers.not_verified"])</dd>
+                </div>
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.phone"]</dt>
+                    <dd class="ops-editor__code">@Vixly.Shared.Localization.VixlyPhone.International(Customer.Phone)</dd>
+                </div>
+                @* The home address the customer gave at the first sign-in, or brought from V3 (owner, 2026-10-26). *@
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.home_address"]</dt>
+                    <dd>
+                        @if (Customer.HomeAddress is { } home)
+                        {
+                            @home.Line1@if (home.Line2 is not null) { <br />@home.Line2 }<br />@home.City@(home.Region is null ? null : ", " + home.Region) @home.PostalCode<br /><CountryFlag Code="@home.CountryCode" /> @OperationsCountries.Name(T, home.CountryCode)
+                        }
+                        else
+                        {
+                            @T["ui.customers.no_address"]
+                        }
+                    </dd>
+                </div>
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.company"]</dt>
+                    <dd>@(string.IsNullOrWhiteSpace(Customer.CompanyName) ? "—" : Customer.CompanyName)</dd>
+                </div>
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.staff.language"]</dt>
+                    <dd>@Customer.Language.ToUpperInvariant()</dd>
+                </div>
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.credit"]</dt>
+                    <dd><span class="ops-editor__status" data-status="@(Customer.CreditAllowed ? "active" : "neutral")">@(Customer.CreditAllowed ? T["ui.customers.credit_on"] : T["ui.customers.credit_off"])</span> @(Customer.CreditReason is null ? null : "· " + Customer.CreditReason)</dd>
+                </div>
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.created"]</dt>
+                    <dd>@Customer.CreatedUtc.ToString("yyyy-MM-dd")</dd>
+                </div>
+                <div class="ops-facts-grid__item">
+                    <dt>@T["ui.customers.last_sign_in"]</dt>
+                    <dd>@(Customer.LastSignInUtc?.ToString("yyyy-MM-dd HH:mm") ?? T["ui.customers.never"])</dd>
+                </div>
+            </dl>
+        </section>
+
+        @if (CanSeePackages)
+        {
+            <CustomerIncomingPackages T="T" CustomerCode="@Customer.Code" Packages="Incoming" />
+        }
+
+        @if (CanSeeShipments)
+        {
+            <CustomerShipments T="T" Shipments="Shipments" />
+        }
+
+        @* Owner, 2026-10-31: credit accounts are opened and changed from Credit only, never from the customer page. *@
+        @if (CanManage && Customer.Status == OperationsCustomerStatus.PendingVerification)
+        {
+            @* Owner, 2026-11-03: the confirmation email did not arrive, or the address was mistyped. *@
+            <form method="post" action="/staff/customers/@Customer.CustomerId/confirmation" class="ops-editor__panel ops-customer-confirmation-panel" aria-labelledby="customer-confirmation">
+                <AntiforgeryToken />
+                <h2 id="customer-confirmation">@T["ui.customers.confirmation"]</h2>
+                <p class="ops-editor__hint">@T["ui.customers.confirmation_hint"]</p>
+                <div class="ops-customer-confirmation-toolbar">
+                    <label>
+                        <span>@T["ui.editor.email"]</span>
+                        <input type="email" name="email" value="@Customer.Email" maxlength="254" required autocomplete="off" spellcheck="false" />
+                    </label>
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.customers.confirmation_send"]</button>
+                </div>
+            </form>
+        }
+        @if (CanManage)
+        {
+            <CustomerStatusPanel T="T" Customer="Customer" CanBan="CanBan" />
+        }
+    </div>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public OperationsCustomerProfile Customer { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsIncomingPackage> Incoming { get; set; } = Array.Empty<OperationsIncomingPackage>();
+
+    [Parameter] public bool CanSeePackages { get; set; }
+
+    [Parameter] public bool CanManage { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsCustomerShipmentRow> Shipments { get; set; } = Array.Empty<OperationsCustomerShipmentRow>();
+
+    [Parameter] public bool CanSeeShipments { get; set; }
+
+    [Parameter] public bool CanBan { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

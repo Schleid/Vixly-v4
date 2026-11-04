@@ -289,8 +289,12 @@ public sealed class PlatformPaymentsAdministration
             Consent(metadata, tenant);
         }
 
+        // Registration and card saving take cards only; any other invoice can also be paid from a US bank account.
+        PlatformMerchantAccount? merchant = await _payments.GetMerchantAsync(cancellationToken);
+        bool allowBank = origin != PlatformCardTransactionOrigin.Registration && !(saveCard || autoCharge);
         PlatformCheckoutSession session = await _gateway.CreateCheckoutAsync(
-            new PlatformCheckoutRequest(PlatformCheckoutPurpose.Payment, profile.ProviderCustomerId, charge.MinorUnits, charge.CurrencyCode, invoice.Number, saveCard || autoCharge, metadata, successUrl, cancelUrl, invoice.Language.Value, charge.IdempotencyKey),
+            new PlatformCheckoutRequest(PlatformCheckoutPurpose.Payment, profile.ProviderCustomerId, charge.MinorUnits, charge.CurrencyCode, invoice.Number, saveCard || autoCharge, metadata, successUrl, cancelUrl, invoice.Language.Value, charge.IdempotencyKey,
+                allowBank, PlatformCheckoutBranding.From(merchant), merchant?.StatementSuffix, origin == PlatformCardTransactionOrigin.Registration),
             cancellationToken);
         charge.AttachCheckout(session.CheckoutId, UtcNow);
         Audit(null, "platform.payments.checkout_started", null, nameof(PlatformInvoice), invoice.Id, new { number = invoice.Number, origin = origin.ToString(), amount = PlatformPaymentsLimits.Format(charge.Amount), currency = charge.CurrencyCode });
@@ -315,7 +319,8 @@ public sealed class PlatformPaymentsAdministration
 
         PlatformCheckoutSession session = await _gateway.CreateCheckoutAsync(
             new PlatformCheckoutRequest(PlatformCheckoutPurpose.SaveCard, profile.ProviderCustomerId, 0, string.Empty, string.Empty, true, metadata, successUrl, cancelUrl, tenant.DefaultLanguage.Value,
-                "vx4-setup-" + link.Id.ToString("N", System.Globalization.CultureInfo.InvariantCulture) + (autoCharge ? "-auto" : "-card")),
+                "vx4-setup-" + link.Id.ToString("N", System.Globalization.CultureInfo.InvariantCulture) + (autoCharge ? "-auto" : "-card"),
+                false, PlatformCheckoutBranding.From(await _payments.GetMerchantAsync(cancellationToken))),
             cancellationToken);
         Audit(null, "platform.payments.checkout_started", null, nameof(PlatformTenant), tenant.Id, new { purpose = "save_card" });
         await SaveAsync(cancellationToken);
@@ -333,12 +338,13 @@ public sealed class PlatformPaymentsAdministration
         ArgumentNullException.ThrowIfNull(invoice);
 
         PlatformCardResult result;
+        string? suffix = (await _payments.GetMerchantAsync(cancellationToken))?.StatementSuffix;
 
         try
         {
             result = await _gateway.ChargeAsync(
                 new PlatformCardChargeRequest(profile.ProviderCustomerId, card.ProviderPaymentMethodId, charge.MinorUnits, charge.CurrencyCode, invoice.Number,
-                    Metadata(charge.PlatformTenantId, invoice.Id, charge.Id, null), charge.IdempotencyKey),
+                    Metadata(charge.PlatformTenantId, invoice.Id, charge.Id, null), charge.IdempotencyKey, suffix),
                 cancellationToken);
         }
         catch (PlatformCardGatewayException exception) when (exception.OutcomeUnknown)

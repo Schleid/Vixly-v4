@@ -7,3 +7,4 @@ Entry point for any engineer or AI assistant working in this repository.
 3. Every project folder has a README stating its owner, what it may reference and what it must not reference.
 4. If a rule is wrong or missing, propose an ADR in `docs/decisions/`. Do not work around it.
 5. Entity classes carry their platform (`PlatformInvoice`, `OperationsInvoice`, `CustomerInvoice`); tables sit in the plane's schema without the prefix (`platform.Invoices`). Planes never reference each other's internals or tables; they talk through `src/Contracts`.
+6. Help pages inside the applications (Public, Control, Customer, Operations) follow `docs/help/HELP-PLAN.md` and ADR-0023. Build them stage by stage, in the order given there.

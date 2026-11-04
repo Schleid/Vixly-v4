@@ -84,7 +84,13 @@ public sealed class PlatformBillingDocumentMailHandler : IPlatformOutboxHandler
             payLink = _payments.Links.PayLink(token);
         }
 
-        await _mailer.SendDocumentAsync(tenant, tenant.ContactFor(PlatformTenantContactRole.Billing), invoice, document, payLink, cancellationToken);
+        // A receipt for a card payment says how the charge reads on the card statement (e.g. "TECHCRAFT* VIXLY").
+        string? statement = document.Kind == PlatformBillingDocumentKind.Receipt
+            && invoice.Payments.FirstOrDefault(item => item.Id == document.OwnerId) is { Method: PlatformPaymentMethod.Card }
+            ? (await _payments.Store.GetMerchantAsync(cancellationToken))?.StatementWording
+            : null;
+
+        await _mailer.SendDocumentAsync(tenant, tenant.ContactFor(PlatformTenantContactRole.Billing), invoice, document, payLink, statement, cancellationToken);
         _billing.Invoices.AddEvents(new[]
         {
             PlatformInvoiceEvent.Record(

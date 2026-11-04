@@ -63,7 +63,12 @@ public static class PlatformAuthEndpoints
             Page<SignInPage>(new
             {
                 ReturnUrl = LocalUrl(returnUrl),
-                Info = done == "reset" ? text.Text("ui.reset.done") : null
+                Info = done switch
+                {
+                    "reset" => text.Text("ui.reset.done"),
+                    "idle" => text.Text("ui.session.signed_out_idle"),
+                    _ => null
+                }
             }));
 
         endpoints.MapPost("/sign-in", async (
@@ -82,6 +87,13 @@ public static class PlatformAuthEndpoints
             if (!response.Succeeded)
             {
                 return Page<SignInPage>(new { ReturnUrl = LocalUrl(returnUrl), Email = email, Error = text.Describe(response.Error) });
+            }
+
+            // Require MFA = No and no second factor: signed in with the password (owner, 2026-10-22).
+            if (response.SessionToken.Length > 0)
+            {
+                StartSession(http, response.SessionToken);
+                return Results.Redirect(LocalUrl(returnUrl));
             }
 
             PlatformCookies.Write(http.Response, PlatformCookies.SignInChallenge, response.ChallengeToken, PlatformSignInChallenge.Lifetime);
@@ -333,6 +345,12 @@ public static class PlatformAuthEndpoints
                 return Page<InvitationPage>(new { Token = token, Error = text.Describe(response.Error) });
             }
 
+            if (response.SessionToken.Length > 0)
+            {
+                StartSession(http, response.SessionToken);
+                return Results.Redirect("/");
+            }
+
             PlatformCookies.Write(http.Response, PlatformCookies.SignInChallenge, response.ChallengeToken, PlatformSignInChallenge.Lifetime);
             return Results.Redirect("/sign-in/enrol");
         }).RequireRateLimiting(PlatformRateLimits.AccountLink);
@@ -371,6 +389,7 @@ public static class PlatformAuthEndpoints
         endpoints.MapPost("/sign-out", async (
             HttpContext http,
             [FromForm] bool? everywhere,
+            [FromForm] string? reason,
             SignOutUseCase useCase) =>
         {
             await useCase.ExecuteAsync(
@@ -379,7 +398,8 @@ public static class PlatformAuthEndpoints
                 http.RequestAborted);
             PlatformCookies.Delete(http.Response, PlatformCookies.Session);
 
-            return Results.Redirect("/sign-in");
+            // The idle timer (keepalive.js) signs out with reason=idle, so the sign-in page says why.
+            return Results.Redirect(reason == "idle" ? "/sign-in?done=idle" : "/sign-in");
         }).RequireAuthorization();
 
         endpoints.MapGet("/session/keepalive", () => Results.NoContent()).RequireAuthorization();

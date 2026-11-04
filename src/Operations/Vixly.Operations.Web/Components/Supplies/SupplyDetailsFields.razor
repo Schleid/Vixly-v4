@@ -1,0 +1,80 @@
+﻿@*
+=========================================================
+FILE: SupplyDetailsFields.razor
+
+PURPOSE:
+The fields describing a supply (Slice 5E, S-1): item code, names, unit, category, taxed, barcodes.
+
+RESPONSIBILITIES:
+- Show the fields with the values typed or saved
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Inside the caller's form
+=========================================================
+*@
+<div class="ops-charges-trio">
+    <div>
+        <label>
+            <span class="ops-label-text">@T["ui.supplies.code"]</span>
+            <input name="code" value="@Form.Code" maxlength="@OperationsSupplyLimits.CodeMaxLength" required autocomplete="off" class="ops-editor__code" />
+        </label>
+        <p class="ops-editor__hint">@T["ui.supplies.code_hint"]</p>
+    </div>
+    <div>
+        <label>
+            <span class="ops-label-text">@T["ui.supplies.category"]</span>
+            <select name="category" required>
+                @foreach (OperationsSupplyCategory category in Enum.GetValues<OperationsSupplyCategory>())
+                {
+                    <option value="@category" selected="@(Form.CategoryValue == category)">@T["ui.supplies.category." + category]</option>
+                }
+            </select>
+        </label>
+    </div>
+    <div>
+        <label>
+            <span class="ops-label-text">@T["ui.supplies.unit"]</span>
+            <input name="unit" value="@Form.Unit" maxlength="@OperationsSupplyLimits.UnitMaxLength" placeholder="@T["ui.supplies.unit_each"]" />
+        </label>
+    </div>
+</div>
+
+<div class="ops-charges-trio">
+    <div>
+        <label>
+            <span class="ops-label-text">@T["ui.supplies.name_en"]</span>
+            <input name="name_en" value="@Form.NameEn" maxlength="@OperationsSupplyLimits.NameMaxLength" required />
+        </label>
+    </div>
+    <div>
+        <label>
+            <span class="ops-label-text">@T["ui.supplies.name_fr"]</span>
+            <input name="name_fr" value="@Form.NameFr" maxlength="@OperationsSupplyLimits.NameMaxLength" />
+        </label>
+    </div>
+    <div>
+        <label>
+            <span class="ops-label-text">@T["ui.supplies.name_es"]</span>
+            <input name="name_es" value="@Form.NameEs" maxlength="@OperationsSupplyLimits.NameMaxLength" />
+        </label>
+    </div>
+</div>
+
+<div class="ops-checkbox-group" style="margin: 0.75rem 0;">
+    <label class="ops-checkbox-label">
+        <input type="checkbox" name="taxed" value="true" checked="@Form.Taxed" />
+        <span>@T["ui.supplies.taxed"]</span>
+    </label>
+</div>
+
+<div style="margin-bottom: 0.75rem;">
+    <label>@T["ui.supplies.barcodes"] <textarea name="barcodes" rows="2" maxlength="300" autocomplete="off" style="width: 100%; box-sizing: border-box;">@Form.Barcodes</textarea></label>
+    <p class="ops-editor__hint">@T["ui.supplies.barcodes_hint"]</p>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsSupplyForm Form { get; set; } = null!;
+}

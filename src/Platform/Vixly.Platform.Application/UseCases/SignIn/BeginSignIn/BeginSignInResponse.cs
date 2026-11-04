@@ -35,6 +35,16 @@ public sealed class BeginSignInResponse
 
     public int RecoveryCodesLeft { get; private init; }
 
+    // Set when Require MFA is No and the person has no second factor: signed in already.
+    public string SessionToken { get; private init; } = string.Empty;
+
+    public static BeginSignInResponse SignedIn(string sessionToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sessionToken);
+
+        return new BeginSignInResponse { Succeeded = true, SessionToken = sessionToken };
+    }
+
     public static BeginSignInResponse Success(string challengeToken, bool enrolmentRequired, bool hasPasskey, bool hasAuthenticatorApp, int recoveryCodesLeft)
     {
         return new BeginSignInResponse { Succeeded = true, ChallengeToken = challengeToken, EnrolmentRequired = enrolmentRequired, HasPasskey = hasPasskey, HasAuthenticatorApp = hasAuthenticatorApp, RecoveryCodesLeft = recoveryCodesLeft };

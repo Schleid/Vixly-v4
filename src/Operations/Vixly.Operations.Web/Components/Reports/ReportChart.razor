@@ -1,0 +1,56 @@
+﻿@*
+=========================================================
+FILE: ReportChart.razor
+
+PURPOSE:
+A simple chart of one column of a report (Slice 11; owner, 2026-10-22: tables and simple charts).
+
+RESPONSIBILITIES:
+- A line over time, or bars for the largest rows (at most 12)
+
+IMPORTANT NOTES:
+- Markup only: an inline SVG, no script; the table below it carries the same figures
+=========================================================
+*@
+
+@if (Points.Count > 0)
+{
+    decimal max = Math.Max(Points.Max(point => point.Value), 1m);
+    <figure class="ops-report__chart" aria-label="@Title">
+        @if (Line)
+        {
+            double step = Points.Count > 1 ? 600d / (Points.Count - 1) : 0d;
+            string path = string.Join(" ", Points.Select((point, index) => (20 + index * step).ToString("0.#", CultureInfo.InvariantCulture) + "," + (180 - (double)(point.Value / max) * 160).ToString("0.#", CultureInfo.InvariantCulture)));
+            <svg viewBox="0 0 640 200" role="img" aria-label="@Title" preserveAspectRatio="none" data-chart="line">
+                <line x1="20" y1="180" x2="620" y2="180" class="ops-report__axis" stroke="currentColor" stroke-opacity="0.3" />
+                <polyline points="@path" class="ops-report__line" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke" />
+                @for (int index = 0; index < Points.Count; index++)
+                {
+                    <circle cx="@((20 + index * step).ToString("0.#", CultureInfo.InvariantCulture))" cy="@((180 - (double)(Points[index].Value / max) * 160).ToString("0.#", CultureInfo.InvariantCulture))" r="2.5" class="ops-report__dot" fill="currentColor"><title>@Points[index].Label: @Points[index].Value.ToString("N0", CultureInfo.CurrentCulture)</title></circle>
+                }
+            </svg>
+        }
+        else
+        {
+            List<(string Label, decimal Value)> bars = Points.Take(12).ToList();
+            <svg viewBox="0 0 640 @(bars.Count * 22 + 4)" role="img" aria-label="@Title" data-chart="bars">
+                @for (int index = 0; index < bars.Count; index++)
+                {
+                    @((MarkupString)("<text x=\"0\" y=\"" + (index * 22 + 15) + "\" class=\"ops-report__bar-label\" font-size=\"12\" fill=\"currentColor\">" + System.Net.WebUtility.HtmlEncode(Short(bars[index].Label)) + "</text>"))
+                    <rect x="200" y="@(index * 22 + 3)" height="16" width="@Math.Max(1, (int)(bars[index].Value / max * 420))" class="ops-report__bar" fill="currentColor" fill-opacity="0.7"><title>@bars[index].Label: @bars[index].Value.ToString("N2", CultureInfo.CurrentCulture)</title></rect>
+                }
+            </svg>
+        }
+        <figcaption>@Title</figcaption>
+    </figure>
+}
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+
+    [Parameter] public IReadOnlyList<(string Label, decimal Value)> Points { get; set; } = Array.Empty<(string, decimal)>();
+
+    [Parameter] public bool Line { get; set; }
+
+    private static string Short(string label) => label.Length > 28 ? label[..27] + "…" : label;
+}

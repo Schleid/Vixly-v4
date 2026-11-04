@@ -1,0 +1,60 @@
+﻿@*
+=========================================================
+FILE: InsuranceTermsView.razor
+
+PURPOSE:
+The insurance terms of each mode, which the customer accepts when insuring (Slice 4C section 8).
+
+RESPONSIBILITIES:
+- Who covers, the risks and exclusions, the price, the payout, the claim rules and the company's own text, in the customer's language
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- The acceptance checkbox is on the form; Operations records when it was accepted
+=========================================================
+*@
+@using System.Globalization
+@using Vixly.Contracts.Operations.Packages
+@inject IStringLocalizer<CustomerText> T
+
+@foreach (CustomerInsuranceTermsDto terms in Terms)
+{
+    <details class="customer-portal__terms">
+        <summary>@(terms.Name is { Length: > 0 } name ? name : T["ui.insurance.title." + terms.Mode].Value)</summary>
+        <p>@(terms.Cover == "Insurer" ? VixlyText.Format(T, "ui.insurance.by_insurer", new Dictionary<string, object> { ["insurer"] = terms.InsurerName ?? string.Empty, ["policy"] = terms.PolicyNumber ?? "-" }) : T["ui.insurance.by_company"].Value)</p>
+        <p>@T["ui.insurance.covers"] @string.Join(", ", terms.Risks.Select(risk => T["ui.insurance.risk." + risk].Value))</p>
+        <p>@(terms.Method == "Percent" ? VixlyText.Format(T, "ui.insurance.price_percent", new Dictionary<string, object> { ["percent"] = Number(terms.Percent), ["minimum"] = Money(terms.MinimumPremium, terms.Currency) }) : T["ui.insurance.price_bands"].Value)</p>
+        @if (terms.Exclusions.Count > 0 || terms.OtherExclusions is not null)
+        {
+            <p>@T["ui.insurance.not_covered"]</p>
+            <ul>
+                @foreach (string exclusion in terms.Exclusions) { <li>@T["ui.insurance.exclusion." + exclusion]</li> }
+                @foreach (string other in (terms.OtherExclusions ?? string.Empty).Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)) { <li>@other</li> }
+            </ul>
+        }
+        <p>@T["ui.insurance.payout." + terms.Payout]@(terms.DeductibleAmount is { } amount ? " · " + VixlyText.Format(T, "ui.insurance.deductible_amount", "amount", Money(amount, terms.Currency)) : null)@(terms.DeductiblePercent is { } percent ? " · " + VixlyText.Format(T, "ui.insurance.deductible_percent", "percent", Number(percent)) : null)</p>
+        @if (terms.MaxPerItem is not null || terms.MaxValue is not null)
+        {
+            <p>@VixlyText.Format(T, "ui.insurance.maximums", new Dictionary<string, object> { ["item"] = Money(terms.MaxPerItem, terms.Currency), ["shipment"] = Money(terms.MaxValue, terms.Currency) })</p>
+        }
+        <p>@VixlyText.Format(T, "ui.insurance.claims", new Dictionary<string, object> { ["damage"] = terms.DamageClaimDays, ["loss"] = terms.LossClaimDays, ["proof"] = string.Join(", ", terms.Proof.Select(proof => T["ui.insurance.proof." + proof].Value)) }) @T["ui.insurance.filed_by." + terms.FiledBy]</p>
+        @* Slice 5B: what the company owes without insurance is shown once per mode on the form (the liability terms), not here. *@
+        @if (CompanyText(terms) is { } text) { <p class="customer-portal__terms-text">@text</p> }
+    </details>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<CustomerInsuranceTermsDto> Terms { get; set; } = Array.Empty<CustomerInsuranceTermsDto>();
+
+    private static string Number(decimal? value) => value is { } number ? number.ToString("0.##", CultureInfo.CurrentCulture) : "-";
+
+    private static string Money(decimal? value, string currency) => value is { } amount ? amount.ToString("N2", CultureInfo.CurrentCulture) + " " + currency : "-";
+
+    // The company's own text in the customer's language, else English.
+    private static string? CompanyText(CustomerInsuranceTermsDto terms) => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName switch
+    {
+        "fr" => terms.TermsFr ?? terms.TermsEn,
+        "es" => terms.TermsEs ?? terms.TermsEn,
+        _ => terms.TermsEn
+    };
+}

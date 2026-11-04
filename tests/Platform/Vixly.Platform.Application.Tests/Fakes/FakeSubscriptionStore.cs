@@ -22,6 +22,7 @@ internal sealed class FakeSubscriptionStore :
     IPlatformPlanRepository,
     IPlatformSubscriptionRepository,
     IPlatformLimitOverrideRepository,
+    IPlatformShipmentUsageRepository,
     IPlatformLicenceCounter,
     IPlatformSubscriptionMailer,
     IPlatformSubscriptionQueries
@@ -116,9 +117,46 @@ internal sealed class FakeSubscriptionStore :
         Overrides.Add(limitOverride);
     }
 
+    public List<PlatformTenantShipmentUsage> Usage { get; } = new();
+
+    public Task<PlatformTenantShipmentUsage?> GetAsync(Guid platformTenantId, string month, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(Usage.FirstOrDefault(item => item.PlatformTenantId == platformTenantId && item.Month == month));
+    }
+
+    public Task<IReadOnlyList<PlatformTenantShipmentUsage>> ListLatestAsync(IReadOnlyCollection<Guid> platformTenantIds, CancellationToken cancellationToken)
+    {
+        return Task.FromResult<IReadOnlyList<PlatformTenantShipmentUsage>>(Usage
+            .Where(item => platformTenantIds.Contains(item.PlatformTenantId))
+            .GroupBy(item => item.PlatformTenantId)
+            .Select(group => group.OrderByDescending(item => item.Month, StringComparer.Ordinal).First())
+            .ToList());
+    }
+
+    public void Add(PlatformTenantShipmentUsage usage)
+    {
+        Usage.Add(usage);
+    }
+
     public Task<int> CountActiveAsync(Guid platformTenantId, CancellationToken cancellationToken)
     {
         return Task.FromResult(ActiveLicences);
+    }
+
+    public List<(string Email, string Plan, DateTimeOffset Renews, string Last4, string? Statement)> RenewalReminders { get; } = new();
+
+    public Task SendRenewalReminderAsync(
+        PlatformTenant tenant,
+        PlatformTenantContact recipient,
+        string planName,
+        DateTimeOffset renewsUtc,
+        string cardBrand,
+        string cardLast4,
+        string? statementWording,
+        CancellationToken cancellationToken)
+    {
+        RenewalReminders.Add((recipient.Email.Value, planName, renewsUtc, cardLast4, statementWording));
+        return Task.CompletedTask;
     }
 
     public Task SendPriceIncreaseAsync(
@@ -171,6 +209,15 @@ internal sealed class FakeSubscriptionStore :
     {
         return Task.FromResult(Subscriptions.Any(item => item.PlatformTenantId == platformTenantId
             && item.Discounts.Any(discount => discount.Source == PlatformDiscountSource.Promotion && discount.SourceId == promotionId)));
+    }
+
+    public Task<IReadOnlyList<PlatformSubscription>> ListRenewalRemindersDueAsync(DateTimeOffset fromUtc, DateTimeOffset toUtc, int max, CancellationToken cancellationToken)
+    {
+        return Task.FromResult<IReadOnlyList<PlatformSubscription>>(Subscriptions
+            .Where(item => item.Status == PlatformSubscriptionStatus.Active && item.Term == PlatformSubscriptionTerm.Annual && !item.CancelAtPeriodEnd
+                && item.PeriodEndUtc > fromUtc && item.PeriodEndUtc <= toUtc && item.RenewalRemindedForUtc != item.PeriodEndUtc)
+            .Take(max)
+            .ToArray());
     }
 
     public Task<IReadOnlyList<PlatformSubscription>> ListWithUnnoticedDiscountsAsync(int max, CancellationToken cancellationToken)

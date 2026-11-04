@@ -1,0 +1,31 @@
+﻿@*
+=========================================================
+FILE: TenantChangesPage.razor
+
+PURPOSE:
+Company change requests tenants sent, for staff to decide (B12).
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/tenants/changes"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.tenant_changes.title"]</PageTitle>
+<h1>@T["ui.tenant_changes.title"]</h1>
+<p class="vx-hint">@T["ui.tenant_changes.lead"]</p>
+<TenantChangesOverview Status="@Status" TenantId="@Tenant" Page="@Page" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+
+    [SupplyParameterFromQuery]
+    public Guid? Tenant { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

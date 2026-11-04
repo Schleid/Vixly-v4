@@ -1,0 +1,33 @@
+﻿@using System.Globalization
+@using Vixly.Operations.Web.Features.Help
+@inject IOperationsHelpReaderSource Reader
+@inject OperationsHelpCatalogue Help
+@* =========================================================
+   FILE: OperationsHelpArticleLink.razor
+
+   PURPOSE:
+   Links a setup task to its published, reader-visible guide.
+
+   RESPONSIBILITIES:
+   - Hide links when the article is absent or unavailable.
+
+   IMPORTANT NOTES:
+   - Uses the same request reader as search and direct help pages.
+   ========================================================= *@
+@if (_title is not null)
+{
+    <VxHelpLink Href="@OperationsHelpCatalogue.Address(_language, Slug)" Label="@_title" />
+}
+
+@code {
+    private string? _title;
+    private string _language = "en";
+    [Parameter, EditorRequired] public string Slug { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        OperationsHelpReaderContext context = await Reader.GetAsync();
+        _language = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+        if (context.Available) _title = Help.Catalogue.Find(_language, Slug, context.Reader)?.Metadata.Title;
+    }
+}

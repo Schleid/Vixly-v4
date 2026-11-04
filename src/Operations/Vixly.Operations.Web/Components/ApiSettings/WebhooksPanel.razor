@@ -1,0 +1,126 @@
+@*
+=========================================================
+FILE: WebhooksPanel.razor
+
+PURPOSE:
+The webhook addresses of the company and the latest deliveries (Slice 10).
+
+RESPONSIBILITIES:
+- Each address: its events, state, last success; change, test, turn off or on, remove
+- Add an address; the latest deliveries with their result and Send again
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Bodies are signed (webhook-id, webhook-timestamp, webhook-signature); the secret is shown once
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<section class="ops-editor__panel" aria-labelledby="webhooks-title" id="webhooks">
+    <h2 id="webhooks-title">@T["ui.api.webhooks"]</h2>
+    <p class="ops-editor__hint">@T["ui.api.webhooks_hint"]</p>
+    @foreach (OperationsWebhookEndpoint endpoint in Endpoints)
+    {
+        <form method="post" action="/staff/settings/api/webhooks/@endpoint.Id" class="ops-editor__form" data-endpoint data-endpoint-active="@endpoint.Active.ToString().ToLowerInvariant()" style="border-top: 1px solid var(--vx-color-border, #e2e8f0); padding-top: 1rem; margin-top: 1rem;">
+            <AntiforgeryToken />
+            <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.8125rem; font-weight: 500;">
+                <span>@T["ui.api.url"]</span>
+                <input name="url" type="url" required maxlength="@OperationsWebhookEndpoint.UrlMaxLength" value="@endpoint.Url" disabled="@(!CanEdit)" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem; width: 100%; max-width: 32rem;" />
+            </label>
+            <fieldset style="border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.75rem 1rem; margin: 0.65rem 0;">
+                <legend style="padding: 0 0.35rem; font-weight: 600; font-size: 0.8125rem;">@T["ui.api.events"]</legend>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 0.5rem;">
+                    @foreach (OperationsWebhookEvents kind in OperationsWebhookEventNames.All)
+                    {
+                        <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8125rem;">
+                            <input type="checkbox" name="events" value="@kind" checked="@endpoint.Events.HasFlag(kind)" disabled="@(!CanEdit)" style="width: 1.1rem; height: 1.1rem;" />
+                            <span>@T["ui.api.event." + kind] <code class="ops-editor__code" style="font-size: 0.75rem;">@OperationsWebhookEventNames.Of(kind)</code></span>
+                        </label>
+                    }
+                </div>
+            </fieldset>
+            <p class="ops-editor__hint" style="margin: 0.35rem 0 0.75rem;">
+                <span class="ops-editor__status" data-status="@(endpoint.Active ? "active" : "inactive")">@T[endpoint.Active ? "ui.api.on" : endpoint.DisabledForFailures ? "ui.api.off_failures" : "ui.api.off"]</span>
+                · @T["ui.api.secret"] <code class="ops-editor__code">whsec_…@endpoint.SecretHint</code>
+                · @T["ui.api.last_success"] @(endpoint.LastSuccessUtc?.ToLocalTime().ToString("g", CultureInfo.CurrentCulture) ?? T["ui.api.never"].Value)
+            </p>
+            @if (CanEdit)
+            {
+                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                    <button type="submit" class="vx-button vx-button--primary" style="height: 32px; padding: 0 0.85rem;">@T["ui.editor.save"]</button>
+                    <button type="submit" formaction="/staff/settings/api/webhooks/@endpoint.Id/test" class="vx-button vx-button--secondary" disabled="@(!endpoint.Active)" style="height: 32px; padding: 0 0.85rem;">@T["ui.api.test"]</button>
+                    <button type="submit" formaction="/staff/settings/api/webhooks/@endpoint.Id/switch?action=@(endpoint.Active ? "off" : "on")" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T[endpoint.Active ? "ui.api.turn_off" : "ui.api.turn_on"]</button>
+                    <button type="submit" formaction="/staff/settings/api/webhooks/@endpoint.Id/switch?action=remove" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.api.remove"]</button>
+                </div>
+            }
+        </form>
+    }
+    @if (CanEdit && Endpoints.Count < OperationsWebhookEndpoint.MaxPerCompany)
+    {
+        <form method="post" action="/staff/settings/api/webhooks" class="ops-editor__form" data-new-endpoint style="border-top: 1px solid var(--vx-color-border, #e2e8f0); padding-top: 1rem; margin-top: 1rem;">
+            <AntiforgeryToken />
+            <h3 style="font-size: 0.9375rem; margin-bottom: 0.5rem;">@T["ui.api.add_webhook"]</h3>
+            <label style="display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.8125rem; font-weight: 500;">
+                <span>@T["ui.api.url"]</span>
+                <input name="url" type="url" required maxlength="@OperationsWebhookEndpoint.UrlMaxLength" placeholder="https://" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem; width: 100%; max-width: 32rem;" />
+            </label>
+            <fieldset style="border: 1px solid var(--vx-color-border, #e2e8f0); border-radius: 0.375rem; padding: 0.75rem 1rem; margin: 0.65rem 0;">
+                <legend style="padding: 0 0.35rem; font-weight: 600; font-size: 0.8125rem;">@T["ui.api.events"]</legend>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 0.5rem;">
+                    @foreach (OperationsWebhookEvents kind in OperationsWebhookEventNames.All)
+                    {
+                        <label class="ops-checkbox-label" style="display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.8125rem;">
+                            <input type="checkbox" name="events" value="@kind" checked style="width: 1.1rem; height: 1.1rem;" />
+                            <span>@T["ui.api.event." + kind]</span>
+                        </label>
+                    }
+                </div>
+            </fieldset>
+            <button type="submit" class="vx-button vx-button--primary" style="height: 32px; padding: 0 0.85rem;">@T["ui.api.add"]</button>
+        </form>
+    }
+</section>
+<section class="ops-editor__panel" aria-labelledby="deliveries-title" id="deliveries">
+    <h2 id="deliveries-title">@T["ui.api.deliveries"]</h2>
+    @if (Deliveries.Count == 0)
+    {
+        <div class="ops-editor__empty"><p>@T["ui.api.deliveries_none"]</p></div>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.api.deliveries"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col">@T["ui.api.when"]</th><th scope="col">@T["ui.api.event"]</th><th scope="col">@T["ui.api.url"]</th><th scope="col">@T["ui.api.result"]</th><th scope="col" class="ops-editor__number">@T["ui.api.tries"]</th><th scope="col"></th></tr></thead>
+                <tbody>
+                    @foreach (OperationsWebhookDelivery delivery in Deliveries)
+                    {
+                        <tr data-delivery-status="@delivery.Status">
+                            <td>@delivery.CreatedUtc.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)</td>
+                            <td class="ops-editor__code">@delivery.EventType</td>
+                            <td style="max-width: 20rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@(Endpoints.FirstOrDefault(item => item.Id == delivery.EndpointId)?.Url)</td>
+                            <td><span class="ops-editor__status" data-status="@delivery.Status.ToString().ToLowerInvariant()">@T["ui.api.status." + delivery.Status]</span>@(delivery.LastStatusCode is { } code ? " · " + code : string.Empty)@(delivery.LastError is { } error ? " · " + error : string.Empty)</td>
+                            <td class="ops-editor__number">@delivery.Attempts</td>
+                            <td>
+                                @if (CanEdit && delivery.Status == OperationsWebhookStatus.Failed)
+                                {
+                                    <form method="post" action="/staff/settings/api/deliveries/@delivery.Id/resend" class="ops-editor__inline" style="margin: 0;">
+                                        <AntiforgeryToken />
+                                        <button type="submit" class="vx-button vx-button--secondary" style="height: 28px; padding: 0 0.65rem; font-size: 0.75rem;">@T["ui.api.resend"]</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    }
+</section>
+
+@code {
+    [Parameter] public IReadOnlyList<OperationsWebhookEndpoint> Endpoints { get; set; } = Array.Empty<OperationsWebhookEndpoint>();
+
+    [Parameter] public IReadOnlyList<OperationsWebhookDelivery> Deliveries { get; set; } = Array.Empty<OperationsWebhookDelivery>();
+
+    [Parameter] public bool CanEdit { get; set; }
+}

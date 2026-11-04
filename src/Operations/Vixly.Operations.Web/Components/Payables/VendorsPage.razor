@@ -1,0 +1,78 @@
+@*
+=========================================================
+FILE: VendorsPage.razor
+
+PURPOSE:
+Vendors (Slice 8): the companies the tenant buys from that are neither carriers nor partner agents.
+
+RESPONSIBILITIES:
+- Add a vendor; change its name, usual category, contact, or turn it off
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Carriers are kept under Carriers, partner agents on their warehouse
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.vendors.title"]" Company="@Company" Section="bills" Error="@Error" Info="@Info">
+    <div class="ops-list-bar" style="margin-bottom: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <a href="/staff/bills" class="vx-button vx-button--secondary">@T["ui.bills.back"]</a>
+        </div>
+    </div>
+    <form method="post" action="/staff/vendors" class="ops-list-bar ops-inline-action-bar" aria-labelledby="add-vendor" style="margin-bottom: 0.75rem; padding: 0.5rem 0.75rem; gap: 0.75rem; flex-wrap: wrap;">
+        <AntiforgeryToken />
+        <strong id="add-vendor" style="font-size: 0.8125rem;">@T["ui.vendors.add"]:</strong>
+        <label style="display: inline-flex; align-items: center; gap: 0.4rem; margin: 0; font-size: 0.8125rem; font-weight: 500;">
+            <span>@T["ui.vendors.name"]</span>
+            <input name="name" maxlength="120" size="20" required style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" />
+        </label>
+        <VendorCategory T="T" />
+        <label style="display: inline-flex; align-items: center; gap: 0.4rem; margin: 0; font-size: 0.8125rem; font-weight: 500;">
+            <span>@T["ui.vendors.contact"]</span>
+            <input name="contact" maxlength="200" size="24" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" />
+        </label>
+        <button type="submit" class="vx-button vx-button--primary" style="height: 32px; padding: 0 0.85rem;">@T["ui.vendors.add_button"]</button>
+    </form>
+    @if (Vendors.Count == 0)
+    {
+        <div class="ops-editor__empty"><p>@T["ui.vendors.none"]</p></div>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.vendors.title"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col">@T["ui.vendors.name"]</th><th scope="col">@T["ui.bills.category"]</th><th scope="col">@T["ui.vendors.contact"]</th><th scope="col" style="text-align: center;">@T["ui.vendors.active"]</th><th scope="col"></th></tr></thead>
+                <tbody>
+                    @foreach (OperationsVendor vendor in Vendors)
+                    {
+                        string form = "vendor-" + vendor.Id.ToString("N");
+                        <tr data-vendor="@vendor.Id">
+                            <td><input form="@form" name="name" maxlength="120" size="20" required value="@vendor.Name" aria-label="@T["ui.vendors.name"]" style="height: 28px; padding: 0.2rem 0.5rem; font-size: 0.8125rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></td>
+                            <td><VendorCategory T="T" Selected="vendor.Category" Form="@form" /></td>
+                            <td><input form="@form" name="contact" maxlength="200" size="24" value="@vendor.Contact" aria-label="@T["ui.vendors.contact"]" style="height: 28px; padding: 0.2rem 0.5rem; font-size: 0.8125rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></td>
+                            <td style="text-align: center;"><input form="@form" type="checkbox" name="active" value="true" checked="@vendor.Active" aria-label="@T["ui.vendors.active"]" style="width: 1.1rem; height: 1.1rem; cursor: pointer;" /></td>
+                            <td>
+                                <form id="@form" method="post" action="/staff/vendors/@vendor.Id" style="margin: 0;">
+                                    <AntiforgeryToken />
+                                    <button type="submit" class="vx-button vx-button--secondary" style="height: 28px; padding: 0 0.65rem; font-size: 0.75rem;">@T["ui.vendors.save"]</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsVendor> Vendors { get; set; } = Array.Empty<OperationsVendor>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

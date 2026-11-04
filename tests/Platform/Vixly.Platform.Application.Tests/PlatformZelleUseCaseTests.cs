@@ -219,6 +219,17 @@ public sealed class PlatformZelleUseCaseTests
             new ReportPlatformZellePaymentRequest { Token = token, Amount = invoice.Balance, SentOn = kit.Now.UtcDateTime.Date, SenderName = "Grace", Reference = "ZL-77" }, CancellationToken.None);
         Assert.True(reported.Succeeded, reported.Error?.Code);
 
+        // Owner, 2026-11-04: the menu counts the waiting report, for those who may open the page; nothing for the others, and nothing pending elsewhere.
+        Vixly.Platform.Application.UseCases.MyAccount.GetPlatformAttentionCount.GetPlatformAttentionCountUseCase attention = new(kit.Kit.SalesAdministration(), kit.Kit.Store, kit.ZelleAdministration(),
+            new Vixly.Platform.Application.UseCases.Tenants.PlatformTenantChanges(kit.Kit.Tenants.Gate(), new PlatformStepUpGuard(kit.Kit.Tenants.Store, kit.Kit.Tenants.Clock), kit.Kit.Tenants.Store, kit.Kit.Tenants.Tenants,
+                new Vixly.Platform.Application.Tests.Fakes.FakeTenantChangeStore(kit.Kit.Tenants.Tenants), kit.Kit.Tenants.Audit(), kit.Kit.Tenants.Outbox(), kit.Kit.Tenants.Store, kit.Kit.Tenants.Clock));
+        PlatformAuthorizationContext viewer = kit.Kit.Staff(PlatformPermissions.BillingView, PlatformPermissions.TenantsView, PlatformPermissions.DiscountsApprove);
+        Assert.Equal(1, (await attention.ExecuteAsync(viewer, new() { Attention = Vixly.Platform.Application.Queries.PlatformAttention.Zelle }, CancellationToken.None)).Count);
+        Assert.Equal(0, (await attention.ExecuteAsync(viewer, new() { Attention = Vixly.Platform.Application.Queries.PlatformAttention.TenantChanges }, CancellationToken.None)).Count);
+        Assert.Equal(0, (await attention.ExecuteAsync(viewer, new() { Attention = Vixly.Platform.Application.Queries.PlatformAttention.Approvals }, CancellationToken.None)).Count);
+        Assert.Null((await attention.ExecuteAsync(kit.Kit.Staff(), new() { Attention = Vixly.Platform.Application.Queries.PlatformAttention.Zelle }, CancellationToken.None)).Count);
+        Assert.Null((await attention.ExecuteAsync(kit.Kit.Staff(), new() { Attention = Vixly.Platform.Application.Queries.PlatformAttention.Approvals }, CancellationToken.None)).Count);
+
         collections.Day(14, invoice);
         await collections.RunAsync();
         Assert.True(collection.Held);

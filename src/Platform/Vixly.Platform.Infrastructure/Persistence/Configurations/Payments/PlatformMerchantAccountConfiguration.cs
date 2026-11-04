@@ -31,6 +31,14 @@ internal sealed class PlatformMerchantAccountConfiguration : IEntityTypeConfigur
         builder.Property(item => item.PublishableKey).HasMaxLength(PlatformPaymentsLimits.PublishableKeyMaxLength).IsUnicode(false);
         builder.Property(item => item.AcceptedCurrencies).HasMaxLength(PlatformPaymentsLimits.MaxCurrencies * 4).IsUnicode(false).IsRequired();
         builder.Property(item => item.LastCheckCode).HasMaxLength(PlatformPaymentsLimits.FailureCodeMaxLength).IsUnicode(false);
+        builder.Property(item => item.CheckoutDisplayName).HasMaxLength(PlatformPaymentsLimits.CheckoutDisplayNameMaxLength);
+        builder.Property(item => item.CheckoutLogoUrl).HasMaxLength(PlatformPaymentsLimits.CheckoutImageUrlMaxLength).IsUnicode(false);
+        builder.Property(item => item.CheckoutIconUrl).HasMaxLength(PlatformPaymentsLimits.CheckoutImageUrlMaxLength).IsUnicode(false);
+        builder.Property(item => item.CheckoutBackgroundColor).HasMaxLength(7).IsUnicode(false);
+        builder.Property(item => item.CheckoutButtonColor).HasMaxLength(7).IsUnicode(false);
+        builder.Property(item => item.StatementPrefix).HasMaxLength(PlatformPaymentsLimits.StatementPrefixMaxLength).IsUnicode(false);
+        builder.Property(item => item.StatementSuffix).HasMaxLength(PlatformPaymentsLimits.StatementMaxLength).IsUnicode(false);
+        builder.Ignore(item => item.StatementWording);
         builder.Ignore(item => item.Currencies);
         builder.Ignore(item => item.IsReady);
         builder.HasOne<PlatformUser>().WithMany().HasForeignKey(item => item.UpdatedByUserId).OnDelete(DeleteBehavior.Restrict);

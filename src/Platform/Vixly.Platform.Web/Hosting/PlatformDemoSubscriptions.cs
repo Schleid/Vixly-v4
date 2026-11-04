@@ -162,7 +162,7 @@ public sealed class PlatformDemoSubscriptions
         PlatformPlan basic = Plan(
             "BASIC",
             ("Basic", "For small teams getting started.", "Essentiel", "Pour les petites équipes qui débutent.", "Básico", "Para equipos pequeños que empiezan."),
-            PlatformPlanVersionTerms.Create("USD", 12m, 120m, 0m, 2, 14, 10, 1, new[] { PlatformPlanFeature.DataExport }),
+            PlatformPlanVersionTerms.Create("USD", 12m, 120m, 0m, 2, 14, 10, 1, Modules(PlatformPlanFeature.DataExport)),
             1,
             actor,
             at);
@@ -178,7 +178,7 @@ public sealed class PlatformDemoSubscriptions
                 30,
                 50,
                 5,
-                new[] { PlatformPlanFeature.DataExport, PlatformPlanFeature.AdvancedAnalytics, PlatformPlanFeature.PortalThemeCustomization, PlatformPlanFeature.HomepageContentCustomization }),
+                Modules(PlatformPlanFeature.DataExport, PlatformPlanFeature.AdvancedAnalytics, PlatformPlanFeature.PortalThemeCustomization, PlatformPlanFeature.HomepageContentCustomization)),
             2,
             actor,
             at);
@@ -192,7 +192,7 @@ public sealed class PlatformDemoSubscriptions
         PlatformPlan legacy = Plan(
             "LEGACY-EU",
             ("Legacy Europe", "Former euro plan, kept for existing customers.", "Ancien Europe", "Ancien forfait en euros, conservé pour les clients existants.", "Antiguo Europa", "Antiguo plan en euros, conservado para los clientes existentes."),
-            PlatformPlanVersionTerms.Create("EUR", 15m, 0m, 0m, 2, null, 20, 2, new[] { PlatformPlanFeature.DataExport }),
+            PlatformPlanVersionTerms.Create("EUR", 15m, 0m, 0m, 2, null, 20, 2, Modules(PlatformPlanFeature.DataExport)),
             9,
             actor,
             at);
@@ -208,11 +208,27 @@ public sealed class PlatformDemoSubscriptions
                 30,
                 60,
                 6,
-                new[] { PlatformPlanFeature.DataExport, PlatformPlanFeature.AdvancedAnalytics, PlatformPlanFeature.PortalThemeCustomization, PlatformPlanFeature.HomepageContentCustomization }),
+                Modules(PlatformPlanFeature.DataExport, PlatformPlanFeature.AdvancedAnalytics, PlatformPlanFeature.PortalThemeCustomization, PlatformPlanFeature.HomepageContentCustomization)),
             at.AddDays(400));
+
+        // Vixly Lite (owner, 2026-10-30): one licence, a monthly shipment cap, none of the Operations modules.
+        Plan(
+            "LITE",
+            ("Lite", "For one-person shippers: the counter, pricing, billing and tracking.", "Lite", "Pour les expéditeurs seuls : comptoir, tarifs, facturation et suivi.", "Lite", "Para quien envía solo: mostrador, tarifas, facturación y rastreo."),
+            PlatformPlanVersionTerms.Create("USD", 25m, 250m, 200m, 1, null, 1, 2, null).WithShipmentCap(150, 0.30m),
+            0,
+            actor,
+            at);
 
         return new DemoPlans(basic, growth, enterprise, legacy);
     }
+
+    // Demo plans before Lite included every Operations module, as the migration PlanModules gives every real plan.
+    private static PlatformPlanFeature[] Modules(params PlatformPlanFeature[] features) => features.Concat(new[]
+    {
+        PlatformPlanFeature.CustomerPortal, PlatformPlanFeature.Insurance, PlatformPlanFeature.CreditAccounts, PlatformPlanFeature.Supplies,
+        PlatformPlanFeature.HomeDelivery, PlatformPlanFeature.SupportDesk, PlatformPlanFeature.Payables
+    }).ToArray();
 
     private PlatformPlan Plan(
         string code,
@@ -236,7 +252,8 @@ public sealed class PlatformDemoSubscriptions
     private void Subscribe(PlatformTenantListItem tenant, PlatformTenant? record, DemoPlans plans, int scenario, bool withOverride, Guid actor, DateTimeOffset now)
     {
         List<PlatformSubscriptionEvent> events = new();
-        int kind = scenario % 8;
+        // Tenant codes are random, so the situations land on different companies each time; the Operations demo companies stay paid.
+        int kind = PlatformDemoTenants.OperationsSlugs.Contains(tenant.Slug) ? 2 : scenario % 8;
         PlatformPlan plan = kind switch
         {
             0 or 4 => plans.Basic,

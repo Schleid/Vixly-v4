@@ -1,0 +1,29 @@
+﻿@*
+=========================================================
+FILE: CustomsField.razor
+
+PURPOSE:
+Who clears customs on a price list: duties included in the price, or transport only (Slice 4C section 7).
+
+RESPONSIBILITIES:
+- One select
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+<label>@T["ui.charges.customs"]
+    <select name="customs">
+        @foreach (OperationsCustomsPolicy policy in Enum.GetValues<OperationsCustomsPolicy>())
+        {
+            <option value="@policy" selected="@(policy == Value)">@T["ui.charges.customs." + policy]</option>
+        }
+    </select>
+</label>
+<p class="ops-editor__hint">@T["ui.charges.customs_hint"]</p>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public OperationsCustomsPolicy Value { get; set; } = OperationsCustomsPolicy.TransportOnly;
+}

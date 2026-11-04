@@ -1,0 +1,60 @@
+﻿@*
+=========================================================
+FILE: RegistrationVerify.razor
+
+PURPOSE:
+Confirms the owner’s email from the emailed link, with a button (Slice 2).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Sign-up is switched off until Stage 3 (owner decision D-U4); RegistrationGate shows the closed page
+- A button, not the link itself, confirms: mail scanners that open links do not use the token
+- The new access token replaces the cookie, so another browser can carry on
+=========================================================
+*@
+@inject IStringLocalizer<PublicText> T
+@inject PlatformApi Api
+@inject NavigationManager Navigation
+
+<ErrorBox Error="_error" />
+@if (string.IsNullOrWhiteSpace(Token))
+{
+    <VxMessage Type="VxMessageType.Warning">@T["public.register.verify_missing"]</VxMessage>
+}
+else
+{
+    <p class="pub-lead">@T["public.register.verify_text"]</p>
+    <form method="post" class="pub-form" @formname="register-verify" @onsubmit="VerifyAsync">
+        <AntiforgeryToken />
+        <input type="hidden" name="token" value="@Token" />
+        <div class="pub-form__actions">
+            <VxButton Variant="VxButtonVariant.Primary" Type="submit">@T["public.register.verify"]</VxButton>
+        </div>
+    </form>
+}
+
+@code {
+    private PlatformApiError? _error;
+
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    [Parameter]
+    public string? Token { get; set; }
+
+    private async Task VerifyAsync()
+    {
+        string token = HttpContext?.Request.HasFormContentType == true ? HttpContext.Request.Form["token"].ToString() : Token ?? string.Empty;
+        PlatformApiResult<Vixly.Contracts.Platform.Registration.PlatformRegistrationAccess> result = await Api.VerifyAsync(token, CancellationToken.None);
+
+        if (result.Value is { } access && HttpContext is not null)
+        {
+            RegistrationCookies.Write(HttpContext, RegistrationCookies.Access, access.AccessToken, null);
+            Navigation.NavigateTo(PublicLanguage.Page(PublicLanguage.Current, "register/plan"));
+            return;
+        }
+
+        _error = result.Error;
+    }
+}

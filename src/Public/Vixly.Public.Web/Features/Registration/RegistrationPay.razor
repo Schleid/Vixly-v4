@@ -1,0 +1,46 @@
+﻿@*
+=========================================================
+FILE: RegistrationPay.razor
+
+PURPOSE:
+Step 4 of sign-up: pay the first invoice by card or Zelle (Slice 5 and the Zelle update).
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- Sign-up is switched off until Stage 3 (owner decision D-U4); RegistrationGate shows the closed page
+=========================================================
+*@
+@inject PlatformApi Api
+@inject NavigationManager Navigation
+
+@if (_access is { } access)
+{
+    <Vixly.Public.Web.Features.Pay.PaymentPanel Target="Vixly.Public.Web.Features.Pay.PaymentTarget.Registration(access)" />
+}
+
+@code {
+    private string? _access;
+
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (RegistrationCookies.Read(HttpContext, RegistrationCookies.Access) is not { } access)
+        {
+            Navigation.NavigateTo(PublicLanguage.Page(PublicLanguage.Current, "register"));
+            return;
+        }
+
+        PlatformApiResult<Vixly.Contracts.Platform.Registration.PlatformRegistrationStatus> status = await Api.StatusAsync(access, CancellationToken.None);
+
+        if (status.Value is { Step: not "pending_payment" } moved)
+        {
+            Navigation.NavigateTo(RegistrationSteps.PageFor(moved.Step));
+            return;
+        }
+
+        _access = access;
+    }
+}

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.Features;
+using Vixly.Shared.Hosting.Security;
 using Microsoft.AspNetCore.Localization;
 using Vixly.Platform.Api.Endpoints;
 using Vixly.Platform.Api.Endpoints.Internal;
@@ -41,9 +42,18 @@ public static class PlatformApiHost
     public static WebApplication Build(string[] args, Action<WebApplicationBuilder>? configure)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+        // A missing setting names itself on a setup page instead of failing the start (owner, 2026-10-23).
+        if (Vixly.Shared.Hosting.Settings.VixlySettingsCheck.Run(builder, PlatformApiSettings.Site, PlatformApiSettings.All, configure) is { } setup)
+        {
+            return setup;
+        }
         PlatformApiOptions api = builder.Configuration.GetSection(PlatformApiOptions.SectionName).Get<PlatformApiOptions>() ?? new PlatformApiOptions();
 
         builder.Services.AddPlatformInfrastructure(builder.Configuration, "Vixly.V4.Platform.Api");
+        builder.Services.AddVixlyKeyRingEncryption(builder.Configuration);
+        // Performance plan P-1 (owner, 2026-11-04): SQL commands and outgoing calls per request; slow requests logged.
+        Vixly.Shared.Hosting.Diagnostics.VixlyRequestTiming.AddVixlyRequestTiming(builder.Services, builder.Configuration);
         builder.Services.AddPlatformApplication();
         builder.Services.AddVixlyForwardedHeaders(builder.Configuration);
         builder.Services.AddHttpContextAccessor();
@@ -64,17 +74,23 @@ public static class PlatformApiHost
 
         WebApplication app = builder.Build();
 
-        app.UseForwardedHeaders();
+        app.UseVixlyForwardedHeaders();
+        Vixly.Shared.Hosting.Diagnostics.VixlyRequestTiming.UseVixlyRequestTiming(app);
         app.UseVixlySecurityHeaders();
         app.UseExceptionHandler(errors => errors.Run(context =>
         {
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             return Task.CompletedTask;
         }));
+
+        app.UseVixlyClientDisconnects();
         app.Use((context, next) =>
         {
             // Provider webhooks carry whole payment objects: 64 KB there, the API limit elsewhere (Slice 5).
-            long maxBody = context.Request.Path.StartsWithSegments("/payments/webhook") ? 64 * 1024 : api.MaxRequestBodyBytes;
+            // A company change carries a proof of up to 10 MB in base64: 15 MB there (B12).
+            long maxBody = context.Request.Path.StartsWithSegments("/payments/webhook") ? 64 * 1024
+                : context.Request.Path.StartsWithSegments("/internal/v1/tenant/company-change") ? 15 * 1024 * 1024
+                : api.MaxRequestBodyBytes;
 
             if (context.Features.Get<IHttpMaxRequestBodySizeFeature>() is { IsReadOnly: false } limit)
             {
@@ -98,6 +114,7 @@ public static class PlatformApiHost
             options.RequestCultureProviders = new List<IRequestCultureProvider> { new AcceptLanguageHeaderRequestCultureProvider() };
         });
         app.UseCors();
+        app.UsePlatformPublicCaller();
         app.UsePlatformInternalAuthentication();
         app.UseRateLimiter();
 
@@ -105,6 +122,8 @@ public static class PlatformApiHost
         app.MapPlatformRegistrationEndpoints();
         app.MapPlatformPaymentEndpoints();
         app.MapPlatformLegalEndpoints();
+        app.MapPlatformLeadEndpoints();
+        app.MapPlatformMaintenanceEndpoints();
         app.MapPlatformSimulatedCheckout(app.Environment);
         app.MapPlatformInternalEndpoints();
 

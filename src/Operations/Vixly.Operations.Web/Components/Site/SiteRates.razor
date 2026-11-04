@@ -1,0 +1,105 @@
+@*
+=========================================================
+FILE: SiteRates.razor
+
+PURPOSE:
+The company's published rates on its home page, with an estimate for a weight (landing page marketing, owner 2026-10-30).
+
+RESPONSIBILITIES:
+- Show each published price list: service, route and its first bands, with a link to all prices
+- Let the visitor estimate one package: service, pickup point and weight, answered by the company's own price lists
+
+IMPORTANT NOTES:
+- Markup only. Prices come from the lists the company publishes, never a customer's prices
+- Always an estimate: customs, taxes and insurance are not included, and the page says so
+- Works without script: the form reloads the home page at the rates section
+- Tenant surface: never says "Vixly"
+=========================================================
+*@
+@using System.Globalization
+@using Vixly.Operations.Application.Charges
+@using Vixly.Operations.Domain.Charges
+@inject IStringLocalizer<OperationsText> T
+
+@if (Page.Site.Settings.ShowRates && Page.Site.Pricing is { Lists.Count: > 0 } pricing)
+{
+    <section class="site-section as-rates" id="rates" aria-labelledby="rates-title">
+        <h2 id="rates-title">@T["site.rates.title"]</h2>
+        <p class="as-section-intro">@T["site.rates.intro"]</p>
+        <div class="as-rates__grid">
+            <ul class="as-rates__lists">
+                @foreach (OperationsPriceListView list in pricing.Lists.Take(MaxLists))
+                {
+                    <li class="as-rate">
+                        <h3>@(list.ServiceLabel ?? T["ui.services.name." + list.ServiceCode].Value)</h3>
+                        <p class="as-rate__route">@VixlyText.Format(T, "site.pricing.route", new Dictionary<string, object> { ["origin"] = list.Origin ?? T["site.pricing.any_origin"].Value, ["destination"] = list.Destination ?? T["site.pricing.any_destination"].Value })</p>
+                        <ul>
+                            @foreach (OperationsRateBand band in list.Bands.Take(MaxBands)) { <li>@OperationsSitePrices.Band(T, band, list, pricing)</li> }
+                            @foreach (OperationsPriceItemView item in list.Items.Take(MaxBands)) { <li>@item.Name: @OperationsSitePrices.Money(item.Price, pricing.CurrencyCode)</li> }
+                        </ul>
+                    </li>
+                }
+            </ul>
+            <form class="as-estimate" method="get" action="@(Page.Home + "#rates")">
+                <h3>@T["site.rates.estimate_title"]</h3>
+                @if (Page.Site.IsPreview)
+                {
+                    <input type="hidden" name="preview" value="true" />
+                    <input type="hidden" name="theme" value="airsea" />
+                }
+                <label>@T["site.rates.service"]
+                    <select name="service">
+                        @foreach (string code in pricing.Lists.Select(list => list.ServiceCode).Distinct(StringComparer.Ordinal))
+                        {
+                            <option value="@(code)" selected="@(Asked?.Service == code)">@T["ui.services.name." + code]</option>
+                        }
+                    </select>
+                </label>
+                @if (Destinations.Count > 0)
+                {
+                    <label>@T["site.rates.destination"]
+                        <select name="destination">
+                            @foreach (OperationsPublicLocation location in Destinations)
+                            {
+                                <option value="@location.Id" selected="@(Asked?.DestinationId == location.Id)">@(location.Name + ", " + location.City)</option>
+                            }
+                        </select>
+                    </label>
+                }
+                <label>@VixlyText.Format(T, "site.rates.weight", "unit", OperationsSitePrices.WeightUnit(pricing))
+                    <input type="number" name="weight" inputmode="decimal" min="0.1" max="1000" step="0.1" required value="@(Asked?.Weight?.ToString("0.##", CultureInfo.InvariantCulture))" />
+                </label>
+                <button type="submit" class="site-button">@T["site.rates.estimate"]</button>
+                @if (Asked is not null)
+                {
+                    <div class="as-estimate__answer" role="status">
+                        @if (Asked.Result is { } result)
+                        {
+                            <p class="as-estimate__total">@VixlyText.Format(T, "site.rates.result", "amount", OperationsSitePrices.Money(result.Total, result.CurrencyCode))</p>
+                            <p class="as-estimate__note">@T["site.rates.result_note"]</p>
+                        }
+                        else
+                        {
+                            <p>@T["site.rates.not_priced"]</p>
+                        }
+                    </div>
+                }
+            </form>
+        </div>
+        <p><a class="site-hero__locations" href="@(Page.Home + "/pricing")">@T["site.rates.all"] <span aria-hidden="true">→</span></a></p>
+    </section>
+}
+
+@code {
+    private const int MaxLists = 4;
+
+    private const int MaxBands = 3;
+
+    [Parameter, EditorRequired]
+    public OperationsSitePage Page { get; set; } = null!;
+
+    private OperationsSiteEstimate? Asked => Page.Estimate;
+
+    private IReadOnlyList<OperationsPublicLocation> Destinations =>
+        OperationsSiteHome.PickupPoints(Page).Where(location => location.Kind == "warehouse").ToList();
+}

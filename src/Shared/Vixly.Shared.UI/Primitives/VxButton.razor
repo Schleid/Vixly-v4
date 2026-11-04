@@ -8,16 +8,18 @@ Accessible button primitive supporting primary, secondary, danger, and subtle va
 
 IMPORTANT NOTES:
 - Pure presentational primitive (ADR-0001)
+- Double-click protection (ADR-0019): while its click handler runs the
+  button is disabled and further clicks are ignored
 - Size budgets (UI-7): max 6 parameters, max 250 lines
 =========================================================
 *@
 
 <button type="@Type"
         class="@GetCssClass()"
-        disabled="@(Disabled || IsBusy)"
-        aria-busy="@(IsBusy ? "true" : null)"
-        @onclick="OnClick">
-    @if (IsBusy)
+        disabled="@(Disabled || IsBusy || _running)"
+        aria-busy="@(IsBusy || _running ? "true" : null)"
+        @onclick="ClickAsync">
+    @if (IsBusy || _running)
     {
         <span class="vx-button__spinner" aria-hidden="true"></span>
     }
@@ -42,6 +44,27 @@ IMPORTANT NOTES:
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+
+    private bool _running;
+
+    private async Task ClickAsync(MouseEventArgs args)
+    {
+        if (_running || Disabled || IsBusy)
+        {
+            return;
+        }
+
+        _running = true;
+
+        try
+        {
+            await OnClick.InvokeAsync(args);
+        }
+        finally
+        {
+            _running = false;
+        }
+    }
 
     private string GetCssClass()
     {

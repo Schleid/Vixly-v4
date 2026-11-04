@@ -1,0 +1,109 @@
+@*
+=========================================================
+FILE: EventSettingsPage.razor
+
+PURPOSE:
+Settings → Events (Slice 6C, E-3 and E-5): the customers' emails, the standard causes and the company's own.
+
+RESPONSIBILITIES:
+- Switch the emails and the standard causes
+- Add a cause in the company's words (English, French, Spanish); change or switch one off
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Events keep the words they were written with
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.event_settings.title"]" Company="@Company" Section="event_settings" Error="@Error" Info="@Info">
+    <form method="post" action="/staff/settings/events" class="ops-editor__panel ops-editor__form">
+        <AntiforgeryToken />
+        <fieldset disabled="@(!CanEdit)">
+            <div class="ops-checkbox-group" style="margin-bottom: 1rem;">
+                <label class="ops-checkbox-label"><input type="checkbox" name="emails" value="true" checked="@EventEmails" /> <span>@T["ui.event_settings.emails"]</span></label>
+                <label class="ops-checkbox-label"><input type="checkbox" name="pickupEmails" value="true" checked="@PickupEmails" /> <span>@T["ui.event_settings.pickup_emails"]</span></label>
+            </div>
+            @foreach (OperationsEventKind kind in new[] { OperationsEventKind.Delay, OperationsEventKind.Exception })
+            {
+                <fieldset style="margin-bottom: 1rem; padding: 0.75rem; border: 1px solid var(--vx-color-border); border-radius: 0.5rem;">
+                    <legend style="font-size: 0.8125rem; font-weight: 600; padding: 0 0.25rem;">@T["ui.event_settings.standard." + kind]</legend>
+                    <div class="ops-checkbox-group">
+                        @foreach (string causeCode in OperationsEventReasons.For(kind))
+                        {
+                            <label class="ops-checkbox-label"><input type="checkbox" name="enabled" value="@causeCode" checked="@(!DisabledCauses.Contains(causeCode))" /> <span>@T["ui.event_reason." + causeCode]</span></label>
+                        }
+                    </div>
+                </fieldset>
+            }
+        </fieldset>
+        @if (CanEdit) { <p class="ops-editor__actions"><button type="submit" class="vx-button vx-button--primary">@T["ui.editor.save"]</button></p> }
+    </form>
+    <section class="ops-editor__panel" aria-labelledby="own-title">
+        <h2 id="own-title">@T["ui.event_settings.own"]</h2>
+        @if (Reasons.Count == 0) { <div class="ops-editor__empty"><p>@T["ui.event_settings.own_none"]</p></div> }
+        @foreach (OperationsEventReason reason in Reasons)
+        {
+            <form method="post" action="/staff/settings/events/causes/@reason.Id" class="ops-editor__form" data-active="@(reason.IsActive ? "true" : "false")" style="margin-bottom: 0.75rem;">
+                <AntiforgeryToken />
+                <fieldset disabled="@(!CanEdit)" style="padding: 0.5rem 0.75rem; border: 1px solid var(--vx-color-border); border-radius: 0.5rem;">
+                    <legend style="font-size: 0.8125rem; font-weight: 600; padding: 0 0.25rem;">@T["ui.events.event_kind." + reason.Kind]</legend>
+                    <input type="hidden" name="kind" value="@reason.Kind" />
+                    <div class="ops-charges-trio" style="margin-bottom: 0.5rem;">
+                        <div><label>EN <input name="en" value="@reason.TextEn" maxlength="@OperationsEventReason.TextMaxLength" required /></label></div>
+                        <div><label>FR <input name="fr" value="@reason.TextFr" maxlength="@OperationsEventReason.TextMaxLength" /></label></div>
+                        <div><label>ES <input name="es" value="@reason.TextEs" maxlength="@OperationsEventReason.TextMaxLength" /></label></div>
+                    </div>
+                    <div class="ops-editor__inline-field" style="align-items: center; justify-content: space-between; margin-top: 0.5rem;">
+                        <label class="ops-checkbox-label"><input type="checkbox" name="active" value="true" checked="@reason.IsActive" /> <span>@T["ui.event_settings.active"]</span></label>
+                        @if (CanEdit) { <button type="submit" class="vx-button vx-button--secondary">@T["ui.editor.save"]</button> }
+                    </div>
+                </fieldset>
+            </form>
+        }
+        @if (CanEdit)
+        {
+            <form method="post" action="/staff/settings/events/causes" class="ops-editor__form" aria-labelledby="new-cause" style="margin-top: 1rem; padding: 0.75rem; border: 1px dashed var(--vx-color-border); border-radius: 0.5rem;">
+                <AntiforgeryToken />
+                <h3 id="new-cause" style="font-size: 0.875rem; font-weight: 600; margin-top: 0;">@T["ui.event_settings.add"]</h3>
+                <div class="ops-charges-duo">
+                    <div>
+                        <label>@T["ui.events.what"]
+                            <select name="kind">
+                                <option value="Delay">@T["ui.events.event_kind.Delay"]</option>
+                                <option value="Exception">@T["ui.events.event_kind.Exception"]</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div><label>EN <input name="en" maxlength="@OperationsEventReason.TextMaxLength" required /></label></div>
+                </div>
+                <div class="ops-charges-duo">
+                    <div><label>FR <input name="fr" maxlength="@OperationsEventReason.TextMaxLength" /></label></div>
+                    <div><label>ES <input name="es" maxlength="@OperationsEventReason.TextMaxLength" /></label></div>
+                </div>
+                <div class="ops-editor__inline-field" style="align-items: center; justify-content: space-between; margin-top: 0.75rem;">
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.event_settings.add"]</button>
+                    <span class="ops-editor__hint" style="margin: 0;">@T["ui.event_settings.add_hint"]</span>
+                </div>
+            </form>
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public bool EventEmails { get; set; }
+
+    [Parameter] public bool PickupEmails { get; set; } = true;
+
+    [Parameter] public IReadOnlyList<string> DisabledCauses { get; set; } = Array.Empty<string>();
+
+    [Parameter] public IReadOnlyList<OperationsEventReason> Reasons { get; set; } = Array.Empty<OperationsEventReason>();
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

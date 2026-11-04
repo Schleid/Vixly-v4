@@ -1,0 +1,16 @@
+﻿@inject PublicHelpCatalogue Help
+@inject IHttpContextAccessor Http
+@inject IStringLocalizer<PublicText> T
+@* =========================================================
+   FILE: PublicHelpContextLink.razor
+
+   PURPOSE:
+   Opens help for the current Public page from the layout header.
+
+   RESPONSIBILITIES:
+   - Fall back to the help home when no article owns the route.
+
+   IMPORTANT NOTES:
+   - Visitor tokens are never copied to help addresses.
+   ========================================================= *@
+<VxHelpLink Href="@Help.ContextAddress(PublicLanguage.Current, Http.HttpContext?.Request.Path.Value ?? "/")" Label="@T["ui.help.context"]" />

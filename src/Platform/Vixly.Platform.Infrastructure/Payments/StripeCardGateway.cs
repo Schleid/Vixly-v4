@@ -22,6 +22,7 @@ namespace Vixly.Platform.Infrastructure.Payments;
 //
 // IMPORTANT NOTES:
 // - Card numbers only ever reach Stripe (PCI SAQ A)
+// - Request options are built by StripeCheckoutOptions (payment methods, branding, statement suffix)
 // - Every money call sends the transaction's idempotency key
 // - Stripe error text is logged without secrets and never returned; callers get codes
 // =========================================================
@@ -73,47 +74,7 @@ internal sealed class StripeCardGateway : IPlatformCardGateway
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        Dictionary<string, string> metadata = new(request.Metadata, StringComparer.Ordinal);
-        SessionCreateOptions options = new()
-        {
-            Customer = request.CustomerId,
-            PaymentMethodTypes = new List<string> { "card" },
-            SuccessUrl = request.SuccessUrl,
-            CancelUrl = request.CancelUrl,
-            Locale = request.Language is "en" or "fr" or "es" ? request.Language : "auto",
-            Metadata = metadata,
-            ClientReferenceId = metadata.GetValueOrDefault(PlatformCardMetadata.Transaction) ?? metadata.GetValueOrDefault(PlatformCardMetadata.Link)
-        };
-
-        if (request.Purpose == PlatformCheckoutPurpose.SaveCard)
-        {
-            options.Mode = "setup";
-            options.SetupIntentData = new SessionSetupIntentDataOptions { Metadata = metadata };
-        }
-        else
-        {
-            options.Mode = "payment";
-            options.LineItems = new List<SessionLineItemOptions>
-            {
-                new()
-                {
-                    Quantity = 1,
-                    PriceData = new SessionLineItemPriceDataOptions
-                    {
-                        Currency = request.CurrencyCode.ToLowerInvariant(),
-                        UnitAmount = request.AmountMinor,
-                        ProductData = new SessionLineItemPriceDataProductDataOptions { Name = request.Description }
-                    }
-                }
-            };
-            options.PaymentIntentData = new SessionPaymentIntentDataOptions
-            {
-                Description = request.Description,
-                Metadata = metadata,
-                SetupFutureUsage = request.SaveCard ? "off_session" : null
-            };
-        }
-
+        SessionCreateOptions options = StripeCheckoutOptions.Session(request);
         Session session = await CallAsync("checkout", () => new SessionService(Client).CreateAsync(options, new RequestOptions { IdempotencyKey = request.IdempotencyKey }, cancellationToken));
         return new PlatformCheckoutSession(session.Id, session.Url);
     }
@@ -137,17 +98,7 @@ internal sealed class StripeCardGateway : IPlatformCardGateway
         try
         {
             PaymentIntent intent = await new PaymentIntentService(Client).CreateAsync(
-                new PaymentIntentCreateOptions
-                {
-                    Amount = request.AmountMinor,
-                    Currency = request.CurrencyCode.ToLowerInvariant(),
-                    Customer = request.CustomerId,
-                    PaymentMethod = request.PaymentMethodId,
-                    OffSession = true,
-                    Confirm = true,
-                    Description = request.Description,
-                    Metadata = new Dictionary<string, string>(request.Metadata, StringComparer.Ordinal)
-                },
+                StripeCheckoutOptions.Charge(request),
                 new RequestOptions { IdempotencyKey = request.IdempotencyKey },
                 cancellationToken);
             return Result(intent);
@@ -221,6 +172,16 @@ internal sealed class StripeCardGateway : IPlatformCardGateway
         return method.Card is { } card
             ? new PlatformCardDetails(method.Id, card.Brand, card.Last4, (int)card.ExpMonth, (int)card.ExpYear)
             : throw new DomainException(PlatformPaymentsErrors.CardInvalid);
+    }
+
+    public async Task<string?> GetWalletAsync(string paymentId, CancellationToken cancellationToken)
+    {
+        PaymentIntent intent = await CallAsync("wallet", () => new PaymentIntentService(Client).GetAsync(
+            paymentId,
+            new PaymentIntentGetOptions { Expand = new List<string> { "payment_method" } },
+            null,
+            cancellationToken));
+        return intent.PaymentMethod?.Card?.Wallet?.Type is { Length: > 0 } wallet ? Code(wallet) : null;
     }
 
     public Task DetachCardAsync(string paymentMethodId, CancellationToken cancellationToken)

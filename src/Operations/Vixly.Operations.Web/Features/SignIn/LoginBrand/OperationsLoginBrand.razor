@@ -1,0 +1,23 @@
+﻿@using Microsoft.Extensions.Localization
+@using Vixly.Operations.Resources
+@using Vixly.Operations.Web.Components.SignIn
+@inject IStringLocalizer<OperationsLoginText> L
+@* =========================================================
+FILE: OperationsLoginBrand.razor
+
+PURPOSE:
+The identity at staff entry: the Operations icon and the portal's name.
+
+RESPONSIBILITIES:
+- Render the fixed Operations icon (owner, 2026-11-01)
+
+IMPORTANT NOTES:
+- Never a company's logo (a wide logo was squeezed into the square) and never the platform's name
+- The company's name is in the subtitle, so staff see which company they sign in to
+========================================================= *@
+<div class="ops-login__identity">
+    <span class="ops-login__logo" data-login-logo>
+        <OperationsMark Size="28" />
+    </span>
+    <span>@L["portal"]</span>
+</div>

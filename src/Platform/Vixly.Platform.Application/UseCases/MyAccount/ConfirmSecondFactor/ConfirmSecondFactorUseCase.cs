@@ -28,6 +28,8 @@ namespace Vixly.Platform.Application.UseCases.MyAccount.ConfirmSecondFactor;
 // - Authenticator codes cannot be replayed: the last accepted
 //   time step is kept (domain)
 // - A passkey confirms through ConfirmSecondFactorWithPasskey
+// - The password confirms only for a person with no second
+//   factor while Require MFA is No (owner, 2026-10-22)
 // =========================================================
 public sealed class ConfirmSecondFactorUseCase
 {
@@ -37,11 +39,15 @@ public sealed class ConfirmSecondFactorUseCase
 
     private readonly IPlatformSecretGenerator _secrets;
 
+    private readonly IPlatformPasswordHasher _hasher;
+
     public ConfirmSecondFactorUseCase(
         PlatformStepUpSteps steps,
         IPlatformAuthenticatorCodes codes,
-        IPlatformSecretGenerator secrets)
+        IPlatformSecretGenerator secrets,
+        IPlatformPasswordHasher hasher)
     {
+        _hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
         _steps = steps ?? throw new ArgumentNullException(nameof(steps));
         _codes = codes ?? throw new ArgumentNullException(nameof(codes));
         _secrets = secrets ?? throw new ArgumentNullException(nameof(secrets));
@@ -58,6 +64,20 @@ public sealed class ConfirmSecondFactorUseCase
         if (await _steps.LoadAsync(context, cancellationToken) is not { } found)
         {
             return ConfirmSecondFactorResponse.Failure(PlatformAuthErrors.SessionEnded);
+        }
+
+        if (request.UsePassword)
+        {
+            bool allowed = await _steps.PasswordConfirmsAsync(found.User, cancellationToken);
+            bool matches = allowed
+                && found.User.Account.PasswordHash is { } hash
+                && !string.IsNullOrEmpty(request.Code)
+                && _hasher.Verify(request.Code, hash) != PlatformPasswordCheck.Failed;
+            Error? outcome = matches
+                ? await _steps.ConfirmAsync(found.Session, found.User, "password", cancellationToken)
+                : await _steps.FailAsync(found.Session, found.User, "password", allowed ? PlatformAuthErrors.PasswordIncorrect : PlatformAuthErrors.CodeInvalid, cancellationToken);
+
+            return outcome is null ? ConfirmSecondFactorResponse.Success() : ConfirmSecondFactorResponse.Failure(outcome);
         }
 
         string method = request.UseRecoveryCode ? "recovery_code" : "authenticator_app";

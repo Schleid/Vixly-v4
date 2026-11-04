@@ -1,4 +1,5 @@
-﻿using Vixly.Platform.Application.UseCases.Licensing;
+﻿using Vixly.Platform.Application.Queries;
+using Vixly.Platform.Application.UseCases.Licensing;
 using Vixly.Shared.Kernel.Errors;
 
 namespace Vixly.Platform.Web.Features.Licensing;

@@ -1,0 +1,71 @@
+@*
+=========================================================
+FILE: SiteStoryPanels.razor
+
+PURPOSE:
+Air and ocean told as stories: the company's photo, its words and its promises (landing page marketing, owner 2026-10-30).
+
+RESPONSIBILITIES:
+- One panel per service switched on, with the photo, title, text, delivery time and up to four promises
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText and the tenant texts; defaults are the service texts
+- Promises are only what the company writes; none is invented
+- Tenant surface: never says "Vixly"
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+@if (Panels.Count > 0)
+{
+    <section class="site-section as-stories" aria-labelledby="stories-title">
+        <h2 id="stories-title">@T["site.services.title"]</h2>
+        @foreach ((string code, Guid? imageId) in Panels)
+        {
+            IReadOnlyList<string> points = OperationsSiteHome.Texts(Page, "story." + code + ".point.", OperationsSiteTextKeys.StoryPoints);
+            <article class="as-story">
+                <figure>
+                    @if (Page.Image(imageId) is { } image)
+                    {
+                        <img src="@image" alt="" width="768" height="512" loading="lazy" decoding="async" />
+                    }
+                    else
+                    {
+                        <SiteCargoArt Kind="@(code)" />
+                    }
+                </figure>
+                <div class="as-story__text">
+                    @if (Page.Site.Text("story." + code + ".title") is { Length: > 0 } title)
+                    {
+                        <p class="as-eyebrow">@T["site.service." + code + ".title"]</p>
+                        <h3>@title</h3>
+                    }
+                    else
+                    {
+                        <h3>@T["site.service." + code + ".title"]</h3>
+                    }
+                    <p>@(Page.Site.Text("story." + code + ".text") ?? Page.Text(T, "service." + code, "site.service." + code + ".text"))</p>
+                    @if (Page.Site.Text("time." + code) is { Length: > 0 } time)
+                    {
+                        <p class="as-story__time">@VixlyText.Format(T, "site.story.time", "time", time)</p>
+                    }
+                    @if (points.Count > 0)
+                    {
+                        <ul class="as-checks">
+                            @foreach (string point in points) { <li>@point</li> }
+                        </ul>
+                    }
+                </div>
+            </article>
+        }
+    </section>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public OperationsSitePage Page { get; set; } = null!;
+
+    private IReadOnlyList<(string Code, Guid? ImageId)> Panels =>
+        OperationsSiteHome.Services(Page).Where(code => code is "air" or "ocean")
+            .Select(code => (code, code == "air" ? Page.Site.Settings.AirImageId : Page.Site.Settings.SeaImageId)).ToList();
+}

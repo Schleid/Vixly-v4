@@ -1,0 +1,57 @@
+﻿@*
+=========================================================
+FILE: CounterSupplyChoices.razor
+
+PURPOSE:
+The supplies a typed name matches at the counter (Slice 5E, S-11): the clerk picks one.
+
+RESPONSIBILITIES:
+- List each supply with its code, name and price today, with a button to add it
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Shown when a text names several supplies
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.counter.supplies.choose"]" Company="@Company" Section="counter">
+    <CounterFindBar />
+    <section class="ops-editor__panel" aria-labelledby="supply-choices">
+        <h2 id="supply-choices">@VixlyText.Format(T, "ui.counter.supplies.found", "text", Text)</h2>
+        <ul class="ops-editor__list">
+            @foreach (OperationsSupply supply in Choices)
+            {
+                <li>
+                    <form method="post" action="@AddAction" class="ops-editor__inline">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+                        <input type="hidden" name="supply" value="@supply.Id" />
+                        <span class="ops-editor__code">@supply.Code</span> · @supply.Name(Language)
+                        @if (supply.UnitPrice(null, 1, UtcNow) is { } price) { <span> · @OperationsChargeWords.Money(price, Currency)</span> }
+                        <button type="submit" class="vx-button vx-button--primary">@T["ui.counter.supplies.add"]</button>
+                    </form>
+                </li>
+            }
+        </ul>
+        <p><a href="@Back">@T["ui.counter.supplies.back"]</a></p>
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public string Text { get; set; } = string.Empty;
+
+    [Parameter] public IReadOnlyList<OperationsSupply> Choices { get; set; } = Array.Empty<OperationsSupply>();
+
+    [Parameter] public string AddAction { get; set; } = string.Empty;
+
+    [Parameter] public string Back { get; set; } = "/staff/counter";
+
+    [Parameter] public string Currency { get; set; } = string.Empty;
+
+    [Parameter] public DateTimeOffset UtcNow { get; set; }
+
+    private static string Language => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+}

@@ -1,0 +1,534 @@
+{
+  "version": 2,
+  "captured": "2026-10-25",
+  "capture": "headless browser document only",
+  "fixture": "build/HelpCapture",
+  "viewport": {
+    "width": 1280,
+    "height": 960
+  },
+  "images": [
+    {
+      "file": "en-overview.png",
+      "language": "en",
+      "scene": "overview",
+      "page": "/en",
+      "marked": [
+        ".pub-nav",
+        ".pub-cta"
+      ],
+      "sha256": "74a704ed994554421108153613d97f5b3e34d7a1cd0dfb9ffd5377fef91834e5"
+    },
+    {
+      "file": "en-plans.png",
+      "language": "en",
+      "scene": "plans",
+      "page": "/en/plans",
+      "marked": [
+        ".pub-plan:first-child .pub-plan__facts",
+        ".pub-plan:first-child a.vx-button"
+      ],
+      "sha256": "a79ec5675aad823d63a086d67b1beb6aac4a54f726d4d068a1d8c7558257f8c6"
+    },
+    {
+      "file": "en-company.png",
+      "language": "en",
+      "scene": "company",
+      "page": "/en/register",
+      "marked": [
+        "form[method=\"post\"] fieldset:nth-of-type(1)",
+        "form[method=\"post\"] fieldset:nth-of-type(2)",
+        "form[method=\"post\"] fieldset:nth-of-type(3)",
+        "#reg-slug",
+        "input[name=\"Form.AcceptedTerms\"]",
+        "form[method=\"post\"] button[type=\"submit\"]"
+      ],
+      "sha256": "90162c89cc8d02e5b2736a4b822dc54aafc2c7ef08010377adb7844e3a2a36ae"
+    },
+    {
+      "file": "en-email.png",
+      "language": "en",
+      "scene": "email",
+      "page": "/__capture/en/email",
+      "marked": [
+        "form button[type=\"submit\"]",
+        "#reg-new-email"
+      ],
+      "sha256": "f5c9a63b9e1bb7fb82457c50803d9914fcaf6ff638ceff29dec8425dd818cb07"
+    },
+    {
+      "file": "en-verify.png",
+      "language": "en",
+      "scene": "verify",
+      "page": "/__capture/en/verify",
+      "marked": [
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "43a5f1a900f337ab10a4dc8be74e12203f7e8aba56501bfe83e2d88c2e308f05"
+    },
+    {
+      "file": "en-plan-choice.png",
+      "language": "en",
+      "scene": "plan-choice",
+      "page": "/__capture/en/plan",
+      "marked": [
+        ".pub-plan-radio-group",
+        "#reg-term",
+        "#reg-licences",
+        "#reg-promo",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "ef85f5febbbb6a76e60c273f3875f61a0f00e55c838082a210d32547878dc2d1"
+    },
+    {
+      "file": "en-first-invoice.png",
+      "language": "en",
+      "scene": "first-invoice",
+      "page": "/__capture/en/pay",
+      "marked": [
+        "main .vx-card",
+        "#pay-card",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "5593f1801e1721b8ccc446949ecd04246d104346950e5b5780a40f47db067b6a"
+    },
+    {
+      "file": "en-workspace-ready.png",
+      "language": "en",
+      "scene": "workspace-ready",
+      "page": "/__capture/en/done",
+      "marked": [
+        "main h2",
+        "main .pub-lead"
+      ],
+      "sha256": "12f8027eeece02c6177a51f669939a616449b3b36cf08e6d2f711af0179bf9ea"
+    },
+    {
+      "file": "en-invoice.png",
+      "language": "en",
+      "scene": "invoice",
+      "page": "/pay/help-demo",
+      "marked": [
+        "main .vx-card",
+        "#pay-card",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "9366f5c1cb17b3b5dc4a7112568143e70bb9a19e91a5b82c772905c0f798934d"
+    },
+    {
+      "file": "en-save-card.png",
+      "language": "en",
+      "scene": "save-card",
+      "page": "/cards/help-save-card",
+      "marked": [
+        "#pay-card",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "2db862b0c7fb86c2bd1cd7bb7e65b61d4c6b48c3465daa02036cbcd0cc7e9a07"
+    },
+    {
+      "file": "en-legal.png",
+      "language": "en",
+      "scene": "legal",
+      "page": "/en/legal",
+      "marked": [
+        "main .vx-card a",
+        "main .pub-list"
+      ],
+      "sha256": "f2d310371c558ccc22f4221c7a7b4f09a090c03c23351a5c1f3fbd013e9a8139"
+    },
+    {
+      "file": "en-contact.png",
+      "language": "en",
+      "scene": "contact",
+      "page": "/en/contact",
+      "marked": [
+        "#contact-company",
+        "#contact-email",
+        "#contact-message",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "356ae528e259a0f86b1dbd11c1be9d334733a0f8db2622d96a4235a5b6e5ce9b"
+    },
+    {
+      "file": "en-offer.png",
+      "language": "en",
+      "scene": "offer",
+      "page": "/en/register",
+      "marked": [
+        ".pub-offer .vx-facts",
+        ".pub-offer__email",
+        "#reg-oemail",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "a4973d26626045a76791d94d328419aa554deb7b18db8654ffb0c4e0801465c2"
+    },
+    {
+      "file": "fr-overview.png",
+      "language": "fr",
+      "scene": "overview",
+      "page": "/fr",
+      "marked": [
+        ".pub-nav",
+        ".pub-cta"
+      ],
+      "sha256": "0b5493675d99240744904b23bd951cd5a1ce66c6451edf2a7c334f480455780e"
+    },
+    {
+      "file": "fr-plans.png",
+      "language": "fr",
+      "scene": "plans",
+      "page": "/fr/plans",
+      "marked": [
+        ".pub-plan:first-child .pub-plan__facts",
+        ".pub-plan:first-child a.vx-button"
+      ],
+      "sha256": "2ef32f1217fbf9caee8a776095a081ab1578b27e16972e1aa83fe09624018696"
+    },
+    {
+      "file": "fr-company.png",
+      "language": "fr",
+      "scene": "company",
+      "page": "/fr/register",
+      "marked": [
+        "form[method=\"post\"] fieldset:nth-of-type(1)",
+        "form[method=\"post\"] fieldset:nth-of-type(2)",
+        "form[method=\"post\"] fieldset:nth-of-type(3)",
+        "#reg-slug",
+        "input[name=\"Form.AcceptedTerms\"]",
+        "form[method=\"post\"] button[type=\"submit\"]"
+      ],
+      "sha256": "328039e124869a074170fe961831eb4c433c9ccf5cbcfce3356dda752793472d"
+    },
+    {
+      "file": "fr-email.png",
+      "language": "fr",
+      "scene": "email",
+      "page": "/__capture/fr/email",
+      "marked": [
+        "form button[type=\"submit\"]",
+        "#reg-new-email"
+      ],
+      "sha256": "1c0225ccd4de0d129db8ab8e521689c6c81a1f956d25a4a54440233c10c8d9a8"
+    },
+    {
+      "file": "fr-verify.png",
+      "language": "fr",
+      "scene": "verify",
+      "page": "/__capture/fr/verify",
+      "marked": [
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "f21147e61e3325bd4090210eaf70772cbfee3ffb7af81cceec8c21544a5c8671"
+    },
+    {
+      "file": "fr-plan-choice.png",
+      "language": "fr",
+      "scene": "plan-choice",
+      "page": "/__capture/fr/plan",
+      "marked": [
+        ".pub-plan-radio-group",
+        "#reg-term",
+        "#reg-licences",
+        "#reg-promo",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "40c81293f8431acbb91099f4ada9d754549bf55dc01338e19670e9705274267a"
+    },
+    {
+      "file": "fr-first-invoice.png",
+      "language": "fr",
+      "scene": "first-invoice",
+      "page": "/__capture/fr/pay",
+      "marked": [
+        "main .vx-card",
+        "#pay-card",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "ab329516b685da294b0dd3ba271afc7081be540575428454637dedb15cf11103"
+    },
+    {
+      "file": "fr-workspace-ready.png",
+      "language": "fr",
+      "scene": "workspace-ready",
+      "page": "/__capture/fr/done",
+      "marked": [
+        "main h2",
+        "main .pub-lead"
+      ],
+      "sha256": "6cd2027ee621730eb7963a425567a763886074a3477eefc8a125b6d0466ccd7f"
+    },
+    {
+      "file": "fr-invoice.png",
+      "language": "fr",
+      "scene": "invoice",
+      "page": "/pay/help-demo",
+      "marked": [
+        "main .vx-card",
+        "#pay-card",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "d5011df92fc221bea14e236125f9b958471b34e3fda55ced662e438a8b5bc1fc"
+    },
+    {
+      "file": "fr-save-card.png",
+      "language": "fr",
+      "scene": "save-card",
+      "page": "/cards/help-save-card",
+      "marked": [
+        "#pay-card",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "4251d18a5665ffe85a801ea9b05b82393921ba6a5afa2959c24a75e60544b2ae"
+    },
+    {
+      "file": "fr-legal.png",
+      "language": "fr",
+      "scene": "legal",
+      "page": "/fr/legal",
+      "marked": [
+        "main .vx-card a",
+        "main .pub-list"
+      ],
+      "sha256": "1df4a1aa0c90c9e1ff144fb476dbce88d6295e40d2d26b6758fc489e4f4026a8"
+    },
+    {
+      "file": "fr-contact.png",
+      "language": "fr",
+      "scene": "contact",
+      "page": "/fr/contact",
+      "marked": [
+        "#contact-company",
+        "#contact-email",
+        "#contact-message",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "2c2602207d33f20e3698b531cc9a12f589e1d7555dea4d0b1d25fc1a284d7138"
+    },
+    {
+      "file": "fr-offer.png",
+      "language": "fr",
+      "scene": "offer",
+      "page": "/fr/register",
+      "marked": [
+        ".pub-offer .vx-facts",
+        ".pub-offer__email",
+        "#reg-oemail",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "c8af90f112035387e7c8f482a31b95ded1633496e01b0f4034d583c3bd4109b0"
+    },
+    {
+      "file": "es-overview.png",
+      "language": "es",
+      "scene": "overview",
+      "page": "/es",
+      "marked": [
+        ".pub-nav",
+        ".pub-cta"
+      ],
+      "sha256": "1632337c439b8264b75607a09f49b0ec8fa57830e4b9d99e740952caed4d6311"
+    },
+    {
+      "file": "es-plans.png",
+      "language": "es",
+      "scene": "plans",
+      "page": "/es/plans",
+      "marked": [
+        ".pub-plan:first-child .pub-plan__facts",
+        ".pub-plan:first-child a.vx-button"
+      ],
+      "sha256": "fd23459046a039157a1fd8ff722c4c7c90a425a70f77e054da3eb1dd27ef35b2"
+    },
+    {
+      "file": "es-company.png",
+      "language": "es",
+      "scene": "company",
+      "page": "/es/register",
+      "marked": [
+        "form[method=\"post\"] fieldset:nth-of-type(1)",
+        "form[method=\"post\"] fieldset:nth-of-type(2)",
+        "form[method=\"post\"] fieldset:nth-of-type(3)",
+        "#reg-slug",
+        "input[name=\"Form.AcceptedTerms\"]",
+        "form[method=\"post\"] button[type=\"submit\"]"
+      ],
+      "sha256": "ad59cdf3df35907023866f9cff127df8ec484277a50ca66d8b670e25898a15a8"
+    },
+    {
+      "file": "es-email.png",
+      "language": "es",
+      "scene": "email",
+      "page": "/__capture/es/email",
+      "marked": [
+        "form button[type=\"submit\"]",
+        "#reg-new-email"
+      ],
+      "sha256": "9fd0998c9a6ff30d1a0a1827705d3a2346f35074a33df0b06eb0c255f6167d31"
+    },
+    {
+      "file": "es-verify.png",
+      "language": "es",
+      "scene": "verify",
+      "page": "/__capture/es/verify",
+      "marked": [
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "908cbc1a3c98386b71787a580b88903ba2b8e431070feea53fd3250e44a47f65"
+    },
+    {
+      "file": "es-plan-choice.png",
+      "language": "es",
+      "scene": "plan-choice",
+      "page": "/__capture/es/plan",
+      "marked": [
+        ".pub-plan-radio-group",
+        "#reg-term",
+        "#reg-licences",
+        "#reg-promo",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "d760cc3b605169e4d12eb16734d18eabb62c79739bb3fa892c5389430f5bb73a"
+    },
+    {
+      "file": "es-first-invoice.png",
+      "language": "es",
+      "scene": "first-invoice",
+      "page": "/__capture/es/pay",
+      "marked": [
+        "main .vx-card",
+        "#pay-card",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "36a6a0a17b4d9ec7ab5d23aee4a8521640938f8529c67d2cbc7138fcd9f301b8"
+    },
+    {
+      "file": "es-workspace-ready.png",
+      "language": "es",
+      "scene": "workspace-ready",
+      "page": "/__capture/es/done",
+      "marked": [
+        "main h2",
+        "main .pub-lead"
+      ],
+      "sha256": "3d41d832663d44c15767cb4e2a42f5e89016d149621b63578ebbb75313ddcdf5"
+    },
+    {
+      "file": "es-invoice.png",
+      "language": "es",
+      "scene": "invoice",
+      "page": "/pay/help-demo",
+      "marked": [
+        "main .vx-card",
+        "#pay-card",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "5de18dc92ef2d8f53738dfb93bcdcc36cdc154fdf65863a651c493ea5c2cd05b"
+    },
+    {
+      "file": "es-save-card.png",
+      "language": "es",
+      "scene": "save-card",
+      "page": "/cards/help-save-card",
+      "marked": [
+        "#pay-card",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "91434498bdde8c1cad9c2f9be82aa4c79f4bb8bd7103f583a4c6d8e0cb5a30de"
+    },
+    {
+      "file": "es-legal.png",
+      "language": "es",
+      "scene": "legal",
+      "page": "/es/legal",
+      "marked": [
+        "main .vx-card a",
+        "main .pub-list"
+      ],
+      "sha256": "a259b2c669caf9e48ff32ac2ecbc487f68c11c23e8e327f9594d465552e8c554"
+    },
+    {
+      "file": "es-contact.png",
+      "language": "es",
+      "scene": "contact",
+      "page": "/es/contact",
+      "marked": [
+        "#contact-company",
+        "#contact-email",
+        "#contact-message",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "f914d691da78cdfe8f287059b248286bdd1a0a755ef5263ad66cb64778a3bfc5"
+    },
+    {
+      "file": "es-offer.png",
+      "language": "es",
+      "scene": "offer",
+      "page": "/es/register",
+      "marked": [
+        ".pub-offer .vx-facts",
+        ".pub-offer__email",
+        "#reg-oemail",
+        "main form button[type=\"submit\"]"
+      ],
+      "sha256": "f9366361e458642c38b1368a8aca457eb13ec91213c81b740156042423a7eecb"
+    },
+    {
+      "file": "en-zelle.png",
+      "language": "en",
+      "scene": "zelle",
+      "page": "/pay/help-demo",
+      "viewport": {
+        "width": 1280,
+        "height": 1645
+      },
+      "marked": [
+        "section[aria-labelledby=\"pay-zelle\"] dl",
+        "#zelle-amount",
+        "#zelle-sent",
+        "#zelle-sender",
+        "#zelle-reference",
+        "section[aria-labelledby=\"pay-zelle\"] button[type=\"submit\"]"
+      ],
+      "sha256": "ec6e714120f50c1e25dfde5daaf6634653266fd6f6c988e58f4ff29f72bdd18b"
+    },
+    {
+      "file": "fr-zelle.png",
+      "language": "fr",
+      "scene": "zelle",
+      "page": "/pay/help-demo",
+      "viewport": {
+        "width": 1280,
+        "height": 1698
+      },
+      "marked": [
+        "section[aria-labelledby=\"pay-zelle\"] dl",
+        "#zelle-amount",
+        "#zelle-sent",
+        "#zelle-sender",
+        "#zelle-reference",
+        "section[aria-labelledby=\"pay-zelle\"] button[type=\"submit\"]"
+      ],
+      "sha256": "94df88428150470b01ecfd8c78fd003ec3083a35dcd95f65d449ab46c057dc2d"
+    },
+    {
+      "file": "es-zelle.png",
+      "language": "es",
+      "scene": "zelle",
+      "page": "/pay/help-demo",
+      "viewport": {
+        "width": 1280,
+        "height": 1696
+      },
+      "marked": [
+        "section[aria-labelledby=\"pay-zelle\"] dl",
+        "#zelle-amount",
+        "#zelle-sent",
+        "#zelle-sender",
+        "#zelle-reference",
+        "section[aria-labelledby=\"pay-zelle\"] button[type=\"submit\"]"
+      ],
+      "sha256": "19e455c5757ab7ee41b476749438352d01cc946f701c0f1c8b6e9fe478cfe908"
+    }
+  ]
+}

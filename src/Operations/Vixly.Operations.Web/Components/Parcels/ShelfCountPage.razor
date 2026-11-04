@@ -1,0 +1,75 @@
+﻿@*
+=========================================================
+FILE: ShelfCountPage.razor
+
+PURPOSE:
+One shelf count (Slice 12D, owner H-7): scan each parcel on the shelf, finish, then see found, missing, extra and unknown.
+
+RESPONSIBILITIES:
+- Open: the scan field, the codes scanned and how many the records expect; Finish
+- Finished: the four lists; Move here for an extra parcel
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@using Vixly.Operations.Application.Receiving
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@VixlyText.Format(T, "ui.shelfcount.of", "shelf", Count.ShelfCode)" Company="@Company" Section="inventory" Error="@Error" Info="@(Done is null ? null : T["ui.shelfcount.done." + Done].Value)">
+    <p><a href="/staff/parcels/shelf-counts">@T["ui.shelfcount.back"]</a></p>
+    <section class="ops-editor__panel" aria-labelledby="count-title">
+        <h2 id="count-title" class="ops-section-title">@Count.ShelfCode · @Count.WarehouseName</h2>
+        @if (Count.IsOpen)
+        {
+            <p>@VixlyText.Format(T, "ui.shelfcount.progress", new Dictionary<string, object> { ["scanned"] = Count.Scanned.Count, ["expected"] = Count.Expected })</p>
+            <form method="post" action="/staff/parcels/shelf-counts/@Count.Id/scan" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <input name="code" placeholder="@T["ui.shelfcount.scan"]" aria-label="@T["ui.shelfcount.scan"]" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" autofocus />
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.shelfcount.add"]</button>
+            </form>
+            <form method="post" action="/staff/parcels/shelf-counts/@Count.Id/finish" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <button type="submit" class="vx-button vx-button--primary">@T["ui.shelfcount.finish"]</button>
+            </form>
+            @if (Count.Scanned.Count > 0)
+            {
+                <p class="ops-editor__hint">@string.Join(" · ", Count.Scanned.Reverse())</p>
+            }
+        }
+        else
+        {
+            <p>@VixlyText.Format(T, "ui.shelfcount.summary", new Dictionary<string, object> { ["found"] = Count.Found.Count, ["missing"] = Count.Missing.Count, ["extra"] = Count.Extra.Count, ["unknown"] = Count.Unknown.Count })</p>
+            <h3>@T["ui.shelfcount.missing"] (@Count.Missing.Count)</h3>
+            <ul class="ops-editor__list" data-list="missing">@foreach (string number in Count.Missing) { <li><a class="ops-editor__code" href="/staff/parcels?search=@number">@number</a></li> }</ul>
+            <h3>@T["ui.shelfcount.extra"] (@Count.Extra.Count)</h3>
+            <ul class="ops-editor__list" data-list="extra">
+                @foreach (string number in Count.Extra)
+                {
+                    <li>
+                        <span class="ops-editor__code">@number</span>
+                        <form method="post" action="/staff/parcels/shelf-counts/@Count.Id/move" class="ops-editor__inline">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="parcel" value="@number" />
+                            <button type="submit" class="vx-button vx-button--secondary vx-button--sm">@T["ui.shelfcount.move_here"]</button>
+                        </form>
+                    </li>
+                }
+            </ul>
+            <h3>@T["ui.shelfcount.unknown"] (@Count.Unknown.Count)</h3>
+            <ul class="ops-editor__list" data-list="unknown">@foreach (string unknown in Count.Unknown) { <li class="ops-editor__code">@unknown</li> }</ul>
+            <h3>@T["ui.shelfcount.found"] (@Count.Found.Count)</h3>
+            <p class="ops-editor__hint" data-list="found">@string.Join(" · ", Count.Found)</p>
+        }
+    </section>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter, EditorRequired] public OperationsShelfCountView Count { get; set; } = null!;
+
+    [Parameter] public string? Done { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+}

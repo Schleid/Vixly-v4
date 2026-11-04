@@ -1,6 +1,6 @@
 # ADR-0010: Global Standard v1.3: plane schemas, table naming, V4 hostnames and independence from V3
 
-- Status: **Accepted** (owner decisions, 2026-10-13)
+- Status: **Accepted** (owner decisions, 2026-10-13). **Amended 2026-10-23** (Amendment 1: production on `vixly.ltd` from the start)
 - Date: 2026-10-13
 - Deciders: Jude (owner)
 - Affects: Global Standard sections 1, 2, 3, 4.1, 6 (S-4, S-5, S-11), 8 (D-1, D-5, D-6), 9, 10, 12, 13; Platform plane document; every plane's Infrastructure
@@ -34,3 +34,17 @@ The Platform V4 upgrade plan (walkthrough and code review of V3, October 2026) r
 - SQL reads stay short (`platform.Invoices`); C# stays unambiguous (`PlatformInvoice`).
 - The Customer plane gets a small `customer` schema for its Data Protection keys even though it reads business data through the Operations API.
 - Global Standard updated to v1.3.
+
+## Amendment 1 (2026-10-23): production on `vixly.ltd` from the start
+
+Owner, 2026-10-23: "I confirm it stays vixly.ltd. techcrafters.ltd was intended for staging but I changed my mind."
+
+- **Decision 3 is replaced.** V4 production uses the `vixly.ltd` names at once: `vixly.ltd` (Public site), `control.vixly.ltd` (Control, behind Cloudflare Access), `api.vixly.ltd` (Platform API), `ops-internal.vixly.ltd` (Operations internal API), `{slug}.vixly.ltd` (companies). There are no `techcrafters.ltd` names; staging stays on `vixly.freeddns.org`.
+- **Why it is safe now.** The reason for `techcrafters.ltd` was V3's domain-wide `.vixly.ltd` cookies. Every V4 cookie is host-only and named `__Host-vx4-*` (decision 4), so V3's cookies never collide with V4's.
+- **How both run on one name.** A Cloudflare Worker decides, per company, whether V3 or V4 serves `{slug}.vixly.ltd` (project document *V4 side-by-side rollout on vixly.ltd*). V4 reads the company's address from `X-Forwarded-Host`, accepted only with the Worker's secret (Global Standard H-3).
+- **Changed with it:**
+  - the production `appsettings.json` of every site (allowed hosts, base domains, links);
+  - the Global Standard's hostname table;
+  - the test hosts, which now name their test domain themselves instead of reading production settings.
+- **Unchanged:** the reserved slugs (H-2), which already list `control`, `api`, `ops-internal` and `www`.
+

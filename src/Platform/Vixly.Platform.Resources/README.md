@@ -1,6 +1,6 @@
 # Vixly.Platform.Resources
 
-`.resx` text for the Platform plane in English, French and Spanish: error texts, enum labels, email and document text. Keys for errors equal the error code. No code beyond a marker type.
+`.resx` text for the Platform plane in English, French and Spanish: error texts, enum labels, email and document text. Keys for errors equal the error code. Embedded Markdown under `Help/{en,fr,es}/` holds Control help (ADR-0023). No code beyond a marker type.
 
 | | |
 |---|---|

@@ -55,4 +55,6 @@ public sealed record StartPlatformRegistrationBody
     public string PrivacyVersion { get; init; } = string.Empty;
 
     public string? BotToken { get; init; }
+
+    public string? OfferToken { get; init; }
 }

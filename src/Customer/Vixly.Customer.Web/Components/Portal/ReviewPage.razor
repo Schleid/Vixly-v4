@@ -1,0 +1,134 @@
+@*
+=========================================================
+FILE: ReviewPage.razor
+
+PURPOSE:
+The customer's review of the company (owner, 2026-11-03).
+
+RESPONSIBILITIES:
+- Write or change the review: stars, words, how the name appears, city, and whether the company may show it
+- Say where the review stands, and delete it
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- Operations checks the setting, the finished shipment and the lengths; why a review is hidden is never shown
+- Placeholder look until the Frontend/UI team designs it (UI inventory)
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Customers
+@using Vixly.Contracts.Operations.Reviews
+@inject IStringLocalizer<CustomerText> T
+
+<CustomerShell Brand="@Brand" Title="@T["ui.review.title"]" SignedIn="true" Error="@Error" Info="@Info" ReturnHere="/customer/review">
+    @if (Review is { } review)
+    {
+        @if (review.HasReview)
+        {
+            <section class="customer-portal__panel customer-review-status" aria-labelledby="review-status">
+                <h2 id="review-status">@T["ui.review.yours"]</h2>
+                <p><strong>@T["ui.review.status." + (review.Status ?? "New")]</strong></p>
+                @if (!review.Agreed)
+                {
+                    <p class="customer-portal__hint">@T["ui.review.feedback_only"]</p>
+                }
+            </section>
+        }
+
+        @if (!review.Asked)
+        {
+            <p class="customer-portal__notice">@VixlyText.Format(T, "ui.review.off", "company", Company)</p>
+        }
+        else if (!review.Eligible)
+        {
+            <p class="customer-portal__notice">@VixlyText.Format(T, "ui.review.not_yet", "company", Company)</p>
+        }
+        else
+        {
+            <form method="post" action="/customer/review" class="customer-portal__form customer-review-form">
+                <AntiforgeryToken />
+                <p class="customer-portal__hint">@VixlyText.Format(T, "ui.review.intro", "company", Company)</p>
+                <fieldset class="customer-review-stars">
+                    <legend>@T["ui.review.rating"]</legend>
+                    <div class="customer-review-stars__grid">
+                        @for (int stars = 5; stars >= 1; stars--)
+                        {
+                            int value = stars;
+                            <label class="customer-review-star-card">
+                                <input type="radio" name="rating" value="@value" required checked="@(Rating == value)" />
+                                <span class="customer-review-star-card__stars" aria-hidden="true">@(new string('★', value))</span>
+                                <span class="customer-review-star-card__text">@VixlyText.Format(T, "ui.review.stars", "count", value)</span>
+                            </label>
+                        }
+                    </div>
+                </fieldset>
+                <label class="customer-review-quote">
+                    <span>@T["ui.review.quote"]</span>
+                    <textarea name="quote" required maxlength="400" rows="4">@Quote</textarea>
+                </label>
+                <p class="customer-portal__hint">@T["ui.review.quote_hint"]</p>
+                <fieldset class="customer-review-name">
+                    <legend>@T["ui.review.name"]</legend>
+                    <div class="customer-review-name__options">
+                        <label class="customer-review-name-card"><input type="radio" name="name" value="FirstAndInitial" checked="@(NameStyle != "FirstOnly")" /> <span>@ShortName</span></label>
+                        <label class="customer-review-name-card"><input type="radio" name="name" value="FirstOnly" checked="@(NameStyle == "FirstOnly")" /> <span>@Customer.FirstName</span></label>
+                    </div>
+                </fieldset>
+                <label class="customer-review-place">
+                    <span>@T["ui.review.place"]</span>
+                    <input name="place" maxlength="80" value="@Place" autocomplete="address-level2" />
+                </label>
+                <label class="customer-review-agreed">
+                    <input type="checkbox" name="agreed" value="true" checked="@Agreed" />
+                    <span>@VixlyText.Format(T, "ui.review.agreed", "company", Company)</span>
+                </label>
+                @if (review.HasReview)
+                {
+                    <p class="customer-portal__hint">@VixlyText.Format(T, "ui.review.change_hint", "company", Company)</p>
+                }
+                <div class="customer-portal__actions customer-review-actions">
+                    <button type="submit" class="vx-button vx-button--primary">@T[review.HasReview ? "ui.review.save" : "ui.review.send"]</button>
+                </div>
+            </form>
+        }
+
+        @if (review.HasReview)
+        {
+            <form method="post" action="/customer/review/delete" class="customer-portal__form customer-review-delete">
+                <AntiforgeryToken />
+                <p class="customer-portal__hint">@T["ui.review.delete_hint"]</p>
+                <div class="customer-portal__actions">
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.review.delete"]</button>
+                </div>
+            </form>
+        }
+    }
+</CustomerShell>
+
+@code {
+    [Parameter] public CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public CustomerReviewDto? Review { get; set; }
+
+    [Parameter, EditorRequired] public CustomerProfileDto Customer { get; set; } = null!;
+
+    [Parameter] public CustomerReviewBody? Entered { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+
+    private string Company => string.IsNullOrWhiteSpace(Brand?.DisplayName) ? T["ui.app.name"] : Brand.DisplayName;
+
+    private string ShortName => Customer.LastName.Trim().Length > 0 ? Customer.FirstName + " " + char.ToUpperInvariant(Customer.LastName.Trim()[0]) + "." : Customer.FirstName;
+
+    // What the customer just typed comes back after a refusal; otherwise their saved review.
+    private int? Rating => Entered is null ? Review?.Rating : Entered.Rating;
+
+    private string? Quote => Entered is null ? Review?.Quote : Entered.Quote;
+
+    private string? Place => Entered is null ? Review?.Place : Entered.Place;
+
+    private string? NameStyle => Entered is null ? Review?.NameStyle : Entered.NameStyle;
+
+    private bool Agreed => Entered?.Agreed ?? Review?.Agreed ?? false;
+}

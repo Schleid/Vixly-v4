@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root><resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>2.0</value></resheader>
+  <data name="account_note" xml:space="preserve"><value>Your personal customer account.</value></data>
+  <data name="login_intro" xml:space="preserve"><value>Sign in to pick up where you left off.</value></data>
+  <data name="story_body" xml:space="preserve"><value>Prepare an arrival, follow your packages and manage your account in your own customer space.</value></data>
+  <data name="story_caption" xml:space="preserve"><value>One account. A clearer view of what comes next.</value></data>
+  <data name="story_emphasis" xml:space="preserve"><value>All in one place.</value></data>
+  <data name="story_title" xml:space="preserve"><value>Your packages.</value></data>
+  <data name="welcome" xml:space="preserve"><value>Welcome back.</value></data>
+</root>

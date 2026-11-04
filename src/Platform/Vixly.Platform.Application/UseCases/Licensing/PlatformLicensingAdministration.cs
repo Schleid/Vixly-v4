@@ -219,16 +219,29 @@ public sealed class PlatformLicensingAdministration
 
     public async Task<PlatformSubscriptionAccess> AccessAsync(Guid tenantId, CancellationToken cancellationToken)
     {
+        return await AccessAsync(tenantId, await _legal.StateAsync(tenantId, cancellationToken), cancellationToken);
+    }
+
+    // Harmonization H-13 (owner, 2026-11-04): with the legal state the caller already worked out, so a company lookup works it out once.
+    public async Task<PlatformSubscriptionAccess> AccessAsync(Guid tenantId, PlatformTenantLegalState legal, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(legal);
         PlatformSubscription? subscription = await _subscriptions.Subscriptions.GetCurrentAsync(tenantId, cancellationToken);
         PlatformSubscriptionAccess access = subscription?.AccessAt(UtcNow, await _subscriptions.AccessRulesAsync(cancellationToken)) ?? PlatformSubscriptionAccess.None;
 
         // Terms overdue: read-only until the owner accepts (Slice 8).
-        return PlatformLegalGate.Cap(access, await _legal.StateAsync(tenantId, cancellationToken));
+        return PlatformLegalGate.Cap(access, legal);
     }
 
     public Task<PlatformTenantLegalState> LegalAsync(Guid tenantId, CancellationToken cancellationToken)
     {
         return _legal.StateAsync(tenantId, cancellationToken);
+    }
+
+    // H-13: from the tenant already loaded, not loaded again.
+    public Task<PlatformTenantLegalState> LegalAsync(PlatformTenant tenant, CancellationToken cancellationToken)
+    {
+        return _legal.StateAsync(tenant, cancellationToken);
     }
 
     // Owner: 2 releases in any 30 days, or 25% of seats when that is more; over it, Vixly reviews (D-L6).
@@ -272,9 +285,10 @@ public sealed class PlatformLicensingAdministration
         _audit.Record(staffUserId, actionCode, permissionCode, targetType, targetId, after: after, reason: reason);
     }
 
-    public void Notice(Guid tenantId, PlatformLicensingNoticeKind kind, Guid? deviceId = null, Guid? registrationId = null, bool? approved = null, int count = 0)
+    public void Notice(Guid tenantId, PlatformLicensingNoticeKind kind, Guid? deviceId = null, Guid? registrationId = null, bool? approved = null, int count = 0,
+        Guid? supportRequestId = null, PlatformOwnerSupportKind? supportKind = null)
     {
-        _outbox.Write(PlatformMessageTypes.LicensingNotice, tenantId, new PlatformLicensingNotice(tenantId, kind, deviceId, registrationId, approved, count, UtcNow));
+        _outbox.Write(PlatformMessageTypes.LicensingNotice, tenantId, new PlatformLicensingNotice(tenantId, kind, deviceId, registrationId, approved, count, UtcNow, supportRequestId, supportKind));
     }
 
     public void RecordTenantActivated(PlatformTenant tenant, PlatformTenantLifecycleEvent change)

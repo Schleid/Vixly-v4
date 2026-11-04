@@ -33,6 +33,10 @@ public sealed class PlatformDemoTenants
 {
     public const string Tag = "demo";
 
+    // The companies Operations.Web fills with demo staff and a demo day (OperationsDemoData): always a paid, active plan with paid
+    // invoices, never one of the unpaid or restricted situations, whatever tenant codes a new database draws (owner report, 2026-10-20).
+    public static readonly IReadOnlySet<string> OperationsSlugs = new HashSet<string>(StringComparer.Ordinal) { "northwind-freight", "bluewater-shipping", "andes-courier" };
+
     private static readonly string[] Companies =
     {
         "Northwind Freight|CA|fr|America/Toronto|+1 514 555 0100|Montreal|QC|ocean,enterprise",
@@ -95,6 +99,9 @@ public sealed class PlatformDemoTenants
         _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
+    // On a new database the demo tenants wait for the first SuperUser (they are created on behalf of staff).
+    public const string NeedsSuperUser = "Create and sign in the first SuperUser before seeding demo tenants.";
+
     public async Task<string> SeedAsync(CancellationToken cancellationToken)
     {
         PagedResult<PlatformTenantListItem> existing = await _queries.ListAsync(
@@ -111,7 +118,7 @@ public sealed class PlatformDemoTenants
 
         if (staff.Count == 0)
         {
-            return "Create and sign in the first SuperUser before seeding demo tenants.";
+            return NeedsSuperUser;
         }
 
         DateTimeOffset now = _administration.UtcNow;
@@ -303,14 +310,21 @@ public sealed class PlatformDemoTenants
         string[] last = { "Martin", "Diallo", "García", "Tremblay", "Benali", "Rojas", "Dubois", "Mensah", "Pérez", "Walsh", "Haddad", "Silva" };
         string person = $"{first[index % first.Length]} {last[(index * 5) % last.Length]}";
 
-        return (person, $"{first[index % first.Length].ToLowerInvariant()}@demo.test");
+        // Email addresses are plain letters only (owner report, 2026-10-19): Lucía signs in as lucia@..., never lucía@...
+        return (person, $"{Plain(first[index % first.Length])}@demo.test");
+    }
+
+    // Lower case without accents: "Lucía" becomes "lucia".
+    private static string Plain(string text)
+    {
+        return new string(text.Normalize(System.Text.NormalizationForm.FormD)
+            .Where(character => System.Globalization.CharUnicodeInfo.GetUnicodeCategory(character) != System.Globalization.UnicodeCategory.NonSpacingMark)
+            .ToArray()).ToLowerInvariant();
     }
 
     private static string Slug(string name)
     {
-        string plain = new string(name.Normalize(System.Text.NormalizationForm.FormD)
-            .Where(character => System.Globalization.CharUnicodeInfo.GetUnicodeCategory(character) != System.Globalization.UnicodeCategory.NonSpacingMark)
-            .ToArray()).ToLowerInvariant();
+        string plain = Plain(name);
         string slug = string.Join('-', plain.Split(' ', StringSplitOptions.RemoveEmptyEntries)
             .Select(word => new string(word.Where(char.IsAsciiLetterOrDigit).ToArray()))
             .Where(word => word.Length > 0));

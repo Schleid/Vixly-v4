@@ -22,4 +22,6 @@ public sealed record PlatformLimitItem(
     int? OverrideValue,
     string? OverrideReason,
     DateTimeOffset? OverrideEndsUtc,
-    string? OverrideSetByName);
+    string? OverrideSetByName,
+    int? UsedThisMonth = null,
+    string? UsedMonth = null);

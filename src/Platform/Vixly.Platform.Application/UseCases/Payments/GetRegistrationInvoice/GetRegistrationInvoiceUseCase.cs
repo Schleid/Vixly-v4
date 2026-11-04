@@ -65,9 +65,15 @@ public sealed class GetRegistrationInvoiceUseCase
         PlatformTenant? tenant = await _payments.Tenants.GetAsync(tenantId, cancellationToken);
         PlatformInvoice? invoice = await PlatformRegistrationInvoice.FindAsync(_payments, tenantId, cancellationToken);
 
-        if (tenant is null || invoice is null)
+        if (tenant is null)
         {
             return GetRegistrationInvoiceResponse.Failure(PlatformPaymentsErrors.NothingToCharge);
+        }
+
+        // The first invoice is issued just after the plan is chosen (outbox, D-B3): until then the visitor waits, never sees a dead end.
+        if (invoice is null)
+        {
+            return GetRegistrationInvoiceResponse.Failure(PlatformPaymentsErrors.InvoicePreparing);
         }
 
         return GetRegistrationInvoiceResponse.Success(new PlatformPaymentLinkSummary(

@@ -23,6 +23,10 @@ public static class PlatformPaymentsErrors
 
     public static Error PublishableKeyInvalid { get; } = Error.Create("platform.payments.publishable_key_invalid");
 
+    public static Error CheckoutSettingInvalid { get; } = Error.Create("platform.payments.checkout_setting_invalid");
+
+    public static Error StatementSuffixInvalid { get; } = Error.Create("platform.payments.statement_suffix_invalid");
+
     public static Error CurrencyInvalid { get; } = Error.Create("platform.payments.currency_invalid");
 
     public static Error TooManyCurrencies { get; } = Error.Create("platform.payments.too_many_currencies", ("max", PlatformPaymentsLimits.MaxCurrencies.ToString(System.Globalization.CultureInfo.InvariantCulture)));
@@ -50,6 +54,9 @@ public static class PlatformPaymentsErrors
     public static Error ChargeOpen { get; } = Error.Create("platform.payments.charge_open");
 
     public static Error NothingToCharge { get; } = Error.Create("platform.payments.nothing_to_charge");
+
+    // Sign-up: the plan is chosen but its first invoice is still being issued by the outbox; the page waits and asks again.
+    public static Error InvoicePreparing { get; } = Error.Create("platform.payments.invoice_preparing");
 
     public static Error AmountInvalid { get; } = Error.Create("platform.payments.amount_invalid");
 

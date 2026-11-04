@@ -1,0 +1,84 @@
+﻿@using Vixly.Shared.UI.Gallery.Resources
+@using System.Globalization
+@* =========================================================
+   FILE: DenseWorkbenchDemo.razor
+
+   PURPOSE:
+   Exercise shared metrics, table, status and paging primitives.
+
+   RESPONSIBILITIES:
+   Provide deterministic sample data and local preview controls.
+
+   IMPORTANT NOTES:
+   No API calls, persistence, live network state or domain logic.
+   ========================================================= *@
+<div class="wb-stack">
+    <div class="vx-metric-grid">
+        @for (int index = 0; index < 4; index++)
+        {
+            int metric = index;
+            <VxMetricCard Label="@L(MetricLabels[metric])" Value="@MetricValues[metric]" Delta="@MetricDeltas[metric]" DeltaStatus="@(metric == 3 ? VxBadgeStatus.Warning : VxBadgeStatus.Success)" Detail="@L("comparison")">
+                <Visualization><svg viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="2"><polyline points="@Charts[metric]" /></svg></Visualization>
+            </VxMetricCard>
+        }
+    </div>
+    <section class="wb-panel" aria-labelledby="wb-table-title">
+        <header class="wb-panel__header"><h2 id="wb-table-title">@L("table")</h2><span class="wb-meta">@Selected.Count / 150</span></header>
+        <div class="wb-filters">
+            <label class="wb-search"><span>@L("search") <kbd>@L("shortcut")</kbd></span><input class="vx-input" data-workbench-search @bind="Search" @bind:event="oninput" /></label>
+            <label>@L("branch") <select class="vx-input" @bind="Branch" @bind:after="ResetPage"><option value="-1">@L("all")</option><option value="0">MIA</option><option value="1">PTP</option><option value="2">FDF</option></select></label>
+            <label>@L("status") <select class="vx-input" @bind="Status" @bind:after="ResetPage"><option value="-1">@L("all")</option>@for (int i = 0; i < StatusKeys.Length; i++) { <option value="@i">@L(StatusKeys[i])</option> }</select></label>
+            <button type="button" class="vx-button vx-button--subtle" @onclick="Clear">@L("clear")</button>
+        </div>
+        <div class="vx-table-scroll" tabindex="0" role="region" aria-label="@L("table")">
+            <VxDataTable TItem="int" Items="@PageRows" Caption="@L("preview")">
+                <HeaderContent>
+                    <th scope="col"><input type="checkbox" aria-label="@L("selectall")" checked="@(PageRows.Count > 0 && PageRows.All(Selected.Contains))" @onchange="SelectPage" /></th>
+                    <th scope="col">@L("tracking")</th><th scope="col">@L("customer")</th><th scope="col">@L("branch")</th><th scope="col">@L("status")</th><th scope="col">@L("weight")</th><th scope="col">@L("amount")</th><th scope="col" class="vx-table__actions">@L("actions")</th>
+                </HeaderContent>
+                <RowTemplate Context="row">
+                    <td><input type="checkbox" aria-label="@(L("select") + " " + Tracking(row))" checked="@Selected.Contains(row)" @onchange="e => Select(row, e)" /></td>
+                    <td class="vx-table__number">@Tracking(row)</td><td>@($"C-{row:0000}")</td><td>@Branches[row % 3]</td>
+                    <td><VxStatusBadge Text="@L(StatusKeys[row % 5])" Status="@Tones[row % 5]" /></td>
+                    <td class="vx-table__number">@((12.4m + row).ToString("N1", Culture))</td><td class="vx-table__number">@((80m + row * 3).ToString("N2", Culture))</td>
+                    <td class="vx-table__actions"><a href="@($"/primitives/workbench?lang={Culture.Name}#wb-detail")" class="vx-button vx-button--subtle" @onclick="() => Opened = row">@L("open")</a></td>
+                </RowTemplate>
+                <EmptyContent><VxEmptyState Title="@L("empty")"><Action><button type="button" class="vx-button" @onclick="Clear">@L("clear")</button></Action></VxEmptyState></EmptyContent>
+            </VxDataTable>
+        </div>
+        <VxPager CurrentPage="@EffectivePage" TotalPages="@TotalPages" PreviousAriaLabel="@L("previous")" NextAriaLabel="@L("next")" PageChanged="p => Page = p" />
+    </section>
+    @if (Opened > 0) { <p class="wb-notice" role="status">@L("detail"): <span class="vx-table__number">@Tracking(Opened)</span> · @L("sample")</p> }
+    <div class="wb-split">
+        <section class="wb-panel"><header class="wb-panel__header"><h2>@L("feed")</h2></header><ol class="wb-feed">@foreach (int i in Enumerable.Range(1, 4)) { <li><time class="vx-table__number">@($"08:3{i}:12")</time><span class="vx-table__number">@Tracking(i)</span><VxStatusBadge Text="@L("registered")" Status="VxBadgeStatus.Info" /></li> }</ol></section>
+        <section class="wb-panel"><header class="wb-panel__header"><h2>@L("queue")</h2></header><ol class="wb-feed">@foreach (int i in Enumerable.Range(1, 4)) { <li><span class="vx-table__number">@($"ZONE-{i:00}")</span><span>@Branches[i % 3]</span><VxStatusBadge Text="@L("staged")" Status="VxBadgeStatus.Warning" /></li> }</ol></section>
+    </div>
+    <details class="wb-panel wb-dispatch"><summary>@L("dispatch")</summary><div class="wb-filters"><p>@L("selected"): @Selected.Count</p><label>@L("route") <select class="vx-input" @bind="Route"><option>MIA → PTP</option><option>PTP → FDF</option></select></label><button type="button" class="vx-button vx-button--primary" disabled="@(Selected.Count == 0)" @onclick="() => Reviewed = true">@L("review")</button></div>@if (Reviewed) { <p class="wb-notice" role="status">@Route · @Selected.Count · @L("sample")</p> }</details>
+    <ShipmentComponentsDemo Language="@Language" SampleId="@(Opened > 0 ? Opened : 1)" />
+</div>
+@code {
+    [Parameter] public string Language { get; set; } = "en";
+    private string L(string key) => WorkbenchLabels.Get(key, Language);
+    private CultureInfo Culture => CultureInfo.GetCultureInfo(Language is "fr" or "es" ? Language : "en");
+    private static readonly string[] MetricLabels = { "active", "received", "revenue", "exceptions" };
+    private string[] MetricValues => new[] { 1284.ToString("N0", Culture), 342.ToString("N0", Culture), 84250.ToString("N0", Culture), "12" };
+    private static readonly string[] MetricDeltas = { "+12.4%", "+8.2%", "+6.8%", "−3" };
+    private static readonly string[] Charts = { "0,25 15,22 30,24 45,12 60,15 80,7 100,3", "0,24 20,16 40,21 60,8 80,12 100,4", "0,27 20,22 40,18 60,20 80,9 100,3", "0,6 20,8 40,17 60,13 80,23 100,26" };
+    private static readonly string[] StatusKeys = { "registered", "staged", "transit", "delivered", "hold" };
+    private static readonly VxBadgeStatus[] Tones = { VxBadgeStatus.Info, VxBadgeStatus.Warning, VxBadgeStatus.Progress, VxBadgeStatus.Success, VxBadgeStatus.Danger };
+    private static readonly string[] Branches = { "MIA", "PTP", "FDF" };
+    private readonly HashSet<int> Selected = new();
+    private string Search = string.Empty;
+    private string Route = "MIA → PTP";
+    private int Branch = -1, Status = -1, Page = 1, Opened;
+    private bool Reviewed;
+    private IEnumerable<int> Filtered => Enumerable.Range(1, 150).Where(i => (Branch < 0 || i % 3 == Branch) && (Status < 0 || i % 5 == Status) && Tracking(i).Contains(Search, StringComparison.OrdinalIgnoreCase));
+    private int TotalPages => Math.Max(1, (Filtered.Count() + 49) / 50);
+    private int EffectivePage => Math.Min(Page, TotalPages);
+    private IReadOnlyList<int> PageRows => Filtered.Skip((EffectivePage - 1) * 50).Take(50).ToArray();
+    private static string Tracking(int row) => $"VX-2026-{row:000000}";
+    private void ResetPage() { Page = 1; Reviewed = false; }
+    private void Clear() { Search = string.Empty; Branch = Status = -1; ResetPage(); }
+    private void Select(int row, ChangeEventArgs e) { if (e.Value is true) Selected.Add(row); else Selected.Remove(row); Reviewed = false; }
+    private void SelectPage(ChangeEventArgs e) { foreach (int row in PageRows) { if (e.Value is true) Selected.Add(row); else Selected.Remove(row); } Reviewed = false; }
+}

@@ -1,0 +1,95 @@
+﻿@*
+=========================================================
+FILE: TenantChangesOverview.razor
+
+PURPOSE:
+The queue of company change requests tenants sent (B12).
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the presenter
+- Text comes from PlatformText (UI-10); Frontend/UI restyles it
+- Filters live in the URL so a view can be bookmarked
+=========================================================
+*@
+@inherits PlatformPresenterComponent<TenantChangesPresenter>
+@using Vixly.Platform.Domain.Tenants
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+<form class="vx-toolbar" role="search" @onsubmit="Apply">
+    <label for="changes-status">@T["ui.tenant_changes.status"]</label>
+    <select id="changes-status" @bind="_status">
+        <option value="All">@T["ui.tenant_changes.status.all"]</option>
+        @foreach (PlatformTenantChangeStatus status in Enum.GetValues<PlatformTenantChangeStatus>())
+        {
+            <option value="@status">@T[TenantChangeDisplay.StatusKey(status)]</option>
+        }
+    </select>
+    <VxButton Type="submit">@T["ui.users.apply"]</VxButton>
+</form>
+<p class="vx-hint">@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.tenant_changes.count", "count", Presenter.State.TotalCount) : T["ui.common.loading"].Value)</p>
+<div id="tenant-changes-list">
+    <VxDataTable Items="Presenter.State.Items" IsLoading="!Presenter.State.Loaded">
+        <HeaderContent>
+            <th scope="col">@T["ui.tenant_changes.submitted"]</th>
+            <th scope="col">@T["ui.tenant_changes.tenant"]</th>
+            <th scope="col">@T["ui.tenant_changes.from"]</th>
+            <th scope="col">@T["ui.tenant_changes.to"]</th>
+            <th scope="col">@T["ui.tenant_changes.status"]</th>
+        </HeaderContent>
+        <RowTemplate Context="change">
+            <td><a href="/tenants/changes/@change.RequestId">@PlatformDisplay.Utc(T, change.SubmittedUtc)</a></td>
+            <td><a href="/tenants/@change.PlatformTenantId">@change.TenantName</a> <span class="vx-hint">@change.TenantCode</span></td>
+            <td>@change.Previous.LegalName</td>
+            <td>@change.Proposed.LegalName</td>
+            <td><VxStatusBadge Status="@TenantChangeDisplay.Badge(change.Status)" Text="@T[TenantChangeDisplay.StatusKey(change.Status)]" /></td>
+        </RowTemplate>
+    </VxDataTable>
+</div>
+@if (Presenter.State.Loaded && Presenter.State.TotalPages > 1)
+{
+    <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="page => Navigation.NavigateTo(Url(page))" />
+}
+
+@code {
+    private string _status = nameof(PlatformTenantChangeStatus.Pending);
+
+    [Parameter]
+    public string? Status { get; set; }
+
+    [Parameter]
+    public Guid? TenantId { get; set; }
+
+    [Parameter]
+    public int? Page { get; set; }
+
+    // Pending requests by default; "All" shows every request.
+    protected override Task OnParametersSetAsync()
+    {
+        PlatformTenantChangeStatus? status = Status is null ? PlatformTenantChangeStatus.Pending : Enum.TryParse(Status, true, out PlatformTenantChangeStatus parsed) ? parsed : null;
+        _status = status?.ToString() ?? "All";
+        return Presenter.LoadAsync(status, TenantId, Page ?? 1);
+    }
+
+    private void Apply()
+    {
+        Navigation.NavigateTo(Url(1));
+    }
+
+    private string Url(int page)
+    {
+        Dictionary<string, string?> query = new()
+        {
+            ["status"] = _status == nameof(PlatformTenantChangeStatus.Pending) ? null : _status,
+            ["tenant"] = TenantId?.ToString("D"),
+            ["page"] = page > 1 ? page.ToString(System.Globalization.CultureInfo.InvariantCulture) : null
+        };
+
+        return Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString("/tenants/changes", query.Where(pair => pair.Value is not null));
+    }
+}

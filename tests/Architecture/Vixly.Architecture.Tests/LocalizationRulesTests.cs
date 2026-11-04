@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using Vixly.Operations.Application.Security;
+using Vixly.Operations.Domain.Common;
 using Vixly.Platform.Application.Security;
 using Vixly.Platform.Domain.Identity;
 using Vixly.Shared.Kernel.Domain;
@@ -34,13 +36,17 @@ public sealed class LocalizationRulesTests
     {
         ("shared", typeof(DomainException).Assembly),
         ("platform", typeof(PlatformSecurityErrors).Assembly),
-        ("platform", typeof(PlatformUserAuthorityLevel).Assembly)
+        ("platform", typeof(PlatformUserAuthorityLevel).Assembly),
+        ("ops", typeof(OperationsEntity).Assembly),
+        ("ops", typeof(OperationsInternalErrors).Assembly)
     };
 
     private static readonly Assembly[] BusinessAssemblies =
     {
         typeof(PlatformUserAuthorityLevel).Assembly,
-        typeof(PlatformAuthorizationContext).Assembly
+        typeof(PlatformAuthorizationContext).Assembly,
+        typeof(OperationsEntity).Assembly,
+        typeof(OperationsAuthorizationContext).Assembly
     };
 
     [Fact]

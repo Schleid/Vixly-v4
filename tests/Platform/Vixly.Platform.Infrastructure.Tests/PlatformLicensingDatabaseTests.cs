@@ -1,9 +1,9 @@
 ﻿using Vixly.Platform.Application.Queries;
 using Vixly.Platform.Domain.Licensing;
 using Vixly.Platform.Domain.Tenants;
-using Vixly.Platform.Infrastructure.Persistence;
 using Vixly.Platform.Infrastructure.Persistence.Queries;
 using Vixly.Platform.Infrastructure.Persistence.Repositories;
+using Vixly.Platform.Infrastructure.Persistence;
 using Vixly.Shared.Kernel.Localization;
 using Vixly.Shared.Kernel.Paging;
 using Vixly.Shared.Kernel.ValueObjects;
@@ -123,6 +123,47 @@ public sealed class PlatformLicensingDatabaseTests : IClassFixture<PlatformDatab
         b.TakeSeat(1, Now);
         Assert.True(await new PlatformUnitOfWork(first).SaveChangesAsync(CancellationToken.None));
         Assert.False(await new PlatformUnitOfWork(second).SaveChangesAsync(CancellationToken.None));
+    }
+
+    [SqlServerFact]
+    public async Task OwnerSupportRequest_RoundTrips_WithItsLink_AndOnlyOpenOnesAreListed()
+    {
+        PlatformTenant tenant = NewTenant();
+        Guid alice = Guid.NewGuid();
+        PlatformOwnerSupportRequest reset = PlatformOwnerSupportRequest.RequestSecondFactorReset(tenant.Id, "Lost phone and codes", "Called back the owner phone on file", alice, Now);
+        PlatformOwnerSupportRequest done = PlatformOwnerSupportRequest.StartDeviceRecovery(tenant.Id, "Laptop stolen", "Called back", null, alice, Now.AddMinutes(-30));
+        done.Complete(Now.AddMinutes(-10));
+        string linkHash = Hash();
+
+        await using (PlatformDbContext context = _database.NewContext())
+        {
+            context.Tenants.Add(tenant);
+            PlatformLicensingRepository repository = new(context);
+            repository.AddSupportRequest(reset);
+            repository.AddSupportRequest(done);
+            Assert.True(await new PlatformUnitOfWork(context).SaveChangesAsync(CancellationToken.None));
+        }
+
+        await using (PlatformDbContext context = _database.NewContext())
+        {
+            PlatformLicensingRepository repository = new(context);
+            PlatformOwnerSupportRequest loaded = (await repository.GetSupportRequestAsync(reset.Id, CancellationToken.None))!;
+            loaded.Approve(Guid.NewGuid(), "Checked", Now.AddMinutes(1));
+            repository.AddLink(PlatformDeviceLink.Create(PlatformDeviceLinkKind.SecondFactorReset, tenant.Id, null, loaded.Id, linkHash, Now.AddMinutes(1)));
+            Assert.True(await new PlatformUnitOfWork(context).SaveChangesAsync(CancellationToken.None));
+        }
+
+        await using PlatformDbContext check = _database.NewContext();
+        PlatformLicensingRepository store = new(check);
+        PlatformOwnerSupportRequest open = Assert.Single(await store.ListOpenSupportRequestsAsync(tenant.Id, CancellationToken.None));
+        Assert.Equal(reset.Id, open.Id);
+        Assert.Equal(PlatformOwnerSupportStatus.Approved, open.Status);
+        Assert.Equal(PlatformOwnerSupportKind.SecondFactorReset, open.Kind);
+        Assert.Equal("Called back the owner phone on file", open.IdentityCheck);
+        Assert.Equal("Checked", open.DecisionNote);
+        PlatformDeviceLink link = (await store.GetLinkAsync(linkHash, CancellationToken.None))!;
+        Assert.Equal(reset.Id, link.SupportRequestId);
+        Assert.Equal(PlatformDeviceLinkKind.SecondFactorReset, link.Kind);
     }
 
     private static string Hash() => Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N");

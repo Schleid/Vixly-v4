@@ -340,7 +340,7 @@ public sealed class PlatformSalesUseCaseTests
     {
         TenantTestKit kit = _kit.Tenants;
         await new StartPlatformTenantRegistrationUseCase(
-            kit.Tenants, kit.Store, kit.Tenants, kit.Slugs(), kit.Tenants, kit.Tenants, kit.Links(), kit.Crypto, kit.Tenants, kit.Audit(), kit.Store, kit.Clock, kit.Legal).ExecuteAsync(
+            kit.Tenants, kit.Store, kit.Tenants, kit.Slugs(), kit.Tenants, kit.Tenants, kit.Links(), kit.Crypto, kit.Tenants, kit.Audit(), kit.Store, kit.Clock, kit.Legal, _kit.Sales).ExecuteAsync(
                 PlatformAnonymousAuthorizationContext.Instance,
                 new StartPlatformTenantRegistrationRequest
                 {

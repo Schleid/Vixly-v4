@@ -1,0 +1,157 @@
+@*
+=========================================================
+FILE: JobRuns.razor
+
+PURPOSE:
+The Jobs page (owner, 2026-10-23): each background job's
+latest run, its last success and failures in the last day,
+then the run history.
+
+IMPORTANT NOTES:
+- Feature component (ADR-0001): behaviour lives in the
+  presenter; this file holds markup and UI glue only
+- Text comes from PlatformText (UI-10); placeholder look until
+  the Frontend/UI team designs it
+- The job, the failure filter and the page live in the URL
+  (UI-3); times are UTC
+=========================================================
+*@
+@inherits PlatformPresenterComponent<JobRunsPresenter>
+@using Vixly.Platform.Application.Queries
+@using Vixly.Shared.Kernel.Clients
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@inject NavigationManager Navigation
+
+@if (Presenter.State.Error is not null)
+{
+    <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+}
+else
+{
+    <VxDataTable Items="Presenter.State.Jobs" IsLoading="@(!Presenter.State.Loaded)" Caption="@T["ui.jobs.latest"]">
+        <HeaderContent>
+            <th scope="col">@T["ui.jobs.job"]</th>
+            <th scope="col">@T["ui.jobs.last_run"]</th>
+            <th scope="col">@T["ui.jobs.outcome"]</th>
+            <th scope="col">@T["ui.jobs.last_success"]</th>
+            <th scope="col">@T["ui.jobs.failed_recently"]</th>
+        </HeaderContent>
+        <RowTemplate Context="item">
+            <td><a href="@Link(item.Job, false, 1)">@T["ui.jobs.job." + item.Job]</a></td>
+            <td>@(item.Latest is { } latest ? PlatformDisplay.Utc(T, latest.StartedUtc) : T["ui.jobs.never"].Value)</td>
+            <td>@Outcome(item.Latest)</td>
+            <td>@(item.LastSucceededUtc is { } succeeded ? PlatformDisplay.Utc(T, succeeded) : "-")</td>
+            <td>
+                @if (item.FailedRecently > 0)
+                {
+                    <a href="@Link(item.Job, true, 1)"><VxStatusBadge Status="VxBadgeStatus.Danger" Text="@item.FailedRecently.ToString(System.Globalization.CultureInfo.CurrentCulture)" /></a>
+                }
+                else
+                {
+                    @("0")
+                }
+            </td>
+        </RowTemplate>
+    </VxDataTable>
+
+    <div class="vx-jobs-history-bar">
+        <h2 class="vx-jobs-history-title">@T["ui.jobs.history"]</h2>
+        <div class="vx-jobs-filter-group">
+            @if (Job is not null)
+            {
+                <span class="vx-jobs-pill-filter">
+                    <span class="vx-jobs-pill-filter__label">@T["ui.jobs.job." + Job]</span>
+                    <a href="@Link(null, FailedOnly, 1)" class="vx-jobs-pill-filter__remove" title="@T["ui.jobs.all_jobs"]" aria-label="@T["ui.jobs.all_jobs"]">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <span class="vx-visually-hidden">@T["ui.jobs.all_jobs"]</span>
+                    </a>
+                </span>
+            }
+            <nav class="vx-jobs-view-switch" role="group" aria-label="@T["ui.jobs.history"]">
+                <a href="@Link(Job, false, 1)" class="vx-jobs-view-btn @(!FailedOnly ? "is-active" : null)">@T["ui.jobs.all_runs"]</a>
+                <a href="@Link(Job, true, 1)" class="vx-jobs-view-btn @(FailedOnly ? "is-active" : null)">@T["ui.jobs.failures_only"]</a>
+            </nav>
+        </div>
+    </div>
+    <VxDataTable Items="Presenter.State.Runs" IsLoading="@(!Presenter.State.Loaded)" Caption="@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.jobs.count", "count", Presenter.State.TotalCount) : null)">
+        <HeaderContent>
+            <th scope="col">@T["ui.jobs.job"]</th>
+            <th scope="col">@T["ui.jobs.started"]</th>
+            <th scope="col">@T["ui.jobs.duration"]</th>
+            <th scope="col">@T["ui.jobs.handled"]</th>
+            <th scope="col">@T["ui.jobs.outcome"]</th>
+        </HeaderContent>
+        <RowTemplate Context="run">
+            <td><a href="@Link(run.Job, FailedOnly, 1)">@T["ui.jobs.job." + run.Job]</a></td>
+            <td><span class="vx-jobs-mono">@PlatformDisplay.Utc(T, run.StartedUtc)</span></td>
+            <td><span class="vx-jobs-mono">@Duration(run)</span></td>
+            <td><span class="vx-jobs-mono">@run.Handled</span></td>
+            <td>@Outcome(run)</td>
+        </RowTemplate>
+        <EmptyContent>
+            <VxEmptyState Title="@T["ui.jobs.empty"]" />
+        </EmptyContent>
+    </VxDataTable>
+    @if (Presenter.State.Loaded && Presenter.State.Runs.Count > 0)
+    {
+        <VxPager CurrentPage="Presenter.State.Page" TotalPages="Presenter.State.TotalPages" PageChanged="GoToPage" />
+    }
+}
+
+@code {
+    [Parameter]
+    public string? Job { get; set; }
+
+    [Parameter]
+    public bool FailedOnly { get; set; }
+
+    [Parameter]
+    public int Page { get; set; } = 1;
+
+    protected override Task OnParametersSetAsync() => Presenter.LoadAsync(Job, FailedOnly, Page);
+
+    private void GoToPage(int page) => Navigation.NavigateTo(Link(Job, FailedOnly, page));
+
+    private static string Link(string? job, bool failedOnly, int page)
+    {
+        List<string> query = new();
+
+        if (job is not null)
+        {
+            query.Add("job=" + Uri.EscapeDataString(job));
+        }
+
+        if (failedOnly)
+        {
+            query.Add("failed=true");
+        }
+
+        if (page > 1)
+        {
+            query.Add("page=" + page.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        }
+
+        return query.Count == 0 ? "/jobs" : "/jobs?" + string.Join("&", query);
+    }
+
+    private RenderFragment Outcome(PlatformJobRunItem? run) => run switch
+    {
+        null => @<span>-</span>,
+        { Failed: > 0 } => @<span><VxStatusBadge Status="VxBadgeStatus.Danger" Text="@T["ui.jobs.failed"]" /> <span class="vx-hint">@run.ErrorCode</span></span>,
+        { FinishedUtc: null } => @<VxStatusBadge Status="VxBadgeStatus.Progress" Text="@T["ui.jobs.unfinished"]" />,
+        _ => @<VxStatusBadge Status="VxBadgeStatus.Success" Text="@T["ui.jobs.succeeded"]" />
+    };
+
+    private string Duration(PlatformJobRunItem run)
+    {
+        if (run.FinishedUtc is not { } finished)
+        {
+            return "-";
+        }
+
+        double seconds = Math.Max(0, (finished - run.StartedUtc).TotalSeconds);
+
+        return VixlyText.Format(T, "ui.jobs.seconds", "seconds", Math.Round(seconds, 1).ToString("0.#", System.Globalization.CultureInfo.CurrentCulture));
+    }
+}

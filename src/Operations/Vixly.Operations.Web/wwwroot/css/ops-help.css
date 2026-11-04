@@ -1,0 +1,22 @@
+/* Company-branded text help. Uses the workspace's shared theme tokens. */
+.ops-help {
+    width: 100%;
+    max-width: var(--vx-content-reading, 76ch);
+    margin-inline: auto;
+    overflow-wrap: anywhere;
+}
+
+.ops-help__search {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--vx-space-3);
+    margin-block: var(--vx-space-5);
+}
+
+.ops-help__search label { flex-basis: 100%; }
+.ops-help__search input { flex: 1 1 12rem; min-width: 0; }
+.ops-help__list { list-style: none; padding: 0; }
+.ops-help__list li { padding-block: var(--vx-space-4); border-bottom: var(--vx-border-width) solid var(--vx-color-border); }
+.ops-help__list a { font-weight: 600; }
+.ops-help__list p { margin-block: var(--vx-space-2) 0; color: var(--vx-color-text-muted); }

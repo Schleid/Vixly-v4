@@ -1,0 +1,24 @@
+﻿@inherits PlatformPresenterComponent<PlatformHelpPresenter>
+@using System.Globalization
+@inject NavigationManager Navigation
+@inject IStringLocalizer<PlatformText> T
+@* =========================================================
+   FILE: PlatformHelpContextLink.razor
+
+   PURPOSE:
+   Opens the current page's help only when the reader may see it.
+
+   RESPONSIBILITIES:
+   - Refresh permission visibility after interactive navigation.
+
+   IMPORTANT NOTES:
+   - Sign-in pages use their own layout without this component.
+   ========================================================= *@
+<VxHelpLink Href="@Presenter.State.ContextAddress" Label="@T["ui.help.context"]" />
+
+@code {
+    [Parameter] public string Path { get; set; } = "/";
+
+    protected override Task OnParametersSetAsync() => Presenter.LoadAsync(
+        CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, null, null, Path);
+}

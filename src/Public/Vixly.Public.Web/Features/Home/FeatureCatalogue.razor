@@ -1,0 +1,65 @@
+﻿@inject IStringLocalizer<PublicText> T
+@* =========================================================
+   FILE: FeatureCatalogue.razor
+
+   PURPOSE:
+   An illustrated journey through the logistics platform.
+
+   RESPONSIBILITIES:
+   Present localized feature copy, section navigation and artwork.
+
+   IMPORTANT NOTES:
+   Static HTML and progressive CSS motion; no backend or client state.
+   Decorative artwork carries no required instructions.
+   ========================================================= *@
+<section class="pub-section pub-feature-intro">
+    <div>
+        <p class="pub-eyebrow">@T["public.home.eyebrow"]</p>
+        <h1>@T["public.features.title"]</h1>
+        <p class="pub-lead">@T["public.features.lead"]</p>
+        <div class="pub-feature-route" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+    <img src="/images/sketch-hero.webp" alt="" width="1200" height="800" decoding="async" fetchpriority="high" />
+</section>
+<nav class="pub-feature-index" aria-label="@T["public.features.title"]">
+    @for (int index = 0; index < Areas.Length; index++)
+    {
+        string area = Areas[index];
+        <a href="@(PublicLanguage.Page(PublicLanguage.Current, "features") + "#feature-chapter-" + area)">
+            <span aria-hidden="true">@((index + 1).ToString("D2"))</span>
+            @T["public.features." + area + ".title"]
+        </a>
+    }
+</nav>
+<div class="pub-feature-journey">
+    @for (int index = 0; index < Areas.Length; index++)
+    {
+        string area = Areas[index];
+        <section class="pub-feature-chapter" id="feature-chapter-@area" aria-labelledby="feature-@area">
+            <div class="pub-feature-chapter__copy">
+                <span class="pub-feature-chapter__number" aria-hidden="true">@((index + 1).ToString("D2")) / @Areas.Length.ToString("D2")</span>
+                <h2 id="feature-@area">@T["public.features." + area + ".title"]</h2>
+                <p>@T["public.features." + area + ".text"]</p>
+                <ul>
+                    <li>@T["public.features." + area + ".point1"]</li>
+                    <li>@T["public.features." + area + ".point2"]</li>
+                    <li>@T["public.features." + area + ".point3"]</li>
+                </ul>
+            </div>
+            <figure class="pub-feature-chapter__art">
+                <img src="@($"/images/sketch-{(area == "customers" ? "customer-web-portal" : area)}.webp")" alt="" width="800" height="600" loading="lazy" decoding="async" />
+            </figure>
+        </section>
+    }
+</div>
+<section class="pub-section pub-closing">
+    <h2>@T["public.home.closing.title"]</h2>
+    <p>@T["public.home.closing.text"]</p>
+    <p class="pub-actions">
+        <a class="vx-button vx-button--primary" href="@PublicLanguage.Page(PublicLanguage.Current, "contact")">@T["public.cta.talk"]</a>
+        <a class="vx-button" href="@PublicLanguage.Page(PublicLanguage.Current, "plans")">@T["public.cta.plans"]</a>
+    </p>
+</section>
+@code {
+    public static readonly string[] Areas = { "shipments", "parcels", "dispatch", "warehouse", "billing", "customers", "organization" };
+}

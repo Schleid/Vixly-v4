@@ -1,0 +1,35 @@
+﻿@using Vixly.Shared.Help
+@using Vixly.Operations.Web.Features.Help
+@inject IStringLocalizer<OperationsText> T
+@* =========================================================
+   FILE: OperationsHelpList.razor
+
+   PURPOSE:
+   Lists already-visible help titles and summaries.
+
+   RESPONSIBILITIES:
+   - Keep empty results localized and article addresses stable.
+
+   IMPORTANT NOTES:
+   - Permission and condition filtering happen before rendering.
+   ========================================================= *@
+@if (Articles.Count == 0)
+{
+    <p>@T["ui.help.empty"]</p>
+}
+else
+{
+    <ul class="ops-help__list">
+        @foreach (HelpArticle article in Articles)
+        {
+            <li>
+                <a href="@OperationsHelpCatalogue.Address(article.Language, article.Metadata.Slug)">@article.Metadata.Title</a>
+                <p>@article.Metadata.Summary</p>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<HelpArticle> Articles { get; set; } = [];
+}

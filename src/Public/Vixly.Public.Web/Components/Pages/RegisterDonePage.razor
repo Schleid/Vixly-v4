@@ -1,0 +1,25 @@
+﻿@*
+=========================================================
+FILE: RegisterDonePage.razor
+
+PURPOSE:
+Sign-up: finished; the workspace is being prepared.
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Sign-up pages are noindex and switched off until Stage 3 (D-U4)
+=========================================================
+*@
+@page "/en/register/done"
+@page "/fr/register/done"
+@page "/es/register/done"
+@attribute [EnableRateLimiting(PublicRateLimits.Registration)]
+@inject IStringLocalizer<PublicText> T
+
+<PageHead TitleKey="public.register.done_page" Indexed="false" />
+<section class="pub-section pub-section--narrow">
+    <h1>@T["public.register.done_page"]</h1>
+    <RegistrationGate>
+        <RegistrationProgress />
+    </RegistrationGate>
+</section>

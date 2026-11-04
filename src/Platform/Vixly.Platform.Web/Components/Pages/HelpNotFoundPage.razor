@@ -1,0 +1,18 @@
+﻿@page "/help-not-found"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+@* =========================================================
+   FILE: HelpNotFoundPage.razor
+
+   PURPOSE:
+   Provides the same not-found response for hidden or absent help.
+
+   RESPONSIBILITIES:
+   - Offer a safe return to the filtered help home.
+
+   IMPORTANT NOTES:
+   - Does not identify which permission or article was missing.
+   ========================================================= *@
+<PageTitle>@T["ui.help.not_found"]</PageTitle>
+<h1>@T["ui.help.not_found"]</h1>
+<p><a href="/help">@T["ui.help.back"]</a></p>

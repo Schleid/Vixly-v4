@@ -64,7 +64,7 @@ IMPORTANT NOTES:
                 <td>@T[PlatformDisplay.ContactRoleKey(contact.Role)]</td>
                 <td>@contact.Name</td>
                 <td>@contact.Email</td>
-                <td>@(contact.Phone ?? T["ui.common.none"].Value)</td>
+                <td>@(contact.Phone is { } contactPhone ? Vixly.Shared.Localization.VixlyPhone.International(contactPhone) : T["ui.common.none"].Value)</td>
             </RowTemplate>
         </VxDataTable>
         @if (CanEdit)

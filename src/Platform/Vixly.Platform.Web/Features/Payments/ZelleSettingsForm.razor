@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: ZelleSettingsForm.razor
 
@@ -39,35 +39,66 @@ IMPORTANT NOTES:
         }
         else
         {
-            <p class="vx-hint">@T["ui.zelle_settings.help"]</p>
-            <form class="vx-form" @onsubmit="SaveAsync">
-                <label><input id="zelle-enabled" type="checkbox" @bind="_enabled" /> @T["ui.zelle_settings.enabled"]</label>
-                <label for="zelle-recipient">@T["ui.zelle_settings.recipient"]</label>
-                <input id="zelle-recipient" @bind="_recipient" maxlength="@PlatformZelleLimits.RecipientMaxLength" />
-                <label for="zelle-email">@T["ui.zelle_settings.email"]</label>
-                <input id="zelle-email" type="email" @bind="_email" maxlength="@PlatformZelleLimits.EmailMaxLength" />
-                <label for="zelle-tag">@T["ui.zelle_settings.tag"]</label>
-                <input id="zelle-tag" @bind="_tag" maxlength="@PlatformZelleLimits.TagMaxLength" />
-                <label for="zelle-phone">@T["ui.zelle_settings.phone"]</label>
-                <input id="zelle-phone" type="tel" @bind="_phone" maxlength="@PlatformZelleLimits.PhoneMaxLength" aria-describedby="zelle-ways-help" />
-                <p id="zelle-ways-help" class="vx-hint">@T["ui.zelle_settings.ways_help"]</p>
-                <div class="vx-actions">
-                    <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.zelle_settings.save"]</VxButton>
+            <div class="vx-zelle-grid">
+                <!-- Column 1: Zelle Account Parameters -->
+                <div>
+                    <p class="vx-hint" style="margin-top: 0;">@T["ui.zelle_settings.help"]</p>
+                    <form class="vx-form" @onsubmit="SaveAsync" style="margin-top: 0.75rem;">
+                        <div class="vx-toggle-box" style="margin-bottom: 0.5rem;">
+                            <input id="zelle-enabled" type="checkbox" @bind="_enabled" />
+                            <label for="zelle-enabled" class="vx-toggle-box__label" style="cursor: pointer; margin: 0;">@T["ui.zelle_settings.enabled"]</label>
+                        </div>
+                        <div class="vx-field-compact">
+                            <label for="zelle-recipient">@T["ui.zelle_settings.recipient"]</label>
+                            <input id="zelle-recipient" @bind="_recipient" maxlength="@PlatformZelleLimits.RecipientMaxLength" placeholder="e.g. Vixly Operations LLC" />
+                        </div>
+                        <div class="vx-field-compact">
+                            <label for="zelle-email">@T["ui.zelle_settings.email"]</label>
+                            <input id="zelle-email" type="email" @bind="_email" maxlength="@PlatformZelleLimits.EmailMaxLength" placeholder="billing@company.com" />
+                        </div>
+                        <div class="vx-form-grid-2">
+                            <div class="vx-field-compact">
+                                <label for="zelle-tag">@T["ui.zelle_settings.tag"]</label>
+                                <input id="zelle-tag" @bind="_tag" maxlength="@PlatformZelleLimits.TagMaxLength" placeholder="$company" />
+                            </div>
+                            <div class="vx-field-compact">
+                                <label for="zelle-phone">@T["ui.zelle_settings.phone"]</label>
+                                <input id="zelle-phone" type="tel" @bind="_phone" maxlength="@PlatformZelleLimits.PhoneMaxLength" aria-describedby="zelle-ways-help" placeholder="+1..." />
+                            </div>
+                        </div>
+                        <p id="zelle-ways-help" class="vx-hint" style="margin-top: -0.25rem;">@T["ui.zelle_settings.ways_help"]</p>
+                        <div class="vx-actions" style="margin-top: 0.75rem;">
+                            <VxButton Variant="VxButtonVariant.Primary" Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.zelle_settings.save"]</VxButton>
+                        </div>
+                    </form>
                 </div>
-            </form>
-            <h3>@T["ui.zelle_settings.qr"]</h3>
-            @if (Presenter.State.QrCode is { } qr)
-            {
-                <p><img id="zelle-qr" src="@($"data:{qr.ContentType};base64,{Convert.ToBase64String(qr.Content)}")" alt="@T["ui.zelle_settings.qr_alt"]" width="160" height="160" /></p>
-                <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => Presenter.SetQrCodeAsync(null, null)" IsBusy="@Presenter.IsBusy">@T["ui.zelle_settings.qr_remove"]</VxButton>
-            }
-            else
-            {
-                <p class="vx-hint">@T["ui.zelle_settings.qr_none"]</p>
-            }
-            <label for="zelle-qr-file">@T["ui.zelle_settings.qr_upload"]</label>
-            <InputFile id="zelle-qr-file" accept="image/png,image/jpeg" OnChange="UploadAsync" aria-describedby="zelle-qr-help" />
-            <p id="zelle-qr-help" class="vx-hint">@VixlyText.Format(T, "ui.zelle_settings.qr_help", "maxKilobytes", PlatformZelleLimits.MaxQrKilobytes)</p>
+
+                <!-- Column 2: QR Code & Actions -->
+                <div class="vx-zelle-qr-panel">
+                    <h3 style="margin: 0; font-size: 0.95rem; font-weight: 700;">@T["ui.zelle_settings.qr"]</h3>
+                    <div class="vx-zelle-qr-box">
+                        @if (Presenter.State.QrCode is { } qr)
+                        {
+                            <img id="zelle-qr" src="@($"data:{qr.ContentType};base64,{Convert.ToBase64String(qr.Content)}")" alt="@T["ui.zelle_settings.qr_alt"]" />
+                        }
+                        else
+                        {
+                            <span class="vx-hint" style="font-size: 0.8rem;">@T["ui.zelle_settings.qr_none"]</span>
+                        }
+                    </div>
+                    @if (Presenter.State.QrCode is not null)
+                    {
+                        <div style="margin-bottom: 0.75rem;">
+                            <VxButton Variant="VxButtonVariant.Subtle" OnClick="() => Presenter.SetQrCodeAsync(null, null)" IsBusy="@Presenter.IsBusy">@T["ui.zelle_settings.qr_remove"]</VxButton>
+                        </div>
+                    }
+                    <div style="width: 100%; text-align: left; margin-top: 0.5rem; padding-top: 0.75rem; border-top: 1px solid var(--vx-color-border);">
+                        <label for="zelle-qr-file" style="display: block; font-size: 0.72rem; font-weight: 700; color: var(--vx-color-text-muted); text-transform: uppercase; margin-bottom: 0.35rem;">@T["ui.zelle_settings.qr_upload"]</label>
+                        <InputFile id="zelle-qr-file" accept="image/png,image/jpeg" OnChange="UploadAsync" aria-describedby="zelle-qr-help" style="width: 100%; font-size: 0.8125rem;" />
+                        <p id="zelle-qr-help" class="vx-hint" style="margin-top: 0.35rem; margin-bottom: 0;">@VixlyText.Format(T, "ui.zelle_settings.qr_help", "maxKilobytes", PlatformZelleLimits.MaxQrKilobytes)</p>
+                    </div>
+                </div>
+            </div>
         }
     </VxCard></div>
     @if (Presenter.State.StepUpPending)

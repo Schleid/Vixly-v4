@@ -13,14 +13,18 @@ namespace Vixly.Shared.Kernel.ValueObjects;
 // RESPONSIBILITIES:
 // - Trim and lower-case input
 // - Reject malformed addresses and over-long values
+// - Accept ASCII only, as browsers' email fields do: an accented
+//   address could be saved but never typed at sign-in (2026-10-18).
+//   An international domain is entered in its xn-- form
 // - Provide value-based equality
 //
 // IMPORTANT NOTES:
 // - Validates format only; it does not verify the mailbox
 //   exists or that the owner consented
-// - New values are always validated. Persisted legacy data is
-//   cleaned by the migration tool, never loaded unvalidated
-//   (ADR-0002)
+// - New values are always validated (Create). A value already
+//   saved is read back as it is (FromStored), so tightening a
+//   rule never stops the apps from loading older records; the
+//   record is corrected the next time it is saved (2026-10-19)
 // =========================================================
 public sealed record EmailAddress
 {
@@ -44,6 +48,16 @@ public sealed record EmailAddress
         }
 
         return email;
+    }
+
+    // =====================================================
+    // METHOD: FROM STORED
+    // =====================================================
+    // For the database only: a saved address under an older rule (an accent, say) still loads.
+    public static EmailAddress FromStored(string value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+        return TryCreate(value, out EmailAddress? email) ? email : new EmailAddress(value.Trim().ToLowerInvariant());
     }
 
     // =====================================================
@@ -78,7 +92,7 @@ public sealed record EmailAddress
     // =====================================================
     private static bool IsValid(string value)
     {
-        if (value.Any(char.IsWhiteSpace))
+        if (value.Any(char.IsWhiteSpace) || !value.All(char.IsAscii))
         {
             return false;
         }

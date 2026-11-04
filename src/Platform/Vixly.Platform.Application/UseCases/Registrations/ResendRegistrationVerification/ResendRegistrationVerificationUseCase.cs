@@ -4,6 +4,7 @@ using Vixly.Platform.Application.Security;
 using Vixly.Platform.Application.UseCases.Registration;
 using Vixly.Platform.Domain.Tenants;
 using Vixly.Shared.Kernel.Domain;
+using Vixly.Shared.Kernel.ValueObjects;
 
 namespace Vixly.Platform.Application.UseCases.Registrations.ResendRegistrationVerification;
 
@@ -15,6 +16,7 @@ namespace Vixly.Platform.Application.UseCases.Registrations.ResendRegistrationVe
 //
 // RESPONSIBILITIES:
 // - Check platform.tenants.edit
+// - Correct a mistyped owner email when staff give a new one
 // - Revoke older links and send a new one
 //
 // IMPORTANT NOTES:
@@ -73,16 +75,34 @@ public sealed class ResendRegistrationVerificationUseCase
 
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();
         PlatformSecret? link = null;
+        bool corrected = false;
 
         try
         {
             _ = registration.ExpireIfDue(utcNow);
+
+            if (!string.IsNullOrWhiteSpace(request.Email))
+            {
+                EmailAddress email = EmailAddress.Create(request.Email);
+
+                if (email != registration.OwnerEmail)
+                {
+                    registration.CorrectOwnerEmail(email, utcNow);
+                    corrected = true;
+                }
+            }
+
             link = await _links.IssueAsync(registration, utcNow, cancellationToken);
         }
         catch (DomainException exception)
         {
             _unitOfWork.DiscardChanges();
             return ResendRegistrationVerificationResponse.Failure(exception.Error);
+        }
+
+        if (corrected)
+        {
+            _audit.Record(context.PlatformUserId, "platform.registrations.email_corrected", PlatformPermissions.TenantsEdit, nameof(PlatformTenantRegistration), registration.Id);
         }
 
         _audit.Record(context.PlatformUserId, "platform.registrations.verification_resent", PlatformPermissions.TenantsEdit, nameof(PlatformTenantRegistration), registration.Id);

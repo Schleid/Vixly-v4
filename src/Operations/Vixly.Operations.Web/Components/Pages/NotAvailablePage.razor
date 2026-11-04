@@ -1,0 +1,35 @@
+﻿@*
+=========================================================
+FILE: NotAvailablePage.razor
+
+PURPOSE:
+The page for a suspended tenant (403).
+
+RESPONSIBILITIES:
+- Show the page for a suspended tenant (403)
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Tenant surface: never says "Vixly" (ADR-0012 W-1)
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@page "/not-available"
+@inject IStringLocalizer<OperationsText> T
+
+<PageTitle>@T["ui.tenant.not_available.title"]</PageTitle>
+<h1>@T["ui.tenant.not_available.title"]</h1>
+<p>@T["ui.tenant.not_available.body"]</p>
+
+@code {
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (HttpContext is { Response.HasStarted: false } http)
+        {
+            http.Response.StatusCode = StatusCodes.Status403Forbidden;
+        }
+    }
+}

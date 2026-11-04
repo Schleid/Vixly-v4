@@ -1,0 +1,39 @@
+﻿@*
+=========================================================
+FILE: InspectionSummaryPanel.razor
+
+PURPOSE:
+A parcel's compliance inspection on its page: why, where it stands, the outcome (Slice 3C).
+
+RESPONSIBILITIES:
+- Show why the parcel was chosen and the inspection's status
+- Show the outcome, what the customer must do and any fee
+- Link to the inspection
+
+IMPORTANT NOTES:
+- Markup only; renders nothing when the parcel was never chosen
+=========================================================
+*@
+@using Vixly.Operations.Domain.Inspection
+@using Vixly.Operations.Web.Components.Inspection
+@if (Inspection is { } inspection)
+{
+    <section class="ops-editor__panel" aria-labelledby="parcel-inspection">
+        <h2 id="parcel-inspection">@T["ui.inspection.compliance"]</h2>
+        <dl>
+            <dt>@T["ui.inspection.queue.why"]</dt><dd>@OperationsInspectionWords.Why(T, inspection.Why, inspection.Reason)</dd>
+            <dt>@T["ui.inspection.queue.status"]</dt><dd>@T["ui.inspection.status." + inspection.Status]</dd>
+            @if (inspection.Result is { } result) { <dt>@T["ui.inspection.outcome.result"]</dt><dd>@T["ui.inspection.result." + result]</dd> }
+            @if (inspection.ItemsFound is { } found) { <dt>@T["ui.inspection.outcome.found"]</dt><dd>@found</dd> }
+            @if (inspection.CustomerAction is { } action) { <dt>@T["ui.inspection.outcome.action"]</dt><dd>@action</dd> }
+            @if (inspection.Fee is { } fee) { <dt>@VixlyText.Format(T, "ui.inspection.outcome.fee", "currency", inspection.FeeCurrency ?? string.Empty)</dt><dd>@fee.ToString("0.00")</dd> }
+        </dl>
+        <p><a href="/staff/inspection/queue/@inspection.Id">@T["ui.inspection.open"]</a></p>
+    </section>
+}
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public OperationsInspection? Inspection { get; set; }
+}

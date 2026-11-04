@@ -1,0 +1,30 @@
+﻿@*
+=========================================================
+FILE: VendorCategory.razor
+
+PURPOSE:
+The category select of a vendor (Slice 8).
+
+RESPONSIBILITIES:
+- Every category, the vendor's selected
+
+IMPORTANT NOTES:
+- Markup only
+=========================================================
+*@
+<label style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0;">@T["ui.bills.category"]
+    <select name="category" form="@Form">
+        @foreach (OperationsBillCategory category in Enum.GetValues<OperationsBillCategory>())
+        {
+            <option value="@category" selected="@(Selected == category)">@T["ui.bills.category." + category]</option>
+        }
+    </select>
+</label>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public OperationsBillCategory Selected { get; set; } = OperationsBillCategory.Other;
+
+    [Parameter] public string? Form { get; set; }
+}

@@ -1,0 +1,110 @@
+﻿@*
+=========================================================
+FILE: SiteHorizonHome.razor
+
+PURPOSE:
+The Horizon home page: dark hero, route illustration, alternating dark and light sections (website themes, step 1).
+
+RESPONSIBILITIES:
+- Arrange the company's real content in the Horizon layout
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText and the tenant texts; values come from the endpoint
+- Tenant surface: never says "Vixly" (ADR-0012 W-1); every value is HTML-encoded by Razor
+- Original artwork only; the route card is an illustration of tracking stages, labelled as an example, never a live parcel
+- Motion is CSS only and stops when the visitor asks for reduced motion
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<SiteShell Page="@Page" Title="@(Page.Company + " | " + Headline)" Description="@Page.Text(T, "meta_description", "site.default.meta_description")">
+    <section class="hz-hero">
+        <div class="hz-hero__text">
+            <h1>@Before<em>@Accent</em>@After</h1>
+            <p>@Page.Text(T, "intro", "site.default.intro")</p>
+            <div class="site-hero__actions">
+                @if (Page.Site.PortalShown)
+                {
+                    <a class="site-button" href="/customer/sign-up">@T["site.hero.create_account"] <span aria-hidden="true">↗</span></a>
+                }
+                <a class="site-button @(Page.Site.PortalShown ? "site-button--outline" : null)" href="#track">@T["site.hero.track"]</a>
+            </div>
+            @if (Services.Count > 0)
+            {
+                <ul class="hz-chips">
+                    @foreach (string code in Services.Take(3))
+                    {
+                        <li>@T["site.service." + code + ".title"]</li>
+                    }
+                </ul>
+            }
+        </div>
+        <div class="hz-hero__visual">
+            <svg class="hz-globe" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
+                <defs>
+                    <radialGradient id="hz-glow" cx="50%" cy="45%" r="55%"><stop offset="0" stop-color="currentColor" stop-opacity=".22" /><stop offset="1" stop-color="currentColor" stop-opacity="0" /></radialGradient>
+                </defs>
+                <circle cx="200" cy="200" r="190" fill="url(#hz-glow)" />
+                <g fill="none" stroke="currentColor" stroke-opacity=".28" stroke-width="1">
+                    <circle cx="200" cy="200" r="150" />
+                    <ellipse cx="200" cy="200" rx="150" ry="55" />
+                    <ellipse cx="200" cy="200" rx="150" ry="110" />
+                    <ellipse cx="200" cy="200" rx="55" ry="150" />
+                    <ellipse cx="200" cy="200" rx="110" ry="150" />
+                    <path d="M50 200h300M200 50v300" />
+                </g>
+                <path class="hz-globe__route" d="M112 248 Q 190 70 296 168" fill="none" stroke="var(--site-accent-light)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6 9" />
+                <circle cx="112" cy="248" r="7" fill="var(--site-accent-light)" />
+                <circle cx="112" cy="248" r="15" fill="none" stroke="var(--site-accent-light)" stroke-opacity=".45" class="hz-globe__pulse" />
+                <circle cx="296" cy="168" r="7" fill="#fff" />
+            </svg>
+            <figure class="hz-route" aria-labelledby="hz-route-caption">
+                <figcaption id="hz-route-caption"><strong>@T["site.route.title"]</strong> <span>@T["site.route.example"]</span></figcaption>
+                <ol>
+                    @foreach (string stage in Stages)
+                    {
+                        <li>@T["ui.milestone." + stage]</li>
+                    }
+                </ol>
+            </figure>
+        </div>
+    </section>
+    <div class="site-tracking-band"><SiteTrackForm Page="@Page" /></div>
+    <SiteFigures Page="@Page" />
+    @if (Services.Count > 0)
+    {
+        <section class="site-section" aria-labelledby="services-title">
+            <h2 id="services-title">@T["site.services.title"]</h2>
+            <ul class="site-cards">
+                @foreach (string code in Services)
+                {
+                    <li class="site-card site-service"><SiteServiceIcon Code="@(code)" /><h3>@T["site.service." + code + ".title"]</h3><p>@Page.Text(T, "service." + code, "site.service." + code + ".text")</p></li>
+                }
+            </ul>
+        </section>
+    }
+    <div class="hz-dark"><SiteSteps Page="@Page" /></div>
+    <SiteLocations Page="@Page" />
+    <SiteFaq Page="@Page" />
+    <div class="hz-dark"><SiteClosing Page="@Page" /></div>
+</SiteShell>
+
+@code {
+    private static readonly string[] Stages = { "ReceivedAtOrigin", "DepartedOrigin", "ArrivedDestinationCountry", "Delivered" };
+
+    private IReadOnlyList<string> Services => OperationsSiteHome.Services(Page);
+
+    private string Headline => Page.Text(T, "headline", "site.default.headline");
+
+    // The company name inside the headline takes the accent colour; a headline without it is shown plain.
+    private int AccentAt => Headline.IndexOf(Page.Company, StringComparison.CurrentCultureIgnoreCase);
+
+    private string Before => AccentAt < 0 ? Headline : Headline[..AccentAt];
+
+    private string Accent => AccentAt < 0 ? string.Empty : Headline.Substring(AccentAt, Page.Company.Length);
+
+    private string After => AccentAt < 0 ? string.Empty : Headline[(AccentAt + Page.Company.Length)..];
+
+    [Parameter, EditorRequired]
+    public OperationsSitePage Page { get; set; } = null!;
+}

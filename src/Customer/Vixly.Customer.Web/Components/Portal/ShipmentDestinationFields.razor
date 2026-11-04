@@ -1,0 +1,88 @@
+@*
+=========================================================
+FILE: ShipmentDestinationFields.razor
+
+PURPOSE:
+Where a shipment goes: the destination warehouse, then pickup there or delivery to an address in its area (Slice 4C); the destination branches before it (Slice 3C).
+
+RESPONSIBILITIES:
+- With destinations: "Deliver to", pickup there or home delivery
+- Without: a destination branch or an address in a country the company serves
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- No script: both delivery kinds are shown and the chosen one is used; Operations checks everything again
+=========================================================
+*@
+@using Vixly.Contracts.Operations.Customers
+@using Vixly.Contracts.Operations.Packages
+@inject IStringLocalizer<CustomerText> T
+
+<fieldset class="customer-destination-fieldset">
+    <legend>@T["ui.shipments.destination"]</legend>
+    @if (Destinations.Count > 0)
+    {
+        <label class="customer-destination-select">
+            <span>@T["ui.shipments.deliver_to"]</span>
+            <select name="destination" required>
+                @foreach (CustomerDestinationDto destination in Destinations) { <option value="@destination.Id" selected="@(destination.Id == Entered?.DestinationId)">@destination.Name · @destination.City, @CountryName(destination.CountryCode)</option> }
+            </select>
+        </label>
+        <p class="customer-portal__hint">@T["ui.shipments.deliver_to_hint"]</p>
+        <div class="customer-delivery-options">
+            @if (Destinations.Any(destination => destination.Pickup))
+            {
+                <label><input type="radio" name="delivery" value="pickup" checked="@(Entered?.Delivery != "home")" required /> <span>@T["ui.shipments.pickup_there"]</span></label>
+            }
+            @if (Destinations.Any(destination => destination.HomeDelivery))
+            {
+                <label><input type="radio" name="delivery" value="home" checked="@(Entered?.Delivery == "home" || !Destinations.Any(destination => destination.Pickup))" required /> <span>@T["ui.shipments.home"]</span></label>
+            }
+        </div>
+        @if (Destinations.Any(destination => destination.HomeDelivery))
+        {
+            <AddressInputs T="T" Entered="Entered" Countries="DestinationCountries" />
+        }
+    }
+    else
+    {
+        @if (Choices.Pickup && Choices.Branches.Count > 0)
+        {
+            <label><input type="radio" name="delivery" value="pickup" checked="@(Entered?.Delivery != "home")" required /> <span>@T["ui.shipments.pickup"]</span></label>
+            <label><span>@T["ui.shipments.branch"]</span>
+                <select name="branch">
+                    @foreach (CustomerChoiceDto branch in Choices.Branches) { <option value="@branch.Id" selected="@(branch.Id == Entered?.BranchId)">@branch.Name · @branch.Detail</option> }
+                </select>
+            </label>
+        }
+        @if (Choices.HomeDelivery && (Choices.Countries?.Count ?? 0) > 0)
+        {
+            <label><input type="radio" name="delivery" value="home" checked="@(Entered?.Delivery == "home" || !(Choices.Pickup && Choices.Branches.Count > 0))" required /> <span>@T["ui.shipments.home"]</span></label>
+            <AddressInputs T="T" Entered="Entered" Countries="BranchCountries" />
+        }
+    }
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired] public CustomerShipmentChoicesDto Choices { get; set; } = null!;
+
+    [Parameter] public CustomerShipmentInstructionsBody? Entered { get; set; }
+
+    private IReadOnlyList<string> BranchCountries => Choices.Countries ?? Array.Empty<string>();
+
+    private IReadOnlyList<string> DestinationCountries => Destinations.Select(destination => destination.CountryCode).Distinct(StringComparer.Ordinal).ToList();
+
+    private IReadOnlyList<CustomerDestinationDto> Destinations => Choices.Destinations ?? Array.Empty<CustomerDestinationDto>();
+
+    private static string CountryName(string code)
+    {
+        try
+        {
+            return new System.Globalization.RegionInfo(code).NativeName;
+        }
+        catch (ArgumentException)
+        {
+            return code;
+        }
+    }
+}

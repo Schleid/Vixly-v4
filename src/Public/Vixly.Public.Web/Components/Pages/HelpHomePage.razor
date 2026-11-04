@@ -1,0 +1,22 @@
+﻿@page "/en/help"
+@page "/fr/help"
+@page "/es/help"
+@attribute [EnableRateLimiting(PublicRateLimits.Help)]
+@attribute [OutputCache(PolicyName = "public-help")]
+@* =========================================================
+   FILE: HelpHomePage.razor
+
+   PURPOSE:
+   Routes Public help home and search to the help feature.
+
+   RESPONSIBILITIES:
+   - Pass the URL query to the feature component.
+
+   IMPORTANT NOTES:
+   - Anonymous; search responses are not output cached.
+   ========================================================= *@
+<Vixly.Public.Web.Features.Help.PublicHelpBrowser Query="@Query" />
+
+@code {
+    [SupplyParameterFromQuery(Name = "q")] public string? Query { get; set; }
+}

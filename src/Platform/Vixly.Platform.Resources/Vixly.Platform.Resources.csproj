@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <EmbeddedResource Include="Help\**\*.md" />
     <ProjectReference Include="..\..\Shared\Vixly.Shared.Kernel\Vixly.Shared.Kernel.csproj" />
   </ItemGroup>
 

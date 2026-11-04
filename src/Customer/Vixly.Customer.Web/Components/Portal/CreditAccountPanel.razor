@@ -1,0 +1,55 @@
+﻿@*
+=========================================================
+FILE: CreditAccountPanel.razor
+
+PURPOSE:
+The customer's credit account on the portal (Slice 5F step 2b, K-8).
+
+RESPONSIBILITIES:
+- Show the state, the limit and terms, what is owed, available and overdue; the open items; the statement PDF
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+- Paying the account on the portal comes with the card payments later
+=========================================================
+*@
+@using System.Globalization
+@using Vixly.Contracts.Operations.Billing
+@inject IStringLocalizer<CustomerText> T
+
+<section id="account" class="customer-portal__panel" aria-labelledby="account-title">
+    <h2 id="account-title">@T["ui.credit.title"] <span class="customer-portal__status" data-status="@Credit.State">@T["ui.credit.state." + Credit.State]</span></h2>
+    <p>@VixlyText.Format(T, "ui.credit.terms", new Dictionary<string, object> { ["limit"] = Money(Credit.Limit), ["days"] = Credit.TermsDays })</p>
+    <dl class="customer-portal__facts">
+        <dt>@T["ui.credit.owed"]</dt><dd>@Money(Credit.Owed)</dd>
+        <dt>@T["ui.credit.available"]</dt><dd>@Money(Credit.Available)</dd>
+        <dt>@T["ui.credit.overdue"]</dt><dd data-overdue="@(Credit.Overdue > 0m)">@Money(Credit.Overdue)</dd>
+    </dl>
+    <p><a href="/customer/invoices/statement" target="_blank" rel="noopener">@T["ui.credit.statement"]</a></p>
+    @if (Credit.Items.Count > 0)
+    {
+        <CustomerTableViewport Label="@T["ui.credit.items"]">
+            <table class="customer-portal__table">
+                <thead><tr><th scope="col">@T["ui.invoices.number"]</th><th scope="col">@T["ui.invoices.for"]</th><th scope="col">@T["ui.invoices.date"]</th><th scope="col">@T["ui.credit.due"]</th><th scope="col">@T["ui.invoices.owed"]</th></tr></thead>
+                <tbody>
+                    @foreach (CustomerCreditItemDto item in Credit.Items)
+                    {
+                        <tr data-overdue="@item.Overdue">
+                            <td><a href="/customer/invoices/@item.InvoiceId/pdf" target="_blank" rel="noopener">@item.Number</a></td>
+                            <td>@item.Reference</td>
+                            <td>@item.IssuedOn.ToString("d", CultureInfo.CurrentCulture)</td>
+                            <td>@(item.DueOn is { } due ? due.ToString("d", CultureInfo.CurrentCulture) : T["ui.credit.awaiting"].Value)</td>
+                            <td>@Money(item.Owed)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </CustomerTableViewport>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public CustomerCreditAccountDto Credit { get; set; } = null!;
+
+    private string Money(decimal amount) => amount.ToString("N2", CultureInfo.CurrentCulture) + " " + Credit.CurrencyCode;
+}

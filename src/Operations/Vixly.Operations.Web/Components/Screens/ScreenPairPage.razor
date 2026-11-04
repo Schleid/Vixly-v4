@@ -1,0 +1,47 @@
+﻿@*
+=========================================================
+FILE: ScreenPairPage.razor
+
+PURPOSE:
+A screen not yet paired (Slice 5F step 3, P-2): the code a clerk gave, typed once.
+
+RESPONSIBILITIES:
+- Ask for the code
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The code is checked by the server, one use, 15 minutes; tries are limited
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<ScreenShell Company="@Company" Problem="@(ProblemCode is null ? null : T[ProblemCode].Value)">
+    @if (FromStripe)
+    {
+        <section class="ops-screen__panel" data-from-stripe>
+            <p class="ops-screen__big">@T["ui.screen.thanks"]</p>
+            <p>@T["ui.screen.phone_done"]</p>
+        </section>
+    }
+    else
+    {
+    <section class="ops-screen__panel" aria-labelledby="pair-title">
+        <h1 id="pair-title">@T["ui.screen.pair_title"]</h1>
+        <p>@T["ui.screen.pair_how"]</p>
+        <form method="post" action="/screen/pair" class="ops-screen__form">
+            <AntiforgeryToken />
+            <label>@T["ui.screen.pair_code"] <input name="code" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" required /></label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.screen.pair_button"]</button>
+        </form>
+    </section>
+    }
+</ScreenShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public string? ProblemCode { get; set; }
+
+    // Back from Stripe on the customer's own phone.
+    [Parameter] public bool FromStripe { get; set; }
+}

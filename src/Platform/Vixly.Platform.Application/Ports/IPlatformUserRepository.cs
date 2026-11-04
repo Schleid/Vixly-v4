@@ -24,6 +24,9 @@ public interface IPlatformUserRepository
 {
     Task<PlatformUser?> GetAsync(Guid platformUserId, CancellationToken cancellationToken);
 
+    // Harmonization H-10: only what the session check reads; null for an unknown staff member.
+    Task<Vixly.Platform.Application.Identity.PlatformSessionFacts?> FindSessionFactsAsync(Guid platformUserId, CancellationToken cancellationToken);
+
     Task<PlatformUser?> FindByEmailAsync(EmailAddress email, CancellationToken cancellationToken);
 
     Task<bool> EmailExistsAsync(EmailAddress email, CancellationToken cancellationToken);
@@ -33,6 +36,9 @@ public interface IPlatformUserRepository
     Task<int> CountOtherActiveSuperUsersAsync(Guid excludedUserId, CancellationToken cancellationToken);
 
     Task<bool> AnyAsync(CancellationToken cancellationToken);
+
+    // The next employee number (TC-0001 ...), from a database sequence: never repeated, even across failed saves.
+    Task<string> NextEmployeeNumberAsync(CancellationToken cancellationToken);
 
     void Add(PlatformUser user);
 }

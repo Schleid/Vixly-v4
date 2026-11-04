@@ -38,13 +38,17 @@ public sealed class PlatformSessionValidator
 
     private readonly TimeProvider _timeProvider;
 
+    private readonly Vixly.Platform.Application.Ports.IPlatformIdleTimesReader? _idle;
+
     public PlatformSessionValidator(
         IPlatformSessionRepository sessions,
         IPlatformUserRepository users,
         IPlatformSecretGenerator secrets,
         IPlatformUnitOfWork unitOfWork,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        Vixly.Platform.Application.Ports.IPlatformIdleTimesReader? idle = null)
     {
+        _idle = idle;
         _sessions = sessions ?? throw new ArgumentNullException(nameof(sessions));
         _users = users ?? throw new ArgumentNullException(nameof(users));
         _secrets = secrets ?? throw new ArgumentNullException(nameof(secrets));
@@ -78,16 +82,18 @@ public sealed class PlatformSessionValidator
 
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();
 
-        if (session.ExpiryReasonAt(utcNow) is PlatformSessionEndReason expired)
+        // Control's inactivity time, set by the security administrator (owner, 2026-10-27).
+        if (session.ExpiryReasonAt(utcNow, await IdleAsync(cancellationToken)) is PlatformSessionEndReason expired)
         {
             session.End(expired, utcNow);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return null;
         }
 
-        PlatformUser? user = await _users.GetAsync(session.PlatformUserId, cancellationToken);
+        // Harmonization H-10: the same rule (an unknown or inactive account ends the session), from a small read.
+        PlatformSessionFacts? user = await _users.FindSessionFactsAsync(session.PlatformUserId, cancellationToken);
 
-        if (user is null || !user.Account.IsActive)
+        if (user is null || !user.IsActive)
         {
             session.End(PlatformSessionEndReason.AccountRestricted, utcNow);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -100,22 +106,27 @@ public sealed class PlatformSessionValidator
         }
 
         return new PlatformValidatedSession(
-            new PlatformAuthorizationContext(user.Id, user.AuthorityLevel, session.Id),
+            new PlatformAuthorizationContext(user.PlatformUserId, user.AuthorityLevel, session.Id),
             $"{user.FirstName} {user.LastName}",
-            user.PreferredLanguage.Value);
+            user.PreferredLanguage);
     }
 
     public async Task<bool> IsStillValidAsync(Guid sessionId, CancellationToken cancellationToken)
     {
         PlatformUserSession? session = await _sessions.GetAsync(sessionId, cancellationToken);
 
-        if (session is null || !session.IsValidAt(_timeProvider.GetUtcNow()))
+        if (session is null || !session.IsValidAt(_timeProvider.GetUtcNow(), await IdleAsync(cancellationToken)))
         {
             return false;
         }
 
-        PlatformUser? user = await _users.GetAsync(session.PlatformUserId, cancellationToken);
+        PlatformSessionFacts? user = await _users.FindSessionFactsAsync(session.PlatformUserId, cancellationToken);
 
-        return user is not null && user.Account.IsActive;
+        return user is not null && user.IsActive;
     }
+
+    public async Task<PlatformIdleTimes> IdleTimesAsync(CancellationToken cancellationToken) =>
+        _idle is null ? PlatformIdleTimes.Default : await _idle.GetAsync(cancellationToken);
+
+    private async Task<TimeSpan> IdleAsync(CancellationToken cancellationToken) => (await IdleTimesAsync(cancellationToken)).Idle;
 }

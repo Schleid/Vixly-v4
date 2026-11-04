@@ -81,6 +81,11 @@ IMPORTANT NOTES:
                 <input id="plan-draft-devices" type="number" min="0" @bind="_model.MaxLicensedDevices" />
                 <label for="plan-draft-warehouses">@T["ui.plans.limit.max_warehouses"]</label>
                 <input id="plan-draft-warehouses" type="number" min="0" @bind="_model.MaxWarehouses" />
+                <label for="plan-draft-shipments">@T["ui.plans.limit.max_shipments_per_month"]</label>
+                <input id="plan-draft-shipments" type="number" min="0" @bind="_model.MaxShipmentsPerMonth" aria-describedby="plan-draft-shipments-hint" />
+                <label for="plan-draft-extra-shipment">@T["ui.plans.extra_shipment_price"]</label>
+                <input id="plan-draft-extra-shipment" type="number" min="0" step="0.01" @bind="_model.ExtraShipmentPrice" />
+                <p id="plan-draft-shipments-hint" class="vx-hint">@T["ui.plans.shipments_hint"]</p>
             </fieldset>
             <fieldset class="vx-fieldset" disabled="@(!Editable)">
                 <legend>@T["ui.plans.features"]</legend>
@@ -168,6 +173,8 @@ IMPORTANT NOTES:
             model.TrialDays = draft.TrialDays;
             model.MaxLicensedDevices = draft.MaxLicensedDevices;
             model.MaxWarehouses = draft.MaxWarehouses;
+            model.MaxShipmentsPerMonth = draft.MaxShipmentsPerMonth;
+            model.ExtraShipmentPrice = draft.ExtraShipmentPrice;
             model.Features.UnionWith(draft.Features);
         }
 

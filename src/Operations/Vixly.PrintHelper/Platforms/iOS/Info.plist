@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Slice 12E: the print helper asks for the camera (the QR code of the Printers page) and Bluetooth (the printer next to the phone). -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>LSRequiresIPhoneOS</key>
+  <true/>
+  <key>UIDeviceFamily</key>
+  <array>
+    <integer>1</integer>
+    <integer>2</integer>
+  </array>
+  <key>UISupportedInterfaceOrientations</key>
+  <array>
+    <string>UIInterfaceOrientationPortrait</string>
+  </array>
+  <key>NSCameraUsageDescription</key>
+  <string>The camera reads the code of the Printers page.</string>
+  <key>NSBluetoothAlwaysUsageDescription</key>
+  <string>Bluetooth sends labels to the printer next to you.</string>
+  <key>XSAppIconAssets</key>
+  <string>Assets.xcassets/appicon.appiconset</string>
+</dict>
+</plist>

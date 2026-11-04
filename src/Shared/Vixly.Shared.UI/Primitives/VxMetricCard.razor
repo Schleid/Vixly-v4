@@ -1,0 +1,28 @@
+﻿@namespace Vixly.Shared.UI.Primitives
+@* =========================================================
+   FILE: VxMetricCard.razor
+
+   PURPOSE:
+   Compact metric with a caller-supplied trend visualization.
+
+   RESPONSIBILITIES:
+   Present labels, values and trend context.
+
+   IMPORTANT NOTES:
+   No calculations, data fetching or plane references.
+   ========================================================= *@
+<article class="vx-metric">
+    <p class="vx-metric__label">@Label</p>
+    <div class="vx-metric__row"><strong class="vx-metric__value">@Value</strong>
+        @if (Visualization is not null) { <span class="vx-metric__chart" aria-hidden="true">@Visualization</span> }
+    </div>
+    <div class="vx-metric__detail">@if (!string.IsNullOrEmpty(Delta)) { <VxStatusBadge Text="@Delta" Status="@DeltaStatus" /> } <span>@Detail</span></div>
+</article>
+@code {
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Value { get; set; } = string.Empty;
+    [Parameter] public string? Delta { get; set; }
+    [Parameter] public string? Detail { get; set; }
+    [Parameter] public RenderFragment? Visualization { get; set; }
+    [Parameter] public VxBadgeStatus DeltaStatus { get; set; } = VxBadgeStatus.Info;
+}

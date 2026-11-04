@@ -9,6 +9,8 @@
 
 ## 1. What the Platform plane is
 
+Control's in-app help is being built under [HELP-2](../help/HELP-2-CONTROL.md), with progress and checks in [HELP-2 verification](../help/HELP-2-VERIFICATION.md). Signed-in help lives at `/help` and `/help/{Slug}`. The System menu and top-bar question mark open help; sign-in pages retain their existing inline hints. Home, search, direct article requests, related articles and contextual links are filtered using the existing GetMyPlatformAccess use case. Hidden and unknown articles answer 404. Resources embeds the en/fr/es Markdown; Web references Shared.Help for validation, rendering and search. This work changes no business actions.
+
 The plane Vixly itself runs: it knows who the tenants are, what they pay for, whether they may log in, and which devices are licensed. It never holds shipment or customer-operational data. Other planes learn about tenants only through `Vixly.Contracts.Platform`.
 
 It owns: `Platform.Domain|Application|Infrastructure|Api|Web|Worker`, `Contracts.Platform`, `Public.Web` (Stage 2, goes live with Platform) and `Vixly.Edge` (Stage 5).
@@ -120,3 +122,14 @@ Resolved by [ADR-0003](../decisions/ADR-0003-platform-plane-scope-and-staff-acco
 - **O-8** Entity names in section 4 are accepted as written.
 
 Resolved by [ADR-0010](../decisions/ADR-0010-standard-v1-3-data-naming-hostnames.md) (Global Standard v1.3): the `platform` schema and per-plane connection string and login (D-1), class prefix with unprefixed tables (4.1), `techcrafters.ltd` hostnames until migration, Public goes live with Platform.
+
+## 10. Backlog for later slices (owner, 2026-10-14)
+
+Each needs its own ADR before it is built. They were chosen to bring tenant management to industry standard.
+
+| Item | What it means | Likely slice |
+|---|---|---|
+| Four-eyes approval | A second staff member approves banning a tenant, and later refunds and write-offs. The request, the approval and the action are each audited; nobody approves their own request | With Slice 4 (refunds) or earlier for ban |
+| Data retention and export | On request, a tenant's data is exported (Platform and Operations parts). Once a tenant is deactivated, its data is deleted after a retention period, legal holds excepted. Needs Operations | After Stage 3 |
+| Business verification (KYB) | Registration documents and tax number are checked before a self-registered tenant is activated. Reduces fraud once card payments go live | With Slice 5 |
+| Theme and template marketplace ([ADR-0017](../decisions/ADR-0017-operations-and-customer-built-together.md), owner 2026-10-16) | Catalog of landing-page themes and templates with versions, previews and prices; which plans include which themes; purchases billed as add-ons on the Platform invoice; which themes each tenant owns. Tenants browse and buy from an Operations "Website" screen through the internal API; their site content stays in Operations; Edge shows the site | Slice 10, after the V3 migration |

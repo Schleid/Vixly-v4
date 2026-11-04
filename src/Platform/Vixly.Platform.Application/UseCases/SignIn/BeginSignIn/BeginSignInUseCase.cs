@@ -98,6 +98,15 @@ public sealed class BeginSignInUseCase
             user.ChangePasswordHash(_hasher.Hash(request.Password!), utcNow);
         }
 
+        if (await _steps.PasswordIsEnoughAsync(user, cancellationToken))
+        {
+            PlatformIssuedSession? issued = await _steps.StartSessionAsync(user, "password", cancellationToken);
+
+            return issued is null
+                ? BeginSignInResponse.Failure(PlatformAuthErrors.SignInFailed)
+                : BeginSignInResponse.SignedIn(issued.Token);
+        }
+
         string challengeToken = _steps.IssueChallenge(user, utcNow);
 
         if (!await _unitOfWork.SaveChangesAsync(cancellationToken))

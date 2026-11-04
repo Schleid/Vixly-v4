@@ -34,6 +34,10 @@ internal sealed class PlatformDeviceConfiguration : IEntityTypeConfiguration<Pla
         builder.Property(item => item.PreviousSecretHash).HasMaxLength(PlatformLicensingLimits.HashLength).IsUnicode(false);
         builder.Property(item => item.RequestedByReference).HasMaxLength(PlatformLicensingLimits.ActorReferenceMaxLength);
         builder.Property(item => item.RequestedByName).HasMaxLength(PlatformLicensingLimits.ActorNameMaxLength);
+        builder.Property(item => item.RegisteredIp).HasMaxLength(PlatformLicensingLimits.IpMaxLength).IsUnicode(false);
+        builder.Property(item => item.RegisteredUserAgent).HasMaxLength(PlatformLicensingLimits.UserAgentMaxLength);
+        builder.Property(item => item.RegisteredCountry).HasMaxLength(2).IsUnicode(false).IsFixedLength();
+        builder.Property(item => item.ApprovedByName).HasMaxLength(PlatformLicensingLimits.ActorNameMaxLength);
         builder.HasIndex(item => new { item.PlatformTenantId, item.Number }).IsUnique();
         builder.HasIndex(item => new { item.PlatformTenantId, item.Status });
         builder.HasIndex(item => item.SecretHash).HasFilter("[SecretHash] IS NOT NULL");

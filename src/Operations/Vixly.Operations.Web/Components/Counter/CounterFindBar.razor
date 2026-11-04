@@ -1,0 +1,34 @@
+﻿@*
+=========================================================
+FILE: CounterFindBar.razor
+
+PURPOSE:
+The search bar on top of every counter page: the next customer is one click away (owner, 2026-10-20: "just click clear, the interface is ready to accept a new phone").
+
+RESPONSIBILITIES:
+- Find a customer by phone, email or customer code
+- Clear: back to an empty counter, the search box focused
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Carries the counter's stylesheet, so every counter page has it
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<link rel="stylesheet" href="/css/ops-counter.css?v=20261020-7" />
+<div class="ops-counter__bar">
+    <form method="get" action="/staff/counter" class="ops-counter__find" role="search">
+        <label for="counter-find">@T["ui.counter.find"]</label>
+        <input id="counter-find" name="find" value="@Find" maxlength="80" autofocus="@Focus" autocomplete="off" inputmode="search" placeholder="@T["ui.counter.find_hint"]" />
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.counter.find_button"]</button>
+    </form>
+    <a class="vx-button vx-button--secondary ops-counter__clear" href="/staff/counter" accesskey="n">@T["ui.counter.clear"]</a>
+</div>
+
+@code {
+    [Parameter] public string? Find { get; set; }
+
+    // Only on the empty counter: elsewhere the clerk's next step is on the page.
+    [Parameter] public bool Focus { get; set; }
+}

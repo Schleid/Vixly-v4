@@ -17,6 +17,7 @@ namespace Vixly.Platform.Domain.Payments;
 // - The idempotency key is the transaction id, so a repeated request cannot charge twice
 // - Succeeded is set only from a verified provider event or a provider lookup, never from a browser
 // - Failure codes are short provider codes, never provider text (S-9)
+// - Delayed marks a checkout paid by bank debit: completed but not settled; it stays Pending until the bank answers
 // =========================================================
 public sealed class PlatformCardTransaction : AuditableEntity
 {
@@ -96,6 +97,12 @@ public sealed class PlatformCardTransaction : AuditableEntity
 
     public PlatformDisputeStatus? Dispute { get; private set; }
 
+    // Paid by a method that settles days later (a US bank debit); the payment is recorded only when it settles.
+    public bool Delayed { get; private set; }
+
+    // The wallet a card payment came through ("apple_pay", "google_pay"...); null for a plain card.
+    public string? Wallet { get; private set; }
+
     public bool IsOpen => Status is PlatformCardTransactionStatus.Created or PlatformCardTransactionStatus.Pending or PlatformCardTransactionStatus.RequiresAction;
 
     public bool IsFinal => !IsOpen;
@@ -155,6 +162,36 @@ public sealed class PlatformCardTransaction : AuditableEntity
     public bool MarkPending(string? providerId, DateTimeOffset utcNow)
     {
         return Move(PlatformCardTransactionStatus.Pending, providerId, null, utcNow);
+    }
+
+    // The checkout completed with a bank debit that has not settled yet. Returns false when nothing changed.
+    public bool MarkDelayed(string? providerId, DateTimeOffset utcNow)
+    {
+        if (Kind != PlatformCardTransactionKind.Charge || !IsOpen)
+        {
+            return false;
+        }
+
+        bool changed = !Delayed || Status != PlatformCardTransactionStatus.Pending;
+        SetReference(providerId);
+        Status = PlatformCardTransactionStatus.Pending;
+        FailureCode = null;
+        Delayed = true;
+        MarkAsModified(utcNow);
+        return changed;
+    }
+
+    public void RecordWallet(string? wallet, DateTimeOffset utcNow)
+    {
+        string? value = string.IsNullOrWhiteSpace(wallet) ? null : PlatformPaymentsLimits.Code(wallet, PlatformPaymentsLimits.WalletMaxLength);
+
+        if (Kind != PlatformCardTransactionKind.Charge || value == Wallet)
+        {
+            return;
+        }
+
+        Wallet = value;
+        MarkAsModified(utcNow);
     }
 
     public bool MarkRequiresAction(string? providerId, DateTimeOffset utcNow)

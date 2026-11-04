@@ -1,0 +1,99 @@
+@*
+=========================================================
+FILE: ShipmentLabelsBar.razor
+
+PURPOSE:
+Print all the labels of a shipment at once (owner, 2026-10-27): its parcels' ID labels and their shipping labels.
+
+RESPONSIBILITIES:
+- "Print all ID labels": one PDF, one label per page; or sent at once to an ID-label printer of the warehouse
+- "Print all shipping labels": the cleared parcels, as one PDF or on a shipping-label printer; only for staff who see the warehouse's parcels
+- Each parcel's own label stays on its line, to reprint one
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The PDF opens in a new tab, ready to print; the shipping labels are marked printed (a form post)
+- Printers appear only when the warehouse has one that is on, for that kind of label
+=========================================================
+*@
+@inherits OperationsAllowedComponent
+@inject IStringLocalizer<OperationsText> T
+
+@if (ParcelCount > 0)
+{
+    <div class="ops-inline-action-bar ops-labels-bar" role="group" aria-label="@T["ui.labels.group"]">
+        <form method="post" action="/staff/shipments/@ShipmentId/labels" target="_blank" class="ops-editor__inline">
+            <AntiforgeryToken />
+            <input type="hidden" name="kind" value="id" />
+            <button type="submit" class="vx-button vx-button--primary">@VixlyText.Format(T, "ui.labels.print_all_ids", "count", ParcelCount)</button>
+        </form>
+        @if (IdPrinters.Count > 0)
+        {
+            <form method="post" action="/staff/shipments/@ShipmentId/labels" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <input type="hidden" name="kind" value="id" />
+                <input type="hidden" name="back" value="@Back" />
+                <select name="printer" aria-label="@T["ui.labels.printer"]">
+                    @foreach (Vixly.Operations.Domain.Printing.OperationsLabelPrinter printer in IdPrinters)
+                    {
+                        <option value="@printer.Id">@printer.Name</option>
+                    }
+                </select>
+                <button type="submit" class="vx-button vx-button--secondary">@T["ui.labels.send_to_printer"]</button>
+            </form>
+        }
+        @if (ShippingWaitsForPayment && !ShippingOffered)
+        {
+            <span class="ops-editor__hint">@T["ui.labels.after_payment_hint"]</span>
+        }
+        @if (ShippingOffered && Can(Vixly.Operations.Domain.Access.OperationsPermissions.ParcelsView))
+        {
+            <form method="post" action="/staff/shipments/@ShipmentId/labels" target="_blank" class="ops-editor__inline">
+                <AntiforgeryToken />
+                <input type="hidden" name="kind" value="shipping" />
+                <input type="hidden" name="back" value="@Back" />
+                <button type="submit" class="vx-button vx-button--primary">@VixlyText.Format(T, "ui.labels.print_all_shipping", "count", ClearedCount ?? ParcelCount)</button>
+            </form>
+            @if (ShippingPrinters.Count > 0)
+            {
+                <form method="post" action="/staff/shipments/@ShipmentId/labels" class="ops-editor__inline">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="kind" value="shipping" />
+                    <input type="hidden" name="back" value="@Back" />
+                    <select name="printer" aria-label="@T["ui.labels.printer"]">
+                        @foreach (Vixly.Operations.Domain.Printing.OperationsLabelPrinter printer in ShippingPrinters)
+                        {
+                            <option value="@printer.Id">@printer.Name</option>
+                        }
+                    </select>
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.labels.send_to_printer"]</button>
+                </form>
+            }
+        }
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public Guid ShipmentId { get; set; }
+
+    // Where a print sent to a printer comes back: "counter" or "shipment".
+    [Parameter] public string Back { get; set; } = "shipment";
+
+    [Parameter] public int ParcelCount { get; set; }
+
+    // The parcels cleared for a shipping label, when known; shipping labels are offered only when some are.
+    [Parameter] public int? ClearedCount { get; set; }
+
+    [Parameter] public bool ShippingOffered { get; set; }
+
+    // Owner, 2026-10-28 (option A): final but not paid yet: the shipping labels wait for payment, and the bar says so.
+    [Parameter] public bool ShippingWaitsForPayment { get; set; }
+
+    [Parameter] public IReadOnlyList<Vixly.Operations.Domain.Printing.OperationsLabelPrinter> Printers { get; set; } = Array.Empty<Vixly.Operations.Domain.Printing.OperationsLabelPrinter>();
+
+    private IReadOnlyList<Vixly.Operations.Domain.Printing.OperationsLabelPrinter> IdPrinters =>
+        Printers.Where(printer => printer.Media == Vixly.Operations.Domain.Printing.OperationsLabelMedia.IdLabel).ToList();
+
+    private IReadOnlyList<Vixly.Operations.Domain.Printing.OperationsLabelPrinter> ShippingPrinters =>
+        Printers.Where(printer => printer.Media == Vixly.Operations.Domain.Printing.OperationsLabelMedia.ShippingLabel).ToList();
+}

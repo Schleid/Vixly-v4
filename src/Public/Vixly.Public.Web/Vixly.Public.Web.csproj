@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- Public site (Stage 2). References per ADR-0015: Contracts.Platform, Shared.UI, Shared.Hosting, Shared.Localization. -->
+  <PropertyGroup>
+    <UserSecretsId>vixly-v4-public-web</UserSecretsId>
+    <!-- Static pages move to the next step without throwing; the debugger no longer stops on every sign-up step (.NET 10). -->
+    <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Help/**/*.md" />
+    <ProjectReference Include="../../Shared/Vixly.Shared.Help/Vixly.Shared.Help.csproj" />
+    <ProjectReference Include="..\..\Contracts\Vixly.Contracts.Platform\Vixly.Contracts.Platform.csproj" />
+    <ProjectReference Include="..\..\Shared\Vixly.Shared.UI\Vixly.Shared.UI.csproj" />
+    <ProjectReference Include="..\..\Shared\Vixly.Shared.Hosting\Vixly.Shared.Hosting.csproj" />
+    <ProjectReference Include="..\..\Shared\Vixly.Shared.Localization\Vixly.Shared.Localization.csproj" />
+  </ItemGroup>
+
+</Project>

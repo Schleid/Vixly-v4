@@ -1,0 +1,33 @@
+﻿@*
+=========================================================
+FILE: JobsPage.razor
+
+PURPOSE:
+Control's background jobs: their latest runs and the run
+history (owner, 2026-10-23).
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/jobs"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.jobs.title"]</PageTitle>
+
+<h1>@T["ui.jobs.title"]</h1>
+<p class="vx-hint">@T["ui.jobs.intro"]</p>
+<JobRuns Job="@Job" FailedOnly="@(Failed ?? false)" Page="@(Page ?? 1)" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Job { get; set; }
+
+    [SupplyParameterFromQuery]
+    public bool? Failed { get; set; }
+
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

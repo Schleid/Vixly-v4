@@ -31,4 +31,6 @@ internal sealed class ConfiguredPlatformTenantPolicy : IPlatformTenantPolicy
     public string PrivacyVersion => _options.PrivacyVersion;
 
     public string TenantBaseDomain => _options.TenantBaseDomain;
+
+    public bool RegistrationInviteOnly => _options.RegistrationInviteOnly;
 }

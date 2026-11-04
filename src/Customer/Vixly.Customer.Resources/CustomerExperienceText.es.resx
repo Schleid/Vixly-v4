@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root><resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>2.0</value></resheader>
+  <data name="account_note" xml:space="preserve"><value>Su cuenta personal de cliente.</value><comment>needs-review</comment></data>
+  <data name="login_intro" xml:space="preserve"><value>Inicie sesión para continuar donde lo dejó.</value><comment>needs-review</comment></data>
+  <data name="story_body" xml:space="preserve"><value>Anuncie una llegada, siga sus paquetes y gestione su cuenta en su propio espacio de cliente.</value><comment>needs-review</comment></data>
+  <data name="story_caption" xml:space="preserve"><value>Una cuenta. Una visión más clara de lo que viene.</value><comment>needs-review</comment></data>
+  <data name="story_emphasis" xml:space="preserve"><value>En un solo lugar.</value><comment>needs-review</comment></data>
+  <data name="story_title" xml:space="preserve"><value>Sus paquetes.</value><comment>needs-review</comment></data>
+  <data name="welcome" xml:space="preserve"><value>Le damos la bienvenida.</value><comment>needs-review</comment></data>
+</root>

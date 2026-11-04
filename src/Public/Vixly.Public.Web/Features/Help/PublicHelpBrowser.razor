@@ -1,0 +1,78 @@
+﻿@inherits Vixly.Shared.UI.Presenters.PresenterComponent<PublicHelpPresenter>
+@using Vixly.Shared.Help
+@inject IStringLocalizer<PublicText> T
+@inject PublicHelpCatalogue Help
+@inject NavigationManager Navigation
+@* =========================================================
+   FILE: PublicHelpBrowser.razor
+
+   PURPOSE:
+   Presents Public help articles, sections and search results.
+
+   RESPONSIBILITIES:
+   - Bind the presenter to accessible static HTML.
+   - Return the normal not-found content for an unknown article.
+
+   IMPORTANT NOTES:
+   - Search submits a GET; no interactive circuit is required.
+   - Only catalogue HTML is passed to VxHelpArticle.
+   ========================================================= *@
+@if (Presenter.State.NotFound)
+{
+    <Vixly.Public.Web.Components.Pages.NotFoundPage />
+}
+else
+{
+    <PublicHelpHead Title="@(Presenter.State.Article?.Metadata.Title ?? T["ui.help.title"].Value)"
+                    Summary="@(Presenter.State.Article?.Metadata.Summary ?? T["ui.help.summary"].Value)"
+                    Slug="@Slug" Search="@(Query is not null)" />
+    <section class="pub-section pub-help">
+        @if (Presenter.State.Article is { } article)
+        {
+            <p><a href="@PublicHelpCatalogue.Home(PublicLanguage.Current)">@T["ui.help.back"]</a></p>
+            <VxHelpArticle Title="@article.Metadata.Title" Html="@article.Html" RelatedLabel="@T["ui.help.related"]"
+                           Related="@Related(article)" />
+        }
+        else
+        {
+            <h1>@T["ui.help.title"]</h1>
+            <p class="pub-lead">@T["ui.help.summary"]</p>
+            <form method="get" action="@PublicHelpCatalogue.Home(PublicLanguage.Current)" class="pub-help-search" role="search">
+                <label for="help-query">@T["ui.help.search"]</label>
+                <input id="help-query" class="vx-input" type="search" name="q" maxlength="160" value="@Presenter.State.Query" />
+                <VxButton Type="submit">@T["ui.help.search_go"]</VxButton>
+            </form>
+            @if (Presenter.State.Query.Length > 0)
+            {
+                <h2>@T["ui.help.results"]</h2>
+                <PublicHelpList Articles="Presenter.State.Articles" />
+                <p><a href="@PublicHelpCatalogue.Home(PublicLanguage.Current)">@T["ui.help.clear"]</a></p>
+            }
+            else
+            {
+                @foreach (string section in PublicHelpCatalogue.Sections)
+                {
+                    <section class="pub-help-section">
+                        <h2>@T["ui.help.section." + section]</h2>
+                        <PublicHelpList Articles="@(Presenter.State.Articles.Where(article => article.Metadata.Section == section).ToArray())" />
+                    </section>
+                }
+            }
+        }
+    </section>
+}
+
+@code {
+    [Parameter] public string? Slug { get; set; }
+    [Parameter] public string? Query { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Presenter.LoadAsync(PublicLanguage.Current, Slug, Query);
+        if (Presenter.State.NotFound) Navigation.NotFound();
+    }
+
+    private IReadOnlyList<VxHelpRelatedLink> Related(HelpArticle article) =>
+        Help.Catalogue.Related(article, PublicHelpCatalogue.Reader)
+            .Select(item => new VxHelpRelatedLink(item.Metadata.Title, PublicHelpCatalogue.Address(item.Language, item.Metadata.Slug))).ToArray();
+}

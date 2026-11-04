@@ -1,0 +1,116 @@
+﻿@*
+=========================================================
+FILE: BundlesPage.razor
+
+PURPOSE:
+The bundles desk (Slice 6A, D-10): parcels ready to bundle by destination and service, and the bundles.
+
+RESPONSIBILITIES:
+- Show the ready groups with their counts and weight; open a bundle for one (ship manager)
+- List the open, closed and recently voided bundles
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Waiting: final parcels still unpaid or held; they cannot be bundled yet
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.bundles.title"]" Company="@Company" Section="bundles" Error="@Error" Info="@Info">
+    <p class="ops-editor__actions"><a class="vx-button vx-button--primary" href="/staff/bundles/fill">@T["ui.bundles.fill"]</a> <a class="vx-button vx-button--secondary" href="/staff/bundles/boxes">@T["ui.bundles.boxes"]</a></p>
+    <section class="ops-editor__panel" aria-labelledby="ready-title">
+        <h2 id="ready-title">@T["ui.bundles.ready"]</h2>
+        @if (Ready.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.bundles.ready_none"]</p></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.bundles.ready"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.bundles.warehouse"]</th><th scope="col">@T["ui.bundles.destination"]</th><th scope="col">@T["ui.bundles.service"]</th><th scope="col" class="ops-editor__number">@T["ui.bundles.parcels"]</th><th scope="col" class="ops-editor__number">@T["ui.bundles.weight"]</th><th scope="col" class="ops-editor__number">@T["ui.bundles.waiting"]</th><th scope="col"></th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsReadyGroup group in Ready)
+                        {
+                            <tr>
+                                <td>@(AllWarehouses.FirstOrDefault(warehouse => warehouse.Id == group.WarehouseId)?.Code)</td>
+                                <td>@OperationsBundleWords.Destination(T, group.DestinationWarehouseId, group.CountryCode, AllWarehouses)</td>
+                                <td>@T["ui.services.name." + group.ServiceCode]</td>
+                                <td class="ops-editor__number">@group.Parcels <small>@VixlyText.Format(T, "ui.bundles.shipments_count", "count", group.Shipments)</small></td>
+                                <td class="ops-editor__number">@OperationsBundleWords.Weight(group.WeightKg, WeightUnit)</td>
+                                <td class="ops-editor__number">@group.Waiting</td>
+                                <td>
+                                    @if (ManageWarehouses.Contains(group.WarehouseId) && group.Parcels > 0)
+                                    {
+                                        <NewBundleForm WarehouseId="@group.WarehouseId" Destination="@OperationsBundleWords.DestinationValue(group.DestinationWarehouseId, group.CountryCode)" Service="@group.ServiceCode"
+                                            Types="@Types" WeightUnit="@WeightUnit" Volumetric="@(Divisors.GetValueOrDefault(group.ServiceCode) is not null)" />
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+    </section>
+    <section class="ops-editor__panel" aria-labelledby="bundles-title">
+        <h2 id="bundles-title">@T["ui.bundles.list"]</h2>
+        @if (Bundles.Count == 0)
+        {
+            <div class="ops-editor__empty"><p>@T["ui.bundles.none"]</p></div>
+        }
+        else
+        {
+            <OperationsTableViewport Label="@T["ui.bundles.list"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col" class="ops-editor__identity-cell">@T["ui.bundles.number"]</th><th scope="col">@T["ui.bundles.destination"]</th><th scope="col">@T["ui.bundles.service"]</th><th scope="col">@T["ui.bundles.type"]</th><th scope="col">@T["ui.bundles.state"]</th><th scope="col" class="ops-editor__number">@T["ui.bundles.parcels"]</th><th scope="col" class="ops-editor__number">@T["ui.bundles.filled"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsBundle bundle in Bundles)
+                        {
+                            <tr data-status="@bundle.Status">
+                                <td class="ops-editor__identity-cell ops-editor__code"><a href="/staff/bundles/@bundle.Id">@bundle.Number</a></td>
+                                <td>@OperationsBundleWords.Destination(T, bundle.DestinationWarehouseId, bundle.DestinationCountryCode, AllWarehouses)</td>
+                                <td>@T["ui.services.name." + bundle.ServiceCode]</td>
+                                <td>@bundle.TypeName</td>
+                                <td><span class="ops-editor__status" data-status="@bundle.Status.ToString().ToLowerInvariant()">@T["ui.bundles.status." + bundle.Status]</span></td>
+                                <td class="ops-editor__number">@bundle.ParcelCount</td>
+                                <td class="ops-editor__number">@OperationsBundleWords.Fill(T, bundle, WeightUnit)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+        }
+    </section>
+    @if (ManageWarehouses.Count > 0 && Services.Count > 0)
+    {
+        <NewBundleForm Warehouses="@Warehouses.Where(warehouse => ManageWarehouses.Contains(warehouse.Id)).ToList()" Destinations="@AllWarehouses.Where(warehouse => warehouse.IsDestination).ToList()"
+            Services="@Services" Types="@Types" WeightUnit="@WeightUnit" />
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> AllWarehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyList<OperationsReadyGroup> Ready { get; set; } = Array.Empty<OperationsReadyGroup>();
+
+    [Parameter] public IReadOnlyList<OperationsBundle> Bundles { get; set; } = Array.Empty<OperationsBundle>();
+
+    [Parameter] public IReadOnlyList<string> Services { get; set; } = Array.Empty<string>();
+
+    [Parameter] public IReadOnlyList<string> Types { get; set; } = Array.Empty<string>();
+
+    [Parameter] public IReadOnlyList<Guid> ManageWarehouses { get; set; } = Array.Empty<Guid>();
+
+    [Parameter] public IReadOnlyDictionary<string, decimal?> Divisors { get; set; } = new Dictionary<string, decimal?>();
+
+    [Parameter] public OperationsWeightUnit WeightUnit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

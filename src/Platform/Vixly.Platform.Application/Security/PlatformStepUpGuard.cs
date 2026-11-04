@@ -23,8 +23,11 @@ public sealed class PlatformStepUpGuard : IPlatformStepUpGuard
 
     private readonly TimeProvider _timeProvider;
 
-    public PlatformStepUpGuard(IPlatformSessionRepository sessions, TimeProvider timeProvider)
+    private readonly Vixly.Platform.Application.Ports.IPlatformIdleTimesReader? _idle;
+
+    public PlatformStepUpGuard(IPlatformSessionRepository sessions, TimeProvider timeProvider, Vixly.Platform.Application.Ports.IPlatformIdleTimesReader? idle = null)
     {
+        _idle = idle;
         _sessions = sessions ?? throw new ArgumentNullException(nameof(sessions));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
@@ -42,10 +45,11 @@ public sealed class PlatformStepUpGuard : IPlatformStepUpGuard
 
         PlatformUserSession? session = await _sessions.GetAsync(sessionId, cancellationToken);
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();
+        TimeSpan idle = _idle is null ? PlatformIdentityLimits.SessionIdleTimeout : (await _idle.GetAsync(cancellationToken)).Idle;
 
         return session is not null
             && session.PlatformUserId == context.PlatformUserId
-            && session.IsValidAt(utcNow)
+            && session.IsValidAt(utcNow, idle)
             && session.HasRecentSecondFactor(utcNow);
     }
 }

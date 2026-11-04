@@ -1,0 +1,44 @@
+﻿@*
+=========================================================
+FILE: HoldAnswersCell.razor
+
+PURPOSE:
+The customer's answers to a held package, on the holds page (Slice 3E).
+
+RESPONSIBILITIES:
+- Show what the customer sent: the document, contents and value, or the choice for a damaged package
+- Accept (the hold ends) or decline with what is still missing
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The document is a download, never shown inside the page
+=========================================================
+*@
+@foreach (OperationsHoldAnswer answer in Answers.Where(item => item.Status == OperationsHoldAnswerStatus.Open))
+{
+    <div class="ops-hold-answer">
+        <p><strong>@T["ui.holds.answer"]</strong> @T["ui.hold." + answer.Reason] · @answer.CreatedUtc.ToString("yyyy-MM-dd HH:mm")</p>
+        @if (answer.Contents is { } contents) { <p>@contents · @answer.DeclaredValue?.ToString("0.00") @answer.CurrencyCode</p> }
+        @if (answer.Choice is { } choice) { <p>@T["ui.holds.choice." + choice]</p> }
+        @if (answer.Note is { } note) { <p>@note</p> }
+        @if (answer.DocumentKey is not null) { <p><a href="/staff/holds/answers/@answer.Id/document">@VixlyText.Format(T, "ui.holds.document", "name", answer.DocumentName ?? string.Empty)</a></p> }
+        <form method="post" action="/staff/holds/answers/@answer.Id" class="ops-editor__inline">
+            <AntiforgeryToken />
+            <input type="hidden" name="key" value="@Guid.NewGuid().ToString("N")" />
+            <input name="note" maxlength="@OperationsHoldLimits.NoteMaxLength" placeholder="@T["ui.holds.note"]" aria-label="@T["ui.holds.note"]" />
+            @if (answer.Choice != "dispose" || CanApprove)
+            {
+                <button type="submit" name="decision" value="accept" class="vx-button vx-button--primary">@T["ui.holds.accept"]</button>
+            }
+            <button type="submit" name="decision" value="decline" class="vx-button vx-button--secondary">@T["ui.holds.decline_answer"]</button>
+        </form>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter] public IReadOnlyList<OperationsHoldAnswer> Answers { get; set; } = Array.Empty<OperationsHoldAnswer>();
+
+    [Parameter] public bool CanApprove { get; set; }
+}

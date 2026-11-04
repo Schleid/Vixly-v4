@@ -1,0 +1,32 @@
+﻿@*
+=========================================================
+FILE: App.razor
+
+PURPOSE:
+The public site document: language, styles and the router.
+
+IMPORTANT NOTES:
+- Static server rendering (D-U1): no interactive render mode
+- Text comes from PublicText (UI-10); Frontend/UI restyles it
+- No Blazor script is loaded: pages and forms work as plain HTML
+- vixly-forms.js blocks repeated submits (ADR-0019); forms still
+  work without it
+=========================================================
+*@
+<!DOCTYPE html>
+<html lang="@PublicLanguage.Current">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <base href="/" />
+    <link rel="icon" href="@Assets["_content/Vixly.Shared.UI/img/vixly-icon.png"]" />
+    <link rel="stylesheet" href="@Assets["_content/Vixly.Shared.UI/vixly-theme.css"]" />
+    <link rel="stylesheet" href="@Assets["_content/Vixly.Shared.UI/vixly-primitives.css"]" />
+    <link rel="stylesheet" href="@Assets["css/public.css"]" />
+    <script src="@Assets["_content/Vixly.Shared.UI/vixly-forms.js"]" defer></script>
+    <HeadOutlet />
+</head>
+<body>
+    <Routes />
+</body>
+</html>

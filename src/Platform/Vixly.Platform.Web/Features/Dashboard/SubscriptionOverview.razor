@@ -1,0 +1,38 @@
+﻿@inherits PlatformPresenterComponent<SubscriptionListPresenter>
+@inject IStringLocalizer<PlatformText> T
+@inject PlatformErrorText Errors
+@* =========================================================
+   FILE: SubscriptionOverview.razor
+
+   PURPOSE:
+   A live metric and first-page preview for the Control overview.
+
+   RESPONSIBILITIES:
+   Present existing authorized Control data and navigation.
+
+   IMPORTANT NOTES:
+   Uses existing presenters; no business rules or sample values.
+   ========================================================= *@
+<div class="vx-control-module">
+    <a class="vx-control-metric-link" href="/subscriptions">
+        <VxMetricCard Label="@T["ui.subscriptions.title"]" Value="@(Presenter.State.Loaded && Presenter.State.Error is null ? Presenter.State.TotalCount.ToString("N0") : "—")" Detail="@T["ui.control.subscriptions_context"]" />
+    </a>
+    <section class="vx-control-panel" aria-busy="@(!Presenter.State.Loaded ? "true" : "false")">
+        <header class="vx-control-panel__header"><h2>@T["ui.subscriptions.title"]</h2><a href="/subscriptions">@T["ui.control.view_all"] →</a></header>
+        @if (Presenter.State.Error is not null)
+        {
+            <VxMessage Type="VxMessageType.Error">@Errors.Describe(Presenter.State.Error)</VxMessage>
+        }
+        else
+        {
+            <VxDataTable Items="Presenter.State.Subscriptions.Take(5).ToArray()" IsLoading="@(!Presenter.State.Loaded)" Caption="@T["ui.control.subscriptions_context"]">
+                <HeaderContent><th scope="col">@T["ui.subscriptions.tenant"]</th><th scope="col">@T["ui.plans.title"]</th><th scope="col">@T["ui.subscriptions.status"]</th></HeaderContent>
+                <RowTemplate Context="item"><td><a href="/tenants/@item.PlatformTenantId#tenant-subscription">@item.TenantName</a></td><td>@item.PlanName</td><td><VxStatusBadge Status="@SubscriptionDisplay.Badge(item.Status)" Text="@T[SubscriptionDisplay.StatusKey(item.Status)]" /></td></RowTemplate>
+                <EmptyContent><VxEmptyState Title="@T["ui.subscriptions.empty"]" /></EmptyContent>
+            </VxDataTable>
+        }
+    </section>
+</div>
+@code {
+    protected override Task OnParametersSetAsync() => Presenter.LoadAsync(null, null, null, null, false, false, 1);
+}

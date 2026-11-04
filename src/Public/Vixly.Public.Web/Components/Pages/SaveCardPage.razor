@@ -1,0 +1,30 @@
+﻿@*
+=========================================================
+FILE: SaveCardPage.razor
+
+PURPOSE:
+Save a card for automatic charging from the link Vixly billing sent (Slice 5).
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- No language in the address: the cookie or the browser chooses (D-U5)
+- noindex; posts are limited to 20 per hour per visitor IP
+=========================================================
+*@
+@page "/cards/{Token}"
+@attribute [EnableRateLimiting(PublicRateLimits.Pay)]
+@inject IStringLocalizer<PublicText> T
+
+<PageHead TitleKey="public.pay.save_title" Indexed="false" />
+<section class="pub-section pub-section--narrow">
+    <h1>@T["public.pay.save_title"]</h1>
+    <PaymentPanel Target="PaymentTarget.Link(Token, true)" Status="@Status" />
+</section>
+
+@code {
+    [Parameter]
+    public string Token { get; set; } = string.Empty;
+
+    [SupplyParameterFromQuery]
+    public string? Status { get; set; }
+}

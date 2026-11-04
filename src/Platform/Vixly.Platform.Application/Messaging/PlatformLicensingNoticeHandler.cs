@@ -49,9 +49,14 @@ public sealed class PlatformLicensingNoticeHandler : IPlatformOutboxHandler
         string? link = null;
         DateTimeOffset? expires = null;
 
-        if (notice.Kind is PlatformLicensingNoticeKind.FirstDeviceLink or PlatformLicensingNoticeKind.RecoveryLink)
+        if (notice.Kind is PlatformLicensingNoticeKind.FirstDeviceLink or PlatformLicensingNoticeKind.RecoveryLink or PlatformLicensingNoticeKind.SecondFactorResetLink)
         {
-            PlatformDeviceLinkKind kind = notice.Kind == PlatformLicensingNoticeKind.FirstDeviceLink ? PlatformDeviceLinkKind.FirstDevice : PlatformDeviceLinkKind.OwnerRecovery;
+            PlatformDeviceLinkKind kind = notice.Kind switch
+            {
+                PlatformLicensingNoticeKind.FirstDeviceLink => PlatformDeviceLinkKind.FirstDevice,
+                PlatformLicensingNoticeKind.RecoveryLink => PlatformDeviceLinkKind.OwnerRecovery,
+                _ => PlatformDeviceLinkKind.SecondFactorReset
+            };
 
             foreach (PlatformDeviceLink older in await _licensing.Store.ListOpenLinksAsync(tenant.Id, kind, cancellationToken))
             {
@@ -59,7 +64,7 @@ public sealed class PlatformLicensingNoticeHandler : IPlatformOutboxHandler
             }
 
             PlatformSecret token = _licensing.NewSecret();
-            PlatformDeviceLink created = PlatformDeviceLink.Create(kind, tenant.Id, notice.RegistrationId, token.Hash, utcNow);
+            PlatformDeviceLink created = PlatformDeviceLink.Create(kind, tenant.Id, notice.RegistrationId, notice.SupportRequestId, token.Hash, utcNow);
             _licensing.Store.AddLink(created);
 
             // Saved before sending, so the link in the email always works; not saved: the message is retried.
@@ -68,16 +73,30 @@ public sealed class PlatformLicensingNoticeHandler : IPlatformOutboxHandler
                 throw new InvalidOperationException("The device link could not be saved; the message will be retried.");
             }
 
-            link = _licensing.Links.DeviceLink(tenant.CurrentSlug, kind, token.Value);
+            link = kind == PlatformDeviceLinkKind.SecondFactorReset
+                ? _licensing.Links.SecondFactorResetLink(tenant.CurrentSlug, token.Value)
+                : _licensing.Links.DeviceLink(tenant.CurrentSlug, kind, token.Value);
             expires = created.ExpiresUtc;
         }
 
         PlatformDevice? device = notice.DeviceId is Guid deviceId ? await _licensing.Store.GetDeviceAsync(deviceId, cancellationToken) : null;
 
-        await _mailer.SendAsync(
-            tenant,
-            tenant.ContactFor(PlatformTenantContactRole.Owner),
-            new PlatformLicensingMail(notice.Kind, link, expires, device?.Number, device?.Name, notice.Approved, notice.Count),
-            cancellationToken);
+        PlatformLicensingMail mail = new(notice.Kind, link, expires, device?.Number, device?.Name, notice.Approved, notice.Count,
+            notice.Kind == PlatformLicensingNoticeKind.Welcome ? _licensing.Links.PortalLink(tenant.CurrentSlug, "staff") : null,
+            notice.Kind == PlatformLicensingNoticeKind.Welcome ? _licensing.Links.PortalLink(tenant.CurrentSlug, string.Empty) : null,
+            notice.SupportKind);
+        PlatformTenantContact owner = tenant.ContactFor(PlatformTenantContactRole.Owner);
+        await _mailer.SendAsync(tenant, owner, mail, cancellationToken);
+
+        // Support actions on the Owner are told to Billing too, so a hijacked inbox alone cannot hide them (D-O13).
+        if (notice.Kind is PlatformLicensingNoticeKind.OwnerSupportStarted or PlatformLicensingNoticeKind.SecondFactorResetDone or PlatformLicensingNoticeKind.DeviceReplaced)
+        {
+            PlatformTenantContact billing = tenant.ContactFor(PlatformTenantContactRole.Billing);
+
+            if (!string.Equals(billing.Email.Value, owner.Email.Value, StringComparison.OrdinalIgnoreCase))
+            {
+                await _mailer.SendAsync(tenant, billing, mail, cancellationToken);
+            }
+        }
     }
 }

@@ -32,6 +32,36 @@ namespace Vixly.Platform.Infrastructure.Persistence;
 // =========================================================
 public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
 {
+    // Harmonization H-9 (owner, 2026-11-04): moves at the start of every action (discarded changes) and at every save,
+    // so what was read for one action is never reused by the next (PlatformPermissionReader).
+    internal long ActionStamp { get; private set; }
+
+    internal void NextAction() => ActionStamp++;
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        try
+        {
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+        finally
+        {
+            NextAction();
+        }
+    }
+
+    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+        finally
+        {
+            NextAction();
+        }
+    }
+
     public PlatformDbContext(DbContextOptions<PlatformDbContext> options)
         : base(options)
     {
@@ -71,6 +101,20 @@ public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
 
     public DbSet<PlatformPublishedEvent> PublishedEvents => Set<PlatformPublishedEvent>();
 
+    public DbSet<Vixly.Platform.Domain.Jobs.PlatformJobRun> JobRuns => Set<Vixly.Platform.Domain.Jobs.PlatformJobRun>();
+
+    public DbSet<Vixly.Platform.Domain.SalesFeed.PlatformSalesFeedEvent> SalesFeedEvents => Set<Vixly.Platform.Domain.SalesFeed.PlatformSalesFeedEvent>();
+
+    public DbSet<Vixly.Platform.Domain.SalesFeed.PlatformSalesFeedState> SalesFeedStates => Set<Vixly.Platform.Domain.SalesFeed.PlatformSalesFeedState>();
+
+    public DbSet<Vixly.Platform.Domain.Maintenance.PlatformMaintenanceWindow> MaintenanceWindows => Set<Vixly.Platform.Domain.Maintenance.PlatformMaintenanceWindow>();
+
+    public DbSet<Vixly.Platform.Domain.Sales.PlatformSalesLead> SalesLeads => Set<Vixly.Platform.Domain.Sales.PlatformSalesLead>();
+
+    public DbSet<Vixly.Platform.Domain.Tenants.PlatformTenantChangeRequest> TenantChangeRequests => Set<Vixly.Platform.Domain.Tenants.PlatformTenantChangeRequest>();
+
+    public DbSet<Vixly.Platform.Domain.Tenants.PlatformTenantChangeProof> TenantChangeProofs => Set<Vixly.Platform.Domain.Tenants.PlatformTenantChangeProof>();
+
     public DbSet<PlatformPlan> Plans => Set<PlatformPlan>();
 
     public DbSet<PlatformSubscription> Subscriptions => Set<PlatformSubscription>();
@@ -79,7 +123,11 @@ public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
 
     public DbSet<PlatformTenantLimitOverride> TenantLimitOverrides => Set<PlatformTenantLimitOverride>();
 
+    public DbSet<PlatformTenantShipmentUsage> TenantShipmentUsage => Set<PlatformTenantShipmentUsage>();
+
     public DbSet<PlatformSalesSettings> SalesSettings => Set<PlatformSalesSettings>();
+
+    public DbSet<PlatformSecuritySettings> SecuritySettings => Set<PlatformSecuritySettings>();
 
     public DbSet<PlatformPromotion> Promotions => Set<PlatformPromotion>();
 
@@ -125,6 +173,8 @@ public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
 
     public DbSet<Vixly.Platform.Domain.Licensing.PlatformDeviceLink> DeviceLinks => Set<Vixly.Platform.Domain.Licensing.PlatformDeviceLink>();
 
+    public DbSet<Vixly.Platform.Domain.Licensing.PlatformOwnerSupportRequest> OwnerSupportRequests => Set<Vixly.Platform.Domain.Licensing.PlatformOwnerSupportRequest>();
+
     public DbSet<Vixly.Platform.Domain.Licensing.PlatformDeviceEvent> DeviceEvents => Set<Vixly.Platform.Domain.Licensing.PlatformDeviceEvent>();
 
     public DbSet<Vixly.Platform.Domain.Payments.PlatformZelleAccount> ZelleAccounts => Set<Vixly.Platform.Domain.Payments.PlatformZelleAccount>();
@@ -146,6 +196,7 @@ public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
         ArgumentNullException.ThrowIfNull(modelBuilder);
 
         modelBuilder.HasDefaultSchema(PlatformDatabase.Schema);
+        modelBuilder.HasSequence<long>(PlatformDatabase.EmployeeNumberSequence);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PlatformDbContext).Assembly);
 
         ApplicationAssignedKeyConvention.Apply(modelBuilder);

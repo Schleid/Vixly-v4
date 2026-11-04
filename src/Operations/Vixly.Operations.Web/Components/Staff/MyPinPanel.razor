@@ -1,0 +1,39 @@
+@*
+=========================================================
+FILE: MyPinPanel.razor
+
+PURPOSE:
+My 4-digit PIN for the company's licensed devices (Slice 12A, owner H-8).
+
+RESPONSIBILITIES:
+- Say whether a PIN is set or locked, and set or change it with the current password
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Only from a full sign-in; the use case refuses a badge or PIN session
+- Responsive form layout with monospace PIN input and aligned save button
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<form method="post" action="/staff/account/pin" class="ops-editor__panel">
+    <AntiforgeryToken />
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+        <h2 style="margin: 0;">@T["ui.account.pin"]</h2>
+        <span class="ops-editor__status" data-status="@(PinLocked ? "suspended" : HasPin ? "active" : "pending")">
+            @T[HasPin ? (PinLocked ? "ui.staff.pin_locked" : "ui.staff.pin_set") : "ui.staff.pin_none"]
+        </span>
+    </div>
+    <p class="ops-editor__hint">@T["ui.account.pin_hint"]</p>
+    <div class="ops-editor__form" style="margin-top: 0.75rem;">
+        <label class="ops-editor__form-span-3">@T["ui.account.current_password"] <input type="password" name="currentPassword" autocomplete="current-password" required /></label>
+        <label class="ops-editor__form-span-3">@T["ui.account.new_pin"] <input type="password" name="pin" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" autocomplete="off" required style="font-family: var(--vx-font-mono, monospace); letter-spacing: 0.25em; text-align: center; max-width: 8rem;" /></label>
+        <div class="ops-editor__form-actions" style="margin-top: 0.5rem;"><button type="submit" class="vx-button vx-button--primary">@T["ui.account.save_pin"]</button></div>
+    </div>
+</form>
+
+@code {
+    [Parameter] public bool HasPin { get; set; }
+
+    [Parameter] public bool PinLocked { get; set; }
+}

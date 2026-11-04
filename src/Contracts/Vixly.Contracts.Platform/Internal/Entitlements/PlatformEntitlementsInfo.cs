@@ -22,4 +22,10 @@ public sealed record PlatformEntitlementsInfo(
     IReadOnlyList<string> Features,
     IReadOnlyDictionary<string, int> Limits,
     PlatformNonPaymentPartInfo? NonPayment,
-    PlatformEntitlementsLegalInfo? Legal);
+    PlatformEntitlementsLegalInfo? Legal)
+{
+    // Shipment cap (owner, 2026-10-29): the price of each shipment above "max_shipments_per_month", in the plan's currency.
+    public decimal ExtraShipmentPrice { get; init; }
+
+    public string? CurrencyCode { get; init; }
+}

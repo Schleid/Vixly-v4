@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <UserSecretsId>vixly-v4-operations-api</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vixly.Operations.Application\Vixly.Operations.Application.csproj" />
+    <ProjectReference Include="..\Vixly.Operations.Infrastructure\Vixly.Operations.Infrastructure.csproj" />
+    <ProjectReference Include="..\Vixly.Operations.Resources\Vixly.Operations.Resources.csproj" />
+    <ProjectReference Include="..\..\Contracts\Vixly.Contracts.Operations\Vixly.Contracts.Operations.csproj" />
+    <ProjectReference Include="..\..\Shared\Vixly.Shared.Localization\Vixly.Shared.Localization.csproj" />
+    <ProjectReference Include="..\..\Shared\Vixly.Shared.Hosting\Vixly.Shared.Hosting.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Vixly.Operations.Api.Tests" />
+  </ItemGroup>
+
+</Project>

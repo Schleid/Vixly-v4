@@ -27,4 +27,6 @@ public sealed record PlatformPublicPlanItem(
     int MaxLicensedDevices,
     int MaxWarehouses,
     IReadOnlyList<PlatformPlanFeature> Features,
-    int? TrialDays);
+    int? TrialDays,
+    int MaxShipmentsPerMonth = 0,
+    decimal ExtraShipmentPrice = 0m);

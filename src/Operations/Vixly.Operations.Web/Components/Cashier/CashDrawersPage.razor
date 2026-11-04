@@ -1,0 +1,75 @@
+@*
+=========================================================
+FILE: CashDrawersPage.razor
+
+PURPOSE:
+Cash drawers (Slice 5F, C-4): open one at a warehouse with a float; the person's own and, for finance, every drawer.
+
+RESPONSIBILITIES:
+- Open a drawer
+- List drawers with their state, expected cash and difference
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.drawers.title"]" Company="@Company" Section="cashier" Error="@Error" Info="@Info">
+    <p><a href="/staff/cashier">@T["ui.cashier.back"]</a></p>
+    @if (Warehouses.Count > 0)
+    {
+        <form method="post" action="/staff/cashier/drawers/open" class="ops-list-bar" aria-labelledby="open-title">
+            <AntiforgeryToken />
+            <strong id="open-title" style="font-size: 0.8125rem;">@T["ui.drawers.open"]:</strong>
+            <label style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0;">@T["ui.drawers.warehouse"]
+                <select name="warehouse">
+                    @foreach (OperationsWarehouse warehouse in Warehouses)
+                    {
+                        <option value="@warehouse.Id">@warehouse.Code · @warehouse.Name</option>
+                    }
+                </select>
+            </label>
+            <label style="display: inline-flex; align-items: center; gap: 0.5rem; margin: 0;">@T["ui.drawers.float"] <input name="float" inputmode="decimal" size="9" required placeholder="0.00" /></label>
+            <button type="submit" class="vx-button vx-button--primary">@T["ui.drawers.open_button"]</button>
+        </form>
+    }
+    @if (Drawers.Count == 0)
+    {
+        <div class="ops-editor__empty"><p>@T["ui.drawers.none"]</p></div>
+    }
+    else
+    {
+        <OperationsTableViewport Label="@T["ui.drawers.title"]">
+            <table class="ops-editor__table">
+                <thead><tr><th scope="col">@T["ui.drawers.opened"]</th><th scope="col">@T["ui.drawers.person"]</th><th scope="col">@T["ui.drawers.state"]</th><th scope="col" class="ops-editor__number">@T["ui.drawers.expected"]</th><th scope="col" class="ops-editor__number">@T["ui.drawers.difference"]</th></tr></thead>
+                <tbody>
+                    @foreach (OperationsCashDrawer drawer in Drawers)
+                    {
+                        <tr data-status="@drawer.Status">
+                            <td><a href="/staff/cashier/drawers/@drawer.Id">@drawer.OpenedUtc.ToString("g", CultureInfo.CurrentCulture)</a></td>
+                            <td>@(People.TryGetValue(drawer.UserId, out string? name) ? name : string.Empty)</td>
+                            <td>@T["ui.drawers.status." + drawer.Status]</td>
+                            <td class="ops-editor__number">@drawer.Expected.ToString("N2", CultureInfo.CurrentCulture)</td>
+                            <td class="ops-editor__number">@(drawer.Difference is { } difference ? difference.ToString("N2", CultureInfo.CurrentCulture) : string.Empty)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </OperationsTableViewport>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsCashDrawer> Drawers { get; set; } = Array.Empty<OperationsCashDrawer>();
+
+    [Parameter] public IReadOnlyList<OperationsWarehouse> Warehouses { get; set; } = Array.Empty<OperationsWarehouse>();
+
+    [Parameter] public IReadOnlyDictionary<Guid, string> People { get; set; } = new Dictionary<Guid, string>();
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

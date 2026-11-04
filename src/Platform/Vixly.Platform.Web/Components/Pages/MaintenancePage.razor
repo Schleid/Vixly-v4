@@ -1,0 +1,27 @@
+﻿@*
+=========================================================
+FILE: MaintenancePage.razor
+
+PURPOSE:
+Maintenance windows the sites announce and close for
+(Control backlog 2026-10-22, section 1).
+
+IMPORTANT NOTES:
+- Page (UI-6): route and composition only
+- Text comes from PlatformText (UI-10)
+=========================================================
+*@
+@page "/maintenance"
+@attribute [Authorize]
+@inject IStringLocalizer<PlatformText> T
+
+<PageTitle>@T["ui.maintenance.title"]</PageTitle>
+
+<h1>@T["ui.maintenance.title"]</h1>
+<p class="vx-hint">@T["ui.maintenance.intro"]</p>
+<MaintenanceWindows Page="@(Page ?? 1)" />
+
+@code {
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
+}

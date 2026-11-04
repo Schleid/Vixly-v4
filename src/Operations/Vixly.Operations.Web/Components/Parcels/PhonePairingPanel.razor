@@ -1,0 +1,41 @@
+﻿@*
+=========================================================
+FILE: PhonePairingPanel.razor
+
+PURPOSE:
+Add a phone running Vixly Print to the warehouse, for a portable Bluetooth printer (Slice 12E, owner H-6).
+
+RESPONSIBILITIES:
+- The form that makes a one-time code; the code and its QR code, once
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The app is named Vixly Print in the stores (owner H-6); the page itself never says "Vixly"
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<section class="ops-editor__panel" aria-labelledby="phone-title">
+    <h2 id="phone-title" class="ops-panel__title">@T["ui.printers.phone_title"]</h2>
+    <p class="ops-editor__hint">@VixlyText.Format(T, "ui.printers.phone_hint", "app", AppName)</p>
+    @if (Pairing is not null)
+    {
+        <p><img src="@Pairing.QrDataUri" alt="@T["ui.printers.phone_qr"]" width="220" height="220" /></p>
+        <p>@T["ui.printers.phone_code"] <code class="ops-editor__code" data-pairing-code>@Pairing.Code</code></p>
+        <p class="ops-editor__hint">@VixlyText.Format(T, "ui.printers.phone_expires", "time", Pairing.ExpiresUtc.ToLocalTime().ToString("t", System.Globalization.CultureInfo.CurrentCulture))</p>
+    }
+    <form method="post" action="/staff/locations/warehouse/@WarehouseId/printers/agents/phone" class="ops-editor__inline">
+        <AntiforgeryToken />
+        <label>@T["ui.printers.phone_name"] <input name="name" required maxlength="60" /></label>
+        <button type="submit" class="vx-button vx-button--secondary">@T["ui.printers.phone_add"]</button>
+    </form>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public Guid WarehouseId { get; set; }
+
+    [Parameter] public PhonePairingView? Pairing { get; set; }
+
+    // The app's name in the stores (OperationsPrintHelper:AppName); a white-label company's own copy carries its name.
+    [Parameter] public string AppName { get; set; } = string.Empty;
+}

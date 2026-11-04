@@ -33,7 +33,8 @@ public static class PlatformPublicEvents
         PlatformMessageTypes.DeviceReleased,
         PlatformMessageTypes.DeviceRevoked,
         PlatformMessageTypes.LegalVersionPublished,
-        PlatformMessageTypes.TermsAccepted
+        PlatformMessageTypes.TermsAccepted,
+        PlatformMessageTypes.RegistrationAccountSetupReady
     };
 
     public static IReadOnlyList<PlatformPublicEvent> From(PlatformOutboxMessage message)
@@ -119,6 +120,12 @@ public static class PlatformPublicEvents
                     new PlatformTermsAcceptedEvent(item.PlatformTenantId, item.DocumentId, item.Version, PlatformWireCodes.Of(item.Source), item.OccurredUtc));
             }
 
+            case PlatformMessageTypes.RegistrationAccountSetupReady:
+            {
+                PlatformRegistrationAccountSetupReady item = PlatformOutboxWriter.Read<PlatformRegistrationAccountSetupReady>(message);
+                return One(PlatformEventTypes.RegistrationAccountSetupReady, item.PlatformTenantId, item.OccurredUtc,
+                    new PlatformRegistrationAccountSetupReadyEvent(item.PlatformTenantId, item.RegistrationId, item.OccurredUtc));
+            }
             default:
                 return Array.Empty<PlatformPublicEvent>();
         }

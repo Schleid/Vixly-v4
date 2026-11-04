@@ -1,0 +1,63 @@
+﻿@*
+=========================================================
+FILE: SignInPage.razor
+
+PURPOSE:
+The customer sign-in page.
+
+RESPONSIBILITIES:
+- Render the customer sign-in page
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); values come from the endpoint
+- Static forms with antiforgery and the form guard (ADR-0019)
+- Customer access presentation; published tenant identity, no staff branding
+=========================================================
+*@
+@inject IStringLocalizer<CustomerText> T
+@inject IStringLocalizer<CustomerExperienceText> L
+
+<CustomerShell Brand="@Brand" Title="@T["ui.sign_in.title"]" ReturnHere="/customer/sign-in">
+    <div class="customer-login">
+    <CustomerAccessStory Company="@(Brand?.DisplayName ?? T["ui.app.name"].Value)" />
+    <section class="customer-login__entry" aria-labelledby="customer-login-title">
+    <p class="customer-login__eyebrow">@T["ui.home.title"]</p>
+    <h2 id="customer-login-title">@L["welcome"]</h2>
+    <p class="customer-login__intro">@L["login_intro"]</p>
+    @if (!string.IsNullOrWhiteSpace(Error)) { <p class="customer-portal__error" role="alert">@Error</p> }
+    @if (!string.IsNullOrWhiteSpace(Info)) { <p class="customer-portal__info" role="status">@Info</p> }
+    <form method="post" action="/customer/sign-in" class="customer-portal__form">
+        <AntiforgeryToken />
+        <label>@T["ui.field.email"] <input type="email" name="email" value="@Email" autocomplete="username" maxlength="254" required /></label>
+        <div class="customer-login__password">
+            <label for="customer-password">@T["ui.field.password"]</label>
+            <input id="customer-password" type="password" name="password" autocomplete="current-password" maxlength="64" required />
+            <a href="/customer/forgot-password">@T["ui.forgot.link"]</a>
+        </div>
+        <button type="submit" class="vx-button vx-button--primary">@T["ui.sign_in.submit"]<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></button>
+    </form>
+    @if (ShowResend)
+    {
+        <form method="post" action="/customer/verify/resend" class="customer-portal__form">
+            <AntiforgeryToken />
+            <input type="hidden" name="email" value="@Email" />
+            <button type="submit" class="vx-button vx-button--secondary">@T["ui.verify.resend"]</button>
+        </form>
+    }
+    <div class="customer-login__join"><p>@T["ui.sign_in.no_account"]</p><a href="/customer/sign-up">@T["ui.sign_up.link"]<span aria-hidden="true">↗</span></a></div>
+    <p class="customer-login__footer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6zM8 12l3 3 5-6"/></svg>@L["account_note"]</p>
+    </section>
+    </div>
+</CustomerShell>
+
+@code {
+    [Parameter] public Vixly.Contracts.Operations.Customers.CustomerPortalBrandDto? Brand { get; set; }
+
+    [Parameter] public string? Email { get; set; }
+
+    [Parameter] public bool ShowResend { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

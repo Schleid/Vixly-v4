@@ -133,7 +133,7 @@ public sealed class PlatformPasskeyEnrolmentTests
 
     private PlatformSignInSteps Steps()
     {
-        return new PlatformSignInSteps(_store, _store, _store, _crypto, _store, Audit(), _store, _clock);
+        return new PlatformSignInSteps(_store, _store, _store, _crypto, _store, Audit(), _store, _clock, new FakeSecuritySettings());
     }
 
     private PlatformPasskeyCeremonies Ceremonies()

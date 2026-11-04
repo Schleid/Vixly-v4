@@ -1,0 +1,135 @@
+@*
+=========================================================
+FILE: TextSettingsPage.razor
+
+PURPOSE:
+Settings → Messages (Slice 9): notices by SMS and WhatsApp through the company's own Twilio account.
+
+RESPONSIBILITIES:
+- Connect the account (id, token, SMS sender, WhatsApp sender), or change the senders; disconnect
+- Choose the notices sent by text, and the approved WhatsApp template for each
+- The recent messages: when, to whom (last digits), which notice, how, what Twilio answered
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- The token is never shown again (its last characters only); customers choose the channel on their portal, with their consent
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.texts.title"]" Company="@Company" Section="texts_settings" Error="@Error" Info="@Info">
+    <p class="ops-editor__hint" style="margin-bottom: 0.75rem;">@T["ui.texts.intro"]</p>
+    @if (!InPlan)
+    {
+        <div class="ops-editor__empty" data-not-in-plan><p>@T["ui.texts.not_in_plan"]</p></div>
+    }
+    else
+    {
+        <section class="ops-editor__panel" aria-labelledby="twilio-title" id="twilio">
+            <h2 id="twilio-title">@T["ui.texts.account"]</h2>
+            @if (Provider is { } provider)
+            {
+                <dl class="ops-facts-grid" data-connected style="margin-bottom: 0.85rem;">
+                    <div class="ops-fact-cell"><dt>@T["ui.texts.account_name"]</dt><dd>@(provider.AccountName ?? provider.AccountSid)</dd></div>
+                    <div class="ops-fact-cell"><dt>@T["ui.texts.token"]</dt><dd class="ops-editor__code">…@provider.TokenHint</dd></div>
+                    <div class="ops-fact-cell"><dt>@T["ui.texts.sms_from"]</dt><dd>@(provider.SmsFrom ?? T["ui.texts.none"].Value)</dd></div>
+                    <div class="ops-fact-cell"><dt>@T["ui.texts.whatsapp_from"]</dt><dd>@(provider.WhatsAppFrom ?? T["ui.texts.none"].Value)</dd></div>
+                </dl>
+            }
+            @if (CanEdit)
+            {
+                <form method="post" action="/staff/settings/messages/connect" class="ops-editor__form">
+                    <AntiforgeryToken />
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 0.85rem; margin-bottom: 0.85rem;">
+                        <label>@T["ui.texts.account_sid"] <input name="accountSid" maxlength="34" autocomplete="off" spellcheck="false" value="@Provider?.AccountSid" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></label>
+                        <label>@T["ui.texts.auth_token"] <input type="password" name="authToken" maxlength="64" autocomplete="off" spellcheck="false" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></label>
+                        <label>@T["ui.texts.sms_from"] <input name="smsFrom" maxlength="34" placeholder="+13055550123" value="@Provider?.SmsFrom" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></label>
+                        <label>@T["ui.texts.whatsapp_from"] <input name="whatsAppFrom" maxlength="16" placeholder="+13055550123" value="@Provider?.WhatsAppFrom" style="height: 32px; padding: 0.25rem 0.5rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></label>
+                    </div>
+                    @if (Provider is not null) { <p class="ops-editor__hint" style="margin-bottom: 0.75rem;">@T["ui.texts.token_keep"]</p> }
+                    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                        <button type="submit" class="vx-button vx-button--primary" style="height: 32px; padding: 0 0.85rem;">@T[Provider is null ? "ui.texts.connect" : "ui.texts.save_account"]</button>
+                    </div>
+                </form>
+                @if (Provider is not null)
+                {
+                    <form method="post" action="/staff/settings/messages/disconnect" class="ops-editor__inline" style="margin-top: 0.5rem;">
+                        <AntiforgeryToken />
+                        <button type="submit" class="vx-button vx-button--secondary" style="height: 32px; padding: 0 0.85rem;">@T["ui.texts.disconnect"]</button>
+                    </form>
+                }
+            }
+        </section>
+        <form method="post" action="/staff/settings/messages/notices" class="ops-editor__panel ops-editor__form" aria-labelledby="notices-title" id="notices">
+            <AntiforgeryToken />
+            <h2 id="notices-title">@T["ui.texts.notices"]</h2>
+            <p class="ops-editor__hint">@T["ui.texts.notices_hint"]</p>
+            <OperationsTableViewport Label="@T["ui.texts.notices"]">
+                <table class="ops-editor__table">
+                    <thead><tr><th scope="col">@T["ui.texts.notice"]</th><th scope="col" style="text-align: center;">@T["ui.texts.by_text"]</th><th scope="col">@T["ui.texts.template"]</th></tr></thead>
+                    <tbody>
+                        @foreach (OperationsTextNotices notice in Enum.GetValues<OperationsTextNotices>().Where(item => item != OperationsTextNotices.None))
+                        {
+                            <tr data-notice="@notice">
+                                <td>@T["ui.texts.notice." + notice]</td>
+                                <td style="text-align: center;"><input type="checkbox" name="notice" value="@notice" checked="@Notices.HasFlag(notice)" disabled="@(!CanEdit)" aria-label="@T["ui.texts.by_text"]" style="width: 1.1rem; height: 1.1rem; cursor: pointer;" /></td>
+                                <td><input name="template_@notice" maxlength="34" size="36" spellcheck="false" placeholder="HX…" value="@Provider?.Template(notice)" disabled="@(!CanEdit || Provider is null)" aria-label="@T["ui.texts.template"]" style="height: 28px; padding: 0.2rem 0.5rem; font-size: 0.8125rem; border: 1px solid var(--vx-color-border-control, #cbd5e1); border-radius: 0.35rem;" /></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </OperationsTableViewport>
+            @if (CanEdit)
+            {
+                <div style="margin-top: 0.75rem;">
+                    <button type="submit" class="vx-button vx-button--primary" style="height: 32px; padding: 0 0.85rem;">@T["ui.texts.save_notices"]</button>
+                </div>
+            }
+        </form>
+        <section class="ops-editor__panel" aria-labelledby="log-title">
+            <h2 id="log-title">@T["ui.texts.log"]</h2>
+            @if (Messages.Count == 0)
+            {
+                <p>@T["ui.texts.log_none"]</p>
+            }
+            else
+            {
+                <OperationsTableViewport Label="@T["ui.texts.log"]">
+                    <table class="ops-editor__table">
+                        <thead><tr><th scope="col">@T["ui.texts.when"]</th><th scope="col">@T["ui.texts.to"]</th><th scope="col">@T["ui.texts.notice"]</th><th scope="col">@T["ui.texts.channel"]</th><th scope="col">@T["ui.texts.result"]</th></tr></thead>
+                        <tbody>
+                            @foreach (OperationsTextMessage message in Messages)
+                            {
+                                <tr data-text-status="@message.Status">
+                                    <td>@message.CreatedUtc.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)</td>
+                                    <td class="ops-editor__code">@message.ToHint</td>
+                                    <td>@T["ui.texts.notice." + message.Notice]</td>
+                                    <td>@T["ui.texts.channel." + message.Channel]</td>
+                                    <td>@T["ui.texts.status." + message.Status]@(message.ErrorCode is { } code ? " · " + code : string.Empty)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </OperationsTableViewport>
+            }
+        </section>
+    }
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public bool InPlan { get; set; }
+
+    [Parameter] public OperationsTextProvider? Provider { get; set; }
+
+    [Parameter] public OperationsTextNotices Notices { get; set; }
+
+    [Parameter] public IReadOnlyList<OperationsTextMessage> Messages { get; set; } = Array.Empty<OperationsTextMessage>();
+
+    [Parameter] public bool CanEdit { get; set; }
+
+    [Parameter] public string? Error { get; set; }
+
+    [Parameter] public string? Info { get; set; }
+}

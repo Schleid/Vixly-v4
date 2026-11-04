@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Vixly.Platform.Application.Ports;
 using Vixly.Platform.Domain.Identity;
 using Vixly.Shared.Kernel.ValueObjects;
@@ -37,6 +38,21 @@ internal sealed class PlatformUserRepository : IPlatformUserRepository
         return WholeUsers().FirstOrDefaultAsync(user => user.Id == platformUserId, cancellationToken);
     }
 
+    // Harmonization H-10: one small read, not the staff member with roles, departments, passkeys and recovery codes.
+    public async Task<Vixly.Platform.Application.Identity.PlatformSessionFacts?> FindSessionFactsAsync(Guid platformUserId, CancellationToken cancellationToken)
+    {
+        var found = await _context.Users
+            .AsNoTracking()
+            .Where(user => user.Id == platformUserId)
+            .Select(user => new { user.Id, user.Account.Status, user.AuthorityLevel, user.FirstName, user.LastName, user.PreferredLanguage })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return found is null
+            ? null
+            : new Vixly.Platform.Application.Identity.PlatformSessionFacts(found.Id, found.Status == PlatformUserAccountStatus.Active, found.AuthorityLevel,
+                found.FirstName, found.LastName, found.PreferredLanguage.Value);
+    }
+
     public Task<PlatformUser?> FindByEmailAsync(EmailAddress email, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(email);
@@ -72,6 +88,34 @@ internal sealed class PlatformUserRepository : IPlatformUserRepository
     public Task<bool> AnyAsync(CancellationToken cancellationToken)
     {
         return _context.Users.AnyAsync(cancellationToken);
+    }
+
+    // A plain command: SQL Server refuses NEXT VALUE FOR inside the subquery EF would wrap around SqlQueryRaw.
+    public async Task<string> NextEmployeeNumberAsync(CancellationToken cancellationToken)
+    {
+        System.Data.Common.DbConnection connection = _context.Database.GetDbConnection();
+        bool opened = connection.State != System.Data.ConnectionState.Open;
+
+        if (opened)
+        {
+            await connection.OpenAsync(cancellationToken);
+        }
+
+        try
+        {
+            await using System.Data.Common.DbCommand command = connection.CreateCommand();
+            command.CommandText = "SELECT NEXT VALUE FOR [" + PlatformDatabase.Schema + "].[" + PlatformDatabase.EmployeeNumberSequence + "]";
+            command.Transaction = _context.Database.CurrentTransaction?.GetDbTransaction();
+
+            return PlatformEmployeeNumber.Format(Convert.ToInt64(await command.ExecuteScalarAsync(cancellationToken), System.Globalization.CultureInfo.InvariantCulture));
+        }
+        finally
+        {
+            if (opened)
+            {
+                await connection.CloseAsync();
+            }
+        }
     }
 
     public void Add(PlatformUser user)

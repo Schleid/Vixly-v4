@@ -45,6 +45,8 @@ public static class PlatformBillingSettingsMapper
                     profile.Website,
                     profile.Logo is not null,
                     profile.SupportEmail,
-                    profile.SupportPhone));
+                    profile.SupportPhone,
+                    profile.Logo,
+                    profile.LogoContentType));
     }
 }

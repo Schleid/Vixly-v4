@@ -61,8 +61,8 @@ public sealed class RecordPlatformPaymentUseCase
             return RecordPlatformPaymentResponse.Failure(PlatformBillingErrors.InvoiceNotFound);
         }
 
-        // Card payments come only from the payment provider (Slice 5), never typed by staff.
-        if (request.Method == PlatformPaymentMethod.Card)
+        // Card and bank debit payments come only from the payment provider (Slice 5), never typed by staff.
+        if (request.Method is PlatformPaymentMethod.Card or PlatformPaymentMethod.BankDebit)
         {
             return RecordPlatformPaymentResponse.Failure(PlatformBillingErrors.MethodNotAllowed);
         }

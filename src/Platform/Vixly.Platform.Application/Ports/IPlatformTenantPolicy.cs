@@ -10,6 +10,7 @@
 // - Expose the configured reserved slugs (added to the H-2 floor)
 // - Expose the current terms and privacy versions
 // - Expose the tenant base domain ({slug}.<base domain>, H-1)
+// - Say whether sign-up needs an invitation (an offer link)
 //
 // IMPORTANT NOTES:
 // - Read from configuration; no secrets
@@ -24,4 +25,6 @@ public interface IPlatformTenantPolicy
     string PrivacyVersion { get; }
 
     string TenantBaseDomain { get; }
+
+    bool RegistrationInviteOnly { get; }
 }

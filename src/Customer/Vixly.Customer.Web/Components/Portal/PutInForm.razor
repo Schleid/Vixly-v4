@@ -1,0 +1,34 @@
+﻿@*
+=========================================================
+FILE: PutInForm.razor
+
+PURPOSE:
+Puts a package the customer announced, or that arrived, into this shipment (Slice 4D).
+
+RESPONSIBILITIES:
+- One button posting to /customer/packages/move, back to the page it came from
+
+IMPORTANT NOTES:
+- Markup only. Text comes from CustomerText (L-10); never "Vixly" (ADR-0012)
+=========================================================
+*@
+@inject IStringLocalizer<CustomerText> T
+
+<form method="post" action="/customer/packages/move" class="customer-portal__inline">
+    <AntiforgeryToken />
+    @if (PreAlertId is { } preAlert) { <input type="hidden" name="preAlert" value="@preAlert" /> }
+    @if (ParcelId is { } parcel) { <input type="hidden" name="parcel" value="@parcel" /> }
+    <input type="hidden" name="shipment" value="@ShipmentId" />
+    <input type="hidden" name="back" value="@Back" />
+    <button type="submit" class="vx-button vx-button--secondary">@T["ui.packages.put_in"]</button>
+</form>
+
+@code {
+    [Parameter] public Guid? PreAlertId { get; set; }
+
+    [Parameter] public Guid? ParcelId { get; set; }
+
+    [Parameter, EditorRequired] public Guid ShipmentId { get; set; }
+
+    [Parameter] public string Back { get; set; } = "/customer/packages";
+}

@@ -1,0 +1,43 @@
+﻿@inject IStringLocalizer<CustomerExperienceText> L
+@inject IStringLocalizer<CustomerText> T
+@* =========================================================
+FILE: CustomerAccessStory.razor
+
+PURPOSE:
+Introduce the customer's own online workspace at sign-in.
+
+RESPONSIBILITIES:
+- Render a decorative account and package overview illustration
+
+IMPORTANT NOTES:
+- Illustrative only: no invented shipment data, counts or delivery promises
+- Tenant identity comes from the existing published brand
+========================================================= *@
+<aside class="customer-access-story" aria-labelledby="customer-story-title">
+    <p class="customer-access-story__eyebrow"><span aria-hidden="true"></span>@T["ui.home.title"]</p>
+    <h2 id="customer-story-title">@L["story_title"] <em>@L["story_emphasis"]</em></h2>
+    <p class="customer-access-story__intro">@L["story_body"]</p>
+    <div class="customer-access-scene" aria-hidden="true">
+        <div class="customer-access-scene__orbit"></div>
+        <div class="customer-access-scene__window">
+            <div class="customer-access-scene__windowbar"><i></i><i></i><i></i><span>@Company</span><svg viewBox="0 0 24 24"><path d="M7 10V7a5 5 0 0 1 10 0v3M5 10h14v11H5zM12 14v3" /></svg></div>
+            <div class="customer-access-scene__workspace">
+                <div class="customer-access-scene__rail"><span></span><span></span><span></span><span></span></div>
+                <div class="customer-access-scene__overview">
+                    <div class="customer-access-scene__greeting"><svg viewBox="0 0 40 40"><circle cx="20" cy="14" r="6"/><path d="M9 33v-3a11 11 0 0 1 22 0v3"/></svg><div><b></b><i></i></div></div>
+                    <div class="customer-access-scene__tabs"><strong>@T["ui.nav.packages"]</strong><span>@T["ui.nav.profile"]</span></div>
+                    <div class="customer-access-scene__package"><svg viewBox="0 0 40 40"><path d="m20 4 15 8v17l-15 8-15-8V12zM5 12l15 8 15-8M20 20v17M12 8l15 8v6"/></svg><div><b></b><i></i></div><span></span></div>
+                    <div class="customer-access-scene__package"><svg viewBox="0 0 40 40"><path d="m20 4 15 8v17l-15 8-15-8V12zM5 12l15 8 15-8M20 20v17M12 8l15 8v6"/></svg><div><b></b><i></i></div><span></span></div>
+                    <div class="customer-access-scene__footer"><i></i><i></i><i></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="customer-access-scene__address"><svg viewBox="0 0 32 32"><rect x="3" y="6" width="26" height="20" rx="4"/><path d="m4 8 12 9L28 8"/></svg><div><strong>@T["ui.nav.home"]</strong><span></span><span></span></div></div>
+        <span class="customer-access-scene__spark customer-access-scene__spark--one">+</span><span class="customer-access-scene__spark customer-access-scene__spark--two">+</span>
+    </div>
+    <div class="customer-access-story__index"><span>01</span><p>@L["story_caption"]</p><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></div>
+</aside>
+
+@code {
+    [Parameter] public string Company { get; set; } = string.Empty;
+}

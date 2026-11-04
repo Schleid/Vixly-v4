@@ -1,0 +1,32 @@
+﻿@*
+=========================================================
+FILE: RouteMapPanel.razor
+
+PURPOSE:
+The live map of a route that is out (Slice 12C, owner H-5): the driver's latest place, the way so far and the next stop.
+
+RESPONSIBILITIES:
+- The map's place and words; ops-route-map.js draws it and refreshes it every 30 seconds
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+- Tiles come through the site (/maps/tiles), never straight from the provider
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<link rel="stylesheet" href="/lib/leaflet/leaflet.css" />
+<section class="ops-editor__panel" aria-labelledby="map-title">
+    <h2 id="map-title" class="ops-section-title">@T["ui.delivery.map_title"]</h2>
+    <div class="ops-route-map" data-route-map="/staff/delivery/routes/@RouteId/map" data-attribution="@Attribution"
+         data-none="@T["ui.delivery.map_none"]" data-next="@T["ui.delivery.map_next"]" data-seen="@T["ui.delivery.map_seen"]" style="height: 320px;"></div>
+    <p class="ops-editor__hint" data-route-map-status></p>
+</section>
+<script src="/lib/leaflet/leaflet.js" defer></script>
+<script src="/js/ops-route-map.js?v=20261023-1" defer></script>
+
+@code {
+    [Parameter, EditorRequired] public Guid RouteId { get; set; }
+
+    [Parameter, EditorRequired] public string Attribution { get; set; } = string.Empty;
+}

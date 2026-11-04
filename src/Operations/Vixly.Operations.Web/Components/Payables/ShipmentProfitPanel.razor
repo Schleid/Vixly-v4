@@ -1,0 +1,33 @@
+﻿@*
+=========================================================
+FILE: ShipmentProfitPanel.razor
+
+PURPOSE:
+A shipment's revenue, costs and profit on its page (Slice 8), for whoever may see costs.
+
+RESPONSIBILITIES:
+- Revenue, carrier cost (estimate or billed), other costs, profit and margin
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10)
+=========================================================
+*@
+<section class="ops-editor__panel" aria-labelledby="profit-title" data-profit>
+    <h2 id="profit-title">@T["ui.profit.panel"]</h2>
+    <dl class="ops-editor__facts">
+        <dt>@T["ui.profit.revenue"]</dt><dd>@Money(Profit.Revenue)</dd>
+        <dt>@T["ui.profit.carrier"]</dt><dd>@Money(Profit.CarrierCost)@if (Profit.Estimated) { <small> · @T[Profit.Dispatched ? "ui.profit.estimated" : "ui.profit.not_dispatched"]</small> }</dd>
+        <dt>@T["ui.profit.other"]</dt><dd>@Money(Profit.DirectCost)</dd>
+        <dt>@T["ui.profit.profit"]</dt><dd data-shipment-profit>@Money(Profit.Profit)@(Profit.Margin is { } margin ? " · " + margin.ToString("0.0", CultureInfo.CurrentCulture) + " %" : string.Empty)</dd>
+    </dl>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public IStringLocalizer<OperationsText> T { get; set; } = null!;
+
+    [Parameter, EditorRequired] public OperationsShipmentProfit Profit { get; set; } = null!;
+
+    [Parameter] public string CurrencyCode { get; set; } = string.Empty;
+
+    private string Money(decimal amount) => OperationsInvoiceWords.Money(amount, CurrencyCode);
+}

@@ -1,0 +1,49 @@
+@*
+=========================================================
+FILE: SiteTestimonials.razor
+
+PURPOSE:
+What customers say about the company, in their own words (landing page marketing, owner 2026-10-30).
+
+RESPONSIBILITIES:
+- Show the testimonials the company chose, with the rating, name, place and where it was said
+
+IMPORTANT NOTES:
+- Markup only. The quotes are the customers' own words, each recorded with their agreement
+- No testimonial, no section: nothing is ever invented
+- Tenant surface: never says "Vixly"
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+@if (Page.Site.Testimonials.Count > 0)
+{
+    <section class="site-section as-voices" aria-labelledby="voices-title">
+        <h2 id="voices-title">@T["site.testimonials.title"]</h2>
+        <ul class="as-voices__list">
+            @foreach (OperationsSiteTestimonial item in Page.Site.Testimonials)
+            {
+                <li>
+                    <figure class="as-voice">
+                        @if (item.Rating is { } rating)
+                        {
+                            <p class="as-voice__stars"><span aria-hidden="true">@(new string('★', rating) + new string('☆', 5 - rating))</span><span class="site-visually-hidden">@VixlyText.Format(T, "site.testimonials.rating", "rating", rating)</span></p>
+                        }
+                        <blockquote><p>@item.Quote</p></blockquote>
+                        <figcaption>
+                            <strong>@item.Name</strong>
+                            @if (Caption(item) is { Length: > 0 } caption) { <span>@caption</span> }
+                        </figcaption>
+                    </figure>
+                </li>
+            }
+        </ul>
+    </section>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public OperationsSitePage Page { get; set; } = null!;
+
+    private static string Caption(OperationsSiteTestimonial item) => string.Join(" · ", new[] { item.Place, item.Source }.OfType<string>());
+}

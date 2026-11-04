@@ -18,6 +18,7 @@ namespace Vixly.Shared.Hosting;
 //
 // IMPORTANT NOTES:
 // - Anonymous, no detail in the body: only the status word
+// - With the owner's key, /health/ready names each check and what is wrong (VixlyHealthDetail, 2026-10-25)
 // - Hosts tag their readiness checks with ReadyTag
 // =========================================================
 public static class VixlyHealth
@@ -31,7 +32,8 @@ public static class VixlyHealth
         endpoints.MapHealthChecks("/health/live", new HealthCheckOptions { Predicate = _ => false });
         endpoints.MapHealthChecks("/health/ready", new HealthCheckOptions
         {
-            Predicate = registration => registration.Tags.Contains(ReadyTag)
+            Predicate = registration => registration.Tags.Contains(ReadyTag),
+            ResponseWriter = VixlyHealthDetail.WriteAsync
         });
 
         return endpoints;

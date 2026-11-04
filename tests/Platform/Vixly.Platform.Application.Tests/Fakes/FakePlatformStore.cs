@@ -79,6 +79,13 @@ internal sealed class FakePlatformStore :
         return Task.FromResult(Users.FirstOrDefault(user => user.Id == platformUserId));
     }
 
+    public Task<Vixly.Platform.Application.Identity.PlatformSessionFacts?> FindSessionFactsAsync(Guid platformUserId, CancellationToken cancellationToken)
+    {
+        PlatformUser? user = Users.FirstOrDefault(item => item.Id == platformUserId);
+        return Task.FromResult(user is null ? null
+            : new Vixly.Platform.Application.Identity.PlatformSessionFacts(user.Id, user.Account.IsActive, user.AuthorityLevel, user.FirstName, user.LastName, user.PreferredLanguage.Value));
+    }
+
     public Task<PlatformUser?> FindByEmailAsync(EmailAddress email, CancellationToken cancellationToken)
     {
         return Task.FromResult(Users.FirstOrDefault(user => user.Email == email));
@@ -102,6 +109,13 @@ internal sealed class FakePlatformStore :
     public Task<bool> EmailExistsAsync(EmailAddress email, CancellationToken cancellationToken)
     {
         return Task.FromResult(Users.Any(user => user.Email == email));
+    }
+
+    public long LastEmployeeNumber { get; set; }
+
+    public Task<string> NextEmployeeNumberAsync(CancellationToken cancellationToken)
+    {
+        return Task.FromResult(PlatformEmployeeNumber.Format(++LastEmployeeNumber));
     }
 
     public Task<int> CountOtherActiveSuperUsersAsync(Guid excludedUserId, CancellationToken cancellationToken)
@@ -243,8 +257,16 @@ internal sealed class FakePlatformStore :
         ResetRequests.Add(request);
     }
 
+    // Owner, 2026-10-23: a mail server that refuses (the person is still saved).
+    public bool MailFails { get; set; }
+
     public Task SendInvitationAsync(PlatformUser user, string token, CancellationToken cancellationToken)
     {
+        if (MailFails)
+        {
+            throw new InvalidOperationException("The mail server refused the message.");
+        }
+
         SentMail.Add(("invitation", user.Id, token));
         return Task.CompletedTask;
     }
@@ -276,6 +298,16 @@ internal sealed class FakePlatformStore :
             .ToList();
 
         return Task.FromResult(new PagedResult<PlatformUserListItem>(items.Skip(page.Skip).Take(page.PageSize).ToList(), page, items.Count));
+    }
+
+    public Task<PagedResult<PlatformSignInItem>> ListSignInsAsync(Guid? platformUserId, DateTimeOffset utcNow, PagedRequest page, CancellationToken cancellationToken)
+    {
+        List<PlatformSignInItem> items = Sessions.Where(session => platformUserId is null || session.PlatformUserId == platformUserId)
+            .OrderByDescending(session => session.CreatedUtc)
+            .Select(session => new PlatformSignInItem(session.Id, session.PlatformUserId, string.Empty, session.CreatedUtc, session.EndedUtc, null, session.IpAddress, session.UserAgent,
+                session.Country))
+            .ToList();
+        return Task.FromResult(new PagedResult<PlatformSignInItem>(items.Skip(page.Skip).Take(page.PageSize).ToList(), page, items.Count));
     }
 
     public Task<PlatformUserActionFacts?> GetActionFactsAsync(Guid platformUserId, DateTimeOffset utcNow, CancellationToken cancellationToken)

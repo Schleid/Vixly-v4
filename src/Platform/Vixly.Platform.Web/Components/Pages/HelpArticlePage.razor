@@ -1,0 +1,20 @@
+﻿@page "/help/{Slug}"
+@attribute [Authorize]
+@using Vixly.Platform.Web.Features.Help
+@* =========================================================
+   FILE: HelpArticlePage.razor
+
+   PURPOSE:
+   Routes signed-in staff to one permission-filtered article.
+
+   RESPONSIBILITIES:
+   - Pass the stable slug to the help feature.
+
+   IMPORTANT NOTES:
+   - Unknown and unauthorized article addresses answer 404.
+   ========================================================= *@
+<PlatformHelpBrowser Slug="@Slug" />
+
+@code {
+    [Parameter] public string Slug { get; set; } = string.Empty;
+}
