@@ -16616,4 +16616,8 @@ Su cuenta de {company} se cerró porque no se respetaron nuestras condiciones de
     <value>Solo una opinión de cliente puede abrir un ticket.</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.editor.nav.waiting" xml:space="preserve">
+    <value>{count} pendientes</value>
+    <comment>needs-review</comment>
+  </data>
 </root>

@@ -4169,3 +4169,6 @@ tr[data-low="true"] td:first-child {
     align-self: flex-end;
     white-space: nowrap;
 }
+
+/* Menu counts (owner, 2026-11-04): what waits on a page; placeholder look until the Frontend/UI team designs it. */
+.ops-nav a .vx-nav-count { margin-left: auto; }

@@ -620,3 +620,13 @@ The script adds the review columns to `ops.SiteTestimonials` (who wrote it, when
 3. Portal, as a customer with a delivered shipment: the home page invites you; *Review us*, send 5 stars with agreement. Operations shows it under *New (1)*; *Publish*; the home page (Air & Sea theme, testimonials on) shows it.
 4. Change the review in the portal: it is *New* again and gone from the website. Delete it: gone from the list.
 5. A review sent without agreement has no *Publish* button; *Hide* with a reason; *Open a ticket*: the ticket appears for customer service with *From a review*.
+
+## 40. Thirty-sixth update (2026-11-04): counts beside the menu
+**Database: no.** Copy **Operations Web** and **Control**. No new setting.
+
+- **Operations:** *Your website* shows how many customer reviews are new; *Payments to verify* shows how many payments wait at the warehouses the person verifies for. Only people who can act on them see the numbers.
+- **Control:** *Approvals* (requests the person may approve, never their own), *Company changes* (pending) and *Zelle payments* (waiting reports) show their counts. A person without the page's permission sees no number. The numbers refresh when you move to another page (at most every 30 seconds).
+
+**Checks:**
+1. Operations, as someone who verifies payments: take a Zelle payment at the cashier; *Payments to verify* shows 1; verify it; the number goes.
+2. Control: report a Zelle payment from a payment link; *Zelle payments* shows 1 after moving to another page.

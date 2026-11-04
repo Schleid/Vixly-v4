@@ -77,6 +77,8 @@ public sealed class ControlOverviewUiTests : BunitContext
         Services.AddLocalization();
         ComponentFactories.AddStub<Microsoft.AspNetCore.Components.Authorization.AuthorizeView>();
         ComponentFactories.AddStub<Vixly.Platform.Web.Features.Help.PlatformHelpContextLink>();
+        // The menu counts load their own data (owner, 2026-11-04); this test is about the shell.
+        ComponentFactories.AddStub<Vixly.Platform.Web.Features.Navigation.NavCount>();
         Services.GetRequiredService<Microsoft.AspNetCore.Components.NavigationManager>().NavigateTo("/invoices?overdue=true");
         var view = Render<Vixly.Platform.Web.Components.Layout.MainLayout>();
         var search = view.Find("form[role=search]");

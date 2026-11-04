@@ -16039,4 +16039,7 @@ Your {company} account has been closed because our terms of service were not res
   <data name="ops.brand.review_not_from_customer" xml:space="preserve">
     <value>Only a customer review can open a ticket.</value>
   </data>
+  <data name="ui.editor.nav.waiting" xml:space="preserve">
+    <value>{count} waiting</value>
+  </data>
 </root>

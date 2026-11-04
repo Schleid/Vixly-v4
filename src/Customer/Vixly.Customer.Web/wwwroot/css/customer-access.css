@@ -13,15 +13,20 @@
 .customer-portal:has(.customer-login) .customer-portal__brand:not(:has(img))::before { display: block; height: 2rem; width: 0.5rem; }
 .customer-portal:has(.customer-login) .customer-portal__languages a { min-width: 36px; min-height: 36px; }
 
-.customer-portal__main:has(.customer-login) {
-    max-width: 72rem;
-    margin: 0 auto 3rem;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
+.customer-portal:has(.customer-login) .customer-portal__main,
+.customer-portal__main:has(.customer-login),
+.customer-portal[data-page="/customer/sign-in"] .customer-portal__main {
+    max-width: 64rem;
+    margin: 1.5rem auto 2.5rem;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
     overflow: visible;
 }
-.customer-portal__main:has(.customer-login) > .customer-portal__heading {
+.customer-portal:has(.customer-login) .customer-portal__main > .customer-portal__heading,
+.customer-portal__main:has(.customer-login) > .customer-portal__heading,
+.customer-portal[data-page="/customer/sign-in"] .customer-portal__heading {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -32,18 +37,21 @@
     white-space: nowrap;
     border: 0;
 }
-.customer-portal__main:has(.customer-login) > .customer-portal__content {
-    padding: 0 1rem;
+.customer-portal:has(.customer-login) .customer-portal__content,
+.customer-portal__main:has(.customer-login) > .customer-portal__content,
+.customer-portal[data-page="/customer/sign-in"] .customer-portal__content {
+    background: transparent !important;
+    padding: 0 !important;
 }
 
 /* Elevated Customer Login Card Enclosure */
 .customer-login {
     display: grid;
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    min-height: 580px;
+    min-height: 460px;
     background: var(--vx-color-surface);
     border: 1px solid var(--vx-color-border);
-    border-radius: 1.5rem;
+    border-radius: 1.25rem;
     box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.04);
     overflow: hidden;
     align-items: stretch;
@@ -52,11 +60,11 @@
 /* Left Showcase Wing: Branded Tenant Atmosphere */
 .customer-access-story {
     position: relative;
-    padding: clamp(2rem, 3.5vw, 3rem);
+    padding: 1.75rem 2rem 1.5rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 2rem;
+    gap: 1rem;
     isolation: isolate;
     background: linear-gradient(155deg, color-mix(in srgb, var(--customer-primary, #2563eb) 14%, #0f172a), #090e1a);
     color: #ffffff;
@@ -78,7 +86,7 @@
     display: flex;
     align-items: center;
     gap: 0.65rem;
-    margin: 0 0 1.25rem;
+    margin: 0 0 0.5rem;
     color: color-mix(in srgb, var(--customer-primary, #2563eb) 80%, #ffffff);
     font-size: 0.6875rem;
     font-weight: 700;
@@ -94,7 +102,7 @@
     max-width: 28rem;
     margin: 0;
     color: #ffffff;
-    font-size: clamp(2rem, 3.2vw, 2.75rem);
+    font-size: clamp(1.75rem, 2.5vw, 2.2rem);
     line-height: 1.1;
     font-weight: 800;
     letter-spacing: -0.04em;
@@ -106,9 +114,9 @@
 }
 .customer-access-story__intro {
     max-width: 26rem;
-    margin: 0.85rem 0 0;
+    margin: 0.5rem 0 0;
     font-size: 0.875rem;
-    line-height: 1.7;
+    line-height: 1.6;
     color: #94a3b8;
 }
 .customer-access-story__index {
@@ -116,7 +124,7 @@
     align-items: center;
     gap: 0.85rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
-    padding-top: 1.25rem;
+    padding-top: 0.85rem;
 }
 .customer-access-story__index > span {
     color: color-mix(in srgb, var(--customer-primary, #2563eb) 85%, #93c5fd);
@@ -140,7 +148,7 @@
 /* Scene Window Simulation */
 .customer-access-scene {
     position: relative;
-    padding: 1.5rem 0.5rem 2rem 0;
+    padding: 0.75rem 0.5rem 1rem 0;
     max-width: 28rem;
     margin: 0 auto;
 }
@@ -165,7 +173,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    padding: 0.65rem 0.85rem;
+    padding: 0.5rem 0.75rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.03);
 }
@@ -192,10 +200,10 @@
 .customer-access-scene__workspace {
     display: grid;
     grid-template-columns: 32px minmax(0, 1fr);
-    min-height: 160px;
+    min-height: 125px;
 }
 .customer-access-scene__rail {
-    padding: 1rem 0.5rem;
+    padding: 0.75rem 0.5rem;
     border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 .customer-access-scene__rail span {
@@ -209,11 +217,11 @@
 .customer-access-scene__rail span:first-child {
     background: var(--customer-primary, #2563eb);
 }
-.customer-access-scene__overview { padding: 0.85rem; }
+.customer-access-scene__overview { padding: 0.75rem; }
 .customer-access-scene__greeting { display: flex; align-items: center; gap: 0.5rem; }
 .customer-access-scene__greeting > svg {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
     padding: 3px;
     stroke: var(--customer-primary, #2563eb);
     fill: none;
@@ -238,12 +246,12 @@
 .customer-access-scene__tabs {
     display: flex;
     gap: 0.75rem;
-    margin: 0.75rem 0 0.6rem;
+    margin: 0.5rem 0 0.4rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     font-size: 0.625rem;
 }
 .customer-access-scene__tabs strong {
-    padding-bottom: 0.4rem;
+    padding-bottom: 0.35rem;
     border-bottom: 2px solid var(--customer-primary, #2563eb);
     color: #ffffff;
 }
@@ -252,15 +260,15 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: 0.4rem;
-    padding: 0.5rem;
+    margin-top: 0.35rem;
+    padding: 0.35rem 0.5rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 0.35rem;
     background: rgba(255, 255, 255, 0.02);
 }
 .customer-access-scene__package > svg {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     padding: 2px;
     fill: none;
     stroke: var(--customer-primary, #2563eb);
@@ -268,7 +276,7 @@
 }
 .customer-access-scene__package div { flex: 1; }
 .customer-access-scene__package b { width: 60%; background: rgba(255, 255, 255, 0.5); }
-.customer-access-scene__package i { width: 40%; margin-top: 0.3rem; background: rgba(255, 255, 255, 0.15); }
+.customer-access-scene__package i { width: 40%; margin-top: 0.25rem; background: rgba(255, 255, 255, 0.15); }
 .customer-access-scene__package > span {
     width: 1.25rem;
     height: 5px;
@@ -279,7 +287,7 @@
     display: flex;
     justify-content: center;
     gap: 4px;
-    margin: 0.75rem 0 0.1rem;
+    margin: 0.5rem 0 0.1rem;
 }
 .customer-access-scene__footer i {
     width: 4px;
@@ -292,12 +300,12 @@
 .customer-access-scene__address {
     position: absolute;
     right: -0.5rem;
-    bottom: 1rem;
+    bottom: 0.5rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    width: 11.5rem;
-    padding: 0.65rem 0.75rem;
+    width: 10.5rem;
+    padding: 0.5rem 0.65rem;
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 0.5rem;
     background: #1e293b;
@@ -331,7 +339,7 @@
     width: 100%;
     max-width: 26rem;
     margin: auto;
-    padding: clamp(2rem, 3.5vw, 3rem) 2rem;
+    padding: 1.75rem 2.25rem 1.5rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -339,7 +347,7 @@
 }
 
 .customer-login__eyebrow {
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.35rem;
     font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
@@ -348,22 +356,22 @@
 }
 .customer-login__entry h2 {
     margin: 0;
-    font-size: clamp(1.6rem, 2.4vw, 2.1rem);
+    font-size: clamp(1.45rem, 2vw, 1.75rem);
     letter-spacing: -0.04em;
     line-height: 1.15;
     font-weight: 750;
     color: var(--vx-color-text);
 }
 .customer-login__intro {
-    margin: 0.5rem 0 1.5rem;
+    margin: 0.35rem 0 1rem;
     color: var(--vx-color-text-muted);
     font-size: 0.875rem;
-    line-height: 1.6;
+    line-height: 1.5;
 }
 
 .customer-login .customer-portal__form {
     display: grid;
-    gap: 1rem;
+    gap: 0.75rem;
     margin-bottom: 0;
 }
 .customer-login .customer-portal__form label {
@@ -375,8 +383,8 @@
     gap: 0.35rem;
 }
 .customer-login .customer-portal__form input {
-    height: 44px;
-    min-height: 44px;
+    height: 40px;
+    min-height: 40px;
     box-sizing: border-box;
     padding: 0 0.85rem;
     font-size: 0.875rem;
@@ -424,11 +432,11 @@
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    height: 44px;
-    min-height: 44px;
+    height: 40px;
+    min-height: 40px;
     box-sizing: border-box;
     border-radius: 0.5rem;
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
     font-size: 0.9375rem;
     font-weight: 650;
     background: var(--customer-primary, #2563eb);
@@ -454,8 +462,8 @@
 .customer-login .vx-button--primary:hover svg { transform: translateX(3px); }
 
 .customer-login__join {
-    margin-top: 1.5rem;
-    padding-top: 1.25rem;
+    margin-top: 1rem;
+    padding-top: 0.85rem;
     border-top: 1px solid var(--vx-color-border);
     display: flex;
     align-items: center;
@@ -479,7 +487,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin: 1.25rem 0 0;
+    margin: 0.85rem 0 0;
     font-size: 0.6875rem;
     color: var(--vx-color-text-subtle);
     line-height: 1.5;

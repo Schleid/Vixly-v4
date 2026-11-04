@@ -9061,4 +9061,7 @@ Details: {link}</value>
   <data name="ui.registrations.resend_help" xml:space="preserve">
     <value>The owner has not confirmed their email yet. Fix the address here if it was mistyped, then send the link again.</value>
   </data>
+  <data name="ui.nav.waiting" xml:space="preserve">
+    <value>{count} waiting</value>
+  </data>
 </root>

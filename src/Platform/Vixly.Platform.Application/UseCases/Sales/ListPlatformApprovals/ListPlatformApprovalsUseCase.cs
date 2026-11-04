@@ -47,28 +47,7 @@ public sealed class ListPlatformApprovalsUseCase
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(request);
 
-        List<PlatformApprovalKind> kinds = new();
-
-        if (await _sales.HoldsAsync(context, PlatformPermissions.DiscountsApprove, cancellationToken))
-        {
-            kinds.Add(PlatformApprovalKind.Discount);
-            kinds.Add(PlatformApprovalKind.Offer);
-        }
-
-        if (await _sales.HoldsAsync(context, PlatformPermissions.PromotionsApprove, cancellationToken))
-        {
-            kinds.Add(PlatformApprovalKind.Promotion);
-        }
-
-        if (await _sales.HoldsAsync(context, PlatformPermissions.PlansPublish, cancellationToken))
-        {
-            kinds.Add(PlatformApprovalKind.PlanVersion);
-        }
-
-        if (await _sales.HoldsAsync(context, PlatformPermissions.BillingApproveCredits, cancellationToken))
-        {
-            kinds.Add(PlatformApprovalKind.CreditNote);
-        }
+        IReadOnlyList<PlatformApprovalKind> kinds = await PlatformApprovalKinds.ForAsync(_sales, context, cancellationToken);
 
         if (kinds.Count == 0)
         {

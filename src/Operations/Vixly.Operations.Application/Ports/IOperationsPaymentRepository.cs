@@ -40,6 +40,9 @@ public interface IOperationsPaymentRepository
     // Read only, oldest first: payments with a tender waiting for finance in these warehouses.
     Task<IReadOnlyList<OperationsPayment>> ListPendingAsync(IReadOnlyCollection<Guid> warehouseIds, int take, CancellationToken cancellationToken);
 
+    // The menu's count of payments to verify (owner, 2026-11-04).
+    Task<int> CountPendingAsync(IReadOnlyCollection<Guid> warehouseIds, CancellationToken cancellationToken);
+
     // Tracked.
     Task<OperationsCashDrawer?> GetDrawerAsync(Guid drawerId, CancellationToken cancellationToken);
 

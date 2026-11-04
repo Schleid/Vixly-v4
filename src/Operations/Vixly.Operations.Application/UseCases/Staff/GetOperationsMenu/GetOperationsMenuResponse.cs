@@ -50,6 +50,17 @@ public sealed class GetOperationsMenuResponse
 
     public bool Includes(string module) => !ModulesOff.Contains(module);
 
+    // Owner, 2026-11-04: what waits on a page, shown beside its menu entry (keyed by the entry's section, such as "site" or "verify").
+    public IReadOnlyDictionary<string, int> Counts { get; private init; } = new Dictionary<string, int>(StringComparer.Ordinal);
+
+    public int CountOf(string section) => Counts.TryGetValue(section, out int count) ? count : 0;
+
+    public GetOperationsMenuResponse WithCounts(IReadOnlyDictionary<string, int> counts) => new()
+    {
+        Succeeded = Succeeded, Error = Error, Permissions = Permissions, IsOwner = IsOwner, IsAdministrator = IsAdministrator, HiddenPages = HiddenPages, PortalOff = PortalOff,
+        ModulesOff = ModulesOff, Counts = counts ?? throw new ArgumentNullException(nameof(counts))
+    };
+
     public static GetOperationsMenuResponse Success(IReadOnlySet<string> permissions, bool isOwner, bool isAdministrator, IReadOnlyList<string>? hiddenPages = null, bool portalOff = false,
         IReadOnlySet<string>? modulesOff = null)
     {

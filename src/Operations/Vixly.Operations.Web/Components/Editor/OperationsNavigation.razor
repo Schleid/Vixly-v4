@@ -28,6 +28,10 @@ IMPORTANT NOTES:
                 <a href="@item.Url" aria-current="@(Section == item.Section ? "page" : null)">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="@Icon(item.Section)" /></svg>
                     <span>@T["ui.editor.nav." + item.Label]</span>
+                    @if (Allowance.CountOf(item.Section) is > 0 and var count)
+                    {
+                        <span class="vx-badge vx-badge--primary vx-nav-count"><span aria-hidden="true">@count</span><span class="ops-visually-hidden">@VixlyText.Format(T, "ui.editor.nav.waiting", "count", count)</span></span>
+                    }
                 </a>
             }
         </details>

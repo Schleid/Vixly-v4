@@ -412,6 +412,8 @@ public sealed partial class OperationsCustomerHttpTests : IClassFixture<Operatio
         (HttpResponseMessage _, string fresh) = await owner.GetAsync("/staff/site/testimonials?view=new");
         Assert.Contains("name=\"ask\" value=\"true\" checked", fresh, StringComparison.Ordinal);
         Assert.Contains("New (2)", WebUtility.HtmlDecode(fresh), StringComparison.Ordinal);
+        // Owner, 2026-11-04: the menu's "Your website" entry counts the new reviews.
+        Assert.Contains(">2 waiting</span>", fresh, StringComparison.Ordinal);
         Assert.Contains("Ana P.", fresh, StringComparison.Ordinal);
         Assert.Contains("Not agreed to be quoted", fresh, StringComparison.Ordinal);
 

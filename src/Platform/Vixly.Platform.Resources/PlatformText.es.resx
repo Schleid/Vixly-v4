@@ -11900,4 +11900,8 @@ Detalles: {link}</value>
     <value>El propietario aún no ha confirmado su correo. Corrija la dirección aquí si se escribió mal y vuelva a enviar el enlace.</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.nav.waiting" xml:space="preserve">
+    <value>{count} pendientes</value>
+    <comment>needs-review</comment>
+  </data>
 </root>

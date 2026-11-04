@@ -3431,3 +3431,6 @@ details.vx-nav-group .vx-nav-item { margin-block: var(--vx-space-1); }
     font-size: 0.75rem;
     white-space: nowrap;
 }
+
+/* Menu counts (owner, 2026-11-04): what waits on a page; placeholder look until the Frontend/UI team designs it. */
+.vx-nav-count { margin-left: auto; }

@@ -56,6 +56,13 @@ internal sealed class OperationsPaymentRepository : IOperationsPaymentRepository
             .OrderBy(payment => payment.TakenUtc).Take(take).ToListAsync(cancellationToken);
     }
 
+    public Task<int> CountPendingAsync(IReadOnlyCollection<Guid> warehouseIds, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(warehouseIds);
+
+        return _context.Payments.CountAsync(payment => payment.Pending && warehouseIds.Contains(payment.WarehouseId), cancellationToken);
+    }
+
     public Task<OperationsCashDrawer?> GetDrawerAsync(Guid drawerId, CancellationToken cancellationToken) =>
         _context.CashDrawers.FirstOrDefaultAsync(drawer => drawer.Id == drawerId, cancellationToken);
 

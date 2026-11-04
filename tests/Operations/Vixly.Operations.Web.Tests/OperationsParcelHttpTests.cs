@@ -2916,6 +2916,8 @@ public sealed partial class OperationsParcelHttpTests : IClassFixture<Operations
         Assert.Contains("Awaiting confirmation", WebUtility.HtmlDecode((await owner.GetAsync("/staff/invoices/" + orderInvoice)).Html), StringComparison.Ordinal);
         (HttpResponseMessage _, string verify) = await finance.GetAsync("/staff/cashier/verify");
         Assert.Contains("ZL-55", verify, StringComparison.Ordinal);
+        // Owner, 2026-11-04: the menu counts the payments waiting for this person to verify.
+        Assert.Matches("class=\"vx-badge vx-badge--primary vx-nav-count\"><span aria-hidden=\"true\">[1-9][0-9]*</span>", verify);
         string check = Regex.Match(verify, "/staff/cashier/verify/[0-9a-f-]{36}/[0-9a-f-]{36}").Value;
         // The one who took it never confirms it (P-6).
         (HttpResponseMessage _, string ownVerify) = await owner.GetAsync("/staff/cashier/verify");

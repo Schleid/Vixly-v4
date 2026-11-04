@@ -16616,4 +16616,8 @@ Votre compte {company} a été fermé car nos conditions de service n’ont pas 
     <value>Seul un avis client peut ouvrir un ticket.</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.editor.nav.waiting" xml:space="preserve">
+    <value>{count} en attente</value>
+    <comment>needs-review</comment>
+  </data>
 </root>
