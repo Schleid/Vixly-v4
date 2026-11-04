@@ -1,23 +1,39 @@
 /* Customer access: an open account workspace, distinct from the staff entry. */
-.customer-portal:has(.customer-login) {
+.customer-portal:has(.customer-login),
+.customer-portal[data-page="/customer/sign-in"] {
     background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--customer-primary, #2563eb) 8%, #f8fafc), #f1f5f9 60%, #e2e8f0 100%);
     min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
 }
-.customer-portal:has(.customer-login) .customer-portal__topbar {
+.customer-portal:has(.customer-login) .customer-portal__topbar,
+.customer-portal[data-page="/customer/sign-in"] .customer-portal__topbar {
+    width: 100%;
     max-width: 72rem;
     padding: 1.25rem 1.5rem;
     border-bottom: 0;
     margin: 0 auto;
+    flex-shrink: 0;
 }
-.customer-portal:has(.customer-login) .customer-portal__brand::before { display: none; }
-.customer-portal:has(.customer-login) .customer-portal__brand:not(:has(img))::before { display: block; height: 2rem; width: 0.5rem; }
-.customer-portal:has(.customer-login) .customer-portal__languages a { min-width: 36px; min-height: 36px; }
+.customer-portal:has(.customer-login) .customer-portal__brand::before,
+.customer-portal[data-page="/customer/sign-in"] .customer-portal__brand::before { display: none; }
+.customer-portal:has(.customer-login) .customer-portal__brand:not(:has(img))::before,
+.customer-portal[data-page="/customer/sign-in"] .customer-portal__brand:not(:has(img))::before { display: block; height: 2rem; width: 0.5rem; }
+.customer-portal:has(.customer-login) .customer-portal__languages a,
+.customer-portal[data-page="/customer/sign-in"] .customer-portal__languages a { min-width: 36px; min-height: 36px; }
 
 .customer-portal:has(.customer-login) .customer-portal__main,
 .customer-portal__main:has(.customer-login),
 .customer-portal[data-page="/customer/sign-in"] .customer-portal__main {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
     max-width: 64rem;
-    margin: 1.5rem auto 2.5rem;
+    margin: auto auto;
+    padding: 1rem 1rem 3.5rem;
     background: transparent !important;
     border: none !important;
     border-radius: 0 !important;
