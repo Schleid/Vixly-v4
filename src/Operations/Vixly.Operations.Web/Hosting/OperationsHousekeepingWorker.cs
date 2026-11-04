@@ -33,8 +33,12 @@ public sealed class OperationsHousekeepingWorker : BackgroundService
 
     private readonly ILogger<OperationsHousekeepingWorker> _logger;
 
-    public OperationsHousekeepingWorker(IServiceScopeFactory scopes, TimeProvider timeProvider, ILogger<OperationsHousekeepingWorker> logger)
+    // P-5: the jobs of a site start one after another.
+    private readonly Vixly.Shared.Hosting.Jobs.VixlyJobStagger _stagger;
+
+    public OperationsHousekeepingWorker(IServiceScopeFactory scopes, TimeProvider timeProvider, ILogger<OperationsHousekeepingWorker> logger, Vixly.Shared.Hosting.Jobs.VixlyJobStagger stagger)
     {
+        _stagger = stagger ?? throw new ArgumentNullException(nameof(stagger));
         _scopes = scopes ?? throw new ArgumentNullException(nameof(scopes));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -102,6 +106,9 @@ public sealed class OperationsHousekeepingWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        // P-5 (owner, 2026-11-04): not every job at the same moment as the first visitor after a start-up.
+        await _stagger.WaitTurnAsync(stoppingToken);
+
         using PeriodicTimer timer = new(Interval);
 
         do

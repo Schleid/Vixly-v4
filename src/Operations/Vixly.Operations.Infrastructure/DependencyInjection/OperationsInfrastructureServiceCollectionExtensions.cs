@@ -205,6 +205,8 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddSingleton<IOperationsDeviceClient, OperationsDeviceClient>();
         services.AddSingleton<IOperationsLegalClient, OperationsLegalClient>();
         services.AddSingleton<IOperationsCompanyClient, OperationsCompanyClient>();
+        // P-4: kept answers from Platform are served while one background call refreshes them.
+        services.AddSingleton<OperationsStaleWhileRefresh>();
         services.AddSingleton<IOperationsPlanFeatures, OperationsPlanFeaturesClient>();
         services.AddSingleton<IOperationsUsageReporter, OperationsUsageReporter>();
         services.AddScoped<CompleteOperationsSecondFactorResetUseCase>();

@@ -35,11 +35,15 @@ internal sealed class OperationsRoleRepository : IOperationsRoleRepository
     public Task<OperationsRole?> FindAdministratorAsync(CancellationToken cancellationToken) =>
         _context.Roles.FirstOrDefaultAsync(role => role.IsAdministrator, cancellationToken);
 
-    public async Task<IReadOnlyList<OperationsRole>> ListAsync(CancellationToken cancellationToken) =>
-        await _context.Roles.OrderByDescending(role => role.IsAdministrator).ThenBy(role => role.Name).ToListAsync(cancellationToken);
+    // P-3: kept for the rest of the request (forgotten at the next save).
+    public Task<IReadOnlyList<OperationsRole>> ListAsync(CancellationToken cancellationToken) =>
+        _context.RememberAsync<IReadOnlyList<OperationsRole>>("roles", async () =>
+            await _context.Roles.OrderByDescending(role => role.IsAdministrator).ThenBy(role => role.Name).ToListAsync(cancellationToken));
 
-    public async Task<IReadOnlyList<OperationsRoleGrant>> ListGrantsAsync(Guid userId, CancellationToken cancellationToken) =>
-        await _context.RoleGrants.Where(grant => grant.UserId == userId).OrderByDescending(grant => grant.GrantedUtc).ToListAsync(cancellationToken);
+    // P-3: the signed-in person's grants, read once per request (forgotten at the next save).
+    public Task<IReadOnlyList<OperationsRoleGrant>> ListGrantsAsync(Guid userId, CancellationToken cancellationToken) =>
+        _context.RememberAsync<IReadOnlyList<OperationsRoleGrant>>("grants:" + userId.ToString("N"), async () =>
+            await _context.RoleGrants.Where(grant => grant.UserId == userId).OrderByDescending(grant => grant.GrantedUtc).ToListAsync(cancellationToken));
 
     public async Task<IReadOnlyList<OperationsRoleGrant>> ListActiveGrantsAsync(CancellationToken cancellationToken) =>
         await _context.RoleGrants.Where(grant => grant.RevokedUtc == null).ToListAsync(cancellationToken);

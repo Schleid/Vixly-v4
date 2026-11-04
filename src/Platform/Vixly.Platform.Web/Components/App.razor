@@ -15,6 +15,10 @@ IMPORTANT NOTES:
 - Signed in: the idle warning with its countdown and the sign-out
   form live outside the interactive tree, so a re-render never
   removes them (keepalive.js; owner, 2026-10-25)
+- Harmonization H-8 (owner, 2026-11-04): signed-in pages render once,
+  in the live connection, without the first render on the server that
+  loaded every page's data twice. Sign-in and help pages keep it (help
+  answers a hidden or unknown article with a real 404)
 =========================================================
 *@
 @inject IStringLocalizer<PlatformText> T
@@ -30,12 +34,12 @@ IMPORTANT NOTES:
     <script src="@Assets["js/control-theme.js"]?v=20261103-2"></script>
     <link rel="stylesheet" href="@Assets["_content/Vixly.Shared.UI/vixly-theme.css"]" />
     <link rel="stylesheet" href="@Assets["_content/Vixly.Shared.UI/vixly-primitives.css"]" />
-    <link rel="stylesheet" href="@Assets["css/vixly.css"]?v=20261103-2" />
+    <link rel="stylesheet" href="@Assets["css/vixly.css"]?v=20261104-1" />
     <link rel="stylesheet" href="@Assets["Vixly.Platform.Web.styles.css"]" />
-    <HeadOutlet @rendermode="InteractiveServer" />
+    <HeadOutlet @rendermode="PageRenderMode" />
 </head>
 <body data-idle-warn="@(SignedIn ? WarnSeconds : null)" data-idle-end="@(SignedIn ? EndSeconds : null)">
-    <Routes @rendermode="InteractiveServer" ClientIp="@HttpContext?.Connection.RemoteIpAddress?.ToString()" UserAgent="@HttpContext?.Request.Headers.UserAgent.ToString()" CorrelationId="@HttpContext?.TraceIdentifier" Country="@Vixly.Shared.Hosting.VixlyClientCountry.Of(HttpContext)" />
+    <Routes @rendermode="PageRenderMode" ClientIp="@HttpContext?.Connection.RemoteIpAddress?.ToString()" UserAgent="@HttpContext?.Request.Headers.UserAgent.ToString()" CorrelationId="@HttpContext?.TraceIdentifier" Country="@Vixly.Shared.Hosting.VixlyClientCountry.Of(HttpContext)" />
     @if (SignedIn)
     {
         <div class="vx-idle" role="alertdialog" aria-labelledby="vx-idle-text" data-idle-warning hidden>
@@ -43,7 +47,7 @@ IMPORTANT NOTES:
             <p class="vx-idle__time">@T["ui.session.time_left"] <strong data-idle-countdown aria-live="off">1:00</strong></p>
             <button type="button" class="vx-button vx-button--primary" data-idle-stay>@T["ui.session.stay"]</button>
         </div>
-        <form method="post" action="/sign-out" data-sign-out data-enhance="false" hidden><AntiforgeryToken /></form>
+        <form id="vx-sign-out" method="post" action="/sign-out" data-sign-out data-enhance="false" hidden><AntiforgeryToken /></form>
     }
     <script src="@Assets["_framework/blazor.web.js"]"></script>
     <script src="@Assets["js/keepalive.js"]"></script>
@@ -58,6 +62,12 @@ IMPORTANT NOTES:
     private HttpContext? HttpContext { get; set; }
 
     private bool SignedIn => HttpContext?.User.Identity?.IsAuthenticated == true;
+
+    // H-8: live only, no first render on the server, for signed-in pages other than help.
+    private static readonly IComponentRenderMode LiveOnly = new InteractiveServerRenderMode(prerender: false);
+
+    private IComponentRenderMode PageRenderMode =>
+        SignedIn && HttpContext?.Request.Path.StartsWithSegments("/help") != true ? LiveOnly : RenderMode.InteractiveServer;
 
     // The server's idle limit and the warning before it: set by the security administrator (owner, 2026-10-27; it was 5 minutes and 1).
     private string EndSeconds { get; set; } = "300";

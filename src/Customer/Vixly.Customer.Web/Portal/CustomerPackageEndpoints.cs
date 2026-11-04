@@ -205,7 +205,11 @@ public static class CustomerPackageEndpoints
             return Results.Redirect("/customer/sign-in");
         }
 
-        CustomerCall<CustomerShipmentChoicesDto> choices = await api.GetShipmentChoicesAsync(signedIn.Tenant, signedIn.Session, http, http.RequestAborted);
+        // Harmonization H-6: side by side; Operations checks the session on each.
+        Task<CustomerCall<CustomerShipmentChoicesDto>> choicesCall = api.GetShipmentChoicesAsync(signedIn.Tenant, signedIn.Session, http, http.RequestAborted);
+        Task<CustomerCall<CustomerPackagesDto>> packagesCall = api.ListPackagesAsync(signedIn.Tenant, signedIn.Session, http, http.RequestAborted);
+        await Task.WhenAll(choicesCall, packagesCall);
+        CustomerCall<CustomerShipmentChoicesDto> choices = choicesCall.Result;
 
         if (choices.ErrorCode == "ops.customers.session_required")
         {
@@ -213,7 +217,7 @@ public static class CustomerPackageEndpoints
             return Results.Redirect("/customer/sign-in");
         }
 
-        CustomerPackagesDto? packages = (await api.ListPackagesAsync(signedIn.Tenant, signedIn.Session, http, http.RequestAborted)).Value;
+        CustomerPackagesDto? packages = packagesCall.Result.Value;
 
         return Page<PreAlertFormPage>(new
         {

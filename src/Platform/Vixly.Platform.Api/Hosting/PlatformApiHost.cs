@@ -52,6 +52,8 @@ public static class PlatformApiHost
 
         builder.Services.AddPlatformInfrastructure(builder.Configuration, "Vixly.V4.Platform.Api");
         builder.Services.AddVixlyKeyRingEncryption(builder.Configuration);
+        // Performance plan P-1 (owner, 2026-11-04): SQL commands and outgoing calls per request; slow requests logged.
+        Vixly.Shared.Hosting.Diagnostics.VixlyRequestTiming.AddVixlyRequestTiming(builder.Services, builder.Configuration);
         builder.Services.AddPlatformApplication();
         builder.Services.AddVixlyForwardedHeaders(builder.Configuration);
         builder.Services.AddHttpContextAccessor();
@@ -73,6 +75,7 @@ public static class PlatformApiHost
         WebApplication app = builder.Build();
 
         app.UseVixlyForwardedHeaders();
+        Vixly.Shared.Hosting.Diagnostics.VixlyRequestTiming.UseVixlyRequestTiming(app);
         app.UseVixlySecurityHeaders();
         app.UseExceptionHandler(errors => errors.Run(context =>
         {

@@ -189,12 +189,13 @@ No connection or network health values are simulated.
                             <span class="vx-user-card__name">@(context.User.Identity?.Name ?? "Admin")</span>
                             <span class="vx-user-card__role">@T["ui.control.workspace"]</span>
                         </div>
-                        <form method="post" action="/sign-out" data-enhance="false" class="vx-user-card__signout">
-                            <AntiforgeryToken />
-                            <button type="submit" class="vx-user-card__signout-btn" title="@T["ui.signout"]" aria-label="@T["ui.signout"]">
+                        @* H-8 (review, 2026-11-04): the button sends the page's own sign-out form (App.razor), whose token the server writes;
+                           this part of the page renders only in the live connection. *@
+                        <div class="vx-user-card__signout">
+                            <button type="submit" form="vx-sign-out" class="vx-user-card__signout-btn" title="@T["ui.signout"]" aria-label="@T["ui.signout"]">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                             </button>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </Authorized>

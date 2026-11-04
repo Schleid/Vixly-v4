@@ -44,7 +44,11 @@ public static class CustomerInvoiceEndpoints
                 return Results.Redirect("/customer/sign-in");
             }
 
-            CustomerCall<CustomerInvoicesDto> call = await api.ListInvoicesAsync(tenant, session, http, http.RequestAborted);
+            // Harmonization H-6: the two calls side by side; Operations checks the session on each.
+            Task<CustomerCall<CustomerInvoicesDto>> invoices = api.ListInvoicesAsync(tenant, session, http, http.RequestAborted);
+            Task<CustomerCall<CustomerCreditAccountDto>> creditCall = api.GetCreditAccountAsync(tenant, session, http, http.RequestAborted);
+            await Task.WhenAll(invoices, creditCall);
+            CustomerCall<CustomerInvoicesDto> call = invoices.Result;
 
             if (call.ErrorCode == "ops.customers.session_required")
             {
@@ -52,7 +56,7 @@ public static class CustomerInvoiceEndpoints
                 return Results.Redirect("/customer/sign-in");
             }
 
-            CustomerCall<CustomerCreditAccountDto> credit = await api.GetCreditAccountAsync(tenant, session, http, http.RequestAborted);
+            CustomerCall<CustomerCreditAccountDto> credit = creditCall.Result;
 
             return new RazorComponentResult<InvoicesPage>(new
             {

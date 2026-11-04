@@ -47,6 +47,8 @@ public static class PublicSiteHost
         builder.Services.AddLocalization();
         builder.Services.AddRazorComponents();
         builder.Services.AddHttpContextAccessor();
+        // Performance plan P-1 (owner, 2026-11-04): outgoing calls per request; slow requests logged. Never the timing header here.
+        Vixly.Shared.Hosting.Diagnostics.VixlyRequestTiming.AddVixlyRequestTiming(builder.Services, builder.Configuration);
         builder.Services.AddMemoryCache();
         builder.Services.AddOutputCache(options => options.AddPolicy("public-help", PublicHelpCachePolicy.Instance));
         builder.Services.AddSingleton<PublicHelpCatalogue>();
@@ -92,6 +94,7 @@ public static class PublicSiteHost
         }
 
         app.UseVixlyForwardedHeaders();
+        Vixly.Shared.Hosting.Diagnostics.VixlyRequestTiming.UseVixlyRequestTiming(app);
         app.UseVixlySecurityHeaders(ContentSecurityPolicy(site));
 
         if (!app.Environment.IsDevelopment())

@@ -87,7 +87,7 @@ public sealed class GetOperationsRepackBoxLabelUseCase
         string? weight = box.WeightKg is { } kg
             ? OperationsUnits.ToShownWeight(kg, settings.WeightUnit).ToString("0.##", CultureInfo.InvariantCulture) + (settings.WeightUnit == OperationsWeightUnit.Pound ? " lb" : " kg")
             : null;
-        OperationsRepackBoxLabel label = new((await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty, box.Number, shipment.Number, warehouse.Code,
+        OperationsRepackBoxLabel label = new((await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty, box.Number, shipment.Number, warehouse.Code,
             destination?.Code ?? shipment.DestinationCountryCode ?? string.Empty, shipment.ServiceCode, shipment.RecipientName ?? string.Empty, box.ParcelCount, weight);
         return GetOperationsRepackBoxLabelResponse.Success(_renderer.RenderRepackBoxLabel(label), box.Number);
     }

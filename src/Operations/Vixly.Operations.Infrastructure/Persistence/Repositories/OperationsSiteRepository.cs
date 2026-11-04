@@ -29,9 +29,10 @@ internal sealed class OperationsSiteRepository : IOperationsSiteRepository
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
     }
 
+    // P-3: read once per request (forgotten at the next save).
     public Task<OperationsTenantBrand?> FindBrandAsync(CancellationToken cancellationToken)
     {
-        return _context.TenantBrands.FirstOrDefaultAsync(cancellationToken);
+        return _context.RememberAsync("brand", () => _context.TenantBrands.FirstOrDefaultAsync(cancellationToken));
     }
 
     public void AddImage(OperationsSiteImage image)

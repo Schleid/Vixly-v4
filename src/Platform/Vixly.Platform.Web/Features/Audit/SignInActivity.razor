@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: SignInActivity.razor
 
@@ -23,7 +23,12 @@ IMPORTANT NOTES:
 
 @if (UserId is not null)
 {
-    <VxMessage Type="VxMessageType.Info">@T["ui.activity.filtered"] <a href="/activity">@T["ui.activity.everyone"]</a></VxMessage>
+    <div class="vx-activity-filter-bar">
+        <VxMessage Type="VxMessageType.Info">
+            <span>@T["ui.activity.filtered"]</span>
+            <a href="/activity" class="vx-activity-filter-reset">@T["ui.activity.everyone"]</a>
+        </VxMessage>
+    </div>
 }
 @if (Presenter.State.Error is not null)
 {
@@ -42,19 +47,19 @@ else
             <th scope="col">@T["ui.activity.system"]</th>
         </HeaderContent>
         <RowTemplate Context="signIn">
-            <td><a href="/activity?user=@signIn.PlatformUserId">@signIn.UserName</a></td>
-            <td>@PlatformDisplay.Utc(T, signIn.SignedInUtc)</td>
+            <td><a href="/activity?user=@signIn.PlatformUserId" class="vx-activity-user-link">@signIn.UserName</a></td>
+            <td><span class="vx-activity-mono">@PlatformDisplay.Utc(T, signIn.SignedInUtc)</span></td>
             <td>
                 @if (signIn.SignedOutUtc is { } signedOut)
                 {
-                    @PlatformDisplay.Utc(T, signedOut) <span class="vx-hint">@T["ui.activity.ended." + signIn.Ended]</span>
+                    <span class="vx-activity-mono">@PlatformDisplay.Utc(T, signedOut)</span> <span class="vx-hint">@T["ui.activity.ended." + signIn.Ended]</span>
                 }
                 else
                 {
                     <VxStatusBadge Status="VxBadgeStatus.Active" Text="@T["ui.activity.still_signed_in"]" />
                 }
             </td>
-            <td>@(signIn.IpAddress ?? "-")</td>
+            <td>@if (signIn.IpAddress is { } ip) { <code class="vx-activity-ip">@ip</code> } else { @("-") }</td>
             <td>@(signIn.Country switch { null => "-", "T1" => T["ui.activity.country.tor"].Value, "XX" => T["ui.activity.country.unknown"].Value, string code => code })</td>
             <td>@(VixlyUserAgents.Browser(signIn.UserAgent) ?? "-")</td>
             <td>@(VixlyUserAgents.System(signIn.UserAgent) ?? "-")</td>

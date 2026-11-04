@@ -90,9 +90,10 @@ public sealed class PlatformSessionValidator
             return null;
         }
 
-        PlatformUser? user = await _users.GetAsync(session.PlatformUserId, cancellationToken);
+        // Harmonization H-10: the same rule (an unknown or inactive account ends the session), from a small read.
+        PlatformSessionFacts? user = await _users.FindSessionFactsAsync(session.PlatformUserId, cancellationToken);
 
-        if (user is null || !user.Account.IsActive)
+        if (user is null || !user.IsActive)
         {
             session.End(PlatformSessionEndReason.AccountRestricted, utcNow);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -105,9 +106,9 @@ public sealed class PlatformSessionValidator
         }
 
         return new PlatformValidatedSession(
-            new PlatformAuthorizationContext(user.Id, user.AuthorityLevel, session.Id),
+            new PlatformAuthorizationContext(user.PlatformUserId, user.AuthorityLevel, session.Id),
             $"{user.FirstName} {user.LastName}",
-            user.PreferredLanguage.Value);
+            user.PreferredLanguage);
     }
 
     public async Task<bool> IsStillValidAsync(Guid sessionId, CancellationToken cancellationToken)
@@ -119,9 +120,9 @@ public sealed class PlatformSessionValidator
             return false;
         }
 
-        PlatformUser? user = await _users.GetAsync(session.PlatformUserId, cancellationToken);
+        PlatformSessionFacts? user = await _users.FindSessionFactsAsync(session.PlatformUserId, cancellationToken);
 
-        return user is not null && user.Account.IsActive;
+        return user is not null && user.IsActive;
     }
 
     public async Task<PlatformIdleTimes> IdleTimesAsync(CancellationToken cancellationToken) =>

@@ -155,7 +155,7 @@ public sealed class OperationsInvoicing
         string language = customer.PreferredLanguage.Value;
         // Owner, 2026-10-29 (B-4): the legal identity of the warehouse's branch, when the branch has one; else the company's.
         OperationsBranch? branch = await _locations.GetBranchAsync(warehouse.BranchId, cancellationToken);
-        OperationsInvoiceParty party = new(branch?.LegalName ?? (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty, branch?.TaxNumber ?? settings.TaxNumber,
+        OperationsInvoiceParty party = new(branch?.LegalName ?? (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty, branch?.TaxNumber ?? settings.TaxNumber,
             warehouse.Name, customer.Code, customer.FirstName + " " + customer.LastName, customer.CompanyName, customer.Phone, customer.Email.Value);
         OperationsInvoiceDraft draft = new(kind, customer.Id, warehouse.Id, shipmentId, saleId, reference, route, serviceCode, currencyCode, language, party, lines, settings.TaxName,
             settings.TaxPerKind, settings.TaxRates, Note(settings.InvoiceNote(language), branch?.LegalNotes)) { PayAtDestination = payAtDestination };

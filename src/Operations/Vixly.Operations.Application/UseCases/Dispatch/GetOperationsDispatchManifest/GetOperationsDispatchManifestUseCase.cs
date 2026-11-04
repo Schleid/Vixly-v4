@@ -88,7 +88,7 @@ public sealed class GetOperationsDispatchManifestUseCase
             (await _dispatches.ListDispatchBundlesAsync(dispatch.Id, cancellationToken)).OrderBy(bundle => bundle.Number, StringComparer.Ordinal).ToList(), cancellationToken);
 
         OperationsWarehouse? destination = dispatch.DestinationWarehouseId is { } destinationId ? await _locations.GetWarehouseAsync(destinationId, cancellationToken) : null;
-        OperationsDispatchManifest manifest = new((await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty, dispatch.Number, warehouses.First(item => item.Id == dispatch.WarehouseId).Code,
+        OperationsDispatchManifest manifest = new((await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty, dispatch.Number, warehouses.First(item => item.Id == dispatch.WarehouseId).Code,
             destination?.Code ?? dispatch.DestinationCountryCode, dispatch.ServiceCode, dispatch.Status == OperationsDispatchStatus.Planned, dispatch.CutoffUtc,
             dispatch.Legs.OrderBy(leg => leg.Sequence).Select(leg => new OperationsManifestLeg(leg.Sequence, OperationsDispatching.Mode(leg.Kind), leg.CarrierId is { } id ? carriers.GetValueOrDefault(id) : null,
                 leg.From, leg.To, leg.Reference, leg.DepartedUtc ?? leg.ScheduledDepartureUtc, leg.ArrivedUtc ?? leg.ScheduledArrivalUtc)).ToList(),

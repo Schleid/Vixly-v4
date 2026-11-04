@@ -53,7 +53,7 @@ public sealed class OperationsShipmentCapHandler : IOperationsOutboxHandler
             return;
         }
 
-        string company = (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty;
+        string company = (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty;
         string price = notice.ExtraShipmentPrice.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) + " " + (notice.CurrencyCode ?? string.Empty);
         string link = _links.Page(account.Slug, "/staff/billing");
 

@@ -42,12 +42,17 @@ public sealed class PlatformSubscriptionClockWorker : BackgroundService
 
     private readonly ILogger<PlatformSubscriptionClockWorker> _logger;
 
+    // P-5: the jobs of a site start one after another.
+    private readonly Vixly.Shared.Hosting.Jobs.VixlyJobStagger _stagger;
+
     public PlatformSubscriptionClockWorker(
         IServiceScopeFactory scopes,
         IOptions<PlatformSubscriptionClockOptions> options,
         TimeProvider timeProvider,
-        ILogger<PlatformSubscriptionClockWorker> logger)
+        ILogger<PlatformSubscriptionClockWorker> logger,
+        Vixly.Shared.Hosting.Jobs.VixlyJobStagger stagger)
     {
+        _stagger = stagger ?? throw new ArgumentNullException(nameof(stagger));
         _scopes = scopes ?? throw new ArgumentNullException(nameof(scopes));
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
@@ -60,6 +65,9 @@ public sealed class PlatformSubscriptionClockWorker : BackgroundService
         {
             return;
         }
+
+        // P-5 (owner, 2026-11-04): not every job at the same moment as the first visitor after a start-up.
+        await _stagger.WaitTurnAsync(stoppingToken);
 
         using PeriodicTimer timer = new(TimeSpan.FromMinutes(Math.Max(1, _options.IntervalMinutes)));
 

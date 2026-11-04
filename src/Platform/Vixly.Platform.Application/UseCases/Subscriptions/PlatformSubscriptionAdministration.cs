@@ -149,7 +149,12 @@ public sealed class PlatformSubscriptionAdministration
     {
         ArgumentNullException.ThrowIfNull(version);
 
-        IReadOnlyList<PlatformTenantLimitOverride> open = await _overrides.ListOpenAsync(platformTenantId, cancellationToken);
+        return MaxLicences(await _overrides.ListOpenAsync(platformTenantId, cancellationToken), version);
+    }
+
+    // The licence ceiling from the company's open overrides, already read (harmonization H-11: once for every plan offered).
+    private int MaxLicences(IReadOnlyList<PlatformTenantLimitOverride> open, PlatformPlanVersion version)
+    {
         PlatformTenantLimitOverride? devices = open.FirstOrDefault(item =>
             item.Kind == PlatformPlanLimitKind.MaxLicensedDevices && item.AppliesAt(UtcNow));
 
@@ -197,17 +202,19 @@ public sealed class PlatformSubscriptionAdministration
         bool publicOnly = false)
     {
         IReadOnlyList<PlatformPlan> plans = await _plans.ListChoosableAsync(publicOnly, cancellationToken);
-        List<PlatformPlanOption> options = new();
 
-        foreach (PlatformPlan plan in plans)
-        {
-            options.Add(await OptionAsync(platformTenantId, plan, language, cancellationToken));
-        }
-
-        return options;
+        // Harmonization H-11 (owner, 2026-11-04): the company's overrides read once, not once per plan.
+        IReadOnlyList<PlatformTenantLimitOverride> open = plans.Count == 0 ? Array.Empty<PlatformTenantLimitOverride>() : await _overrides.ListOpenAsync(platformTenantId, cancellationToken);
+        return plans.Select(plan => Option(plan, language, open)).ToList();
     }
 
     public async Task<PlatformPlanOption> OptionAsync(Guid platformTenantId, PlatformPlan plan, LanguageCode language, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(plan);
+        return Option(plan, language, await _overrides.ListOpenAsync(platformTenantId, cancellationToken));
+    }
+
+    private PlatformPlanOption Option(PlatformPlan plan, LanguageCode language, IReadOnlyList<PlatformTenantLimitOverride> open)
     {
         ArgumentNullException.ThrowIfNull(plan);
 
@@ -222,7 +229,7 @@ public sealed class PlatformSubscriptionAdministration
             version.AnnualPricePerLicence,
             version.SetupFee,
             version.MinimumLicences,
-            await MaxLicencesAsync(platformTenantId, version, cancellationToken),
+            MaxLicences(open, version),
             version.TrialDays);
     }
 

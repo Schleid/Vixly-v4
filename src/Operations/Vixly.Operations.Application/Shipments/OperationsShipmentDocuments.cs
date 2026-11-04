@@ -136,7 +136,7 @@ public sealed class OperationsShipmentDocuments
 
         return new OperationsShipmentDocument(
             kind,
-            (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty,
+            (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty,
             shipment.Number!,
             OperationsTimeZones.Today(_timeProvider.GetUtcNow(), settings?.TimeZone),
             origin is null ? string.Empty : origin.Code + " · " + origin.Address.City + ", " + origin.Address.CountryCode,

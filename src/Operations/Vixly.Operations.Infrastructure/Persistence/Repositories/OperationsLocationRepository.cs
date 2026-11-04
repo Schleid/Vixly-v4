@@ -37,8 +37,11 @@ internal sealed class OperationsLocationRepository : IOperationsLocationReposito
     public Task<OperationsBranch?> GetBranchAsync(Guid branchId, CancellationToken cancellationToken) =>
         _context.Branches.FirstOrDefaultAsync(item => item.Id == branchId, cancellationToken);
 
+    // Harmonization H-5: answered from the warehouses this request already read, else read once per request (forgotten at the next save).
     public Task<OperationsWarehouse?> GetWarehouseAsync(Guid warehouseId, CancellationToken cancellationToken) =>
-        _context.Warehouses.FirstOrDefaultAsync(item => item.Id == warehouseId, cancellationToken);
+        _context.TryRemembered("warehouses", out IReadOnlyList<OperationsWarehouse> all)
+            ? Task.FromResult(all.FirstOrDefault(item => item.Id == warehouseId))
+            : _context.RememberAsync("warehouse:" + warehouseId.ToString("N"), () => _context.Warehouses.FirstOrDefaultAsync(item => item.Id == warehouseId, cancellationToken));
 
     public Task<OperationsCountryContact?> GetContactAsync(Guid contactId, CancellationToken cancellationToken) =>
         _context.CountryContacts.FirstOrDefaultAsync(item => item.Id == contactId, cancellationToken);
@@ -46,8 +49,9 @@ internal sealed class OperationsLocationRepository : IOperationsLocationReposito
     public async Task<IReadOnlyList<OperationsBranch>> ListBranchesAsync(CancellationToken cancellationToken) =>
         await _context.Branches.OrderBy(item => item.Code).ToListAsync(cancellationToken);
 
-    public async Task<IReadOnlyList<OperationsWarehouse>> ListWarehousesAsync(CancellationToken cancellationToken) =>
-        await _context.Warehouses.OrderBy(item => item.Code).ToListAsync(cancellationToken);
+    // P-3: read once per request (forgotten at the next save).
+    public Task<IReadOnlyList<OperationsWarehouse>> ListWarehousesAsync(CancellationToken cancellationToken) =>
+        _context.RememberAsync<IReadOnlyList<OperationsWarehouse>>("warehouses", async () => await _context.Warehouses.OrderBy(item => item.Code).ToListAsync(cancellationToken));
 
     public async Task<IReadOnlyList<OperationsCountryContact>> ListContactsAsync(CancellationToken cancellationToken) =>
         await _context.CountryContacts.OrderBy(item => item.SortOrder).ThenBy(item => item.CountryCode).ToListAsync(cancellationToken);

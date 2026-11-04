@@ -20,10 +20,19 @@ namespace Vixly.Platform.Infrastructure.Security;
 // IMPORTANT NOTES:
 // - Two small no-tracking queries, both on indexed columns;
 //   no entity is materialised
+// - Harmonization H-9 (owner, 2026-11-04): one read per action. The
+//   answer is reused only by the same action of the same person (the
+//   context's action stamp moves at each new action and each save),
+//   and never after 5 seconds; every new action reads afresh, so a
+//   removed right applies from the next action, as before
 // =========================================================
 internal sealed class PlatformPermissionReader : IPlatformPermissionReader
 {
+    private static readonly TimeSpan KeptAtMost = TimeSpan.FromSeconds(5);
+
     private readonly PlatformDbContext _context;
+
+    private (Guid UserId, long Action, DateTimeOffset ReadAt, PlatformPermissionSnapshot? Snapshot)? _kept;
 
     public PlatformPermissionReader(PlatformDbContext context)
     {
@@ -34,6 +43,21 @@ internal sealed class PlatformPermissionReader : IPlatformPermissionReader
         Guid platformUserId,
         DateTimeOffset utcNow,
         CancellationToken cancellationToken)
+    {
+        if (_kept is { } kept && kept.UserId == platformUserId && kept.Action == _context.ActionStamp
+            && utcNow >= kept.ReadAt && utcNow - kept.ReadAt < KeptAtMost)
+        {
+            return kept.Snapshot;
+        }
+
+        // The action is the one the read started in (review, 2026-11-04): a new action begun meanwhile reads again.
+        long action = _context.ActionStamp;
+        PlatformPermissionSnapshot? snapshot = await ReadNowAsync(platformUserId, utcNow, cancellationToken);
+        _kept = (platformUserId, action, utcNow, snapshot);
+        return snapshot;
+    }
+
+    private async Task<PlatformPermissionSnapshot?> ReadNowAsync(Guid platformUserId, DateTimeOffset utcNow, CancellationToken cancellationToken)
     {
         var user = await _context.Users
             .AsNoTracking()

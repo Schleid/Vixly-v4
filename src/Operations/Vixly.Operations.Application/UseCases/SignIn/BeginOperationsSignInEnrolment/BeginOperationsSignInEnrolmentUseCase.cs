@@ -58,7 +58,7 @@ public sealed class BeginOperationsSignInEnrolmentUseCase
         }
 
         // The app shows the tenant name as the issuer, never the product (ADR-0012 W-1).
-        string issuer = (await _brands.FindAsync(cancellationToken))?.DisplayName ?? found.User.Email.Value.Split('@')[1];
+        string issuer = (await _brands.FindDisplayNameAsync(cancellationToken)) ?? found.User.Email.Value.Split('@')[1];
         OperationsUserAuthenticatorApp? pendingApp = found.User.AuthenticatorApp;
         OperationsAuthenticatorEnrolment? reopened = pendingApp is { IsConfirmed: false }
             ? _codes.Reopen(pendingApp.EncryptedSecret, issuer, found.User.Email.Value)

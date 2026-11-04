@@ -38,6 +38,21 @@ internal sealed class PlatformUserRepository : IPlatformUserRepository
         return WholeUsers().FirstOrDefaultAsync(user => user.Id == platformUserId, cancellationToken);
     }
 
+    // Harmonization H-10: one small read, not the staff member with roles, departments, passkeys and recovery codes.
+    public async Task<Vixly.Platform.Application.Identity.PlatformSessionFacts?> FindSessionFactsAsync(Guid platformUserId, CancellationToken cancellationToken)
+    {
+        var found = await _context.Users
+            .AsNoTracking()
+            .Where(user => user.Id == platformUserId)
+            .Select(user => new { user.Id, user.Account.Status, user.AuthorityLevel, user.FirstName, user.LastName, user.PreferredLanguage })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return found is null
+            ? null
+            : new Vixly.Platform.Application.Identity.PlatformSessionFacts(found.Id, found.Status == PlatformUserAccountStatus.Active, found.AuthorityLevel,
+                found.FirstName, found.LastName, found.PreferredLanguage.Value);
+    }
+
     public Task<PlatformUser?> FindByEmailAsync(EmailAddress email, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(email);

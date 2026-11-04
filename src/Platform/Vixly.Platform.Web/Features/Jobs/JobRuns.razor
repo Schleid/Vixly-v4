@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: JobRuns.razor
 
@@ -55,21 +55,25 @@ else
         </RowTemplate>
     </VxDataTable>
 
-    <h2>@T["ui.jobs.history"]</h2>
-    <p>
-        @if (Job is not null)
-        {
-            <span>@T["ui.jobs.job." + Job]</span> @(" · ") <a href="@Link(null, FailedOnly, 1)">@T["ui.jobs.all_jobs"]</a> @(" · ")
-        }
-        @if (FailedOnly)
-        {
-            <a href="@Link(Job, false, 1)">@T["ui.jobs.all_runs"]</a>
-        }
-        else
-        {
-            <a href="@Link(Job, true, 1)">@T["ui.jobs.failures_only"]</a>
-        }
-    </p>
+    <div class="vx-jobs-history-bar">
+        <h2 class="vx-jobs-history-title">@T["ui.jobs.history"]</h2>
+        <div class="vx-jobs-filter-group">
+            @if (Job is not null)
+            {
+                <span class="vx-jobs-pill-filter">
+                    <span class="vx-jobs-pill-filter__label">@T["ui.jobs.job." + Job]</span>
+                    <a href="@Link(null, FailedOnly, 1)" class="vx-jobs-pill-filter__remove" title="@T["ui.jobs.all_jobs"]" aria-label="@T["ui.jobs.all_jobs"]">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <span class="vx-visually-hidden">@T["ui.jobs.all_jobs"]</span>
+                    </a>
+                </span>
+            }
+            <nav class="vx-jobs-view-switch" role="group" aria-label="@T["ui.jobs.history"]">
+                <a href="@Link(Job, false, 1)" class="vx-jobs-view-btn @(!FailedOnly ? "is-active" : null)">@T["ui.jobs.all_runs"]</a>
+                <a href="@Link(Job, true, 1)" class="vx-jobs-view-btn @(FailedOnly ? "is-active" : null)">@T["ui.jobs.failures_only"]</a>
+            </nav>
+        </div>
+    </div>
     <VxDataTable Items="Presenter.State.Runs" IsLoading="@(!Presenter.State.Loaded)" Caption="@(Presenter.State.Loaded ? VixlyText.Format(T, "ui.jobs.count", "count", Presenter.State.TotalCount) : null)">
         <HeaderContent>
             <th scope="col">@T["ui.jobs.job"]</th>
@@ -80,9 +84,9 @@ else
         </HeaderContent>
         <RowTemplate Context="run">
             <td><a href="@Link(run.Job, FailedOnly, 1)">@T["ui.jobs.job." + run.Job]</a></td>
-            <td>@PlatformDisplay.Utc(T, run.StartedUtc)</td>
-            <td>@Duration(run)</td>
-            <td>@run.Handled</td>
+            <td><span class="vx-jobs-mono">@PlatformDisplay.Utc(T, run.StartedUtc)</span></td>
+            <td><span class="vx-jobs-mono">@Duration(run)</span></td>
+            <td><span class="vx-jobs-mono">@run.Handled</span></td>
             <td>@Outcome(run)</td>
         </RowTemplate>
         <EmptyContent>

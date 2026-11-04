@@ -27,5 +27,7 @@ internal sealed class OperationsSettingsRepository : IOperationsSettingsReposito
 
     public void Add(OperationsTenantSettings settings) => _context.TenantSettings.Add(settings ?? throw new ArgumentNullException(nameof(settings)));
 
-    public Task<OperationsTenantSettings?> FindAsync(CancellationToken cancellationToken) => _context.TenantSettings.FirstOrDefaultAsync(cancellationToken);
+    // P-3: read once per request (forgotten at the next save).
+    public Task<OperationsTenantSettings?> FindAsync(CancellationToken cancellationToken) =>
+        _context.RememberAsync("settings", () => _context.TenantSettings.FirstOrDefaultAsync(cancellationToken));
 }

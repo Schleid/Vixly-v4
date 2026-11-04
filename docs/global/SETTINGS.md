@@ -101,6 +101,28 @@
 | `PublicSite:KeysPath` | W | Form keys, **outside the site folder**; without it open forms fail after each restart |
 | `PublicSite:SalesEmail` | W | `sales@techcrafters.ltd` |
 
+## Request timing (every site)
+
+Performance plan P-1 (owner, 2026-11-04). Neither is a secret; both are optional.
+
+| Setting | | What it is |
+|---|---|---|
+| `VixlyTiming:SlowRequestMs` | optional | A request slower than this is logged as a warning (`Vixly.Timing`) with its route pattern, its SQL commands and its calls to other sites. Default `1000`; `0` logs none |
+| `VixlyTiming:ShowHeader` | optional | `true` adds a `Server-Timing` header (SQL, calls, total). Only Operations staff pages for owners, and Control for signed-in staff; never the public site, the customer portal or the APIs. Default `false`. Turn on for a measurement, then off |
+
+## Background jobs start (Operations Web and Control)
+
+Performance plan P-5 (owner, 2026-11-04). Neither is a secret; both are optional.
+
+| Setting | | What it is |
+|---|---|---|
+| `VixlyJobs:StartDelaySeconds` | optional | How long after start-up the first background job begins. Default `20` (0 to 600) |
+| `VixlyJobs:SpacingSeconds` | optional | How much later each next job begins. Default `5` (0 to 120). `0` and `0` start every job at once, as before |
+
+## Keeping the sites awake
+
+SmarterASP gives no control over the app pools' idle time-out. An outside uptime monitor calls each site's `/health/live` every 5 minutes (release notes, section 42): `vixly.ltd`, `control.vixly.ltd`, `api.vixly.ltd`, one company address (`galeo.vixly.ltd`) and its `/customer`, and `ops-internal.vixly.ltd`. `/health/live` answers one word and reads nothing.
+
 ## Making a caller key pair
 - **Pairs:** one per caller:
   - Operations → Platform (`operations`);

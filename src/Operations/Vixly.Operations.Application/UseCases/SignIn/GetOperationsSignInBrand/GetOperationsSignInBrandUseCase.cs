@@ -35,7 +35,7 @@ public sealed class GetOperationsSignInBrandUseCase
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(request);
 
-        string? name = (await _brands.FindAsync(cancellationToken))?.DisplayName;
+        string? name = (await _brands.FindDisplayNameAsync(cancellationToken));
 
         return name is null
             ? GetOperationsSignInBrandResponse.Failure(OperationsCommonErrors.NotFound)

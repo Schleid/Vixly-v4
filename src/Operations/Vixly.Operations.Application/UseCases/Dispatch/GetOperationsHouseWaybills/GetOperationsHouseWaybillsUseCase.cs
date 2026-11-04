@@ -90,7 +90,7 @@ public sealed class GetOperationsHouseWaybillsUseCase
         Vixly.Operations.Domain.Settings.OperationsTenantSettings settings = await _settings.FindAsync(cancellationToken)
             ?? Vixly.Operations.Domain.Settings.OperationsTenantSettings.CreateDefault(context.RequiredTenantId, _timeProvider.GetUtcNow());
         Dictionary<Guid, OperationsCarrier> carriers = (await _dispatches.ListCarriersAsync(cancellationToken)).ToDictionary(carrier => carrier.Id);
-        IReadOnlyList<OperationsHouseWaybill> waybills = await _papers.HouseWaybillsAsync(dispatch, request.ShipmentId, (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty, carriers,
+        IReadOnlyList<OperationsHouseWaybill> waybills = await _papers.HouseWaybillsAsync(dispatch, request.ShipmentId, (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty, carriers,
             settings, OperationsTimeZones.Today(dispatch.ClosedUtc ?? _timeProvider.GetUtcNow(), settings.TimeZone), request.ContentsFallback, cancellationToken);
 
         if (waybills.Count == 0)

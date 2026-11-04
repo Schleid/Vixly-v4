@@ -76,7 +76,7 @@ public sealed class GetOperationsRunSheetUseCase
         OperationsTenantSettings settings = await _settings.FindAsync(cancellationToken) ?? OperationsTenantSettings.CreateDefault(context.RequiredTenantId, _timeProvider.GetUtcNow());
         // A partner agent whose partner does not handle money sees no amounts (R-8), on paper too.
         bool money = access!.HandlesMoneyAt(view.Warehouse);
-        OperationsRunSheet sheet = new((await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty, view.Route.Number, view.Warehouse.Name, view.Route.ServiceDate,
+        OperationsRunSheet sheet = new((await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty, view.Route.Number, view.Warehouse.Name, view.Route.ServiceDate,
             view.Route.DriverName, (await _desk.StopRowsAsync(view, settings, cancellationToken)).Select(stop => money ? stop : stop with { Due = 0m }).ToList(),
             settings.DeliveryProofs, settings.CurrencyCode);
         return GetOperationsRunSheetResponse.Success(_renderer.RenderRunSheet(sheet), view.Route.Number);

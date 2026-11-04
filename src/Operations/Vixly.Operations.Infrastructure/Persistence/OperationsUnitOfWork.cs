@@ -42,6 +42,7 @@ internal sealed class OperationsUnitOfWork : IOperationsUnitOfWork
         catch (DbUpdateException exception) when (exception.InnerException is SqlException { Number: 2601 or 2627 })
         {
             _context.ChangeTracker.Clear();
+            _context.Forget();
             return false;
         }
     }
@@ -75,5 +76,6 @@ internal sealed class OperationsUnitOfWork : IOperationsUnitOfWork
     public void DiscardChanges()
     {
         _context.ChangeTracker.Clear();
+        _context.Forget();
     }
 }

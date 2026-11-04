@@ -34,7 +34,9 @@ internal sealed class OperationsUserRepository : IOperationsUserRepository
 
     public Task<OperationsUser?> GetAsync(Guid userId, CancellationToken cancellationToken)
     {
-        return _context.Users.FirstOrDefaultAsync(user => user.Id == userId, cancellationToken);
+        // P-3: the signed-in person is looked up several times per page; once is enough.
+        // Harmonization H-2: one command (the person, the account, the authenticator app and at most 10 recovery codes), not a split query.
+        return _context.RememberAsync("user:" + userId.ToString("N"), () => _context.Users.AsSingleQuery().FirstOrDefaultAsync(user => user.Id == userId, cancellationToken));
     }
 
     public Task<OperationsUser?> FindByEmailAsync(EmailAddress email, CancellationToken cancellationToken)

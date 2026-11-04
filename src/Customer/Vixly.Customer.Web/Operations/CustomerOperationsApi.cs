@@ -2,6 +2,7 @@
 using System.Net.Http.Json;
 using System.Net;
 using Microsoft.Extensions.Caching.Memory;
+using Vixly.Shared.Hosting.Caching;
 using Vixly.Contracts.Operations.Common;
 using Vixly.Contracts.Operations.Customers;
 using Vixly.Contracts.Operations.Internal;
@@ -16,7 +17,8 @@ namespace Vixly.Customer.Web.Operations;
 // Calls Operations.Api for Customer.Web (Stage 3, Slice 0, D-F4).
 //
 // RESPONSIBILITIES:
-// - Ask which tenant a host name belongs to (cached 60 seconds)
+// - Ask which tenant a host name belongs to (cached 60 seconds: it decides whether a company is live or suspended, so it is never served older)
+// - The brand: kept 60 seconds, then served while one background call refreshes it (harmonization H-7)
 //
 // IMPORTANT NOTES:
 // - Every call carries a fresh signed token
@@ -36,12 +38,16 @@ public sealed class CustomerOperationsApi
 
     private readonly ILogger<CustomerOperationsApi> _logger;
 
-    public CustomerOperationsApi(IHttpClientFactory http, CustomerCallerSigner signer, IMemoryCache cache, ILogger<CustomerOperationsApi> logger)
+    // H-7 (owner, 2026-11-04): the brand is served while one background call refreshes it, never past 10 minutes.
+    private readonly VixlyStaleWhileRefresh _fresh;
+
+    public CustomerOperationsApi(IHttpClientFactory http, CustomerCallerSigner signer, IMemoryCache cache, ILogger<CustomerOperationsApi> logger, VixlyStaleWhileRefresh fresh)
     {
         _http = http ?? throw new ArgumentNullException(nameof(http));
         _signer = signer ?? throw new ArgumentNullException(nameof(signer));
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _fresh = fresh ?? throw new ArgumentNullException(nameof(fresh));
     }
 
     // =====================================================
@@ -51,19 +57,39 @@ public sealed class CustomerOperationsApi
     {
         string key = "customer.brand:" + tenantId.ToString("N");
 
-        if (_cache.TryGetValue(key, out CustomerPortalBrandDto? cached) && cached is not null)
+        if (_fresh.TryGet<CustomerPortalBrandDto>(key, CacheTime, token => RefreshBrandAsync(key, tenantId, token), out CustomerPortalBrandDto kept))
         {
-            return cached;
+            return kept;
         }
 
+        long generation = _fresh.Generation(key);
         CustomerCall<CustomerPortalBrandDto> call = await SendAsync<CustomerPortalBrandDto>(HttpMethod.Get, "internal/v1/customers/brand", tenantId, null, null, null, cancellationToken);
 
         if (call.Value is { DisplayName.Length: > 0 } brand)
         {
-            _cache.Set(key, brand, CacheTime);
+            _fresh.Keep(key, brand, generation);
             return brand;
         }
 
+        return null;
+    }
+
+    // The background call: Operations unreachable keeps the brand for now; any other answer without a brand drops it.
+    private async Task<CustomerPortalBrandDto?> RefreshBrandAsync(string key, Guid tenantId, CancellationToken cancellationToken)
+    {
+        CustomerCall<CustomerPortalBrandDto> call = await SendAsync<CustomerPortalBrandDto>(HttpMethod.Get, "internal/v1/customers/brand", tenantId, null, null, null, cancellationToken);
+
+        if (call.Value is { DisplayName.Length: > 0 } brand)
+        {
+            return brand;
+        }
+
+        if (call.Unavailable)
+        {
+            throw new HttpRequestException("Operations could not be reached for the brand.");
+        }
+
+        _fresh.Forget(key);
         return null;
     }
 
@@ -447,6 +473,7 @@ public sealed class CustomerOperationsApi
         ArgumentException.ThrowIfNullOrWhiteSpace(slug);
         string key = "customer.tenant:" + slug;
 
+        // Not served while refreshed (review, 2026-11-04): this answer is the portal's only check of a suspended company.
         if (_cache.TryGetValue(key, out OperationsTenantHostDto? cached) && cached is not null)
         {
             return cached;

@@ -46,9 +46,15 @@ internal sealed class FakeOperationsHandler : HttpMessageHandler
 
     public CustomerPortalBrandDto Brand { get; set; } = new("Northwind Couriers", null, null, "#123456", "#0F766E");
 
+    // The portal sends some calls side by side (harmonization H-6): what the fake records is kept under one lock.
+    private readonly object _gate = new();
+
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        Calls++;
+        lock (_gate)
+        {
+            Calls++;
+        }
 
         if (Down)
         {
@@ -70,7 +76,12 @@ internal sealed class FakeOperationsHandler : HttpMessageHandler
             return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = JsonContent.Create(Array.Empty<OperationsMaintenanceWindowDto>()) });
         }
 
-        Claims.Add(JsonDocument.Parse(Base64Url.DecodeFromChars(parts[1])).RootElement.Clone());
+        JsonElement claims = JsonDocument.Parse(Base64Url.DecodeFromChars(parts[1])).RootElement.Clone();
+
+        lock (_gate)
+        {
+            Claims.Add(claims);
+        }
 
         if (request.RequestUri!.AbsolutePath.StartsWith("/internal/v1/customers/", StringComparison.Ordinal))
         {
@@ -90,7 +101,10 @@ internal sealed class FakeOperationsHandler : HttpMessageHandler
         JsonElement? body = request.Content is null ? null : JsonDocument.Parse(await request.Content.ReadAsStringAsync(cancellationToken)).RootElement.Clone();
         FakeCustomerCall call = new(request.Method.Method, path,
             request.Headers.TryGetValues(OperationsCallerClaims.SessionHeader, out IEnumerable<string>? sessions) ? sessions.Single() : null, body);
-        Requests.Add(call);
+        lock (_gate)
+        {
+            Requests.Add(call);
+        }
 
         if (path == "brand" && request.Method == HttpMethod.Get)
         {

@@ -57,7 +57,7 @@ public sealed class OperationsCreditStatements
         OperationsTenantSettings settings = await _settings.FindAsync(cancellationToken) ?? OperationsTenantSettings.CreateDefault(tenantId, _timeProvider.GetUtcNow());
         DateOnly today = OperationsCreditBook.Today(settings, _timeProvider.GetUtcNow());
         (IReadOnlyList<Domain.Billing.OperationsInvoice> items, OperationsCreditPosition position) = await _book.ReadAsync(account, customer.Id, today, cancellationToken);
-        OperationsCreditStatement statement = new((await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty, customer, account, today, settings.CurrencyCode,
+        OperationsCreditStatement statement = new((await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty, customer, account, today, settings.CurrencyCode,
             account.TermsOr(settings.CreditTermsDays), items.Where(item => item.OnAccount == OperationsAccountCharge.Charged).ToList(), position);
         CultureInfo before = CultureInfo.CurrentUICulture;
 

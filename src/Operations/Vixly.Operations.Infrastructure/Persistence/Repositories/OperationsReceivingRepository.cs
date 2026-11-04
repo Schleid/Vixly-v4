@@ -162,8 +162,9 @@ internal sealed class OperationsReceivingRepository : IOperationsReceivingReposi
     public Task<OperationsShipment?> FindShipmentByKeyAsync(Guid customerId, string requestKey, CancellationToken cancellationToken) =>
         _context.Shipments.AsNoTracking().FirstOrDefaultAsync(item => item.CustomerId == customerId && item.RequestKey == requestKey, cancellationToken);
 
+    // Harmonization H-5: a shipment page reads its shipment several times; once per request (forgotten at the next save).
     public Task<OperationsShipment?> GetShipmentAsync(Guid shipmentId, CancellationToken cancellationToken) =>
-        _context.Shipments.FirstOrDefaultAsync(item => item.Id == shipmentId, cancellationToken);
+        _context.RememberAsync("shipment:" + shipmentId.ToString("N"), () => _context.Shipments.FirstOrDefaultAsync(item => item.Id == shipmentId, cancellationToken));
 
     public Task<OperationsShipment?> FindShipmentByTrackingNumberAsync(string trackingNumber, CancellationToken cancellationToken) =>
         _context.Shipments.AsNoTracking().FirstOrDefaultAsync(item => item.TrackingNumber == trackingNumber, cancellationToken);

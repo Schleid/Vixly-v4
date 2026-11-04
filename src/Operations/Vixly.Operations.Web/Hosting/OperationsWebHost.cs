@@ -48,6 +48,11 @@ public static class OperationsWebHost
 
         builder.Services.AddOperationsInfrastructure(builder.Configuration, "Vixly.V4.Operations.Web");
         builder.Services.AddVixlyKeyRingEncryption(builder.Configuration);
+        // Performance plan P-1 (owner, 2026-11-04): SQL commands and outgoing calls per request; slow requests logged.
+        Vixly.Shared.Hosting.Diagnostics.VixlyRequestTiming.AddVixlyRequestTiming(builder.Services, builder.Configuration);
+
+        // Performance plan P-5: the background jobs start one after another.
+        Vixly.Shared.Hosting.Jobs.VixlyJobStagger.Add(builder.Services);
         builder.Services.AddVixlyForwardedHeaders(builder.Configuration);
         builder.Services.AddOptions<OperationsHostingOptions>().Bind(builder.Configuration.GetSection(OperationsHostingOptions.SectionName));
         builder.Services.AddHostedService<OperationsOutboxWorker>();
@@ -108,6 +113,8 @@ public static class OperationsWebHost
         // Before the forwarded headers: the country is read only from a trusted proxy (owner, 2026-10-21).
         app.UseVixlyClientCountry();
         app.UseVixlyForwardedHeaders();
+        Vixly.Shared.Hosting.Diagnostics.VixlyRequestTiming.UseVixlyRequestTiming(app, async http => http.Request.Path.StartsWithSegments("/staff") && OperationsCurrentUser.IsSignedIn(http)
+            && (await http.RequestServices.GetRequiredService<Vixly.Operations.Web.Security.OperationsAllowed>().GetAsync()).IsOwner);
         app.UseOperationsDevelopmentCustomerProxy();
         app.UseVixlySecurityHeaders();
         app.UseOperationsCameraPages();

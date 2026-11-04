@@ -32,6 +32,36 @@ namespace Vixly.Platform.Infrastructure.Persistence;
 // =========================================================
 public sealed class PlatformDbContext : DbContext, IDataProtectionKeyContext
 {
+    // Harmonization H-9 (owner, 2026-11-04): moves at the start of every action (discarded changes) and at every save,
+    // so what was read for one action is never reused by the next (PlatformPermissionReader).
+    internal long ActionStamp { get; private set; }
+
+    internal void NextAction() => ActionStamp++;
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        try
+        {
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+        finally
+        {
+            NextAction();
+        }
+    }
+
+    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+        finally
+        {
+            NextAction();
+        }
+    }
+
     public PlatformDbContext(DbContextOptions<PlatformDbContext> options)
         : base(options)
     {

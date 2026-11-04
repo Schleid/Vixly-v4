@@ -102,7 +102,7 @@ public sealed class OperationsShippingLabels
         Vixly.Operations.Domain.Locations.OperationsWarehouse? origin = warehouses.GetValueOrDefault(shipment.OriginWarehouseId);
 
         return new OperationsShippingLabel(
-            (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty,
+            (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty,
             shipment.Number!,
             number,
             piece,

@@ -34,8 +34,12 @@ public sealed class OperationsTicketEscalationWorker : BackgroundService
 
     private readonly ILogger<OperationsTicketEscalationWorker> _logger;
 
-    public OperationsTicketEscalationWorker(IServiceScopeFactory scopes, IConfiguration configuration, TimeProvider timeProvider, ILogger<OperationsTicketEscalationWorker> logger)
+    // P-5: the jobs of a site start one after another.
+    private readonly Vixly.Shared.Hosting.Jobs.VixlyJobStagger _stagger;
+
+    public OperationsTicketEscalationWorker(IServiceScopeFactory scopes, IConfiguration configuration, TimeProvider timeProvider, ILogger<OperationsTicketEscalationWorker> logger, Vixly.Shared.Hosting.Jobs.VixlyJobStagger stagger)
     {
+        _stagger = stagger ?? throw new ArgumentNullException(nameof(stagger));
         _scopes = scopes ?? throw new ArgumentNullException(nameof(scopes));
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
@@ -50,6 +54,9 @@ public sealed class OperationsTicketEscalationWorker : BackgroundService
             _logger.LogWarning("No Platform caller key is set: ticket escalations are not sent.");
             return;
         }
+
+        // P-5 (owner, 2026-11-04): not every job at the same moment as the first visitor after a start-up.
+        await _stagger.WaitTurnAsync(stoppingToken);
 
         using PeriodicTimer timer = new(Interval);
 

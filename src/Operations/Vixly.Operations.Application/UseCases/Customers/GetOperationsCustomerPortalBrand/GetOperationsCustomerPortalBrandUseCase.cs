@@ -43,13 +43,14 @@ public sealed class GetOperationsCustomerPortalBrandUseCase
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(request);
 
-        if (await _brands.FindAsync(cancellationToken) is not { } brand)
+        // Harmonization H-1: the published settings only, never the website texts.
+        if (await _brands.FindPublishedAsync(cancellationToken) is not { } published)
         {
             return GetOperationsCustomerPortalBrandResponse.Failure(OperationsCommonErrors.NotFound);
         }
 
         OperationsPlanFeatures features = await _features.GetAsync(context.RequiredTenantId, cancellationToken);
-        OperationsBrandSettings settings = features.ThemeCustomization ? brand.Published : brand.Published.WithDefaultTheme();
+        OperationsBrandSettings settings = features.ThemeCustomization ? published : published.WithDefaultTheme();
         return GetOperationsCustomerPortalBrandResponse.Success(settings, await _reviews.AskedAsync(context.RequiredTenantId, cancellationToken));
     }
 }

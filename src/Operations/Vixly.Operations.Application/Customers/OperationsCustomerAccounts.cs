@@ -187,7 +187,7 @@ public sealed class OperationsCustomerAccounts
         ArgumentNullException.ThrowIfNull(customer);
         ArgumentNullException.ThrowIfNull(extra);
         ArgumentNullException.ThrowIfNull(worded);
-        string company = (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty;
+        string company = (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty;
 
         // Slice 9: by SMS or WhatsApp when the customer chose it and the company sends this notice by text; otherwise, or when the text fails, by email.
         // A code goes by email as well (review): a text Twilio accepts can still fail to arrive.
@@ -205,7 +205,7 @@ public sealed class OperationsCustomerAccounts
     {
         ArgumentNullException.ThrowIfNull(email);
         ArgumentNullException.ThrowIfNull(language);
-        string company = (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty;
+        string company = (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty;
         string toName = string.IsNullOrWhiteSpace(name) ? email.Value : name.Trim();
         await _mailer.SendAsync(new OperationsCustomerMail(OperationsCustomerMailKind.EmailNotAllowed, email.Value, toName, language, company, _links.Page(portalSlug, "/customer/sign-up")),
             cancellationToken);

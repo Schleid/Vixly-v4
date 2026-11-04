@@ -4170,5 +4170,41 @@ tr[data-low="true"] td:first-child {
     white-space: nowrap;
 }
 
-/* Menu counts (owner, 2026-11-04): what waits on a page; placeholder look until the Frontend/UI team designs it. */
-.ops-nav a .vx-nav-count { margin-left: auto; }
+/* Menu counts (owner, 2026-11-04): what waits on a page */
+.ops-nav a .vx-nav-count {
+    margin-left: auto;
+    margin-inline-start: auto;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.35rem;
+    height: 1.25rem;
+    padding: 0 0.4rem;
+    border-radius: 9999px;
+    font-family: var(--vx-font-mono, monospace);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #bfdbfe;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.28) 0%, rgba(37, 99, 235, 0.45) 100%);
+    border: 1px solid rgba(147, 197, 253, 0.35);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transition: all 150ms ease;
+}
+
+.ops-nav a:hover .vx-nav-count {
+    color: #ffffff;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.55) 0%, rgba(37, 99, 235, 0.75) 100%);
+    border-color: rgba(147, 197, 253, 0.6);
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+.ops-nav a[aria-current=page] .vx-nav-count {
+    color: #ffffff;
+    background: #2563eb;
+    border-color: #93c5fd;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}

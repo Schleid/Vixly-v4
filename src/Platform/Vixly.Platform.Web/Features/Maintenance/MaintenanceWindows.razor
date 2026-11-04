@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: MaintenanceWindows.razor
 
@@ -30,12 +30,24 @@ IMPORTANT NOTES:
 }
 @if (Presenter.State.PassToken is { } pass)
 {
-    <VxMessage Type="VxMessageType.Info">
-        @T["ui.maintenance.pass_intro"]
-        <code>/maintenance-pass/@pass</code>
-        <span class="vx-hint">@T["ui.maintenance.pass_staff"] <code>/staff/maintenance-pass/@pass</code></span>
-        <span class="vx-hint">@T["ui.maintenance.pass_once"]</span>
-    </VxMessage>
+    <div class="vx-maintenance-pass-card">
+        <VxMessage Type="VxMessageType.Info">
+            <div class="vx-maintenance-pass-content">
+                <p class="vx-maintenance-pass-intro">@T["ui.maintenance.pass_intro"]</p>
+                <div class="vx-maintenance-pass-grid">
+                    <div class="vx-maintenance-pass-item">
+                        <span class="vx-maintenance-pass-tag">Web / Customer:</span>
+                        <code class="vx-maintenance-code">/maintenance-pass/@pass</code>
+                    </div>
+                    <div class="vx-maintenance-pass-item">
+                        <span class="vx-maintenance-pass-tag">Staff workspace:</span>
+                        <code class="vx-maintenance-code">/staff/maintenance-pass/@pass</code>
+                    </div>
+                </div>
+                <p class="vx-hint vx-maintenance-pass-hint">@T["ui.maintenance.pass_once"]</p>
+            </div>
+        </VxMessage>
+    </div>
 }
 @if (Presenter.State.Error is not null)
 {
@@ -85,13 +97,15 @@ IMPORTANT NOTES:
                     <input id="maintenance-ends" type="datetime-local" class="vx-input" @bind="_model.EndsUtc" required />
                 </div>
             </div>
-            <fieldset class="vx-fieldset">
+            <fieldset class="vx-fieldset vx-maintenance-sites">
                 <legend class="vx-label">@T["ui.maintenance.sites"]</legend>
-                <label><input type="checkbox" class="vx-checkbox" @bind="_model.PublicSite" /> @T["ui.maintenance.site.public"]</label>
-                <label><input type="checkbox" class="vx-checkbox" @bind="_model.CompanyWebsites" /> @T["ui.maintenance.site.companies"]</label>
-                <label><input type="checkbox" class="vx-checkbox" @bind="_model.CustomerPortals" /> @T["ui.maintenance.site.customers"]</label>
-                <label><input type="checkbox" class="vx-checkbox" @bind="_model.StaffWorkspaces" /> @T["ui.maintenance.site.staff"]</label>
-                <span class="vx-hint">@T["ui.maintenance.control_stays_open"]</span>
+                <div class="vx-maintenance-sites-grid">
+                    <label class="vx-checkbox-label"><input type="checkbox" class="vx-checkbox" @bind="_model.PublicSite" /> <span>@T["ui.maintenance.site.public"]</span></label>
+                    <label class="vx-checkbox-label"><input type="checkbox" class="vx-checkbox" @bind="_model.CompanyWebsites" /> <span>@T["ui.maintenance.site.companies"]</span></label>
+                    <label class="vx-checkbox-label"><input type="checkbox" class="vx-checkbox" @bind="_model.CustomerPortals" /> <span>@T["ui.maintenance.site.customers"]</span></label>
+                    <label class="vx-checkbox-label"><input type="checkbox" class="vx-checkbox" @bind="_model.StaffWorkspaces" /> <span>@T["ui.maintenance.site.staff"]</span></label>
+                </div>
+                <p class="vx-hint">@T["ui.maintenance.control_stays_open"]</p>
             </fieldset>
             <div class="vx-field-compact">
                 <label for="maintenance-notice" class="vx-label">@T["ui.maintenance.notice_hours"]</label>
@@ -118,7 +132,7 @@ IMPORTANT NOTES:
     </VxCard>
 }
 
-<h2>@T["ui.maintenance.past"]</h2>
+<h2 class="vx-maintenance-past-title">@T["ui.maintenance.past"]</h2>
 <VxDataTable Items="Presenter.State.Past" IsLoading="@(!Presenter.State.Loaded)">
     <HeaderContent>
         <th scope="col">@T["ui.maintenance.starts"]</th>

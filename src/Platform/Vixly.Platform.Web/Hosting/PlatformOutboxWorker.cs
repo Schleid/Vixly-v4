@@ -29,8 +29,12 @@ public sealed class PlatformOutboxWorker : BackgroundService
 
     private readonly ILogger<PlatformOutboxWorker> _logger;
 
-    public PlatformOutboxWorker(IServiceScopeFactory scopes, IOptions<PlatformOutboxOptions> options, ILogger<PlatformOutboxWorker> logger)
+    // P-5: the jobs of a site start one after another.
+    private readonly Vixly.Shared.Hosting.Jobs.VixlyJobStagger _stagger;
+
+    public PlatformOutboxWorker(IServiceScopeFactory scopes, IOptions<PlatformOutboxOptions> options, ILogger<PlatformOutboxWorker> logger, Vixly.Shared.Hosting.Jobs.VixlyJobStagger stagger)
     {
+        _stagger = stagger ?? throw new ArgumentNullException(nameof(stagger));
         _scopes = scopes ?? throw new ArgumentNullException(nameof(scopes));
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -42,6 +46,9 @@ public sealed class PlatformOutboxWorker : BackgroundService
         {
             return;
         }
+
+        // P-5 (owner, 2026-11-04): not every job at the same moment as the first visitor after a start-up.
+        await _stagger.WaitTurnAsync(stoppingToken);
 
         using PeriodicTimer timer = new(TimeSpan.FromSeconds(Math.Max(1, _options.IntervalSeconds)));
 

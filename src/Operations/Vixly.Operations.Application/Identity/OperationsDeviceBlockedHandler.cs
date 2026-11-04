@@ -53,7 +53,7 @@ public sealed class OperationsDeviceBlockedHandler : IOperationsOutboxHandler
             return;
         }
 
-        string company = (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty;
+        string company = (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty;
         string person = block.UserId is { } userId && await _users.GetAsync(userId, cancellationToken) is { } user ? user.FullName : "-";
         string link = _links.Page(notice.PortalSlug, "/staff/devices/" + block.DeviceId);
 

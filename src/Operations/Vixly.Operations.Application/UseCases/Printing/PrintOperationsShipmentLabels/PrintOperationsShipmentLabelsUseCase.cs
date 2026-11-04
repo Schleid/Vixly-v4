@@ -121,7 +121,7 @@ public sealed class PrintOperationsShipmentLabelsUseCase
     private async Task<PrintOperationsShipmentLabelsResponse> IdLabelsAsync(Guid tenantId, OperationsWarehouse warehouse, IReadOnlyList<OperationsParcel> parcels, Guid? printerId,
         string name, CancellationToken cancellationToken)
     {
-        string company = (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty;
+        string company = (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty;
         Dictionary<Guid, string?> codes = new();
 
         foreach (Guid customerId in parcels.Where(parcel => parcel.CustomerId is not null).Select(parcel => parcel.CustomerId!.Value).Distinct())

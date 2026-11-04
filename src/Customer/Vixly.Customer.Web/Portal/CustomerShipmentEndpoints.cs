@@ -254,7 +254,14 @@ public static class CustomerShipmentEndpoints
             return Results.Redirect("/customer/sign-in");
         }
 
-        CustomerCall<CustomerShipmentChoicesDto> choices = await api.GetShipmentChoicesAsync(signedIn.Tenant, signedIn.Session, http, http.RequestAborted);
+        // Harmonization H-6: the choices beside the shipment being changed, or beside the packages for a new one; Operations checks the session on each.
+        Task<CustomerCall<CustomerShipmentChoicesDto>> choicesCall = api.GetShipmentChoicesAsync(signedIn.Tenant, signedIn.Session, http, http.RequestAborted);
+        Task<CustomerCall<CustomerShipmentDetailDto>>? shipmentCall = shipmentId is { } id ? api.GetShipmentAsync(signedIn.Tenant, signedIn.Session, id, http, http.RequestAborted) : null;
+
+        // Slice 4D: the packages in no shipment yet, to tick for a new shipment.
+        Task<CustomerCall<CustomerPackagesDto>>? packagesCall = shipmentId is null ? api.ListPackagesAsync(signedIn.Tenant, signedIn.Session, http, http.RequestAborted) : null;
+        await Task.WhenAll(new Task?[] { choicesCall, shipmentCall, packagesCall }.OfType<Task>());
+        CustomerCall<CustomerShipmentChoicesDto> choices = choicesCall.Result;
 
         if (choices.ErrorCode == "ops.customers.session_required")
         {
@@ -264,11 +271,9 @@ public static class CustomerShipmentEndpoints
 
         CustomerShipmentDto? current = null;
 
-        if (shipmentId is { } id)
+        if (shipmentCall is not null)
         {
-            CustomerCall<CustomerShipmentDetailDto> call = await api.GetShipmentAsync(signedIn.Tenant, signedIn.Session, id, http, http.RequestAborted);
-
-            if (call.Value is not { Shipment: { IsOpen: true } open })
+            if (shipmentCall.Result.Value is not { Shipment: { IsOpen: true } open })
             {
                 return Results.NotFound();
             }
@@ -276,8 +281,7 @@ public static class CustomerShipmentEndpoints
             current = open;
         }
 
-        // Slice 4D: the packages in no shipment yet, to tick for a new shipment.
-        CustomerPackagesDto? packages = shipmentId is null ? (await api.ListPackagesAsync(signedIn.Tenant, signedIn.Session, http, http.RequestAborted)).Value : null;
+        CustomerPackagesDto? packages = packagesCall?.Result.Value;
 
         return Page<ShipmentFormPage>(new
         {
@@ -304,7 +308,11 @@ public static class CustomerShipmentEndpoints
             return Results.Redirect("/customer/sign-in");
         }
 
-        CustomerCall<CustomerShipmentDetailDto> call = await api.GetShipmentAsync(signedIn.Tenant, signedIn.Session, shipmentId, http, http.RequestAborted);
+        // Harmonization H-6: the shipment and its driver side by side; Operations checks the session and that the shipment is the customer's on each.
+        Task<CustomerCall<CustomerShipmentDetailDto>> shipmentCall = api.GetShipmentAsync(signedIn.Tenant, signedIn.Session, shipmentId, http, http.RequestAborted);
+        Task<CustomerCall<CustomerDriverDto>> driverCall = api.GetDriverAsync(signedIn.Tenant, signedIn.Session, shipmentId, http, http.RequestAborted);
+        await Task.WhenAll(shipmentCall, driverCall);
+        CustomerCall<CustomerShipmentDetailDto> call = shipmentCall.Result;
 
         if (call.ErrorCode == "ops.customers.session_required")
         {
@@ -321,7 +329,7 @@ public static class CustomerShipmentEndpoints
         CustomerPackagesDto? packages = detail.Shipment.IsOpen ? (await api.ListPackagesAsync(signedIn.Tenant, signedIn.Session, http, http.RequestAborted)).Value : null;
 
         // Slice 12C: the driver, when it is out for delivery today.
-        CustomerDriverDto? driver = (await api.GetDriverAsync(signedIn.Tenant, signedIn.Session, shipmentId, http, http.RequestAborted)).Value;
+        CustomerDriverDto? driver = driverCall.Result.Value;
 
         return Page<ShipmentPage>(new
         {

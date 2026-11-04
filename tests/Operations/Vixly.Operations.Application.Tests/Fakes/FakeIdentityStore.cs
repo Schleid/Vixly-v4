@@ -129,6 +129,10 @@ internal sealed class FakeIdentityStore : IOperationsUserRepository, IOperations
 
     public Task<OperationsTenantBrand?> FindAsync(CancellationToken cancellationToken) => Task.FromResult(Brands.FirstOrDefault());
 
+    public Task<string?> FindDisplayNameAsync(CancellationToken cancellationToken) => Task.FromResult(Brands.FirstOrDefault()?.DisplayName);
+
+    public Task<Vixly.Operations.Domain.Branding.OperationsBrandSettings?> FindPublishedAsync(CancellationToken cancellationToken) => Task.FromResult(Brands.FirstOrDefault()?.Published);
+
     public Task<IReadOnlyList<Guid>> ListTenantIdsAsync(CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<Guid>>(Brands.Select(brand => brand.TenantId).Distinct().ToList());
 
     public Task<bool> SaveChangesAsync(CancellationToken cancellationToken)

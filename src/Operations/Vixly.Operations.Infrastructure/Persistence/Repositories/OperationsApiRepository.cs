@@ -107,6 +107,7 @@ internal sealed class OperationsApiRepository : IOperationsApiRepository
                 // A delivery already queued (another round raced this one): nothing changes.
                 await transaction.RollbackAsync(cancellationToken);
                 _context.ChangeTracker.Clear();
+                _context.Forget();
                 return false;
             }
 

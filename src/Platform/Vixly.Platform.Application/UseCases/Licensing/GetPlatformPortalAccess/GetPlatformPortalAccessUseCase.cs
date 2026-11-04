@@ -2,6 +2,7 @@
 using Vixly.Platform.Application.Ports;
 using Vixly.Platform.Application.Queries;
 using Vixly.Platform.Application.Security;
+using Vixly.Platform.Application.UseCases.Legal;
 using Vixly.Platform.Application.UseCases.Licensing;
 using Vixly.Platform.Domain.Licensing;
 using Vixly.Platform.Domain.Subscriptions;
@@ -57,7 +58,7 @@ public sealed class GetPlatformPortalAccessUseCase
                 PlatformSubscriptionAccess.None,
                 tenant.CurrentSlug,
                 tenant.DefaultLanguage.Value,
-                (await _licensing.LegalAsync(tenant.Id, cancellationToken)).Status,
+                (await _licensing.LegalAsync(tenant, cancellationToken)).Status,
                 tenant.TimeZone));
         }
 
@@ -67,15 +68,18 @@ public sealed class GetPlatformPortalAccessUseCase
             return GetPlatformPortalAccessResponse.Success(new PlatformPortalAccess(false, null, null, PlatformSubscriptionAccess.None));
         }
 
+        // Harmonization H-13: the legal state worked out once, from the tenant already loaded (it was twice, each reloading the tenant).
+        PlatformTenantLegalState legal = await _licensing.LegalAsync(tenant, cancellationToken);
+
         // An old address answers the current one, so Edge can redirect (slug corrections, Slice 2).
         return GetPlatformPortalAccessResponse.Success(new PlatformPortalAccess(
             true,
             tenant.Id,
             tenant.Status,
-            await _licensing.AccessAsync(tenant.Id, cancellationToken),
+            await _licensing.AccessAsync(tenant.Id, legal, cancellationToken),
             tenant.CurrentSlug,
             tenant.DefaultLanguage.Value,
-            (await _licensing.LegalAsync(tenant.Id, cancellationToken)).Status,
+            legal.Status,
             tenant.TimeZone));
     }
 }

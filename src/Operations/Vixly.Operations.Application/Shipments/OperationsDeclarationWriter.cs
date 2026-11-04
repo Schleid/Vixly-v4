@@ -89,7 +89,7 @@ public sealed class OperationsDeclarationWriter
         byte[]? signature = shipment.CustomerSignatureKey is { } key ? await _files.ReadAsync(shipment.TenantId, key, cancellationToken) : null;
 
         OperationsCustomerDeclaration declaration = new(
-            (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty,
+            (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty,
             shipment.Number ?? string.Empty,
             DateOnly.FromDateTime(_timeProvider.GetUtcNow().UtcDateTime),
             customer.FirstName + " " + customer.LastName + (customer.Code is { } code ? " · " + code : string.Empty),

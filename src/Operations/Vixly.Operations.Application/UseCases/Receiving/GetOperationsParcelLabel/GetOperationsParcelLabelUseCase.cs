@@ -90,7 +90,7 @@ public sealed class GetOperationsParcelLabelUseCase
         }
 
         string? customerCode = parcel.CustomerId is { } customerId ? (await _customers.GetAsync(customerId, cancellationToken))?.Code : null;
-        string company = (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty;
+        string company = (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty;
         byte[] content = _renderer.RenderParcelLabel(new OperationsParcelLabel(number, customerCode, company, warehouse.Code, parcel.CreatedUtc));
 
         return GetOperationsParcelLabelResponse.Success(content, number + ".pdf");

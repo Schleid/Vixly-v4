@@ -47,6 +47,8 @@ public static class CustomerWebHost
 
         builder.Services.AddCustomerInfrastructure(builder.Configuration);
         builder.Services.AddVixlyKeyRingEncryption(builder.Configuration);
+        // Performance plan P-1 (owner, 2026-11-04): SQL commands and outgoing calls per request; slow requests logged.
+        Vixly.Shared.Hosting.Diagnostics.VixlyRequestTiming.AddVixlyRequestTiming(builder.Services, builder.Configuration);
         builder.Services.AddVixlyForwardedHeaders(builder.Configuration);
         builder.Services.AddOptions<CustomerHostingOptions>().Bind(builder.Configuration.GetSection(CustomerHostingOptions.SectionName));
         builder.Services.AddOptions<CustomerOperationsOptions>().Bind(builder.Configuration.GetSection(CustomerOperationsOptions.SectionName));
@@ -64,6 +66,8 @@ public static class CustomerWebHost
 
             client.Timeout = TimeSpan.FromSeconds(Math.Clamp(options.TimeoutSeconds, 1, 60));
         });
+        // H-7: host and brand served while refreshed.
+        builder.Services.AddSingleton<Vixly.Shared.Hosting.Caching.VixlyStaleWhileRefresh>();
         builder.Services.AddSingleton<CustomerOperationsApi>();
         builder.Services.AddOptions<Vixly.Customer.Web.Portal.CustomerBotCheckOptions>().Bind(builder.Configuration.GetSection(Vixly.Customer.Web.Portal.CustomerBotCheckOptions.SectionName));
         builder.Services.AddHttpClient(Vixly.Customer.Web.Portal.TurnstileCustomerBotCheck.HttpClientName, client => client.Timeout = TimeSpan.FromSeconds(10));
@@ -86,6 +90,7 @@ public static class CustomerWebHost
         WebApplication app = builder.Build();
 
         app.UseVixlyForwardedHeaders();
+        Vixly.Shared.Hosting.Diagnostics.VixlyRequestTiming.UseVixlyRequestTiming(app);
         app.UseVixlySecurityHeaders(Vixly.Customer.Web.Portal.CustomerPortalSecurity.ContentSecurityPolicy);
 
         if (!app.Environment.IsDevelopment())

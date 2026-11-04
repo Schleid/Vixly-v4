@@ -84,7 +84,7 @@ public sealed class GetOperationsShipperLetterUseCase
         Vixly.Operations.Domain.Settings.OperationsTenantSettings settings = await _settings.FindAsync(cancellationToken)
             ?? Vixly.Operations.Domain.Settings.OperationsTenantSettings.CreateDefault(context.RequiredTenantId, _timeProvider.GetUtcNow());
         Dictionary<Guid, OperationsCarrier> carriers = (await _dispatches.ListCarriersAsync(cancellationToken)).ToDictionary(carrier => carrier.Id);
-        OperationsShipperLetter letter = await _papers.LetterAsync(dispatch, (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty, carriers, settings,
+        OperationsShipperLetter letter = await _papers.LetterAsync(dispatch, (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty, carriers, settings,
             OperationsTimeZones.Today(_timeProvider.GetUtcNow(), settings.TimeZone), cancellationToken);
         return GetOperationsShipperLetterResponse.Success(_renderer.RenderShipperLetter(letter), dispatch.Number + "-SLI.pdf");
     }

@@ -54,7 +54,7 @@ public sealed class OperationsQuoteDocuments
 
         OperationsTenantSettings? settings = await _settings.FindAsync(cancellationToken);
         Dictionary<Guid, OperationsWarehouse> warehouses = (await _locations.ListWarehousesAsync(cancellationToken)).ToDictionary(item => item.Id);
-        string company = (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty;
+        string company = (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty;
         DateOnly validUntil = OperationsTimeZones.Today(quote.ValidUntilUtc, settings?.TimeZone);
         OperationsQuoteDocument document = new(quote, company, customer.FullName, customer.Code, customer.Email.Value,
             quote.OriginWarehouseId is { } from && warehouses.TryGetValue(from, out OperationsWarehouse? origin) ? origin.Name : null,

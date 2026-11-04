@@ -50,6 +50,7 @@ internal sealed class PlatformUnitOfWork : IPlatformUnitOfWork
         catch (DbUpdateException exception) when (IsUniqueViolation(exception))
         {
             _context.ChangeTracker.Clear();
+            _context.NextAction();
             return false;
         }
     }
@@ -59,8 +60,10 @@ internal sealed class PlatformUnitOfWork : IPlatformUnitOfWork
         return exception.InnerException is SqlException { Number: 2601 or 2627 };
     }
 
+    // Every presenter action starts here (PlatformUseCaseScope): a new action for what is kept per action (H-9).
     public void DiscardChanges()
     {
         _context.ChangeTracker.Clear();
+        _context.NextAction();
     }
 }

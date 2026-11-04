@@ -24,6 +24,9 @@ public interface IPlatformUserRepository
 {
     Task<PlatformUser?> GetAsync(Guid platformUserId, CancellationToken cancellationToken);
 
+    // Harmonization H-10: only what the session check reads; null for an unknown staff member.
+    Task<Vixly.Platform.Application.Identity.PlatformSessionFacts?> FindSessionFactsAsync(Guid platformUserId, CancellationToken cancellationToken);
+
     Task<PlatformUser?> FindByEmailAsync(EmailAddress email, CancellationToken cancellationToken);
 
     Task<bool> EmailExistsAsync(EmailAddress email, CancellationToken cancellationToken);

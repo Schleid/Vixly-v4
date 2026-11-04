@@ -180,6 +180,11 @@ public sealed partial class CustomerAccountHttpTests : IAsyncLifetime
         Assert.Contains("href=\"/customer/invoices/" + unpaid + "/pay\"", list, StringComparison.Ordinal);
         Assert.DoesNotContain("/customer/invoices/" + paid + "/pay", list, StringComparison.Ordinal);
 
+        // Harmonization H-6: the invoices and the credit account are asked side by side, each with its own session header and its own single-use token.
+        Assert.Contains(_host.Operations.Requests, item => item.Path == "me/invoices" && item.Session == "session-7");
+        Assert.Contains(_host.Operations.Requests, item => item.Path == "me/credit" && item.Session == "session-7");
+        Assert.Equal(_host.Operations.Claims.Count, _host.Operations.Claims.Select(claim => claim.GetProperty("jti").GetString()).Distinct().Count());
+
         (_, string choose) = await GetAsync("/customer/invoices/" + unpaid + "/pay");
         Assert.Contains("Pay by Zelle", choose, StringComparison.Ordinal);
         Assert.Contains("Pay by bank transfer", choose, StringComparison.Ordinal);

@@ -35,8 +35,12 @@ public sealed class OperationsEdgeBrandWorker : BackgroundService
 
     private readonly ILogger<OperationsEdgeBrandWorker> _logger;
 
-    public OperationsEdgeBrandWorker(IServiceScopeFactory scopes, IConfiguration configuration, TimeProvider timeProvider, ILogger<OperationsEdgeBrandWorker> logger)
+    // P-5: the jobs of a site start one after another.
+    private readonly Vixly.Shared.Hosting.Jobs.VixlyJobStagger _stagger;
+
+    public OperationsEdgeBrandWorker(IServiceScopeFactory scopes, IConfiguration configuration, TimeProvider timeProvider, ILogger<OperationsEdgeBrandWorker> logger, Vixly.Shared.Hosting.Jobs.VixlyJobStagger stagger)
     {
+        _stagger = stagger ?? throw new ArgumentNullException(nameof(stagger));
         _scopes = scopes ?? throw new ArgumentNullException(nameof(scopes));
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
@@ -49,6 +53,9 @@ public sealed class OperationsEdgeBrandWorker : BackgroundService
         {
             return;
         }
+
+        // P-5 (owner, 2026-11-04): not every job at the same moment as the first visitor after a start-up.
+        await _stagger.WaitTurnAsync(stoppingToken);
 
         using PeriodicTimer timer = new(Interval);
 

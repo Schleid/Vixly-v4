@@ -79,7 +79,7 @@ public sealed class GetOperationsReceiptDocumentUseCase
             .ToDictionary(customer => customer.Id, customer => customer.Code);
         string clerk = (await _users.GetAsync(receipt.ReceivedByUserId, cancellationToken))?.FullName ?? string.Empty;
         OperationsReceiptDocument document = new(
-            (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty,
+            (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty,
             warehouse.Code,
             warehouse.Name,
             receipt.Number,

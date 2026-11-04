@@ -59,6 +59,11 @@ public static class PlatformWebHost
 
         builder.Services.AddPlatformInfrastructure(builder.Configuration, "Vixly.V4.Platform.Web");
         builder.Services.AddVixlyKeyRingEncryption(builder.Configuration);
+        // Performance plan P-1 (owner, 2026-11-04): SQL commands and outgoing calls per request; slow requests logged.
+        Vixly.Shared.Hosting.Diagnostics.VixlyRequestTiming.AddVixlyRequestTiming(builder.Services, builder.Configuration);
+
+        // Performance plan P-5: the background jobs start one after another.
+        Vixly.Shared.Hosting.Jobs.VixlyJobStagger.Add(builder.Services);
         builder.Services.AddPlatformApplication();
         builder.Services.AddVixlyForwardedHeaders(builder.Configuration);
 
@@ -107,6 +112,7 @@ public static class PlatformWebHost
         // Before the forwarded headers: the country is read only from a trusted proxy (owner, 2026-10-21).
         app.UseVixlyClientCountry();
         app.UseVixlyForwardedHeaders();
+        Vixly.Shared.Hosting.Diagnostics.VixlyRequestTiming.UseVixlyRequestTiming(app, http => Task.FromResult(http.User.Identity?.IsAuthenticated == true));
         app.UseVixlySecurityHeaders();
 
         if (!app.Environment.IsDevelopment())

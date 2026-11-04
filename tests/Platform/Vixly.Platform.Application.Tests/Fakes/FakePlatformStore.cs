@@ -79,6 +79,13 @@ internal sealed class FakePlatformStore :
         return Task.FromResult(Users.FirstOrDefault(user => user.Id == platformUserId));
     }
 
+    public Task<Vixly.Platform.Application.Identity.PlatformSessionFacts?> FindSessionFactsAsync(Guid platformUserId, CancellationToken cancellationToken)
+    {
+        PlatformUser? user = Users.FirstOrDefault(item => item.Id == platformUserId);
+        return Task.FromResult(user is null ? null
+            : new Vixly.Platform.Application.Identity.PlatformSessionFacts(user.Id, user.Account.IsActive, user.AuthorityLevel, user.FirstName, user.LastName, user.PreferredLanguage.Value));
+    }
+
     public Task<PlatformUser?> FindByEmailAsync(EmailAddress email, CancellationToken cancellationToken)
     {
         return Task.FromResult(Users.FirstOrDefault(user => user.Email == email));

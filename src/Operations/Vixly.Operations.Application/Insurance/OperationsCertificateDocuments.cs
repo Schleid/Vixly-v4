@@ -91,7 +91,7 @@ public sealed class OperationsCertificateDocuments
         OperationsInsuranceCoverage coverage = terms.Coverage;
 
         return new OperationsCertificateDocument(
-            (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty,
+            (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty,
             certificate.Number,
             certificate.Status,
             DateOnly.FromDateTime(certificate.CreatedUtc.UtcDateTime),

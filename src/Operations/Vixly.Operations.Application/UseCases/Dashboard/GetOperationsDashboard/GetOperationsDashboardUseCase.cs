@@ -62,7 +62,8 @@ public sealed class GetOperationsDashboardUseCase
         DateTimeOffset utcNow = _timeProvider.GetUtcNow();
         DateOnly today = DateOnly.FromDateTime(TimeZoneInfo.TryFindSystemTimeZoneById(settings?.TimeZone ?? "UTC", out TimeZoneInfo? zone)
             ? TimeZoneInfo.ConvertTime(utcNow, zone).DateTime : utcNow.UtcDateTime);
-        List<OperationsDashboardCounter> counters = new();
+        Dictionary<string, IReadOnlyCollection<Guid>?> asks = new(StringComparer.Ordinal);
+        List<(string Key, string Link)> shown = new();
 
         foreach ((string key, string permission, string link, bool perWarehouse) in OperationsDashboardCounters.All)
         {
@@ -72,11 +73,13 @@ public sealed class GetOperationsDashboardUseCase
             }
 
             // Warehouse-scoped staff count their own warehouses only.
-            IReadOnlyCollection<Guid>? mine = access.HasTenantWide(permission) ? null
+            asks[key] = access.HasTenantWide(permission) ? null
                 : warehouses.Where(warehouse => access.CoversWarehouse(permission, warehouse.Id, warehouse.BranchId)).Select(warehouse => warehouse.Id).ToList();
-            counters.Add(new OperationsDashboardCounter(key, link, await _reader.CountAsync(key, mine, today, cancellationToken)));
+            shown.Add((key, link));
         }
 
-        return GetOperationsDashboardResponse.Success(counters);
+        // Harmonization H-4 (owner, 2026-11-04): every counter this person may see, in one database command.
+        IReadOnlyDictionary<string, int> counts = asks.Count == 0 ? new Dictionary<string, int>() : await _reader.CountManyAsync(asks, today, cancellationToken);
+        return GetOperationsDashboardResponse.Success(shown.Select(item => new OperationsDashboardCounter(item.Key, item.Link, counts.GetValueOrDefault(item.Key))).ToList());
     }
 }

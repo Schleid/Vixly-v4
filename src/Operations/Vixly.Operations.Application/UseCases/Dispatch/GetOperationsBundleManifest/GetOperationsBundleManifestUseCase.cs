@@ -91,7 +91,7 @@ public sealed class GetOperationsBundleManifestUseCase
             ?? Vixly.Operations.Domain.Settings.OperationsTenantSettings.CreateDefault(context.RequiredTenantId, _timeProvider.GetUtcNow());
         OperationsWarehouse? destination = bundle.DestinationWarehouseId is { } destinationId ? await _locations.GetWarehouseAsync(destinationId, cancellationToken) : null;
         string? dispatchNumber = bundle.DispatchId is { } dispatchId ? (await _dispatches.GetDispatchAsync(dispatchId, cancellationToken))?.Number : null;
-        OperationsBundleManifest manifest = new((await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty, warehouse.Code, destination?.Code ?? bundle.DestinationCountryCode,
+        OperationsBundleManifest manifest = new((await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty, warehouse.Code, destination?.Code ?? bundle.DestinationCountryCode,
             bundle.ServiceCode, dispatchNumber, await _manifests.BundleAsync(bundle, cancellationToken), settings.WeightUnit, settings.DimensionUnit);
         return GetOperationsBundleManifestResponse.Success(_renderer.RenderBundleManifest(manifest), bundle.Number);
     }

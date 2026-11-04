@@ -93,8 +93,12 @@ public static class CustomerReviewEndpoints
             return Results.Redirect("/customer/sign-in");
         }
 
-        CustomerCall<CustomerReviewDto> call = await api.GetReviewAsync(signedIn.Tenant, signedIn.Session, http, http.RequestAborted);
-        CustomerCall<CustomerProfileDto> me = await api.GetMeAsync(signedIn.Tenant, signedIn.Session, http, http.RequestAborted);
+        // Harmonization H-6: side by side; Operations checks the session on each.
+        Task<CustomerCall<CustomerReviewDto>> reviewCall = api.GetReviewAsync(signedIn.Tenant, signedIn.Session, http, http.RequestAborted);
+        Task<CustomerCall<CustomerProfileDto>> meCall = api.GetMeAsync(signedIn.Tenant, signedIn.Session, http, http.RequestAborted);
+        await Task.WhenAll(reviewCall, meCall);
+        CustomerCall<CustomerReviewDto> call = reviewCall.Result;
+        CustomerCall<CustomerProfileDto> me = meCall.Result;
 
         if (call.ErrorCode == "ops.customers.session_required" || me.Value is null)
         {

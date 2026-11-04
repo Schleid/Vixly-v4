@@ -91,4 +91,19 @@ public sealed class ControlOverviewUiTests : BunitContext
         Assert.Equal("Help", view.Find("a[href='/help']").TextContent.Trim());
     }
 
+    // H-8 (review, 2026-11-04): the sidebar renders only in the live connection, so its sign-out button sends the page's own form, whose token the server writes.
+    [Fact]
+    public void SidebarSignOut_SendsThePagesOwnSignOutForm()
+    {
+        Services.AddLocalization();
+        AddAuthorization().SetAuthorized("Ada Lovelace");
+        ComponentFactories.AddStub<Vixly.Platform.Web.Features.Help.PlatformHelpContextLink>();
+        ComponentFactories.AddStub<Vixly.Platform.Web.Features.Navigation.NavCount>();
+        var view = Render<Vixly.Platform.Web.Components.Layout.MainLayout>();
+        var button = view.Find(".vx-user-card__signout-btn");
+        Assert.Equal("vx-sign-out", button.GetAttribute("form"));
+        Assert.Equal("submit", button.GetAttribute("type"));
+        Assert.Empty(view.FindAll(".vx-user-card form"));
+    }
+
 }

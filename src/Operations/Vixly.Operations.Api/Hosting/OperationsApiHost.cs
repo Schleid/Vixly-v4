@@ -46,6 +46,8 @@ public static class OperationsApiHost
         builder.Services.AddScoped<Vixly.Operations.Application.Ports.IOperationsRequestMetadata, OperationsApiRequestMetadata>();
         builder.Services.AddOperationsInfrastructure(builder.Configuration, "Vixly.V4.Operations.Api");
         builder.Services.AddVixlyKeyRingEncryption(builder.Configuration);
+        // Performance plan P-1 (owner, 2026-11-04): SQL commands and outgoing calls per request; slow requests logged.
+        Vixly.Shared.Hosting.Diagnostics.VixlyRequestTiming.AddVixlyRequestTiming(builder.Services, builder.Configuration);
         builder.Services.AddMemoryCache();
         builder.Services.Configure<OperationsInternalOptions>(builder.Configuration.GetSection(OperationsInternalOptions.SectionName));
         builder.Services.AddSingleton<OperationsCallerTokenValidator>();
@@ -54,6 +56,7 @@ public static class OperationsApiHost
         configure?.Invoke(builder);
 
         WebApplication app = builder.Build();
+        Vixly.Shared.Hosting.Diagnostics.VixlyRequestTiming.UseVixlyRequestTiming(app);
 
         app.UseVixlySecurityHeaders();
         app.UseExceptionHandler(errors => errors.Run(context =>

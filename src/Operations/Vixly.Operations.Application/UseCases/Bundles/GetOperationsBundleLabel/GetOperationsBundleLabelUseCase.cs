@@ -89,7 +89,7 @@ public sealed class GetOperationsBundleLabelUseCase
                 + (settings.DimensionUnit == OperationsDimensionUnit.Inch ? " in" : " cm")
             : null;
 
-        OperationsBundleLabel label = new((await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty, bundle.Number, warehouse.Code,
+        OperationsBundleLabel label = new((await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty, bundle.Number, warehouse.Code,
             destination?.Code ?? bundle.DestinationCountryCode, bundle.ServiceCode, bundle.TypeName, bundle.ParcelCount, weight, size, bundle.Status == OperationsBundleStatus.Closed);
         return GetOperationsBundleLabelResponse.Success(_renderer.RenderBundleLabel(label), bundle.Number);
     }

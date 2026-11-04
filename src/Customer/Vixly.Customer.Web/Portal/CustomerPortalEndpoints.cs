@@ -59,7 +59,11 @@ public static class CustomerPortalEndpoints
 
             if (CustomerSessionCookie.Read(http.Request) is { } session)
             {
-                CustomerCall<CustomerProfileDto> me = await api.GetMeAsync(tenant, session, http, http.RequestAborted);
+                // Harmonization H-6: the invitation (asked only when the company asks for reviews) beside the profile.
+                Task<CustomerCall<CustomerProfileDto>> meCall = api.GetMeAsync(tenant, session, http, http.RequestAborted);
+                Task<CustomerCall<Vixly.Contracts.Operations.Reviews.CustomerReviewDto>>? reviewCall = brand?.AskForReviews == true ? api.GetReviewAsync(tenant, session, http, http.RequestAborted) : null;
+                await (reviewCall is null ? meCall : Task.WhenAll(meCall, reviewCall));
+                CustomerCall<CustomerProfileDto> me = meCall.Result;
 
                 // The first sign-in asks for the home address once (owner, 2026-10-26).
                 if (me.Value is { HomeAddress: null })
@@ -70,7 +74,7 @@ public static class CustomerPortalEndpoints
                 if (me.Value is { } customer)
                 {
                     // Customer reviews (owner, 2026-11-03): the invitation shows only when the company asks; one more call, only then.
-                    bool reviewInvite = brand?.AskForReviews == true && (await api.GetReviewAsync(tenant, session, http, http.RequestAborted)).Value?.InvitePending == true;
+                    bool reviewInvite = reviewCall is not null && reviewCall.Result.Value?.InvitePending == true;
                     return Page<HomePage>(new { Brand = brand, Customer = customer, TourStep = customer.WelcomeTourPending || tour == 1 ? 1 : 0,
                         TourError = tourError == true, Info = done is null ? null : text["ui.done." + (done == "welcome" ? "welcome" : "saved")].Value, ReviewInvite = reviewInvite });
                 }
@@ -360,14 +364,24 @@ public static class CustomerPortalEndpoints
     {
         Guid tenant = Tenant(http) ?? throw new InvalidOperationException("No tenant.");
 
-        if (CustomerSessionCookie.Read(http.Request) is not { } session
-            || (await api.GetMeAsync(tenant, session, http, http.RequestAborted)).Value is not { } customer)
+        if (CustomerSessionCookie.Read(http.Request) is not { } session)
         {
             CustomerSessionCookie.Delete(http.Response);
             return Results.Redirect("/customer/sign-in");
         }
 
-        CustomerNoticesDto? notices = (await api.GetNoticesAsync(tenant, session, http, http.RequestAborted)).Value;
+        // Harmonization H-6: the profile and the notices side by side; Operations checks the session on each.
+        Task<CustomerCall<CustomerProfileDto>> me = api.GetMeAsync(tenant, session, http, http.RequestAborted);
+        Task<CustomerCall<CustomerNoticesDto>> noticesCall = api.GetNoticesAsync(tenant, session, http, http.RequestAborted);
+        await Task.WhenAll(me, noticesCall);
+
+        if (me.Result.Value is not { } customer)
+        {
+            CustomerSessionCookie.Delete(http.Response);
+            return Results.Redirect("/customer/sign-in");
+        }
+
+        CustomerNoticesDto? notices = noticesCall.Result.Value;
         return Page<ProfilePage>(new { Brand = await api.GetBrandAsync(tenant, http.RequestAborted), Customer = customer, Notices = notices, Error = error, Info = info });
     }
 

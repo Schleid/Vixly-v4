@@ -630,3 +630,97 @@ The script adds the review columns to `ops.SiteTestimonials` (who wrote it, when
 **Checks:**
 1. Operations, as someone who verifies payments: take a Zelle payment at the cashier; *Payments to verify* shows 1; verify it; the number goes.
 2. Control: report a Zelle payment from a payment link; *Zelle payments* shows 1 after moving to another page.
+
+## 41. Thirty-seventh update (2026-11-04): measuring where pages spend their time
+**Database: no.** Copy **every site** (Operations Web, Operations API, customer portal, Control, Platform API, public site). No required setting.
+
+First step of the performance plan (vixly/planes/performance-plan-2026-11-04.md, P-1). Nothing gets faster yet: this measures, so each next fix can show its before and after.
+
+- **Slow requests are logged:** any request over 1 second writes one warning line, for example `Slow request GET /staff/customers/{customerId} 200 in 1840 ms: 14 SQL commands in 220 ms, 1 calls in 1450 ms`. It names the route pattern, never the address, ids, tokens or emails. Change the limit with `VixlyTiming__SlowRequestMs` (0 turns it off).
+- **A timing header on demand:** with `VixlyTiming__ShowHeader` set to `true`, Operations staff pages (owners only) and Control (signed-in staff) carry a `Server-Timing` header with the SQL time and count, the calls to other sites, and the total. Browsers show it under *Network › Timing*. Never on the public site, the customer portal or the APIs. Off by default.
+
+**Checks (staging):**
+1. Set `VixlyTiming__ShowHeader=true` on the Operations Web pool, recycle, sign in as the owner, open the home page; the browser's Network tab shows `sql`, `calls` and `app` timings.
+2. Sign in as a staff member who is not the owner: no `Server-Timing` header. The customer portal never has one.
+3. Use the sites for a day, then send me the `Slow request` lines from the logs: they choose the order of the next fixes. Then set `VixlyTiming__ShowHeader` back to `false`.
+
+## 42. Thirty-eighth update (2026-11-04): faster pages, no waiting on Control, staggered jobs
+**Database: no.** Copy **every site** (Operations Web, Operations API, customer portal, Control, Platform API, public site). No required setting.
+
+Steps P-3, P-4 and P-5 of the performance plan (vixly/planes/performance-plan-2026-11-04.md). P-2 (the company filter) is set aside by the owner for now.
+
+- **P-3, each lookup once per page:** the signed-in staff member, their rights, the roles, the warehouses, the company settings and the brand are read once per request and reused for the rest of it. Measured on a copy: a simple staff page from 14 database commands to 8, the home page from 51 to 29, *Staff* from 36 to 21. The kept copy belongs to one request and one company: it is forgotten at every save, and it is never given to another company or to system work. Removing someone's access still takes effect on their next click.
+- **P-4, pages do not wait on Control:** after a minute, the company's saved answer from Control (and, after 5 minutes, its plan features) is still used while one call refreshes it in the background. A saved answer is never used past **10 minutes** while Control can be reached; the page then waits for Control, as before. A suspension or closure from Control's event feed still clears it at once, and a refresh already under way can no longer bring it back. When Control cannot be reached, the last good answer is still used for up to 24 hours (owner, 2026-10-20), unchanged.
+- **P-5, staggered jobs:** the background jobs of Operations Web and Control no longer all start with the site. The first starts 20 seconds after start-up, each next one 5 seconds later (`VixlyJobs__StartDelaySeconds`, `VixlyJobs__SpacingSeconds`; optional). Each job's own rhythm is unchanged.
+- **P-5, a pre-built database model is not possible:** Entity Framework refuses to pre-build a model that has query filters, and the company filter is one. The model (about 2 seconds) is built once when a site starts, so the fix is to keep the sites from going to sleep (below).
+
+**To do once (hosting):** create a free monitor at an uptime service (for example UptimeRobot) that calls each address below every 5 minutes. `/health/live` shows only the word "Healthy": no data, nothing about the database.
+
+| Site | Address |
+|---|---|
+| Public site | `https://vixly.ltd/health/live` |
+| Control | `https://control.vixly.ltd/health/live` |
+| Platform API | `https://api.vixly.ltd/health/live` |
+| Operations Web | `https://galeo.vixly.ltd/health/live` |
+| Customer portal | `https://galeo.vixly.ltd/customer/health/live` |
+| Operations API | `https://ops-internal.vixly.ltd/health/live` |
+
+One company's address keeps Operations Web and the portal awake for every company: they are the same sites.
+
+**Checks (staging):**
+1. With `VixlyTiming__ShowHeader=true`, the owner's home page shows a much smaller `sql` count than before (about half).
+2. Leave Operations idle for 2 minutes, then open a page: it no longer waits on Control (no `calls` time in the header, no `Slow request` line with a call to Control).
+3. Suspend a test company in Control: its site shows the suspension within a minute, as before.
+4. After a recycle, the log shows the jobs starting one after another over about a minute, the first about 20 seconds after start-up.
+5. After a day with the monitors on, the `Slow request` lines from the first visit of the morning are gone.
+
+## 43. Thirty-ninth update (2026-11-04): Operations pages do less of the same work
+**Database: no.** Copy **Operations Web** and **Operations API**. No setting.
+
+Feature harmonization, Operations part (vixly/planes/feature-harmonization-2026-11-04.md, H-1 to H-5). Every check stays where it was; the pages read the same data, fewer times and less of it.
+
+- **H-1, the company name without the website texts:** the staff pages, documents, labels and emails that only show the company's name (and the customer portal's brand) read it on its own, instead of loading the whole brand with every website text in every language.
+- **H-2, the signed-in staff member in one database command** instead of two.
+- **H-3, the two menu counts in one command.**
+- **H-4, the home page's counters in one command:** only the counters the person may see, each over their own warehouses, as before.
+- **H-5, a warehouse or shipment read again in the same request** is the one already read.
+
+Measured on a copy with the demo day's data, every menu page and one detail page each: **855 database commands down to 647 (24% fewer)**. A typical list or settings page goes from 10 to 7, the home page from 33 to 18.
+
+**Checks (staging):**
+1. With `VixlyTiming__ShowHeader=true`, the owner's home page and a list page (Customers, Invoices) show about a third fewer `sql` commands than with section 42.
+2. The home page counters show the same numbers as before for the owner and for a staff member limited to one warehouse.
+3. The menu counts (*Your website*, *Payments to verify*) still appear for whoever may act on them.
+4. A label, a receipt and an invoice still carry the company's name.
+
+## 44. Fortieth update (2026-11-04): the customer portal stops waiting in line
+**Database: no.** Copy the **customer portal** (`/customer`). No setting.
+
+Feature harmonization, customer portal part (vixly/planes/feature-harmonization-2026-11-04.md, H-6 and H-7). Every call is still checked by Operations: signed single-use token, plan, session and ownership.
+
+- **H-6, calls side by side:** pages that ask Operations two or three things that do not depend on each other now ask them at the same time: *Invoices* (invoices and credit), *Profile* (profile and notices), *Review us* (review and profile), *Home* (profile and the review invitation), *Announce a package* and the shipment forms (choices and packages, or the shipment being changed), and a shipment's page (the shipment and its driver). The page waits for the slowest call instead of for each in turn.
+- **H-7, no waiting every minute for the brand:** the company's brand is still kept 60 seconds; after that the kept brand is used while one call refreshes it in the background, never past 10 minutes. Before, the first visitor each minute waited for Operations. Which company a host belongs to (it says whether the company is live or suspended) is still asked at most every 60 seconds, as before (section 45).
+
+**Checks (staging):**
+1. Open *Invoices*, *Profile* and a shipment's page: they show what they showed before.
+2. Change the company's name or colours in the website editor and publish: the portal shows the change within about a minute, as before.
+3. Sign out in another tab, then open *Invoices*: the portal goes to sign-in.
+
+## 45. Forty-first update (2026-11-04): Control loads each page once
+**Database: no.** Copy **Control**, **Platform API** and the **customer portal**. No setting.
+
+Feature harmonization, Control and Platform API part (vixly/planes/feature-harmonization-2026-11-04.md, H-8 to H-13).
+
+- **H-8, each page loads once (owner, 2026-11-04):** signed-in pages no longer render first on the server and then again in the live connection; they render once, in the live connection. On first open a page shows a short moment before it fills in; moving between pages is unchanged. The sign-in page and the help pages are served as before (help answers a hidden or unknown article with a real "not found").
+- **H-9, one permission read per action:** an action reads the person's rights once and its buttons reuse that answer, instead of reading them again for each button. Every new action reads afresh, and an answer is never reused after 5 seconds, so a removed right applies from the next action, as before.
+- **H-10, the session check reads only what it checks:** whether the account is active, its level, name and language, instead of the whole staff member with roles, departments, passkeys and recovery codes, on every request and every minute of an open page.
+- **H-11, a company's plan choices read its limit overrides once,** not once per plan.
+- **H-13, a company lookup works out the legal state once,** from the company already loaded (it was twice, each time reloading the company and the terms). Operations makes this call for every company every minute or so.
+- **Independent review, applied:** the customer portal again asks which company a host belongs to at most every 60 seconds and never serves an older answer, because that answer is what stops a suspended company's portal (section 44 had served it while refreshing); the sidebar's sign-out button sends the page's own sign-out form, so it keeps a valid token now that the sidebar renders only in the live connection; a permission answer is filed under the action it was read for.
+
+**Checks (staging):**
+1. Sign in to Control: the overview fills in after a short moment; open a tenant, the subscriptions and the approvals: they show as before.
+2. Remove a right from a test staff member while they are signed in: their next click is refused, as before.
+3. Deactivate a test staff member: their open page signs out within a minute, as before.
+4. Help: an article opens; a wrong address shows "not found".
+5. A company's site and staff workspace still open, and a company with overdue terms still shows read-only.

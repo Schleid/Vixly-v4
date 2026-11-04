@@ -56,7 +56,7 @@ public sealed class OperationsTicketEscalatedHandler : IOperationsOutboxHandler
             return;
         }
 
-        string company = (await _brands.FindAsync(cancellationToken))?.DisplayName ?? string.Empty;
+        string company = (await _brands.FindDisplayNameAsync(cancellationToken)) ?? string.Empty;
         string link = _links.Page(notice.PortalSlug, "/staff/tickets/" + ticket.Id);
 
         foreach (OperationsUser manager in await _people.ManagersAsync(ticket.Topic, notice.Step >= 2, cancellationToken))

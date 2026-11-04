@@ -28,12 +28,17 @@ namespace Vixly.Operations.Infrastructure.Persistence;
 // IMPORTANT NOTES:
 // - Without an entered tenant or system scope, a tenant query throws instead of returning every tenant
 // - The Data Protection key ring lives here too (S-5)
+// - Performance plan P-3: a few lookups (the staff member, rights, warehouses, settings, brand) are kept for the rest of this context
+//   only, per tenant or system scope, and forgotten at every save or cleared tracker
 // =========================================================
 public sealed class OperationsDbContext : DbContext, IDataProtectionKeyContext
 {
     private readonly IOperationsTenantScope _scope;
 
     private readonly Action<ModelBuilder>? _testModel;
+
+    // P-3: the lookups this context already made, by scope and key (a context is one request or one job item).
+    private readonly Dictionary<string, object?> _remembered = new(StringComparer.Ordinal);
 
     public OperationsDbContext(DbContextOptions<OperationsDbContext> options, IOperationsTenantScope scope)
         : base(options)
@@ -267,20 +272,75 @@ public sealed class OperationsDbContext : DbContext, IDataProtectionKeyContext
     internal Guid TenantFilterId => _scope.TenantId
         ?? (_scope.IsSystem ? Guid.Empty : throw new InvalidOperationException("Tenant data was queried outside a tenant scope (D-F1)."));
 
+    // =====================================================
+    // METHOD: REMEMBER
+    // Performance plan P-3 (owner, 2026-11-04): a lookup repeated in the same request is answered from the first one.
+    // The key carries the scope, so a company's answer is never reused in another company or in system work;
+    // every save and every cleared tracker forgets everything, so a change is always read again.
+    // Only for tracked lookups whose answer the same context would give again (EF returns the tracked rows).
+    // =====================================================
+    internal async Task<T> RememberAsync<T>(string key, Func<Task<T>> load)
+    {
+        ArgumentNullException.ThrowIfNull(load);
+
+        string scoped = (_scope.IsSystem ? "system|" : "tenant|") + (_scope.TenantId?.ToString("N") ?? "-") + "|" + key;
+
+        if (_remembered.TryGetValue(scoped, out object? kept))
+        {
+            return (T)kept!;
+        }
+
+        T loaded = await load();
+        _remembered[scoped] = loaded;
+        return loaded;
+    }
+
+    // What this context already remembered under the key, if anything (harmonization H-5: a row by id found in a list already read).
+    internal bool TryRemembered<T>(string key, out T value)
+    {
+        string scoped = (_scope.IsSystem ? "system|" : "tenant|") + (_scope.TenantId?.ToString("N") ?? "-") + "|" + key;
+
+        if (_remembered.TryGetValue(scoped, out object? kept) && kept is T found)
+        {
+            value = found;
+            return true;
+        }
+
+        value = default!;
+        return false;
+    }
+
+    // The tracker was cleared (a clash or discarded changes): what was remembered is no longer tracked.
+    internal void Forget() => _remembered.Clear();
+
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
-        GiveTrackingNumbersAsync(false, CancellationToken.None).GetAwaiter().GetResult();
-        RecordApiEvents();
-        CheckTenantOfChanges();
-        return base.SaveChanges(acceptAllChangesOnSuccess);
+        try
+        {
+            GiveTrackingNumbersAsync(false, CancellationToken.None).GetAwaiter().GetResult();
+            RecordApiEvents();
+            CheckTenantOfChanges();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+        finally
+        {
+            Forget();
+        }
     }
 
     public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
     {
-        await GiveTrackingNumbersAsync(true, cancellationToken);
-        RecordApiEvents();
-        CheckTenantOfChanges();
-        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        try
+        {
+            await GiveTrackingNumbersAsync(true, cancellationToken);
+            RecordApiEvents();
+            CheckTenantOfChanges();
+            return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+        finally
+        {
+            Forget();
+        }
     }
 
     // =====================================================
