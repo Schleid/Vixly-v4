@@ -15,12 +15,12 @@ updated: 2026-10-29
 review: ok
 ---
 
-Su sitio muestra el nombre, el logotipo, los colores, los textos, los servicios y las ubicaciones de su empresa. Usted cambia un borrador; los visitantes no ven nada nuevo hasta que publique.
+Su sitio muestra el nombre, el logotipo, los colores, los textos, los servicios y las ubicaciones de {brandName}. Usted cambia un borrador; los visitantes no ven nada nuevo hasta que publique.
 
 ## Elegir un tema
 1. Abra **Sitio web** en el menú.
 2. En **Tema y fuente**, lea la breve descripción de cada tema. **Clásico** es la página estándar, **Horizonte** abre oscuro y llamativo con un dibujo de ruta, **Aire y mar** es luminoso, con una foto grande y aéreo y marítimo lado a lado.
-3. Use **Vista previa: Horizonte** (u otro tema) arriba para ver su borrador en ese tema, en una pestaña nueva. No se guarda nada.
+3. Use *Vista previa: Horizonte* (u otro tema) arriba para ver su borrador en ese tema, en una pestaña nueva. No se guarda nada.
 4. Elija el tema y una fuente y seleccione **Guardar**.
 5. Seleccione **Publicar ahora** cuando la vista previa se vea bien.
 

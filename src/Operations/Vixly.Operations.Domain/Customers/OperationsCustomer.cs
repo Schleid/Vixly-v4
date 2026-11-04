@@ -106,6 +106,16 @@ public sealed class OperationsCustomer : OperationsEntity
         MarkAsModified(utcNow);
     }
 
+    // The portal's invitation to review (owner, 2026-11-03): once dismissed it does not come back.
+    public DateTimeOffset? ReviewInviteDismissedUtc { get; private set; }
+
+    public void DismissReviewInvite(DateTimeOffset utcNow)
+    {
+        if (ReviewInviteDismissedUtc is not null) return;
+        ReviewInviteDismissedUtc = utcNow;
+        MarkAsModified(utcNow);
+    }
+
     public string FullName => FirstName + " " + LastName;
 
     // =====================================================
@@ -147,6 +157,22 @@ public sealed class OperationsCustomer : OperationsEntity
         Status = OperationsCustomerStatus.Active;
         StatusChangedUtc = utcNow;
         EmailVerifiedUtc = utcNow;
+        MarkAsModified(utcNow);
+    }
+
+    // =====================================================
+    // METHOD: CORRECT EMAIL (2026-11-03): staff fix a mistyped address while the account waits for confirmation
+    // =====================================================
+    public void CorrectEmail(EmailAddress email, DateTimeOffset utcNow)
+    {
+        ArgumentNullException.ThrowIfNull(email);
+
+        if (Status != OperationsCustomerStatus.PendingVerification)
+        {
+            throw new DomainException(OperationsCustomerErrors.NotPending);
+        }
+
+        Email = email;
         MarkAsModified(utcNow);
     }
 

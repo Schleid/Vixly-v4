@@ -50,6 +50,7 @@ public sealed class GetOperationsSiteDraftUseCase
 
         return brand is null
             ? GetOperationsSiteDraftResponse.Failure(OperationsCommonErrors.NotFound)
-            : GetOperationsSiteDraftResponse.Success(brand.Draft, brand.TextsFor(OperationsSiteTextStage.Draft, request.Language), brand.PublishedVersion, brand.HasUnpublishedChanges);
+            : GetOperationsSiteDraftResponse.Success(brand.Draft, brand.TextsFor(OperationsSiteTextStage.Draft, request.Language), brand.PublishedVersion, brand.HasUnpublishedChanges)
+                .WithNewReviews(await _site.CountNewReviewsAsync(cancellationToken));
     }
 }

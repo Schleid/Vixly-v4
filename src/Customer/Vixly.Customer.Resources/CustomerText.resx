@@ -1892,4 +1892,109 @@
   <data name="ui.prealert.condition_used" xml:space="preserve">
     <value>Used</value>
   </data>
+  <data name="ui.nav.review" xml:space="preserve">
+    <value>Review us</value>
+  </data>
+  <data name="ui.review.title" xml:space="preserve">
+    <value>Review us</value>
+  </data>
+  <data name="ui.review.yours" xml:space="preserve">
+    <value>Your review</value>
+  </data>
+  <data name="ui.review.status.New" xml:space="preserve">
+    <value>Received, waiting to be read</value>
+  </data>
+  <data name="ui.review.status.Published" xml:space="preserve">
+    <value>Shown on the website</value>
+  </data>
+  <data name="ui.review.status.Hidden" xml:space="preserve">
+    <value>Not shown on the website</value>
+  </data>
+  <data name="ui.review.feedback_only" xml:space="preserve">
+    <value>You did not allow it on the website, so it stays private feedback.</value>
+  </data>
+  <data name="ui.review.off" xml:space="preserve">
+    <value>{company} is not asking for reviews at the moment.</value>
+  </data>
+  <data name="ui.review.not_yet" xml:space="preserve">
+    <value>You can review {company} once one of your shipments has been delivered or picked up.</value>
+  </data>
+  <data name="ui.review.intro" xml:space="preserve">
+    <value>Tell {company} and future customers how it went. Your full name is never shown.</value>
+  </data>
+  <data name="ui.review.rating" xml:space="preserve">
+    <value>Your rating</value>
+  </data>
+  <data name="ui.review.stars" xml:space="preserve">
+    <value>{count} out of 5</value>
+  </data>
+  <data name="ui.review.quote" xml:space="preserve">
+    <value>Your review</value>
+  </data>
+  <data name="ui.review.quote_hint" xml:space="preserve">
+    <value>Up to 400 characters, plain text.</value>
+  </data>
+  <data name="ui.review.name" xml:space="preserve">
+    <value>Show my name as</value>
+  </data>
+  <data name="ui.review.place" xml:space="preserve">
+    <value>City (optional)</value>
+  </data>
+  <data name="ui.review.agreed" xml:space="preserve">
+    <value>{company} may show this review on its website.</value>
+  </data>
+  <data name="ui.review.change_hint" xml:space="preserve">
+    <value>If you change it, {company} reads it again before it can be shown.</value>
+  </data>
+  <data name="ui.review.send" xml:space="preserve">
+    <value>Send my review</value>
+  </data>
+  <data name="ui.review.save" xml:space="preserve">
+    <value>Save my changes</value>
+  </data>
+  <data name="ui.review.delete" xml:space="preserve">
+    <value>Delete my review</value>
+  </data>
+  <data name="ui.review.delete_hint" xml:space="preserve">
+    <value>Deleting it also removes it from the website at once.</value>
+  </data>
+  <data name="ui.review.done.saved" xml:space="preserve">
+    <value>Your review is saved. Thank you.</value>
+  </data>
+  <data name="ui.review.done.deleted" xml:space="preserve">
+    <value>Your review is deleted.</value>
+  </data>
+  <data name="ui.review.invite_title" xml:space="preserve">
+    <value>How was your shipment with {company}?</value>
+  </data>
+  <data name="ui.review.invite_text" xml:space="preserve">
+    <value>A rating and a few words help us and future customers.</value>
+  </data>
+  <data name="ui.review.invite_go" xml:space="preserve">
+    <value>Leave a review</value>
+  </data>
+  <data name="ui.review.invite_dismiss" xml:space="preserve">
+    <value>No thanks</value>
+  </data>
+  <data name="ops.brand.reviews_off" xml:space="preserve">
+    <value>Reviews are not open at the moment.</value>
+  </data>
+  <data name="ops.brand.review_not_yet" xml:space="preserve">
+    <value>You can leave a review once one of your shipments has been delivered or picked up.</value>
+  </data>
+  <data name="ops.brand.testimonial_quote_required" xml:space="preserve">
+    <value>Write a few words.</value>
+  </data>
+  <data name="ops.brand.testimonial_too_long" xml:space="preserve">
+    <value>Your review or your city is too long.</value>
+  </data>
+  <data name="ops.brand.testimonial_rating_invalid" xml:space="preserve">
+    <value>Choose a rating from 1 to 5.</value>
+  </data>
+  <data name="ops.brand.text_not_plain" xml:space="preserve">
+    <value>Use plain text only, without &lt; or &gt;.</value>
+  </data>
+  <data name="ops.brand.testimonial_name_required" xml:space="preserve">
+    <value>Your first name is missing from your profile.</value>
+  </data>
 </root>

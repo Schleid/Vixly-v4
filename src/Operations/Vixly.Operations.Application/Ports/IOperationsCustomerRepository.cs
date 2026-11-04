@@ -47,6 +47,9 @@ public interface IOperationsCustomerRepository
 
     Task<IReadOnlyList<OperationsCustomerToken>> ListOpenTokensAsync(Guid customerId, OperationsCustomerTokenPurpose purpose, CancellationToken cancellationToken);
 
+    // Links of this kind sent since a moment, used or not (the resend limit).
+    Task<int> CountTokensSinceAsync(Guid customerId, OperationsCustomerTokenPurpose purpose, DateTimeOffset sinceUtc, CancellationToken cancellationToken);
+
     // Counts a failed sign-in in the database itself; true when the account is now locked.
     Task<bool> RecordFailedSignInAsync(Guid customerId, DateTimeOffset utcNow, CancellationToken cancellationToken);
 

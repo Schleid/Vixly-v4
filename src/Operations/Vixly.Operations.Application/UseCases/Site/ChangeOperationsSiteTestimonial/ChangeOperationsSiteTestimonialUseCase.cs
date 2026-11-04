@@ -17,6 +17,7 @@ namespace Vixly.Operations.Application.UseCases.Site.ChangeOperationsSiteTestimo
 //
 // IMPORTANT NOTES:
 // - Shown and hidden take effect on the website at once; the testimonial is the customer's words, never edited
+// - Customer reviews (owner, 2026-11-03): published only with the customer's agreement, hidden with a reason, never removed by the company; up and down order the published ones
 // =========================================================
 public sealed class ChangeOperationsSiteTestimonialUseCase
 {
@@ -57,22 +58,62 @@ public sealed class ChangeOperationsSiteTestimonialUseCase
             return ChangeOperationsSiteTestimonialResponse.Failure(OperationsBrandingErrors.TestimonialNotFound);
         }
 
-        switch (request.Action)
+        DateTimeOffset utcNow = _timeProvider.GetUtcNow();
+
+        try
         {
-            case "show":
-                testimonial.ChangeShown(true, _timeProvider.GetUtcNow());
-                break;
-            case "hide":
-                testimonial.ChangeShown(false, _timeProvider.GetUtcNow());
-                break;
-            case "remove":
-                _site.RemoveTestimonial(testimonial);
-                break;
-            default:
-                return ChangeOperationsSiteTestimonialResponse.Failure(OperationsCommonErrors.NotFound);
+            switch (request.Action)
+            {
+                case "show":
+                    IReadOnlyList<OperationsSiteTestimonial> shown = await _site.ListTestimonialsAsync(Vixly.Operations.Application.Site.OperationsTestimonialView.Published, 1000, cancellationToken);
+                    testimonial.ChangeShown(true, utcNow);
+
+                    if (testimonial.FromCustomer)
+                    {
+                        testimonial.MoveTo(shown.Where(item => item.Id != testimonial.Id).Select(item => item.SortOrder + 1).DefaultIfEmpty(0).Max(), utcNow);
+                    }
+
+                    break;
+                case "hide":
+                    testimonial.Hide(testimonial.FromCustomer ? request.HideReason : null, utcNow);
+                    break;
+                case "remove":
+                    if (testimonial.FromCustomer)
+                    {
+                        return ChangeOperationsSiteTestimonialResponse.Failure(OperationsBrandingErrors.ReviewIsCustomers);
+                    }
+
+                    _site.RemoveTestimonial(testimonial);
+                    break;
+                case "up":
+                case "down":
+                    IReadOnlyList<OperationsSiteTestimonial> order = await _site.ListTestimonialsAsync(Vixly.Operations.Application.Site.OperationsTestimonialView.Published, 1000, cancellationToken);
+                    int at = order.ToList().FindIndex(item => item.Id == testimonial.Id);
+                    int other = request.Action == "up" ? at - 1 : at + 1;
+
+                    if (at < 0 || other < 0 || other >= order.Count)
+                    {
+                        return ChangeOperationsSiteTestimonialResponse.Success();
+                    }
+
+                    // Number them in their current order first, so two with the same place still swap.
+                    for (int index = 0; index < order.Count; index++)
+                    {
+                        order[index].MoveTo(index == at ? other : index == other ? at : index, utcNow);
+                    }
+
+                    break;
+                default:
+                    return ChangeOperationsSiteTestimonialResponse.Failure(OperationsCommonErrors.NotFound);
+            }
+        }
+        catch (Vixly.Shared.Kernel.Domain.DomainException exception)
+        {
+            return ChangeOperationsSiteTestimonialResponse.Failure(exception.Error);
         }
 
-        _audit.Record(context.UserId, "ops.site.testimonial_" + request.Action, nameof(OperationsSiteTestimonial), testimonial.Id);
+        _audit.Record(context.UserId, "ops.site.testimonial_" + request.Action, nameof(OperationsSiteTestimonial), testimonial.Id,
+            arguments: request.Action == "hide" && request.HideReason is { } reason ? new { reason = reason.ToString() } : null);
 
         return await _unitOfWork.SaveChangesAsync(cancellationToken)
             ? ChangeOperationsSiteTestimonialResponse.Success()

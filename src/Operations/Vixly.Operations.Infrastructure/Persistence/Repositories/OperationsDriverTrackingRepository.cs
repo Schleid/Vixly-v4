@@ -58,5 +58,5 @@ internal sealed class OperationsDriverTrackingRepository : IOperationsDriverTrac
         _context.DeliveryStops.CountAsync(item => item.RouteId == routeId && item.Sequence < sequence && item.Status == OperationsStopStatus.Pending, cancellationToken);
 
     public Task<int> DeleteOlderThanAsync(DateTimeOffset cutoffUtc, int batchSize, CancellationToken cancellationToken) =>
-        _context.DriverPositions.Where(item => item.TakenUtc < cutoffUtc).Take(batchSize).ExecuteDeleteAsync(cancellationToken);
+        _context.DriverPositions.Where(item => item.TakenUtc < cutoffUtc).OrderBy(item => item.TakenUtc).Take(batchSize).ExecuteDeleteAsync(cancellationToken);
 }

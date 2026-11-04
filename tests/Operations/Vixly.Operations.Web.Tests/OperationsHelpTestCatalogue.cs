@@ -13,6 +13,7 @@ namespace Vixly.Operations.Web.Tests;
 //
 // IMPORTANT NOTES:
 // - HTTP startup tests separately validate against real endpoints.
+// - Add a route here when an article names a new page.
 // =========================================================
 internal static class OperationsHelpTestCatalogue
 {
@@ -24,6 +25,8 @@ internal static class OperationsHelpTestCatalogue
         "/staff/insurance/", "/staff/inspection/setup", "/staff/settings/invoices", "/staff/settings/payments",
         "/staff/settings/credit", "/staff/settings/bundles", "/staff/settings/events", "/staff/settings/pickup",
         "/staff/settings/delivery", "/staff/supplies", "/staff/supplies/{supplyId:guid}",
-        "/staff/carriers", "/staff/carriers/{carrierId:guid}"
+        "/staff/carriers", "/staff/carriers/{carrierId:guid}",
+        "/staff/billing", "/staff/customers", "/staff/customers/new", "/staff/items", "/staff/settings/items",
+        "/staff/site", "/staff/site/testimonials", "/staff/support", "/staff/support/requests", "/staff/tickets/"
     });
 }

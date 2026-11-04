@@ -14,5 +14,6 @@
 // =========================================================
 public sealed class ListOperationsSiteTestimonialsRequest
 {
-
+    // Customer reviews (owner, 2026-11-03): new, published, hidden or all.
+    public Vixly.Operations.Application.Site.OperationsTestimonialView View { get; init; }
 }

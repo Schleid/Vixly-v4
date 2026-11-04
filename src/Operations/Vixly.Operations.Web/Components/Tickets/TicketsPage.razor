@@ -76,7 +76,7 @@ IMPORTANT NOTES:
                                 <td><span class="ops-ticket-topic">@T["ui.tickets.topic." + ticket.Topic]</span></td>
                                 <td>@(Warehouses.FirstOrDefault(wh => wh.Id == ticket.WarehouseId)?.Code)</td>
                                 <td class="ops-editor__code">@ticket.TrackingNumber</td>
-                                <td>@T[ticket.FromCustomer ? "ui.tickets.by_customer" : "ui.tickets.by_agent"]</td>
+                                <td>@T[ticket.FromCustomer ? "ui.tickets.by_customer" : ticket.OpenedBy == OperationsTicketSource.Review ? "ui.tickets.by_review" : "ui.tickets.by_agent"]</td>
                                 <td>@(ticket.TakenByUserId is { } taker ? People.GetValueOrDefault(taker) : T["ui.tickets.nobody"].Value)</td>
                                 <td>
                                     <div class="ops-ticket-status-group">

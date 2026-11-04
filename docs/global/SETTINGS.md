@@ -30,6 +30,7 @@
 | `PlatformMail:SmtpHost` | R | The mail server (unless `PlatformMail:PickupDirectory`) |
 | `PlatformMail:Password` | W, S | Without it every email fails |
 | `PlatformPayments:Stripe:SecretKey` | W, S | Card payments are off without it |
+| `DataProtection:KeyEncryptionKey` | R, S | Locks Platform's key ring in the database (staff sign-in, authenticator keys): 32 random bytes, base64. **The same value on Control and Platform API**, different from Operations' |
 | `PlatformPayments:Stripe:WebhookSecret` | W, S | The same value as the API's: without it Control reports the card provider keys as not configured |
 | `PlatformSales:TechOs:Url` | W | TechOS's full event address: `https://techcrafters.ltd/api/sales-sources/vixly/events` (staging `https://techcrafters.dyndns.ws/api/sales-sources/vixly/events`); the site alone is refused |
 | `PlatformSales:TechOs:Secret` | W, S | The secret TechOS holds for the Vixly source |
@@ -43,7 +44,7 @@
 | Setting | | What it is |
 |---|---|---|
 | `ConnectionStrings:Platform` | R, S | As Control |
-| `PlatformHosting:*`, `PlatformTenants:TenantBaseDomain`, `PlatformMail:*`, `PlatformPayments:Stripe:SecretKey` | R / W | As Control |
+| `PlatformHosting:*`, `PlatformTenants:TenantBaseDomain`, `PlatformMail:*`, `PlatformPayments:Stripe:SecretKey`, `DataProtection:KeyEncryptionKey` | R / W | As Control (the same key-encryption key) |
 | `PlatformApi:AllowedOrigins[]` | W | `https://vixly.ltd` |
 | `PlatformBotCheck:SecretKey` | R, S | Cloudflare Turnstile secret, unless `PlatformBotCheck:Enabled=false` |
 | `PlatformInternal:Hosts[]` | R | The host name Operations calls (internal API) |

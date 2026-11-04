@@ -63,6 +63,6 @@ internal sealed class OperationsCreditRepository : IOperationsCreditRepository
             .OrderBy(invoice => invoice.AccountRequestedUtc).Take(take).ToListAsync(cancellationToken);
 
     public async Task<IReadOnlyList<Guid>> ListTenantsWithAccountsAsync(CancellationToken cancellationToken) =>
-        await _context.CreditAccounts.AsNoTracking().Where(account => account.Status != OperationsCreditAccountStatus.Closed).Select(account => account.TenantId).Distinct().Take(10_000)
+        await _context.CreditAccounts.AsNoTracking().Where(account => account.Status != OperationsCreditAccountStatus.Closed).Select(account => account.TenantId).Distinct().OrderBy(id => id).Take(10_000)
             .ToListAsync(cancellationToken);
 }

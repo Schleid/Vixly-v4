@@ -60,9 +60,10 @@ public static class OperationsEditorEndpoints
         });
 
         // Customer testimonials (owner, 2026-10-30): recorded with the customer's agreement, shown or hidden on the website.
-        staff.MapGet("/site/testimonials", async (HttpContext http, string? saved, Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsUseCase list,
+        staff.MapGet("/site/testimonials", async (HttpContext http, string? saved, string? done, Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsUseCase list,
             GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
-            await TestimonialsPageAsync(http, list, await CompanyAsync(http, brand), text, null, saved is null ? null : Saved(http, "testimonial"), null));
+            await TestimonialsPageAsync(http, list, await CompanyAsync(http, brand), text, null,
+                done == "ticket" ? Saved(http, "review_ticket") : saved is null ? null : Saved(http, "testimonial"), null));
 
         staff.MapPost("/site/testimonials", async (HttpContext http, IFormCollection form, Vixly.Operations.Application.UseCases.Site.RecordOperationsSiteTestimonial.RecordOperationsSiteTestimonialUseCase record,
             Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsUseCase list, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
@@ -81,15 +82,44 @@ public static class OperationsEditorEndpoints
                 : await TestimonialsPageAsync(http, list, await CompanyAsync(http, brand), text, response.Error, null, request);
         });
 
-        staff.MapPost("/site/testimonials/{testimonialId:guid}/{action:regex(^(show|hide|remove)$)}", async (HttpContext http, Guid testimonialId, string action,
+        staff.MapPost("/site/testimonials/{testimonialId:guid}/{action:regex(^(show|hide|remove|up|down)$)}", async (HttpContext http, Guid testimonialId, string action, IFormCollection form,
             Vixly.Operations.Application.UseCases.Site.ChangeOperationsSiteTestimonial.ChangeOperationsSiteTestimonialUseCase change, Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsUseCase list,
             GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
         {
             Vixly.Operations.Application.UseCases.Site.ChangeOperationsSiteTestimonial.ChangeOperationsSiteTestimonialResponse response = await change.ExecuteAsync(OperationsCurrentUser.Context(http),
-                new Vixly.Operations.Application.UseCases.Site.ChangeOperationsSiteTestimonial.ChangeOperationsSiteTestimonialRequest { TestimonialId = testimonialId, Action = action }, http.RequestAborted);
+                new Vixly.Operations.Application.UseCases.Site.ChangeOperationsSiteTestimonial.ChangeOperationsSiteTestimonialRequest
+                {
+                    TestimonialId = testimonialId, Action = action,
+                    HideReason = Enum.TryParse(form["reason"], out Vixly.Operations.Domain.Branding.OperationsReviewHideReason reason) && Enum.IsDefined(reason) ? reason : null
+                }, http.RequestAborted);
+
+            return response.Succeeded
+                ? Results.Redirect("/staff/site/testimonials?saved=1&view=" + View(http).ToString().ToLowerInvariant())
+                : await TestimonialsPageAsync(http, list, await CompanyAsync(http, brand), text, response.Error, null, null);
+        });
+
+        // Customer reviews (owner, 2026-11-03): the portal asks for them or not; a ticket from a review for customer service.
+        staff.MapPost("/site/testimonials/reviews", async (HttpContext http, IFormCollection form,
+            Vixly.Operations.Application.UseCases.Site.ChangeOperationsReviewInvitations.ChangeOperationsReviewInvitationsUseCase change,
+            Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsUseCase list, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
+        {
+            Vixly.Operations.Application.UseCases.Site.ChangeOperationsReviewInvitations.ChangeOperationsReviewInvitationsResponse response = await change.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Site.ChangeOperationsReviewInvitations.ChangeOperationsReviewInvitationsRequest { Ask = form["ask"] == "true" }, http.RequestAborted);
 
             return response.Succeeded
                 ? Results.Redirect("/staff/site/testimonials?saved=1")
+                : await TestimonialsPageAsync(http, list, await CompanyAsync(http, brand), text, response.Error, null, null);
+        });
+
+        staff.MapPost("/site/testimonials/{testimonialId:guid}/ticket", async (HttpContext http, Guid testimonialId,
+            Vixly.Operations.Application.UseCases.Site.OpenOperationsReviewTicket.OpenOperationsReviewTicketUseCase open,
+            Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsUseCase list, GetOperationsSignInBrandUseCase brand, OperationsErrorText text) =>
+        {
+            Vixly.Operations.Application.UseCases.Site.OpenOperationsReviewTicket.OpenOperationsReviewTicketResponse response = await open.ExecuteAsync(OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Site.OpenOperationsReviewTicket.OpenOperationsReviewTicketRequest { TestimonialId = testimonialId }, http.RequestAborted);
+
+            return response.Succeeded
+                ? Results.Redirect("/staff/site/testimonials?done=ticket&view=" + View(http).ToString().ToLowerInvariant())
                 : await TestimonialsPageAsync(http, list, await CompanyAsync(http, brand), text, response.Error, null, null);
         });
 
@@ -273,23 +303,35 @@ public static class OperationsEditorEndpoints
             Draft = draft.Draft,
             Texts = draft.Texts,
             HasUnpublishedChanges = draft.HasUnpublishedChanges,
+            NewReviews = draft.NewReviews,
             Features = features,
             Error = text.Describe(error ?? draft.Error),
             Info = info
         });
     }
 
+    // Customer reviews (owner, 2026-11-03): ?view=new|published|hidden|all, from the address or the form.
+    private static Vixly.Operations.Application.Site.OperationsTestimonialView View(HttpContext http) =>
+        Enum.TryParse(http.Request.Query["view"].ToString(), true, out Vixly.Operations.Application.Site.OperationsTestimonialView view)
+            && view is not Vixly.Operations.Application.Site.OperationsTestimonialView.Staff && Enum.IsDefined(view)
+            ? view
+            : Vixly.Operations.Application.Site.OperationsTestimonialView.All;
+
     private static async Task<IResult> TestimonialsPageAsync(HttpContext http, Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsUseCase list, string? company,
         OperationsErrorText text, Error? error, string? info, Vixly.Operations.Application.UseCases.Site.RecordOperationsSiteTestimonial.RecordOperationsSiteTestimonialRequest? entered)
     {
         Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsResponse response =
-            await list.ExecuteAsync(OperationsCurrentUser.Context(http), new Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsRequest(), http.RequestAborted);
+            await list.ExecuteAsync(OperationsCurrentUser.Context(http), new Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsRequest { View = View(http) }, http.RequestAborted);
         http.Response.Headers.CacheControl = "no-store";
 
         return Page<SiteTestimonialsPage>(new
         {
             Company = company,
             Testimonials = response.Testimonials,
+            View = View(http),
+            NewCount = response.NewCount,
+            AskForReviews = response.AskForReviews,
+            PortalInPlan = response.PortalInPlan,
             Entered = entered,
             Error = text.Describe(error ?? response.Error),
             Info = info
@@ -325,6 +367,7 @@ public static class OperationsEditorEndpoints
             "image" => text["ui.editor.saved.image"],
             "location" => text["ui.editor.saved.location"],
             "testimonial" => text["ui.editor.saved.testimonial"],
+            "review_ticket" => text["ui.editor.saved.review_ticket"],
             _ => text["ui.editor.saved.draft"]
         };
     }

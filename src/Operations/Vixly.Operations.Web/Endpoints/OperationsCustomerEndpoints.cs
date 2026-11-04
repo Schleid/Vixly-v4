@@ -100,11 +100,26 @@ public static class OperationsCustomerEndpoints
             return await AfterAsync(http, customerId, response.Succeeded, response.Error, "status", get, brand, errors);
         });
 
+        // Owner, 2026-11-03: staff send the confirmation email again, to a corrected address when it was mistyped.
+        staff.MapPost("/customers/{customerId:guid}/confirmation", async (HttpContext http, Guid customerId, [FromForm] string? email,
+            Vixly.Operations.Application.UseCases.Customers.ResendOperationsCustomerConfirmation.ResendOperationsCustomerConfirmationUseCase useCase,
+            GetOperationsCustomerUseCase get, GetOperationsSignInBrandUseCase brand, OperationsErrorText errors) =>
+        {
+            Vixly.Operations.Application.UseCases.Customers.ResendOperationsCustomerConfirmation.ResendOperationsCustomerConfirmationResponse response = await useCase.ExecuteAsync(
+                OperationsCurrentUser.Context(http),
+                new Vixly.Operations.Application.UseCases.Customers.ResendOperationsCustomerConfirmation.ResendOperationsCustomerConfirmationRequest
+                {
+                    CustomerId = customerId, Email = email, PortalSlug = OperationsStaffResults.PortalSlug(http)
+                }, http.RequestAborted);
+
+            return await AfterAsync(http, customerId, response.Succeeded, response.Error, "confirmation", get, brand, errors);
+        });
+
         return endpoints;
     }
 
     private static string? Done(IStringLocalizer<OperationsText> text, string? done) =>
-        done is "status" or "credit" ? text["ui.customers.done." + done].Value : null;
+        done is "status" or "credit" or "confirmation" ? text["ui.customers.done." + done].Value : null;
 
     private static async Task<IResult> AfterAsync(HttpContext http, Guid customerId, bool succeeded, Error? error, string done, GetOperationsCustomerUseCase get,
         GetOperationsSignInBrandUseCase brand, OperationsErrorText errors)

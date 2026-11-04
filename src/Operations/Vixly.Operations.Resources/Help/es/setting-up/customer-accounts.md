@@ -15,10 +15,10 @@ updated: 2026-10-31
 review: ok
 ---
 
-Abra el cliente desde **Clientes**. Al final de la página, elija el cambio e indique un motivo. El motivo queda en el historial del cliente; el cliente recibe un correo sin él.
+Abra el cliente desde **Clientes**. Al final de la página, elija el cambio e indique un motivo. El motivo queda en el historial del cliente; el cliente recibe un correo de {brandName} sin él.
 
 ## Las acciones
-- **Suspender**: el cliente no puede iniciar sesión ni enviar nuevos envíos. Puede elegir **Reactivar automáticamente el**: la cuenta vuelve a estar activa sola ese día. Suspenda de nuevo para cambiar el día.
+- **Suspender**: el cliente no puede iniciar sesión ni enviar nuevos envíos. Puede elegir **Reactivar automáticamente el (opcional)**: la cuenta vuelve a estar activa sola ese día. Suspenda de nuevo para cambiar el día.
 - **Reactivar**: termina una suspensión o reabre una cuenta cerrada.
 - **Cerrar la cuenta**: para un cliente que se va o pide cerrarla. Se puede reabrir más tarde.
 - **Bloquear (incumple las condiciones, definitivo)**: la cuenta nunca se puede reabrir, y el correo y el teléfono del cliente no pueden abrir una cuenta nueva con su empresa.

@@ -23,12 +23,16 @@ public sealed class GetOperationsCustomerPortalBrandUseCase
 
     private readonly IOperationsPlanFeatures _features;
 
+    private readonly Vixly.Operations.Application.Site.OperationsCustomerReviews _reviews;
+
     public GetOperationsCustomerPortalBrandUseCase(
         IOperationsBrandRepository brands,
-        IOperationsPlanFeatures features)
+        IOperationsPlanFeatures features,
+        Vixly.Operations.Application.Site.OperationsCustomerReviews reviews)
     {
         _brands = brands ?? throw new ArgumentNullException(nameof(brands));
         _features = features ?? throw new ArgumentNullException(nameof(features));
+        _reviews = reviews ?? throw new ArgumentNullException(nameof(reviews));
     }
 
     public async Task<GetOperationsCustomerPortalBrandResponse> ExecuteAsync(
@@ -46,6 +50,6 @@ public sealed class GetOperationsCustomerPortalBrandUseCase
 
         OperationsPlanFeatures features = await _features.GetAsync(context.RequiredTenantId, cancellationToken);
         OperationsBrandSettings settings = features.ThemeCustomization ? brand.Published : brand.Published.WithDefaultTheme();
-        return GetOperationsCustomerPortalBrandResponse.Success(settings);
+        return GetOperationsCustomerPortalBrandResponse.Success(settings, await _reviews.AskedAsync(context.RequiredTenantId, cancellationToken));
     }
 }

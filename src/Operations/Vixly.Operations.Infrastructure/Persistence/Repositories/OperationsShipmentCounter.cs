@@ -31,5 +31,5 @@ internal sealed class OperationsShipmentCounter : IOperationsShipmentCounter
             .CountAsync(item => item.CreatedUtc >= fromUtc && item.CreatedUtc < toUtc && item.Status != OperationsShipmentStatus.Cancelled, cancellationToken);
 
     public async Task<IReadOnlyList<Guid>> ListTenantsCreatingSinceAsync(DateTimeOffset sinceUtc, CancellationToken cancellationToken) =>
-        await _context.Shipments.AsNoTracking().Where(item => item.CreatedUtc >= sinceUtc).Select(item => item.TenantId).Distinct().Take(10_000).ToListAsync(cancellationToken);
+        await _context.Shipments.AsNoTracking().Where(item => item.CreatedUtc >= sinceUtc).Select(item => item.TenantId).Distinct().OrderBy(id => id).Take(10_000).ToListAsync(cancellationToken);
 }

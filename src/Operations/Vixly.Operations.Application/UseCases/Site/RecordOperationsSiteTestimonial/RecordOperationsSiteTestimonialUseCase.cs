@@ -53,7 +53,8 @@ public sealed class RecordOperationsSiteTestimonialUseCase
             return RecordOperationsSiteTestimonialResponse.Failure(refused);
         }
 
-        IReadOnlyList<OperationsSiteTestimonial> existing = await _site.ListTestimonialsAsync(cancellationToken);
+        // The limit is for testimonials staff enter; customer reviews are one per customer (owner, 2026-11-03).
+        IReadOnlyList<OperationsSiteTestimonial> existing = await _site.ListTestimonialsAsync(Vixly.Operations.Application.Site.OperationsTestimonialView.Staff, OperationsSiteTestimonial.MaxPerCompany + 1, cancellationToken);
 
         if (existing.Count >= OperationsSiteTestimonial.MaxPerCompany)
         {

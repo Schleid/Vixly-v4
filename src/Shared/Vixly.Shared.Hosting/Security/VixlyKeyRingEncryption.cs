@@ -27,7 +27,7 @@ namespace Vixly.Shared.Hosting.Security;
 // IMPORTANT NOTES:
 // - Without it, a copy of the database (a .bak, a stolen login) is enough to read every secret the site keeps:
 //   companies' card and text provider keys, webhook secrets, authenticator keys
-// - Every site that shares a key ring needs the same key: Operations Web and Operations API (the customer portal has its own ring)
+// - Every site that shares a key ring needs the same key: Operations Web and Operations API; Control and Platform API (the customer portal has its own ring)
 // - Without the setting (Development) nothing changes: keys stay as before
 // - Older unlocked keys stay readable, so what they protected still reads; new secrets use the locked key
 // - The key: 32 random bytes, base64 (44 characters); never in a file, never logged

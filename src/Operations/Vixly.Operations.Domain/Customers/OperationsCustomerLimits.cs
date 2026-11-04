@@ -16,6 +16,9 @@ public static class OperationsCustomerLimits
 {
     public const int NameMaxLength = 100;
 
+    // Confirmation links staff may send one customer in an hour (2026-11-03), so a button cannot flood an inbox.
+    public const int ConfirmationResendsPerHour = 5;
+
     public const int CompanyMaxLength = 150;
 
     public const int CodeMaxLength = 20;

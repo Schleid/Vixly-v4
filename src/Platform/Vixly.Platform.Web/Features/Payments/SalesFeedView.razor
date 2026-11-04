@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: SalesFeedView.razor
 
@@ -84,7 +84,7 @@ IMPORTANT NOTES:
                 <th scope="col">@T["ui.sales_feed.occurred"]</th>
                 <th scope="col">@T["ui.sales_feed.error"]</th>
                 <th scope="col">@T["ui.sales_feed.answered"]</th>
-                <th scope="col"><span class="vx-visually-hidden">@T["ui.sales_feed.send_again"]</span></th>
+                <th scope="col" class="vx-table-actions-header"><span class="vx-visually-hidden">@T["ui.sales_feed.send_again"]</span></th>
             </HeaderContent>
             <RowTemplate Context="item">
                 <td>@item.Sequence.ToString(System.Globalization.CultureInfo.InvariantCulture)</td>
@@ -104,8 +104,12 @@ IMPORTANT NOTES:
                 <td>
                     @if (Presenter.State.CanManage)
                     {
-                        <VxButton OnClick="@(() => Presenter.SendAgainAsync(item.Id))" IsBusy="@Presenter.IsBusy">@T["ui.sales_feed.send_again"]</VxButton>
-                        <VxButton OnClick="@(() => Presenter.RebuildAsync(item.Id))" IsBusy="@Presenter.IsBusy">@T["ui.sales_feed.rebuild"]</VxButton>
+                        <div class="vx-table-actions">
+                            <VxButton OnClick="@(() => Presenter.SendAgainAsync(item.Id))" IsBusy="@Presenter.IsBusy">@T["ui.sales_feed.send_again"]</VxButton>
+                            <VxButton OnClick="@(() => Presenter.RebuildAsync(item.Id))" IsBusy="@Presenter.IsBusy">@T["ui.sales_feed.rebuild"]</VxButton>
+    
+                        </div>
+
                     }
                 </td>
             </RowTemplate>

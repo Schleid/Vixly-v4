@@ -27,9 +27,19 @@ public sealed class ListOperationsSiteTestimonialsResponse
 
     public IReadOnlyList<OperationsSiteTestimonial> Testimonials { get; private init; } = Array.Empty<OperationsSiteTestimonial>();
 
-    public static ListOperationsSiteTestimonialsResponse Success(IReadOnlyList<OperationsSiteTestimonial> testimonials)
+    // Customer reviews (owner, 2026-11-03): how many are new, whether the portal asks for them, and whether the plan has the portal.
+    public int NewCount { get; private init; }
+
+    public bool AskForReviews { get; private init; }
+
+    public bool PortalInPlan { get; private init; }
+
+    public static ListOperationsSiteTestimonialsResponse Success(IReadOnlyList<OperationsSiteTestimonial> testimonials, int newCount = 0, bool askForReviews = false, bool portalInPlan = false)
     {
-        return new ListOperationsSiteTestimonialsResponse { Succeeded = true, Testimonials = testimonials };
+        return new ListOperationsSiteTestimonialsResponse
+        {
+            Succeeded = true, Testimonials = testimonials, NewCount = newCount, AskForReviews = askForReviews, PortalInPlan = portalInPlan
+        };
     }
 
     public static ListOperationsSiteTestimonialsResponse Failure(Error error)

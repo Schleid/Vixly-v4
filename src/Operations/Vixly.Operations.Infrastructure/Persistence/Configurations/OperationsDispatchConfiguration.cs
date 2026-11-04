@@ -32,6 +32,7 @@ internal sealed class OperationsDispatchConfiguration : IEntityTypeConfiguration
         builder.Property(dispatch => dispatch.CancelReason).HasMaxLength(300);
         builder.Property(dispatch => dispatch.CostComputed).HasPrecision(14, 2);
         builder.Property(dispatch => dispatch.CostTotal).HasPrecision(14, 2);
+        builder.Property(dispatch => dispatch.BilledTotal).HasColumnType("decimal(18,2)");
         builder.Property(dispatch => dispatch.CostNote).HasMaxLength(OperationsDispatch.CostNoteMaxLength);
         builder.Property(dispatch => dispatch.CostCurrencyCode).HasMaxLength(3).IsUnicode(false);
         builder.Property(dispatch => dispatch.ExportReference).HasMaxLength(OperationsDispatch.ExportReferenceMaxLength);

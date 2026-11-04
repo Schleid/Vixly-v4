@@ -77,7 +77,7 @@ internal sealed class OperationsHoldRepository : IOperationsHoldRepository
     }
 
     public async Task<IReadOnlyList<Guid>> ListTenantsWithWaitingAsync(DateTimeOffset receivedBefore, CancellationToken cancellationToken) =>
-        await WaitingSince(receivedBefore).AsNoTracking().Select(item => item.TenantId).Distinct().Take(10_000).ToListAsync(cancellationToken);
+        await WaitingSince(receivedBefore).AsNoTracking().Select(item => item.TenantId).Distinct().OrderBy(id => id).Take(10_000).ToListAsync(cancellationToken);
 
     // Still at the warehouse (no milestone after receipt), with a hold for its customer, received before the date, and no answer
     // of the customer waiting for staff (a package whose customer answered is neither reminded nor unclaimed).

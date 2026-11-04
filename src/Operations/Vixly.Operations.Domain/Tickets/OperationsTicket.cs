@@ -135,6 +135,14 @@ public sealed class OperationsTicket : OperationsEntity
         return ticket;
     }
 
+    // Staff open a ticket from a customer review (owner, 2026-11-03): for customer service (topic Other), about the customer's last finished shipment; never shown to the customer.
+    public static OperationsTicket FromReview(Guid tenantId, Guid customerId, Guid warehouseId, Guid shipmentId, string reference, Guid staffUserId, string? text, DateTimeOffset utcNow)
+    {
+        OperationsTicket ticket = FromCall(tenantId, customerId, warehouseId, shipmentId, null, reference, OperationsTicketTopic.Other, staffUserId, text, utcNow);
+        ticket.OpenedBy = OperationsTicketSource.Review;
+        return ticket;
+    }
+
     // Someone of the department takes it (or gives it to a colleague): "I'm on it".
     public void Take(Guid userId, DateTimeOffset utcNow)
     {

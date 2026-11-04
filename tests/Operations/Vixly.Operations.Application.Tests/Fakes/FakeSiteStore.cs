@@ -42,8 +42,26 @@ internal sealed class FakeSiteStore : IOperationsSiteRepository, IOperationsLoca
 
     public int DeliveredPackages { get; set; }
 
-    public Task<IReadOnlyList<OperationsSiteTestimonial>> ListTestimonialsAsync(CancellationToken cancellationToken) =>
-        Task.FromResult<IReadOnlyList<OperationsSiteTestimonial>>(Testimonials.OrderBy(item => item.SortOrder).ToList());
+    public Task<IReadOnlyList<OperationsSiteTestimonial>> ListTestimonialsAsync(Vixly.Operations.Application.Site.OperationsTestimonialView view, int take, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<OperationsSiteTestimonial>>(Testimonials.Where(item => view switch
+        {
+            Vixly.Operations.Application.Site.OperationsTestimonialView.New => item.IsNew,
+            Vixly.Operations.Application.Site.OperationsTestimonialView.Published => item.Shown,
+            Vixly.Operations.Application.Site.OperationsTestimonialView.Hidden => !item.Shown && !item.IsNew,
+            Vixly.Operations.Application.Site.OperationsTestimonialView.Staff => !item.FromCustomer,
+            _ => true
+        }).OrderBy(item => item.SortOrder).ThenBy(item => item.CreatedUtc).Take(take).ToList());
+
+    public Task<OperationsSiteTestimonial?> FindCustomerReviewAsync(Guid customerId, CancellationToken cancellationToken) =>
+        Task.FromResult(Testimonials.FirstOrDefault(item => item.CustomerId == customerId));
+
+    public Task<int> CountNewReviewsAsync(CancellationToken cancellationToken) => Task.FromResult(Testimonials.Count(item => item.IsNew));
+
+    // Customer reviews: the customers whose last finished shipment the test sets.
+    public Dictionary<Guid, Vixly.Operations.Application.Site.OperationsReviewShipment> FinishedShipments { get; } = new();
+
+    public Task<Vixly.Operations.Application.Site.OperationsReviewShipment?> FindLastFinishedShipmentAsync(Guid customerId, CancellationToken cancellationToken) =>
+        Task.FromResult(FinishedShipments.TryGetValue(customerId, out Vixly.Operations.Application.Site.OperationsReviewShipment? shipment) ? shipment : null);
 
     public Task<OperationsSiteTestimonial?> GetTestimonialAsync(Guid testimonialId, CancellationToken cancellationToken) =>
         Task.FromResult(Testimonials.FirstOrDefault(item => item.Id == testimonialId));

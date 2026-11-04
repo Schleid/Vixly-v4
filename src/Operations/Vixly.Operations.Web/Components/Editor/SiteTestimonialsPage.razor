@@ -4,6 +4,7 @@ FILE: SiteTestimonialsPage.razor
 
 PURPOSE:
 The company's customer testimonials for its website: record one with the customer's agreement, show, hide or remove (owner, 2026-10-30).
+Customer reviews from the portal (owner, 2026-11-03): new ones to publish or hide, the portal's request on or off, a ticket from a review.
 
 RESPONSIBILITIES:
 - List every testimonial with its quote, name, place, rating, source and whether the website shows it
@@ -13,11 +14,13 @@ IMPORTANT NOTES:
 - Markup only. Text comes from OperationsText (L-10)
 - Never invented: no agreement, no testimonial; the quote is never edited afterwards (remove and record again)
 - Only six show on the website, in this order; those who edit the website change them
+- A customer review is published only with the customer's agreement, never edited and never removed by the company (the customer can delete it)
 - Brief §5 record and table layout with top-aligned controls
 =========================================================
 *@
 @inherits OperationsAllowedComponent
 @using Vixly.Operations.Domain.Access
+@using Vixly.Operations.Application.Site
 @inject IStringLocalizer<OperationsText> T
 
 <EditorShell Title="@T["ui.testimonials.title"]" Company="@Company" Section="site" Error="@Error" Info="@Info">
@@ -25,11 +28,30 @@ IMPORTANT NOTES:
         <a class="ops-editor__back-link" href="/staff/site">← @T["ui.testimonials.back"]</a>
     </div>
 
+    @if (PortalInPlan && Can(OperationsPermissions.BrandEdit))
+    {
+        <form method="post" action="/staff/site/testimonials/reviews" class="ops-editor__panel ops-reviews-setting" aria-labelledby="reviews-setting">
+            <AntiforgeryToken />
+            <h2 id="reviews-setting">@T["ui.testimonials.reviews"]</h2>
+            <p class="ops-editor__hint">@T["ui.testimonials.reviews_hint"]</p>
+            <label class="ops-checkbox-label"><input type="checkbox" name="ask" value="true" checked="@AskForReviews" /> <span>@T["ui.testimonials.reviews_ask"]</span></label>
+            <div class="ops-editor__form-actions"><button type="submit" class="vx-button vx-button--secondary">@T["ui.testimonials.reviews_save"]</button></div>
+        </form>
+    }
+
     <section class="ops-editor__panel ops-testimonials-list-panel" aria-labelledby="testimonials-list">
         <div class="ops-testimonials-header">
             <h2 id="testimonials-list">@T["ui.testimonials.list"]</h2>
             <p class="ops-editor__hint">@VixlyText.Format(T, "ui.testimonials.hint", "count", OperationsSiteTestimonial.ShownOnSite)</p>
         </div>
+        <nav class="ops-list-bar ops-testimonials-views" aria-label="@T["ui.testimonials.views"]">
+            @foreach (OperationsTestimonialView option in Views)
+            {
+                <a href="/staff/site/testimonials?view=@option.ToString().ToLowerInvariant()" class="vx-button vx-button--@(option == View ? "primary" : "secondary")" aria-current="@(option == View ? "page" : null)">
+                    @T["ui.testimonials.view." + option.ToString().ToLowerInvariant()]@if (option == OperationsTestimonialView.New && NewCount > 0) { <text> (@NewCount)</text> }
+                </a>
+            }
+        </nav>
         @if (Testimonials.Count == 0)
         {
             <div class="ops-editor__empty"><p>@T["ui.testimonials.none"]</p></div>
@@ -40,41 +62,83 @@ IMPORTANT NOTES:
                 <table class="ops-editor__table ops-testimonials-table">
                     <thead>
                         <tr>
-                            <th scope="col" style="min-width: 14rem;">@T["ui.testimonials.quote"]</th>
-                            <th scope="col" style="min-width: 10rem;">@T["ui.testimonials.name"]</th>
-                            <th scope="col" style="width: 5rem; text-align: center;">@T["ui.testimonials.rating"]</th>
-                            <th scope="col" style="width: 5.5rem; text-align: center;">@T["ui.testimonials.shown"]</th>
-                            <th scope="col" style="width: 9rem; text-align: right;"><span class="ops-visually-hidden">@T["ui.testimonials.list"]</span></th>
+                            <th scope="col" class="ops-testimonials-col-quote">@T["ui.testimonials.quote"]</th>
+                            <th scope="col" class="ops-testimonials-col-name">@T["ui.testimonials.name"]</th>
+                            <th scope="col" class="ops-testimonials-col-rating">@T["ui.testimonials.rating"]</th>
+                            <th scope="col" class="ops-testimonials-col-shown">@T["ui.testimonials.shown"]</th>
+                            <th scope="col" class="ops-testimonials-col-actions"><span class="ops-visually-hidden">@T["ui.testimonials.list"]</span></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (OperationsSiteTestimonial item in Testimonials)
                         {
                             <tr>
-                                <td>@item.Quote</td>
-                                <td>
+                                <td class="ops-testimonials-cell-quote">@item.Quote</td>
+                                <td class="ops-testimonials-cell-name">
                                     <strong>@item.Name</strong>
                                     @if (item.Place is not null) { <br /><span>@item.Place</span> }
                                     @if (item.Source is not null) { <br /><span class="ops-editor__hint">@item.Source</span> }
+                                    <br /><span class="ops-editor__hint">@(item.FromCustomer ? VixlyText.Format(T, "ui.testimonials.from_customer", "date", (item.SubmittedUtc ?? item.CreatedUtc).ToString("d", System.Globalization.CultureInfo.CurrentCulture)) : T["ui.testimonials.from_staff"].Value)</span>
+                                    @if (item.FromCustomer && !item.MayBePublished) { <br /><span class="ops-editor__hint">@T["ui.testimonials.not_agreed"]</span> }
                                 </td>
-                                <td style="text-align: center;">@(item.Rating is { } r ? $"{r} ★" : "—")</td>
-                                <td style="text-align: center;">
-                                    <span class="ops-editor__status" data-status="@(item.Shown ? "active" : "neutral")">
-                                        @T[item.Shown ? "ui.testimonials.yes" : "ui.testimonials.no"]
+                                <td class="ops-testimonials-cell-rating">@(item.Rating is { } r ? $"{r} ★" : "—")</td>
+                                <td class="ops-testimonials-cell-shown">
+                                    <span class="ops-editor__status" data-status="@(item.IsNew ? "open" : item.Shown ? "active" : "closed")">
+                                        @T[item.IsNew ? "ui.testimonials.status.new" : item.Shown ? "ui.testimonials.yes" : "ui.testimonials.no"]
                                     </span>
+                                    @if (item.HiddenReason is { } reason) { <br /><span class="ops-editor__hint">@T["ui.testimonials.reason." + reason]</span> }
                                 </td>
                                 <td class="ops-table-actions-cell">
                                     @if (Can(OperationsPermissions.BrandEdit))
                                     {
                                         <div class="ops-table-actions">
-                                            <form method="post" action="/staff/site/testimonials/@item.Id/@(item.Shown ? "hide" : "show")" class="ops-editor__inline">
-                                                <AntiforgeryToken />
-                                                <button type="submit" class="vx-button vx-button--secondary">@T[item.Shown ? "ui.testimonials.hide" : "ui.testimonials.show"]</button>
-                                            </form>
-                                            <form method="post" action="/staff/site/testimonials/@item.Id/remove" class="ops-editor__inline">
-                                                <AntiforgeryToken />
-                                                <button type="submit" class="vx-button vx-button--subtle">@T["ui.testimonials.remove"]</button>
-                                            </form>
+                                            @if (!item.Shown && item.MayBePublished)
+                                            {
+                                                <form method="post" action="/staff/site/testimonials/@item.Id/show?view=@ViewName" class="ops-editor__inline">
+                                                    <AntiforgeryToken />
+                                                    <button type="submit" class="vx-button vx-button--@(item.FromCustomer ? "primary" : "secondary")">@T[item.FromCustomer ? "ui.testimonials.publish" : "ui.testimonials.show"]</button>
+                                                </form>
+                                            }
+                                            @if (item.Shown || item.IsNew)
+                                            {
+                                                <form method="post" action="/staff/site/testimonials/@item.Id/hide?view=@ViewName" class="ops-editor__inline">
+                                                    <AntiforgeryToken />
+                                                    @if (item.FromCustomer)
+                                                    {
+                                                        <label class="ops-visually-hidden" for="reason-@item.Id">@T["ui.testimonials.reason"]</label>
+                                                        <select id="reason-@item.Id" name="reason">
+                                                            <option value="">@T["ui.testimonials.reason.none"]</option>
+                                                            @foreach (OperationsReviewHideReason option in Enum.GetValues<OperationsReviewHideReason>()) { <option value="@option">@T["ui.testimonials.reason." + option]</option> }
+                                                        </select>
+                                                    }
+                                                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.testimonials.hide"]</button>
+                                                </form>
+                                            }
+                                            @if (item.Shown)
+                                            {
+                                                <form method="post" action="/staff/site/testimonials/@item.Id/up?view=@ViewName" class="ops-editor__inline">
+                                                    <AntiforgeryToken />
+                                                    <button type="submit" class="vx-button vx-button--subtle" aria-label="@T["ui.testimonials.up"]">↑</button>
+                                                </form>
+                                                <form method="post" action="/staff/site/testimonials/@item.Id/down?view=@ViewName" class="ops-editor__inline">
+                                                    <AntiforgeryToken />
+                                                    <button type="submit" class="vx-button vx-button--subtle" aria-label="@T["ui.testimonials.down"]">↓</button>
+                                                </form>
+                                            }
+                                            @if (item.FromCustomer)
+                                            {
+                                                <form method="post" action="/staff/site/testimonials/@item.Id/ticket?view=@ViewName" class="ops-editor__inline">
+                                                    <AntiforgeryToken />
+                                                    <button type="submit" class="vx-button vx-button--subtle">@T["ui.testimonials.ticket"]</button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form method="post" action="/staff/site/testimonials/@item.Id/remove?view=@ViewName" class="ops-editor__inline">
+                                                    <AntiforgeryToken />
+                                                    <button type="submit" class="vx-button vx-button--subtle">@T["ui.testimonials.remove"]</button>
+                                                </form>
+                                            }
                                         </div>
                                     }
                                 </td>
@@ -116,6 +180,24 @@ IMPORTANT NOTES:
 
     [Parameter]
     public IReadOnlyList<OperationsSiteTestimonial> Testimonials { get; set; } = Array.Empty<OperationsSiteTestimonial>();
+
+    // Customer reviews (owner, 2026-11-03).
+    [Parameter]
+    public OperationsTestimonialView View { get; set; }
+
+    [Parameter]
+    public int NewCount { get; set; }
+
+    [Parameter]
+    public bool AskForReviews { get; set; }
+
+    [Parameter]
+    public bool PortalInPlan { get; set; }
+
+    private static readonly OperationsTestimonialView[] Views =
+        { OperationsTestimonialView.All, OperationsTestimonialView.New, OperationsTestimonialView.Published, OperationsTestimonialView.Hidden };
+
+    private string ViewName => View.ToString().ToLowerInvariant();
 
     [Parameter]
     public Vixly.Operations.Application.UseCases.Site.RecordOperationsSiteTestimonial.RecordOperationsSiteTestimonialRequest? Entered { get; set; }

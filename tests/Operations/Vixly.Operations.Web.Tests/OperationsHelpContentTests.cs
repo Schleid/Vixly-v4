@@ -30,7 +30,9 @@ public sealed class OperationsHelpContentTests
             .Descendants("data").Select(element => element.Element("value")?.Value ?? "").ToHashSet(StringComparer.Ordinal);
         OperationsHelpCatalogue help = OperationsHelpTestCatalogue.Create();
         IReadOnlyList<HelpArticle> articles = help.Catalogue.Visible(language, new(OperationsPermissions.All, []));
-        Assert.Equal(27, articles.Count);
+        // Every article file is published; none is hidden by the catalogue.
+        int files = Directory.GetFiles(Path.Combine(root, "src/Operations/Vixly.Operations.Resources/Help", language), "*.md", SearchOption.AllDirectories).Length;
+        Assert.Equal(files, articles.Count);
         foreach (HelpArticle article in articles)
         {
             Assert.Contains("{brandName}", article.Body);

@@ -69,8 +69,10 @@ public static class CustomerPortalEndpoints
 
                 if (me.Value is { } customer)
                 {
+                    // Customer reviews (owner, 2026-11-03): the invitation shows only when the company asks; one more call, only then.
+                    bool reviewInvite = brand?.AskForReviews == true && (await api.GetReviewAsync(tenant, session, http, http.RequestAborted)).Value?.InvitePending == true;
                     return Page<HomePage>(new { Brand = brand, Customer = customer, TourStep = customer.WelcomeTourPending || tour == 1 ? 1 : 0,
-                        TourError = tourError == true, Info = done is null ? null : text["ui.done." + (done == "welcome" ? "welcome" : "saved")].Value });
+                        TourError = tourError == true, Info = done is null ? null : text["ui.done." + (done == "welcome" ? "welcome" : "saved")].Value, ReviewInvite = reviewInvite });
                 }
 
                 CustomerSessionCookie.Delete(http.Response);

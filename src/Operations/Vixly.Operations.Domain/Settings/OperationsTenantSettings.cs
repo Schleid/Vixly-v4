@@ -325,6 +325,15 @@ public sealed class OperationsTenantSettings : OperationsEntity
         MarkAsModified(utcNow);
     }
 
+    // Customer reviews (owner, 2026-11-03): the portal asks customers for a review only when the company turns this on.
+    public bool AskForReviews { get; private set; }
+
+    public void ChangeAskForReviews(bool ask, DateTimeOffset utcNow)
+    {
+        AskForReviews = ask;
+        MarkAsModified(utcNow);
+    }
+
     // The company's own name of one of its other methods.
     public string? OtherName(Vixly.Operations.Domain.Billing.OperationsPaymentMethod method) => method switch
     {

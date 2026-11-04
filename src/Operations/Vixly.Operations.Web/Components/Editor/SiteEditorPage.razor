@@ -101,7 +101,7 @@ IMPORTANT NOTES:
                     <label class="ops-site-checkbox"><input type="checkbox" name="showSteps" value="true" checked="@Draft.ShowSteps" /> <span>@T["ui.editor.site.show_steps"]</span></label>
                     <label class="ops-site-checkbox"><input type="checkbox" name="showFaq" value="true" checked="@Draft.ShowFaq" /> <span>@T["ui.editor.site.show_faq"]</span></label>
                     @foreach ((string name, bool on) in Marketing) { <label class="ops-site-checkbox"><input type="checkbox" name="@name" value="true" checked="@on" /> <span>@T["ui.editor.site." + name]</span></label> }
-                    <a class="ops-site-checkbox" href="/staff/site/testimonials">@T["ui.testimonials.manage"] <span aria-hidden="true">→</span></a>
+                    <a class="ops-site-checkbox" href="/staff/site/testimonials@(NewReviews > 0 ? "?view=new" : null)">@T["ui.testimonials.manage"]@if (NewReviews > 0) { <span class="ops-editor__status" data-status="open">@VixlyText.Format(T, "ui.testimonials.new_count", "count", NewReviews)</span> } <span aria-hidden="true">→</span></a>
                 </div>
             </fieldset>
 
@@ -233,6 +233,10 @@ IMPORTANT NOTES:
 
     [Parameter]
     public bool HasUnpublishedChanges { get; set; }
+
+    // Customer reviews waiting for the company (owner, 2026-11-03).
+    [Parameter]
+    public int NewReviews { get; set; }
 
     [Parameter]
     public string? Error { get; set; }

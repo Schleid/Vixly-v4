@@ -15,7 +15,7 @@ updated: 2026-10-29
 review: ok
 ---
 
-A support agent answers callers about one shipment or package at a time. They never see a customer list, a full address, a full phone number or an email, and they change nothing: they open a call ticket for your staff.
+A support agent answers callers about one shipment or package at a time. They never see a customer list, a full address, a full phone number or an email, and they change nothing: they open a call ticket for {brandName}'s staff.
 
 ## Set up an agent
 1. Invite the agent like any staff member and give them the **Support agent** role for the whole company.

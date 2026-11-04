@@ -15,12 +15,12 @@ updated: 2026-10-29
 review: ok
 ---
 
-Votre site affiche le nom, le logo, les couleurs, les textes, les services et les adresses de votre entreprise. Vous modifiez un brouillon ; les visiteurs ne voient rien de nouveau avant la publication.
+Votre site affiche le nom, le logo, les couleurs, les textes, les services et les adresses de {brandName}. Vous modifiez un brouillon ; les visiteurs ne voient rien de nouveau avant la publication.
 
 ## Choisir un thème
 1. Ouvrez **Site web** dans le menu.
 2. Sous **Thème et police**, lisez la courte description de chaque thème. **Classique** est la page standard, **Horizon** s'ouvre sur un fond sombre et marquant avec un dessin d'itinéraire, **Air et mer** est lumineux, avec une grande photo et l'aérien et le maritime côte à côte.
-3. Utilisez **Aperçu : Horizon** (ou un autre thème) en haut pour voir votre brouillon dans ce thème, dans un nouvel onglet. Rien n'est enregistré.
+3. Utilisez *Aperçu : Horizon* (ou un autre thème) en haut pour voir votre brouillon dans ce thème, dans un nouvel onglet. Rien n'est enregistré.
 4. Choisissez le thème et une police, puis sélectionnez **Enregistrer**.
 5. Sélectionnez **Publier maintenant** quand l'aperçu vous convient.
 

@@ -4657,7 +4657,7 @@ GO
 -- =========================================================
 -- 3. OPERATIONS PLANE (schema [ops])
 -- Generated from the EF migrations of
--- Vixly.Operations.Infrastructure: OperationsFoundation, StaffSignIn, TenantSite, ContactPhones, StaffAndRoles, TenantSettings, ShippingServices, Customers, CustomersSelfService, TrackingCore, Receiving, ReceivingStations, CustomerShipments, InspectionAndHolds, HoldAnswersAndUnclaimed, ChargesEngine, ZonesAndPriceVersions, RoutesAndModes, OriginIntake, ShippingLabels, UndeclaredParcels, Tickets, ShipmentsDesk, InsuranceModule, FrontDeskCounter, InsuranceProducts, CounterSignature, SuppliesCatalogue, SuppliesStock, SuppliesAtCounter, InvoicesAndCreditNotes, CashierAndPayments, BundlesAndRepackBoxes, CreditAccounts, Dispatches, DispatchPapers, OperationalEvents, DestinationReceiving, PickupCounter, HomeDelivery, FreightCollect, BundleListsAndPricing, SignInPlaces, PartnerAgents, CustomersMailbox, CardPayments, CustomerScreens, Payables, TextMessages, CompanyApi, Reporting, DeviceBlocks, RequireMfa, QuickSignIn, DriverApps, HandheldsAndPrintHelper, CustomerHomeAddress, SplitCardPayments, IdleSettings, PortalPayments, CustomerWelcomeTour, TrackingAndDocumentLogo, BranchesAsCountries, CustomerLookup, SupportAgents, TicketDesk, WebsiteThemes, ShipmentCap, LandingMarketing, CustomerBans, ShippingLabelCodes, ParcelItems
+-- Vixly.Operations.Infrastructure: OperationsFoundation, StaffSignIn, TenantSite, ContactPhones, StaffAndRoles, TenantSettings, ShippingServices, Customers, CustomersSelfService, TrackingCore, Receiving, ReceivingStations, CustomerShipments, InspectionAndHolds, HoldAnswersAndUnclaimed, ChargesEngine, ZonesAndPriceVersions, RoutesAndModes, OriginIntake, ShippingLabels, UndeclaredParcels, Tickets, ShipmentsDesk, InsuranceModule, FrontDeskCounter, InsuranceProducts, CounterSignature, SuppliesCatalogue, SuppliesStock, SuppliesAtCounter, InvoicesAndCreditNotes, CashierAndPayments, BundlesAndRepackBoxes, CreditAccounts, Dispatches, DispatchPapers, OperationalEvents, DestinationReceiving, PickupCounter, HomeDelivery, FreightCollect, BundleListsAndPricing, SignInPlaces, PartnerAgents, CustomersMailbox, CardPayments, CustomerScreens, Payables, TextMessages, CompanyApi, Reporting, DeviceBlocks, RequireMfa, QuickSignIn, DriverApps, HandheldsAndPrintHelper, CustomerHomeAddress, SplitCardPayments, IdleSettings, PortalPayments, CustomerWelcomeTour, TrackingAndDocumentLogo, BranchesAsCountries, CustomerLookup, SupportAgents, TicketDesk, WebsiteThemes, ShipmentCap, LandingMarketing, CustomerBans, ShippingLabelCodes, ParcelItems, CustomerReviews
 -- =========================================================
 IF OBJECT_ID(N'[ops].[__EFMigrationsHistory]') IS NULL
 BEGIN
@@ -15681,6 +15681,127 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261104005706_CustomerReviews'
+)
+BEGIN
+    ALTER TABLE [ops].[TenantSettings] ADD [AskForReviews] bit NOT NULL DEFAULT CAST(0 AS bit);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261104005706_CustomerReviews'
+)
+BEGIN
+    DECLARE @var29 nvarchar(max);
+    SELECT @var29 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[ops].[SiteTestimonials]') AND [c].[name] = N'ConsentRecordedUtc');
+    IF @var29 IS NOT NULL EXEC(N'ALTER TABLE [ops].[SiteTestimonials] DROP CONSTRAINT ' + @var29 + ';');
+    ALTER TABLE [ops].[SiteTestimonials] ALTER COLUMN [ConsentRecordedUtc] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261104005706_CustomerReviews'
+)
+BEGIN
+    DECLARE @var30 nvarchar(max);
+    SELECT @var30 = QUOTENAME([d].[name])
+    FROM [sys].[default_constraints] [d]
+    INNER JOIN [sys].[columns] [c] ON [d].[parent_column_id] = [c].[column_id] AND [d].[parent_object_id] = [c].[object_id]
+    WHERE ([d].[parent_object_id] = OBJECT_ID(N'[ops].[SiteTestimonials]') AND [c].[name] = N'ConsentRecordedByUserId');
+    IF @var30 IS NOT NULL EXEC(N'ALTER TABLE [ops].[SiteTestimonials] DROP CONSTRAINT ' + @var30 + ';');
+    ALTER TABLE [ops].[SiteTestimonials] ALTER COLUMN [ConsentRecordedByUserId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261104005706_CustomerReviews'
+)
+BEGIN
+    ALTER TABLE [ops].[SiteTestimonials] ADD [CustomerAgreedUtc] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261104005706_CustomerReviews'
+)
+BEGIN
+    ALTER TABLE [ops].[SiteTestimonials] ADD [CustomerId] uniqueidentifier NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261104005706_CustomerReviews'
+)
+BEGIN
+    ALTER TABLE [ops].[SiteTestimonials] ADD [HiddenReason] tinyint NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261104005706_CustomerReviews'
+)
+BEGIN
+    ALTER TABLE [ops].[SiteTestimonials] ADD [NameStyle] tinyint NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261104005706_CustomerReviews'
+)
+BEGIN
+    ALTER TABLE [ops].[SiteTestimonials] ADD [ReviewedUtc] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261104005706_CustomerReviews'
+)
+BEGIN
+    ALTER TABLE [ops].[SiteTestimonials] ADD [SubmittedUtc] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261104005706_CustomerReviews'
+)
+BEGIN
+    ALTER TABLE [ops].[Customers] ADD [ReviewInviteDismissedUtc] datetimeoffset NULL;
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261104005706_CustomerReviews'
+)
+BEGIN
+    EXEC(N'CREATE UNIQUE INDEX [IX_SiteTestimonials_TenantId_CustomerId_One] ON [ops].[SiteTestimonials] ([TenantId], [CustomerId]) WHERE [CustomerId] IS NOT NULL');
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261104005706_CustomerReviews'
+)
+BEGIN
+    CREATE INDEX [IX_SiteTestimonials_TenantId_ReviewedUtc] ON [ops].[SiteTestimonials] ([TenantId], [ReviewedUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [ops].[__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261104005706_CustomerReviews'
+)
+BEGIN
+    INSERT INTO [ops].[__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261104005706_CustomerReviews', N'10.0.13');
+END;
+
+COMMIT;
+GO
+
 -- =========================================================
 -- 4. CUSTOMER PLANE (schema [customer])
 -- Generated from the EF migrations of
@@ -15882,7 +16003,7 @@ GO
 SELECT @@SERVERNAME AS [server], DB_NAME() AS [database], v.[schema], v.[file_newest],
        h.[db_newest],
        CASE WHEN h.[db_newest] = v.[file_newest] THEN N'UP TO DATE' ELSE N'NOT UPDATED: wrong database, or an error in the Messages tab' END AS [status]
-FROM (VALUES (N'platform', N'20261102202423_SalesFeedAndCheckout'), (N'ops', N'20261101053129_ParcelItems'), (N'customer', N'20261018024801_CustomerFoundation')) AS v([schema], [file_newest])
+FROM (VALUES (N'platform', N'20261102202423_SalesFeedAndCheckout'), (N'ops', N'20261104005706_CustomerReviews'), (N'customer', N'20261018024801_CustomerFoundation')) AS v([schema], [file_newest])
 CROSS APPLY (SELECT MAX(MigrationId) AS [db_newest] FROM (
     SELECT N'platform' AS [schema], MigrationId FROM [platform].[__EFMigrationsHistory]
     UNION ALL SELECT N'ops', MigrationId FROM [ops].[__EFMigrationsHistory]

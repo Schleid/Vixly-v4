@@ -16,6 +16,7 @@ namespace Vixly.Operations.Domain.Tests;
 // - Images are PNG, JPEG or WebP within size limits
 // - The draft is invisible until published
 // - Locations keep their own country
+// - Customer reviews: published only with agreement, new again after a change, hidden with a known reason, the name shortened
 //
 // IMPORTANT NOTES:
 // - No database
@@ -191,6 +192,54 @@ public sealed class OperationsTenantSiteDomainTests
     private static OperationsBrandSettings Settings(string primary, string accent, OperationsSitePreset preset = OperationsSitePreset.Ocean)
     {
         return OperationsBrandSettings.Initial("Acme").With("Acme", preset, primary, accent, OperationsSiteServices.All, true, false, (null, null, null, null, null, null));
+    }
+
+    [Fact]
+    public void CustomerReview_PublishedOnlyWithAgreement_NewAgainAfterAChange()
+    {
+        Guid customer = Guid.NewGuid();
+        OperationsSiteTestimonial review = OperationsSiteTestimonial.Submit(Tenant, customer, " Marie ", "pierre", OperationsReviewNameStyle.FirstAndInitial, "Doral", "Great service", 5, false, Now);
+
+        Assert.Equal("Marie P.", review.Name);
+        Assert.True(review.FromCustomer);
+        Assert.True(review.IsNew);
+        Assert.False(review.MayBePublished);
+        Assert.Equal(OperationsBrandingErrors.ReviewNotAgreed, Assert.Throws<DomainException>(() => review.ChangeShown(true, Now)).Error);
+
+        review.Rewrite("Marie", "Pierre", OperationsReviewNameStyle.FirstOnly, null, "Great service", 4, true, Now.AddMinutes(1));
+        review.ChangeShown(true, Now.AddMinutes(2));
+        Assert.Equal("Marie", review.Name);
+        Assert.True(review.Shown);
+        Assert.False(review.IsNew);
+
+        // The customer changes it: off the website and new again; the first agreement time is kept while they keep agreeing.
+        review.Rewrite("Marie", "Pierre", OperationsReviewNameStyle.FirstOnly, null, "Still great", 4, true, Now.AddMinutes(3));
+        Assert.False(review.Shown);
+        Assert.True(review.IsNew);
+        Assert.Equal(Now.AddMinutes(1), review.CustomerAgreedUtc);
+    }
+
+    [Fact]
+    public void CustomerReview_NeedsStarsAndPlainWords_AndIsHiddenOnlyForAKnownReason()
+    {
+        Guid customer = Guid.NewGuid();
+
+        Assert.Equal(OperationsBrandingErrors.TestimonialRatingInvalid, Assert.Throws<DomainException>(() =>
+            OperationsSiteTestimonial.Submit(Tenant, customer, "Marie", "Pierre", OperationsReviewNameStyle.FirstAndInitial, null, "Fine", null, true, Now)).Error);
+        Assert.Equal(OperationsBrandingErrors.TextNotPlain, Assert.Throws<DomainException>(() =>
+            OperationsSiteTestimonial.Submit(Tenant, customer, "Marie", "Pierre", OperationsReviewNameStyle.FirstAndInitial, null, "<b>Fine</b>", 5, true, Now)).Error);
+
+        OperationsSiteTestimonial review = OperationsSiteTestimonial.Submit(Tenant, customer, "Marie", "Pierre", OperationsReviewNameStyle.FirstAndInitial, null, "Fine", 3, true, Now);
+        Assert.Equal(OperationsBrandingErrors.ReviewHideReasonInvalid, Assert.Throws<DomainException>(() => review.Hide((OperationsReviewHideReason)99, Now)).Error);
+        review.Hide(OperationsReviewHideReason.PersonalInformation, Now);
+        Assert.False(review.IsNew);
+        Assert.Equal(OperationsReviewHideReason.PersonalInformation, review.HiddenReason);
+
+        // A testimonial staff entered has no reason and is always publishable.
+        OperationsSiteTestimonial staff = OperationsSiteTestimonial.Record(Tenant, "Jean", null, "Quick", 5, null, true, Guid.NewGuid(), 0, Now);
+        staff.Hide(OperationsReviewHideReason.Other, Now);
+        Assert.Null(staff.HiddenReason);
+        Assert.True(staff.MayBePublished);
     }
 
     private static OperationsLocationDetails Details(string code, string city, string country)

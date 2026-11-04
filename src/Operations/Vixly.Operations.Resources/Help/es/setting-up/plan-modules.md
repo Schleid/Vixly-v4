@@ -15,16 +15,16 @@ updated: 2026-10-30
 review: ok
 ---
 
-El plan de su empresa decide qué partes del espacio de trabajo usa. Cuando una parte no está en su plan, sus páginas no están en el menú y el mostrador no la ofrece.
+El plan de {brandName} decide qué partes del espacio de trabajo usa. Cuando una parte no está en su plan, sus páginas no están en el menú y el mostrador no la ofrece.
 
 ## Partes que un plan puede dejar fuera
-- **Portal de clientes:** los clientes no pueden crear una cuenta, iniciar sesión ni solicitar envíos en línea. Su sitio web no muestra botones de inicio de sesión ni de cuenta; conserva la página de rastreo.
-- **Seguro:** ningún producto de seguro en el mostrador y ningún envío asegurado.
-- **Cuentas de crédito:** no se factura a cuenta en la caja.
-- **Suministros:** no se venden suministros en el mostrador.
-- **Entrega a domicilio:** los envíos se retiran en una sucursal.
-- **Mesa de soporte y tickets.**
-- **Facturas de proveedores y ganancia.**
+- *Portal de clientes:* los clientes no pueden crear una cuenta, iniciar sesión ni solicitar envíos en línea. Su sitio web no muestra botones de inicio de sesión ni de cuenta; conserva la página de rastreo.
+- **Seguro**: ningún producto de seguro en el mostrador y ningún envío asegurado.
+- **Cuentas de crédito**: no se factura a cuenta en la caja.
+- **Suministros**: no se venden suministros en el mostrador.
+- **Entrega a domicilio**: los envíos se retiran en una sucursal.
+- *Mesa de soporte y tickets.*
+- *Facturas de proveedores y ganancia.*
 
 ## Ingresar un cliente usted mismo
 Sin el portal de clientes, los clientes no se registran solos. El personal que gestiona clientes los agrega:

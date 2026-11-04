@@ -10,10 +10,12 @@ using Vixly.Platform.Application.UseCases.Registration.ResendMyRegistrationVerif
 using Vixly.Platform.Application.UseCases.Registration.StartPlatformTenantRegistration;
 using Vixly.Platform.Application.UseCases.Registration.VerifyRegistrationEmail;
 using Vixly.Platform.Application.UseCases.Registrations.CancelPlatformTenantRegistration;
+using Vixly.Platform.Application.UseCases.Registrations.ResendRegistrationVerification;
 using Vixly.Platform.Application.UseCases.Tenants;
 using Vixly.Platform.Domain.Identity;
 using Vixly.Platform.Domain.Messaging;
 using Vixly.Platform.Domain.Tenants;
+using Vixly.Shared.Kernel.Errors;
 using Vixly.Shared.Kernel.Localization;
 using Vixly.Shared.Kernel.ValueObjects;
 
@@ -188,6 +190,53 @@ public sealed class PlatformTenantRegistrationFlowTests
         Assert.Equal("grace.hopper@northwind.example", _kit.Tenants.Mail[^1].To);
         Assert.Equal("g***********@northwind.example", status.MaskedEmail);
         Assert.Equal("northwind", status.Slug);
+    }
+
+    [Fact]
+    public async Task StaffResend_CorrectsAMistypedEmail_AndSendsTheLinkThere()
+    {
+        await StartAsync();
+        Guid registrationId = _kit.Tenants.Registrations[0].Id;
+        ResendRegistrationVerificationUseCase resend = new(_kit.Gate(), _kit.Tenants, _kit.Links(), _kit.Audit(), _kit.Store, _kit.Clock, _kit.Tenants);
+
+        ResendRegistrationVerificationResponse corrected = await resend.ExecuteAsync(
+            _kit.Staff(PlatformPermissions.TenantsEdit),
+            new ResendRegistrationVerificationRequest { RegistrationId = registrationId, Email = " Grace.Hopper@northwind.example " },
+            CancellationToken.None);
+        int auditCount = _kit.Store.AuditEntries.Count;
+        _kit.Clock.Advance(TimeSpan.FromMinutes(2));
+        ResendRegistrationVerificationResponse same = await resend.ExecuteAsync(
+            _kit.Staff(PlatformPermissions.TenantsEdit),
+            new ResendRegistrationVerificationRequest { RegistrationId = registrationId, Email = "grace.hopper@northwind.example" },
+            CancellationToken.None);
+
+        Assert.True(corrected.Succeeded);
+        Assert.True(same.Succeeded);
+        Assert.Equal("grace.hopper@northwind.example", _kit.Tenants.Registrations[0].OwnerEmail.Value);
+        Assert.Equal("grace.hopper@northwind.example", _kit.Tenants.Mail[^1].To);
+        Assert.Contains(_kit.Store.AuditEntries, entry => entry.ActionCode == "platform.registrations.email_corrected");
+        Assert.DoesNotContain(_kit.Store.AuditEntries.Skip(auditCount), entry => entry.ActionCode == "platform.registrations.email_corrected");
+    }
+
+    [Fact]
+    public async Task StaffResend_RefusesABadEmail_AndNeedsTenantsEdit()
+    {
+        await StartAsync();
+        Guid registrationId = _kit.Tenants.Registrations[0].Id;
+        ResendRegistrationVerificationUseCase resend = new(_kit.Gate(), _kit.Tenants, _kit.Links(), _kit.Audit(), _kit.Store, _kit.Clock, _kit.Tenants);
+        int mails = _kit.Tenants.Mail.Count;
+
+        ResendRegistrationVerificationResponse bad = await resend.ExecuteAsync(
+            _kit.Staff(PlatformPermissions.TenantsEdit),
+            new ResendRegistrationVerificationRequest { RegistrationId = registrationId, Email = "not-an-email" },
+            CancellationToken.None);
+
+        Assert.Equal(KernelErrors.EmailInvalid, bad.Error);
+        Assert.Equal(mails, _kit.Tenants.Mail.Count);
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => resend.ExecuteAsync(
+            _kit.Staff(),
+            new ResendRegistrationVerificationRequest { RegistrationId = registrationId },
+            CancellationToken.None));
     }
 
     [Fact]

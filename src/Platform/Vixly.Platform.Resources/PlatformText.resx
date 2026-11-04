@@ -9055,4 +9055,10 @@ Details: {link}</value>
   <data name="platform.sales_feed.rebuild_not_possible" xml:space="preserve">
     <value>This event cannot be written again: its record no longer exists, or it is a daily total.</value>
   </data>
+  <data name="ui.registrations.resend_email" xml:space="preserve">
+    <value>Owner email</value>
+  </data>
+  <data name="ui.registrations.resend_help" xml:space="preserve">
+    <value>The owner has not confirmed their email yet. Fix the address here if it was mistyped, then send the link again.</value>
+  </data>
 </root>

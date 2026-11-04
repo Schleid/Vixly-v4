@@ -15922,4 +15922,121 @@ Your {company} account has been closed because our terms of service were not res
   <data name="ui.cards.restricted_key_hint" xml:space="preserve">
     <value>Best: a restricted key (rk_) made for this system in Stripe (Developers, API keys, Create restricted key) with Checkout Sessions, PaymentIntents and Charges and Refunds set to Write, plus Terminal Readers if you use card readers. A full secret key (sk_) also works but can do far more than card payments need.</value>
   </data>
+  <data name="ui.customers.confirmation" xml:space="preserve">
+    <value>Confirmation email</value>
+  </data>
+  <data name="ui.customers.confirmation_hint" xml:space="preserve">
+    <value>The customer has not confirmed the email address yet. Send the link again if the email did not arrive; correct the address first if it was mistyped. The new link replaces the old one.</value>
+  </data>
+  <data name="ui.customers.confirmation_send" xml:space="preserve">
+    <value>Send the confirmation email again</value>
+  </data>
+  <data name="ui.customers.done.confirmation" xml:space="preserve">
+    <value>The confirmation email was sent again.</value>
+  </data>
+  <data name="ops.customers.email_is_staff" xml:space="preserve">
+    <value>This is a staff work email; a customer account needs the customer's own email.</value>
+  </data>
+  <data name="ops.customers.confirmation_resend_limit" xml:space="preserve">
+    <value>The confirmation email was already sent {limit} times in the last hour. Try again later.</value>
+  </data>
+  <data name="ui.testimonials.new_count" xml:space="preserve">
+    <value>{count} new</value>
+  </data>
+  <data name="ui.testimonials.reviews" xml:space="preserve">
+    <value>Customer reviews</value>
+  </data>
+  <data name="ui.testimonials.reviews_hint" xml:space="preserve">
+    <value>When this is on, customers with a delivered or picked-up shipment can review the company in the customer portal. Nothing appears on the website until you publish it, and you cannot change their words.</value>
+  </data>
+  <data name="ui.testimonials.reviews_ask" xml:space="preserve">
+    <value>Ask customers for reviews in the customer portal</value>
+  </data>
+  <data name="ui.testimonials.reviews_save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="ui.testimonials.views" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="ui.testimonials.view.all" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="ui.testimonials.view.new" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="ui.testimonials.view.published" xml:space="preserve">
+    <value>Published</value>
+  </data>
+  <data name="ui.testimonials.view.hidden" xml:space="preserve">
+    <value>Hidden</value>
+  </data>
+  <data name="ui.testimonials.from_customer" xml:space="preserve">
+    <value>Customer review, {date}</value>
+  </data>
+  <data name="ui.testimonials.from_staff" xml:space="preserve">
+    <value>Entered by staff</value>
+  </data>
+  <data name="ui.testimonials.not_agreed" xml:space="preserve">
+    <value>Not agreed to be quoted: feedback only</value>
+  </data>
+  <data name="ui.testimonials.status.new" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="ui.testimonials.reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="ui.testimonials.reason.none" xml:space="preserve">
+    <value>Reason (optional)</value>
+  </data>
+  <data name="ui.testimonials.reason.PersonalInformation" xml:space="preserve">
+    <value>Personal information</value>
+  </data>
+  <data name="ui.testimonials.reason.Abusive" xml:space="preserve">
+    <value>Abusive or offensive</value>
+  </data>
+  <data name="ui.testimonials.reason.NotAboutService" xml:space="preserve">
+    <value>Not about our service</value>
+  </data>
+  <data name="ui.testimonials.reason.SuspectedFake" xml:space="preserve">
+    <value>Suspected fake</value>
+  </data>
+  <data name="ui.testimonials.reason.Other" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="ui.testimonials.publish" xml:space="preserve">
+    <value>Publish</value>
+  </data>
+  <data name="ui.testimonials.up" xml:space="preserve">
+    <value>Move up</value>
+  </data>
+  <data name="ui.testimonials.down" xml:space="preserve">
+    <value>Move down</value>
+  </data>
+  <data name="ui.testimonials.ticket" xml:space="preserve">
+    <value>Open a ticket</value>
+  </data>
+  <data name="ui.editor.saved.review_ticket" xml:space="preserve">
+    <value>A ticket is open for customer service.</value>
+  </data>
+  <data name="ui.tickets.by_review" xml:space="preserve">
+    <value>From a review</value>
+  </data>
+  <data name="ops.brand.review_not_agreed" xml:space="preserve">
+    <value>The customer did not agree to be quoted, so this review cannot be published.</value>
+  </data>
+  <data name="ops.brand.review_hide_reason_invalid" xml:space="preserve">
+    <value>Choose a reason from the list.</value>
+  </data>
+  <data name="ops.brand.reviews_off" xml:space="preserve">
+    <value>Customer reviews are off.</value>
+  </data>
+  <data name="ops.brand.review_not_yet" xml:space="preserve">
+    <value>This customer has no delivered or picked-up shipment.</value>
+  </data>
+  <data name="ops.brand.review_is_customers" xml:space="preserve">
+    <value>This review belongs to the customer: hide it instead.</value>
+  </data>
+  <data name="ops.brand.review_not_from_customer" xml:space="preserve">
+    <value>Only a customer review can open a ticket.</value>
+  </data>
 </root>

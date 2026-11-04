@@ -39,6 +39,11 @@ public static class OperationsCustomerErrors
 
     public static Error NotPending { get; } = Error.Create("ops.customers.not_pending");
 
+    // Staff resending the confirmation email (2026-11-03): the corrected address is a work email.
+    public static Error EmailIsStaff { get; } = Error.Create("ops.customers.email_is_staff");
+
+    public static Error ConfirmationResendLimit { get; } = Error.Create("ops.customers.confirmation_resend_limit", ("limit", OperationsCustomerLimits.ConfirmationResendsPerHour));
+
     public static Error CodeInvalid { get; } = Error.Create("ops.customers.code_invalid");
 
     public static Error SessionEnded { get; } = Error.Create("ops.customers.session_ended");

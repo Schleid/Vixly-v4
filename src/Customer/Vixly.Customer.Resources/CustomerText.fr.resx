@@ -1940,4 +1940,144 @@
     <value>Usagé</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.nav.review" xml:space="preserve">
+    <value>Donnez votre avis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.title" xml:space="preserve">
+    <value>Donnez votre avis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.yours" xml:space="preserve">
+    <value>Votre avis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.status.New" xml:space="preserve">
+    <value>Reçu, en attente de lecture</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.status.Published" xml:space="preserve">
+    <value>Affiché sur le site web</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.status.Hidden" xml:space="preserve">
+    <value>Non affiché sur le site web</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.feedback_only" xml:space="preserve">
+    <value>Vous ne l'avez pas autorisé sur le site web : il reste un commentaire privé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.off" xml:space="preserve">
+    <value>{company} ne demande pas d'avis pour le moment.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.not_yet" xml:space="preserve">
+    <value>Vous pourrez donner votre avis sur {company} dès qu'un de vos envois aura été livré ou retiré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.intro" xml:space="preserve">
+    <value>Dites à {company} et aux futurs clients comment cela s'est passé. Votre nom complet n'est jamais affiché.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.rating" xml:space="preserve">
+    <value>Votre note</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.stars" xml:space="preserve">
+    <value>{count} sur 5</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.quote" xml:space="preserve">
+    <value>Votre avis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.quote_hint" xml:space="preserve">
+    <value>Jusqu'à 400 caractères, texte simple.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.name" xml:space="preserve">
+    <value>Afficher mon nom ainsi</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.place" xml:space="preserve">
+    <value>Ville (facultatif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.agreed" xml:space="preserve">
+    <value>{company} peut afficher cet avis sur son site web.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.change_hint" xml:space="preserve">
+    <value>Si vous le modifiez, {company} le relit avant de pouvoir l'afficher.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.send" xml:space="preserve">
+    <value>Envoyer mon avis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.save" xml:space="preserve">
+    <value>Enregistrer mes modifications</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.delete" xml:space="preserve">
+    <value>Supprimer mon avis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.delete_hint" xml:space="preserve">
+    <value>Le supprimer le retire aussi du site web immédiatement.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.done.saved" xml:space="preserve">
+    <value>Votre avis est enregistré. Merci.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.done.deleted" xml:space="preserve">
+    <value>Votre avis est supprimé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.invite_title" xml:space="preserve">
+    <value>Comment s'est passé votre envoi avec {company} ?</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.invite_text" xml:space="preserve">
+    <value>Une note et quelques mots nous aident, ainsi que les futurs clients.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.invite_go" xml:space="preserve">
+    <value>Donner mon avis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.review.invite_dismiss" xml:space="preserve">
+    <value>Non merci</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.reviews_off" xml:space="preserve">
+    <value>Les avis ne sont pas ouverts pour le moment.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.review_not_yet" xml:space="preserve">
+    <value>Vous pourrez donner votre avis dès qu'un de vos envois aura été livré ou retiré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.testimonial_quote_required" xml:space="preserve">
+    <value>Écrivez quelques mots.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.testimonial_too_long" xml:space="preserve">
+    <value>Votre avis ou votre ville est trop long.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.testimonial_rating_invalid" xml:space="preserve">
+    <value>Choisissez une note de 1 à 5.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.text_not_plain" xml:space="preserve">
+    <value>Utilisez du texte simple, sans &lt; ni &gt;.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.testimonial_name_required" xml:space="preserve">
+    <value>Votre prénom manque dans votre profil.</value>
+    <comment>needs-review</comment>
+  </data>
 </root>

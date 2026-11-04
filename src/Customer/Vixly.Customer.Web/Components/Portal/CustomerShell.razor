@@ -34,7 +34,7 @@ IMPORTANT NOTES:
     }
     <link rel="stylesheet" href="_content/Vixly.Shared.UI/vixly-theme.css?v=20261018-customer3" />
     <link rel="stylesheet" href="_content/Vixly.Shared.UI/vixly-primitives.css" />
-    <link rel="stylesheet" href="css/customer-portal.css?v=20261101-1" />
+    <link rel="stylesheet" href="css/customer-portal.css?v=20261103-1" />
     <link rel="stylesheet" href="css/customer-access.css?v=20261018-customer3" />
     <link rel="stylesheet" href="css/customer-continuity.css?v=20261020-1" />
     <link rel="stylesheet" href="css/customer-help.css?v=20261027-1" />
@@ -74,6 +74,10 @@ IMPORTANT NOTES:
                 <a href="/customer/invoices" aria-current="@(ReturnHere.StartsWith("/customer/invoices", StringComparison.Ordinal) ? "page" : null)">@T["ui.nav.invoices"]</a>
                 <a href="/customer/pricing" aria-current="@(ReturnHere == "/customer/pricing" ? "page" : null)">@T["ui.nav.pricing"]</a>
                 <a href="/customer/rates" aria-current="@(ReturnHere == "/customer/rates" ? "page" : null)">@T["ui.nav.rates"]</a>
+                @if (Brand?.AskForReviews == true)
+                {
+                    <a href="/customer/review" aria-current="@(ReturnHere == "/customer/review" ? "page" : null)">@T["ui.nav.review"]</a>
+                }
                 <a href="/customer/profile" aria-current="@(ReturnHere == "/customer/profile" ? "page" : null)">@T["ui.nav.profile"]</a>
             </nav>
         }

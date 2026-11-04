@@ -15,17 +15,26 @@ namespace Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimoni
 //
 // IMPORTANT NOTES:
 // - Those who view the website see every testimonial, shown or hidden
+// - Customer reviews (owner, 2026-11-03): one view at a time, at most 200, with the number of new ones
 // =========================================================
 public sealed class ListOperationsSiteTestimonialsUseCase
 {
+    private const int MaxListed = 200;
+
     private readonly IOperationsSiteRepository _site;
 
     private readonly OperationsOwnerCheck _owner;
 
-    public ListOperationsSiteTestimonialsUseCase(IOperationsSiteRepository site, OperationsOwnerCheck owner)
+    private readonly IOperationsSettingsRepository _settings;
+
+    private readonly IOperationsPlanFeatures _features;
+
+    public ListOperationsSiteTestimonialsUseCase(IOperationsSiteRepository site, OperationsOwnerCheck owner, IOperationsSettingsRepository settings, IOperationsPlanFeatures features)
     {
         _site = site ?? throw new ArgumentNullException(nameof(site));
         _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _features = features ?? throw new ArgumentNullException(nameof(features));
     }
 
     public async Task<ListOperationsSiteTestimonialsResponse> ExecuteAsync(
@@ -41,6 +50,9 @@ public sealed class ListOperationsSiteTestimonialsUseCase
             return ListOperationsSiteTestimonialsResponse.Failure(refused);
         }
 
-        return ListOperationsSiteTestimonialsResponse.Success(await _site.ListTestimonialsAsync(cancellationToken));
+        IReadOnlyList<OperationsSiteTestimonial> items = await _site.ListTestimonialsAsync(request.View, MaxListed, cancellationToken);
+        bool portal = (await _features.GetAsync(context.RequiredTenantId, cancellationToken)).Includes(Vixly.Operations.Application.Plans.OperationsPlanModules.CustomerPortal);
+        return ListOperationsSiteTestimonialsResponse.Success(items, await _site.CountNewReviewsAsync(cancellationToken),
+            portal && (await _settings.FindAsync(cancellationToken))?.AskForReviews == true, portal);
     }
 }

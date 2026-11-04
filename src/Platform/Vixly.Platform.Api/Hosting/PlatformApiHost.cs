@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.Features;
+using Vixly.Shared.Hosting.Security;
 using Microsoft.AspNetCore.Localization;
 using Vixly.Platform.Api.Endpoints;
 using Vixly.Platform.Api.Endpoints.Internal;
@@ -50,6 +51,7 @@ public static class PlatformApiHost
         PlatformApiOptions api = builder.Configuration.GetSection(PlatformApiOptions.SectionName).Get<PlatformApiOptions>() ?? new PlatformApiOptions();
 
         builder.Services.AddPlatformInfrastructure(builder.Configuration, "Vixly.V4.Platform.Api");
+        builder.Services.AddVixlyKeyRingEncryption(builder.Configuration);
         builder.Services.AddPlatformApplication();
         builder.Services.AddVixlyForwardedHeaders(builder.Configuration);
         builder.Services.AddHttpContextAccessor();

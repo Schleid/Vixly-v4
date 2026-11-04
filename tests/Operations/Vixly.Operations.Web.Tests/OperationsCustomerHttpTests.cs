@@ -126,6 +126,52 @@ public sealed partial class OperationsCustomerHttpTests : IClassFixture<Operatio
         Assert.Contains("ops.customers.status_changed", history, StringComparison.Ordinal);
     }
 
+    // Owner, 2026-11-03: the confirmation email did not arrive or the address was mistyped; staff send it again, to the corrected address.
+    [SqlServerFact]
+    public async Task Staff_SendTheConfirmationAgain_ToACorrectedAddress_AFewTimesAnHour()
+    {
+        Guid tenant = NewTenant("confco", "Conf Co");
+        using CookieClient owner = await OwnerAsync("confco");
+        Guid pending;
+        Guid other = await RegisteredCustomerAsync(tenant, "taken@example.com", "C00001");
+
+        await using (AsyncServiceScope scope = _host.Services.CreateAsyncScope())
+        {
+            scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+            OperationsCustomer customer = OperationsCustomer.SignUp(tenant, "Clif", "Naccius", null, EmailAddress.Create("cnacius@yaho.com"), "+50931636384", LanguageCode.Fr, "$2a$12$hash", DateTimeOffset.UtcNow);
+            scope.ServiceProvider.GetRequiredService<IOperationsCustomerRepository>().Add(customer);
+            await scope.ServiceProvider.GetRequiredService<IOperationsUnitOfWork>().SaveChangesAsync(CancellationToken.None);
+            pending = customer.Id;
+        }
+
+        string path = "/staff/customers/" + pending;
+        (HttpResponseMessage _, string page) = await owner.GetAsync(path);
+        Assert.Contains("action=\"" + path + "/confirmation\"", page, StringComparison.Ordinal);
+        (HttpResponseMessage _, string confirmed) = await owner.GetAsync("/staff/customers/" + other);
+        Assert.DoesNotContain("/confirmation\"", confirmed, StringComparison.Ordinal);
+
+        // Another customer's address, or a work email, is refused; nothing is sent.
+        (HttpResponseMessage _, string taken) = await owner.PostAsync(path + "/confirmation", page, ("email", "taken@example.com"));
+        Assert.Contains("Another customer already uses this email.", System.Net.WebUtility.HtmlDecode(taken), StringComparison.Ordinal);
+        Assert.DoesNotContain(_host.CustomerMailer.Sent, mail => mail.ToAddress == "taken@example.com" && mail.Kind == OperationsCustomerMailKind.Verification);
+
+        // Corrected and sent: the link goes to the new address.
+        Assert.Equal(path + "?done=confirmation", (await owner.PostAsync(path + "/confirmation", page, ("email", "cnaccius@yahoo.com"))).Response.Headers.Location?.OriginalString);
+        Assert.Contains(_host.CustomerMailer.Sent, mail => mail.ToAddress == "cnaccius@yahoo.com" && mail.Kind == OperationsCustomerMailKind.Verification);
+        (HttpResponseMessage _, string after) = await owner.GetAsync(path + "?done=confirmation");
+        Assert.Contains("cnaccius@yahoo.com", after, StringComparison.Ordinal);
+        Assert.Contains("The confirmation email was sent again.", System.Net.WebUtility.HtmlDecode(after), StringComparison.Ordinal);
+
+        // Five links an hour at most.
+        for (int sent = 1; sent < Vixly.Operations.Domain.Customers.OperationsCustomerLimits.ConfirmationResendsPerHour; sent++)
+        {
+            Assert.EndsWith("?done=confirmation", (await owner.PostAsync(path + "/confirmation", after, ("email", "cnaccius@yahoo.com"))).Response.Headers.Location?.OriginalString);
+        }
+
+        (HttpResponseMessage _, string limited) = await owner.PostAsync(path + "/confirmation", after, ("email", "cnaccius@yahoo.com"));
+        Assert.Contains("already sent 5 times in the last hour", System.Net.WebUtility.HtmlDecode(limited), StringComparison.Ordinal);
+    }
+
     [SqlServerFact]
     public async Task StaffWithoutCustomerPermissions_SeeNothing()
     {
@@ -189,7 +235,7 @@ public sealed partial class OperationsCustomerHttpTests : IClassFixture<Operatio
 
         using CookieClient ada = await StaffAsync(owner, "callco", "Calls", "ops.support.lookup");
         (HttpResponseMessage _, string people) = await owner.GetAsync("/staff/people");
-        string adaId = Regex.Match(people, "/staff/people/(?<id>[0-9a-f-]{36})\"[^>]*>Ada Lovelace").Groups["id"].Value;
+        string adaId = Regex.Match(people, "/staff/people/(?<id>[0-9a-f-]{36})\"[^>]*>(<strong>)?Ada Lovelace").Groups["id"].Value;
         (HttpResponseMessage _, string member) = await owner.GetAsync("/staff/people/" + adaId);
         (HttpResponseMessage outside, string _) = await owner.PostAsync("/staff/people/" + adaId + "/outside", member,
             ("outside", "true"), ("days", "1"), ("days", "2"), ("days", "4"), ("days", "8"), ("days", "16"), ("days", "32"), ("days", "64"));
@@ -345,6 +391,68 @@ public sealed partial class OperationsCustomerHttpTests : IClassFixture<Operatio
     }
 
     // Two booked shipments with their tracking numbers, at a Miami warehouse.
+    // Customer reviews (owner, 2026-11-03): the company turns the request on, publishes only what the customer agreed to, hides with a reason,
+    // never removes a customer's words, and opens a ticket from a poor review.
+    [SqlServerFact]
+    public async Task Reviews_TheCompanyDecides_PublishesOnlyWithAgreement_HidesWithAReason_AndOpensATicket()
+    {
+        Guid tenant = NewTenant("revco", "Rev Co");
+        using CookieClient owner = await OwnerAsync("revco");
+        Guid jean = await RegisteredCustomerAsync(tenant, "jean.rev@example.com", "C00001");
+        Guid marie = await RegisteredCustomerAsync(tenant, "marie.rev@example.com", "C00002", "+50948605107");
+        await ShipmentAsync(tenant, (jean, "VXREV0000001"));
+        Guid quiet = await ReviewAsync(tenant, jean, false, "Slow this time.", 2);
+        Guid happy = await ReviewAsync(tenant, marie, true, "Fast & careful.", 5);
+
+        // The request is off until the company turns it on.
+        (HttpResponseMessage _, string page) = await owner.GetAsync("/staff/site/testimonials");
+        Assert.Contains("name=\"ask\"", page, StringComparison.Ordinal);
+        Assert.DoesNotContain("name=\"ask\" value=\"true\" checked", page, StringComparison.Ordinal);
+        Assert.Equal("/staff/site/testimonials?saved=1", (await owner.PostAsync("/staff/site/testimonials/reviews", page, ("ask", "true"))).Response.Headers.Location?.OriginalString);
+        (HttpResponseMessage _, string fresh) = await owner.GetAsync("/staff/site/testimonials?view=new");
+        Assert.Contains("name=\"ask\" value=\"true\" checked", fresh, StringComparison.Ordinal);
+        Assert.Contains("New (2)", WebUtility.HtmlDecode(fresh), StringComparison.Ordinal);
+        Assert.Contains("Ana P.", fresh, StringComparison.Ordinal);
+        Assert.Contains("Not agreed to be quoted", fresh, StringComparison.Ordinal);
+
+        // No agreement, no publication, even by a direct post; the customer's words are never removed by the company.
+        Assert.DoesNotContain("/staff/site/testimonials/" + quiet + "/show", fresh, StringComparison.Ordinal);
+        Assert.Contains("did not agree to be quoted", WebUtility.HtmlDecode((await owner.PostAsync("/staff/site/testimonials/" + quiet + "/show?view=new", fresh)).Html), StringComparison.Ordinal);
+        Assert.Contains("belongs to the customer", WebUtility.HtmlDecode((await owner.PostAsync("/staff/site/testimonials/" + quiet + "/remove?view=new", fresh)).Html), StringComparison.Ordinal);
+
+        // Published with agreement; hidden with a reason the customer never sees.
+        Assert.Equal("/staff/site/testimonials?saved=1&view=new", (await owner.PostAsync("/staff/site/testimonials/" + happy + "/show?view=new", fresh)).Response.Headers.Location?.OriginalString);
+        Assert.Contains("Fast & careful.", WebUtility.HtmlDecode((await owner.GetAsync("/staff/site/testimonials?view=published")).Html), StringComparison.Ordinal);
+        Assert.Equal("/staff/site/testimonials?saved=1&view=new", (await owner.PostAsync("/staff/site/testimonials/" + quiet + "/hide?view=new", fresh, ("reason", "SuspectedFake"))).Response.Headers.Location?.OriginalString);
+        string hidden = (await owner.GetAsync("/staff/site/testimonials?view=hidden")).Html;
+        Assert.Contains("Suspected fake", hidden, StringComparison.Ordinal);
+        Assert.DoesNotContain("New (", WebUtility.HtmlDecode((await owner.GetAsync("/staff/site/testimonials")).Html), StringComparison.Ordinal);
+
+        // A ticket from the poor review, for customer service, about the customer's last finished shipment.
+        Assert.Equal("/staff/site/testimonials?done=ticket&view=hidden", (await owner.PostAsync("/staff/site/testimonials/" + quiet + "/ticket?view=hidden", hidden)).Response.Headers.Location?.OriginalString);
+        await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();
+        scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+        Vixly.Operations.Domain.Tickets.OperationsTicket ticket = await scope.ServiceProvider.GetRequiredService<Vixly.Operations.Infrastructure.Persistence.OperationsDbContext>()
+            .Tickets.SingleAsync(item => item.CustomerId == jean);
+        Assert.Equal(Vixly.Operations.Domain.Tickets.OperationsTicketSource.Review, ticket.OpenedBy);
+        Assert.Equal(Vixly.Operations.Domain.Tickets.OperationsTicketTopic.Other, ticket.Topic);
+        Assert.Equal("VXREV0000001", ticket.TrackingNumber);
+        Assert.Contains("From a review", (await owner.GetAsync("/staff/tickets/" + ticket.Id)).Html, StringComparison.Ordinal);
+    }
+
+    private async Task<Guid> ReviewAsync(Guid tenant, Guid customer, bool agreed, string quote, int rating)
+    {
+        await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();
+        scope.ServiceProvider.GetRequiredService<IOperationsTenantScope>().Enter(tenant);
+        Vixly.Operations.Infrastructure.Persistence.OperationsDbContext context = scope.ServiceProvider.GetRequiredService<Vixly.Operations.Infrastructure.Persistence.OperationsDbContext>();
+        await context.Shipments.Where(item => item.CustomerId == customer).ExecuteUpdateAsync(set => set.SetProperty(item => item.DeliveredUtc, DateTimeOffset.UtcNow));
+        Vixly.Operations.Domain.Branding.OperationsSiteTestimonial review = Vixly.Operations.Domain.Branding.OperationsSiteTestimonial.Submit(tenant, customer, "Ana", "Pierre",
+            Vixly.Operations.Domain.Branding.OperationsReviewNameStyle.FirstAndInitial, "Doral", quote, rating, agreed, DateTimeOffset.UtcNow);
+        context.Add(review);
+        await context.SaveChangesAsync();
+        return review.Id;
+    }
+
     private async Task ShipmentAsync(Guid tenant, params (Guid Customer, string Tracking)[] shipments)
     {
         await using AsyncServiceScope scope = _host.Services.CreateAsyncScope();

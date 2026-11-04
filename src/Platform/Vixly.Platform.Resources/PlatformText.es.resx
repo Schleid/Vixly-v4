@@ -11892,4 +11892,12 @@ Detalles: {link}</value>
     <value>Este evento no se puede volver a escribir: su registro ya no existe o es un total diario.</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.registrations.resend_email" xml:space="preserve">
+    <value>Correo del propietario</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.registrations.resend_help" xml:space="preserve">
+    <value>El propietario aún no ha confirmado su correo. Corrija la dirección aquí si se escribió mal y vuelva a enviar el enlace.</value>
+    <comment>needs-review</comment>
+  </data>
 </root>

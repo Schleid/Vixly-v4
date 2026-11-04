@@ -15,16 +15,16 @@ updated: 2026-10-30
 review: ok
 ---
 
-Le forfait de votre entreprise décide des parties de l'espace de travail que vous utilisez. Quand une partie n'est pas dans votre forfait, ses pages ne sont pas dans le menu et le comptoir ne la propose pas.
+Le forfait de {brandName} décide des parties de l'espace de travail que vous utilisez. Quand une partie n'est pas dans votre forfait, ses pages ne sont pas dans le menu et le comptoir ne la propose pas.
 
 ## Parties qu'un forfait peut laisser de côté
-- **Portail client :** les clients ne peuvent ni créer de compte, ni se connecter, ni demander d'envoi en ligne. Votre site n'affiche aucun bouton de connexion ou de compte ; il garde la page de suivi.
-- **Assurance :** aucun produit d'assurance au comptoir, aucun envoi assuré.
-- **Comptes de crédit :** pas de facturation sur compte à la caisse.
-- **Fournitures :** pas de fournitures vendues au comptoir.
-- **Livraison à domicile :** les envois sont retirés en agence.
-- **Service d'assistance et tickets.**
-- **Factures fournisseurs et bénéfice.**
+- *Portail client :* les clients ne peuvent ni créer de compte, ni se connecter, ni demander d'envoi en ligne. Votre site n'affiche aucun bouton de connexion ou de compte ; il garde la page de suivi.
+- **Assurance** : aucun produit d'assurance au comptoir, aucun envoi assuré.
+- **Comptes de crédit** : pas de facturation sur compte à la caisse.
+- **Fournitures** : pas de fournitures vendues au comptoir.
+- **Livraison à domicile** : les envois sont retirés en agence.
+- *Service d'assistance et tickets.*
+- *Factures fournisseurs et bénéfice.*
 
 ## Saisir un client vous-même
 Sans portail client, les clients ne s'inscrivent pas eux-mêmes. Le personnel qui gère les clients les ajoute :

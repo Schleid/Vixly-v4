@@ -1,4 +1,4 @@
-﻿@*
+@*
 =========================================================
 FILE: CustomerPage.razor
 
@@ -104,6 +104,22 @@ IMPORTANT NOTES:
         }
 
         @* Owner, 2026-10-31: credit accounts are opened and changed from Credit only, never from the customer page. *@
+        @if (CanManage && Customer.Status == OperationsCustomerStatus.PendingVerification)
+        {
+            @* Owner, 2026-11-03: the confirmation email did not arrive, or the address was mistyped. *@
+            <form method="post" action="/staff/customers/@Customer.CustomerId/confirmation" class="ops-editor__panel ops-customer-confirmation-panel" aria-labelledby="customer-confirmation">
+                <AntiforgeryToken />
+                <h2 id="customer-confirmation">@T["ui.customers.confirmation"]</h2>
+                <p class="ops-editor__hint">@T["ui.customers.confirmation_hint"]</p>
+                <div class="ops-customer-confirmation-toolbar">
+                    <label>
+                        <span>@T["ui.editor.email"]</span>
+                        <input type="email" name="email" value="@Customer.Email" maxlength="254" required autocomplete="off" spellcheck="false" />
+                    </label>
+                    <button type="submit" class="vx-button vx-button--primary">@T["ui.customers.confirmation_send"]</button>
+                </div>
+            </form>
+        }
         @if (CanManage)
         {
             <CustomerStatusPanel T="T" Customer="Customer" CanBan="CanBan" />

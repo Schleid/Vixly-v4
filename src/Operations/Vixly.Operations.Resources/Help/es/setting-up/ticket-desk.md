@@ -15,14 +15,14 @@ updated: 2026-10-29
 review: needs-review
 ---
 
-**Tickets** reúne los tickets de paquetes faltantes de los clientes y los tickets que los agentes de soporte abren durante las llamadas. Cada ticket tiene un tema, y solo el departamento de ese tema lo ve.
+**Tickets** reúne los tickets de paquetes faltantes de los clientes de {brandName} y los tickets que los agentes de soporte abren durante las llamadas. Cada ticket tiene un tema, y solo el departamento de ese tema lo ve.
 
 ## Quién ve qué
-- **Paquete faltante o equivocado:** el personal del almacén (que puede ver los paquetes allí).
-- **Facturación y pago:** Finanzas (que puede ver facturas o cobrar).
-- **Retiro, entrega, destinatario:** atención al cliente, y el personal de envíos de la sucursal.
-- **Daño o reclamo:** atención al cliente y seguros.
-- **Otro:** atención al cliente.
+- **Paquete faltante o equivocado**: el personal del almacén (que puede ver los paquetes allí).
+- **Facturación y pago**: Finanzas (que puede ver facturas o cobrar).
+- **Retiro, entrega, destinatario**: atención al cliente, y el personal de envíos de la sucursal.
+- **Daño o reclamo**: atención al cliente y seguros.
+- **Otro**: atención al cliente.
 
 El propietario y los administradores ven todos los tickets.
 

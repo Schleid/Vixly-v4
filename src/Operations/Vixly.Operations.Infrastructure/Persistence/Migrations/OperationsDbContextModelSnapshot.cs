@@ -1387,14 +1387,23 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ConsentRecordedByUserId")
+                    b.Property<Guid?>("ConsentRecordedByUserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset>("ConsentRecordedUtc")
+                    b.Property<DateTimeOffset?>("ConsentRecordedUtc")
                         .HasColumnType("datetimeoffset");
 
                     b.Property<DateTimeOffset>("CreatedUtc")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("CustomerAgreedUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte?>("HiddenReason")
+                        .HasColumnType("tinyint");
 
                     b.Property<DateTimeOffset?>("LastModifiedUtc")
                         .HasColumnType("datetimeoffset");
@@ -1403,6 +1412,9 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
+
+                    b.Property<byte?>("NameStyle")
+                        .HasColumnType("tinyint");
 
                     b.Property<string>("Place")
                         .HasMaxLength(80)
@@ -1416,6 +1428,9 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                     b.Property<int?>("Rating")
                         .HasColumnType("int");
 
+                    b.Property<DateTimeOffset?>("ReviewedUtc")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<bool>("Shown")
                         .HasColumnType("bit");
 
@@ -1426,12 +1441,22 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         .HasMaxLength(40)
                         .HasColumnType("nvarchar(40)");
 
+                    b.Property<DateTimeOffset?>("SubmittedUtc")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "CustomerId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_SiteTestimonials_TenantId_CustomerId_One")
+                        .HasFilter("[CustomerId] IS NOT NULL");
+
+                    b.HasIndex("TenantId", "ReviewedUtc");
 
                     b.HasIndex("TenantId", "SortOrder");
 
@@ -2240,6 +2265,9 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("nvarchar(8)");
+
+                    b.Property<DateTimeOffset?>("ReviewInviteDismissedUtc")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -5862,6 +5890,9 @@ namespace Vixly.Operations.Infrastructure.Persistence.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("AllowCredit")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("AskForReviews")
                         .HasColumnType("bit");
 
                     b.Property<string>("BankTransferInstructionsEn")

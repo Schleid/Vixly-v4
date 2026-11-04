@@ -1035,6 +1035,87 @@ public sealed partial class OperationsCustomerPackageFlowTests : IClassFixture<O
         Assert.Equal(HttpStatusCode.NotFound, (await ben.GetAsync("/customer/rates?shipment=" + shipment)).StatusCode);
     }
 
+    // Customer reviews (owner, 2026-11-03): only once the company asks and a shipment is finished; one review, the customer's own words,
+    // new again after a change, deleted by the customer; the home page invites once.
+    [SqlServerFact]
+    public async Task Customer_ReviewsTheCompany_OnlyAfterAFinishedShipment_ChangesAndDeletesIt()
+    {
+        Browser ana = await ConfirmedAsync("ana.review@example.com");
+        Dictionary<string, string> review = new() { ["rating"] = "5", ["quote"] = "Fast & careful.", ["name"] = "FirstAndInitial", ["place"] = "Doral", ["agreed"] = "true" };
+
+        // The company does not ask yet: no page to write, and Operations refuses.
+        Assert.Contains("not asking for reviews", WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/review")), StringComparison.Ordinal);
+        Assert.Contains("Reviews are not open", WebUtility.HtmlDecode(await Read(await ana.PostAsync("/customer/review", "/customer/review", review))), StringComparison.Ordinal);
+
+        await WithDatabaseAsync(async context =>
+        {
+            Vixly.Operations.Domain.Settings.OperationsTenantSettings? settings = await context.TenantSettings.SingleOrDefaultAsync();
+
+            if (settings is null)
+            {
+                settings = Vixly.Operations.Domain.Settings.OperationsTenantSettings.CreateDefault(_tenant, DateTimeOffset.UtcNow);
+                context.Add(settings);
+            }
+
+            settings.ChangeAskForReviews(true, DateTimeOffset.UtcNow);
+        });
+
+        // The portal keeps the company's look a minute; the test does not wait for it.
+        (_portal.Services.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>() as Microsoft.Extensions.Caching.Memory.MemoryCache)?.Clear();
+
+        // Asked, but nothing delivered yet.
+        Assert.Contains("once one of your shipments has been delivered or picked up", WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/review")), StringComparison.Ordinal);
+        Assert.Contains("You can leave a review once", WebUtility.HtmlDecode(await Read(await ana.PostAsync("/customer/review", "/customer/review", review))), StringComparison.Ordinal);
+
+        // A finished shipment, and a home address so the home page shows.
+        await ana.PostAsync("/customer/packages/shipments/new", "/customer/packages/shipments/new", Shipment("TBA0007770001"));
+        Guid anaId = await CustomerIdAsync("ana.review@example.com");
+        await WithDatabaseAsync(context => context.Database.ExecuteSqlInterpolatedAsync(
+            $"UPDATE [ops].[Shipments] SET [DeliveredUtc] = SYSDATETIMEOFFSET() WHERE [CustomerId] = {anaId}; UPDATE [ops].[Customers] SET [Home_Line1] = '1 Main St', [Home_City] = 'Doral', [Home_CountryCode] = 'US', [HomeAddressUtc] = SYSDATETIMEOFFSET() WHERE [Id] = {anaId}"));
+        Assert.Contains("How was your shipment with Parcel Express?", WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/")), StringComparison.Ordinal);
+
+        // Plain text only; then saved, new for the company, the name shortened.
+        Dictionary<string, string> markup = new(review) { ["quote"] = "<b>Great</b>" };
+        Assert.Contains("Use plain text only", WebUtility.HtmlDecode(await Read(await ana.PostAsync("/customer/review", "/customer/review", markup))), StringComparison.Ordinal);
+        Assert.Equal("/customer/review?done=saved", (await ana.PostAsync("/customer/review", "/customer/review", review)).Headers.Location?.OriginalString);
+        string mine = WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/review"));
+        Assert.Contains("Received, waiting to be read", mine, StringComparison.Ordinal);
+        Assert.Contains("Fast & careful.", mine, StringComparison.Ordinal);
+        Assert.DoesNotContain("How was your shipment", WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/")), StringComparison.Ordinal);
+
+        OperationsSiteTestimonial? saved = null;
+        await WithDatabaseAsync(async context => saved = await context.SiteTestimonials.SingleAsync(item => item.CustomerId == anaId));
+        Assert.Equal("Ana P.", saved!.Name);
+        Assert.True(saved.IsNew);
+        Assert.False(saved.Shown);
+        Assert.NotNull(saved.CustomerAgreedUtc);
+
+        // Published by the company, then changed by the customer: off the website and new again; without agreement it is feedback only.
+        await WithDatabaseAsync(async context => (await context.SiteTestimonials.SingleAsync(item => item.CustomerId == anaId)).ChangeShown(true, DateTimeOffset.UtcNow));
+        Assert.Contains("Shown on the website", WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/review")), StringComparison.Ordinal);
+        Dictionary<string, string> feedbackOnly = new(review) { ["quote"] = "Good, a bit slow.", ["name"] = "FirstOnly" };
+        feedbackOnly.Remove("agreed");
+        Assert.Equal("/customer/review?done=saved", (await ana.PostAsync("/customer/review", "/customer/review", feedbackOnly)).Headers.Location?.OriginalString);
+        string changed = WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/review"));
+        Assert.Contains("Received, waiting to be read", changed, StringComparison.Ordinal);
+        Assert.Contains("stays private feedback", changed, StringComparison.Ordinal);
+        await WithDatabaseAsync(async context => saved = await context.SiteTestimonials.SingleAsync(item => item.CustomerId == anaId));
+        Assert.Equal("Ana", saved!.Name);
+        Assert.False(saved.Shown);
+        Assert.Null(saved.CustomerAgreedUtc);
+
+        // Another customer never sees it.
+        Browser ben = await ConfirmedAsync("ben.review@example.com");
+        Assert.DoesNotContain("Good, a bit slow.", await ben.GetStringAsync("/customer/review"), StringComparison.Ordinal);
+
+        // Deleted by the customer; the invitation comes back once, then not after "No thanks".
+        Assert.Equal("/customer/review?done=deleted", (await ana.PostAsync("/customer/review", "/customer/review/delete", new())).Headers.Location?.OriginalString);
+        await WithDatabaseAsync(async context => Assert.False(await context.SiteTestimonials.AnyAsync(item => item.CustomerId == anaId)));
+        Assert.Contains("How was your shipment", WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/")), StringComparison.Ordinal);
+        Assert.Equal("/customer/", (await ana.PostAsync("/customer/", "/customer/review/dismiss", new())).Headers.Location?.OriginalString);
+        Assert.DoesNotContain("How was your shipment", WebUtility.HtmlDecode(await ana.GetStringAsync("/customer/")), StringComparison.Ordinal);
+    }
+
     private async Task<Guid> CustomerIdAsync(string email)
     {
         Guid id = Guid.Empty;

@@ -15,7 +15,7 @@ updated: 2026-10-29
 review: needs-review
 ---
 
-Un agente de soporte atiende llamadas sobre un envío o un paquete a la vez. Nunca ve una lista de clientes, una dirección completa, un teléfono completo ni un correo, y no cambia nada: abre un ticket de llamada para su personal.
+Un agente de soporte atiende llamadas sobre un envío o un paquete a la vez. Nunca ve una lista de clientes, una dirección completa, un teléfono completo ni un correo, y no cambia nada: abre un ticket de llamada para el personal de {brandName}.
 
 ## Configurar un agente
 1. Invite al agente como a cualquier miembro del personal y dele el rol **Agente de soporte** para toda la empresa.

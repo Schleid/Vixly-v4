@@ -259,8 +259,8 @@ public sealed class OperationsTenantSiteHttpTests : IClassFixture<OperationsWebD
             .Response.Headers.Location?.OriginalString);
         string listed = (await owner.GetAsync("/staff/site/testimonials")).Html;
         Assert.Contains("Fast & careful.", listed, StringComparison.Ordinal);
-        string hide = Regex.Match(listed, "action=\"(?<a>/staff/site/testimonials/[0-9a-f-]{36}/hide)\"").Groups["a"].Value;
-        Assert.Equal("/staff/site/testimonials?saved=1", (await owner.PostAsync(hide, listed)).Response.Headers.Location?.OriginalString);
+        string hide = WebUtility.HtmlDecode(Regex.Match(listed, "action=\"(?<a>/staff/site/testimonials/[0-9a-f-]{36}/hide[^\"]*)\"").Groups["a"].Value);
+        Assert.Equal("/staff/site/testimonials?saved=1&view=all", (await owner.PostAsync(hide, listed)).Response.Headers.Location?.OriginalString);
 
         string page = WebUtility.HtmlDecode((await owner.GetAsync("/en?preview=true&theme=airsea")).Html);
         foreach (string expected in new[] { "Florida to Haiti", "Weighed and photographed", "5 to 7 days", "Consolidated on the next flight", "Family run", "Your packages, our care",

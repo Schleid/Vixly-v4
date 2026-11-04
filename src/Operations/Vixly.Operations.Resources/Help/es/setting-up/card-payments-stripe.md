@@ -18,10 +18,10 @@ review: needs-review
 Los pagos con tarjeta, en la página de pago y en los lectores, los cobra la propia cuenta de Stripe de su empresa y se abonan en ella. {brandName} nunca guarda el dinero. Conecta la cuenta una sola vez, con tres valores de Stripe. Empiece en el modo de prueba de Stripe, pruebe un pago y luego haga lo mismo con la cuenta real.
 
 ## Pasos
-1. En Stripe, abra **Desarrolladores**, **Claves API** y luego **Crear clave restringida**. Elija la integración propia y los **permisos personalizados**.
-2. Ponga **Checkout Sessions**, **PaymentIntents** y **Charges and Refunds** en **escritura (Write)**. Si usa lectores de tarjetas en el mostrador, ponga también **Terminal Readers** en escritura. Deje todo lo demás en **Ninguno (None)**, cree la clave y cópiela (empieza por rk_).
-3. En Stripe, abra **Desarrolladores**, **Webhooks** y agregue un endpoint en la dirección que muestra el panel **Tarjetas (Stripe)**, para los eventos que allí se indican. Copie su **secreto de firma** (empieza por whsec_).
-4. Copie la **clave publicable** (pk_) en **Desarrolladores**, **Claves API**, en el mismo modo que la clave restringida.
+1. En Stripe, abra *Desarrolladores*, *Claves API* y luego *Crear clave restringida*. Elija la integración propia y los permisos personalizados.
+2. Ponga *Checkout Sessions*, *PaymentIntents* y *Charges and Refunds* en escritura (Write). Si usa lectores de tarjetas en el mostrador, ponga también *Terminal Readers* en escritura. Deje todo lo demás en *Ninguno (None)*, cree la clave y cópiela (empieza por rk_).
+3. En Stripe, abra *Desarrolladores*, **Webhooks** y agregue un endpoint en la dirección que muestra el panel **Tarjetas (Stripe)**, para los eventos que allí se indican. Copie su secreto de firma (empieza por whsec_).
+4. Copie la clave publicable (pk_) en *Desarrolladores*, *Claves API*, en el mismo modo que la clave restringida.
 5. En **Métodos de pago**, **Tarjetas (Stripe)**, pegue la clave restringida, la clave publicable y el secreto de firma, y guarde.
 
 ## Qué pasa después

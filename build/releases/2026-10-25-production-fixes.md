@@ -577,3 +577,46 @@ Keep each value in your password manager: without it the sites can no longer rea
 1. After setting the variable and copying: Operations `/health/ready` is Healthy; staff sign-in works; a customer can sign in to the portal.
 2. Staging, with a Stripe test account: create a restricted key with only Charges and Refunds; saving it is refused (*cannot reach everything card payments need*). Add the other permissions; saving works.
 3. Take a $1 test card payment at the cashier (payment page), refund it, and check the webhook deliveries in Stripe are 200.
+
+## 37. Thirty-third update (2026-11-03): Control's key ring locked too
+**Database: no.** Set the setting first, then copy **Control** and **Platform API**. No script.
+
+**New setting:** `DataProtection__KeyEncryptionKey` on the **Control** and **Platform API** pools: the **same** value on both (they share one key ring), different from Operations' and the portal's, different on staging. Make it as in section 36 and keep it in your password manager.
+
+- The key ring that protects Control's staff sign-in cookies and authenticator keys was stored in the database in clear, like Operations' (section 36). New keys are now locked with the key above; at the first start a locked key comes into use. Staff already signed in stay signed in.
+
+**Checks:**
+1. Control and Platform API `/health/ready` are Healthy.
+2. Sign out of Control and sign in again (password and second factor).
+3. A company's workspace still opens (Operations calls Platform API).
+
+## 38. Thirty-fourth update (2026-11-03): send the confirmation email again, to a corrected address
+**Database: no.** Copy **Operations Web** and **Control**. No new setting.
+
+- **Operations, customer record:** while a customer has not confirmed their email, staff who manage customers see a *Confirmation email* panel with the address. Fix it if it was mistyped, then *Send again*. The old link stops working. At most 5 sends per customer per hour. An address already used by another customer, or by a staff member, is refused. Each send is in the audit log.
+- **Operations help:** nine setup guides (website, website texts, customer accounts, plan modules, plan shipments, support calls, tickets, card payments, branches and warehouses) now name the company, and bold only the exact labels on screen. Stripe's screen names are in italics. Same in English, French and Spanish.
+- **Quieter, cleaner logs:** Operations Web, Operations API and the customer portal no longer list every database command (Control and Platform API already worked this way), and all five no longer list every outgoing web call (Platform API, Stripe, TechOS). Warnings and errors still show. The three model warnings at start-up are gone: a website draft saved with no services is kept as "none" (it could have been replaced by "all" when first saved; no company was affected, since a site starts with every service on), and two settings now state their type. Clean-up jobs remove the oldest expired rows first. No database change.
+- **Control, registration page:** while a sign-up waits for email verification, the *Send the link again* button now has the owner's email above it. Correct the address if it was mistyped; the link goes to the new address and the old one stops working. Same limit as the public resend. The correction is in the audit log.
+
+**Checks:**
+1. Operations: open a customer who is *Waiting for email confirmation*, send again; the email arrives and its link confirms the account.
+2. Change the address to a wrong format: refused with a message. Send 6 times in a row: the 6th is refused.
+3. Control: open a registration that is *Waiting for email verification*, correct the email, *Send the link again*; the page shows the new address and the email arrives there.
+
+## 39. Thirty-fifth update (2026-11-03): customer reviews
+**Database: yes.** Run the global SQL script, then copy **Operations Web**, **Operations API** and the **customer portal**. No new setting.
+
+The script adds the review columns to `ops.SiteTestimonials` (who wrote it, when they agreed, when the company looked at it, why it was hidden), the invitation date to `ops.Customers`, and the company's switch to `ops.TenantSettings` (off for every company).
+
+- **Customer portal:** when the company asks, customers with a delivered or picked-up shipment get a *Review us* page: stars, a short text, how their name appears ("Marie P." or "Marie", never the full name), an optional city, and whether the company may show it. One review per customer; they can change or delete it. A one-time invitation shows on the home page after the first finished shipment.
+- **Operations, Your website › Customer testimonials:** a switch *Ask customers for reviews in the customer portal* (plans with the customer portal only); views *All*, *New*, *Published*, *Hidden*; customer reviews are published only with the customer's agreement, hidden with an optional reason the customer never sees, ordered with arrows, and never edited or removed by the company. *Open a ticket* sends customer service a ticket about the customer's last finished shipment. The website editor shows how many reviews are new.
+- **A changed review** goes back to *New* and off the website until published again; a deleted review leaves the website at once.
+- **The website** keeps showing testimonials as "What our customers say", with stars per review and no average or count (the U.S. rule on reviews, 16 CFR 465.7).
+- **Help:** new Operations article *Customer reviews: ask, publish or hide*.
+
+**Checks (staging first):**
+1. Run the script; check `ops.__EFMigrationsHistory` ends with `CustomerReviews`.
+2. Operations: *Your website › Customer testimonials*, tick the switch, *Save*.
+3. Portal, as a customer with a delivered shipment: the home page invites you; *Review us*, send 5 stars with agreement. Operations shows it under *New (1)*; *Publish*; the home page (Air & Sea theme, testimonials on) shows it.
+4. Change the review in the portal: it is *New* again and gone from the website. Delete it: gone from the list.
+5. A review sent without agreement has no *Publish* button; *Hide* with a reason; *Open a ticket*: the ticket appears for customer service with *From a review*.

@@ -27,5 +27,14 @@ internal sealed class OperationsSiteTestimonialConfiguration : IEntityTypeConfig
         builder.Property(item => item.Quote).HasMaxLength(OperationsSiteTestimonial.QuoteMaxLength).IsRequired();
         builder.Property(item => item.Source).HasMaxLength(OperationsSiteTestimonial.SourceMaxLength);
         builder.HasIndex(item => new { item.TenantId, item.SortOrder });
+
+        // Customer reviews (owner, 2026-11-03): one per customer; new ones are counted for the badge.
+        builder.HasIndex(item => new { item.TenantId, item.CustomerId }).IsUnique().HasFilter("[CustomerId] IS NOT NULL").HasDatabaseName("IX_SiteTestimonials_TenantId_CustomerId_One");
+        builder.HasIndex(item => new { item.TenantId, item.ReviewedUtc });
+        builder.Property(item => item.NameStyle).HasConversion<byte?>();
+        builder.Property(item => item.HiddenReason).HasConversion<byte?>();
+        builder.Ignore(item => item.FromCustomer);
+        builder.Ignore(item => item.IsNew);
+        builder.Ignore(item => item.MayBePublished);
     }
 }

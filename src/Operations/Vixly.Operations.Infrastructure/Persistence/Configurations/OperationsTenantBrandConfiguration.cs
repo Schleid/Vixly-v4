@@ -32,6 +32,8 @@ internal sealed class OperationsTenantBrandConfiguration : IEntityTypeConfigurat
         builder.OwnsOne(brand => brand.Published, settings => Map(settings, "Published_", "DisplayName"));
         builder.Navigation(brand => brand.Draft).IsRequired();
         builder.Navigation(brand => brand.Published).IsRequired();
+        // EF keeps the draft's sentinel only when set again here (Map sets it, but the draft copy loses it; 2026-11-03).
+        builder.OwnsOne(brand => brand.Draft).Property(item => item.Services).HasSentinel((OperationsSiteServices)(-1));
 
         builder.OwnsMany(brand => brand.Texts, text =>
         {

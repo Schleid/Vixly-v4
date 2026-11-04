@@ -16460,4 +16460,160 @@ Votre compte {company} a été fermé car nos conditions de service n’ont pas 
     <value>Le mieux : une clé restreinte (rk_) créée pour ce système dans Stripe (Développeurs, Clés API, Créer une clé restreinte), avec Checkout Sessions, PaymentIntents et Charges and Refunds en écriture (Write), plus Terminal Readers si vous utilisez des lecteurs de cartes. Une clé secrète complète (sk_) fonctionne aussi, mais permet bien plus que ce dont les paiements par carte ont besoin.</value>
     <comment>needs-review</comment>
   </data>
+  <data name="ui.customers.confirmation" xml:space="preserve">
+    <value>E-mail de confirmation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.confirmation_hint" xml:space="preserve">
+    <value>Le client n'a pas encore confirmé son adresse e-mail. Renvoyez le lien si l'e-mail n'est pas arrivé ; corrigez d'abord l'adresse si elle était mal saisie. Le nouveau lien remplace l'ancien.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.confirmation_send" xml:space="preserve">
+    <value>Renvoyer l'e-mail de confirmation</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.customers.done.confirmation" xml:space="preserve">
+    <value>L'e-mail de confirmation a été renvoyé.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.customers.email_is_staff" xml:space="preserve">
+    <value>C'est l'e-mail professionnel d'un employé ; un compte client a besoin de l'e-mail du client.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.customers.confirmation_resend_limit" xml:space="preserve">
+    <value>L'e-mail de confirmation a déjà été envoyé {limit} fois dans la dernière heure. Réessayez plus tard.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.new_count" xml:space="preserve">
+    <value>{count} nouveaux</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.reviews" xml:space="preserve">
+    <value>Avis des clients</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.reviews_hint" xml:space="preserve">
+    <value>Quand cette option est active, les clients ayant un envoi livré ou retiré peuvent donner leur avis dans le portail client. Rien n'apparaît sur le site web avant que vous le publiiez, et vous ne pouvez pas modifier leurs mots.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.reviews_ask" xml:space="preserve">
+    <value>Demander l'avis des clients dans le portail client</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.reviews_save" xml:space="preserve">
+    <value>Enregistrer</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.views" xml:space="preserve">
+    <value>Afficher</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.view.all" xml:space="preserve">
+    <value>Tous</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.view.new" xml:space="preserve">
+    <value>Nouveaux</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.view.published" xml:space="preserve">
+    <value>Publiés</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.view.hidden" xml:space="preserve">
+    <value>Masqués</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.from_customer" xml:space="preserve">
+    <value>Avis client, {date}</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.from_staff" xml:space="preserve">
+    <value>Saisi par l'équipe</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.not_agreed" xml:space="preserve">
+    <value>Citation non autorisée : commentaire seulement</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.status.new" xml:space="preserve">
+    <value>Nouveau</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.reason" xml:space="preserve">
+    <value>Raison</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.reason.none" xml:space="preserve">
+    <value>Raison (facultatif)</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.reason.PersonalInformation" xml:space="preserve">
+    <value>Informations personnelles</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.reason.Abusive" xml:space="preserve">
+    <value>Abusif ou offensant</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.reason.NotAboutService" xml:space="preserve">
+    <value>Sans rapport avec notre service</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.reason.SuspectedFake" xml:space="preserve">
+    <value>Faux présumé</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.reason.Other" xml:space="preserve">
+    <value>Autre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.publish" xml:space="preserve">
+    <value>Publier</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.up" xml:space="preserve">
+    <value>Monter</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.down" xml:space="preserve">
+    <value>Descendre</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.testimonials.ticket" xml:space="preserve">
+    <value>Ouvrir un ticket</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.editor.saved.review_ticket" xml:space="preserve">
+    <value>Un ticket est ouvert pour le service client.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.tickets.by_review" xml:space="preserve">
+    <value>D'après un avis</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.review_not_agreed" xml:space="preserve">
+    <value>Le client n'a pas accepté d'être cité : cet avis ne peut pas être publié.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.review_hide_reason_invalid" xml:space="preserve">
+    <value>Choisissez une raison dans la liste.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.reviews_off" xml:space="preserve">
+    <value>Les avis des clients sont désactivés.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.review_not_yet" xml:space="preserve">
+    <value>Ce client n'a aucun envoi livré ou retiré.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.review_is_customers" xml:space="preserve">
+    <value>Cet avis appartient au client : masquez-le plutôt.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.brand.review_not_from_customer" xml:space="preserve">
+    <value>Seul un avis client peut ouvrir un ticket.</value>
+    <comment>needs-review</comment>
+  </data>
 </root>

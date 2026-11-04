@@ -136,6 +136,7 @@ public static class CustomerWebHost
         Vixly.Customer.Web.Portal.CustomerTrackEndpoints.MapCustomerTrackEndpoints(app);
         Vixly.Customer.Web.Portal.CustomerRateEndpoints.MapCustomerRateEndpoints(app);
         Vixly.Customer.Web.Portal.CustomerTicketEndpoints.MapCustomerTicketEndpoints(app);
+        Vixly.Customer.Web.Portal.CustomerReviewEndpoints.MapCustomerReviewEndpoints(app);
         Vixly.Customer.Web.Portal.CustomerInvoiceEndpoints.MapCustomerInvoiceEndpoints(app);
         // Any method: a failed form post comes back here as a post (2026-10-18).
         app.MapVixlyErrorPage(

@@ -73,11 +73,23 @@ IMPORTANT NOTES:
             }
             else
             {
-                <div class="vx-actions">
-                    @if (registration.Status == PlatformTenantRegistrationStatus.PendingEmailVerification)
-                    {
-                        <VxButton IsBusy="@Presenter.IsBusy" OnClick="() => Presenter.ResendAsync(RegistrationId)">@T["ui.registrations.resend"]</VxButton>
-                    }
+                @if (registration.Status == PlatformTenantRegistrationStatus.PendingEmailVerification)
+                {
+                    <form class="vx-form vx-registration-resend-form" @onsubmit="() => Presenter.ResendAsync(RegistrationId, _email ?? registration.OwnerEmail)">
+                        <p class="vx-hint">@T["ui.registrations.resend_help"]</p>
+                        <div class="vx-registration-resend-toolbar">
+                            <label for="registration-resend-email">
+                                <span class="vx-form__label-text">@T["ui.registrations.resend_email"]</span>
+                                <input id="registration-resend-email" type="email" value="@(_email ?? registration.OwnerEmail)" @onchange="e => _email = e.Value?.ToString()" maxlength="254" required />
+                            </label>
+
+                            <VxButton Type="submit" IsBusy="@Presenter.IsBusy">@T["ui.registrations.resend"]</VxButton>
+                        </div>
+
+
+                    </form>
+                }
+                <div class="vx-actions vx-registration-cancel-action">
                     <VxButton OnClick="Presenter.StartCancel">@T["ui.registrations.cancel"]</VxButton>
                 </div>
             }
@@ -96,6 +108,8 @@ else
 
 @code {
     private string? _reason;
+
+    private string? _email;
 
     [Parameter, EditorRequired]
     public Guid RegistrationId { get; set; }

@@ -79,6 +79,8 @@ public sealed class OperationsHelpRenderingTests
         await using HtmlRenderer renderer = new(services, services.GetRequiredService<ILoggerFactory>());
         return await renderer.Dispatcher.InvokeAsync(async () =>
         {
+            // The link reads the language from the UI culture; fix it so any machine's locale gives the same page.
+            System.Globalization.CultureInfo.CurrentUICulture = new System.Globalization.CultureInfo("en");
             var result = await renderer.RenderComponentAsync<T>(ParameterView.FromDictionary(parameters));
             return result.ToHtmlString();
         });

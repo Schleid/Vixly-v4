@@ -23,6 +23,7 @@ public static class PlatformWebSettings
     public static IReadOnlyList<VixlySettingRule> All { get; } = new[]
     {
         VixlySettingRule.Need("ConnectionStrings:Platform", VixlySettingKind.Text, "The Platform database."),
+        VixlySettingRule.Need(Vixly.Shared.Hosting.Security.VixlyKeyRingEncryption.KeySetting, VixlySettingKind.Secret, "Locks the key ring kept in the database (32 random bytes, base64; environment variable). The same value on Control and Platform API.", minLength: Vixly.Shared.Hosting.Security.VixlyKeyRingEncryption.KeyTextLength),
         VixlySettingRule.Need("PlatformHosting:ConsoleBaseUrl", VixlySettingKind.Url, "Control's address, used in emails."),
         VixlySettingRule.Need("PlatformHosting:PublicBaseUrl", VixlySettingKind.Url, "The public site's address, used in emails."),
         VixlySettingRule.Need("PlatformTenants:TenantBaseDomain", VixlySettingKind.Text, "The domain under which each company gets its address."),

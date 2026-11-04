@@ -15,12 +15,12 @@ updated: 2026-10-29
 review: ok
 ---
 
-Your website shows your company's own name, logo, colours, texts, services and locations. You change a draft; visitors see nothing new until you publish.
+Your website shows {brandName}'s own name, logo, colours, texts, services and locations. You change a draft; visitors see nothing new until you publish.
 
 ## Choose a theme
 1. Open **Website** in the menu.
 2. Under **Theme and font**, read the short description of each theme. **Classic** is the standard page, **Horizon** opens dark and bold with a route drawing, **Air & Sea** is bright with a large photo and air and ocean side by side.
-3. Use **Preview: Horizon** (or another theme) at the top to see your draft in that theme, in a new tab. Nothing is saved.
+3. Use *Preview: Horizon* (or another theme) at the top to see your draft in that theme, in a new tab. Nothing is saved.
 4. Pick the theme and a font, then select **Save**.
 5. Select **Publish now** when the preview looks right.
 

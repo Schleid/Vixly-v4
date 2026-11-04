@@ -15,5 +15,8 @@
 public enum OperationsTicketSource
 {
     Customer = 0,
-    Agent = 1
+    Agent = 1,
+
+    // Opened by staff from a customer review (owner, 2026-11-03).
+    Review = 2
 }

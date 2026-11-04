@@ -15,10 +15,10 @@ updated: 2026-10-31
 review: ok
 ---
 
-Ouvrez le client depuis **Clients**. En bas de la page, choisissez le changement et donnez une raison. La raison reste dans l'historique du client ; le client reçoit un e-mail sans elle.
+Ouvrez le client depuis **Clients**. En bas de la page, choisissez le changement et donnez une raison. La raison reste dans l'historique du client ; le client reçoit un e-mail de {brandName} sans elle.
 
 ## Les actions
-- **Suspendre** : le client ne peut ni se connecter ni envoyer de nouveaux colis. Vous pouvez choisir **Réactiver automatiquement le** : le compte redevient actif tout seul ce jour-là. Suspendez de nouveau pour changer le jour.
+- **Suspendre** : le client ne peut ni se connecter ni envoyer de nouveaux colis. Vous pouvez choisir **Réactiver automatiquement le (facultatif)** : le compte redevient actif tout seul ce jour-là. Suspendez de nouveau pour changer le jour.
 - **Réactiver** : met fin à une suspension, ou rouvre un compte fermé.
 - **Fermer le compte** : pour un client qui part ou demande la fermeture. Il peut être rouvert plus tard.
 - **Bannir (non-respect des conditions, définitif)** : le compte ne peut jamais être rouvert, et l'e-mail et le téléphone du client ne peuvent pas ouvrir un nouveau compte chez vous.

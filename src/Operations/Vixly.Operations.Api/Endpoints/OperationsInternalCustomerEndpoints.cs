@@ -55,7 +55,7 @@ public static class OperationsInternalCustomerEndpoints
             // The portal's warning and sign-out follow the company's inactivity time for customers (owner, 2026-10-27).
             Vixly.Operations.Application.Identity.OperationsIdleTimes times = await idle.GetAsync(cancellationToken);
             return Results.Ok(new CustomerPortalBrandDto(brand.DisplayName, brand.LogoImageId, brand.FaviconImageId, brand.PrimaryColour, brand.AccentColour,
-                (int)times.Customer.TotalMinutes, (int)times.Warn.TotalMinutes));
+                (int)times.Customer.TotalMinutes, (int)times.Warn.TotalMinutes, response.AskForReviews));
         });
 
         customers.MapPost("/sign-up", async (HttpContext http, CustomerSignUpBody body, SignUpOperationsCustomerUseCase useCase, CancellationToken cancellationToken) =>

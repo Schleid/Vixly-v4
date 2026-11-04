@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Vixly.Shared.Hosting.Security;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Vixly.Platform.Application.DependencyInjection;
@@ -57,6 +58,7 @@ public static class PlatformWebHost
         }
 
         builder.Services.AddPlatformInfrastructure(builder.Configuration, "Vixly.V4.Platform.Web");
+        builder.Services.AddVixlyKeyRingEncryption(builder.Configuration);
         builder.Services.AddPlatformApplication();
         builder.Services.AddVixlyForwardedHeaders(builder.Configuration);
 

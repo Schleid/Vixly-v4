@@ -102,7 +102,7 @@ internal sealed class OperationsTicketRepository : IOperationsTicketRepository
         await Escalatable(openedBefore).OrderBy(item => item.CreatedUtc).Take(take).ToListAsync(cancellationToken);
 
     public async Task<IReadOnlyList<Guid>> ListTenantsWithEscalatableAsync(DateTimeOffset openedBefore, CancellationToken cancellationToken) =>
-        await Escalatable(openedBefore).AsNoTracking().Select(item => item.TenantId).Distinct().Take(10_000).ToListAsync(cancellationToken);
+        await Escalatable(openedBefore).AsNoTracking().Select(item => item.TenantId).Distinct().OrderBy(id => id).Take(10_000).ToListAsync(cancellationToken);
 
     private IQueryable<OperationsTicket> Escalatable(DateTimeOffset openedBefore) =>
         _context.Tickets.Where(item => item.Status != OperationsTicketStatus.Resolved && item.EscalationsSent < 2 && item.CreatedUtc <= openedBefore);

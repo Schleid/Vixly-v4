@@ -24,13 +24,20 @@ public interface IOperationsSiteRepository
     Task<OperationsSiteImage?> GetImageAsync(Guid imageId, CancellationToken cancellationToken);
 
     // Customer testimonials (owner, 2026-10-30), in the company's order.
-    Task<IReadOnlyList<OperationsSiteTestimonial>> ListTestimonialsAsync(CancellationToken cancellationToken);
-
     Task<OperationsSiteTestimonial?> GetTestimonialAsync(Guid testimonialId, CancellationToken cancellationToken);
 
     void AddTestimonial(OperationsSiteTestimonial testimonial);
 
     void RemoveTestimonial(OperationsSiteTestimonial testimonial);
+
+    // Customer reviews (owner, 2026-11-03): one view of the list, the customer's own review, new ones to look at, and the customer's last finished shipment.
+    Task<IReadOnlyList<OperationsSiteTestimonial>> ListTestimonialsAsync(Vixly.Operations.Application.Site.OperationsTestimonialView view, int take, CancellationToken cancellationToken);
+
+    Task<OperationsSiteTestimonial?> FindCustomerReviewAsync(Guid customerId, CancellationToken cancellationToken);
+
+    Task<int> CountNewReviewsAsync(CancellationToken cancellationToken);
+
+    Task<Vixly.Operations.Application.Site.OperationsReviewShipment?> FindLastFinishedShipmentAsync(Guid customerId, CancellationToken cancellationToken);
 
     // Packages of shipments picked up or delivered, from the company's records (owner, 2026-10-30).
     Task<int> CountDeliveredPackagesAsync(CancellationToken cancellationToken);

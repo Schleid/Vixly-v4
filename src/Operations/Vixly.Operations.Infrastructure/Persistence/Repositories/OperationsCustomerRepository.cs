@@ -80,6 +80,11 @@ internal sealed class OperationsCustomerRepository : IOperationsCustomerReposito
             .ToListAsync(cancellationToken);
     }
 
+    public Task<int> CountTokensSinceAsync(Guid customerId, OperationsCustomerTokenPurpose purpose, DateTimeOffset sinceUtc, CancellationToken cancellationToken)
+    {
+        return _context.CustomerTokens.CountAsync(token => token.CustomerId == customerId && token.Purpose == purpose && token.CreatedUtc >= sinceUtc, cancellationToken);
+    }
+
     // One atomic statement, so failures sent at the same time all count (review M2).
     public async Task<bool> RecordFailedSignInAsync(Guid customerId, DateTimeOffset utcNow, CancellationToken cancellationToken)
     {

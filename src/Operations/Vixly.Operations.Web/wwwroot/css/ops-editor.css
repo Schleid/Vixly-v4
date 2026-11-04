@@ -3912,6 +3912,18 @@ tr[data-low="true"] td:first-child {
 /* =========================================================
    Site Testimonials (/staff/site/testimonials)
    ========================================================= */
+.ops-reviews-setting {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    border-inline-start: 3px solid var(--vx-color-primary, #2563eb);
+}
+.ops-reviews-setting h2 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.125rem;
+    font-weight: 700;
+}
 .ops-testimonials-list-panel {
     display: flex;
     flex-direction: column;
@@ -3922,6 +3934,77 @@ tr[data-low="true"] td:first-child {
     margin: 0 0 0.25rem 0;
     font-size: 1.125rem;
     font-weight: 700;
+}
+.ops-testimonials-views {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+}
+.ops-testimonials-views a.vx-button {
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 0.75rem !important;
+    font-size: 0.8125rem !important;
+}
+.ops-testimonials-col-quote {
+    min-width: 14rem;
+}
+.ops-testimonials-col-name {
+    min-width: 10rem;
+}
+.ops-testimonials-col-rating,
+.ops-testimonials-cell-rating {
+    width: 5.5rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+.ops-testimonials-col-shown,
+.ops-testimonials-cell-shown {
+    width: 6.5rem;
+    text-align: center;
+}
+.ops-testimonials-col-actions {
+    min-width: 14rem;
+    text-align: right;
+}
+.ops-testimonials-table .ops-table-actions-cell {
+    text-align: right;
+    vertical-align: middle;
+}
+.ops-testimonials-table .ops-table-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+.ops-testimonials-table .ops-table-actions form.ops-editor__inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0;
+}
+.ops-testimonials-table .ops-table-actions select {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0.15rem 0.4rem !important;
+    font-size: 0.75rem !important;
+    border: 1px solid var(--vx-color-border-control, #cbd5e1) !important;
+    border-radius: 0.25rem !important;
+    background: var(--vx-color-surface, #ffffff) !important;
+    color: var(--vx-color-text, #1e293b) !important;
+    margin: 0 !important;
+}
+.ops-testimonials-table .ops-table-actions .vx-button {
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 0.55rem !important;
+    font-size: 0.75rem !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    white-space: nowrap;
 }
 .ops-testimonials-table th:last-child {
     text-align: right;
@@ -4035,4 +4118,54 @@ tr[data-low="true"] td:first-child {
     margin: 0 !important;
     font-size: 0.75rem;
     color: var(--vx-color-text-muted);
+}
+
+/* =========================================================
+   Customer Confirmation Email Panel (/staff/customers/{id})
+   ========================================================= */
+.ops-customer-confirmation-panel {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-inline-start: 3px solid var(--vx-color-primary, #2563eb);
+}
+.ops-customer-confirmation-panel h2 {
+    margin: 0 0 0.35rem 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+.ops-customer-confirmation-toolbar {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+}
+.ops-customer-confirmation-toolbar label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1 1 18rem;
+    min-width: 14rem;
+    max-width: 28rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--vx-color-text-muted);
+}
+.ops-customer-confirmation-toolbar input {
+    height: 32px;
+    min-height: 32px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8125rem;
+    border: 1px solid var(--vx-color-border-control, #cbd5e1);
+    border-radius: 0.35rem;
+    background: var(--vx-color-surface, #ffffff);
+    color: var(--vx-color-text, #1e293b);
+}
+.ops-customer-confirmation-toolbar .vx-button {
+    height: 32px;
+    min-height: 32px;
+    padding: 0 1rem;
+    font-size: 0.8125rem;
+    align-self: flex-end;
+    white-space: nowrap;
 }

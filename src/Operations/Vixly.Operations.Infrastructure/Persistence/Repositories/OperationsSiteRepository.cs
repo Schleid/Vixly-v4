@@ -45,8 +45,37 @@ internal sealed class OperationsSiteRepository : IOperationsSiteRepository
         return _context.SiteImages.AsNoTracking().FirstOrDefaultAsync(image => image.Id == imageId, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<OperationsSiteTestimonial>> ListTestimonialsAsync(CancellationToken cancellationToken) =>
-        await _context.SiteTestimonials.OrderBy(item => item.SortOrder).ThenBy(item => item.CreatedUtc).ToListAsync(cancellationToken);
+    // Customer reviews (owner, 2026-11-03): one view, in the company's order, oldest first within a place.
+    public async Task<IReadOnlyList<OperationsSiteTestimonial>> ListTestimonialsAsync(Vixly.Operations.Application.Site.OperationsTestimonialView view, int take, CancellationToken cancellationToken)
+    {
+        IQueryable<OperationsSiteTestimonial> items = _context.SiteTestimonials;
+        items = view switch
+        {
+            Vixly.Operations.Application.Site.OperationsTestimonialView.New => items.Where(item => item.CustomerId != null && item.ReviewedUtc == null),
+            Vixly.Operations.Application.Site.OperationsTestimonialView.Published => items.Where(item => item.Shown),
+            Vixly.Operations.Application.Site.OperationsTestimonialView.Hidden => items.Where(item => !item.Shown && (item.CustomerId == null || item.ReviewedUtc != null)),
+            Vixly.Operations.Application.Site.OperationsTestimonialView.Staff => items.Where(item => item.CustomerId == null),
+            _ => items
+        };
+
+        return await items.OrderBy(item => item.SortOrder).ThenBy(item => item.CreatedUtc).ThenBy(item => item.Id).Take(Math.Clamp(take, 1, 1000)).ToListAsync(cancellationToken);
+    }
+
+    public Task<OperationsSiteTestimonial?> FindCustomerReviewAsync(Guid customerId, CancellationToken cancellationToken) =>
+        _context.SiteTestimonials.FirstOrDefaultAsync(item => item.CustomerId == customerId, cancellationToken);
+
+    public Task<int> CountNewReviewsAsync(CancellationToken cancellationToken) =>
+        _context.SiteTestimonials.CountAsync(item => item.CustomerId != null && item.ReviewedUtc == null, cancellationToken);
+
+    public async Task<Vixly.Operations.Application.Site.OperationsReviewShipment?> FindLastFinishedShipmentAsync(Guid customerId, CancellationToken cancellationToken)
+    {
+        var last = await _context.Shipments.AsNoTracking()
+            .Where(shipment => shipment.CustomerId == customerId && (shipment.PickedUpUtc != null || shipment.DeliveredUtc != null))
+            .OrderByDescending(shipment => shipment.DeliveredUtc ?? shipment.PickedUpUtc)
+            .Select(shipment => new { shipment.Id, Warehouse = shipment.DestinationWarehouseId ?? shipment.OriginWarehouseId, Reference = shipment.TrackingNumber ?? shipment.Number })
+            .FirstOrDefaultAsync(cancellationToken);
+        return last is null ? null : new Vixly.Operations.Application.Site.OperationsReviewShipment(last.Id, last.Warehouse, last.Reference ?? last.Id.ToString("N")[..12]);
+    }
 
     public Task<OperationsSiteTestimonial?> GetTestimonialAsync(Guid testimonialId, CancellationToken cancellationToken) =>
         _context.SiteTestimonials.FirstOrDefaultAsync(item => item.Id == testimonialId, cancellationToken);

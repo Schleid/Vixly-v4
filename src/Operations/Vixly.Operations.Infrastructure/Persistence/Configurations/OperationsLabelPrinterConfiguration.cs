@@ -28,7 +28,7 @@ internal sealed class OperationsLabelPrinterConfiguration : IEntityTypeConfigura
         builder.HasIndex(item => new { item.TenantId, item.WarehouseId });
 
         // Slice 4D step 2: printers before it hold ID labels.
-        builder.Property(item => item.Media).HasDefaultValue(Vixly.Operations.Domain.Printing.OperationsLabelMedia.IdLabel);
+        builder.Property(item => item.Media).HasDefaultValue(Vixly.Operations.Domain.Printing.OperationsLabelMedia.IdLabel).HasSentinel((Vixly.Operations.Domain.Printing.OperationsLabelMedia)0);
         builder.HasOne<OperationsWarehouse>().WithMany().HasForeignKey(item => item.WarehouseId).OnDelete(DeleteBehavior.Restrict);
     }
 }

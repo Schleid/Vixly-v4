@@ -66,4 +66,17 @@ public static class OperationsBrandingErrors
     public static Error TestimonialNotFound { get; } = Error.Create("ops.brand.testimonial_not_found");
 
     public static Error TestimonialLimitReached { get; } = Error.Create("ops.brand.testimonial_limit_reached");
+
+    // Customer reviews (owner, 2026-11-03).
+    public static Error ReviewNotAgreed { get; } = Error.Create("ops.brand.review_not_agreed");
+
+    public static Error ReviewHideReasonInvalid { get; } = Error.Create("ops.brand.review_hide_reason_invalid");
+
+    public static Error ReviewsOff { get; } = Error.Create("ops.brand.reviews_off");
+
+    public static Error ReviewNotYet { get; } = Error.Create("ops.brand.review_not_yet");
+
+    public static Error ReviewIsCustomers { get; } = Error.Create("ops.brand.review_is_customers");
+
+    public static Error ReviewNotFromCustomer { get; } = Error.Create("ops.brand.review_not_from_customer");
 }

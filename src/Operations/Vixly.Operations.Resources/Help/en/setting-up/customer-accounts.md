@@ -15,10 +15,10 @@ updated: 2026-10-31
 review: ok
 ---
 
-Open the customer from **Customers**. At the bottom of the page, choose the change and give a reason. The reason stays in the customer's history; the customer receives an email without it.
+Open the customer from **Customers**. At the bottom of the page, choose the change and give a reason. The reason stays in the customer's history; the customer receives an email from {brandName} without it.
 
 ## The actions
-- **Suspend**: the customer cannot sign in or send new shipments. Optionally choose **Reactivate automatically on**: the account becomes active again by itself that day. You can suspend again to change the day.
+- **Suspend**: the customer cannot sign in or send new shipments. Optionally choose **Reactivate automatically on (optional)**: the account becomes active again by itself that day. You can suspend again to change the day.
 - **Reactivate**: ends a suspension, or reopens a closed account.
 - **Close the account**: for a customer who leaves or asks to close. It can be reopened later.
 - **Ban (breaks our terms, permanent)**: the account can never be reopened, and the customer's email and phone number cannot open a new account with your company.

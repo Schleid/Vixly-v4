@@ -72,6 +72,7 @@ public static class OperationsApiHost
         app.MapOperationsInternalCustomerEndpoints();
         app.MapOperationsInternalPackageEndpoints();
         app.MapOperationsInternalTicketEndpoints();
+        app.MapOperationsInternalReviewEndpoints();
         app.MapOperationsInternalInvoiceEndpoints();
         app.MapOperationsInternalShipmentEndpoints();
         app.MapOperationsInternalRateEndpoints();

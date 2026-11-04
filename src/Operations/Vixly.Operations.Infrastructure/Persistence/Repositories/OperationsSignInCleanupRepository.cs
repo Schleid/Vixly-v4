@@ -28,18 +28,19 @@ internal sealed class OperationsSignInCleanupRepository : IOperationsSignInClean
 
     public async Task<int> RemoveSessionsExpiredBeforeAsync(DateTimeOffset cutoffUtc, int batchSize, CancellationToken cancellationToken)
     {
-        int removed = await DeleteAsync(_context.UserSessions.Where(item => item.ExpiresUtc < cutoffUtc), batchSize, cancellationToken);
-        return removed + await DeleteAsync(_context.CustomerSessions.Where(item => item.ExpiresUtc < cutoffUtc), batchSize, cancellationToken);
+        int removed = await DeleteAsync(_context.UserSessions.Where(item => item.ExpiresUtc < cutoffUtc).OrderBy(item => item.ExpiresUtc), batchSize, cancellationToken);
+        return removed + await DeleteAsync(_context.CustomerSessions.Where(item => item.ExpiresUtc < cutoffUtc).OrderBy(item => item.ExpiresUtc), batchSize, cancellationToken);
     }
 
     public async Task<int> RemoveLinksExpiredBeforeAsync(DateTimeOffset cutoffUtc, int batchSize, CancellationToken cancellationToken)
     {
-        int removed = await DeleteAsync(_context.SignInChallenges.Where(item => item.ExpiresUtc < cutoffUtc), batchSize, cancellationToken);
-        removed += await DeleteAsync(_context.AccountTokens.Where(item => item.ExpiresUtc < cutoffUtc), batchSize, cancellationToken);
-        return removed + await DeleteAsync(_context.CustomerTokens.Where(item => item.ExpiresUtc < cutoffUtc), batchSize, cancellationToken);
+        int removed = await DeleteAsync(_context.SignInChallenges.Where(item => item.ExpiresUtc < cutoffUtc).OrderBy(item => item.ExpiresUtc), batchSize, cancellationToken);
+        removed += await DeleteAsync(_context.AccountTokens.Where(item => item.ExpiresUtc < cutoffUtc).OrderBy(item => item.ExpiresUtc), batchSize, cancellationToken);
+        return removed + await DeleteAsync(_context.CustomerTokens.Where(item => item.ExpiresUtc < cutoffUtc).OrderBy(item => item.ExpiresUtc), batchSize, cancellationToken);
     }
 
-    private static async Task<int> DeleteAsync<T>(IQueryable<T> rows, int batchSize, CancellationToken cancellationToken)
+    // Oldest first, one batch at a time.
+    private static async Task<int> DeleteAsync<T>(IOrderedQueryable<T> rows, int batchSize, CancellationToken cancellationToken)
     {
         int total = 0;
         int removed;

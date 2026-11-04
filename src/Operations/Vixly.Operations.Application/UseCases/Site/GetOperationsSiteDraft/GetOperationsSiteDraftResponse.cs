@@ -33,6 +33,14 @@ public sealed class GetOperationsSiteDraftResponse
 
     public bool HasUnpublishedChanges { get; private init; }
 
+    // Customer reviews (owner, 2026-11-03): how many wait for the company, shown beside the testimonials link.
+    public int NewReviews { get; private init; }
+
+    public GetOperationsSiteDraftResponse WithNewReviews(int count) => new()
+    {
+        Succeeded = Succeeded, Error = Error, Draft = Draft, Texts = Texts, PublishedVersion = PublishedVersion, HasUnpublishedChanges = HasUnpublishedChanges, NewReviews = count
+    };
+
     public static GetOperationsSiteDraftResponse Success(OperationsBrandSettings? draft, IReadOnlyDictionary<string, string> texts, int publishedVersion, bool hasUnpublishedChanges)
     {
         return new GetOperationsSiteDraftResponse { Succeeded = true, Draft = draft, Texts = texts, PublishedVersion = publishedVersion, HasUnpublishedChanges = hasUnpublishedChanges };

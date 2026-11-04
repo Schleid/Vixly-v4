@@ -18,10 +18,10 @@ review: ok
 Card payments, on the payment page and on card readers, are taken by your company's own Stripe account and paid into it. {brandName} never holds the money. You connect the account once, with three values from Stripe. Start in Stripe's test mode, try a payment, then do the same with the live account.
 
 ## Steps
-1. In Stripe, open **Developers**, **API keys**, then **Create restricted key**. Choose *Building your own integration* and *Custom permissions*.
-2. Set **Checkout Sessions**, **PaymentIntents** and **Charges and Refunds** to **Write**. If you use card readers at the counter, also set **Terminal Readers** to **Write**. Leave everything else at **None**, then create the key and copy it (it starts with rk_).
-3. Still in Stripe, open **Developers**, **Webhooks**, and add an endpoint at the address shown on the **Cards (Stripe)** panel, for the events listed there. Copy its **Signing secret** (it starts with whsec_).
-4. Copy the **Publishable key** (pk_) from **Developers**, **API keys**, in the same mode as the restricted key.
+1. In Stripe, open *Developers*, **API keys**, then *Create restricted key*. Choose *Building your own integration* and *Custom permissions*.
+2. Set *Checkout Sessions*, *PaymentIntents* and *Charges and Refunds* to *Write*. If you use card readers at the counter, also set *Terminal Readers* to *Write*. Leave everything else at **None**, then create the key and copy it (it starts with rk_).
+3. Still in Stripe, open *Developers*, **Webhooks**, and add an endpoint at the address shown on the **Cards (Stripe)** panel, for the events listed there. Copy its **Signing secret** (it starts with whsec_).
+4. Copy the **Publishable key (pk_…)** (pk_) from *Developers*, **API keys**, in the same mode as the restricted key.
 5. In **Payment methods**, **Cards (Stripe)**, paste the restricted key, the publishable key and the signing secret, then save.
 
 ## What happens next

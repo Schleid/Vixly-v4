@@ -15,7 +15,7 @@ updated: 2026-10-29
 review: needs-review
 ---
 
-Un agent de support répond aux appelants sur un envoi ou un colis à la fois. Il ne voit jamais de liste de clients, d'adresse complète, de numéro de téléphone complet ni d'e-mail, et il ne modifie rien : il ouvre un ticket d'appel pour votre équipe.
+Un agent de support répond aux appelants sur un envoi ou un colis à la fois. Il ne voit jamais de liste de clients, d'adresse complète, de numéro de téléphone complet ni d'e-mail, et il ne modifie rien : il ouvre un ticket d'appel pour l'équipe de {brandName}.
 
 ## Configurer un agent
 1. Invitez l'agent comme tout membre du personnel et donnez-lui le rôle **Agent de support** pour toute l'entreprise.

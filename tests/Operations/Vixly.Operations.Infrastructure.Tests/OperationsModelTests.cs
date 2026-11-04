@@ -14,6 +14,7 @@ namespace Vixly.Operations.Infrastructure.Tests;
 // RESPONSIBILITIES:
 // - Every table lives in the ops schema
 // - Every tenant entity has the tenant filter and index
+// - The model builds without EF's default-value and decimal warnings
 //
 // IMPORTANT NOTES:
 // - Builds the model only
@@ -50,6 +51,24 @@ public sealed class OperationsModelTests
         {
             Assert.Equal(Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.Never, entity.FindProperty("Id")!.ValueGenerated);
         }
+    }
+
+    [Fact]
+    public void Model_HasNoDefaultValueOrDecimalWarnings()
+    {
+        // A database default without a sentinel turns a chosen "none" into the default on insert (draft site services, 2026-11-03).
+        OperationsTenantScope scope = new();
+        scope.EnterSystem();
+        DbContextOptions<OperationsDbContext> options = new DbContextOptionsBuilder<OperationsDbContext>()
+            .UseSqlServer("Server=placeholder;Database=Model;Integrated Security=true")
+            .EnableServiceProviderCaching(false)
+            .ConfigureWarnings(warnings => warnings.Throw(
+                Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.BoolWithDefaultWarning,
+                Microsoft.EntityFrameworkCore.Diagnostics.SqlServerEventId.DecimalTypeDefaultWarning))
+            .Options;
+        using OperationsDbContext context = new(options, scope);
+
+        Assert.NotNull(context.Model);
     }
 
     private static OperationsDbContext NewContext()

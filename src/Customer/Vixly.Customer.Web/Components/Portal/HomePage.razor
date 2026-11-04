@@ -24,6 +24,20 @@ IMPORTANT NOTES:
         <a href="/customer/rates"><svg class="customer-home-action__icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/></svg><span>@T["ui.nav.rates"]</span><span aria-hidden="true">↗</span></a>
         <a href="/customer/tickets"><svg class="customer-home-action__icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>@T["ui.nav.tickets"]</span><span aria-hidden="true">↗</span></a>
     </nav>
+    @if (ReviewInvite)
+    {
+        <section class="customer-portal__panel customer-review-invite" aria-labelledby="review-invite-title">
+            <h2 id="review-invite-title">@VixlyText.Format(T, "ui.review.invite_title", "company", Brand?.DisplayName ?? string.Empty)</h2>
+            <p>@T["ui.review.invite_text"]</p>
+            <div class="customer-portal__actions">
+                <a href="/customer/review" class="vx-button vx-button--primary">@T["ui.review.invite_go"]</a>
+                <form method="post" action="/customer/review/dismiss">
+                    <AntiforgeryToken />
+                    <button type="submit" class="vx-button vx-button--secondary">@T["ui.review.invite_dismiss"]</button>
+                </form>
+            </div>
+        </section>
+    }
     <section class="customer-portal__panel" aria-labelledby="mailbox-title">
         <h2 id="mailbox-title">@T["ui.mailbox.title"]</h2>
         <p class="customer-portal__code">@VixlyText.Format(T, "ui.mailbox.code", "code", Customer.Code ?? string.Empty)</p>
@@ -56,4 +70,7 @@ IMPORTANT NOTES:
     [Parameter] public string? Info { get; set; }
     [Parameter] public int TourStep { get; set; }
     [Parameter] public bool TourError { get; set; }
+
+    // Customer reviews (owner, 2026-11-03): after a finished shipment, until the customer reviews or closes it.
+    [Parameter] public bool ReviewInvite { get; set; }
 }

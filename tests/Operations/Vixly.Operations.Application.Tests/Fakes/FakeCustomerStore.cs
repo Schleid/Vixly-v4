@@ -50,6 +50,9 @@ internal sealed class FakeCustomerStore : IOperationsCustomerRepository
     public Task<IReadOnlyList<OperationsCustomerToken>> ListOpenTokensAsync(Guid customerId, OperationsCustomerTokenPurpose purpose, CancellationToken cancellationToken) =>
         throw new NotSupportedException();
 
+    public Task<int> CountTokensSinceAsync(Guid customerId, OperationsCustomerTokenPurpose purpose, DateTimeOffset sinceUtc, CancellationToken cancellationToken) =>
+        throw new NotSupportedException();
+
     public Task<bool> RecordFailedSignInAsync(Guid customerId, DateTimeOffset utcNow, CancellationToken cancellationToken) => throw new NotSupportedException();
 
     public Task<(IReadOnlyList<OperationsCustomer> Items, int TotalCount)> ListAsync(string? search, int page, int pageSize, CancellationToken cancellationToken) =>

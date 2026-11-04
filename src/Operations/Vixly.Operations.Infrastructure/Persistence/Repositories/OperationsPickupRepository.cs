@@ -95,7 +95,7 @@ internal sealed class OperationsPickupRepository : IOperationsPickupRepository
         await Remindable(utcNow).OrderBy(shipment => shipment.PickupReadyUtc).Take(take).ToListAsync(cancellationToken);
 
     public async Task<IReadOnlyList<Guid>> ListTenantsWithRemindableAsync(DateTimeOffset utcNow, CancellationToken cancellationToken) =>
-        await Remindable(utcNow).AsNoTracking().Select(shipment => shipment.TenantId).Distinct().Take(10_000).ToListAsync(cancellationToken);
+        await Remindable(utcNow).AsNoTracking().Select(shipment => shipment.TenantId).Distinct().OrderBy(id => id).Take(10_000).ToListAsync(cancellationToken);
 
     // Waiting at its pickup counter, not collected, with its next step due (7, 14, 21, 25 days).
     private IQueryable<OperationsShipment> Remindable(DateTimeOffset utcNow)

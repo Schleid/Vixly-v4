@@ -15,14 +15,14 @@ updated: 2026-10-29
 review: needs-review
 ---
 
-**Tickets** regroupe les tickets de colis manquants des clients et les tickets que les agents de support ouvrent pendant les appels. Chaque ticket a un sujet, et seul le service de ce sujet le voit.
+**Tickets** regroupe les tickets de colis manquants des clients de {brandName} et les tickets que les agents de support ouvrent pendant les appels. Chaque ticket a un sujet, et seul le service de ce sujet le voit.
 
 ## Qui voit quoi
-- **Colis manquant ou erroné :** le personnel de l'entrepôt (qui peut y voir les colis).
-- **Facturation et paiement :** la comptabilité (qui peut voir les factures ou encaisser).
-- **Retrait, livraison, destinataire :** le service client, et le personnel des envois de l'agence.
-- **Dommage ou réclamation :** le service client et l'assurance.
-- **Autre :** le service client.
+- **Colis manquant ou erroné** : le personnel de l'entrepôt (qui peut y voir les colis).
+- **Facturation et paiement** : la comptabilité (qui peut voir les factures ou encaisser).
+- **Retrait, livraison, destinataire** : le service client, et le personnel des envois de l'agence.
+- **Dommage ou réclamation** : le service client et l'assurance.
+- **Autre** : le service client.
 
 Le propriétaire et les administrateurs voient tous les tickets.
 

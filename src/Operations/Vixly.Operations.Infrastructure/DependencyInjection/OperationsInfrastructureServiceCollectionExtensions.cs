@@ -256,6 +256,7 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.SignUpOperationsCustomer.SignUpOperationsCustomerUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.VerifyOperationsCustomerEmail.VerifyOperationsCustomerEmailUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.ResendOperationsCustomerVerification.ResendOperationsCustomerVerificationUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Customers.ResendOperationsCustomerConfirmation.ResendOperationsCustomerConfirmationUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.SignInOperationsCustomer.SignInOperationsCustomerUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.SignOutOperationsCustomer.SignOutOperationsCustomerUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Customers.RequestOperationsCustomerPasswordReset.RequestOperationsCustomerPasswordResetUseCase>();
@@ -385,6 +386,14 @@ public static class OperationsInfrastructureServiceCollectionExtensions
         services.AddScoped<Vixly.Operations.Application.UseCases.Site.ListOperationsSiteTestimonials.ListOperationsSiteTestimonialsUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Site.RecordOperationsSiteTestimonial.RecordOperationsSiteTestimonialUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Site.ChangeOperationsSiteTestimonial.ChangeOperationsSiteTestimonialUseCase>();
+        // Customer reviews (owner, 2026-11-03).
+        services.AddScoped<Vixly.Operations.Application.Site.OperationsCustomerReviews>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Site.ChangeOperationsReviewInvitations.ChangeOperationsReviewInvitationsUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Site.OpenOperationsReviewTicket.OpenOperationsReviewTicketUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Site.GetMyOperationsReview.GetMyOperationsReviewUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Site.SaveMyOperationsReview.SaveMyOperationsReviewUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Site.DeleteMyOperationsReview.DeleteMyOperationsReviewUseCase>();
+        services.AddScoped<Vixly.Operations.Application.UseCases.Site.DismissMyOperationsReviewInvite.DismissMyOperationsReviewInviteUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.AddToOperationsBundleList.AddToOperationsBundleListUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.RemoveFromOperationsBundleList.RemoveFromOperationsBundleListUseCase>();
         services.AddScoped<Vixly.Operations.Application.UseCases.Bundles.GetOperationsRepackBoxLabel.GetOperationsRepackBoxLabelUseCase>();

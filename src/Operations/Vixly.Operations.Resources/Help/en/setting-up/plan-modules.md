@@ -15,16 +15,16 @@ updated: 2026-10-30
 review: ok
 ---
 
-Your company's plan decides which parts of the workspace you use. When a part is not in your plan, its pages are not in the menu, and the counter does not offer it.
+The {brandName} plan decides which parts of the workspace you use. When a part is not in your plan, its pages are not in the menu, and the counter does not offer it.
 
 ## Parts a plan may leave out
-- **Customer portal:** customers cannot create an account, sign in or request shipments online. Your website shows no sign-in or account buttons; it keeps the tracking page.
-- **Insurance:** no insurance products at the counter, and no insured shipments.
-- **Credit accounts:** no bill-my-account at the cashier.
-- **Supplies:** no supplies sold at the counter.
-- **Home delivery:** shipments are picked up at a branch.
-- **Support desk and tickets.**
-- **Bills and profit.**
+- *Customer portal:* customers cannot create an account, sign in or request shipments online. Your website shows no sign-in or account buttons; it keeps the tracking page.
+- **Insurance**: no insurance products at the counter, and no insured shipments.
+- **Credit accounts**: no bill-my-account at the cashier.
+- **Supplies**: no supplies sold at the counter.
+- **Home delivery**: shipments are picked up at a branch.
+- *Support desk and tickets.*
+- *Bills and profit.*
 
 ## Enter a customer yourself
 Without the customer portal, customers do not register themselves. Staff who manage customers add them:

@@ -27,9 +27,12 @@ public sealed class GetOperationsCustomerPortalBrandResponse
 
     public OperationsBrandSettings? Settings { get; private init; }
 
-    public static GetOperationsCustomerPortalBrandResponse Success(OperationsBrandSettings? settings)
+    // Customer reviews (owner, 2026-11-03): the portal shows "Review us" only when the company asks.
+    public bool AskForReviews { get; private init; }
+
+    public static GetOperationsCustomerPortalBrandResponse Success(OperationsBrandSettings? settings, bool askForReviews = false)
     {
-        return new GetOperationsCustomerPortalBrandResponse { Succeeded = true, Settings = settings };
+        return new GetOperationsCustomerPortalBrandResponse { Succeeded = true, Settings = settings, AskForReviews = askForReviews };
     }
 
     public static GetOperationsCustomerPortalBrandResponse Failure(Error error)

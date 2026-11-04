@@ -15,14 +15,14 @@ updated: 2026-10-29
 review: ok
 ---
 
-**Tickets** gathers the customers' missing-package tickets and the tickets support agents open during calls. Each ticket has a topic, and only the department of that topic sees it.
+**Tickets** gathers the missing-package tickets from {brandName}'s customers and the tickets support agents open during calls. Each ticket has a topic, and only the department of that topic sees it.
 
 ## Who sees what
-- **Missing or wrong package:** the warehouse's staff (who can view parcels there).
-- **Billing and payment:** Finance (who can view invoices or take payments).
-- **Pickup, delivery, recipient:** customer service, and the shipment staff of the branch.
-- **Damage or claim:** customer service and insurance.
-- **Other:** customer service.
+- **Missing or wrong package**: the warehouse's staff (who can view parcels there).
+- **Billing and payment**: Finance (who can view invoices or take payments).
+- **Pickup, delivery, recipient**: customer service, and the shipment staff of the branch.
+- **Damage or claim**: customer service and insurance.
+- **Other**: customer service.
 
 The Owner and the Administrators see every ticket.
 

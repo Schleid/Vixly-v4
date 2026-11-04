@@ -182,6 +182,21 @@ public sealed class CustomerOperationsApi
         SendAsync<object>(HttpMethod.Post, "internal/v1/customers/me/tickets/" + ticketId + "/messages", tenantId, session, body, http, cancellationToken);
 
     // =====================================================
+    // REVIEWS (owner, 2026-11-03)
+    // =====================================================
+    public Task<CustomerCall<Vixly.Contracts.Operations.Reviews.CustomerReviewDto>> GetReviewAsync(Guid tenantId, string session, HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<Vixly.Contracts.Operations.Reviews.CustomerReviewDto>(HttpMethod.Get, "internal/v1/customers/me/review", tenantId, session, null, http, cancellationToken);
+
+    public Task<CustomerCall<object>> SaveReviewAsync(Guid tenantId, string session, Vixly.Contracts.Operations.Reviews.CustomerReviewBody body, HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<object>(HttpMethod.Put, "internal/v1/customers/me/review", tenantId, session, body, http, cancellationToken);
+
+    public Task<CustomerCall<object>> DeleteReviewAsync(Guid tenantId, string session, HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<object>(HttpMethod.Delete, "internal/v1/customers/me/review", tenantId, session, null, http, cancellationToken);
+
+    public Task<CustomerCall<object>> DismissReviewInviteAsync(Guid tenantId, string session, HttpContext http, CancellationToken cancellationToken) =>
+        SendAsync<object>(HttpMethod.Post, "internal/v1/customers/me/review/dismiss", tenantId, session, null, http, cancellationToken);
+
+    // =====================================================
     // RATES (Slice 4)
     // =====================================================
     public Task<CustomerCall<Vixly.Contracts.Operations.Rates.CustomerRatesDto>> GetRatesAsync(Guid tenantId, string session, Vixly.Contracts.Operations.Rates.CustomerRatesBody body, HttpContext http,

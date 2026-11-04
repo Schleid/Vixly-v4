@@ -91,7 +91,7 @@ public sealed class GetOperationsPublicSiteUseCase
         // Landing page marketing: real figures and real customers only, each switched on by the company.
         int? delivered = request.Home && settings.ShowDelivered ? OperationsPublicFigures.Delivered(await _site.CountDeliveredPackagesAsync(cancellationToken)) : null;
         IReadOnlyList<OperationsSiteTestimonial> testimonials = request.Home && settings.ShowTestimonials
-            ? (await _site.ListTestimonialsAsync(cancellationToken)).Where(item => item.Shown).Take(OperationsSiteTestimonial.ShownOnSite).ToList()
+            ? await _site.ListTestimonialsAsync(Vixly.Operations.Application.Site.OperationsTestimonialView.Published, OperationsSiteTestimonial.ShownOnSite, cancellationToken)
             : Array.Empty<OperationsSiteTestimonial>();
 
         return GetOperationsPublicSiteResponse.Success(new OperationsPublicSite(
