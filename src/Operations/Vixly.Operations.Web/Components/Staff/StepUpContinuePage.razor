@@ -1,0 +1,41 @@
+﻿@*
+=========================================================
+FILE: StepUpContinuePage.razor
+
+PURPOSE:
+After a correct code, sends the action that asked for it (owner, 2026-11-04).
+
+RESPONSIBILITIES:
+- Render the waiting action as a form with a fresh form token, sent at once by the page's script
+- Offer a Continue button when scripts are off
+
+IMPORTANT NOTES:
+- Markup only. Text comes from OperationsText (L-10); values come from the endpoint (OperationsStepUpContinuation)
+- The action goes through its own endpoint and every check, as if sent again by hand
+- Placeholder look: Frontend/UI designs the final experience
+=========================================================
+*@
+@inject IStringLocalizer<OperationsText> T
+
+<EditorShell Title="@T["ui.confirm.title"]" Company="@Company" Section="account">
+    <form method="post" action="@Action" class="ops-editor__panel ops-stepup-panel" data-stepup-continue>
+        <AntiforgeryToken />
+        @foreach ((string name, string value) in Fields)
+        {
+            <input type="hidden" name="@name" value="@value" />
+        }
+        <p class="ops-stepup-desc">@T["ui.confirm.continuing"]</p>
+        <div class="ops-stepup-row">
+            <button type="submit" class="vx-button vx-button--primary ops-stepup-btn">@T["ui.confirm.continue"]</button>
+        </div>
+    </form>
+    <script src="/js/ops-stepup-continue.js" defer></script>
+</EditorShell>
+
+@code {
+    [Parameter] public string? Company { get; set; }
+
+    [Parameter] public string Action { get; set; } = "/staff";
+
+    [Parameter] public IReadOnlyList<(string Name, string Value)> Fields { get; set; } = Array.Empty<(string, string)>();
+}

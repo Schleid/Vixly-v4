@@ -32,6 +32,9 @@ public static class OperationsRoleErrors
 
     public static Error ScopeInvalid { get; } = Error.Create("ops.roles.scope_invalid");
 
+    // Owner, 2026-11-04: the Administrator role is for the whole company; said plainly, not as a scope problem.
+    public static Error AdministratorCompanyWide { get; } = Error.Create("ops.roles.administrator_company_wide");
+
     public static Error GrantExists { get; } = Error.Create("ops.roles.grant_exists");
 
     public static Error ReasonRequired { get; } = Error.Create("ops.staff.reason_required", ("maxLength", OperationsAccessLimits.ReasonMaxLength));

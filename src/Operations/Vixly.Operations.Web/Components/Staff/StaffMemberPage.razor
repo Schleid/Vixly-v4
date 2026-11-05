@@ -77,7 +77,9 @@ IMPORTANT NOTES:
         {
             <form method="post" action="/staff/people/@Member.UserId/grant" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--vx-color-border);">
                 <AntiforgeryToken />
-                <select name="roleId" aria-label="@T["ui.staff.role"]" style="height: 32px; min-height: 32px; font-size: 0.8125rem; border: 1px solid var(--vx-color-border-control); border-radius: 0.35rem; background: var(--vx-color-surface);">
+                <select name="roleId" required aria-label="@T["ui.staff.role"]" style="height: 32px; min-height: 32px; font-size: 0.8125rem; border: 1px solid var(--vx-color-border-control); border-radius: 0.35rem; background: var(--vx-color-surface);">
+                    @* Owner, 2026-11-04: no role chosen in advance, so nobody gets Administrator by accident. *@
+                    <option value="" disabled selected>@T["ui.staff.role_choose"]</option>
                     @foreach (OperationsRoleSummary role in Roles.Where(role => role.IsActive))
                     {
                         <option value="@role.RoleId">@(role.IsAdministrator ? T["ui.roles.administrator"] : role.Name)</option>

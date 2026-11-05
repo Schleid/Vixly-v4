@@ -7343,7 +7343,7 @@ Le rapport programmé « {report} » ({period}) est en pièce jointe.
     <value>File d'inspection</value>
   </data>
   <data name="ui.editor.nav.inspection_setup" xml:space="preserve">
-    <value>Règles d'inspection</value>
+    <value>Paramètres d'inspection</value>
   </data>
   <data name="ui.editor.nav.insurance" xml:space="preserve">
     <value>Assurance</value>
@@ -7382,7 +7382,7 @@ Le rapport programmé « {report} » ({period}) est en pièce jointe.
     <value>Réception entrepôt</value>
   </data>
   <data name="ui.editor.nav.report_settings" xml:space="preserve">
-    <value>Règles des rapports</value>
+    <value>Paramètres des rapports</value>
   </data>
   <data name="ui.editor.nav.reports" xml:space="preserve">
     <value>Rapports</value>
@@ -7394,7 +7394,7 @@ Le rapport programmé « {report} » ({period}) est en pièce jointe.
     <value>Services d’expédition</value>
   </data>
   <data name="ui.editor.nav.settings" xml:space="preserve">
-    <value>Paramètres</value>
+    <value>Paramètres généraux</value>
   </data>
   <data name="ui.editor.nav.shipments" xml:space="preserve">
     <value>Envois</value>
@@ -8402,7 +8402,7 @@ Le rapport programmé « {report} » ({period}) est en pièce jointe.
     <value>Les colis sont ouverts pour une inspection de conformité quand une règle correspond, quand la part aléatoire les choisit, ou quand un employé les met de côté au poste.</value>
   </data>
   <data name="ui.inspection.setup.title" xml:space="preserve">
-    <value>Règles d'inspection</value>
+    <value>Paramètres d'inspection</value>
   </data>
   <data name="ui.inspection.share.hint" xml:space="preserve">
     <value>Tiré une fois, au premier contrôle d'un colis. 0 la désactive ; les règles s'appliquent toujours.</value>
@@ -11375,7 +11375,7 @@ Le rapport programmé « {report} » ({period}) est en pièce jointe.
     <value>Quand est-on à l’heure ? Paramètres → Règles des rapports.</value>
   </data>
   <data name="ui.reports.rules_title" xml:space="preserve">
-    <value>Règles des rapports</value>
+    <value>Paramètres des rapports</value>
   </data>
   <data name="ui.reports.schedule.format" xml:space="preserve">
     <value>Fichier</value>
@@ -12104,7 +12104,7 @@ Le rapport programmé « {report} » ({period}) est en pièce jointe.
     <value>Par exemple America/New_York ou America/Port-au-Prince. Les dates de prix commencent à minuit dans ce fuseau.</value>
   </data>
   <data name="ui.settings.title" xml:space="preserve">
-    <value>Paramètres</value>
+    <value>Paramètres généraux</value>
   </data>
   <data name="ui.settings.units" xml:space="preserve">
     <value>Unités</value>
@@ -16618,6 +16618,22 @@ Votre compte {company} a été fermé car nos conditions de service n’ont pas 
   </data>
   <data name="ui.editor.nav.waiting" xml:space="preserve">
     <value>{count} en attente</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.roles.administrator_company_wide" xml:space="preserve">
+    <value>Le rôle Administrateur vaut pour toute l’entreprise. Choisissez Toute l’entreprise, ou un rôle comme Directeur d’agence pour une seule agence ou un seul entrepôt.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.role_choose" xml:space="preserve">
+    <value>Choisissez un rôle</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.confirm.continuing" xml:space="preserve">
+    <value>Confirmé. Nous terminons ce que vous avez demandé…</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.confirm.continue" xml:space="preserve">
+    <value>Continuer</value>
     <comment>needs-review</comment>
   </data>
 </root>

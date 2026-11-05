@@ -278,16 +278,29 @@ public static class OperationsStaffEndpoints
         });
 
         // Step-up
-        staff.MapGet("/confirm", async (HttpContext http, string? returnUrl, StaffPages pages) => await pages.ConfirmAsync(http, Local(returnUrl), null));
+        staff.MapGet("/confirm", async (HttpContext http, string? returnUrl, string? step, StaffPages pages) => await pages.ConfirmAsync(http, Local(returnUrl), Step(step), null));
 
-        staff.MapPost("/confirm", async (HttpContext http, [FromForm] string? code, [FromForm] string? returnUrl, ConfirmOperationsSecondFactorUseCase useCase, StaffPages pages) =>
+        staff.MapPost("/confirm", async (HttpContext http, [FromForm] string? code, [FromForm] string? returnUrl, [FromForm] string? step, ConfirmOperationsSecondFactorUseCase useCase, StaffPages pages,
+            Vixly.Operations.Web.Security.OperationsStepUpContinuation continuation) =>
         {
             ConfirmOperationsSecondFactorResponse response = await useCase.ExecuteAsync(OperationsCurrentUser.Context(http), new ConfirmOperationsSecondFactorRequest { Code = code ?? string.Empty }, http.RequestAborted);
-            return response.Succeeded ? Results.Redirect(Local(returnUrl)) : await pages.ConfirmAsync(http, Local(returnUrl), response.Error);
+
+            if (!response.Succeeded)
+            {
+                // A wrong code keeps the waiting action for the next try.
+                return await pages.ConfirmAsync(http, Local(returnUrl), Step(step), response.Error);
+            }
+
+            // Owner, 2026-11-04: the action that asked for this code continues; without one (or an upload), back to the page as before.
+            return continuation.Take(http, Step(step)) is { } action ? await pages.ContinueAsync(http, action) : Results.Redirect(Local(returnUrl));
         }).RequireRateLimiting(OperationsRateLimits.SecondFactor);
 
         return endpoints;
     }
+
+    // The step id of a waiting action: 32 lowercase hexadecimal characters, else none.
+    private static string? Step(string? value) =>
+        value is { Length: 32 } && value.All(character => character is >= '0' and <= '9' or >= 'a' and <= 'f') ? value : null;
 
     // "tenant", "branch:{id}" or "warehouse:{id}" from the scope list.
     internal static (OperationsRoleScope Scope, Guid? ScopeId) Scope(string? value)

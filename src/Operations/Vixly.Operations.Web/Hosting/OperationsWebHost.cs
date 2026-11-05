@@ -91,6 +91,9 @@ public static class OperationsWebHost
         builder.Services.AddScoped<OperationsErrorText>();
         builder.Services.AddScoped<Vixly.Operations.Web.Security.OperationsAllowed>();
         builder.Services.AddScoped<StaffPages>();
+
+        // Owner, 2026-11-04: a sensitive action continues after its fresh code.
+        builder.Services.AddSingleton<Vixly.Operations.Web.Security.OperationsStepUpContinuation>();
         HashSet<string> helpRoutes = new(StringComparer.Ordinal);
         builder.Services.AddSingleton(_ => new Vixly.Operations.Web.Features.Help.OperationsHelpCatalogue(helpRoutes));
         builder.Services.AddScoped<Vixly.Operations.Web.Features.Help.IOperationsHelpReaderSource, Vixly.Operations.Web.Features.Help.OperationsHelpReaderSource>();
@@ -147,6 +150,9 @@ public static class OperationsWebHost
         app.UseAuthorization();
         app.UseAntiforgery();
         app.UseMiddleware<OperationsBlankFields>();
+
+        // Owner, 2026-11-04: a staff action that asks for a fresh code continues after it.
+        app.UseMiddleware<Vixly.Operations.Web.Security.OperationsStepUpContinuationMiddleware>();
 
         app.MapStaticAssets();
         app.MapVixlyHealth();

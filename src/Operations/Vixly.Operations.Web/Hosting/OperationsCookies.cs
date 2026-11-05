@@ -32,6 +32,9 @@ public static class OperationsCookies
     // Between the password and the second factor (5 minutes).
     public const string SignIn = "__Host-vx4-ops-signin";
 
+    // A staff action waiting for its fresh code (5 minutes, once; owner 2026-11-04).
+    public const string StepUp = "__Host-vx4-ops-stepup";
+
     public static void Write(HttpResponse response, string name, string value, TimeSpan? lifetime)
     {
         ArgumentNullException.ThrowIfNull(response);

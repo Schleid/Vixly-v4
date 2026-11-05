@@ -82,6 +82,8 @@ IMPORTANT NOTES:
             </label>
             <label class="ops-editor__form-span-2">@T["ui.staff.role"]
                 <select name="roleId" required>
+                    @* Owner, 2026-11-04: no role chosen in advance, so nobody gets Administrator by accident. *@
+                    <option value="" disabled selected>@T["ui.staff.role_choose"]</option>
                     @foreach (OperationsRoleSummary role in Roles.Where(role => role.IsActive))
                     {
                         <option value="@role.RoleId">@RoleName(role)</option>

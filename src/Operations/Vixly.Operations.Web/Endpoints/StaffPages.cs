@@ -195,7 +195,7 @@ public sealed class StaffPages
         });
     }
 
-    public async Task<IResult> ConfirmAsync(HttpContext http, string returnUrl, Error? error)
+    public async Task<IResult> ConfirmAsync(HttpContext http, string returnUrl, string? step, Error? error)
     {
         GetMyOperationsAccountResponse account = await _account.ExecuteAsync(OperationsCurrentUser.Context(http), new GetMyOperationsAccountRequest(), http.RequestAborted);
 
@@ -203,10 +203,18 @@ public sealed class StaffPages
         {
             Company = await CompanyAsync(http),
             ReturnUrl = returnUrl,
+            Step = step,
             HasSecondFactor = account.Me?.HasSecondFactor ?? false,
             PasswordConfirms = account.PasswordConfirms,
             Error = _errors.Describe(error)
         });
+    }
+
+    // After a correct code: the waiting action, sent again with a fresh form token (OperationsStepUpContinuation).
+    public async Task<IResult> ContinueAsync(HttpContext http, Vixly.Operations.Web.Security.OperationsStepUpAction action)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+        return Page<StepUpContinuePage>(http, new { Company = await CompanyAsync(http), action.Action, action.Fields });
     }
 
     private static IResult Page<TComponent>(HttpContext http, object parameters)

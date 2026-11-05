@@ -10,14 +10,14 @@ routes: [/staff/settings]
 related: [invoice-settings, payment-settings, shipping-services]
 sources:
   - src/Operations/Vixly.Operations.Web/Components/Settings/SettingsPage.razor
-updated: 2026-10-25
+updated: 2026-11-04
 review: needs-review
 ---
 
 Los ajustes definen cómo {brandName} registra importes, medidas y trabajo diario. Estos cambios afectan a varias pantallas; compruebe los valores actuales antes de modificarlos. Algunos lectores pueden consultar sin editar; utilice los campos y el botón de guardado que aparezcan disponibles.
 
 ## Pasos
-1. Abra **Configuración** desde la navegación.
+1. En la parte Ajustes del menú, abra **Ajustes generales**.
 2. Revise **Moneda de facturación**. Lea el aviso: la moneda queda bloqueada cuando existen facturas.
 3. Compruebe **Peso**, **Dimensiones** y **Zona horaria** según el trabajo de su empresa.
 4. Revise las opciones de cobro en destino, crédito, precios públicos y entrega. Lea los requisitos de acceso antes de cambiarlos.

@@ -127,7 +127,7 @@ public sealed class GrantOperationsRoleUseCase
         // The Administrator role is tenant-wide and given only by the Owner.
         if (role.IsAdministrator && request.Scope != OperationsRoleScope.Tenant)
         {
-            return GrantOperationsRoleResponse.Failure(OperationsRoleErrors.ScopeInvalid);
+            return GrantOperationsRoleResponse.Failure(OperationsRoleErrors.AdministratorCompanyWide);
         }
 
         if (!access.CanGrant(role, request.Scope, request.ScopeId, branchOfWarehouse))

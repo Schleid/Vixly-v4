@@ -48,8 +48,9 @@ IMPORTANT NOTES:
     // An item with no permission is open to every signed-in person; otherwise any one of its permissions shows it.
     public static bool Visible(string[] permissions, GetOperationsMenuResponse allowed) => permissions.Length == 0 || allowed.HasAny(permissions);
 
-    // Four chapters (owner, 2026-10-22): Front Office (serving customers), Warehouse Operations (moving packages),
-    // Back Office (running the business: money, setup, people, the company) and Technical (website, integrations, history).
+    // Chapters (owner, 2026-10-22, 2026-10-29, 2026-11-04): Front Office (serving customers), Warehouse Operations (moving packages),
+    // Back Office (running the business: money, catalogue, people, the company), Support, Settings (what is set up once) and
+    // Technical (website, integrations, history).
     // Billing, Terms and Licences live inside Company (its tabs). Each item names the permissions of its page (the page's use case checks the same ones).
     public static readonly (string Key, (string Section, string Url, string Label, string[] Permissions)[] Items)[] Groups =
     {
@@ -95,16 +96,6 @@ IMPORTANT NOTES:
             ("supplies", "/staff/supplies", "supplies", new[] { OperationsPermissions.ChargesConfigure }),
             ("carriers", "/staff/carriers", "carriers", new[] { OperationsPermissions.CarriersManage }),
             ("insurance", "/staff/insurance", "insurance", new[] { OperationsPermissions.InsuranceView }),
-            ("inspection_setup", "/staff/inspection/setup", "inspection_setup", new[] { OperationsPermissions.InspectionConfigure }),
-            ("settings", "/staff/settings", "settings", new[] { OperationsPermissions.SettingsView }),
-            ("invoice_settings", "/staff/settings/invoices", "invoice_settings", new[] { OperationsPermissions.SettingsView }),
-            ("payment_settings", "/staff/settings/payments", "payment_settings", new[] { OperationsPermissions.SettingsView }),
-            ("bundle_settings", "/staff/settings/bundles", "bundle_settings", new[] { OperationsPermissions.SettingsView }),
-            ("credit_settings", "/staff/settings/credit", "credit_settings", new[] { OperationsPermissions.SettingsView }),
-            ("event_settings", "/staff/settings/events", "event_settings", new[] { OperationsPermissions.SettingsView }),
-            ("pickup_settings", "/staff/settings/pickup", "pickup_settings", new[] { OperationsPermissions.SettingsView }),
-            ("delivery_settings", "/staff/settings/delivery", "delivery_settings", new[] { OperationsPermissions.SettingsView }),
-            ("report_settings", "/staff/settings/reports", "report_settings", new[] { OperationsPermissions.SettingsView }),
             ("staff", "/staff/people", "staff", new[] { OperationsPermissions.StaffView }),
             ("roles", "/staff/roles", "roles", new[] { OperationsPermissions.RolesView }),
             ("company", "/staff/company", "company", new[] { OperationsPermissions.CompanyView })
@@ -119,6 +110,20 @@ IMPORTANT NOTES:
                 OperationsPermissions.ParcelsView, OperationsPermissions.InvoicesView, OperationsPermissions.PaymentsTake, OperationsPermissions.CustomersManage,
                 OperationsPermissions.ShipmentsManage, OperationsPermissions.InsuranceManage
             })
+        }),
+        // Owner, 2026-11-04: what is set up once has its own chapter, just above Technical (Back Office had 23 items).
+        ("settings", new[]
+        {
+            ("settings", "/staff/settings", "settings", new[] { OperationsPermissions.SettingsView }),
+            ("invoice_settings", "/staff/settings/invoices", "invoice_settings", new[] { OperationsPermissions.SettingsView }),
+            ("payment_settings", "/staff/settings/payments", "payment_settings", new[] { OperationsPermissions.SettingsView }),
+            ("credit_settings", "/staff/settings/credit", "credit_settings", new[] { OperationsPermissions.SettingsView }),
+            ("pickup_settings", "/staff/settings/pickup", "pickup_settings", new[] { OperationsPermissions.SettingsView }),
+            ("delivery_settings", "/staff/settings/delivery", "delivery_settings", new[] { OperationsPermissions.SettingsView }),
+            ("bundle_settings", "/staff/settings/bundles", "bundle_settings", new[] { OperationsPermissions.SettingsView }),
+            ("event_settings", "/staff/settings/events", "event_settings", new[] { OperationsPermissions.SettingsView }),
+            ("inspection_setup", "/staff/inspection/setup", "inspection_setup", new[] { OperationsPermissions.InspectionConfigure }),
+            ("report_settings", "/staff/settings/reports", "report_settings", new[] { OperationsPermissions.SettingsView })
         }),
         ("technical", new[]
         {

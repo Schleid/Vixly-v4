@@ -10,14 +10,14 @@ routes: [/staff/settings]
 related: [invoice-settings, payment-settings, shipping-services]
 sources:
   - src/Operations/Vixly.Operations.Web/Components/Settings/SettingsPage.razor
-updated: 2026-10-25
+updated: 2026-11-04
 review: needs-review
 ---
 
 Les paramètres définissent comment {brandName} enregistre les montants, les mesures et le travail quotidien. Ces choix concernent plusieurs écrans : vérifiez les valeurs actuelles avant toute modification. Certains lecteurs peuvent consulter sans modifier ; utilisez les champs et le bouton d’enregistrement effectivement disponibles.
 
 ## Étapes
-1. Ouvrez **Paramètres** dans la navigation.
+1. Dans la partie Paramètres du menu, ouvrez **Paramètres généraux**.
 2. Consultez **Devise de facturation**. Lisez l’avis associé : la devise est verrouillée dès que des factures existent.
 3. Vérifiez **Poids**, **Dimensions** et **Fuseau horaire** selon les pratiques de l’entreprise.
 4. Examinez les choix de paiement à destination, crédit, prix publics et livraison. Lisez les exigences de connexion avant de les modifier.

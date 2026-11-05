@@ -125,9 +125,13 @@ public sealed class InviteOperationsStaffMemberUseCase
         }
 
         // Inviting gives a role: the same scope rules as a grant (GrantOperationsRole).
+        if (role.IsAdministrator && request.Scope != OperationsRoleScope.Tenant)
+        {
+            return InviteOperationsStaffMemberResponse.Failure(OperationsRoleErrors.AdministratorCompanyWide);
+        }
+
         if ((request.Scope == OperationsRoleScope.Branch && (request.ScopeId is not { } branchId || await _locations.GetBranchAsync(branchId, cancellationToken) is null))
-            || (request.Scope == OperationsRoleScope.Warehouse && branchOfWarehouse is null)
-            || (role.IsAdministrator && request.Scope != OperationsRoleScope.Tenant))
+            || (request.Scope == OperationsRoleScope.Warehouse && branchOfWarehouse is null))
         {
             return InviteOperationsStaffMemberResponse.Failure(OperationsRoleErrors.ScopeInvalid);
         }

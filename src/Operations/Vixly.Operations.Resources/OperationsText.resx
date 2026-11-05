@@ -7343,7 +7343,7 @@ The scheduled report "{report}" ({period}) is attached.
     <value>Inspection queue</value>
   </data>
   <data name="ui.editor.nav.inspection_setup" xml:space="preserve">
-    <value>Inspection rules</value>
+    <value>Inspection settings</value>
   </data>
   <data name="ui.editor.nav.insurance" xml:space="preserve">
     <value>Insurance</value>
@@ -7382,7 +7382,7 @@ The scheduled report "{report}" ({period}) is attached.
     <value>Warehouse reception</value>
   </data>
   <data name="ui.editor.nav.report_settings" xml:space="preserve">
-    <value>Report rules</value>
+    <value>Report settings</value>
   </data>
   <data name="ui.editor.nav.reports" xml:space="preserve">
     <value>Reports</value>
@@ -7394,7 +7394,7 @@ The scheduled report "{report}" ({period}) is attached.
     <value>Shipping services</value>
   </data>
   <data name="ui.editor.nav.settings" xml:space="preserve">
-    <value>Settings</value>
+    <value>General settings</value>
   </data>
   <data name="ui.editor.nav.shipments" xml:space="preserve">
     <value>Shipments</value>
@@ -8402,7 +8402,7 @@ The scheduled report "{report}" ({period}) is attached.
     <value>Parcels are opened for compliance inspection when a rule matches, when the random share picks them, or when a clerk sets them aside at the station.</value>
   </data>
   <data name="ui.inspection.setup.title" xml:space="preserve">
-    <value>Inspection rules</value>
+    <value>Inspection settings</value>
   </data>
   <data name="ui.inspection.share.hint" xml:space="preserve">
     <value>Drawn once, at a parcel's first check. 0 turns it off; the rules still apply.</value>
@@ -11375,7 +11375,7 @@ The scheduled report "{report}" ({period}) is attached.
     <value>When does something count as on time? Settings → Report rules.</value>
   </data>
   <data name="ui.reports.rules_title" xml:space="preserve">
-    <value>Report rules</value>
+    <value>Report settings</value>
   </data>
   <data name="ui.reports.schedule.format" xml:space="preserve">
     <value>File</value>
@@ -12104,7 +12104,7 @@ The scheduled report "{report}" ({period}) is attached.
     <value>For example America/New_York or America/Port-au-Prince. Price dates start at midnight in this time zone.</value>
   </data>
   <data name="ui.settings.title" xml:space="preserve">
-    <value>Settings</value>
+    <value>General settings</value>
   </data>
   <data name="ui.settings.units" xml:space="preserve">
     <value>Units</value>
@@ -16041,5 +16041,17 @@ Your {company} account has been closed because our terms of service were not res
   </data>
   <data name="ui.editor.nav.waiting" xml:space="preserve">
     <value>{count} waiting</value>
+  </data>
+  <data name="ops.roles.administrator_company_wide" xml:space="preserve">
+    <value>The Administrator role is for the whole company. Choose Whole company, or a role such as Branch manager for one branch or warehouse.</value>
+  </data>
+  <data name="ui.staff.role_choose" xml:space="preserve">
+    <value>Choose a role</value>
+  </data>
+  <data name="ui.confirm.continuing" xml:space="preserve">
+    <value>Confirmed. Finishing what you asked…</value>
+  </data>
+  <data name="ui.confirm.continue" xml:space="preserve">
+    <value>Continue</value>
   </data>
 </root>

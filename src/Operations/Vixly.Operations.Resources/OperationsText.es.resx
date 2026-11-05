@@ -7343,7 +7343,7 @@ El informe programado «{report}» ({period}) va adjunto.
     <value>Cola de inspección</value>
   </data>
   <data name="ui.editor.nav.inspection_setup" xml:space="preserve">
-    <value>Reglas de inspección</value>
+    <value>Ajustes de inspección</value>
   </data>
   <data name="ui.editor.nav.insurance" xml:space="preserve">
     <value>Seguros</value>
@@ -7382,7 +7382,7 @@ El informe programado «{report}» ({period}) va adjunto.
     <value>Recepción en almacén</value>
   </data>
   <data name="ui.editor.nav.report_settings" xml:space="preserve">
-    <value>Reglas de informes</value>
+    <value>Ajustes de informes</value>
   </data>
   <data name="ui.editor.nav.reports" xml:space="preserve">
     <value>Informes</value>
@@ -7394,7 +7394,7 @@ El informe programado «{report}» ({period}) va adjunto.
     <value>Servicios de envío</value>
   </data>
   <data name="ui.editor.nav.settings" xml:space="preserve">
-    <value>Configuración</value>
+    <value>Ajustes generales</value>
   </data>
   <data name="ui.editor.nav.shipments" xml:space="preserve">
     <value>Envíos</value>
@@ -8402,7 +8402,7 @@ El informe programado «{report}» ({period}) va adjunto.
     <value>Los paquetes se abren para inspección de cumplimiento cuando una regla coincide, cuando el porcentaje aleatorio los elige o cuando un empleado los aparta en el puesto.</value>
   </data>
   <data name="ui.inspection.setup.title" xml:space="preserve">
-    <value>Reglas de inspección</value>
+    <value>Ajustes de inspección</value>
   </data>
   <data name="ui.inspection.share.hint" xml:space="preserve">
     <value>Se sortea una vez, en el primer control del paquete. 0 lo desactiva; las reglas siguen aplicándose.</value>
@@ -11375,7 +11375,7 @@ El informe programado «{report}» ({period}) va adjunto.
     <value>¿Cuándo se está a tiempo? Configuración → Reglas de informes.</value>
   </data>
   <data name="ui.reports.rules_title" xml:space="preserve">
-    <value>Reglas de informes</value>
+    <value>Ajustes de informes</value>
   </data>
   <data name="ui.reports.schedule.format" xml:space="preserve">
     <value>Archivo</value>
@@ -12104,7 +12104,7 @@ El informe programado «{report}» ({period}) va adjunto.
     <value>Por ejemplo America/New_York o America/Port-au-Prince. Las fechas de precios empiezan a medianoche en esta zona.</value>
   </data>
   <data name="ui.settings.title" xml:space="preserve">
-    <value>Configuración</value>
+    <value>Ajustes generales</value>
   </data>
   <data name="ui.settings.units" xml:space="preserve">
     <value>Unidades</value>
@@ -16618,6 +16618,22 @@ Su cuenta de {company} se cerró porque no se respetaron nuestras condiciones de
   </data>
   <data name="ui.editor.nav.waiting" xml:space="preserve">
     <value>{count} pendientes</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ops.roles.administrator_company_wide" xml:space="preserve">
+    <value>El rol Administrador es para toda la empresa. Elija Toda la empresa, o un rol como Gerente de sucursal para una sola sucursal o un solo almacén.</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.staff.role_choose" xml:space="preserve">
+    <value>Elija un rol</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.confirm.continuing" xml:space="preserve">
+    <value>Confirmado. Terminamos lo que pidió…</value>
+    <comment>needs-review</comment>
+  </data>
+  <data name="ui.confirm.continue" xml:space="preserve">
+    <value>Continuar</value>
     <comment>needs-review</comment>
   </data>
 </root>

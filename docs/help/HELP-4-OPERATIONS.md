@@ -166,7 +166,7 @@ Permissions are any-of. The `ops.` prefix is omitted below and is written in ful
 
 ## 5. Notes for this stage
 
-- **Menu chapters (owner, 2026-10-22).** The staff menu has four chapters: Front Office, Warehouse Operations, Back Office and Technical. The help home lists its sections under the same four chapters, in the same order, with Getting started first. Front desk is now called *Customer drop-off* and Receiving *Warehouse reception*: articles use these names.
+- **Menu chapters (owner, 2026-10-22; Support 2026-10-29; Settings 2026-11-04).** The staff menu has six chapters: Front Office, Warehouse Operations, Back Office, Support, Settings and Technical. Settings holds the pages set up once (General settings, Invoices and taxes, Payment methods, the Credit, Pickup, Delivery, Bundle, Events, Inspection and Report settings); articles say "in the Settings part of the menu". The help home lists its sections in the order of `OperationsHelpCatalogue.Sections`, with Getting started first. Front desk is now called *Customer drop-off* and Receiving *Warehouse reception*: articles use these names.
 - **Warehouse scope.** Many rights are given per warehouse. Articles say "at your warehouse" where the screens offer only the warehouses a person works at; never explain grants in a daily-work article.
 - **Partner agents** see only their articles. Their workspace has fewer pages; the `partner-agents-at-a-glance` article is their starting point.
 - **Settings decide what screens show** (payment methods, delivery modes, numbering, units, currency). Write "if {brandName} uses…" only where a screen changes; never assume one company's setup.

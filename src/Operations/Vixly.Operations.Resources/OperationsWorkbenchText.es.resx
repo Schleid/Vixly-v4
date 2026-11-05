@@ -112,4 +112,8 @@
     <value>Soporte</value>
     <comment>needs-review</comment>
   </data>
+  <data name="settings" xml:space="preserve">
+    <value>Ajustes</value>
+    <comment>needs-review</comment>
+  </data>
 </root>

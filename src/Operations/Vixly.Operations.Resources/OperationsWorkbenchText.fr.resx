@@ -112,4 +112,8 @@
     <value>Support client</value>
     <comment>needs-review</comment>
   </data>
+  <data name="settings" xml:space="preserve">
+    <value>Paramètres</value>
+    <comment>needs-review</comment>
+  </data>
 </root>

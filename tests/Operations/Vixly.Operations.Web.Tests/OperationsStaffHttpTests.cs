@@ -120,7 +120,7 @@ public sealed class OperationsStaffHttpTests : IClassFixture<OperationsWebDataba
     }
 
     [SqlServerFact]
-    public async Task SensitiveAction_AsksForAFreshCode_ThenGoesBack()
+    public async Task SensitiveAction_AsksForAFreshCode_ThenContinues()
     {
         Guid tenant = NewTenant("stepco", "Step Co");
         (CookieClient browser, string key) = await OwnerAsync(tenant, "stepco");
@@ -130,18 +130,94 @@ public sealed class OperationsStaffHttpTests : IClassFixture<OperationsWebDataba
         (HttpResponseMessage _, string account) = await owner.GetAsync("/staff/account");
         Assert.Contains("10 recovery codes left", account, StringComparison.Ordinal);
         (HttpResponseMessage asked, string _) = await owner.PostAsync("/staff/account/recovery-codes", account);
-        Assert.Equal("/staff/confirm?returnUrl=%2Fstaff%2Faccount", asked.Headers.Location?.OriginalString);
+        Assert.Matches("^/staff/confirm\\?returnUrl=%2Fstaff%2Faccount&step=[0-9a-f]{32}$", asked.Headers.Location?.OriginalString);
 
         (HttpResponseMessage _, string confirm) = await owner.GetAsync(asked.Headers.Location!.OriginalString);
-        (HttpResponseMessage _, string wrong) = await owner.PostAsync("/staff/confirm", confirm, ("code", "000000"), ("returnUrl", "/staff/account"));
+        (HttpResponseMessage _, string wrong) = await owner.PostAsync("/staff/confirm", confirm, ("code", "000000"), ("returnUrl", "/staff/account"), ("step", StepOf(confirm)));
         Assert.DoesNotContain("10 recovery codes left", wrong, StringComparison.Ordinal);
-        (HttpResponseMessage confirmed, string _) = await owner.PostAsync("/staff/confirm", confirm, ("code", Code(key, DateTime.UtcNow.AddSeconds(30))), ("returnUrl", "/staff/account"));
-        Assert.Equal("/staff/account", confirmed.Headers.Location?.OriginalString);
+        (HttpResponseMessage confirmed, string continuing) = await owner.PostAsync("/staff/confirm", wrong, ("code", Code(key, DateTime.UtcNow.AddSeconds(30))), ("returnUrl", "/staff/account"), ("step", StepOf(wrong)));
 
-        (HttpResponseMessage _, string fresh) = await owner.GetAsync("/staff/account");
-        (HttpResponseMessage _, string codes) = await owner.PostAsync("/staff/account/recovery-codes", fresh);
+        // Owner, 2026-11-04: the action that asked for the code continues; no second try.
+        Assert.Equal(HttpStatusCode.OK, confirmed.StatusCode);
+        (HttpResponseMessage _, string codes) = await ContinueAsync(owner, continuing, "/staff/account/recovery-codes");
         Assert.Equal(10, RecoveryCode.Matches(codes).Count);
         Assert.Contains("shown only once", codes, StringComparison.Ordinal);
+    }
+
+    // Owner, 2026-11-04: "the invitation does not go through, I have to do it a 2nd time." It goes through after the code, once.
+    [SqlServerFact]
+    public async Task Invitation_ThatAsksForACode_GoesThroughAfterIt_Once()
+    {
+        Guid tenant = NewTenant("contco", "Cont Co");
+        (CookieClient browser, string key) = await OwnerAsync(tenant, "contco");
+        using CookieClient owner = browser;
+        await AgeSecondFactorAsync(tenant);
+
+        (HttpResponseMessage _, string people) = await owner.GetAsync("/staff/people");
+        string role = Regex.Match(people, "<option value=\"(?<id>[0-9a-f-]{36})\">Warehouse worker</option>").Groups["id"].Value;
+        (HttpResponseMessage asked, string _) = await owner.PostAsync("/staff/people/invite", people,
+            ("fullName", "Henry Louis"), ("email", "henry@contco.example"), ("language", "fr"), ("roleId", role), ("scope", "tenant"));
+        Assert.StartsWith("/staff/confirm?", asked.Headers.Location?.OriginalString, StringComparison.Ordinal);
+        Assert.NotNull(owner.Cookie(OperationsCookies.StepUp));
+        Assert.DoesNotContain("henry", asked.Headers.Location!.OriginalString, StringComparison.OrdinalIgnoreCase);
+
+        (HttpResponseMessage _, string confirm) = await owner.GetAsync(asked.Headers.Location!.OriginalString);
+        (HttpResponseMessage _, string continuing) = await owner.PostAsync("/staff/confirm", confirm, ("code", Code(key, DateTime.UtcNow.AddSeconds(30))), ("returnUrl", "/staff/people"), ("step", StepOf(confirm)));
+        Assert.Contains("data-stepup-continue", continuing, StringComparison.Ordinal);
+        Assert.Contains("ops-stepup-continue.js", continuing, StringComparison.Ordinal);
+        Assert.Null(owner.Cookie(OperationsCookies.StepUp));
+
+        (HttpResponseMessage invited, string _) = await ContinueAsync(owner, continuing, "/staff/people/invite");
+        Assert.Contains("?done=invited", invited.Headers.Location?.OriginalString, StringComparison.Ordinal);
+        Assert.Equal("henry@contco.example", _host.Mailer.Invitations.Last().ToAddress);
+
+        // Once only: the code page again has nothing waiting, and nothing is sent again.
+        int sent = _host.Mailer.Invitations.Count;
+        (HttpResponseMessage _, string again) = await owner.GetAsync("/staff/confirm?returnUrl=%2Fstaff%2Fpeople");
+        (HttpResponseMessage _, string nothing) = await owner.PostAsync("/staff/confirm", again, ("code", Code(key, DateTime.UtcNow.AddSeconds(60))), ("returnUrl", "/staff/people"));
+        Assert.DoesNotContain("data-stepup-continue", nothing, StringComparison.Ordinal);
+        Assert.Equal(sent, _host.Mailer.Invitations.Count);
+    }
+
+    // Review, 2026-11-04: an action left on its code page is never sent by a code entered elsewhere, and an upload that asks drops it.
+    [SqlServerFact]
+    public async Task AbandonedAction_IsNotSent_ByACodeForSomethingElse()
+    {
+        Guid tenant = NewTenant("leftco", "Left Co");
+        (CookieClient browser, string key) = await OwnerAsync(tenant, "leftco");
+        using CookieClient owner = browser;
+        await AgeSecondFactorAsync(tenant);
+
+        (HttpResponseMessage _, string people) = await owner.GetAsync("/staff/people");
+        string role = Regex.Match(people, "<option value=\"(?<id>[0-9a-f-]{36})\">Warehouse worker</option>").Groups["id"].Value;
+        int sent = _host.Mailer.Invitations.Count;
+        (HttpResponseMessage asked, string _) = await owner.PostAsync("/staff/people/invite", people,
+            ("fullName", "Iris Noel"), ("email", "iris@leftco.example"), ("language", "fr"), ("roleId", role), ("scope", "tenant"));
+        Assert.NotNull(owner.Cookie(OperationsCookies.StepUp));
+
+        // The code page opened by hand, without the step of that action: the code works, nothing waiting is sent.
+        (HttpResponseMessage _, string direct) = await owner.GetAsync("/staff/confirm?returnUrl=%2Fstaff%2Fpeople");
+        Assert.DoesNotContain("name=\"step\"", direct, StringComparison.Ordinal);
+        (HttpResponseMessage confirmed, string done) = await owner.PostAsync("/staff/confirm", direct, ("code", Code(key, DateTime.UtcNow.AddSeconds(30))), ("returnUrl", "/staff/people"));
+        Assert.Equal(HttpStatusCode.Redirect, confirmed.StatusCode);
+        Assert.DoesNotContain("data-stepup-continue", done, StringComparison.Ordinal);
+        Assert.Null(owner.Cookie(OperationsCookies.StepUp));
+        Assert.Equal(sent, _host.Mailer.Invitations.Count);
+    }
+
+    private static string StepOf(string page) => Regex.Match(page, "name=\"step\" value=\"(?<step>[0-9a-f]{32})\"").Groups["step"].Value;
+
+    // The continue page as its script sends it: its own form, with its fresh token and the kept fields.
+    private static async Task<(HttpResponseMessage Response, string Html)> ContinueAsync(CookieClient browser, string page, string action)
+    {
+        Match form = Regex.Match(page, "<form method=\"post\" action=\"(?<action>[^\"]+)\"[^>]*data-stepup-continue[^>]*>(?<body>.*?)</form>", RegexOptions.Singleline);
+        Assert.True(form.Success, "the continue form");
+        Assert.Equal(action, form.Groups["action"].Value);
+        (string Name, string Value)[] fields = Regex.Matches(form.Groups["body"].Value, "<input type=\"hidden\" name=\"(?<name>[^\"]+)\" value=\"(?<value>[^\"]*)\"")
+            .Where(match => match.Groups["name"].Value != "__RequestVerificationToken")
+            .Select(match => (match.Groups["name"].Value, match.Groups["value"].Value))
+            .ToArray();
+        return await browser.PostAsync(action, page, fields);
     }
 
     // Owner, R-6 (2026-10-21): the type and browser of a device; used from another country than its own, the device is blocked, the administrators

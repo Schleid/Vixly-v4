@@ -724,3 +724,48 @@ Feature harmonization, Control and Platform API part (vixly/planes/feature-harmo
 3. Deactivate a test staff member: their open page signs out within a minute, as before.
 4. Help: an article opens; a wrong address shows "not found".
 5. A company's site and staff workspace still open, and a company with overdue terms still shows read-only.
+
+## 46. Forty-second update (2026-11-04): a role for one branch, said plainly
+**Database: no.** Copy **Operations Web**. No setting.
+
+Owner, 2026-11-04: "I cannot assign a branch manager to Les Cayes branch." The Owner could; the form misled. *Administrator* was chosen in advance as the first role, and the Administrator role is for the whole company, so a branch with it was refused with "Choose a branch or warehouse you are allowed to manage."
+
+- **No role chosen in advance:** *Invite a person* and *Give a role* on a person's page start at *Choose a role*; the form is not sent until a role is chosen.
+- **A message that says why:** the Administrator role with a branch or warehouse is refused with "The Administrator role is for the whole company. Choose Whole company, or a role such as Branch manager for one branch or warehouse." (French and Spanish too). A branch or warehouse that is not the company's still gets the old message.
+- **Tested:** inviting a Branch manager for Les Cayes, giving an existing person that role from their page, and both refusals.
+
+**Checks (staging):**
+1. *Staff › Invite a person*: the role list shows *Choose a role*; choose *Branch manager* and *Branch: Les Cayes*: the person is invited.
+2. Choose *Administrator* and a branch: the new message.
+
+## 47. Forty-third update (2026-11-04): a sensitive action goes through after its code
+**Database: no.** Copy **Operations Web**. No setting.
+
+Owner, 2026-11-04: "after filling the form I am asked to confirm by entering my authenticator app code; when I do so, the invitation does not go through, I have to do it a 2nd time." True of every staff action that asks for a fresh code (about 28: inviting staff, roles, the company's details, payment settings, API keys, credit, bills...): after the code, the page came back empty.
+
+- **The action continues:** when an action needs a fresh code, what was submitted is kept; after a correct code, it is sent again by itself and goes through. With scripts off, a *Continue* button sends it.
+- **How it is kept:** in a cookie only this site can read (encrypted and signed by the server), tied to the signed-in session, used once and gone after 5 minutes. Nothing of the form goes into the web address. The old form token is never kept; the action is sent again with a fresh one and goes through all its checks (rights, the fresh code, double-click protection).
+- **Only its own code page sends it:** each kept action gets a random step number, put in the address of its code page. A code entered on any other code page (opened by hand, or for another action) never sends it, and any action asking for a code drops the one kept before it.
+- **Once, checked on the server too:** two tabs, or a copied cookie, cannot send it twice.
+- **A wrong code** keeps the action waiting for the next try.
+- **Not carried, as before (back to the page after the code):** uploads (the document logo, website images) and forms holding a secret (payment keys, webhook secrets, the text-message token, passwords), so a secret is never written back into a page.
+
+**Checks (staging):**
+1. Wait more than 5 minutes after signing in, then invite a person: after the code, the person is invited, with no second try.
+2. Enter a wrong code first, then the right one: the invitation still goes through.
+3. Change the document logo after 5 minutes: after the code, the page comes back to choose the file again (as before).
+4. Start an invitation after 5 minutes, leave the code page, open */staff/confirm* by hand and enter a code: nobody is invited.
+5. Save the payment settings with a new secret key after 5 minutes: after the code, the page comes back to enter it again (as before).
+
+## 48. Forty-fourth update (2026-11-04): a Settings chapter in the staff menu
+**Database: no.** Copy **Operations Web** (the texts are inside it). No setting.
+
+Owner, 2026-11-04: Back Office had 23 entries. What is set up once now has its own chapter, **Settings**, just above Technical.
+
+- **Settings:** General settings (was *Settings*: currency, units, time zone, numbering, sign-in security), Invoices and taxes, Payment methods, Credit settings, Pickup settings, Delivery settings, Bundle settings, Events settings, Inspection settings (was *Inspection rules*) and Report settings (was *Report rules*). The three renamed pages carry the new name as their title too, in English, French and Spanish.
+- **Back Office** keeps Bills, Profit, Reports, Locations, Services, Item catalogue, Charges, Supplies, Carriers, Insurance, Staff, Roles and Company. Roles stays next to Staff: a role is chosen with every invitation.
+- **Nothing else changes:** the same addresses and rights; a chapter with nothing a person may open stays hidden. The help articles name the new places.
+
+**Checks (staging):**
+1. As the owner: the menu reads Front Office, Warehouse Operations, Back Office, Support, Settings, Technical; Settings holds the ten pages above, and *General settings* opens the page that used to be *Settings*.
+2. As someone without the settings rights (a warehouse worker): no Settings chapter.
